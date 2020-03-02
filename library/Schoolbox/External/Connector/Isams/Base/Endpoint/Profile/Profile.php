@@ -198,6 +198,7 @@ class Profile implements IStrategy
             $yearLevel = trim((string)$student->NCYear);
             $form = trim((string)$student->Form);
             $academicHouse = trim((string)$student->AcademicHouse);
+            $dob = strtotime(trim((string)$student->DOB));
 
             /* Students without usernames are skipped
              */
@@ -273,7 +274,6 @@ class Profile implements IStrategy
                 ->setAlertMedical($this->findMedicalAlert($studentId))
                 ->setAlertMessage($messages)
                 ->setCampusName($this->findCampusName($campusMapping, (int)$student->NCYear))
-                ->setDateOfBirth(\Alaress_Date_Format::newFromTimestamp(strtotime(trim((string)$student->DOB))))
                 ->setEmail(trim((string)$student->EmailAddress))
                 ->setEnrolmentDate($this->findEnrolmentDate(trim((string)$student->EnrolmentDate)))
                 ->setFormName($form)
@@ -310,6 +310,13 @@ class Profile implements IStrategy
                 /* SEN (Special Education Needs)
                  */
                 ->setSpecialNeeds($this->findSpecialNeeds($studentId));
+
+            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+             */
+            if ($dob) {
+                $studentProfile
+                    ->setDateOfBirth(new \Alaress_Date_Format($dob, \Alaress_Date_Format::TIMESTAMP));
+            }
 
             /* Log it
              */
