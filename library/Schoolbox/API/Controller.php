@@ -165,7 +165,7 @@ class Controller extends Base
                 $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
             } else {
                 // Redirect somewhere (locally only?)
-                $page = $this->getRequest()->query->get('page');
+                $page = $this->getRequest()->query->get('redirect');
                 $pageUri = new Uri($page);
 
                 //Determine if page redirect is valid
