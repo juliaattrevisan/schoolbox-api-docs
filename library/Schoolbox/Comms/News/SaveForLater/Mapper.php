@@ -50,6 +50,15 @@ class Mapper extends \Schoolbox\Mapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('article', 'a')}
+        ";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString()
+    {
+        return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('article', '', 'a', true)}
         ";
@@ -76,11 +85,12 @@ class Mapper extends \Schoolbox\Mapper
                    ->isNull('deleted_at')
                    ->lessThanOrEqualTo('a.publish_at', $nowDatabase);
 
-        $query = $this->getSelectString() . ' WHERE ' . implode(' AND ', $pb->getWhere());
+        $query = 'SELECT article_id ' . $this->getFromString()
+            . ' WHERE ' . implode(' AND ', $pb->getWhere());
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
-        $res = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        return array_column($res, 'article_id');
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 }
