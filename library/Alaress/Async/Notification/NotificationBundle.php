@@ -42,7 +42,7 @@ class NotificationBundle
         /* I did consider injecting this, but the threat of destablising everything seemed a bit much
          * to do without consultation
          */
-        $this->rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+        $this->rosettaStone = new RosettaStoneFactory();
     }
 
 

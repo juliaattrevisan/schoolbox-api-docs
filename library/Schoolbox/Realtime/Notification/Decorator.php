@@ -14,11 +14,15 @@ use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 use UnderflowException;
 
+/**
+ * Class Decorator
+ *
+ * @package Schoolbox\Realtime\Notification
+ */
 class Decorator extends NotificationBundle
 {
 
@@ -135,9 +139,11 @@ class Decorator extends NotificationBundle
         /* Apply group headings as required
          * Localise terminology
          */
+        $rosettaStone = $this->rosettaStone->build(L10nMapper::getInstance());
+
         $headings = [
             'work'     => 'Schoolwork',
-            'news'     => $this->rosettaStone->translate('news', false, true),
+            'news'     => $rosettaStone->translate('news', false, true),
             'activity' => 'Activity'
         ];
 
