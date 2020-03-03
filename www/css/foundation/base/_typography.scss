@@ -224,18 +224,6 @@ blockquote{
   /* Remove display of links to places, when printing
    */
   a[href*="/"]:after, a[href*="/"]:visited:after {content: normal;}
-
-  //html,
-	//body{
-	//	width: calc(1280px);
-	//}
-
-  //
-	//@for $i from 1 through 12 {
-	//	.large-#{$i} {
-	//		width: percentage($i / 12);
-	//	}
-	//}
 }
 
 .noselect {
