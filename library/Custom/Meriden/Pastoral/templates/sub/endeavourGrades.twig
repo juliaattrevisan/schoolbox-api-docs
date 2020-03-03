@@ -44,8 +44,10 @@
                     <th>Term 3</th>
                     <th>Term 4</th>
                 {% else %}
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <th>{{ criterion.label }}</th>
+                    {% for capabilityMark in report.subjectReport.namedGrades.endeavourGrades.rubric.capabilityMarks %}
+                        {% for indicatorMark in capabilityMark.indicatorMarks %}
+                            {{ indicatorMark.indicatorUsage.indicator.name }}
+                        {% endfor %}
                     {% else %}
                         {# fill all with N/A #}
                         <th>Term 1</th>
@@ -89,8 +91,10 @@
                     </td>
                 {% else %}
                     {# Old-style rubric endeavor grade #}
-                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                        <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
+                    {% for capabilityMark in report.subjectReport.namedGrades.endeavourGrades.rubric.capabilityMarks %}
+                        {% for indicatorMark in capabilityMark.indicatorMarks %}
+                            {{ indicatorMark.descriptor.description|default('N/A') }}
+                        {% endfor %}
                     {% else %}
                         <td>N/A</td>
                         <td>N/A</td>
