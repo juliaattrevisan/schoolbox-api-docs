@@ -327,7 +327,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->baseProfileMapper->save($studentBaseProfile);
+                    $result = $this->baseProfileMapper->save($studentBaseProfile);
                 }
 
                 $this->log->debug(sprintf(
@@ -730,14 +730,22 @@ class Profile implements IStrategy
                 continue;
             }
 
+            $watchlist = new Watchlist($this->log, [
+                ['Chloe', 'Rootes']
+            ]);
+
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
+
+                $watchlist->observe('Reusing new base profile', $parentBaseProfile, $firstname, $lastname);
             } catch (Exception $e) {
                 $parentProfile = $this->parentProfileMapper->createModel();
                 $parentBaseProfile = $this->baseProfileMapper->createModel();
 
                 $parentProfile->setBaseProfile($parentBaseProfile);
+
+                $watchlist->observe('Creating new base profile', $parentBaseProfile, $firstname, $lastname);
             }
 
             $parentBaseProfile
@@ -754,11 +762,17 @@ class Profile implements IStrategy
                 $externalId
             ));
 
+            $watchlist->observe('Prior to saving base profile', $parentBaseProfile, $firstname, $lastname);
+
             /* Then save it
              */
             if ($this->perform) {
-                $this->baseProfileMapper->save($parentBaseProfile);
+                $result = $this->baseProfileMapper->save($parentBaseProfile);
+
+                var_dump($result);
             }
+
+            $watchlist->observe('After new base profile', $parentBaseProfile, $firstname, $lastname);
 
             $this->log->debug(sprintf(
                 'Added base profile for parent %s (%s) with sis_user_profile_id %s',
@@ -777,19 +791,23 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->debug(sprintf(
-                'Preparing roletype-profile for parent %s (%s)',
+                'Preparing roletype-specific profile for parent %s (%s)',
                 trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
                 $externalId
             ));
 
             /* Then save it
              */
+            $watchlist->observe('Before saving roletype-specific profile', $parentProfile, $firstname, $lastname);
+
             if ($this->perform) {
-                $this->parentProfileMapper->save($parentProfile);
+                $result = $this->parentProfileMapper->save($parentProfile);
             }
 
+            $watchlist->observe('After saving roletype-specific profile', $parentProfile, $firstname, $lastname);
+
             $this->log->info(sprintf(
-                'Added roletype-profile for parent %s (%s) with sis_user_profile_id %s',
+                'Added roletype-specific profile for parent %s (%s) with sis_user_profile_id %s',
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
                 $externalId,
                 $parentBaseProfile->getId()
