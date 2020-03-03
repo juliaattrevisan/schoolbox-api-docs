@@ -770,58 +770,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $result = $this->baseProfileMapper->save($parentBaseProfile);
-
-                /* Somehow this didn't save properly; we might be overwhelming our db with all these saves
-                 * For some reason it's just happening here, and for Sentral as far as we can tell
-                 *
-                 * Try again a few times; if we still can't persist it, log message and skip
-                 */
-                if (!$result[0]) {
-                    $this->log->error(sprintf(
-                        "Didn't succeed in saving parent base profile for %s %s (%s) - trying again...",
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    /* Try again a few times...
-                     */
-                    for ($nRetry = 1; (!$result[0] && $nRetry <= self::MAX_RETRY); $nRetry++) {
-                        $result = $this->baseProfileMapper->save($parentBaseProfile);
-
-                        $this->log->error(sprintf(
-                            'Retry attempt %s...',
-                            $nRetry
-                        ));
-
-                        sleep(self::RETRY_SLEEP);
-                    }
-
-                    /* If it's still broken, get out of here...
-                     */
-                    if (!$result[0]) {
-                        $this->log->error(sprintf(
-                            "Couldn't save parent base profile for %s %s (%s)",
-                            $firstname,
-                            $lastname,
-                            $externalId
-                        ));
-
-                        print_r($parentBaseProfile);
-                    } else {
-                        $this->log->error(sprintf(
-                            'Salvaged parent base profile for %s %s (%s) after %s attempt(s) with %s seconds delay',
-                            $firstname,
-                            $lastname,
-                            $externalId,
-                            $nRetry,
-                            self::RETRY_SLEEP
-                        ));
-
-                        print_r($parentBaseProfile);
-                    }
-                }
+                $this->persistParentBaseProfile($parentBaseProfile, $firstname, $lastname, $externalId);
             }
 
             $this->log->debug(sprintf(
@@ -849,7 +798,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $result = $this->parentProfileMapper->save($parentProfile);
+                $this->parentProfileMapper->save($parentProfile);
             }
 
             $this->log->info(sprintf(
@@ -884,6 +833,74 @@ class Profile implements IStrategy
         }
     }
 
+
+    /**
+     * Persist parent base profiles with retry mechanism
+     *
+     * For some reason there's a timing issue when saving a boatload of data,
+     * and strangely only occurs here?
+     *
+     * Identified by FK constraint failures.
+     *
+     * @param UserProfile\Model $parentBaseProfile
+     * @param string            $firstname
+     * @param string            $lastname
+     * @param string            $externalId
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function persistParentBaseProfile(UserProfile\Model $parentBaseProfile, string $firstname, string $lastname, string $externalId): void
+    {
+        $result = $this->baseProfileMapper->save($parentBaseProfile);
+
+        /* Somehow this didn't save properly; we might be overwhelming our db with all these saves
+         * For some reason it's just happening here, and for Sentral as far as we can tell
+         *
+         * Try again a few times; if we still can't persist it, log message and skip
+         */
+        if (!$result[0]) {
+            $this->log->error(sprintf(
+                "Didn't succeed in saving parent base profile for %s %s (%s) - trying again...",
+                $firstname,
+                $lastname,
+                $externalId
+            ));
+
+            /* Try again a few times...
+             */
+            for ($nRetry = 1; (!$result[0] && $nRetry <= self::MAX_RETRY); $nRetry++) {
+                $result = $this->baseProfileMapper->save($parentBaseProfile);
+
+                $this->log->error(sprintf(
+                    'Retry attempt %s...',
+                    $nRetry
+                ));
+
+                sleep(self::RETRY_SLEEP);
+            }
+
+            /* If it's still broken, get out of here...
+             */
+            if (!$result[0]) {
+                $this->log->error(sprintf(
+                    "Couldn't save parent base profile for %s %s (%s)",
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+            } else {
+                $this->log->error(sprintf(
+                    'Salvaged parent base profile for %s %s (%s) after %s attempt(s) with %s seconds delay',
+                    $firstname,
+                    $lastname,
+                    $externalId,
+                    $nRetry,
+                    self::RETRY_SLEEP
+                ));
+            }
+        }
+    }
 
     /**
      * Import staff profile data
