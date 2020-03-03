@@ -7,15 +7,14 @@
  */
 declare(strict_types=1);
 
-
 namespace Schoolbox\Realtime\Notification;
-
 
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
-use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 use UnderflowException;
@@ -133,12 +132,14 @@ class Decorator extends NotificationBundle
             }
         }
 
-        // apply group headings as required
-        $headings = array(
+        /* Apply group headings as required
+         * Localise terminology
+         */
+        $headings = [
             'work'     => 'Schoolwork',
-            'news'     => 'News',
+            'news'     => $this->rosettaStone->translate('news', false, true),
             'activity' => 'Activity'
-        );
+        ];
 
         foreach ($headings as $ns => $heading) {
             if (isset($context['groups'][$ns])) {
