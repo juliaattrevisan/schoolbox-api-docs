@@ -822,6 +822,7 @@ class Controller extends Base
         foreach ($summated as &$capability) {
             uasort($capability['indicators'], [$this, 'sortByName']);
         }
+        unset($capability);
         uasort($summated, [$this, 'sortByName']);
 
         return $summated;
