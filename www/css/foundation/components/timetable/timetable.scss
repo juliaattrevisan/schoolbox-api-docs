@@ -40,7 +40,7 @@ $timetable-cell-border: $body-bg;
          */
         .timetable-subject {
             padding: 1rem;
-            
+
             /* override global icon colour.
             *  make it normal icon size.
             */
@@ -87,12 +87,48 @@ $timetable-cell-border: $body-bg;
     background-color: $accent-background;
 }
 
+/* Custom rules for full timetable grid
+ */
 @media print {
-    .timetable td .timetable-subject,
-    .timetable tr th {
-        padding: 0.25rem;
+  .timetable {
+
+    /* Reduce font size in each time element
+     */
+    th, time {
+      font-size: 0.5rem;
+      padding: 0.25rem !important;
     }
-    .timetable-small{
-        display: none;
+
+    /* Hide the indicator border
+     */
+    .timetable-subject-active {
+      border: 0 !important;
+
+      /* Hide the indicator triangle
+       */
+      &:before {
+        border-top: 0 !important
+      }
     }
+
+    /* Reduce font size in each timetable-subject div
+     */
+    .timetable-subject {
+      font-size: 0.5rem;
+      font-weight: bold;
+      height: auto !important;
+      padding: 0.25rem !important;
+
+      /* Bold the subject being taught, but normal-weight
+       * all the subject's meta details
+       */
+      div {
+        font-weight: normal;
+      }
+    }
+  }
+
+  .timetable-small {
+    display: none;
+  }
 }
