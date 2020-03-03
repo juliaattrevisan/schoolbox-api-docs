@@ -830,8 +830,8 @@ class Controller extends Base
 
     /**
      * Quick alpha sort function for indicators and capabilities summary section
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     private function sortByName($a, $b) {
