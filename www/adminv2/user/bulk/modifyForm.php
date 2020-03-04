@@ -19,7 +19,7 @@ if (empty($this)) {
 /* Superusers only
  */
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 if (!isset($_POST['userId']) || empty($_POST['userId'])) {

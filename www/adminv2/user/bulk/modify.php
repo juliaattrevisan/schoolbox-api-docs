@@ -7,8 +7,11 @@
 
 /* Superusers only
  */
+
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
