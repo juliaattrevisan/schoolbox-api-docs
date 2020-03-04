@@ -341,6 +341,11 @@
 
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
         function getNormalisedCustomMark($groupRows, customMark, rowMaxSum, capMax) {
+            // The custom mark may be empty. This is null, not zero
+            if (customMark === '') {
+                return null;
+            }
+
             var normalised = 0;
 
             if ($groupRows.length) {
