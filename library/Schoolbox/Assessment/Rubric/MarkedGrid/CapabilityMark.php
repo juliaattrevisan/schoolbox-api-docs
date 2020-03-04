@@ -122,10 +122,13 @@ class CapabilityMark
     /**
      * Render the capability's mark in normalized format.
      *
-     * @return float
+     * @return null|float
      */
-    public function retrieveNormalizedMark(): float
+    public function retrieveNormalizedMark(): ?float
     {
+        if (!isset($this->value)) {
+            return null;
+        }
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
         $normMark = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
         return round($normMark, self::PRECISION);
