@@ -1,7 +1,7 @@
 {#
  # A list of news articles that can be seen by the world
  # Typically async'd into components
- # 
+ #
  # @deprecated use article-list.twig instead
  #
  # @param Collection|News\Model[] articles
@@ -116,7 +116,7 @@
 
                 {% if archiveRoute and showArchiveNewsLink %}
                     {% set emptyStateMessage = emptyStateMessage|merge([
-                        ' or <a href="'~ archiveRoute ~ '?' ~ archiveRouteSuffix ~'">view the news archive</a>'
+                        ' or <a href="'~ archiveRoute ~ '?' ~ archiveRouteSuffix ~'">view the ' ~ locale.news ~ ' archive</a>'
                     ]) %}
                 {% endif %}
 

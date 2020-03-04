@@ -1,18 +1,20 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-
 namespace Alaress\Async\Notification;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
+use Schoolbox\L10n\RosettaStoneFactory;
 
+/**
+ * Class NotificationBundle
+ *
+ * @package Alaress\Async\Notification
+ */
 class NotificationBundle
 {
 
@@ -21,11 +23,24 @@ class NotificationBundle
 
 
     /**
+     * Allows you to localise terminology
+     *
+     * @var RosettaStoneFactory
+     */
+    protected $rosettaStoneFactory;
+
+
+    /**
      * Construct
      */
     public function __construct()
     {
         $this->notifications = [];
+
+        /* I did consider injecting this, but the threat of destablising everything seemed a bit much
+         * to do without consultation
+         */
+        $this->rosettaStoneFactory = new RosettaStoneFactory();
     }
 
 
@@ -90,6 +105,7 @@ class NotificationBundle
         return $this;
     }
 
+
     /**
      * @param int $limit
      * @param int $dir
@@ -134,6 +150,7 @@ class NotificationBundle
         return $this;
     }
 
+
     /**
      * @param int $limit
      * @param int $offset
@@ -142,5 +159,4 @@ class NotificationBundle
     {
         $this->notifications = array_slice($this->notifications, $offset, $limit, false);
     }
-
 }
