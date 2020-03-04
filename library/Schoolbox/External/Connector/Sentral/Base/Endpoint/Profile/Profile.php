@@ -877,7 +877,7 @@ class Profile implements IStrategy
 
             /* Try again a few times...
              */
-            for ($nRetry = 1; (!$result[0] && $nRetry <= self::MAX_RETRY); $nRetry++) {
+            for ($nRetry = 1; $nRetry <= self::MAX_RETRY; $nRetry++) {
                 $result = $this->baseProfileMapper->save($parentBaseProfile);
 
                 $this->log->error(sprintf(
@@ -885,6 +885,14 @@ class Profile implements IStrategy
                     $nRetry
                 ));
 
+                /* If you succeeded, get out
+                 */
+                if ($result[0]) {
+                    break;
+                }
+
+                /* Otherwise, take a nap and try again after a nice rest
+                 */
                 sleep(self::RETRY_SLEEP);
             }
 
