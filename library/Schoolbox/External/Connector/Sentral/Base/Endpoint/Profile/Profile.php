@@ -770,7 +770,14 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->persistParentBaseProfile($parentBaseProfile, $firstname, $lastname, $externalId);
+                $saveResult = $this->persistParentBaseProfile($parentBaseProfile, $firstname, $lastname, $externalId);
+
+                /* If the persistence didn't save, continue with the rest of the loop
+                 * Logging already occurred inside persistParentBaseProfile()
+                 */
+                if (!$saveResult) {
+                    continue;
+                }
             }
 
             $this->log->debug(sprintf(
@@ -846,11 +853,12 @@ class Profile implements IStrategy
      * @param string            $firstname
      * @param string            $lastname
      * @param string            $externalId
+     * @return bool
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function persistParentBaseProfile(UserProfile\Model $parentBaseProfile, string $firstname, string $lastname, string $externalId): void
+    private function persistParentBaseProfile(UserProfile\Model $parentBaseProfile, string $firstname, string $lastname, string $externalId): bool
     {
         $result = $this->baseProfileMapper->save($parentBaseProfile);
 
@@ -889,17 +897,23 @@ class Profile implements IStrategy
                     $lastname,
                     $externalId
                 ));
-            } else {
-                $this->log->error(sprintf(
-                    'Salvaged parent base profile for %s %s (%s) after %s attempt(s) with %s seconds delay',
-                    $firstname,
-                    $lastname,
-                    $externalId,
-                    $nRetry,
-                    self::RETRY_SLEEP
-                ));
+
+                return false;
             }
+
+            /* Otherwise alert us that we retried a few times, then continue normally
+             */
+            $this->log->error(sprintf(
+                'Salvaged parent base profile for %s %s (%s) after %s attempt(s) with %s seconds delay',
+                $firstname,
+                $lastname,
+                $externalId,
+                $nRetry,
+                self::RETRY_SLEEP
+            ));
         }
+
+        return true;
     }
 
     /**
