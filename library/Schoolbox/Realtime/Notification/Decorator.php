@@ -139,7 +139,7 @@ class Decorator extends NotificationBundle
         /* Apply group headings as required
          * Localise terminology
          */
-        $rosettaStone = $this->rosettaStone->build(L10nMapper::getInstance());
+        $rosettaStone = $this->rosettaStoneFactory->build(L10nMapper::getInstance());
 
         $headings = [
             'work'     => 'Schoolwork',

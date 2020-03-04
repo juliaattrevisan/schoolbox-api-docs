@@ -8,7 +8,6 @@ namespace Alaress\Async\Notification;
 
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 
 /**
@@ -26,9 +25,9 @@ class NotificationBundle
     /**
      * Allows you to localise terminology
      *
-     * @var RosettaStone
+     * @var RosettaStoneFactory
      */
-    protected $rosettaStone;
+    protected $rosettaStoneFactory;
 
 
     /**
@@ -41,7 +40,7 @@ class NotificationBundle
         /* I did consider injecting this, but the threat of destablising everything seemed a bit much
          * to do without consultation
          */
-        $this->rosettaStone = new RosettaStoneFactory();
+        $this->rosettaStoneFactory = new RosettaStoneFactory();
     }
 
 
