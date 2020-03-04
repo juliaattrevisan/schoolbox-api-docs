@@ -143,7 +143,7 @@ class Decorator extends NotificationBundle
 
         $headings = [
             'work'     => 'Schoolwork',
-            'news'     => $rosettaStone->translate('news', false, true),
+            'news'     => $rosettaStone->translate('news', true, true),
             'activity' => 'Activity'
         ];
 
