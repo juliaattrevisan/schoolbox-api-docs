@@ -582,7 +582,7 @@ ul.filters {
 }
 
 .filter-interaction {
-    border-bottom: 1px solid $gainsboro;
+    border-bottom: 1px solid #ededed;
 }
 
 // flex version of columns for filter results
@@ -629,7 +629,8 @@ ul.filters {
 
 .filter-dropdown {
     .filter-component {
-      border-right: 1px solid $gainsboro;
+      border-bottom: 1px solid #ededed;
+      border-right: 1px solid #ededed;
       margin: 0;
 
       @media #{$medium-down} {
