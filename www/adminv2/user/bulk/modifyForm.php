@@ -16,6 +16,12 @@ if (empty($this)) {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
+/* Superusers only
+ */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    error(19);
+}
+
 if (!isset($_POST['userId']) || empty($_POST['userId'])) {
     error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
 }
