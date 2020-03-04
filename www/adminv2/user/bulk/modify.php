@@ -1,11 +1,19 @@
 <?php
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+/* Superusers only
+ */
+
+use Schoolbox\Error\Mapper as ErrorMapper;
+
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
+
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
 
 /* Search options
