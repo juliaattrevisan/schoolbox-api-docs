@@ -8,7 +8,6 @@ namespace Alaress\Async\Notification;
 
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
-use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 
@@ -107,6 +106,7 @@ class NotificationBundle
         return $this;
     }
 
+
     /**
      * @param int $limit
      * @param int $dir
@@ -151,6 +151,7 @@ class NotificationBundle
         return $this;
     }
 
+
     /**
      * @param int $limit
      * @param int $offset
@@ -159,5 +160,4 @@ class NotificationBundle
     {
         $this->notifications = array_slice($this->notifications, $offset, $limit, false);
     }
-
 }
