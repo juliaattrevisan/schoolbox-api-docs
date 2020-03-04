@@ -373,6 +373,7 @@
                 }"
                 :resources="config.resources"
                 :resourceColumns="config.resourceColumns"
+                resource-order="name"
                 :schedulerLicenseKey="config.schedulerLicenseKey"
                 :default-date="config.defaultDate"
                 :default-view="config.defaultView"
