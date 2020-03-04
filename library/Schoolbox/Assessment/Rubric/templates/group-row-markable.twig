@@ -83,7 +83,9 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark ? (capabilityMark.retrieveNormalizedMark | round(2)) : null }}"/> %
+                               value="{{ capabilityMark and capabilityMark.retrieveNormalizedMark is not null
+                                ? (capabilityMark.retrieveNormalizedMark | round(2))
+                                : null }}"/> %
                     {% endif %}
 
                     {% if groupUsage.containsDescriptorsWithValue %}
