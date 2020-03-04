@@ -100,8 +100,7 @@ class ClassList
         }
 
         // Add in other folders with feedback during the term, this will pick up archived classes
-
-        if ($this->user->getRole()->isStaff()) {
+        if (!$isTermCurrent && $this->user->getRole()->isStaff()) {
             $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term), 'id');
         } elseif ($this->user->getRole()->isStudent()) {
             /** @var GenericCollection|Folder\Model[] $folderList */
