@@ -5,6 +5,7 @@ namespace SmokeTests;
 
 
 use Codeception\Exception\ConditionalAssertionFailed;
+use Codeception\TestInterface;
 use IntegrationTester;
 use Payload;
 
@@ -14,8 +15,9 @@ class FetchPagesFromCsvCest
     protected $personas = [
         'Superuser'              => ['username' => 'alaress', 'password' => 'alaress'],
         'Admin'                  => ['username' => 'alaress', 'password' => 'alaress'],
-        'Teacher'                => ['username' => 'jcoles', 'password' => 'password'],
+        'Teacher'                => ['username' => 'achan', 'password' => 'password'],
         'Student'                => ['username' => 'jreed', 'password' => 'password'],
+        'Parent'                 => ['username' => 'jennireed01', 'password' => 'password'],
         'Pastoral Moderator'     => ['username' => 'jcoles', 'password' => 'password'],
         'Fixtures Administrator' => ['username' => 'jcoles', 'password' => 'password'],
         'News Moderator'         => ['username' => 'rwhite', 'password' => 'password'],
@@ -31,11 +33,13 @@ class FetchPagesFromCsvCest
         #Might not need this login any more as I think this runs each test, so the login differs each test now.
         #$i->loginAdmin(); #we logged in as alaress
     }
+    
 
     /**
      * Fail test to ensure we can get a 404 response from schoolbox.
      *
      * @param IntegrationTester $i
+     * @skip
      */
     public function getFailure404(IntegrationTester $i)
     {
@@ -57,6 +61,7 @@ class FetchPagesFromCsvCest
      * Fail test to ensure we can get a permission denied from schoolbox using sitepage
      *
      * @param IntegrationTester $i
+     * @skip
      */
     public function getFailureSitePagePermissionDenied(IntegrationTester $i)
     {
@@ -78,6 +83,7 @@ class FetchPagesFromCsvCest
      * Fail test to ensure we can get a permission denied from schoolbox using Aura
      *
      * @param IntegrationTester $i
+     * @skip
      */
     public function getFailureAuraPermissionDenied(IntegrationTester $i)
     {
@@ -132,13 +138,12 @@ class FetchPagesFromCsvCest
 
         if(!isset($this->users[$persona]))
         {
-            $session = $i->getSessionCookie();
-            $this->users[$persona]=[$session];
             $user_details = $this->personas[$persona];
             $this->loginUser($i, $user_details['username'], $user_details['password']);
-
+            $session = $i->getSessionCookie();
+            $this->users[$persona]=[$session];
         } else {
-            $i->getSessionCookie($this->users[$persona]);
+            $i->setSessionCookie($this->users[$persona][0]);
         }
 
         #Need to login to the right user
