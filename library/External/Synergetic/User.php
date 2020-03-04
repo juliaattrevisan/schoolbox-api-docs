@@ -770,9 +770,10 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * If Synergetic Filetypes were provided, filter based on the value given
      *
+     * @param bool $quote
      * @return string|null
      */
-    private function getAllowedFileTypes(): ?string
+    public function getAllowedFileTypes(bool $quote): ?string
     {
         $allowedFileTypes = trim($this->config->get('external_synergetic_allowed_file_types') ?? '');
 
@@ -785,7 +786,14 @@ class External_Synergetic_User implements External_UserInterface
         $values = explode(',', $allowedFileTypes);
         $values = array_map('trim', $values);
         $values = array_filter($values);
-        $values = "'" . implode("','", $values) . "'";
+        if (empty($values)) {
+            return null;
+        }
+        if ($quote) {
+            $values = "'" . implode("','", $values) . "'";
+        } else {
+            $values = implode(',', $values);
+        }
 
         return $values;
     }
@@ -806,7 +814,7 @@ class External_Synergetic_User implements External_UserInterface
         /* Filter by filetype
          */
         $allowedFileTypesSql = '';
-        $allowedFileTypes = $this->getAllowedFileTypes();
+        $allowedFileTypes = $this->getAllowedFileTypes(true);
 
         if ($user->getRole()->isStudent()) {
             if (null !== $allowedFileTypes) {

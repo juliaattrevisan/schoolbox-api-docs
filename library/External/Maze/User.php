@@ -965,4 +965,12 @@ class External_Maze_User implements External_UserInterface
     {
         return $this->helper;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowedFileTypes(bool $quote): ?string
+    {
+        return null;
+    }
 }

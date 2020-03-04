@@ -19,6 +19,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     const FORMAT_ISO8601 = 126;
 
+    /**
+     * Default File Type used by dbo.spsTimetable
+     */
+    private const DEFAULT_FILE_TYPE = 'A';
+
     /** @var MSSQL $database */
     private $database;
 
@@ -429,17 +434,23 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
+        $allowedFileTypeString = $this->externalUser->getAllowedFileTypes(false);
+        // FileType 'A' is embedded in dbo.spsTimetable. If Allowed File Types is defined and it does not include A
+        // we need to explicitly remove it.
+        $excludeDefaultFileType = $allowedFileTypeString && !in_array(self::DEFAULT_FILE_TYPE, explode(',', $allowedFileTypeString));
+
         $statement = $this->database->prepareProcedure('dbo.spsTimetable');
         $statement->bindInputs(
             [
                 'FileYear' => $fileYear,
                 'FileSemester' => $fileSemester,
+                'FileType' =>  $allowedFileTypeString,
                 'ID' => $externalUserId,
                 'Date' => $date->getDatabaseDate(),
                 'IncludeStaffScheduleFlag' => 1,
                 'CheckAttendancesExistFlag' => 1,
                 'IncludeSparesFlag' => 0,
-                'IncludeRecessFlag' => 0
+                'IncludeRecessFlag' => 0,
             ]
         );
 
@@ -450,6 +461,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodsForSequenceIds = [];
         foreach ($iterator as $spRow) {
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                if ($excludeDefaultFileType && ($spRow['FileType'] === self::DEFAULT_FILE_TYPE)) {
+                    continue;
+                }
                 // There is a SeqLinkedTo field, which is only set for linked classes.
                 $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
                 $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
@@ -526,11 +540,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         // Add classes into it
+        $allowedFileType = $this->externalUser->getAllowedFileTypes(false);
+        $allowedFileTypes = $allowedFileType ? explode(',', $allowedFileType) : [];
         foreach ($periodList as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['class'][$desc['ClassCode']])
+                    && (empty($allowedFileTypes) || in_array($desc['FileType'], $allowedFileTypes))
                 ) {
                     $timetable[$x]['class'][$desc['ClassCode']] = array(
                         'description'       => $desc['Description'],
@@ -597,6 +614,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $allowedFileTypes = $this->externalUser->getAllowedFileTypes(true);
+        $allowedFileTypeSql = $allowedFileTypes ? " Timetable.FileType IN ({$allowedFileTypes}) AND " : '';
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
@@ -620,6 +639,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				(StudentClasses.ID='$externalUserId' AND
 				Timetable.DayNumber = '$dayNumber' AND
 				Timetable.TimetableGroup = '$campusString' AND
+				{$allowedFileTypeSql}
 				StudentClasses.StartDate <= getdate() AND
 				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
 				ORDER BY Timetable.PeriodNumber";
@@ -636,6 +656,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				SubjectClasses.FileSemester='" . $fileSemester . "' AND
 				SubjectClasses.FileYear='" . $fileYear . "' AND
 				Timetable.TimetableGroup = '$campusString' AND
+				{$allowedFileTypeSql}
 				Timetable.StaffID='$externalUserId' AND
 				Timetable.DayNumber = '$dayNumber'
 				ORDER BY Timetable.PeriodNumber";
@@ -701,6 +722,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $allowedFileTypes = $this->externalUser->getAllowedFileTypes(true);
+        $allowedFileTypesSql = $allowedFileTypes ? " Timetable.FileType IN ({$allowedFileTypes}) AND " : '';
+
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
@@ -726,6 +750,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						((Timetable.FileSemester=" . $fileSemester . ") AND
 						(Timetable.FileYear=" . $fileYear . ") AND
 						Timetable.TimetableGroup = '$campusString' AND
+						{$allowedFileTypesSql}
 						(StudentClasses.ID='$externalUserId'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . "
@@ -752,6 +777,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						SubjectClasses.FileYear='" . $fileYear . "' AND
 						Timetable.TimetableGroup = '$campusString' AND
 						Timetable.StaffID='$externalUserId' AND
+						{$allowedFileTypesSql}
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         }

@@ -536,4 +536,12 @@ class External_Denbigh_User implements External_UserInterface
     {
         return [];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowedFileTypes(bool $quote): ?string
+    {
+        return null;
+    }
 }
