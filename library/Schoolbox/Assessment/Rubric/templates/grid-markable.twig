@@ -627,12 +627,7 @@
                 ev = ev + '.' + namespace;
             }
 
-            $elem.each(function () {
-                if (this.hasAttribute('data-scaled-mark') && this.hasAttribute('data-max')) {
-                    $(this).trigger(ev);
-                }
-            });
-
+            $elem.trigger(ev);
         }
 
     });
