@@ -21,7 +21,7 @@
         });
     });
 </script>
-{% if markbook.assessments | length %}
+{% if markbook.assessments | length and tabs | length %}
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
@@ -54,7 +54,6 @@
 </div>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Activities</h2>
         <section>
             <script type="text/javascript">
                 $(function () {

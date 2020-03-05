@@ -506,7 +506,7 @@ class Controller extends Base
 
         if ($canSeeGraph) {
             $tabs['graph'] = [
-                'label' => 'Activities',
+                'label' => 'Class Results',
             ];
         }
 
