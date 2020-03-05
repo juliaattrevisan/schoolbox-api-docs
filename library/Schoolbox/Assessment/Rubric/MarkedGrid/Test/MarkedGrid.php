@@ -76,6 +76,35 @@ class MarkedGrid extends TestCase
                 'humanReadableMark' => null,
             ]
         ];
+
+        // Test clearing capability marks and setting indicator marks instead
+        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(false);
+        $markedGrid->getCapabilityMarks()[1]->setValue(null);
+        $markedGrid->getCapabilityMarks()[2]->setValue(null);
+
+        // Add indicator marks as the test grid doesn't have them.
+        // Each indicator mark always uses the last descriptor
+        // (the one with the highest mark) for testing.
+        foreach ($markedGrid->iterateCapabilityUsages() as $capabilityUsage) {
+            $capabilityMark = $markedGrid->retrieveCapabilityMark($capabilityUsage);
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                /** @var Grid\Descriptor $selectedDescriptor */
+                $selectedDescriptor = $indicatorUsage->getDescriptors()->last();
+                $indicatorMark      = (new RubricMarkedGrid\IndicatorMark($indicatorUsage))
+                    ->setDescriptor($selectedDescriptor)
+                    ->setValue($selectedDescriptor->getMaxValue());
+                $capabilityMark->getIndicatorMarks()[$indicatorUsage->getIndicator()->getId()] = $indicatorMark;
+            }
+        }
+
+        yield 'mark-per-capability off, all capability marks null, indicator marks set to max' => [
+            $markedGrid,
+            [
+                'normalizedMark'    => 100.0,
+                'scaledMark'        => 32.0,
+                'humanReadableMark' => '32 / 32',
+            ]
+        ];
     }
 
 
