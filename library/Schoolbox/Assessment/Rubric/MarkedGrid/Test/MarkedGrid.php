@@ -190,7 +190,7 @@ class MarkedGrid extends TestCase
 
     /**
      * @dataProvider getTestRetrieveMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::calculateScaledMark
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::retrieveHumanReadableMark
      *
      * @param RubricMarkedGrid\MarkedGrid $grid
      * @param array                       $expected
