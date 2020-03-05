@@ -68,6 +68,7 @@
                                 name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                                 id="group-{{ capabilityId }}-mark">
 
+                            <option value="">(no grade)</option>
                             {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                 <option value="{{ gradeLevel.lowerBound }}"
                                         {% if letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}

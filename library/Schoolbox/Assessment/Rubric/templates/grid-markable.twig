@@ -422,7 +422,7 @@
         // Get an array of letter grade {value : letter} pairs
         function getLetterGrades($dropdown) {
             var grades = [];
-            $dropdown.find("option").each(function(index, option) {
+            $dropdown.find("option[data-letter]").each(function(index, option) {
                 grades.push(
                     {'value' : $(option).prop("value"), 'letter' : $(option).attr('data-letter')}
                 );
@@ -446,7 +446,7 @@
                     break;
                 }
             }
-            $dropdown.prop("selectedIndex", optionIndex);
+            $dropdown.prop("selectedIndex", optionIndex + 1);
         }
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
