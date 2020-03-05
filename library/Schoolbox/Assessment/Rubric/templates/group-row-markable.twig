@@ -10,13 +10,13 @@
 {% set markScheme = capabilityMark.markScheme ?? rubricGrid.assessment.markScheme %}
 {% set markType   = markScheme.generateContext %}
 {% if showGroupTotal %}
-    {% set letterGradeBracket = false %}
+    {% set letterGradeBracket = null %}
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% if markScheme.gradeGroup is defined %}
         {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
             {# If cap mark has been given, find the bracket that matches the given mark #}
-            {% if capabilityMark.value != null %}
+            {% if capabilityMark.value is not null %}
                 {# Is this below the last? If so use the last one #}
                 {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
                     {% set letterGradeBracket = gradeLevel.lowerBound %}
