@@ -102,9 +102,9 @@ class CapabilityMark extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateScaledMark
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
-     * @param float                           $expected
+     * @param null|float                      $expected
      */
-    public function testCalculateScaledMark(RubricMarkedGrid\CapabilityMark $capabilityMark, float $expected): void
+    public function testCalculateScaledMark(RubricMarkedGrid\CapabilityMark $capabilityMark, ?float $expected): void
     {
         $this->assertSame($expected, $capabilityMark->calculateScaledMark());
     }
@@ -159,7 +159,7 @@ class CapabilityMark extends TestCase
             $nullCapabilityUsages,
             $capabilityMarks
         );
-        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], 0];
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], null];
         yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 6];
     }
 
@@ -169,11 +169,11 @@ class CapabilityMark extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateIndicatorMarkSum
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
-     * @param float                           $expected
+     * @param null|float                      $expected
      */
     public function testCalculateIndicatorMarkSum(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
-        float $expected
+        ?float $expected
     ): void {
         $this->assertSame($expected, $capabilityMark->calculateIndicatorMarkSum());
     }
