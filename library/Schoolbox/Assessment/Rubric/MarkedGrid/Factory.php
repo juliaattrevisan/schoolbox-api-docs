@@ -72,6 +72,8 @@ class Factory
                     // Set the capability mark normalised to a value out of the total descriptor points for the capability
                     $capabilityUnscaledMark = null;
                     if (!$isSelfReflection) {
+                        // If the mark is passed as an empty string:
+                        // treat that as a null cap mark, not zero
                         $capabilityUnscaledMark = $postCapabilities[$capabilityId]['unscaledMark'] ?? '';
                         if ($capabilityUnscaledMark === '') {
                             $capabilityUnscaledMark = null;
