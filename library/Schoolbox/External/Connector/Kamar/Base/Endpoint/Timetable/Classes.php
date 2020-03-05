@@ -331,6 +331,9 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class
      *
+     * If one was previously saved from some other xml, just reuse that
+     * instead of spawning a clone
+     *
      * @param array $subject
      * @return ClassEntry
      * @throws Exception
@@ -339,21 +342,37 @@ class Classes implements IStrategy
      */
     private function createTimetableClass(array $subject): ClassEntry
     {
+        /* See if one exists already; if so, reuse it
+         */
+        try {
+            $timetableClass = $this->classEntryMapper->findOneByColumnList([
+                'code'        => $subject['class']['code'],
+                'name'        => $subject['class']['name'],
+                'description' => $subject['class']['name']
+            ]);
 
-        /** @var ClassEntry $timetableClass */
-        $timetableClass = $this->classEntryMapper->createModel()
-            ->setCode($subject['class']['code'])
-            ->setName($subject['class']['name'])
-            ->setDescription($subject['class']['name']);
+            $this->log->info(sprintf(
+                'Reusing previously-saved class %s %s with id %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                $timetableClass->getId()
+            ));
+        } catch (Exception $e) {
+            /** @var ClassEntry $timetableClass */
+            $timetableClass = $this->classEntryMapper->createModel()
+                ->setCode($subject['class']['code'])
+                ->setName($subject['class']['name'])
+                ->setDescription($subject['class']['name']);
 
-        $this->log->info(sprintf(
-            'Creating new class %s %s',
-            $timetableClass->getName(),
-            $timetableClass->getCode()
-        ));
+            $this->log->info(sprintf(
+                'Creating new class %s %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
 
-        if ($this->perform) {
-            $this->classEntryMapper->save($timetableClass);
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
         }
 
         return $timetableClass;
