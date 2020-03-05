@@ -147,44 +147,6 @@ class Classes implements IStrategy
 
 
     /**
-     * Determine which week we're in, if possible
-     * Returns null when it can't be determined
-     *
-     * @param int $year
-     * @return int|null
-     * @throws Exception
-     * @throws PDOException
-     */
-    private function findWeekOffset(int $year): ?int
-    {
-        $terms = $this->termMapper->findForYear($year);
-
-        if ($terms->count()) {
-            $term = $terms->first();
-            $now = \Alaress_Date_Format::now();
-
-            $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-            $currentWeek = (int)date('W', $now->getUnixTimestamp());
-
-            /* Include the current week in calculations using a +1 offset
-             * e.g. if term begins on 8/1/20,
-             *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-             *     11/1/20 is in week 2
-             *     17/1/20 is in week 2
-             *     21/2/20 is in week 3
-             */
-            $offset = $currentWeek - $startWeek + 1;
-
-            if ($offset > 0) {
-                return $offset;
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
@@ -209,7 +171,7 @@ class Classes implements IStrategy
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $currentWeekOffset = $this->findWeekOffset((int)date('Y'));
+        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset((int)date('Y'));
 
         /* Can't determine which week we're in; can't import anything
          */

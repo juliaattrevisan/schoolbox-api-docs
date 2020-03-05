@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
+use Schoolbox\Assessment\Term;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -71,41 +73,6 @@ $app = new class extends CliTool\App {
 
 
     /**
-     * Cloned out of the Classes strat
-     *
-     * @param int $year
-     * @return int|null
-     */
-    private function findWeekOffset(int $year): ?int
-    {
-        $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findForYear($year);
-
-        if ($terms->count()) {
-            $term = $terms->first();
-            $now = \Alaress_Date_Format::now();
-
-            $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-            $currentWeek = (int)date('W', $now->getUnixTimestamp());
-
-            /* Include the current week in calculations using a +1 offset
-             * e.g. if term begins on 8/1/20,
-             *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-             *     11/1/20 is in week 2
-             *     17/1/20 is in week 2
-             *     21/2/20 is in week 3
-             */
-            $offset = $currentWeek - $startWeek + 1;
-
-            if ($offset > 0) {
-                return $offset;
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
      * Run the cli tool
      */
     public function run(): void
@@ -147,11 +114,13 @@ HELP;
             exit;
         }
 
+        /* Understand args
+         */
         $year = (int)$this->getOpt(self::OPT_LONG_YEAR);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
-        $offset = $this->findWeekOffset($year);
+        $weekOffset = (new WeekOffset(Term\Mapper::getInstance()))->findWeekOffset($year);
 
-        $this->getLogger()->info("We are in week {$offset}.");
+        $this->getLogger()->info("We are in week {$weekOffset}.");
 
         /* Use the path specified in config
          */
@@ -159,9 +128,9 @@ HELP;
 
         $dirhandle = opendir($path);
 
-        /* Investiate all files
+        /* Investigate all files
          */
-        while ($xmlFile = readdir($dirhandle)) {
+        for ($n = 0; $xmlFile = readdir($dirhandle);) {
             if ($xmlFile !== '.' && $xmlFile !== '..' && strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
                 $nodes = new SimpleXMLElement(file_get_contents("{$path}/{$xmlFile}"));
 
@@ -172,7 +141,7 @@ HELP;
                 foreach ($timetables as $timetable) {
                     $studentId = $timetable->xpath('@student')[0];
 
-                    $weeks = $timetable->xpath("week[@index={$offset}]");
+                    $weeks = $timetable->xpath("week[@index={$weekOffset}]");
 
                     /* Find out if this week contains a particular class as per the cli args
                      */
@@ -211,7 +180,18 @@ HELP;
                         }
                     }
                 }
+
+                /* Number of files processed
+                 */
+                $n++;
             }
+        }
+
+        if (!$n) {
+            $this->getLogger()->info(sprintf(
+                'No files processed: do you have any xmls in %s?',
+                $path
+            ));
         }
     }
 
