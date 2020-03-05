@@ -187,7 +187,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
-                                AND studsub.stud_code = '$externalUserId'
                                 AND studsub.stud_code = '{$this->database->quote($externalUserId)}'
                                 AND day_code = '$dayNumber'
                                 AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
