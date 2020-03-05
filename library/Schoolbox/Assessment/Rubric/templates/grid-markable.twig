@@ -366,24 +366,22 @@
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $("[data-use-descriptor-values]").click(function(e) {
-            var $button = $(this);
-            var $gradeInput = $button.siblings('[data-group-mark]');
-            var rubricId = $button.closest('[data-group-summary]').attr('data-rubric-id');
-            var groupId = $button.closest('[data-group-summary]').attr('data-group-id');
-
-            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
-            var $groupRows = $(rowSelector);
-            var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-            var $groupSummary = $rb.find(groupSummarySelector);
-
-            var $descriptorCheckboxes = $groupRows.find('input');
-            var scaledGroupMark = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
+            var $button               = $(this),
+                $gradeInput           = $button.siblings('[data-group-mark]'),
+                rubricId              = $button.closest('[data-group-summary]').attr('data-rubric-id'),
+                groupId               = $button.closest('[data-group-summary]').attr('data-group-id'),
+                rowSelector           = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
+                $groupRows            = $(rowSelector),
+                groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
+                $groupSummary         = $rb.find(groupSummarySelector),
+                $descriptorCheckboxes = $groupRows.find('input'),
+                scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', scaledGroupMark);
             $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
-            switch(markType) {
+            switch (markType) {
                 case 'letter':
                     assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
@@ -406,10 +404,9 @@
             // with descriptor changes once they've clicked this button
             $groupSummary.removeAttr('data-customised');
 
-            var rubricTotalMark = getTotalMark();
-
-            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
-            var rubricSummary = $rb.find(rubricSummarySelector);
+            var rubricTotalMark       = getTotalMark(),
+                rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
+                rubricSummary         = $rb.find(rubricSummarySelector);
 
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
