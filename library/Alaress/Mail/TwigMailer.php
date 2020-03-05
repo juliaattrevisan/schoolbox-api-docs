@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -55,6 +55,13 @@ class TwigMailer extends AbstractMailer {
             new Twig_SimpleFilter(
                 'purify',
                 array('Scrub', 'html'),
+                array('is_safe' => array('html'))
+            )
+        );
+        $this->twig->addFilter(
+            new Twig_SimpleFilter(
+                'purifyAbsoluteUri',
+                array('Scrub', 'htmlAbsoluteUri'),
                 array('is_safe' => array('html'))
             )
         );
@@ -122,4 +129,4 @@ class TwigMailer extends AbstractMailer {
 	}
 
 
-} 
+}
