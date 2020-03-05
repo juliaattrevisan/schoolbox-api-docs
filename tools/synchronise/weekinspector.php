@@ -174,9 +174,8 @@ HELP;
                                 if (($slotSpecified && $slotMatches && $teacherSpecified && $teacherMatches) ||
                                     (!$slotSpecified && !$teacherSpecified)) {
                                     $message = sprintf(
-                                        'Student %s, week %s, day %s, slot %s: Teachers: %s, Rooms: %s: %s',
+                                        'Student %s, day %s, slot %s: Teachers: %s, Rooms: %s: %s',
                                         $studentId,
-                                        $offset,
                                         $day,
                                         $slot,
                                         $teachers,
