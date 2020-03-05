@@ -121,6 +121,9 @@ class DataSync
     /** @var LoggerInterface */
     private $log;
 
+    /** @var string */
+    private $siteLocation;
+
     /**
      * @param IConnector              $canvasDb
      * @param IConnector              $schoolboxDb
@@ -203,6 +206,7 @@ class DataSync
         $this->config                 = $config;
         $this->persist                = $persist;
         $this->log                    = $log;
+        $this->siteLocation           = strtolower($config->get('site_location'));
     }
 
 
@@ -230,7 +234,7 @@ class DataSync
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge            = new Bridge\Account($this->schoolboxDb);
         $assignmentBridge         = new Bridge\Assignment(
-            $this->config->get('site_location'),
+            $this->siteLocation,
             $this->markTypeMapper->findAll(),
             $this->workTypeMapper->findAll()
         );
@@ -241,9 +245,16 @@ class DataSync
 
         $this->syncAccounts($accountBridge);
         $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
-        $this->syncCourseAssignments($assignmentBridge, $courseBridge);
-        $this->syncCourseQuiz($assignmentBridge, $courseBridge);
-
+        if ($this->syncCanvasAssignments()) {
+            $this->syncCourseAssignments($assignmentBridge, $courseBridge);
+        } else {
+            $this->log->info('Skipping syncing course assignments');
+        }
+        if ($this->syncCanvasQuizzes()) {
+            $this->syncCourseQuiz($assignmentBridge, $courseBridge);
+        } else {
+            $this->log->info('Skipping syncing course quizzes');
+        }
         // Defer building this one till as late as possible (it can take a while)
         $sectionBridge = new Bridge\CourseSection(
             $this->canvasDb,
@@ -257,7 +268,11 @@ class DataSync
         $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
         $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
         $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
-        $this->syncSubmission($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+        if ($this->syncCanvasMarks()) {
+            $this->syncSubmission($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+        } else {
+            $this->log->info('Skipping syncing marks');
+        }
 
         if (!$this->persist) {
             $this->schoolboxDb->rollBack();
@@ -518,5 +533,45 @@ class DataSync
             $this->returnedWorkMapper,
             $this->assessmentDataSource
         ))->synchronise();
+    }
+
+    /**
+     * Returns whether to sync canvas assessments
+     * @return bool
+     */
+    private function syncCanvasAssignments(): bool
+    {
+        // For now, all instances sync assignments
+        return true;
+    }
+
+    /**
+     * Returns whether to sync canvas quizzes
+     * @return bool
+     */
+    private function syncCanvasQuizzes(): bool
+    {
+        switch ($this->siteLocation) {
+            case 'staloy':
+                return false;
+            case 'demo':
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Returns whether to sync canvas assessment marks
+     * @return bool
+     */
+    private function syncCanvasMarks(): bool
+    {
+        switch ($this->siteLocation) {
+            case 'staloy':
+                return false;
+            case 'demo':
+            default:
+                return true;
+        }
     }
 }

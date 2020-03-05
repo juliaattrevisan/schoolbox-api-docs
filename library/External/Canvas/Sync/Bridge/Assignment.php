@@ -19,7 +19,6 @@ use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function explode;
-use function strtolower;
 
 /**
  * Responsible for providing the link between a Canvas Assignment/Quiz to Schoolbox SubmissionBox/Quiz Spec
@@ -53,23 +52,6 @@ class Assignment
         $this->siteLocation = $siteLocation;
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
         $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
-    }
-
-    public function syncCanvasAssignments(): bool
-    {
-        // For now, all instances sync assignments
-        return true;
-    }
-
-    public function syncCanvasQuizzes(): bool
-    {
-        switch (strtolower($this->siteLocation)) {
-            case 'staloy':
-                return false;
-            case 'demo':
-            default:
-                return true;
-        }
     }
 
 
@@ -167,7 +149,7 @@ class Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        switch (strtolower($this->siteLocation)) {
+        switch ($this->siteLocation) {
             // Hard-coded for now to the staloy/demo dataset
             case 'staloy':
                 $config = [

@@ -215,9 +215,6 @@ class CourseQuiz extends CourseAssessmentAbstract
             $unitSpecFolder = $this->folderMapper->findOneByPredicates($pb);
 
             foreach ($courseData['quizzes'] as $quizCanvasId => $quizData) {
-                if (!$this->assignmentBridge->syncCanvasQuizzes()) {
-                    continue;
-                }
                 $quiz                  = $this->syncWithCompositeQuiz(
                     $unitSpecFolder,
                     $quizCanvasId,
