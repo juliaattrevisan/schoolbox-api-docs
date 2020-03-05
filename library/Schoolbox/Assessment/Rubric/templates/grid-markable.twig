@@ -443,7 +443,11 @@
                     break;
                 }
             }
-            $dropdown.prop("selectedIndex", optionIndex + 1);
+
+            // Offset the selected option by +1, to take into account empty grade
+            $dropdown.find('option').prop('selected', function(i) {
+                return i === optionIndex + 1;
+            });
         }
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
