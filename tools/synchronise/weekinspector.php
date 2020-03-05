@@ -70,6 +70,12 @@ $app = new class extends CliTool\App {
     }
 
 
+    /**
+     * Cloned out of the Classes strat
+     *
+     * @param int $year
+     * @return int|null
+     */
     private function findWeekOffset(int $year): ?int
     {
         $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findForYear($year);
@@ -143,26 +149,33 @@ HELP;
 
         $year = (int)$this->getOpt(self::OPT_LONG_YEAR);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
-
         $offset = $this->findWeekOffset($year);
 
         $this->getLogger()->info("We are in week {$offset}.");
 
-        $path = '/vagrant/data/cache/stream/kamar/archive';
+        /* Use the path specified in config
+         */
+        $path = $this->getConfig()->get('schooldata_import_endpoint_host');
 
         $dirhandle = opendir($path);
 
+        /* Investiate all files
+         */
         while ($xmlFile = readdir($dirhandle)) {
             if ($xmlFile !== '.' && $xmlFile !== '..' && strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
                 $nodes = new SimpleXMLElement(file_get_contents("{$path}/{$xmlFile}"));
 
                 $timetables = $nodes->xpath('/SMSDirectoryData/timetables/timetable');
 
+                /* Investigate every timetable node in every file
+                 */
                 foreach ($timetables as $timetable) {
                     $studentId = $timetable->xpath('@student')[0];
 
                     $weeks = $timetable->xpath("week[@index={$offset}]");
 
+                    /* Find out if this week contains a particular class as per the cli args
+                     */
                     foreach ($weeks as $week) {
                         $subjects = $week->xpath("days/day/slots/subjects/subject[contains(code, '{$classCode}')]");
 
