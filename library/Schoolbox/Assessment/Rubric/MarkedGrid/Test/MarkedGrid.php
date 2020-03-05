@@ -49,6 +49,33 @@ class MarkedGrid extends TestCase
                 'humanReadableMark' => '7 / 32',
             ]
         ];
+
+        // If marking per capability, and all cap marks are null:
+        // the grid's marks are null
+        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(true);
+        $markedGrid->getCapabilityMarks()[1]->setValue(null);
+        $markedGrid->getCapabilityMarks()[2]->setValue(null);
+        yield 'mark-per-capability on, all capability marks null' => [
+            $markedGrid,
+            [
+                'normalizedMark'    => null,
+                'scaledMark'        => null,
+                'humanReadableMark' => null,
+            ]
+        ];
+
+        // If not marking per capability: explicitly cap marks are ignored?
+        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(false);
+        $markedGrid->getCapabilityMarks()[1]->setValue(null);
+        $markedGrid->getCapabilityMarks()[2]->setValue(null);
+        yield 'mark-per-capability off, all capability marks null' => [
+            $markedGrid,
+            [
+                'normalizedMark'    => null,
+                'scaledMark'        => null,
+                'humanReadableMark' => null,
+            ]
+        ];
     }
 
 
