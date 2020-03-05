@@ -431,22 +431,23 @@
 
         // Given a percentage mark, set a capability dropdown to its corresponding letter grade
         function assignLetterGrade(numericMark, $dropdown) {
-            var grades = getLetterGrades($dropdown);
-
-            // Default option index if no other selected: the last one
-            var optionIndex = grades.length - 1,
-                numberMark  = Number(numericMark);
-            for (var i = 0; i < grades.length; i++) {
-                // TODO assumes values are always descending which might not be the case?
-                if (numberMark >= Number(grades[i].value)) {
-                    optionIndex = i;
-                    break;
+            // Numeric mark is null? select the first option (empty grade)
+            var optionIndex = 0;
+            if (numericMark !== null) {
+                var grades     = getLetterGrades($dropdown),
+                    numberMark = Number(numericMark);
+                for (var i = 0; i < grades.length; i++) {
+                    // TODO assumes values are always descending which might not be the case?
+                    if (numberMark >= Number(grades[i].value)) {
+                        // Offset the selected option by +1, to take into account empty grade
+                        optionIndex = i + 1;
+                        break;
+                    }
                 }
             }
 
-            // Offset the selected option by +1, to take into account empty grade
             $dropdown.find('option').prop('selected', function(i) {
-                return i === optionIndex + 1;
+                return i === optionIndex;
             });
         }
 
