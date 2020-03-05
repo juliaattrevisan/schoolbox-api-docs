@@ -232,15 +232,11 @@
                 rubricTotalMark = null;
 
             if ($groupRows.length) {
-                var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-                var $groupSummary = $rb.find(groupSummarySelector);
-                var $descriptorCheckboxes = $groupRows.find('input');
+                var groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
+                    $groupSummary         = $rb.find(groupSummarySelector),
+                    $descriptorCheckboxes = $groupRows.find('input'),
+                    scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
-                var scaledGroupMark = null;
-                var indicatorMark = summateDescriptors($descriptorCheckboxes);
-                if (indicatorMark > 0) {
-                    scaledGroupMark = scale($groupSummary, indicatorMark);
-                }
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', scaledGroupMark);
 
