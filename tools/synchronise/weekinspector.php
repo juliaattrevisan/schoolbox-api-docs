@@ -125,7 +125,9 @@ Usage: php weekinspector.php --year {year} --code {code} [--slot {slot} --teache
         --slot       a slot index between 1 and 10
         --teachers   a teacher string
 
-Example: php weekinspector.php --year 2020 --code 13MATC [--slot 2 --teachers JKE]
+Examples:
+    php weekinspector.php --year 2020 --code 13MATC
+    php weekinspector.php --year 2020 --code 13MATC --slot 2 --teachers JKE
 
 
 HELP;
