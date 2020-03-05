@@ -104,13 +104,13 @@ Examples:
     // All classes with code 13MATC
     php weekinspector.php --year 2020 --code 13MATC
 
-    // All slot 2 classes
+    // All slot 2 classes with code 13MATC
     php weekinspector.php --year 2020 --code 13MATC --slot 2
 
-    // All classes taught by JKE
+    // All classes with code 13MATC taught by JKE
     php weekinspector.php --year 2020 --code 13MATC --teachers JKE
 
-    // All slot 2 classes taught by JKE
+    // All slot 2 classes with code 13MATC taught by JKE
     php weekinspector.php --year 2020 --code 13MATC --slot 2 --teachers JKE
 
 
