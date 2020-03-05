@@ -11,7 +11,18 @@
                 data:     {groupID: '{STUDENT_GROUP_IDS}'},
                 dataType: 'json'
             }
-        })
+        });
+
+        $('#folderForm').alaressValidate({
+            rules: {
+                'page_title': {requiredNotBlank: true},
+            },
+            messages: {
+                'page_title': {required: 'You must enter a page name before you can proceed.'},
+            }
+        });
+
+
     });
 </script>
 <!-- END custom_head -->
