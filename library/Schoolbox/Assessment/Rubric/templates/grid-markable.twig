@@ -229,14 +229,14 @@
                 rubricId        = $changed.attr('data-rubric'),
                 rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
                 $groupRows      = $(rowSelector),
-                rubricTotalMark = 0;
+                rubricTotalMark = null;
 
             if ($groupRows.length) {
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
                 var $groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
-                var scaledGroupMark = 0;
+                var scaledGroupMark = null;
                 var indicatorMark = summateDescriptors($descriptorCheckboxes);
                 if (indicatorMark > 0) {
                     scaledGroupMark = scale($groupSummary, indicatorMark);
@@ -516,17 +516,21 @@
 
         // Scale an unscaled mark based on a group's max mark
         function scale($groupSummary, value) {
-            var groupMax = $groupSummary.attr('data-max');
-            var groupRowMaxSum = $groupSummary.attr('data-row-max-sum');
+            if (value === null) {
+                return null;
+            }
+
+            var groupMax = $groupSummary.attr('data-max'),
+                groupRowMaxSum = $groupSummary.attr('data-row-max-sum'),
+                scaledGroupSum;
 
             if (groupRowMaxSum > 0) {
-                var scaledGroupSum = value * (groupMax / groupRowMaxSum);
-            }
-            else {
-                var scaledGroupSum = value;
+                scaledGroupSum = value * (groupMax / groupRowMaxSum);
+            } else {
+                scaledGroupSum = value;
             }
 
-            if(scaledGroupSum % 1 != 0){
+            if (scaledGroupSum % 1 !== 0) {
                 scaledGroupSum = scaledGroupSum.toFixed(2);
             }
 
@@ -535,7 +539,7 @@
 
         // Get the raw unscaled sum of selected descriptor values from the collection of descriptors passed in
         function summateDescriptors($descriptorCheckboxes) {
-            var descriptorSummation = 0;
+            var descriptorSummation = null;
 
             $descriptorCheckboxes.each(function () {
                 var $descriptorCheckbox = $(this);
@@ -551,7 +555,7 @@
                         descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
                     }
                     if (!isNaN(descriptorValue)) {
-                        descriptorSummation += descriptorValue;
+                        descriptorSummation = (descriptorSummation || 0) + descriptorValue;
                     }
                 }
             });
@@ -563,7 +567,7 @@
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
         {
-            var totalMark = 0;
+            var totalMark = null;
             var rubricOverallMax = 0;
 
             var $groupSummary = $rb.find('[data-group-summary]');
@@ -573,7 +577,7 @@
                     var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
 
                     if (!isNaN(groupScaledMark)) {
-                        totalMark += groupScaledMark;
+                        totalMark = (totalMark || 0) + groupScaledMark;
                     }
 
                     rubricOverallMax += $(this).attr('data-max');
@@ -584,7 +588,7 @@
             }
 
             // If sum isn't a whole number: round to 2dp
-            if(totalMark % 1 != 0){
+            if (totalMark !== null && totalMark % 1 !== 0){
                 totalMark = totalMark.toFixed(2);
             }
 
