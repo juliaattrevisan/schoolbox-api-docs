@@ -36,25 +36,30 @@ $app = new class extends CliTool\App {
 
 
     /**
-     * --flag
-     *
-     * An example arg that's a boolean on/off
-     */
-    private const OPT_LONG_FLAG = 'flag';
-
-
-    /**
-     * --input
-     *
-     * An example arg that has an actual value, denoted by the colon
+     * A year for which to search for a Term
+     * The dates are used as week offsets
      */
     private const OPT_LONG_YEAR = 'year:';
 
+
+    /**
+     * A class code for which to search
+     */
     private const OPT_LONG_CODE = 'code:';
 
+
+    /**
+     * A particular slot index for which to search
+     */
     private const OPT_LONG_SLOT = 'slot:';
 
+
+    /**
+     * A particular teacher string for which to search
+     * Teacher ids are comma-separated in some classes
+     */
     private const OPT_LONG_TEACHER = 'teachers:';
+
 
     /**
      * @inheritdoc
@@ -63,7 +68,6 @@ $app = new class extends CliTool\App {
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FLAG,
             self::OPT_LONG_YEAR,
             self::OPT_LONG_CODE,
             self::OPT_LONG_SLOT,
