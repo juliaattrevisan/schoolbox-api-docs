@@ -110,13 +110,22 @@ $app = new class extends CliTool\App {
 Find a file containing the specified class code, slot and teacher code.
 Used to find data spread across multiple xml files broadcast by Kamar.
 
-Usage: php weekinspector.php --year {year} --code {code} --slot {slot} --teachers {teachers}
+Slot and Teacher are optional args that must be provided together.
+If only one, or none, are provided, then the tool just looks for class codes.
+
+The intent behind that interface was so that you could look for instances of
+a particular class taught by a particular teacher, and where that manifests
+among the forest of xml files.
+
+Otherwise it just reports when classes occur across the entire forest.
+
+Usage: php weekinspector.php --year {year} --code {code} [--slot {slot} --teachers {teachers}]
         --year       a four digit int
         --code       a class code string
         --slot       a slot index between 1 and 10
         --teachers   a teacher string
 
-Example: php weekinspector.php --year 2020 --code 13MATC --slot 2 --teachers JKE
+Example: php weekinspector.php --year 2020 --code 13MATC [--slot 2 --teachers JKE]
 
 
 HELP;
@@ -134,8 +143,6 @@ HELP;
 
         $dirhandle = opendir($path);
 
-        $stack = [];
-
         while ($xmlFile = readdir($dirhandle)) {
             if ($xmlFile !== '.' && $xmlFile !== '..' && strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
                 $nodes = new SimpleXMLElement(file_get_contents("{$path}/{$xmlFile}"));
@@ -151,8 +158,6 @@ HELP;
                         $subjects = $week->xpath("days/day/slots/subjects/subject[contains(code, '{$classCode}')]");
 
                         if (\count($subjects)) {
-
-
                             foreach ($subjects as $subject) {
                                 $subjectsNode = $subject->xpath('ancestor::subjects')[0];
 
@@ -161,7 +166,13 @@ HELP;
 
                                 $teachers = (string)$subject->teachers;
 
-                                if ($slot === $this->getOpt(self::OPT_LONG_SLOT) && $teachers === $this->getOpt(self::OPT_LONG_TEACHER)) {
+                                $slotSpecified = (bool)$this->getOpt(self::OPT_LONG_SLOT);
+                                $slotMatches = $slot === $this->getOpt(self::OPT_LONG_SLOT);
+                                $teacherSpecified = (bool)$this->getOpt(self::OPT_LONG_TEACHER);
+                                $teacherMatches = $teachers === $this->getOpt(self::OPT_LONG_TEACHER);
+
+                                if (($slotSpecified && $slotMatches && $teacherSpecified && $teacherMatches) ||
+                                    (!$slotSpecified && !$teacherSpecified)) {
                                     $message = sprintf(
                                         'Student %s, week %s, day %s, slot %s: Teachers: %s, Rooms: %s: %s',
                                         $studentId,
