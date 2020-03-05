@@ -43,8 +43,8 @@
 
             var target = $(e.target),
                 scaledMark = target.attr('data-scaled-mark');
-            if (scaledMark === null) {
-                self.options.onCalculate('')
+            if (scaledMark === null || scaledMark === undefined) {
+                self.options.onCalculate.call(target, '')
             } else {
                 switch (self.options.mode) {
                     case 'percent':
