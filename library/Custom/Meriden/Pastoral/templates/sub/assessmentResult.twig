@@ -4,7 +4,7 @@
             {% for indicatorMark in capabilityMark.indicatorMarks %}
                 <tr>
                     <td>{{ indicatorMark.indicatorUsage.indicator.name }}</td>
-                    <td>{{ indicatorMark.descriptor.description|default('N/A') }}</td>
+                    <td>{{ indicatorMark.descriptor.description }}</td>
                 </tr>
             {% endfor %}
         {% endfor %}
