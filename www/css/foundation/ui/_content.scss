@@ -1017,12 +1017,25 @@ $selector-width: 2.25rem;
 // Activity list
 .activity-list {
     @include information-list;
-    li{
-        .grade{
+    li {
+        .grade {
             text-align: center;
             font-weight: $font-weight-bold;
             font-size: rem-calc(($base-font-size + 2));
             min-width: 6rem;
+        }
+    }
+    // Specific to Grade page
+    &.group {
+        li {
+            padding: 0 !important;
+
+            &.subject-group {
+                border-bottom: 0;
+            }
+        }
+        li ul li {
+            border-top: 0;
         }
     }
     // Grades expandable layout
