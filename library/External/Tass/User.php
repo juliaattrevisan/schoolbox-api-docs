@@ -221,7 +221,7 @@ class External_Tass_User implements External_UserInterface
 
         $charIndexQuery = [];
 
-        $ids = implode(',', array_map(static function ($val) {
+        $ids = implode(',', array_map(function ($val) {
                 return sprintf("'%s'", $this->database->quote($val));
             }, $externalUserId)
         );
