@@ -185,7 +185,7 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
         -- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
         LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND t.curr_flg = 'Y' AND s.cmpy_code=t.cmpy_code
-        WHERE stud_code = '$externalUserId'
+        WHERE stud_code = '{$this->database->quote($externalUserId)}'
         ";
         $student = $this->database->trimRow($this->database->getRow($query));
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -221,13 +221,13 @@ class External_Tass_User implements External_UserInterface
 
         $charIndexQuery = [];
 
-        $ids = implode(',', array_map(static function ($val) {
-            return sprintf("'%s'", $val);
+        $ids = implode(',', array_map(function ($val) {
+                return sprintf("'%s'", $this->database->quote($val));
             }, $externalUserId)
         );
 
         foreach ($externalUserId as $externalId) {
-            $charIndexQuery[] = "(CHARINDEX(','+ '$externalId' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
+            $charIndexQuery[] = "(CHARINDEX(','+ '{$this->database->quote($externalId)}' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
         }
 
         $charIndexQueryString = implode(' OR ', $charIndexQuery);

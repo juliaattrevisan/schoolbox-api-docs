@@ -187,7 +187,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
-                                AND studsub.stud_code = '$externalUserId'
+                                AND studsub.stud_code = '{$this->database->quote($externalUserId)}'
                                 AND day_code = '$dayNumber'
                                 AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                 AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
@@ -198,7 +198,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '$externalUserId'
+                            AND tch_code = '{$this->database->quote($externalUserId)}'
                             AND day_code = '$dayNumber'
                          ORDER BY prd_code";
         }
@@ -274,7 +274,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
-                                    AND studsub.stud_code = '$externalUserId'
+                                    AND studsub.stud_code = '{$this->database->quote($externalUserId)}'
                                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                             ORDER BY prd_code, day_code";
@@ -285,7 +285,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '$externalUserId'
+                            AND tch_code = '{$this->database->quote($externalUserId)}'
                          ORDER BY prd_code, day_code";
         }
 
