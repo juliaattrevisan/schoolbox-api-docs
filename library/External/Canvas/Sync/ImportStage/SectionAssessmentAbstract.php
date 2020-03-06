@@ -54,49 +54,49 @@ abstract class SectionAssessmentAbstract
     use ModelSaveTrait;
 
     /** @var IConnector */
-    private $canvasDb;
+    protected $canvasDb;
 
     /** @var IConnector */
-    private $schoolboxDb;
+    protected $schoolboxDb;
 
     /** @var External_ClassInterface */
-    private $externalClass;
+    protected $externalClass;
 
     /** @var null|string */
-    private $currentFileYear;
+    protected $currentFileYear;
 
     /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
+    protected $unitImplMapper;
 
     /** @var UnitSpec\Mapper */
-    private $unitSpecMapper;
+    protected $unitSpecMapper;
 
     /** @var Assessment\Mapper */
-    private $assessmentMapper;
+    protected $assessmentMapper;
 
     /** @var Participant\Plan\Mapper */
-    private $participantPlanMapper;
+    protected $participantPlanMapper;
 
     /** @var Participant\Mapper */
-    private $participantMapper;
+    protected $participantMapper;
 
     /** @var UserMapper */
-    private $userMapper;
+    protected $userMapper;
 
     /** @var LoggerInterface */
-    private $log;
+    protected $log;
 
     /** @var Bridge\AssignmentDates */
-    private $assignmentDatesBridge;
+    protected $assignmentDatesBridge;
 
     /** @var Bridge\Course */
-    private $courseBridge;
+    protected $courseBridge;
 
     /** @var Bridge\CourseSection */
-    private $courseSectionBridge;
+    protected $courseSectionBridge;
 
     /** @var Bridge\AssignmentOverride */
-    private $assignmentOverrideBridge;
+    protected $assignmentOverrideBridge;
 
 
     // Per-execution counts
@@ -109,7 +109,7 @@ abstract class SectionAssessmentAbstract
     private $countAssessablesCreated;
     private $countAssessablesMoved;
     private $countAssessablesUpdated;
-    private $countAssessablesDeleted;
+    protected $countAssessablesDeleted;
 
     private $countPlansCreated;
     private $countPlansUpdated;
@@ -424,24 +424,7 @@ abstract class SectionAssessmentAbstract
      * @throws Database\Exception
      * @throws Mapper\Exception
      */
-    protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void
-    {
-        $candidateAssessmentIds = $this->getAssessableAssessmentIds();
-        if (!count($candidateAssessmentIds)) {
-            return;
-        }
-
-        $schoolboxEntity       = ucfirst($this->getSchoolboxEntity());
-        $assessmentIdsToDelete = array_diff($candidateAssessmentIds, $assessmentImplIdsSynchronised);
-
-        // TODO this should delete the Assessable, not the Assessment
-        $idColumn = $this->assessmentMapper->getIdentifierColumn();
-        foreach ($this->assessmentMapper->findByColumn($idColumn, $assessmentIdsToDelete) as $assessmentImpl) {
-            $this->log->debug("Deleting un-synchronised {$schoolboxEntity}Impl (assessment.id: {$assessmentImpl->getId()})");
-            $this->assessmentMapper->delete($assessmentImpl);
-            $this->countAssessablesDeleted++;
-        }
-    }
+    abstract protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void;
 
 
     /**

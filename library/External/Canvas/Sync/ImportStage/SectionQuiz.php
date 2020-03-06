@@ -48,12 +48,6 @@ class SectionQuiz extends SectionAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var IConnector */
-    private $schoolboxDb;
-
     /** @var Quiz\Mapper */
     private $quizMapper;
 
@@ -68,16 +62,6 @@ class SectionQuiz extends SectionAssessmentAbstract
 
     /** @var QuizSolution\Mapper */
     private $quizSolutionMapper;
-
-    /** @var Assessment\Mapper */
-    private $assessmentMapper;
-
-    /** @var Participant\Plan\Mapper */
-    private $participantPlanMapper;
-
-    /** @var LoggerInterface */
-    private $log;
-
 
     /** @var Quiz\Model[] $quizSpecCache Indexed by Canvas `assess`.`canvas_id` */
     private $quizSpecCache = [];
@@ -148,14 +132,10 @@ class SectionQuiz extends SectionAssessmentAbstract
             $courseSectionBridge,
             $assignmentOverrideBridge
         );
-        $this->canvasDb              = $canvasDb;
-        $this->schoolboxDb           = $schoolboxDb;
         $this->quizMapper            = $quizMapper;
         $this->quizSectionMapper     = $quizSectionMapper;
         $this->quizQuestionMapper    = $quizQuestionMapper;
         $this->quizSolutionMapper    = $quizSolutionMapper;
-        $this->participantPlanMapper = $planMapper;
-        $this->log                   = $log;
     }
 
 
@@ -651,6 +631,27 @@ class SectionQuiz extends SectionAssessmentAbstract
         }
 
         return $quizImpl;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void
+    {
+        $candidateAssessmentIds = $this->getAssessableAssessmentIds();
+        if (!count($candidateAssessmentIds)) {
+            return;
+        }
+
+        $assessmentIdsToDelete = array_diff($candidateAssessmentIds, $assessmentImplIdsSynchronised);
+
+        $idColumn = $this->assessmentMapper->getIdentifierColumn();
+        foreach ($this->assessmentMapper->findByColumn($idColumn, $assessmentIdsToDelete) as $assessmentImpl) {
+            $this->log->debug("Deleting un-synchronised QuizImpl (assessment.id: {$assessmentImpl->getId()})");
+            $this->assessmentMapper->softDeleteQuiz($assessmentImpl);
+            $this->countAssessablesDeleted++;
+        }
     }
 
 

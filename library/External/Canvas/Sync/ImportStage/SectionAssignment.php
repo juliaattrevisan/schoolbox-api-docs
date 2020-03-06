@@ -42,27 +42,11 @@ class SectionAssignment extends SectionAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var IConnector */
-    private $schoolboxDb;
-
     /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
-
-    /** @var Assessment\Mapper */
-    private $assessmentMapper;
-
-    /** @var Participant\Plan\Mapper */
-    private $participantPlanMapper;
-
-    /** @var LoggerInterface */
-    private $log;
+    protected $submissionBoxMapper;
 
     /** @var SubmissionBox[] $submissionBoxSpecCache Indexed by Canvas `assignment`.`canvas_id` */
     private $submissionBoxSpecCache = [];
-
 
     /**
      * @param IConnector                $canvasDb
@@ -117,12 +101,7 @@ class SectionAssignment extends SectionAssessmentAbstract
             $courseSectionBridge,
             $assignmentOverrideBridge
         );
-        $this->canvasDb              = $canvasDb;
-        $this->schoolboxDb           = $schoolboxDb;
         $this->submissionBoxMapper   = $submissionBoxMapper;
-        $this->assessmentMapper      = $assessmentMapper;
-        $this->participantPlanMapper = $planMapper;
-        $this->log                   = $log;
     }
 
     /** @inheritDoc */
@@ -393,6 +372,27 @@ class SectionAssignment extends SectionAssessmentAbstract
             return (int)$externalId;
         };
         return array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void
+    {
+        $candidateAssessmentIds = $this->getAssessableAssessmentIds();
+        if (!count($candidateAssessmentIds)) {
+            return;
+        }
+
+        $assessmentIdsToDelete = array_diff($candidateAssessmentIds, $assessmentImplIdsSynchronised);
+
+        $idColumn = $this->assessmentMapper->getIdentifierColumn();
+        foreach ($this->assessmentMapper->findByColumn($idColumn, $assessmentIdsToDelete) as $assessmentImpl) {
+            $this->log->debug("Deleting un-synchronised SubmissionBoxImpl (assessment.id: {$assessmentImpl->getId()})");
+            $this->assessmentMapper->softDeleteDueWork($assessmentImpl);
+            $this->countAssessablesDeleted++;
+        }
     }
 
 
