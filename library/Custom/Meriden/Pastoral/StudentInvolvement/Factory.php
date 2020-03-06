@@ -413,12 +413,17 @@ class Factory
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
+                $rubric   = null;
+                if ($assessment instanceof DueWork
+                    && $feedback instanceof DueWorkFeedback
+                    && $assessment->getUseRubric()
+                ) {
+                    $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                }
                 if ($feedback) {
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => $assessment,
-                        'rubric'      => $feedback instanceof DueWorkFeedback
-                            ? $this->rubricMapper->retrieveMarkedGrid($feedback)
-                            : null,
+                        'rubric'      => $rubric,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
