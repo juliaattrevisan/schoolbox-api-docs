@@ -20,6 +20,26 @@ Usage:
 
         $('[data-collapser]').collapsable();
 
+
+        /**
+         * Apply the javascript validator
+         *
+         * @param modifyValidation
+         */
+        function initValidator(modifyValidation) {
+            $("#update-course-form").alaressValidate(modifyValidation);
+
+            $('[data-unit-name]').each(function() {
+                $(this).rules('add', {
+                    required: true,
+                    messages: {
+                        required: "Please enter a name for this {{ locale.unit }}."
+                    }
+                });
+            });
+        }
+
+
         /**
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
@@ -38,21 +58,14 @@ Usage:
             onkeyup: false
         };
 
-        $("#update-course-form").alaressValidate(modifyValidation);
-
-        $('[data-unit-name]').each(function() {
-            $(this).rules('add', {
-                required: true,
-                messages: {
-                    required: "Please enter a name for this {{ locale.unit }}."
-                }
-            });
-        });
+        /* Apply initially; this gets reset during async mage calls, it seems, so we
+         * will end up re-initialising elsewhere
+         */
+        initValidator(modifyValidation);
 
         $.validator.addMethod('oneUnit', function() {
             return $('input[data-unit-name]').length;
         }, 'Please create at least one {{ locale.unit }} for this course.');
-
 
         // Mage Buttons
         var $mageNextButton = $('[data-mage-next="unit-info"]');
@@ -107,18 +120,9 @@ Usage:
                 $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
             },
 
-            // Reset validation
-            onXhrAlways: function(data) {
-                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
-
-                $('[data-unit-name]').each(function() {
-                    $(this).rules('add', {
-                        required: true,
-                        messages: {
-                            required: "Please enter a name for this {{ locale.unit }}."
-                        }
-                    });
-                });
+            // Reset validation always
+            onXhrAlways: function() {
+                initValidator(modifyValidation);
             },
 
             validateOptions: {
@@ -152,18 +156,9 @@ Usage:
                 $(document).foundation();
             },
 
-            // Reset validation
-            onXhrAlways: function(data) {
-                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
-
-                $('[data-unit-name]').each(function() {
-                    $(this).rules('add', {
-                        required: true,
-                        messages: {
-                            required: "Please enter a name for this {{ locale.unit }}."
-                        }
-                    });
-                });
+            // Reset validation always
+            onXhrAlways: function() {
+                initValidator(modifyValidation);
             },
 
             validateOptions: {
