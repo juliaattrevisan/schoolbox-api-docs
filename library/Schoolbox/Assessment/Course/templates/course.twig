@@ -105,10 +105,22 @@ Usage:
 
                 // Display the 'Save Course' section
                 $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
-
-                // Reset validation
-                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
             },
+
+            // Reset validation
+            onXhrAlways: function(data) {
+                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
+
+                $('[data-unit-name]').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+                        messages: {
+                            required: "Please enter a name for this {{ locale.unit }}."
+                        }
+                    });
+                });
+            },
+
             validateOptions: {
                 rules: {
                     name: "required",
@@ -138,9 +150,20 @@ Usage:
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
                 $(document).foundation();
+            },
 
-                // Reset validation
+            // Reset validation
+            onXhrAlways: function(data) {
                 $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
+
+                $('[data-unit-name]').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+                        messages: {
+                            required: "Please enter a name for this {{ locale.unit }}."
+                        }
+                    });
+                });
             },
 
             validateOptions: {
