@@ -31,7 +31,7 @@ Usage:
 
             $('[data-unit-name]').each(function() {
                 $(this).rules('add', {
-                    required: true,
+                    requiredNotBlank: true,
                     messages: {
                         required: "Please enter a name for this {{ locale.unit }}."
                     }
