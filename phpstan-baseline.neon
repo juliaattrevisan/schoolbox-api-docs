@@ -10411,21 +10411,6 @@ parameters:
 			path: library/Schoolbox/Learning/Module.php
 
 		-
-			message: "#^PHPDoc tag @throws with type Schoolbox\\\\Learning\\\\InvalidArgumentException\\|Schoolbox\\\\Learning\\\\InvalidPath\\|Schoolbox\\\\Learning\\\\UnexpectedValueException is not subtype of Throwable$#"
-			count: 1
-			path: library/Schoolbox/Learning/Module.php
-
-		-
-			message: "#^Instantiated class Schoolbox\\\\Learning\\\\UnexpectedValueException not found\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Module.php
-
-		-
-			message: "#^Instantiated class Schoolbox\\\\Learning\\\\InvalidPath not found\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Module.php
-
-		-
 			message: "#^Variable \\$user in PHPDoc tag @var does not match assigned variable \\$reviewer\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
