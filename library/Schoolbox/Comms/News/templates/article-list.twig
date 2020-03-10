@@ -59,7 +59,9 @@
                             </h3>
 
                             <p class="meta">
-                                <span>By
+                                <span>
+                                    <template v-if="article.sticky">Pinned by</template>
+                                    <template v-else>By</template>
                                     <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
                                     <template v-else>${ article.author.fullname }</template>
                                 </span>
