@@ -17,8 +17,10 @@ use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
@@ -26,6 +28,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use UnderflowException;
+use UnexpectedValueException;
 use function implode;
 use function is_array;
 use function strtolower;
@@ -56,7 +59,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws InvalidArgumentException
      */
     protected function mapping()
@@ -124,7 +127,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * The Next Pieces
      *
      * @return string
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     protected function getFromString(): string
     {
@@ -143,55 +146,28 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
+     *
+     * @throws Exception
+     * @throws DefinitionException
+     * @throws UnexpectedValueException
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
+        $stickyCollection = $this->createCollection();
         $collection = $this->createCollection();
-        $idColumn   = $this->getIdentifierColumn();
-        /** @var Topic\Mapper $topicMapper */
-        $topicMapper = $this->getJoinMapper('comms_news_article_topic');
-        /** @var UserMapper $authorMapper */
-        $authorMapper = $this->getJoinMapper('author');
-        /** @var UserMapper $moderatorMapper */
-        $moderatorMapper = $this->getJoinMapper('moderator');
-        /** @var UserMapper $rejectorMapper */
-        $rejectorMapper = $this->getJoinMapper('rejector');
-        /** @var Storage\Mapper $featureImageMapper */
-        $featureImageMapper = $this->getJoinMapper('featureImage');
-        /** @var \Schoolbox\File\MimetypeMapper $mimeTypeMapper */
-        $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            if ($collection->offsetExists($row[$idColumn])) {
-                $article = $collection->offsetGet($row[$idColumn]);
+            if ((bool)$row['sticky']) {
+                $this->populateCollection($stickyCollection, $row);
             } else {
-                $article = $this->hydrate($row);
-                $collection->setOffset($row[$idColumn], $article);
-
-                // Hydrate 1:1 and 1:0..1 joins
-                $article->setTopics($topicMapper->createCollection());
-                $article->setAuthor($authorMapper->hydrate($row, 'a'));
-                $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
-                $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
-
-                $featureImage = $featureImageMapper->hydrate($row, 'fi');
-                if ($featureImage) {
-                    $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
-                }
-
-                /** @var Thread\Model|null $discussionThread */
-                $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
-                if ($discussionThread) {
-                    $article->setDiscussionThread($discussionThread);
-                }
+                $this->populateCollection($collection, $row);
             }
+        }
 
-            $topic = $topicMapper->hydrate($row, 'topics');
-            if ($topic) {
-                $article->getTopics()->setOffset($topic->getId(), $topic);
-            }
+        /* Reorder topics sequentially
+         */
+        foreach ($stickyCollection as $article) {
+            $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
 
         /* Reorder topics sequentially
@@ -200,7 +176,87 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
 
-        return $collection;
+        /* Combine collections
+         */
+        return $stickyCollection->merge($collection);
+    }
+
+
+    /**
+     * Populate $row data into an article's Model instance, then chuck it into
+     * the provided $collection
+     *
+     * @param GenericCollection $collection
+     * @param array             $row
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws UnexpectedValueException
+     */
+    private function populateCollection(GenericCollection $collection, array $row)
+    {
+        /* Could probably inject these into the function but they don't...
+         * really seem to cost much
+         */
+        /** @var Topic\Mapper $topicMapper */
+        $topicMapper = $this->getJoinMapper('comms_news_article_topic');
+
+        /** @var UserMapper $authorMapper */
+        $authorMapper = $this->getJoinMapper('author');
+
+        /** @var UserMapper $moderatorMapper */
+        $moderatorMapper = $this->getJoinMapper('moderator');
+
+        /** @var UserMapper $rejectorMapper */
+        $rejectorMapper = $this->getJoinMapper('rejector');
+
+        /** @var Storage\Mapper $featureImageMapper */
+        $featureImageMapper = $this->getJoinMapper('featureImage');
+
+        /** @var MimetypeMapper $mimeTypeMapper */
+        $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
+
+        /* If the article was put into this stack already, just reuse it
+         * Otherwise hydrate and store
+         */
+        $idColumn   = $this->getIdentifierColumn();
+
+        if ($collection->offsetExists($row[$idColumn])) {
+            $article = $collection->offsetGet($row[$idColumn]);
+        } else {
+            $article = $this->hydrate($row);
+            $collection->setOffset($row[$idColumn], $article);
+
+            // Hydrate 1:1 and 1:0..1 joins
+            $article->setTopics($topicMapper->createCollection());
+            $article->setAuthor($authorMapper->hydrate($row, 'a'));
+            $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
+            $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
+
+            /* If there's a feature image, bolt that on
+             */
+            $featureImage = $featureImageMapper->hydrate($row, 'fi');
+
+            if ($featureImage) {
+                $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
+            }
+
+            /* If there's a discussion thread, bolt that on
+             */
+            /** @var Thread\Model|null $discussionThread */
+            $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
+
+            if ($discussionThread) {
+                $article->setDiscussionThread($discussionThread);
+            }
+        }
+
+        /* Attach topics
+         */
+        $topic = $topicMapper->hydrate($row, 'topics');
+
+        if ($topic) {
+            $article->getTopics()->setOffset($topic->getId(), $topic);
+        }
     }
 
 
