@@ -4,6 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning;
 
 use Alaress\Authorizer\Authorizer;
@@ -46,14 +47,14 @@ class Module extends BaseModule
     {
         /** @var string[][] $routes */
         $routes = [
-            'GET' => [
-                '/pending'                                => 'getPendingAssessments',        // (no preload)
-                '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
-                '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
+            'GET'  => [
+                '/pending'            => 'getPendingAssessments',        // (no preload)
+                '/pending/{userId}'   => 'getPendingAssessmentsForUser', // viewee
+                '/classes{/termCode}' => 'getClasses',                   // (no preload)
             ],
             'POST' => [
-                '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
-            ]
+                '/pending/{userId}' => 'postPendingAssessmentsForUser', // viewee
+            ],
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -116,17 +117,17 @@ class Module extends BaseModule
 
         // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
-                $authorizer,
-                '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\All(
-                        new Rule\IsLoggedIn(),
-                        new Rule\IsUser('userId'),
-                        new Rule\HasRole(Role::STAFF)
-                    )
+            $authorizer,
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\IsUser('userId'),
+                    new Rule\HasRole(Role::STAFF)
                 )
-            );
+            )
+        );
     }
 
     /**
@@ -206,17 +207,17 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'externalClass'              => $this->getInjector()->get('externalClass'),
-            'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
-            'rosettaStone'               => $injector->lazyGet('l10n'),
-            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
-            'classListFactory' => $injector->lazy(function () {
+            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
+            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
+            'externalClass'         => $this->getInjector()->get('externalClass'),
+            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'logMapper'             => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
+            'rosettaStone'          => $injector->lazyGet('l10n'),
+            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
+            'classListFactory'      => $injector->lazy(function () {
                 /** @var IConnector $database */
                 $database = $this->getInjector()->get('databaseInternal');
                 return new Folder\ClassListFactory($database);
@@ -282,7 +283,7 @@ class Module extends BaseModule
      */
     private function preloadFolder(array $params): array
     {
-        $folder = 'folder';
+        $folder   = 'folder';
         $folderId = 'folderId';
 
         if (($params[$folder] ?? null) instanceof Folder\Model) {
