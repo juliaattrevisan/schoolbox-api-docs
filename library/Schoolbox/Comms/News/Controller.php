@@ -393,9 +393,11 @@ class Controller extends Base
 
         // Update article with proposed audience. Cache existing audience for later efficient persistence
         $existingAudience = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty())->shallowClone();
+
         if (!$article->isApproved()) {
             $this->updateArticleAudience($article, $data['audience']);
         }
+
         // Validate proposed article + audience
         // (This protects against DOM manipulation + logic bugs, it should not be shown on normal work-flows)
         try{
@@ -406,6 +408,7 @@ class Controller extends Base
                 'success' => false,
                 'message' => $e->getMessage(),
             ]));
+
             return;
         }
 
@@ -1383,6 +1386,8 @@ class Controller extends Base
      * @param Model $article
      * @param array $postData
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
@@ -1392,8 +1397,16 @@ class Controller extends Base
             ->setTitle($postData['title'])
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
-            ->setSticky((bool)$postData['sticky'])
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+
+        /* I still think that the ValidNewsModerator spec pattern makes this low level
+         * interrogation go away and behave consistently...but ok
+         *
+         * Write and Moderate are the only service level perms; Read doesn't exist.
+         */
+        if ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ) {
+            $article->setSticky((bool)$postData['sticky']);
+        }
 
         // Only set comments allowed if the value is passed in the form,
         // and the feature is enabled
