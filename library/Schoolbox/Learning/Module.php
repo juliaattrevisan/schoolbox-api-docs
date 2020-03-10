@@ -4,17 +4,20 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
+use InvalidArgumentException;
+use Twig_Error_Loader;
+use UnexpectedValueException;
 use function array_key_exists;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
@@ -28,8 +31,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\Filter;
-use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -46,14 +47,14 @@ class Module extends BaseModule
     {
         /** @var string[][] $routes */
         $routes = [
-            'GET' => [
-                '/pending'                                => 'getPendingAssessments',        // (no preload)
-                '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
-                '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
+            'GET'  => [
+                '/pending'            => 'getPendingAssessments',        // (no preload)
+                '/pending/{userId}'   => 'getPendingAssessmentsForUser', // viewee
+                '/classes{/termCode}' => 'getClasses',                   // (no preload)
             ],
             'POST' => [
-                '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
-            ]
+                '/pending/{userId}' => 'postPendingAssessmentsForUser', // viewee
+            ],
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -97,7 +98,7 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -116,23 +117,23 @@ class Module extends BaseModule
 
         // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
-                $authorizer,
-                '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\All(
-                        new Rule\IsLoggedIn(),
-                        new Rule\IsUser('userId'),
-                        new Rule\HasRole(Role::STAFF)
-                    )
+            $authorizer,
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\IsUser('userId'),
+                    new Rule\HasRole(Role::STAFF)
                 )
-            );
+            )
+        );
     }
 
     /**
      * @inheritdoc
      * @throws ApplicationException\Exception If Invalid user id specified
-     * @throws \InvalidArgumentException If mapper definition not found
+     * @throws InvalidArgumentException If mapper definition not found
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -190,7 +191,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws \Twig_Error_Loader If template directory not found
+     * @throws Twig_Error_Loader If template directory not found
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
@@ -199,24 +200,24 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
-     * @throws \InvalidArgumentException If mapper class not found
+     * @throws InvalidArgumentException If mapper class not found
      * @throws ServiceNotFound If cannot fetch service from DI
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'externalClass'              => $this->getInjector()->get('externalClass'),
-            'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
-            'rosettaStone'               => $injector->lazyGet('l10n'),
-            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
-            'classListFactory' => $injector->lazy(function () {
+            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
+            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
+            'externalClass'         => $this->getInjector()->get('externalClass'),
+            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'logMapper'             => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
+            'rosettaStone'          => $injector->lazyGet('l10n'),
+            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
+            'classListFactory'      => $injector->lazy(function () {
                 /** @var IConnector $database */
                 $database = $this->getInjector()->get('databaseInternal');
                 return new Folder\ClassListFactory($database);
@@ -237,7 +238,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
     {
@@ -246,7 +247,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getFolderMapper()
     {
@@ -255,7 +256,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()
     {
@@ -264,7 +265,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()
     {
@@ -277,12 +278,12 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws InvalidPath
      * @throws UnexpectedValueException
+     * @throws MapperException
      */
     private function preloadFolder(array $params): array
     {
-        $folder = 'folder';
+        $folder   = 'folder';
         $folderId = 'folderId';
 
         if (($params[$folder] ?? null) instanceof Folder\Model) {
@@ -290,11 +291,7 @@ class Module extends BaseModule
         } elseif (!array_key_exists($folderId, $params)) {
             throw new UnexpectedValueException("No 'folderId' found in route params");
         } else {
-            try {
-                $preload[$folder] = $this->getFolderMapper()->findById($params[$folderId]);
-            } catch (Mapper\Exception $e) {
-                throw new InvalidPath('Folder Not Found', 0, $e);
-            }
+            $preload[$folder] = $this->getFolderMapper()->findById($params[$folderId]);
         }
 
         return $preload;
