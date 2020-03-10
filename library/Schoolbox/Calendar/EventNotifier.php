@@ -59,10 +59,14 @@ class EventNotifier extends AbstractModuleNotifier
             return;
         }
 
-        if ($bundle->getMethod() === Mapper::METHOD_CREATE) {
+        $method = $bundle->getMethod();
+        if ($method === Mapper::METHOD_CREATE) {
             // advise 10 minutes before start
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
-        } elseif ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+            return;
+        }
+
+        if ($method === Mapper::METHOD_UPDATE) {
             // Bundle the updated trigger only if event was and is published
             if ($event->isPublished() && !$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
@@ -76,13 +80,16 @@ class EventNotifier extends AbstractModuleNotifier
                 $upcoming = $start - (60 * self::UPCOMING_WINDOW);
             }
             $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
+            return;
+        }
 
-        } elseif ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+        if ($method === Mapper::METHOD_DELETE) {
+            // Detach all existing triggers, and trigger the deleted event
+            // (which retracts all messages for this event already in the queue)
             $bundle->detachEach([
                 self::TRIGGER_UPCOMING,
                 self::TRIGGER_UPDATED,
             ]);
-            // trigger to retract existing notifications
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
             return;
         }
