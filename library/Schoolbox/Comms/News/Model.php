@@ -1041,6 +1041,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
             'title',
             'blurb',
             'body',
+            'sticky',
             'author',
             'featureImage',
             'publishAt',
