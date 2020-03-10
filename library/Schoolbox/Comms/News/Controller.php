@@ -828,6 +828,7 @@ class Controller extends Base
             'id',
             'title',
             'blurb',
+            'sticky',
             'featureImage',
             'author' => [
                 'fullname'
