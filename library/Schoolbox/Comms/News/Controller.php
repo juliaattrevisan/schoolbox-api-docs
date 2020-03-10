@@ -363,7 +363,7 @@ class Controller extends Base
             'returnUrl'              => $this->getExplicitReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'        => $this->getEntityTypesData(),
-            'isNewsModerator'        => ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ)
+            'isNewsModerator'        => $this->isNewsModerator(),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -827,7 +827,7 @@ class Controller extends Base
 
         if (count($articleIds)) {
             $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
-            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['publish_at' => 'DESC']]);
+            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['sticky' => 'DESC', 'publish_at' => 'DESC']]);
         } else {
             $articles = $this->newsMapper->createCollection();
         }
@@ -1409,7 +1409,7 @@ class Controller extends Base
          *
          * Write and Moderate are the only service level perms; Read doesn't exist.
          */
-        if ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ) {
+        if ($this->isNewsModerator()) {
             $article->setSticky((bool)$postData['sticky']);
         }
 
@@ -1635,5 +1635,20 @@ class Controller extends Base
         if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
+    }
+
+
+    /**
+     * Decide whether the currently-logged-in user is a News Moderator or Superuser
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     */
+    private function isNewsModerator(): bool
+    {
+        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ);
     }
 }

@@ -153,21 +153,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
-        $stickyCollection = $this->createCollection();
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            if ((bool)$row['sticky']) {
-                $this->populateCollection($stickyCollection, $row);
-            } else {
-                $this->populateCollection($collection, $row);
-            }
-        }
-
-        /* Reorder topics sequentially
-         */
-        foreach ($stickyCollection as $article) {
-            $article->getTopics()->sortBy('sequence', 'asc', null, true);
+            $this->populateCollection($collection, $row);
         }
 
         /* Reorder topics sequentially
@@ -176,9 +165,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
 
-        /* Combine collections
-         */
-        return $stickyCollection->merge($collection);
+        return $collection;
     }
 
 

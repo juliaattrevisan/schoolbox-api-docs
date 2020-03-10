@@ -47,7 +47,13 @@ class Homepage extends Base
             $params->getFolderId(),
             Audience\Model::RELATIONSHIP_SELF,
             true,
-            [ "{$this->newsMapper->getTable()}.publish_at" => 'DESC', "{$this->newsMapper->getTable()}.created_at" => 'DESC'],
+            [
+                /* Split sticky news from non-sticky news
+                 */
+                "{$this->newsMapper->getTable()}.sticky" => 'DESC',
+                "{$this->newsMapper->getTable()}.publish_at" => 'DESC',
+                "{$this->newsMapper->getTable()}.created_at" => 'DESC'
+            ],
             $params->getLimit()
         );
 
@@ -56,24 +62,9 @@ class Homepage extends Base
         /** @var GenericCollection|Model[] $articles */
         $articles = $this->loadArticleByIds($articleIds)->indexBy($idProperty);
 
-        /* Split sticky news from non-sticky news
-         * This is done in a mapper normally, but this is loading via audiencing which only gives us article ids
-         * Therefore traverse, split, then recombine - via a slightly different mechanism
-         */
-        $stickyCollection = $this->newsMapper->createCollection();
-        $collection = $this->newsMapper->createCollection();
-
         foreach ($articles as $id => $article) {
             $article->setAudience(new GenericCollection(Audience\Model::class));
-
-            if ($article->getSticky()) {
-                $stickyCollection->setOffset($id, $article);
-            } else {
-                $collection->setOffset($id, $article);
-            }
         }
-
-        $articles = $stickyCollection->merge($collection)->indexBy($idProperty);
 
         /* Tremendous Assumption
          *
