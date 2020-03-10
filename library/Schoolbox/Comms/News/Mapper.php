@@ -153,37 +153,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
-        $collection = $this->createCollection();
 
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $this->populateCollection($collection, $row);
-        }
-
-        /* Reorder topics sequentially
-         */
-        foreach ($collection as $article) {
-            $article->getTopics()->sortBy('sequence', 'asc', null, true);
-        }
-
-        return $collection;
-    }
-
-
-    /**
-     * Populate $row data into an article's Model instance, then chuck it into
-     * the provided $collection
-     *
-     * @param GenericCollection $collection
-     * @param array             $row
-     * @throws DefinitionException
-     * @throws Exception
-     * @throws UnexpectedValueException
-     */
-    private function populateCollection(GenericCollection $collection, array $row)
-    {
-        /* Could probably inject these into the function but they don't...
-         * really seem to cost much
-         */
         /** @var Topic\Mapper $topicMapper */
         $topicMapper = $this->getJoinMapper('comms_news_article_topic');
 
@@ -202,48 +172,61 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
 
-        /* If the article was put into this stack already, just reuse it
-         * Otherwise hydrate and store
-         */
-        $idColumn   = $this->getIdentifierColumn();
+        $collection = $this->createCollection();
 
-        if ($collection->offsetExists($row[$idColumn])) {
-            $article = $collection->offsetGet($row[$idColumn]);
-        } else {
-            $article = $this->hydrate($row);
-            $collection->setOffset($row[$idColumn], $article);
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            // Hydrate 1:1 and 1:0..1 joins
-            $article->setTopics($topicMapper->createCollection());
-            $article->setAuthor($authorMapper->hydrate($row, 'a'));
-            $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
-            $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
-
-            /* If there's a feature image, bolt that on
+            /* If the article was put into this stack already, just reuse it
+             * Otherwise hydrate and store
              */
-            $featureImage = $featureImageMapper->hydrate($row, 'fi');
+            $idColumn   = $this->getIdentifierColumn();
 
-            if ($featureImage) {
-                $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
+            if ($collection->offsetExists($row[$idColumn])) {
+                $article = $collection->offsetGet($row[$idColumn]);
+            } else {
+                $article = $this->hydrate($row);
+                $collection->setOffset($row[$idColumn], $article);
+
+                // Hydrate 1:1 and 1:0..1 joins
+                $article->setTopics($topicMapper->createCollection());
+                $article->setAuthor($authorMapper->hydrate($row, 'a'));
+                $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
+                $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
+
+                /* If there's a feature image, bolt that on
+                 */
+                $featureImage = $featureImageMapper->hydrate($row, 'fi');
+
+                if ($featureImage) {
+                    $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
+                }
+
+                /* If there's a discussion thread, bolt that on
+                 */
+                /** @var Thread\Model|null $discussionThread */
+                $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
+
+                if ($discussionThread) {
+                    $article->setDiscussionThread($discussionThread);
+                }
             }
 
-            /* If there's a discussion thread, bolt that on
+            /* Attach topics
              */
-            /** @var Thread\Model|null $discussionThread */
-            $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
+            $topic = $topicMapper->hydrate($row, 'topics');
 
-            if ($discussionThread) {
-                $article->setDiscussionThread($discussionThread);
+            if ($topic) {
+                $article->getTopics()->setOffset($topic->getId(), $topic);
             }
         }
 
-        /* Attach topics
+        /* Reorder topics sequentially
          */
-        $topic = $topicMapper->hydrate($row, 'topics');
-
-        if ($topic) {
-            $article->getTopics()->setOffset($topic->getId(), $topic);
+        foreach ($collection as $article) {
+            $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
+
+        return $collection;
     }
 
 
