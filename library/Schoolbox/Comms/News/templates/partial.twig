@@ -27,7 +27,8 @@
 
                         <h3><a href="{{ articleURL }}">{{ article.title }}</a></h3>
 
-                        <p class="meta">By
+                        <p class="meta">
+                            {% if article.sticky %}Pinned by{% else %}By{% endif %}
                             {% if article.author.deletedAt.isNull %}
                                 <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                             {% else %}
