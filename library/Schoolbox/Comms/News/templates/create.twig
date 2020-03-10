@@ -351,6 +351,10 @@
                     </div>
                 </fieldset>
 
+                {# Only news moderator or superuser can change this setting
+                 # This prevents teachers getting over eager about their content
+                 #}
+                {% if isNewsModerator %}
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="news-sticky">Priority {{ locale.news }}</label>
@@ -365,6 +369,7 @@
                         </div>
                     </div>
                 </fieldset>
+                {% endif %}
 
                 <fieldset class="content">
                     <div class="small-12 columns">
