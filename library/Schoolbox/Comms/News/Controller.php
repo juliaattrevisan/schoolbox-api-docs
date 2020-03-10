@@ -1391,6 +1391,7 @@ class Controller extends Base
             ->setTitle($postData['title'])
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
+            ->setSticky((bool)$postData['sticky'])
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
 
         // Only set comments allowed if the value is passed in the form,

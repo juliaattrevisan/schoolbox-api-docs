@@ -353,6 +353,21 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
+                        <label for="news-sticky">Sticky</label>
+                        <p class="meta">This article always appears at the top of listings to communicate important messages.</p>
+
+                        <div class="switch round">
+                            <input id="news-sticky" type="checkbox" name="sticky" {{ article.sticky }} {% if article.sticky %}checked="checked"{% endif %}>
+                            <label for="news-sticky">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
                         <label for="news-topics">Topics</label>
                         <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
                         <select data-topics name="topics[]" id="news-topics" multiple></select>
