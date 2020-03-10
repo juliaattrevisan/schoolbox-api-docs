@@ -59,10 +59,10 @@ class EventNotifier extends AbstractModuleNotifier
             return;
         }
 
-        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
+        if ($bundle->getMethod() === Mapper::METHOD_CREATE) {
             // advise 10 minutes before start
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
-        } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+        } elseif ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
             // Bundle the updated trigger only if event was and is published
             if ($event->isPublished() && !$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
@@ -77,6 +77,14 @@ class EventNotifier extends AbstractModuleNotifier
             }
             $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
 
+        } elseif ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+            $bundle->detachEach([
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_UPDATED,
+            ]);
+            // trigger to retract existing notifications
+            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            return;
         }
     }
 
@@ -370,6 +378,18 @@ class EventNotifier extends AbstractModuleNotifier
     public function notifyParentUpdated($event, $author, $diff = null)
     {
         return $this->notifyUpdated(Role::PARENT, $event, $author, $diff);
+    }
+
+
+    /**
+     * On deletion of an event, retract all notifications relating to it.
+     *
+     * @param Event $event
+     * @return Envelope
+     */
+    public function notifySystemDeleted(Event $event): Envelope
+    {
+        return $this->retractEventObject(new Envelope(), $event);
     }
 
 
