@@ -604,7 +604,7 @@ class Notifier extends AbstractModuleNotifier
             $envelope->targetToUser(
                 $recipient->getId(),
                 $instance,
-                $article->getSticky() ? Instance::DELIVERY_ALERT : Instance::DELIVERY_INSTANT
+                $article->getSticky() ? Instance::DELIVERY_ALERT : Instance::DELIVERY_NOTIFY
             );
         }
 
