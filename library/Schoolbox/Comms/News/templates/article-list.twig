@@ -43,7 +43,7 @@
                     </div>
                 </li>
 
-                <li :class="'actions-small-1 ' + (article.sticky ? 'sticky' : '')" v-for="article in currentArticles">
+                <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card wrap-down">
                             <template v-if="article.featureImage">
