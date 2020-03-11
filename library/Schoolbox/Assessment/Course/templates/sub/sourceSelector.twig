@@ -22,11 +22,11 @@
                 }
             });
 
-            var $selector = $(this),
+            let $selector = $(this),
                 target = $selector.data('source'),
                 $input = $('[name="' + target + '"]');
 
-            var modal = $('<div data-reveal class="reveal-modal" />');
+            let modal = $('#faculty-selector-modal');
 
             modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}/' + $("#parent").val()).one('click', '[data-selection]', function (e) {
                 e.preventDefault();
@@ -46,6 +46,7 @@
 
                 modal.foundation('reveal', 'close');
             });
+
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
                 $.magnificPopup.close();
             });
@@ -53,6 +54,8 @@
     })
 </script>
 {% endautoescape %}
+
+<div data-reveal id="faculty-selector-modal" class="reveal-modal"></div>
 
 <label class="required">{{ locale.faculty.proper }} / {{ locale.subject.proper }} Folder</label>
 
