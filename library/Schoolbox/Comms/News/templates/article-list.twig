@@ -43,7 +43,7 @@
                     </div>
                 </li>
 
-                <li :class="'actions-small-1 ' + (article.sticky ? 'sticky' : '')" v-for="article in currentArticles">
+                <li class="actions-small-1" v-bind:class="sticky(article)" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card wrap-down">
                             <template v-if="article.featureImage">
@@ -318,6 +318,13 @@
             }
         },
         methods: {
+
+            /* Decide additional css class to render for this article
+             */
+            sticky: function(article) {
+                return article.sticky ? 'sticky' : '';
+            },
+
             /*
              * On change of page
              *
