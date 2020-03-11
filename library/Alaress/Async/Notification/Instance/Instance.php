@@ -62,6 +62,14 @@ class Instance implements JsonSerializable
     public const ACTION_RETRACT_ALL = 'retract-all';
 
     /**
+     * Delivery: alert
+     *
+     * Set as part of this instance's topic: if it's there, the message will
+     * bypass routing, and be upgraded to instant+email+app.
+     */
+    public const DELIVERY_ALERT = 'alert';
+
+    /**
      * Delivery: instant
      *
      * Set as part of this instance's topic: if it's there, the message will
