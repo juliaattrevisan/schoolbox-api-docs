@@ -33,7 +33,12 @@ class InstanceBundle
      * @param string   $target
      * @param Instance $instance
      * @param string   $delivery The delivery method:
-     *                           one of the `Instance::DELIVERY_*` constants
+     *                           one of the `Instance::DELIVERY_*` constants.
+     *                           Currently, setting a delivery method only works
+     *                           for instances targeted directly to a user,
+     *                           because the only instant or alert queue that a
+     *                           user listens to is their own personal queue.
+     *
      */
     protected function bind($target, $instance, string $delivery = Instance::DELIVERY_NOTIFY)
     {
