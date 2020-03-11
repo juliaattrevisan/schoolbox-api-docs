@@ -1,6 +1,6 @@
 <?php
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -103,15 +103,16 @@ class Envelope extends InstanceBundle {
 	}
 
 	/**
-	 * @param User|int $userId
-	 * @param Instance $instance
-	 * @param bool     $force
-	 */
-	public function targetToUser($userId, $instance, $force = false) {
+     * @param User|int $userId
+     * @param Instance $instance
+     * @param string   $delivery The delivery method:
+     *                           one of the `Instance::DELIVERY_*` constants
+     */
+	public function targetToUser($userId, $instance, string $delivery = Instance::DELIVERY_NOTIFY) {
 		if($userId instanceof User) {
 			$userId = $userId->getId();
 		}
-		$this->bind("user.$userId", $instance, $force);
+		$this->bind("user.$userId", $instance, $delivery);
 	}
 
 	/**

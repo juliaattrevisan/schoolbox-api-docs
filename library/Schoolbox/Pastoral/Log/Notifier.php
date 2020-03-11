@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Log;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -49,7 +50,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setAllowSelfSend(true);
 
             $message = $builder->build();
-            $envelope->targetToUser($model->getUserId(), $message, true);
+            $envelope->targetToUser($model->getUserId(), $message, Instance::DELIVERY_INSTANT);
         }
 
         return $envelope;

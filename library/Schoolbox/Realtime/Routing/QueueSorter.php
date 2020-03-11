@@ -245,4 +245,4 @@ class QueueSorter implements FilterInterface
         return $intent;
     }
 
-} 
+}

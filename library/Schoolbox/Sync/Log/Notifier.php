@@ -10,6 +10,7 @@ namespace Schoolbox\Sync\Log;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -101,7 +102,7 @@ class Notifier extends AbstractModuleNotifier
             ->setAllowSelfSend(true);
 
         // forcibly send this message to the user
-        $envelope->targetToUser($user->getId(), $bob->build(), true);
+        $envelope->targetToUser($user->getId(), $bob->build(), Instance::DELIVERY_INSTANT);
 
         return $envelope;
     }

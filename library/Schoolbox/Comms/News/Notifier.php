@@ -9,6 +9,7 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Comms\News\Audience\IUserResolver;
@@ -596,7 +597,14 @@ class Notifier extends AbstractModuleNotifier
             if ($recipient->getId() === $author->getId()) {
                 continue;
             }
-            $envelope->targetToUser($recipient->getId(), $instance);
+
+            // Is this an important article?
+            // If so, bypass standard delivery mechanisms
+            $envelope->targetToUser(
+                $recipient->getId(),
+                $instance,
+                $article->getSticky() ? Instance::DELIVERY_ALERT : Instance::DELIVERY_INSTANT
+            );
         }
 
         return $envelope;

@@ -32,9 +32,10 @@ class InstanceBundle
      *
      * @param string   $target
      * @param Instance $instance
-     * @param bool     $force
+     * @param string   $delivery The delivery method:
+     *                           one of the `Instance::DELIVERY_*` constants
      */
-    protected function bind($target, $instance, $force = false)
+    protected function bind($target, $instance, string $delivery = Instance::DELIVERY_NOTIFY)
     {
 
         // If we accidentally passed a builder object (ie. forgot to call build()),
@@ -49,15 +50,9 @@ class InstanceBundle
 
         $topics = $this->splStore->offsetGet($instance);
 
-        // detect whether or not to force-send to the user
-        // (DELIVERY_INSTANT will bypass routing, DELIVERY_NOTIFY is more courteous)
-        $prefix = ($force && strpos($target, 'user.') === 0)
-            ? Instance::DELIVERY_INSTANT
-            : Instance::DELIVERY_NOTIFY;
-
-        // iterate the instance's topics, and prepend the given target
+        // iterate the instance's topics, and prepend the given target and delivery
         foreach ($instance->getTopics() as $topic) {
-            $destination                = "$prefix.$target.$topic";
+            $destination                = "$delivery.$target.$topic";
             $topics[sha1($destination)] = $destination;
         }
 
