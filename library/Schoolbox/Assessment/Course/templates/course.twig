@@ -177,6 +177,13 @@ Usage:
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
 
+        {# This validation was triggering even though it was okay to be empty
+         # That condition exists when you want to save the course without
+         # creating a new unit; as usual, solve the problem by deleting the problem
+         #}
+        $mageSaveCourseButton.on('click', function() {
+            $('[data-new-unit]').remove();
+        });
     });
 </script>
 {% endautoescape %}
