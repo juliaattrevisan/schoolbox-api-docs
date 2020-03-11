@@ -56,6 +56,20 @@ Usage:
 
 
         /**
+         *  Toggle button availability
+         *
+         *  @return void
+         */
+        function toggleSaveCourse() {
+            if ($('[data-unit-spec]').length) {
+                $mageSaveCourseButton.attr('disabled', false);
+            } else {
+                $mageSaveCourseButton.attr('disabled', true);
+            }
+        }
+
+
+        /**
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
          */
@@ -102,11 +116,7 @@ Usage:
 
                                 /* Toggle button availability
                                  */
-                                if ($('[data-unit-spec]').length) {
-                                    $mageSaveCourseButton.attr('disabled', false);
-                                } else {
-                                    $mageSaveCourseButton.attr('disabled', true);
-                                }
+                                toggleSaveCourse();
                             });
                         });
                 }
@@ -146,11 +156,7 @@ Usage:
 
                 /* Toggle button availability
                  */
-                if ($('[data-unit-spec]').length) {
-                    $mageSaveCourseButton.attr('disabled', false);
-                } else {
-                    $mageSaveCourseButton.attr('disabled', true);
-                }
+                toggleSaveCourse();
             },
 
             validateOptions: {
@@ -190,11 +196,7 @@ Usage:
 
                 /* Toggle button availability
                  */
-                if ($('[data-unit-spec]').length) {
-                    $mageSaveCourseButton.attr('disabled', false);
-                } else {
-                    $mageSaveCourseButton.attr('disabled', true);
-                }
+                toggleSaveCourse();
             },
 
             validateOptions: {
