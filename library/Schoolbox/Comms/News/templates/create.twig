@@ -357,14 +357,13 @@
                 {% if isNewsModerator %}
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="news-sticky">Priority {{ locale.news }}</label>
-                        <p class="meta">This article will be pinned to the top of listings and all users will be notified immediately to communicate important messages.</p>
-
+                        <label for="news-sticky">Priority {{ locale.news.proper }}</label>
+                        <p class="meta">News items will be pinned to the top of the feed. The audience will be directly notified via email, push and instant notifications, regardless of user settings.</p>
                         <div class="switch round">
                             <input id="news-sticky" type="checkbox" name="sticky" {{ article.sticky }} {% if article.sticky %}checked="checked"{% endif %}>
                             <label for="news-sticky">
-                                <span>Yes</span>
-                                <span>No</span>
+                                <span>On</span>
+                                <span>Off</span>
                             </label>
                         </div>
                     </div>
