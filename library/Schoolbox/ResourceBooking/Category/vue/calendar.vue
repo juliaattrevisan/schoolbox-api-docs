@@ -272,6 +272,20 @@
             onQuickSwitch(value) {
                 this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
             },
+
+            /**
+             * Apply natural sort ordering to resources before display
+             */
+            natcasesort() {
+                let resources = this.config.resources;
+                return resources.sort((a, b) => a.name.localeCompare(b.name, 'en', {
+                    numeric: true,
+                    sensitivity: 'base'
+                }));
+
+                // var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+                // return resources.sort(collator.compare);
+            },
         },
         mounted() {
             // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
@@ -371,9 +385,8 @@
                     center: 'title',
                     right: 'customFilters,resourceTimelineMonth,resourceTimelineWeek,resourceTimelineDay,customExport'
                 }"
-                :resources="config.resources"
+                :resources="natcasesort()"
                 :resourceColumns="config.resourceColumns"
-                resource-order="name"
                 :schedulerLicenseKey="config.schedulerLicenseKey"
                 :default-date="config.defaultDate"
                 :default-view="config.defaultView"
