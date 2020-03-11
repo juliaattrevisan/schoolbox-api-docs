@@ -201,13 +201,17 @@ class QueueSorter implements FilterInterface
 
     /**
      * Calculate a set of route levels relevant to this user x instance.
-     * Will be a subset of [ MU, DI, IN, MO, EM ]
      *
      * @param User     $user
      * @param Instance $instance
-     * @return array
+     * @return array One or more of these constants:
+     *              `* RoutePermission::MUTE`
+     *              `* RoutePermission::DIGEST`
+     *              `* RoutePermission::INSTANT`
+     *              `* RoutePermission::PUSH`
+     *              `* RoutePermission::EMAIL`
      */
-    private function getReroutedLevel(User $user, Instance $instance)
+    private function getReroutedLevel(User $user, Instance $instance): array
     {
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
@@ -261,10 +265,10 @@ class QueueSorter implements FilterInterface
         ) {
             $this->log->info("User doesn't have digest schedule: upgrading to at least instant");
             $newIntent = [RoutePermission::INSTANT];
-            if (!$this->permMapper->isPush($intent)) {
+            if ($this->permMapper->isPush($intent)) {
                 $newIntent[] = RoutePermission::PUSH;
             }
-            if (!$this->permMapper->isEmail($intent)) {
+            if ($this->permMapper->isEmail($intent)) {
                 $newIntent[] = RoutePermission::EMAIL;
             }
             $intent = $newIntent;
