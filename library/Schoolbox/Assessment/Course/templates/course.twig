@@ -20,6 +20,11 @@ Usage:
 
         $('[data-collapser]').collapsable();
 
+        // Mage Buttons
+        var $mageNextButton = $('[data-mage-next="unit-info"]');
+        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
+        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
+
 
         /**
          * Apply the javascript validator
@@ -37,6 +42,16 @@ Usage:
                     }
                 });
             });
+
+            {# This validation was triggering even though it was okay to be empty
+             # That condition exists when you want to save the course without
+             # creating a new unit; as usual, solve the problem by deleting the problem
+             #}
+            if ($('[data-unit-spec]').length) {
+                $mageSaveCourseButton.on('click', function () {
+                    $('[data-new-unit]').remove();
+                });
+            }
         }
 
 
@@ -67,10 +82,6 @@ Usage:
             return $('input[data-unit-name]').length;
         }, 'Please create at least one {{ locale.unit }} for this course.');
 
-        // Mage Buttons
-        var $mageNextButton = $('[data-mage-next="unit-info"]');
-        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
-        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
 
         /**
          * Deletion of Units
@@ -178,14 +189,6 @@ Usage:
             var unitSpecId = window.location.hash.slice(1);
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
-
-        {# This validation was triggering even though it was okay to be empty
-         # That condition exists when you want to save the course without
-         # creating a new unit; as usual, solve the problem by deleting the problem
-         #}
-        $mageSaveCourseButton.on('click', function() {
-            $('[data-new-unit]').remove();
-        });
     });
 </script>
 {% endautoescape %}
