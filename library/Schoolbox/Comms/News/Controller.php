@@ -268,6 +268,7 @@ class Controller extends Base
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'            => $this->getExplicitReturnUrl(),
             'entityTypesData'      => $this->getEntityTypesData(),
+            'isNewsModerator'      => $this->isNewsModerator(),
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
