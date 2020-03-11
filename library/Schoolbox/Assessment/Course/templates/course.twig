@@ -20,6 +20,55 @@ Usage:
 
         $('[data-collapser]').collapsable();
 
+        // Mage Buttons
+        var $mageNextButton = $('[data-mage-next="unit-info"]');
+        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
+        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
+
+
+        /**
+         * Apply the javascript validator
+         *
+         * @param modifyValidation
+         */
+        function initValidator(modifyValidation) {
+            $("#update-course-form").alaressValidate(modifyValidation);
+
+            $('[data-unit-name]').each(function() {
+                $(this).rules('add', {
+                    requiredNotBlank: true,
+                    messages: {
+                        required: "Please enter a name for this {{ locale.unit }}."
+                    }
+                });
+            });
+
+            {# This validation was triggering even though it was okay to be empty
+             # That condition exists when you want to save the course without
+             # creating a new unit; as usual, solve the problem by deleting the problem
+             #}
+            if ($('[data-unit-spec]').length) {
+                $mageSaveCourseButton.on('click', function () {
+                    $('[data-new-unit]').remove();
+                });
+            }
+        }
+
+
+        /**
+         *  Toggle button availability
+         *
+         *  @return void
+         */
+        function toggleSaveCourse() {
+            if ($('[data-unit-spec]').length) {
+                $mageSaveCourseButton.attr('disabled', false);
+            } else {
+                $mageSaveCourseButton.attr('disabled', true);
+            }
+        }
+
+
         /**
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
@@ -38,26 +87,15 @@ Usage:
             onkeyup: false
         };
 
-        $("#update-course-form").alaressValidate(modifyValidation);
-
-        $('[data-unit-name]').each(function() {
-            $(this).rules('add', {
-                required: true,
-                messages: {
-                    required: "Please enter a name for this {{ locale.unit }}."
-                }
-            });
-        });
+        /* Apply initially; this gets reset during async mage calls, it seems, so we
+         * will end up re-initialising elsewhere
+         */
+        initValidator(modifyValidation);
 
         $.validator.addMethod('oneUnit', function() {
             return $('input[data-unit-name]').length;
         }, 'Please create at least one {{ locale.unit }} for this course.');
 
-
-        // Mage Buttons
-        var $mageNextButton = $('[data-mage-next="unit-info"]');
-        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
-        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
 
         /**
          * Deletion of Units
@@ -72,8 +110,13 @@ Usage:
                     $.post($button.attr('href'))
                         .done(function () {
                             var $listItem = $button.closest('[data-unit-spec]');
+
                             $listItem.slideUp(400, function () {
                                 $listItem.detach();
+
+                                /* Toggle button availability
+                                 */
+                                toggleSaveCourse();
                             });
                         });
                 }
@@ -105,10 +148,17 @@ Usage:
 
                 // Display the 'Save Course' section
                 $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
-
-                // Reset validation
-                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
             },
+
+            // Reset validation always
+            onXhrAlways: function() {
+                initValidator(modifyValidation);
+
+                /* Toggle button availability
+                 */
+                toggleSaveCourse();
+            },
+
             validateOptions: {
                 rules: {
                     name: "required",
@@ -138,14 +188,22 @@ Usage:
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
                 $(document).foundation();
+            },
 
-                // Reset validation
-                $('#update-course-form').removeData('validator').alaressValidate(modifyValidation);
+            // Reset validation always
+            onXhrAlways: function() {
+                initValidator(modifyValidation);
+
+                /* Toggle button availability
+                 */
+                toggleSaveCourse();
             },
 
             validateOptions: {
                 rules: {
-                    newUnitName: "required"
+                    newUnitName: {
+                        requiredNotBlank: true
+                    }
                 },
                 messages: {
                     newUnitName: "Please enter a name for your new {{ locale.unit }}"
@@ -158,7 +216,6 @@ Usage:
             var unitSpecId = window.location.hash.slice(1);
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
-
     });
 </script>
 {% endautoescape %}
@@ -309,7 +366,7 @@ Usage:
                 <div class="row" data-mage="unit-info">
                     {# Don't delete the inline style, it's needed -#}
                     <div class="small-12 column" {% if not courseSpec.id %}data-mage-collapsed style="display: none;"{% endif %}>
-                        <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
+                        <input type="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
                     </div>
                 </div>
             {% endif %}

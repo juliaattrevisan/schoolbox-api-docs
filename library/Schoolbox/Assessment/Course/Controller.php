@@ -601,18 +601,33 @@ class Controller extends Base\Base
         if (\is_array($post['unit'])) {
             $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
 
+            /* Keep track of how many units were missing names
+             */
+            $emptyUnit = 0;
+
             // save unit name changes
             foreach ($courseSpec->getUnits() as $unitSpec) {
-                $unitName = $post['unit'][$unitSpec->getId()]['name'];
+                $unitName = trim($post['unit'][$unitSpec->getId()]['name']);
 
-                if (isset($unitName)) {
+                /* Don't try to save empty units
+                 */
+                if ('' !== $unitName) {
                     // Re-hydrate unit folder to ensure curriculum codes etc are hydrated.
                     $unitFolder = $this->folderMapper->findById($unitSpec->getFolder()->getId());
                     $this->folderMapper->save($unitFolder->setName($unitName));
+                } else {
+                    $emptyUnit++;
                 }
             }
+
+            /* Report problems with units
+             */
+            if ($emptyUnit) {
+                $this->sendError(new Base\Exception('At least one unit in this course has no name. ', ['Units must have names.']));
+                return;
+            }
         } else {
-            $this->sendError(new Base\Exception('Cannot create a Course without Units.', ['You need to create at least 1 unit']));
+            $this->sendError(new Base\Exception('Cannot create a Course without Units. ', ['You need to create at least 1 unit.']));
             return;
         }
 
