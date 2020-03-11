@@ -10,7 +10,6 @@ namespace Schoolbox\Realtime\Routing;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Instance\InstanceBundle;
 use Exception;
 use InvalidArgumentException;
 use PDOException;

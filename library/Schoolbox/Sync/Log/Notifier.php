@@ -89,12 +89,13 @@ class Notifier extends AbstractModuleNotifier
             $storage = Storage\Mapper::getInstance()->findByHash($storage->getHash());
         }
 
-        $bob->setTitle($log->isDry()
+        $bob->setTitle(
+            $log->isDry()
                 ? 'User provisioning dry run has completed'
                 : 'User provisioning live update has completed'
             )
             ->setIcon('/images/icon.php?size=' . $this->iconSize . '&icon=' . NSMapper::NS_UPS)
-            ->setHref('/adminv2/ups/log/' . $log->getId().'.html')
+            ->setHref('/adminv2/ups/log/' . $log->getId() . '.html')
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic(implode('.', ['ups', $log->getId(), self::TRIGGER_LOGGED]))
