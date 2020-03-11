@@ -153,6 +153,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
+        $idColumn = $this->getIdentifierColumn();
 
         /** @var Topic\Mapper $topicMapper */
         $topicMapper = $this->getJoinMapper('comms_news_article_topic');
@@ -179,8 +180,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             /* If the article was put into this stack already, just reuse it
              * Otherwise hydrate and store
              */
-            $idColumn   = $this->getIdentifierColumn();
-
             if ($collection->offsetExists($row[$idColumn])) {
                 $article = $collection->offsetGet($row[$idColumn]);
             } else {
