@@ -161,12 +161,12 @@ class BindingLoader implements ILoader
 
         $perms = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
 
-        $baseServiceRoute = "*.notify.service.1.%d.%s.#";
+        $baseServiceRoute = "*.%s.service.1.%d.%s.#";
         foreach ($folders as $folder) {
             // we have to manually map each access level (sigh)
             foreach ($perms as $p) {
-                $from = sprintf($baseServiceRoute, $folder->getId(), $p);
-                $to   = sprintf($baseServiceRoute, $folder->getParent()->getId(), $p);
+                $from = sprintf($baseServiceRoute, Instance::DELIVERY_NOTIFY, $folder->getId(), $p);
+                $to   = sprintf($baseServiceRoute, Instance::DELIVERY_NOTIFY, $folder->getParent()->getId(), $p);
                 yield $from => $to;
             }
         }
