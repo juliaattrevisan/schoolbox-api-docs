@@ -609,24 +609,11 @@ class Instance implements JsonSerializable
      */
     public function retrieveDeliveryMethod(): string
     {
-        $topic = $this->topics[0];
-        [, $delivery] = explode('.', $topic);
-        return $delivery ?? self::DELIVERY_NOTIFY;
-    }
-
-
-    /**
-     * Is this message always delivered instantly, regardless of routing?
-     *
-     * @return bool
-     */
-    public function isDeliveryAlwaysInstant(): bool
-    {
         // TODO consider inspecting all topics, not just the first
         // But what if the message is delivered to multiple users differently?
         $topic = $this->topics[0];
         [, $delivery] = explode('.', $topic);
-        return $delivery === self::DELIVERY_INSTANT;
+        return $delivery ?? self::DELIVERY_NOTIFY;
     }
 
     /**
