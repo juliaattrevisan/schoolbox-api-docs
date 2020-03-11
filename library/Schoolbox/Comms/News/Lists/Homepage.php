@@ -62,7 +62,7 @@ class Homepage extends Base
         /** @var GenericCollection|Model[] $articles */
         $articles = $this->loadArticleByIds($articleIds)->indexBy($idProperty);
 
-        foreach ($articles as $id => $article) {
+        foreach ($articles as $article) {
             $article->setAudience(new GenericCollection(Audience\Model::class));
         }
 
