@@ -263,7 +263,7 @@ class QueueSorter implements FilterInterface
         if ($this->permMapper->isDigest($intent)
             && (string)$user->getRole()->getDigestSchedule() === Role::DIGEST_NEVER
         ) {
-            $this->log->info("User doesn't have digest schedule: upgrading to at least instant");
+            $this->log->info("User doesn't have digest schedule: ensuring delivery is at least instant");
             $newIntent = [RoutePermission::INSTANT];
             if ($this->permMapper->isPush($intent)) {
                 $newIntent[] = RoutePermission::PUSH;
