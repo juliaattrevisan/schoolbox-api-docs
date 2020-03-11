@@ -96,8 +96,17 @@ Usage:
                     $.post($button.attr('href'))
                         .done(function () {
                             var $listItem = $button.closest('[data-unit-spec]');
+
                             $listItem.slideUp(400, function () {
                                 $listItem.detach();
+
+                                /* Toggle button availability
+                                 */
+                                if ($('[data-unit-spec]').length) {
+                                    $mageSaveCourseButton.attr('disabled', false);
+                                } else {
+                                    $mageSaveCourseButton.attr('disabled', true);
+                                }
                             });
                         });
                 }
@@ -134,6 +143,14 @@ Usage:
             // Reset validation always
             onXhrAlways: function() {
                 initValidator(modifyValidation);
+
+                /* Toggle button availability
+                 */
+                if ($('[data-unit-spec]').length) {
+                    $mageSaveCourseButton.attr('disabled', false);
+                } else {
+                    $mageSaveCourseButton.attr('disabled', true);
+                }
             },
 
             validateOptions: {
@@ -170,6 +187,14 @@ Usage:
             // Reset validation always
             onXhrAlways: function() {
                 initValidator(modifyValidation);
+
+                /* Toggle button availability
+                 */
+                if ($('[data-unit-spec]').length) {
+                    $mageSaveCourseButton.attr('disabled', false);
+                } else {
+                    $mageSaveCourseButton.attr('disabled', true);
+                }
             },
 
             validateOptions: {
