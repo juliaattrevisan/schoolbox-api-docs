@@ -6,7 +6,7 @@
     $(function() {
         // {RESPONSE} can be empty - function wrapper caters for that possibility.
         (function (response) {
-            $('[data-signature]').alaressSignaturePad({
+            $('[data-signature="{RESPONSE_ID}"]').alaressSignaturePad({
                 displayOnly: true,
                 rescale: true,
                 init: response
@@ -18,7 +18,7 @@
 <tr class="row content">
     <td>
     <h4>Answer Given</h4>
-    <div class="sigPad row readonly" data-signature>
+    <div class="sigPad row readonly" data-signature="{RESPONSE_ID}">
         <div class="sigPadWrapper small-12 columns no-pad">
             <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
         </div>
