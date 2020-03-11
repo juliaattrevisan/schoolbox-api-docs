@@ -624,6 +624,7 @@ class Controller extends Base\Base
              */
             if ($emptyUnit) {
                 $this->sendError(new Base\Exception('At least one unit in this course has no name. ', ['Units must have names.']));
+                return;
             }
         } else {
             $this->sendError(new Base\Exception('Cannot create a Course without Units. ', ['You need to create at least 1 unit.']));
