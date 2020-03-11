@@ -8,7 +8,9 @@
 
 namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Routing\IRouter;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
@@ -16,7 +18,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Traversable;
-use PDO;
 
 class BindingLoader implements ILoader
 {
@@ -120,8 +121,10 @@ class BindingLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
-        $userRoutes = [
-            "*.instant.user.$userId.#" => true,
+        $baseUserRoute = "*.%s.user.%d.#";
+        $userRoutes    = [
+            sprintf($baseUserRoute, Instance::DELIVERY_ALERT, $userId)   => true,
+            sprintf($baseUserRoute, Instance::DELIVERY_INSTANT, $userId) => true,
         ];
 
         try {
@@ -133,7 +136,7 @@ class BindingLoader implements ILoader
 
         foreach ($bindings as $prefix => $data) {
             foreach ($data as $target) {
-                $binding              = "*.notify.$prefix.$target";
+                $binding              = sprintf("*.%s.%s.%s", Instance::DELIVERY_NOTIFY, $prefix, $target);
                 $userRoutes[$binding] = true;
             }
         }
@@ -149,7 +152,7 @@ class BindingLoader implements ILoader
     {
         $stmt = $this->userMapper->getDatabase()->query('SELECT `from`, `to` FROM msg_redirect');
 
-        while (list ($from, $to) = $stmt->fetch(PDO::FETCH_NUM)) {
+        while ([$from, $to] = $stmt->fetch(PDO::FETCH_NUM)) {
             yield $from => $to;
         }
 
@@ -158,12 +161,12 @@ class BindingLoader implements ILoader
 
         $perms = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
 
+        $baseServiceRoute = "*.notify.service.1.%d.%s.#";
         foreach ($folders as $folder) {
             // we have to manually map each access level (sigh)
             foreach ($perms as $p) {
-                $from = "*.notify.service.1.{$folder->getId()}.{$p}.#";
-                $to   = "*.notify.service.1.{$folder->getParent()->getId()}.{$p}.#";
-
+                $from = sprintf($baseServiceRoute, $folder->getId(), $p);
+                $to   = sprintf($baseServiceRoute, $folder->getParent()->getId(), $p);
                 yield $from => $to;
             }
         }
