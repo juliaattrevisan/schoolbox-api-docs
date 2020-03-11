@@ -163,7 +163,9 @@ Usage:
 
             validateOptions: {
                 rules: {
-                    newUnitName: "required"
+                    newUnitName: {
+                        requiredNotBlank: true
+                    }
                 },
                 messages: {
                     newUnitName: "Please enter a name for your new {{ locale.unit }}"
