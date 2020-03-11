@@ -600,6 +600,22 @@ class Instance implements JsonSerializable
 
 
     /**
+     * Retrieve the delivery method for this message.
+     *
+     * Should be one of the `self::DELIVERY_*` constants, and will fall back to
+     * `self::DELIVERY_NOTIFY` if not defined at all.
+     *
+     * @return string
+     */
+    public function retrieveDeliveryMethod(): string
+    {
+        $topic = $this->topics[0];
+        [, $delivery] = explode('.', $topic);
+        return $delivery ?? self::DELIVERY_NOTIFY;
+    }
+
+
+    /**
      * Is this message always delivered instantly, regardless of routing?
      *
      * @return bool
