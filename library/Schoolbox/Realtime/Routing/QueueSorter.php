@@ -219,9 +219,29 @@ class QueueSorter implements FilterInterface
             $instance->getFolderId()
         );
 
+        $delivery = $instance->retrieveDeliveryMethod();
+
+        // Is this sent as an alert?
+        // Unmute, and route to instant+push+email if not already
+        if ($delivery === Instance::DELIVERY_ALERT) {
+            $this->log->debug('Delivery type is alert: upgrading to instant+push+email');
+            if ($this->permMapper->isMuted($intent)) {
+                $intent = [];
+            }
+            if (!$this->permMapper->isInstant($intent)) {
+                $intent[] = RoutePermission::INSTANT;
+            }
+            if (!$this->permMapper->isPush($intent)) {
+                $intent[] = RoutePermission::PUSH;
+            }
+            if (!$this->permMapper->isEmail($intent)) {
+                $intent[] = RoutePermission::EMAIL;
+            }
+        }
+
         // Is this sent via instant delivery?
-        // Route to instant if not already, and un-mute
-        if ($instance->isDeliveryAlwaysInstant() && !$this->permMapper->isInstant($intent)) {
+        // Unmute, and route to instant if not already
+        if ($delivery === Instance::DELIVERY_INSTANT && !$this->permMapper->isInstant($intent)) {
             $this->log->debug('Delivery type is instant: upgrading to instant');
             if ($this->permMapper->isMuted($intent)) {
                 $intent = [];
@@ -236,7 +256,9 @@ class QueueSorter implements FilterInterface
         }
 
         // if the user in question has no digest schedule and digest level is selected, upgrade to instant
-        if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER) {
+        if ($this->permMapper->isDigest($intent)
+            && (string)$user->getRole()->getDigestSchedule() === Role::DIGEST_NEVER
+        ) {
             $this->log->info("User doesn't have digest schedule: upgrading to instant");
             $intent = [RoutePermission::INSTANT];
         }
