@@ -15,7 +15,7 @@
 
     <ul class="information-list">
         {% for article in articles %}
-            <li class="actions-small-2">
+            <li class="actions-small-2 {{ article.sticky ? 'sticky' : '' }}">
                 <div class="list-item">
                     <div class="small-12 card wrap-down">
                         {%  set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
@@ -27,7 +27,8 @@
 
                         <h3><a href="{{ articleURL }}">{{ article.title }}</a></h3>
 
-                        <p class="meta">By
+                        <p class="meta">
+                            {% if article.sticky %}Pinned by{% else %}By{% endif %}
                             {% if article.author.deletedAt.isNull %}
                                 <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                             {% else %}

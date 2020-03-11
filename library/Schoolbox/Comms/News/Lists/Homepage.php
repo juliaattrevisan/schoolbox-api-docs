@@ -47,7 +47,13 @@ class Homepage extends Base
             $params->getFolderId(),
             Audience\Model::RELATIONSHIP_SELF,
             true,
-            [ "{$this->newsMapper->getTable()}.publish_at" => 'DESC', "{$this->newsMapper->getTable()}.created_at" => 'DESC'],
+            [
+                /* Split sticky news from non-sticky news
+                 */
+                "{$this->newsMapper->getTable()}.sticky" => 'DESC',
+                "{$this->newsMapper->getTable()}.publish_at" => 'DESC',
+                "{$this->newsMapper->getTable()}.created_at" => 'DESC'
+            ],
             $params->getLimit()
         );
 

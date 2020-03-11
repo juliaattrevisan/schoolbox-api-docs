@@ -120,6 +120,12 @@ class Archive extends Base
 
         $articles = $this->loadArticleByIds($articleIds);
 
+        /* Disregard the sticky bit for each article in the Archive
+         */
+        foreach ($articles as $article) {
+            $article->setSticky(false);
+        }
+
         // Figure out the articles that this user has saved for later
         $savedArticleIds = $this->findSavedArticles($user, $this->saveForLaterEnabled);
 

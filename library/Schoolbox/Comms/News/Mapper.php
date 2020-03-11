@@ -17,8 +17,10 @@ use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
@@ -26,6 +28,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use UnderflowException;
+use UnexpectedValueException;
 use function implode;
 use function is_array;
 use function strtolower;
@@ -56,7 +59,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws InvalidArgumentException
      */
     protected function mapping()
@@ -68,16 +71,17 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('blurb', self::TYPE_STRING);
-        $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, 'discussionThread', 'discussionThread');
+        $this->uses('sticky', self::TYPE_BOOLEAN);
         $this->uses('comments_allowed', self::TYPE_BOOLEAN);
+        $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
+        $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, 'discussionThread', 'discussionThread');
+        $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->joins('accepted_by', UserMapper::class, 'id', null, null, 'acceptedBy', 'moderator');
         $this->uses('accepted_at', self::TYPE_DATETIME);
         $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejector');
         $this->uses('rejected_at', self::TYPE_DATETIME);
         $this->uses('rejected_reason', self::TYPE_STRING);
-        $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses('publish_at', self::TYPE_DATETIME);
         $this->uses('expires_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -123,7 +127,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * The Next Pieces
      *
      * @return string
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
     protected function getFromString(): string
     {
@@ -142,27 +146,40 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
+     *
+     * @throws Exception
+     * @throws DefinitionException
+     * @throws UnexpectedValueException
      */
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
-        $collection = $this->createCollection();
-        $idColumn   = $this->getIdentifierColumn();
+        $idColumn = $this->getIdentifierColumn();
+
         /** @var Topic\Mapper $topicMapper */
         $topicMapper = $this->getJoinMapper('comms_news_article_topic');
+
         /** @var UserMapper $authorMapper */
         $authorMapper = $this->getJoinMapper('author');
+
         /** @var UserMapper $moderatorMapper */
         $moderatorMapper = $this->getJoinMapper('moderator');
+
         /** @var UserMapper $rejectorMapper */
         $rejectorMapper = $this->getJoinMapper('rejector');
+
         /** @var Storage\Mapper $featureImageMapper */
         $featureImageMapper = $this->getJoinMapper('featureImage');
-        /** @var \Schoolbox\File\MimetypeMapper $mimeTypeMapper */
+
+        /** @var MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
 
+        $collection = $this->createCollection();
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            /* If the article was put into this stack already, just reuse it
+             * Otherwise hydrate and store
+             */
             if ($collection->offsetExists($row[$idColumn])) {
                 $article = $collection->offsetGet($row[$idColumn]);
             } else {
@@ -175,19 +192,28 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 $article->setAcceptedBy($moderatorMapper->hydrate($row, 'm'));
                 $article->setRejectedBy($rejectorMapper->hydrate($row, 'r'));
 
+                /* If there's a feature image, bolt that on
+                 */
                 $featureImage = $featureImageMapper->hydrate($row, 'fi');
+
                 if ($featureImage) {
                     $article->setFeatureImage($featureImage->setMimetype($mimeTypeMapper->hydrate($row, 'afe')));
                 }
 
+                /* If there's a discussion thread, bolt that on
+                 */
                 /** @var Thread\Model|null $discussionThread */
                 $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
+
                 if ($discussionThread) {
                     $article->setDiscussionThread($discussionThread);
                 }
             }
 
+            /* Attach topics
+             */
             $topic = $topicMapper->hydrate($row, 'topics');
+
             if ($topic) {
                 $article->getTopics()->setOffset($topic->getId(), $topic);
             }

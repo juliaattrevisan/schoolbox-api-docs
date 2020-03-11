@@ -9,7 +9,7 @@
  # @param string queryStringTopic - The string to use for topic in the URL
  # @param string topicAll - The slug for the 'all' tab
  # @param string referrer - Referrer for stats logging
- # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not 
+ # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not
  # @param bool modifyWindowState - If true- push changes to the window state
  # @param bool compactMode - Removes the blurb from the news card
  #}
@@ -43,7 +43,7 @@
                     </div>
                 </li>
 
-                <li class="actions-small-1" v-for="article in currentArticles">
+                <li :class="'actions-small-1 ' + (article.sticky ? 'sticky' : '')" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card wrap-down">
                             <template v-if="article.featureImage">
@@ -59,7 +59,9 @@
                             </h3>
 
                             <p class="meta">
-                                <span>By
+                                <span>
+                                    <template v-if="article.sticky">Pinned by</template>
+                                    <template v-else>By</template>
                                     <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
                                     <template v-else>${ article.author.fullname }</template>
                                 </span>

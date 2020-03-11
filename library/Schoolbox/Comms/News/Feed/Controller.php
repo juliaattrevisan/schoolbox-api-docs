@@ -140,7 +140,10 @@ class Controller extends Base
             News\Model::STATE_PUBLISHED
         );
 
-        $articles = $this->newsMapper->findByColumn('id', $availableIds, ['order' => ['publish_at' => 'DESC']]);
+        $articles = $this->newsMapper->findByColumn('id', $availableIds, ['order' => [
+            'sticky' => 'DESC',
+            'publish_at' => 'DESC'
+        ]]);
 
         $this->getResponse()->content->set($this->buildXmlOutput('@commsNewsFeed/rss.twig', [
             'folder'     => $folder,

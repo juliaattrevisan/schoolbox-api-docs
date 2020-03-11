@@ -14,6 +14,7 @@ use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
@@ -190,7 +191,7 @@ class Controller extends Base
      * @since 18.1
      *
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
@@ -267,6 +268,7 @@ class Controller extends Base
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'            => $this->getExplicitReturnUrl(),
             'entityTypesData'      => $this->getEntityTypesData(),
+            'isNewsModerator'      => $this->isNewsModerator(),
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -331,10 +333,13 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws UnexpectedValueException
      * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
+     * @throws ServiceNotFound
      */
     public function getUpdate(Model $article): void
     {
@@ -359,6 +364,7 @@ class Controller extends Base
             'returnUrl'              => $this->getExplicitReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'        => $this->getEntityTypesData(),
+            'isNewsModerator'        => $this->isNewsModerator(),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -393,9 +399,11 @@ class Controller extends Base
 
         // Update article with proposed audience. Cache existing audience for later efficient persistence
         $existingAudience = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty())->shallowClone();
+
         if (!$article->isApproved()) {
             $this->updateArticleAudience($article, $data['audience']);
         }
+
         // Validate proposed article + audience
         // (This protects against DOM manipulation + logic bugs, it should not be shown on normal work-flows)
         try{
@@ -406,6 +414,7 @@ class Controller extends Base
                 'success' => false,
                 'message' => $e->getMessage(),
             ]));
+
             return;
         }
 
@@ -752,7 +761,7 @@ class Controller extends Base
      * @since 18.1
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     public function getIndex(): void
     {
@@ -819,7 +828,7 @@ class Controller extends Base
 
         if (count($articleIds)) {
             $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
-            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['publish_at' => 'DESC']]);
+            $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['sticky' => 'DESC', 'publish_at' => 'DESC']]);
         } else {
             $articles = $this->newsMapper->createCollection();
         }
@@ -828,6 +837,7 @@ class Controller extends Base
             'id',
             'title',
             'blurb',
+            'sticky',
             'featureImage',
             'author' => [
                 'fullname'
@@ -892,7 +902,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @api   GET /news/archive{/year,month}
@@ -1051,7 +1061,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws PDOException
@@ -1106,7 +1116,7 @@ class Controller extends Base
      * Index of articles you've authored
      *
      * @api GET /news/me
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAuthored()
@@ -1382,6 +1392,8 @@ class Controller extends Base
      * @param Model $article
      * @param array $postData
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
@@ -1392,6 +1404,15 @@ class Controller extends Base
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+
+        /* I still think that the ValidNewsModerator spec pattern makes this low level
+         * interrogation go away and behave consistently...but ok
+         *
+         * Write and Moderate are the only service level perms; Read doesn't exist.
+         */
+        if ($this->isNewsModerator()) {
+            $article->setSticky((bool)$postData['sticky']);
+        }
 
         // Only set comments allowed if the value is passed in the form,
         // and the feature is enabled
@@ -1615,5 +1636,20 @@ class Controller extends Base
         if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
+    }
+
+
+    /**
+     * Decide whether the currently-logged-in user is a News Moderator or Superuser
+     *
+     * @return bool
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     */
+    private function isNewsModerator(): bool
+    {
+        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ);
     }
 }

@@ -98,6 +98,12 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $author;
 
     /**
+     * @var bool
+     */
+    private $sticky;
+
+
+    /**
      * @var Storage\Model|null
      */
     private $featureImage;
@@ -744,6 +750,26 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
+     * @return bool
+     */
+    public function getSticky(): ?bool
+    {
+        return $this->sticky;
+    }
+
+
+    /**
+     * @param null|bool $sticky
+     * @return $this
+     */
+    public function setSticky(?bool $sticky): self
+    {
+        $this->sticky = $sticky;
+        return $this;
+    }
+
+
+    /**
      * @return \Alaress_Date_Format|null
      */
     public function getPublishAt(): ?\Alaress_Date_Format
@@ -1015,6 +1041,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
             'title',
             'blurb',
             'body',
+            'sticky',
             'author',
             'featureImage',
             'publishAt',
