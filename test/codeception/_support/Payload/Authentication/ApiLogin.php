@@ -14,12 +14,10 @@ class ApiLogin extends Request
 {
     use PostTrait;
 
-    public function __construct(string $apiID)
-    { //appId=james&username=drhodes&password=password&token=123
-        $this->setFormParam('appId', $apiID);
+    public function __construct()
+    {
         $this->setUsername('');
         $this->setPassword('');
-        $this->setToken('');
         $this->setRedirectPageQueryParam('');
     }
 
@@ -42,13 +40,13 @@ class ApiLogin extends Request
     {
         if ($page != '' && isset($page))
         {
-            $this->setQueryParam('page', $page);
+            $this->setQueryParam('redirect', $page);
         }
         else
         {
-            if ($this->getQueryParam('page') != null)
+            if ($this->getQueryParam('redirect') != null)
             {
-                $this->unsetQueryParam('page');
+                $this->unsetQueryParam('redirect');
             }
         }
 

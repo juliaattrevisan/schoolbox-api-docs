@@ -103,7 +103,7 @@ class LoginCest
         printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
 
         #WHEN
-        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
+        $loginPayload = new Payload\Authentication\ApiLogin();
         $loginPayload->setUsername($user);
         $loginPayload->setPassword($password);
 
@@ -132,29 +132,7 @@ class LoginCest
         printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
 
         #WHEN
-        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
-        $loginPayload->setUsername($user);
-        $loginPayload->setPassword($password);
-
-        $i->sendRequest($loginPayload);
-
-        #THEN
-        $i->seeResponseCodeIs(401);
-    }
-
-    public function ApiLoginFailWrongApp(IntegrationTester $i):void
-    {
-        #GIVEN
-        $user     = 'alaress';
-        $password = 'alaress';
-
-        /** @var \Codeception\Module\Db $db */
-        $db=$i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
-
-        #WHEN
-        $loginPayload = new Payload\Authentication\ApiLogin('auto_app_fail');
+        $loginPayload = new Payload\Authentication\ApiLogin();
         $loginPayload->setUsername($user);
         $loginPayload->setPassword($password);
 
@@ -177,7 +155,7 @@ class LoginCest
         printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
 
         #WHEN
-        $loginPayload = new Payload\Authentication\ApiLogin('auto_test');
+        $loginPayload = new Payload\Authentication\ApiLogin();
         $loginPayload->setUsername($user);
         $loginPayload->setPassword($password);
         $loginPayload->setRedirectPageQueryParam($page);
