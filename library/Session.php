@@ -251,10 +251,6 @@ class Session
             $result = $this->authenticateLDAP($username, $password);
         }
 
-        if (!$result && Config::get('edumate_auth_enabled')) {
-            $result = $this->authenticateEdumate($username, $password);
-        }
-
         if (!$result) {
             //fall back on SQL if ldap is not enable or fails
             $result = $this->authenticateSQL($username, $password);
@@ -409,30 +405,6 @@ class Session
             new \Alaress\Password\Service()
         );
         return $passwordValidator->checkPassword($username, $password);
-    }
-
-
-    protected function authenticateEdumate($username, $password)
-    {
-        //
-        // Only for parents.
-        $url = Config::get('edumate_auth_url');
-        if (empty($url)) {
-            return false;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 2);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("username" => $username, "password" => $password)));
-        $result = curl_exec($ch);
-        $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        unset($ch);
-        //
-        // Edumate always returns a string - "You have not been authenticated"
-        // or a session ID which i'm guessing is either an int or hex number.
-        return ($code < 400 && preg_match('/^[0-9]+$/', $result));
     }
 
     public function ldap_escape($str, $for_dn = false)

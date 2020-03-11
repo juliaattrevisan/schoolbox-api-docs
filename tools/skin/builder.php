@@ -83,7 +83,6 @@ HELP;
             'accent-hover' => Config::get('skin_colour_accent_hover'),
             'logo-background' => Config::get('skin_colour_logo_background'),
             'body-bg' => Config::get('skin_colour_body_bg'),
-            'button-input-scale' => Config::get('skin_button_input_scale'),
             'login-form-background-color' => Config::get('skin_colour_login_background'),
             'form-border-color' => Config::get('skin_colour_form_input_border_color'),
             'form-bg-hover-color' => Config::get('skin_colour_form_background_hover_color'),

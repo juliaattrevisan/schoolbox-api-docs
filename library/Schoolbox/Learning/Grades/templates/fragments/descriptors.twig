@@ -45,7 +45,7 @@
             {% if not loop.first %}
                 <tr>
             {% endif %}
-            <th class="rb-criterion-name"><b>{{ indicator.name | nl2br }}</b></th>
+            <th class="rb-criterion-name">{{ indicator.name | nl2br }}</th>
             {% for activity_id, activity in rubricAssessmentList %}
                 {% set activity = indicator.activities[activity_id] %}
                 <td><div><span class="rb-description">

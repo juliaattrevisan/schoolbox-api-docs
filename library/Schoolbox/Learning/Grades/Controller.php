@@ -26,6 +26,7 @@ use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
@@ -433,6 +434,9 @@ class Controller extends Base
         $request         = $this->request->post['filter_selection'] ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
 
+        /* @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
         $codec           = new Codec(Filter\Mapper::getInstance(), Filter\Selection\Mapper::getInstance());
         $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
@@ -506,7 +510,7 @@ class Controller extends Base
 
         if ($canSeeGraph) {
             $tabs['graph'] = [
-                'label' => 'Activities',
+                'label' => 'Class Results',
             ];
         }
 
@@ -516,7 +520,7 @@ class Controller extends Base
             }
 
             if ($this->getConfigLoader()->get('grade_capability_display')) {
-                $tabs['capabilities'] = ['label'=>'Capability Grades' ];
+                $tabs['capabilities'] = ['label'=> $l10n->translate('rubricGroup', false,true) .' Marks' ];
             }
 
             if ($this->getConfigLoader()->get('grade_progression_display')) {
