@@ -24,7 +24,7 @@ use PDOException;
 abstract class Base implements IBroker
 {
     /** Login timeout (seconds) */
-    const LOGIN_TIMEOUT = 5;
+    const LOGIN_TIMEOUT = 2;
 
     /** @var array $options Connection options */
     protected $options = [];
