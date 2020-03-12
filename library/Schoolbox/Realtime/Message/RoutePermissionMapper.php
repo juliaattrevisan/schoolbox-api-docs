@@ -311,7 +311,7 @@ class RoutePermissionMapper extends Mapper
     /**
      * Transparently cache prepared statements rather than creating new ones
      *
-     * @param $queryString
+     * @param  string $queryString
      * @return PDOStatement
      */
     public function prepare(string $queryString): PDOStatement

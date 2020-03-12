@@ -11071,11 +11071,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Message/RerouteOverrideMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$queryString\\)\\: Unexpected token \"\\$queryString\", expected type at offset 93$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$slug\\)\\: Unexpected token \"\\$slug\", expected type at offset 91$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Message/SourceMapper.php

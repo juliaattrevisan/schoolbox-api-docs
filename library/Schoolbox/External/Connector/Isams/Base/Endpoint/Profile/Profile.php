@@ -269,7 +269,7 @@ class Profile implements IStrategy
 
             /* Smoosh it all together
              */
-            /** @var Profile $studentProfile */
+            /** @var UserProfile\Student\Model $studentProfile */
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment($this->findComments($studentId))
