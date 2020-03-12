@@ -147,44 +147,6 @@ class Classes implements IStrategy
 
 
     /**
-     * Determine which week we're in, if possible
-     * Returns null when it can't be determined
-     *
-     * @param int $year
-     * @return int|null
-     * @throws Exception
-     * @throws PDOException
-     */
-    private function findWeekOffset(int $year): ?int
-    {
-        $terms = $this->termMapper->findForYear($year);
-
-        if ($terms->count()) {
-            $term = $terms->first();
-            $now = \Alaress_Date_Format::now();
-
-            $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-            $currentWeek = (int)date('W', $now->getUnixTimestamp());
-
-            /* Include the current week in calculations using a +1 offset
-             * e.g. if term begins on 8/1/20,
-             *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-             *     11/1/20 is in week 2
-             *     17/1/20 is in week 2
-             *     21/2/20 is in week 3
-             */
-            $offset = $currentWeek - $startWeek + 1;
-
-            if ($offset > 0) {
-                return $offset;
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
@@ -209,7 +171,7 @@ class Classes implements IStrategy
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $currentWeekOffset = $this->findWeekOffset((int)date('Y'));
+        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset((int)date('Y'));
 
         /* Can't determine which week we're in; can't import anything
          */
@@ -369,6 +331,9 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class
      *
+     * If one was previously saved from some other xml, just reuse that
+     * instead of spawning a clone
+     *
      * @param array $subject
      * @return ClassEntry
      * @throws Exception
@@ -377,21 +342,37 @@ class Classes implements IStrategy
      */
     private function createTimetableClass(array $subject): ClassEntry
     {
+        /* See if one exists already; if so, reuse it
+         */
+        try {
+            $timetableClass = $this->classEntryMapper->findOneByColumnList([
+                'code'        => $subject['class']['code'],
+                'name'        => $subject['class']['name'],
+                'description' => $subject['class']['name']
+            ]);
 
-        /** @var ClassEntry $timetableClass */
-        $timetableClass = $this->classEntryMapper->createModel()
-            ->setCode($subject['class']['code'])
-            ->setName($subject['class']['name'])
-            ->setDescription($subject['class']['name']);
+            $this->log->info(sprintf(
+                'Reusing previously-saved class %s %s with id %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                $timetableClass->getId()
+            ));
+        } catch (Exception $e) {
+            /** @var ClassEntry $timetableClass */
+            $timetableClass = $this->classEntryMapper->createModel()
+                ->setCode($subject['class']['code'])
+                ->setName($subject['class']['name'])
+                ->setDescription($subject['class']['name']);
 
-        $this->log->info(sprintf(
-            'Creating new class %s %s',
-            $timetableClass->getName(),
-            $timetableClass->getCode()
-        ));
+            $this->log->info(sprintf(
+                'Creating new class %s %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
 
-        if ($this->perform) {
-            $this->classEntryMapper->save($timetableClass);
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
         }
 
         return $timetableClass;
@@ -400,6 +381,9 @@ class Classes implements IStrategy
 
     /**
      * Create a Timetable Class Period
+     *
+     * If one was previously saved from some other xml, just reuse that
+     * instead of spawning a clone
      *
      * @param array           $users
      * @param array           $subject
@@ -421,11 +405,33 @@ class Classes implements IStrategy
          * - class_id comes from $timetableClass->getId()
          */
 
-        /** @var ClassPeriod $timetableClassPeriod */
-        $timetableClassPeriod = $this->classPeriodMapper->createModel()
-            ->setClass($timetableClass)
-            ->setPeriod($period)
-            ->setRoom($subject['room']['name']);
+        /* See if one exists already; if so, reuse it
+         */
+        try {
+            $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
+                'class_id' => $timetableClass->getId(),
+                'period_id' => $period->getId()
+            ]);
+
+            $this->log->info(sprintf(
+                'Reusing previously saved class period %s using period_id %s, with id %s',
+                $timetableClass->getName(),
+                $period->getId(),
+                $timetableClassPeriod->getId()
+            ));
+        } catch (Exception $e) {
+            /** @var ClassPeriod $timetableClassPeriod */
+            $timetableClassPeriod = $this->classPeriodMapper->createModel()
+                ->setClass($timetableClass)
+                ->setPeriod($period)
+                ->setRoom($subject['room']['name']);
+
+            $this->log->info(sprintf(
+                'Creating new class period %s %s',
+                $timetableClass->getName(),
+                $period->getId()
+            ));
+        }
 
         /* Throw warning, but assign them anyway
          */
