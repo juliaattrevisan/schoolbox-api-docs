@@ -58,7 +58,7 @@ class AssignmentDates
         } else {
             $dueDate = $unitImplDueDate;
         }
-        $closeDate = $lockAt ?? $unitImplDueDate;
+        $closeDate = $lockAt ?? $dueDate;
 
         return [$publishDate, $openDate, $dueDate, $closeDate];
     }
