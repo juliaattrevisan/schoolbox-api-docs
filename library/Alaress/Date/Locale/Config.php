@@ -159,4 +159,15 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
     {
         return explode(',', $this->getConfig()->get('locale_weekend'));
     }
+
+    /**
+     * Do not preserve the config loader on serialize/unserialize: it should not
+     * be stored, and will be reloaded whenever `getConfig` is called anyway.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
+    }
 }
