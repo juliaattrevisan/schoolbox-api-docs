@@ -10,3 +10,7 @@ ALTER TABLE `sis_class_period`
 
 ALTER TABLE `sis_class_user`
     CHANGE COLUMN `external_id` `external_id` VARCHAR(64) COLLATE 'utf8mb4_unicode_ci' NOT NULL ;
+
+-- users can only have one instance of themselves in a class
+ALTER TABLE `sis_class_user`
+    ADD UNIQUE INDEX `class_user_involvement` (`class_id` ASC, `external_id` ASC);
