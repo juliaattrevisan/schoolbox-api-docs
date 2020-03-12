@@ -100,9 +100,10 @@ class Scrub
      * Retrieves the singleton HTMLPurifier instance with our special config,
      * creating it if it doesn't already exist.
      *
+     * @param string|null $uriBase If provided, this will be used to make URL absolute
      * @return HTMLPurifier
      */
-    public static function getHtmlPurifierInstance()
+    public static function getHtmlPurifierInstance(?string $uriBase = null): HTMLPurifier
     {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
 
@@ -194,6 +195,13 @@ class Scrub
                     'data'    => true,
                 )
             );
+
+            // Make url absolute, when fqdn is provided
+            if ($uriBase) {
+                $config->set('URI.MakeAbsolute', true);
+                $config->set('URI.Base', $uriBase);
+            }
+
             //
             // Allow embeds and objects, allowing more properties than standard
             // HTMLPurifier definition allows.
@@ -386,6 +394,25 @@ class Scrub
                 return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
             },
             "$html",
+            Config::get('scrub_html_cache_timeout')
+        );
+    }
+
+    /**
+     * Variant of html
+     * @param string $html
+     * @param string $domain
+     * @return mixed
+     */
+    static public function htmlAbsoluteUri(string $html, string $domain): string
+    {
+        return Alaress\Redis::getInstance()->cacheFunctionCall(
+            'scrub.htmlAbsoluteUri',
+            function ($params) {
+                $purifier = self::getHtmlPurifierInstance($params[1]);
+                return self::htmlDomModify($purifier->purify($params[0]));
+            },
+            ["$html", $domain],
             Config::get('scrub_html_cache_timeout')
         );
     }
