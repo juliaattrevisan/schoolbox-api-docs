@@ -402,7 +402,7 @@ class Scrub
      * Variant of html
      * @param string $html
      * @param string $domain
-     * @return mixed
+     * @return string
      */
     static public function htmlAbsoluteUri(string $html, string $domain): string
     {
