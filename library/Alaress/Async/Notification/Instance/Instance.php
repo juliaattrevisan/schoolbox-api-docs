@@ -62,6 +62,14 @@ class Instance implements JsonSerializable
     public const ACTION_RETRACT_ALL = 'retract-all';
 
     /**
+     * Delivery: alert
+     *
+     * Set as part of this instance's topic: if it's there, the message will
+     * bypass routing, and be upgraded to instant+email+app.
+     */
+    public const DELIVERY_ALERT = 'alert';
+
+    /**
      * Delivery: instant
      *
      * Set as part of this instance's topic: if it's there, the message will
@@ -592,17 +600,20 @@ class Instance implements JsonSerializable
 
 
     /**
-     * Is this message always delivered instantly, regardless of routing?
+     * Retrieve the delivery method for this message.
      *
-     * @return bool
+     * Should be one of the `self::DELIVERY_*` constants, and will fall back to
+     * `self::DELIVERY_NOTIFY` if not defined at all.
+     *
+     * @return string
      */
-    public function isDeliveryAlwaysInstant(): bool
+    public function retrieveDeliveryMethod(): string
     {
         // TODO consider inspecting all topics, not just the first
         // But what if the message is delivered to multiple users differently?
         $topic = $this->topics[0];
         [, $delivery] = explode('.', $topic);
-        return $delivery === self::DELIVERY_INSTANT;
+        return $delivery ?? self::DELIVERY_NOTIFY;
     }
 
     /**

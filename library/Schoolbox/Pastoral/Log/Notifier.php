@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Log;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -40,8 +41,9 @@ class Notifier extends AbstractModuleNotifier
             // Create the message
 
             $builder = new Builder();
-            $builder->setTitle(sprintf("%s import completed", $this->l10n->translate('pastoralCare', false, true)))
-                ->setIcon("/images/icon.php?size=".$this->iconSize."&icon=".NSMapper::NS_PASTORAL_LOG)
+            $builder
+                ->setTitle(sprintf("%s import completed", $this->l10n->translate('pastoralCare', false, true)))
+                ->setIcon("/images/icon.php?size=" . $this->iconSize . "&icon=" . NSMapper::NS_PASTORAL_LOG)
                 ->setHref("/adminv2/import/pastoral/log/{$model->getImportId()}")
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
@@ -49,7 +51,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setAllowSelfSend(true);
 
             $message = $builder->build();
-            $envelope->targetToUser($model->getUserId(), $message, true);
+            $envelope->targetToUser($model->getUserId(), $message, Instance::DELIVERY_INSTANT);
         }
 
         return $envelope;
@@ -61,7 +63,7 @@ class Notifier extends AbstractModuleNotifier
     public function loadDependencies($dependencies = null)
     {
         if (empty($dependencies["l10n"])) {
-            $stoneFactory = new RosettaStoneFactory();
+            $stoneFactory         = new RosettaStoneFactory();
             $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
         }
 

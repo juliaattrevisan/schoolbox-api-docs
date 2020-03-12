@@ -10,7 +10,6 @@ namespace Schoolbox\Realtime\Routing;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Instance\InstanceBundle;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
@@ -202,13 +201,17 @@ class QueueSorter implements FilterInterface
 
     /**
      * Calculate a set of route levels relevant to this user x instance.
-     * Will be a subset of [ MU, DI, IN, MO, EM ]
      *
      * @param User     $user
      * @param Instance $instance
-     * @return array
+     * @return array One or more of these constants:
+     *              `* RoutePermission::MUTE`
+     *              `* RoutePermission::DIGEST`
+     *              `* RoutePermission::INSTANT`
+     *              `* RoutePermission::PUSH`
+     *              `* RoutePermission::EMAIL`
      */
-    private function getReroutedLevel(User $user, Instance $instance)
+    private function getReroutedLevel(User $user, Instance $instance): array
     {
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
@@ -220,9 +223,29 @@ class QueueSorter implements FilterInterface
             $instance->getFolderId()
         );
 
+        $delivery = $instance->retrieveDeliveryMethod();
+
+        // Is this sent as an alert?
+        // Unmute, and route to instant+push+email if not already
+        if ($delivery === Instance::DELIVERY_ALERT) {
+            $this->log->debug('Delivery type is alert: upgrading to instant+push+email');
+            if ($this->permMapper->isMuted($intent)) {
+                $intent = [];
+            }
+            if (!$this->permMapper->isInstant($intent)) {
+                $intent[] = RoutePermission::INSTANT;
+            }
+            if (!$this->permMapper->isPush($intent)) {
+                $intent[] = RoutePermission::PUSH;
+            }
+            if (!$this->permMapper->isEmail($intent)) {
+                $intent[] = RoutePermission::EMAIL;
+            }
+        }
+
         // Is this sent via instant delivery?
-        // Route to instant if not already, and un-mute
-        if ($instance->isDeliveryAlwaysInstant() && !$this->permMapper->isInstant($intent)) {
+        // Unmute, and route to instant if not already
+        if ($delivery === Instance::DELIVERY_INSTANT && !$this->permMapper->isInstant($intent)) {
             $this->log->debug('Delivery type is instant: upgrading to instant');
             if ($this->permMapper->isMuted($intent)) {
                 $intent = [];
@@ -237,12 +260,21 @@ class QueueSorter implements FilterInterface
         }
 
         // if the user in question has no digest schedule and digest level is selected, upgrade to instant
-        if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER) {
-            $this->log->info("User doesn't have digest schedule: upgrading to instant");
-            $intent = [RoutePermission::INSTANT];
+        if ($this->permMapper->isDigest($intent)
+            && (string)$user->getRole()->getDigestSchedule() === Role::DIGEST_NEVER
+        ) {
+            $this->log->info("User doesn't have digest schedule: ensuring delivery is at least instant");
+            $newIntent = [RoutePermission::INSTANT];
+            if ($this->permMapper->isPush($intent)) {
+                $newIntent[] = RoutePermission::PUSH;
+            }
+            if ($this->permMapper->isEmail($intent)) {
+                $newIntent[] = RoutePermission::EMAIL;
+            }
+            $intent = $newIntent;
         }
 
         return $intent;
     }
 
-} 
+}
