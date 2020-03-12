@@ -99,8 +99,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     }
     $file->setTitle($_POST['description']);
     $file->setDescription($_POST['comment']);
-    // If not set default to visible
-    $visible = isset($_POST['visible']) ? $_POST['visible'] : true;
+    // If not set default to whatever in admin settings
+    $visible = $_POST['visible'] ?? !$kernel->get('config')->get('file_default_to_hidden');
+
     $file->setHidden(!$visible);
     $file->setModifiedAt(Alaress_Date_Format::now());
 
