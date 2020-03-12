@@ -276,15 +276,11 @@
             /**
              * Apply natural sort ordering to resources before display
              */
-            natcasesort() {
-                let resources = this.config.resources;
-                return resources.sort((a, b) => a.name.localeCompare(b.name, 'en', {
-                    numeric: true,
-                    sensitivity: 'base'
-                }));
-
-                // var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-                // return resources.sort(collator.compare);
+            resourceOrder(a, b) {
+                if (typeof a?.name === 'string' && typeof b?.name === 'string') {
+                    return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
+                }
+                return 0;
             },
         },
         mounted() {
@@ -385,7 +381,8 @@
                     center: 'title',
                     right: 'customFilters,resourceTimelineMonth,resourceTimelineWeek,resourceTimelineDay,customExport'
                 }"
-                :resources="natcasesort()"
+                :resources="config.resources"
+                :resource-order="resourceOrder"
                 :resourceColumns="config.resourceColumns"
                 :schedulerLicenseKey="config.schedulerLicenseKey"
                 :default-date="config.defaultDate"
