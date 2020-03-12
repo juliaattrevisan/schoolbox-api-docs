@@ -1,15 +1,11 @@
-{% if grade.rubric.groups %}
+{% if grade.rubric %}
     <table class="width-auto bordered-table">
-        {% for group in grade.rubric.groups %}
-            {% for criterion in group.criteria %}
-                {% for descriptor in criterion.descriptors %}
-                    {% if descriptor.selected %}
-                        <tr>
-                            <td>{{ criterion.name }}</td>
-                            <td>{{ descriptor.text }}</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
+        {% for capabilityMark in grade.rubric.capabilityMarks %}
+            {% for indicatorMark in capabilityMark.indicatorMarks %}
+                <tr>
+                    <td>{{ indicatorMark.indicatorUsage.indicator.name }}</td>
+                    <td>{{ indicatorMark.descriptor.description }}</td>
+                </tr>
             {% endfor %}
         {% endfor %}
     </table>
