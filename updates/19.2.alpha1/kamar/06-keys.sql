@@ -1,3 +1,18 @@
+-- Uniqueify class codes
+DELETE
+    t1 FROM sis_class t1,
+            sis_class t2
+WHERE t1.id > t2.id
+  AND t1.code = t2.code;
+
+-- Uniqueify class involvements
+DELETE
+    t1 FROM sis_class_user t1,
+            sis_class_user t2
+WHERE t1.id > t2.id
+  AND t1.class_id = t2.class_id
+  AND t1.external_id = t2.external_id;
+
 -- sis_class.code must be unique, to prevent dupe classes
 -- from being inserted and manifesting in the timetable
 ALTER TABLE `sis_class`
