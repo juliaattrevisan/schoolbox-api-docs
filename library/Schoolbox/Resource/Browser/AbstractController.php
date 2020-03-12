@@ -460,12 +460,15 @@ abstract class AbstractController extends BaseController
      * @version 19.1
      *
      * @param int $folderId
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     public function postFiles($folderId): void
     {
         $folder  = $this->folderMapper->findById($folderId);
         $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
         $results = $factory->build($this->request->post->get('attachment'))->getAll();
+        $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
 
         /** @var Resource\AbstractFile[] $results */
         foreach ($results as $file) {
@@ -475,7 +478,8 @@ abstract class AbstractController extends BaseController
                 ->setOwner($this->getUser())
                 ->setFolder($folder)
                 ->setTitle($file->getStorage()->getFilename())
-                ->setFilename($file->getStorage()->getFilename());
+                ->setFilename($file->getStorage()->getFilename())
+                ->setHidden($defaultToHidden);
         }
         $this->fileMapper->save($results);
 
