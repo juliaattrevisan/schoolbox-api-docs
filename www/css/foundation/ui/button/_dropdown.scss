@@ -17,7 +17,7 @@ $f-dropdown-icon-align: 0.25rem;
 @import "../../../../javascript/components/foundation/scss/foundation/components/dropdown";
 
 // Dropdown
-.f-dropdown{
+.f-dropdown {
 	@include box-shadow(-2px, 2px, 4px, rgba(0,0,0,0.15));
     overflow-y: auto;
     overflow-x: hidden;
@@ -27,7 +27,7 @@ $f-dropdown-icon-align: 0.25rem;
         overflow: visible;
         z-index: 1002;
     }
-	li{
+	li {
 		display: block;
 		width: 100%;
 		a:hover {
@@ -58,3 +58,32 @@ $f-dropdown-icon-align: 0.25rem;
 	}
 }
 
+#tab-control {
+    @media #{$large-up} {
+        max-width: rem-calc(700);
+    }
+
+    .container {
+        display: flex;
+        @media #{$medium-down} {
+            flex-wrap: wrap;
+        }
+    }
+    .category {
+        flex: 1 auto;
+
+        @media #{$medium-down} {
+            flex: 1 100%;
+        }
+        &:last-child ul {
+            margin: 0;
+        }
+    }
+    ul {
+        margin: 0 2px 0 0;
+    }
+    .separator {
+        background-color: $content-ui-hover;
+        color: $anchor-font-color;
+    }
+}
