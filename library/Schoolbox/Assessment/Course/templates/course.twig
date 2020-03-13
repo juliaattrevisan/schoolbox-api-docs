@@ -61,12 +61,42 @@ Usage:
          *  @return void
          */
         function toggleSaveCourse() {
-            if ($('[data-unit-spec]').length) {
-                $mageSaveCourseButton.attr('disabled', false);
-            } else {
+            let invalidUnits = 0;
+            let hasUnits = $('[data-unit-spec]').length;
+
+            /* No units? No submit
+             */
+            if (!hasUnits) {
                 $mageSaveCourseButton.attr('disabled', true);
+                return;
+            }
+
+            /* Every unit must have a name
+             */
+            $.each($('[data-unit-name]'), function(index, element) {
+                if ($.trim($(element).val()) === '') {
+                    invalidUnits++;
+                }
+            });
+
+            if (invalidUnits) {
+                $mageSaveCourseButton.attr('disabled', true);
+            } else {
+                $mageSaveCourseButton.attr('disabled', false);
             }
         }
+
+
+        /* Disable save course button while editing is occurring
+         * Check that all the units have names
+         * This is built excessively because of various input methods like copy-paste
+         * and tabindexing
+         */
+        toggleSaveCourse();
+
+        $(document).on('keyup', '[data-unit-name]', function() {
+            toggleSaveCourse();
+        });
 
 
         /**
@@ -77,11 +107,14 @@ Usage:
             rules: {
                 name: "required",
                 parent: "required",
-                newUnitName: "oneUnit"
+                newUnitName: {
+                    requiredNotBlank: true
+                }
             },
             messages: {
                 name: "Please enter a name for this course.",
-                parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course."
+                parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course.",
+                newUnitName: 'Please create at least one {{ locale.unit }} for this course.'
             },
             onfocusout: false,
             onkeyup: false
@@ -91,10 +124,6 @@ Usage:
          * will end up re-initialising elsewhere
          */
         initValidator(modifyValidation);
-
-        $.validator.addMethod('oneUnit', function() {
-            return $('input[data-unit-name]').length;
-        }, 'Please create at least one {{ locale.unit }} for this course.');
 
 
         /**
