@@ -109,7 +109,9 @@ class Controller extends Base
             array(
                 'template' => '@resourceItem/browse.twig',
                 'data'     => array(
-                    'list'         => $list,
+                    'list' => $list->sortByCallback(static function (Model $a, Model $b) {
+                        return strnatcasecmp($a->getName(), $b->getName());
+                    }),
                     'categoryId'   => $catId,
                     'category'     => $category,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll([
