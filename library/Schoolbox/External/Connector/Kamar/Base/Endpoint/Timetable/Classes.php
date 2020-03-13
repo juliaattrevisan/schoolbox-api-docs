@@ -171,7 +171,7 @@ class Classes implements IStrategy
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset((int)date('Y'));
+        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset(\Alaress_Date_Format::now());
 
         /* Can't determine which week we're in; can't import anything
          */

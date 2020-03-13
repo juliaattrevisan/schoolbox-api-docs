@@ -122,7 +122,7 @@ HELP;
          */
         $year = (int)$this->getOpt(self::OPT_LONG_YEAR);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
-        $weekOffset = (new WeekOffset(Term\Mapper::getInstance()))->findWeekOffset($year);
+        $weekOffset = (new WeekOffset(Term\Mapper::getInstance()))->findWeekOffset(\Alaress_Date_Format::now());
 
         $this->getLogger()->info("We are in week {$weekOffset}.");
 
