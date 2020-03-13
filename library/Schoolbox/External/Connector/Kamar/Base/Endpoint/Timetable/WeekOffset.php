@@ -8,7 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
+use PDOException;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class WeekOffset
@@ -43,6 +45,8 @@ class WeekOffset
      *
      * @param Alaress_Date_Format $date
      * @return int|null
+     * @throws PDOException
+     * @throws Exception
      */
     public function findWeekOffset(Alaress_Date_Format $date): ?int
     {
