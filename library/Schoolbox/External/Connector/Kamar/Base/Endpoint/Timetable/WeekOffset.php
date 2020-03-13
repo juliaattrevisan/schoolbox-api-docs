@@ -54,10 +54,8 @@ class WeekOffset
             return null;
         }
 
-        $now = Alaress_Date_Format::now();
-
         $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-        $currentWeek = (int)date('W', $now->getUnixTimestamp());
+        $currentWeek = (int)date('W', $date->getUnixTimestamp());
 
         /* Include the current week in calculations using a +1 offset
          * e.g. if term begins on 8/1/20,
