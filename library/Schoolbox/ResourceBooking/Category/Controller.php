@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
-use Schoolbox\ResourceBooking\Item\Model as ItemModel;
 use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 
 class Controller extends Base {
@@ -122,11 +121,9 @@ class Controller extends Base {
         $this->getResponse()->content->set(
             [
                 'template' => '@resourceCategory/read.twig',
-                'data' => [
-                    'category'  => $category,
-                    'resources' => $resources->sortByCallback(static function (ItemModel $a, ItemModel $b) {
-                        return strnatcasecmp($a->getName(), $b->getName());
-                    }),
+                'data'     => [
+                    'category'      => $category,
+                    'resources'     => $resources,
                     'calendar' => [
                         'date' => $calendarDate->getDatabase(),
                         'view' => $this->request->query->get('view', 'week'),
