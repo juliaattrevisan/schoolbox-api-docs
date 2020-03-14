@@ -112,7 +112,7 @@ class WeatherstackClient
         try {
             $decodedResponse = json_decode($response, true);
         } catch (\RuntimeException $e) {
-            throw new \DomainException('Unable to read Weather API response', '', $e);
+            throw new \DomainException('Unable to read Weather API response', 0, $e);
         }
 
         /* If the api wasn't correctly configured, $responseData returns an array
