@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -151,22 +151,22 @@ class LogMapper extends Mapper {
 
         $joins = array(
             self::KIND_LINK   => "
-                LEFT JOIN {$this->getJoinSql('link', 'log', 'l', true)}
+                INNER JOIN {$this->getJoinSql('link', 'log', 'l', true)}
                 AND object = 'link'
                 AND l.category = :ctxt
             ",
             self::KIND_FILE   => "
-                LEFT JOIN {$this->getJoinSql('file', 'log', 'f', true)}
+                INNER JOIN {$this->getJoinSql('file', 'log', 'f', true)}
                 AND object = 'file'
                 AND f.category = :ctxt
             ",
             self::KIND_FOLDER => "
-                LEFT JOIN {$this->getJoinSql('cat',  'log', 'c', true)}
+                INNER JOIN {$this->getJoinSql('cat',  'log', 'c', true)}
                 AND object = 'folder'
                 AND c.parent = :ctxt
             ",
             self::KIND_CONTENT => "
-                LEFT JOIN {$this->getJoinSql('text', 'log', 't', true)}
+                INNER JOIN {$this->getJoinSql('text', 'log', 't', true)}
                 AND object = 'content'
                 AND t.categoryID = :ctxt
             "
@@ -179,17 +179,9 @@ class LogMapper extends Mapper {
             self::KIND_CONTENT => $this->getJoinMapper('text')->getColumnString('t'),
         );
 
-        $wheres = array(
-            self::KIND_LINK    => "object = 'link'   AND l.id IS NOT NULL",
-            self::KIND_FILE    => "object = 'file'   AND f.id IS NOT NULL",
-            self::KIND_FOLDER  => "object = 'folder' AND c.id IS NOT NULL",
-            self::KIND_CONTENT => "object = 'content' AND t.textBoxID IS NOT NULL"
-        );
-
         // are we filtering? or just grabbing all the things?
         $selectSql = $selects[$filter];
         $joinSql = $joins[$filter];
-        $whereSql = $wheres[$filter];
 
         /** @var UserMapper $userMapper */
         $userMapper = $this->getJoinMapper('user');
@@ -203,7 +195,6 @@ class LogMapper extends Mapper {
                 LEFT JOIN {$this->getJoinSql('user', 'log', 'u', true)}
                 $joinSql
             WHERE log.time <= :time
-            AND $whereSql
             ORDER BY log.time DESC
             LIMIT $offset, $limit
         ");
@@ -303,4 +294,4 @@ class LogMapper extends Mapper {
         return true;
     }
 
-} 
+}

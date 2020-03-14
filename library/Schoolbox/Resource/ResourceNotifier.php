@@ -151,18 +151,19 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             $user     = $log->getUser();
             $time     = $log->getTimestamp()->getUnixTimeStamp();
 
-            switch ($log->getAction()) {
-                case LogMapper::ACTION_CREATE:
-                    $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
-                    break;
-                case LogMapper::ACTION_UPDATE:
-                    $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
-                    break;
-                case LogMapper::ACTION_DELETE:
-                    $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
-                    break;
+            if ($resource !== null && $resource->getId()) {
+                switch ($log->getAction()) {
+                    case LogMapper::ACTION_CREATE:
+                        $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
+                        break;
+                    case LogMapper::ACTION_UPDATE:
+                        $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
+                        break;
+                    case LogMapper::ACTION_DELETE:
+                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
+                        break;
+                }
             }
-
         }
         return $c;
     }
