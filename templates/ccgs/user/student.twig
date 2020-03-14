@@ -1,0 +1,8 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_studiesCode %}
+    {% if externalUser.StudentStudiesCode %}
+        <dt class="no-margin small-6 medium-3">WA Student Number (WASN):</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+    {% endif %}
+{% endblock details_studiesCode %}
