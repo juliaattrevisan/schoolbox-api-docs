@@ -76,6 +76,10 @@ abstract class Component_FactoryAbstract
             $instance = $this->getInstance($instance);
         }
 
+        if(!$instance instanceof Component_Instance) {
+            return false;
+        }
+
         /** @var Component_Instance $instance */
         $class = $instance->getDefinition()->getClass();
 
