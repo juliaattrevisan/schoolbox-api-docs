@@ -92,7 +92,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             $ids        = $componentInstanceMapper->save($newComp);
-            $instanceID = $ids[0];
+            $instanceID = $newComp->getId();
 
             $componentInstanceMapper->cascadeSequence($_POST['cid']);
         } else {
