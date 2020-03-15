@@ -349,7 +349,16 @@ class RecursiveUndeleter extends CliTool\App
             $this->printDeletedAtDates($this->softDeletedModels);
 
             if ($this->perform()) {
-                $this->restoreSoftDeletedModels();
+                $this->database->beginTransaction();
+                try {
+                    $this->restoreSoftDeletedModels();
+                    $this->database->commit();
+                } catch (Throwable $e) {
+                    $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);
+                    $this->logger->error($e->getTraceAsString());
+                    $this->database->rollBack();
+                    exit(1);
+                }
             }
         } catch (PDOException $e) {
             $this->logger->error($e->getMessage());
