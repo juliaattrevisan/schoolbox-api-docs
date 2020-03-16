@@ -42,7 +42,7 @@ foreach ($_POST as $post => $val) {
     }
 }
 
-$vars = implode(';', $params);
+$vars = implode(Report_Factory::PARAM_SEPARATOR, $params);
 
 if ($vars === '') {
     $vars = 'all';

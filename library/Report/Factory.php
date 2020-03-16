@@ -14,6 +14,11 @@ class Report_Factory {
      */
     public const ALLOWED_REPORTS = ['group', 'activity', 'login'];
 
+    /**
+     * Special char used in search vars to separate key-value pairs
+     */
+    public const PARAM_SEPARATOR = ';';
+
     // provide optional type safety
     private static $typesafe = false;
 
