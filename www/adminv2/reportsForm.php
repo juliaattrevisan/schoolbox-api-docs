@@ -42,7 +42,7 @@ foreach ($_POST as $post => $val) {
     }
 }
 
-$vars = implode('&', $params);
+$vars = implode(';', $params);
 
 if ($vars === '') {
     $vars = 'all';
