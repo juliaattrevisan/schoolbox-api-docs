@@ -22,7 +22,7 @@ if (!Report_Factory::isValidReport($_POST['bounce'])) {
 /* Parse their filter inputs and redirect back to the page
  */
 $bounce = "Location: /adminv2/reports/{$_POST['bounce']}/";
-$vars = '';
+$params = [];
 
 foreach ($_POST as $post => $val) {
 
@@ -38,13 +38,11 @@ foreach ($_POST as $post => $val) {
     $val = str_replace('/', '-', $val);
 
     if ($val) {
-        $vars .= "$post=$val&";
+        $params[] = "$post=$val";
     }
 }
 
-/* Exclude trailing comma (but why is this a thing?)
- */
-$vars = (string)substr($vars, 0, -1);
+$vars = implode('&', $params);
 
 if ($vars === '') {
     $vars = 'all';
