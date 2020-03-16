@@ -126,6 +126,8 @@ class EventType implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * Is this the "Task" event type?
      *
+     * @deprecated An event's task status is now an attribute of the event
+     * @see `Event::$class`, `Event::CLASS_EVENT`, `Event::CLASS_TASK`
      * @return bool
      */
     public function isTaskType()

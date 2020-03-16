@@ -231,12 +231,13 @@ if (is_numeric($_GET['eventID'])) {
 /* Event Types (except tasks)
  */
 $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-$allEventTypes           = $calendarEventTypeMapper->findAll()->filter(
-    function ($eventType) {
-        /** @var \Schoolbox\Calendar\EventType $eventType */
-        return !$eventType->isTaskType();
-    }
-);
+$allEventTypes           = $calendarEventTypeMapper->findAll();
+//->filter(
+//    function ($eventType) {
+//        /** @var \Schoolbox\Calendar\EventType $eventType */
+//        return !$eventType->isTaskType();
+//    }
+//);
 $page->setVar('type_select_block', '');
 $page->setVar('type_no_select_block', '');
 $page->dropDown(
@@ -251,13 +252,14 @@ $page->dropDown(
 );
 // Is this a task? Don't show the event type
 // (You shouldn't even be here if this is a task)
-if ($event->getType()->isTaskType()) {
-    $page->setVar('EVENT_EVENTTYPE_ID', $event->getType()->getId());
-    $page->setVar('EVENT_EVENTTYPE_NAME', $event->getType()->getType());
-    $page->parse('type_no_select_block', 'type_no_select');
-} else {
-    $page->parse('type_select_block', 'type_select');
-}
+$page->parse('type_select_block', 'type_select');
+//if ($event->getType()->isTaskType()) {
+//    $page->setVar('EVENT_EVENTTYPE_ID', $event->getType()->getId());
+//    $page->setVar('EVENT_EVENTTYPE_NAME', $event->getType()->getType());
+//    $page->parse('type_no_select_block', 'type_no_select');
+//} else {
+//    $page->parse('type_select_block', 'type_select');
+//}
 
 /**
  * Group (Folder) selection

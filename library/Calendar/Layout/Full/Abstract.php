@@ -229,7 +229,7 @@ abstract class Calendar_Layout_Full_Abstract
                             'id'         => $v->getId(),
                             'name'       => $v->getType(),
                             'color'      => $v->getColor(),
-                            'isTaskType' => $v->isTaskType(),
+//                            'isTaskType' => $v->isTaskType(),
                         ];
                     }
                 )
@@ -238,12 +238,12 @@ abstract class Calendar_Layout_Full_Abstract
         $this->page->setVar('SOURCES_JSON', json_encode($sourceList));
 
 
-        // output task type too
-        foreach ($typeList as $type) {
-            if ($type->isTaskType()) {
-                $this->page->setVar('TASK_TYPE_ID', $type->getId());
-            }
-        }
+//        // output task type too
+//        foreach ($typeList as $type) {
+//            if ($type->isTaskType()) {
+//                $this->page->setVar('TASK_TYPE_ID', $type->getId());
+//            }
+//        }
 
 
         // Output selected filters as JSON

@@ -67,7 +67,7 @@ class EventType extends Base
                     'id'            => (int) $v->getId(),
                     'name'          => $v->getType(),
                     'color'         => $v->getColor(),
-                    'isTaskType'    => $v->isTaskType(),
+//                    'isTaskType'    => $v->isTaskType(),
                 ];
             }
         );
