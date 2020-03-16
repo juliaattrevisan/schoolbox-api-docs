@@ -123,16 +123,21 @@ class Generator
             }
 
             // If $capabilityMarkValue is null:
-            // set the value based on scaling factor
-            $indicatorMaxValue = $capabilityUsageObject->calculateMaxValueFromIndicators();
-            $scalingFactor     = $indicatorMaxValue
-                ? $capabilityMaxValue / $indicatorMaxValue
-                : 0
-            ;
-            $capabilityMarkObject->setValue(
-                $capabilityMarkValue
-                ?? ($capabilityMarkObject->calculateIndicatorMarkSum() * $scalingFactor)
-            );
+            // set the value based on scaling factor, but only if the capability
+            // mark has indicator marks: otherwise leave it as null
+            if (!isset($capabilityMarkValue)) {
+                $indicatorMarkSum = $capabilityMarkObject->calculateIndicatorMarkSum();
+                if (isset($indicatorMarkSum)) {
+                    $indicatorMaxValue = $capabilityUsageObject->calculateMaxValueFromIndicators();
+                    $scalingFactor     = $indicatorMaxValue
+                        ? $capabilityMaxValue / $indicatorMaxValue
+                        : 0
+                    ;
+                    $capabilityMarkValue = $indicatorMarkSum * $scalingFactor;
+                }
+            }
+
+            $capabilityMarkObject->setValue($capabilityMarkValue);
 
             $capabilityMarkObjects[$capabilityId] = $capabilityMarkObject;
         }

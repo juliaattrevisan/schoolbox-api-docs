@@ -41,22 +41,26 @@
 
         $(element).on('dynagrade dynagrade.preload', function (e) {
 
-            var target = $(e.target);
-
-            switch (self.options.mode) {
-                case 'percent':
-                    calcPercent.call(target, self.options.onCalculate);
-                    break;
-                case 'letter':
-                    calcLetter.call(target, conf, self.options.onCalculate);
-                    break;
-                case 'none':
-                    calcNone.call(target, self.options.onCalculate);
-                    break;
-                case 'raw':
-                default:
-                    calcRaw.call(target, self.options.onCalculate);
-                    break;
+            var target = $(e.target),
+                scaledMark = target.attr('data-scaled-mark');
+            if (scaledMark === null || scaledMark === undefined) {
+                self.options.onCalculate.call(target, '')
+            } else {
+                switch (self.options.mode) {
+                    case 'percent':
+                        calcPercent.call(target, self.options.onCalculate);
+                        break;
+                    case 'letter':
+                        calcLetter.call(target, conf, self.options.onCalculate);
+                        break;
+                    case 'none':
+                        calcNone.call(target, self.options.onCalculate);
+                        break;
+                    case 'raw':
+                    default:
+                        calcRaw.call(target, self.options.onCalculate);
+                        break;
+                }
             }
 
         });

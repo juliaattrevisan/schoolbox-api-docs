@@ -78,9 +78,9 @@ class CapabilityMark
     /**
      * Calculates the capability's mark, with a scaling factor applied.
      *
-     * @return float
+     * @return null|float
      */
-    public function calculateScaledMark(): float
+    public function calculateScaledMark(): ?float
     {
         // If a capability mark has been provided, use it
         if (null !== $this->value) {
@@ -95,13 +95,16 @@ class CapabilityMark
     /**
      * Calculates the sum of all indicator marks in this capability mark.
      *
-     * @return float
+     * @return null|float
      */
-    public function calculateIndicatorMarkSum(): float
+    public function calculateIndicatorMarkSum(): ?float
     {
-        $indicatorMarkSum = 0;
+        $indicatorMarkSum = null;
         foreach ($this->indicatorMarks as $indicatorMark) {
-            $indicatorMarkSum += $indicatorMark->getValue();
+            $indicatorMarkValue = $indicatorMark->getValue();
+            if (isset($indicatorMarkValue)) {
+                $indicatorMarkSum = ($indicatorMarkSum ?? 0.0) + $indicatorMarkValue;
+            }
         }
         return $indicatorMarkSum;
     }
@@ -122,10 +125,13 @@ class CapabilityMark
     /**
      * Render the capability's mark in normalized format.
      *
-     * @return float
+     * @return null|float
      */
-    public function retrieveNormalizedMark(): float
+    public function retrieveNormalizedMark(): ?float
     {
+        if (!isset($this->value)) {
+            return null;
+        }
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
         $normMark = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
         return round($normMark, self::PRECISION);

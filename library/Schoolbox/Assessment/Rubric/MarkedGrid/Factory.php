@@ -70,10 +70,17 @@ class Factory
                 $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
                 if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
                     // Set the capability mark normalised to a value out of the total descriptor points for the capability
-                    $capabilityUnscaledMark = $isSelfReflection
-                        ? null
-                        : (float)$postCapabilities[$capabilityId]['unscaledMark'];
-
+                    $capabilityUnscaledMark = null;
+                    if (!$isSelfReflection) {
+                        // If the mark is passed as an empty string:
+                        // treat that as a null cap mark, not zero
+                        $capabilityUnscaledMark = $postCapabilities[$capabilityId]['unscaledMark'] ?? '';
+                        if ($capabilityUnscaledMark === '') {
+                            $capabilityUnscaledMark = null;
+                        } else {
+                            $capabilityUnscaledMark = (float)$capabilityUnscaledMark;
+                        }
+                    }
                     $capabilityMark->setValue($capabilityUnscaledMark);
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());

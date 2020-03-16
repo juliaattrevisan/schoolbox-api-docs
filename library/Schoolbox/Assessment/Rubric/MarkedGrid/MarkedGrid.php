@@ -86,13 +86,22 @@ class MarkedGrid
      * Calculates the grid's mark, with the scaling factor from each of its
      * capabilities applied.
      *
-     * @return float
+     * @return null|float
      */
-    public function calculateScaledMark(): float
+    public function calculateScaledMark(): ?float
     {
-        $value = 0.0;
+        $value = null;
         foreach ($this->capabilityMarks as $capabilityMark) {
-            $value += $capabilityMark->calculateScaledMark();
+            // Mark-per-capability?
+            // Use the actual input value (which may be null) instead of the
+            // calculated mark.
+            $capabilityValue = $this->grid->isMarkPerCapability()
+                ? $capabilityMark->getValue()
+                : $capabilityMark->calculateScaledMark();
+
+            if (isset($capabilityValue)) {
+                $value = ($value ?? 0) + $capabilityValue;
+            }
         }
         return $value;
     }
@@ -101,15 +110,18 @@ class MarkedGrid
      * Convert the given mark to a percentage of the total available marks -
      * this is used by IMarkScheme implementations to generate human readable marks
      *
-     * @return float
+     * @return null|float
      */
-    public function retrieveNormalizedMark(): float
+    public function retrieveNormalizedMark(): ?float
     {
-        if ($this->calculateTotalAvailableMarks() > 0) {
-            return round(($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100, self::PRECISION);
-        } else {
-            return 0.0;
+        $scaledMark = $this->calculateScaledMark();
+        if (!isset($scaledMark)) {
+            return null;
         }
+        if ($this->calculateTotalAvailableMarks() > 0) {
+            return round(($scaledMark / $this->calculateTotalAvailableMarks()) * 100, self::PRECISION);
+        }
+        return 0.0;
     }
 
     /**

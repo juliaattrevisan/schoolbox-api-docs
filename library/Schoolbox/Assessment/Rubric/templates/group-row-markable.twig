@@ -10,13 +10,13 @@
 {% set markScheme = capabilityMark.markScheme ?? rubricGrid.assessment.markScheme %}
 {% set markType   = markScheme.generateContext %}
 {% if showGroupTotal %}
-    {% set letterGradeBracket = false %}
+    {% set letterGradeBracket = null %}
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% if markScheme.gradeGroup is defined %}
         {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
             {# If cap mark has been given, find the bracket that matches the given mark #}
-            {% if capabilityMark.value != null %}
+            {% if capabilityMark.value is not null %}
                 {# Is this below the last? If so use the last one #}
                 {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
                     {% set letterGradeBracket = gradeLevel.lowerBound %}
@@ -68,9 +68,10 @@
                                 name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                                 id="group-{{ capabilityId }}-mark">
 
+                            <option value="" {% if capabilityMark.value is null %}selected{% endif %}>(no grade)</option>
                             {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                 <option value="{{ gradeLevel.lowerBound }}"
-                                        {% if letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
+                                        {% if capabilityMark.value is not null and letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
                                         data-letter="{{ gradeLevel.caption }}">
                                     {{ gradeLevel.caption }}
                                 </option>
@@ -83,7 +84,9 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark ? (capabilityMark.retrieveNormalizedMark | round(2)) : null }}"/> %
+                               value="{{ capabilityMark and capabilityMark.retrieveNormalizedMark is not null
+                                ? (capabilityMark.retrieveNormalizedMark | round(2))
+                                : null }}"/> %
                     {% endif %}
 
                     {% if groupUsage.containsDescriptorsWithValue %}
