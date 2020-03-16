@@ -78,6 +78,12 @@ class MigrateToStorage
      */
     public function migrate(): void
     {
+        $message = $this->perform
+            ? "Running in 'perform' mode, changes will be persisted"
+            : "Running in 'dry-run' mode, changes will be simulated";
+        $this->logger->info($message);
+        $this->logger->info("Configured portrait directory: {$this->portraitPath}");
+        $this->logger->info(sprintf("%d files found in portrait directory", count(scandir($this->portraitPath))-2));
 
         /* Prepared statements
          */
@@ -103,6 +109,7 @@ class MigrateToStorage
             if (('.' === $file) || ('..' === $file)) {
                 continue;
             }
+            $this->logger->info("Processing file: $file");
 
             /* If it's an actual file, send it in
              */
@@ -137,6 +144,7 @@ class MigrateToStorage
                         /* Save it into brownhole
                          */
                         $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+                        $this->logger->debug("File written to storage");
 
                         /* Update user with latest version
                          */

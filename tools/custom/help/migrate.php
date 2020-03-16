@@ -42,7 +42,7 @@ Migrate portraits from filesystem portrait_dir into Storage and associate them
 with schoolbox user accounts. Each profile picture is assumed to be a jpg and
 you can dump as many as you want into the stock_portrait folder.
 
-Profile pictures are only assigned to users who don't have a portrait already. 
+Profile pictures are only assigned to users who don't have a portrait already.
 
 Usage: migrate.php [-v] [-p]
         -p Actually migrate portraits (otherwise, this will only show what would
@@ -144,7 +144,7 @@ HELP;
     }
 };
 
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
