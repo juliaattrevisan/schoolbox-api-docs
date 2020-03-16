@@ -134,7 +134,7 @@ class Submission extends SectionAssignment
                 $hasMarkToSync       = false;
                 $sbSubmissionBoxSpec = $this->submissionBoxMapper->findOneByColumn('external_id', $assessmentCanvasId);
 
-                $assessmentImpls   = $this->assessmentDataSource->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
+                $assessmentImpls   = $this->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
                 $canvasSubmissions = $this->loadCanvasSubmissions($assessmentCanvasId);
                 $this->log->info("Processing submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
 
@@ -142,7 +142,12 @@ class Submission extends SectionAssignment
                 foreach ($assessmentImpls as $assessmentImpl) {
                     // load participants
                     $assessmentCollection = $this->assessmentDataSource->createCollection()->add($assessmentImpl);
-                    $result               = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessmentCollection);
+                    try {
+                        $result = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessmentCollection);
+                    } catch (\Exception $e) {
+                        $this->log->warning('Failed to load participant: ' . $e->getMessage() . ' ' . $e->getTraceAsString());
+                        continue;
+                    }
                     foreach ($result as $assessmentWithParticipants) {
                         // should be only one
                         $assessmentImpl = $assessmentWithParticipants;
@@ -261,6 +266,23 @@ class Submission extends SectionAssignment
     protected function resetCounts(): void
     {
         $this->syncMarkCount = 0;
+    }
+
+    /**
+     * Finds assessment impl from assessment spec
+     * @param int $assessmentSpecId
+     * @return GenericCollection|IAssessable[]
+     */
+    private function findAllImplementationsBySpecificationId(int $assessmentSpecId)
+    {
+        $query     = '
+                SELECT implementation_assessment_id
+                FROM assessment_specification_implementation
+                WHERE specification_assessment_id = :specId';
+        $statement = $this->schoolboxDb->executeQuery($query, ['specId' => $assessmentSpecId]);
+        $ids       = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+        return $this->assessmentDataSource->findAllByIds($ids);
     }
 
     /**
