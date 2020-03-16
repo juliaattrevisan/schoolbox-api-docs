@@ -1,25 +1,35 @@
 <?php
 /**
- * Report Factory for generating concrete instances of reports.
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-class Report_Factory {
+/**
+ * Class Report_Factory
+ *
+ * Report Factory for generating concrete instances of reports.
+ */
+class Report_Factory
+{
 
     /**
      * Allowed report types
      */
     public const ALLOWED_REPORTS = ['group', 'activity', 'login'];
 
+
     /**
      * Special char used in search vars to separate key-value pairs
      */
     public const PARAM_SEPARATOR = ';';
 
-    // provide optional type safety
+
+    /**
+     * provide optional type safety
+     *
+     * @var bool
+     */
     private static $typesafe = false;
 
 
@@ -37,11 +47,11 @@ class Report_Factory {
 
     /**
      * @static
-     * @param $reportType
-     * @param $page
-     * @return Report_IReport
+     * @param null|string $reportType
+     * @param SitePage $page
+     * @return null|Report_IReport
      */
-    public static function build($reportType, $page): Report_IReport
+    public static function build(?string $reportType, SitePage $page): ?Report_IReport
     {
 
         /* Invalid reports don't do anything
@@ -52,10 +62,10 @@ class Report_Factory {
         }
 
         // get the class to be implemented
-        $class = "Report_" . ucwords(strtolower($reportType));
+        $class = 'Report_' . ucwords(strtolower($reportType));
 
+        // not found
         if (!class_exists($class)) {
-            // not found
             return null;
         }
 
