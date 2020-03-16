@@ -9,26 +9,44 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-if(!$_POST['bounce']) {
+/* This is a hidden input field; its absence causes this to exit early
+ * Its value is 'activity' for the Activity Report
+ *
+ * Anyway, there are three reports: activity group login, as per Report_Factory
+ * If you're not one of these reports...just die
+ */
+if (!$_POST['bounce']) {
     error(2);
 }
 
-// parse their filter inputs and redirect back to the page
-$bounce = "Location: /adminv2/reports/" . $_POST['bounce'] . "/";
-$vars = "";
+/* Parse their filter inputs and redirect back to the page
+ */
+$bounce = "Location: /adminv2/reports/{$_POST['bounce']}/";
+$vars = '';
 
-foreach($_POST as $post => $val) {
-    if($post == 'bounce')
+foreach ($_POST as $post => $val) {
+
+    /* We don't do anything with this hidden input
+     */
+    if ($post === 'bounce') {
         continue;
-    if($val = str_replace('/','-',$val))
+    }
+
+    /* Replace slashes in search terms with a hyphen - for some reason
+    */
+    $val = str_replace('/', '-', $val);
+
+    if ($val) {
         $vars .= "$post=$val,";
+    }
 }
 
-$vars = substr($vars, 0, strlen($vars) - 1);
+/* Exclude trailing comma (but why is this a thing?)
+ */
+$vars = (string)substr($vars, 0, -1);
 
-if($vars == '')
+if ($vars === '') {
     $vars = 'all';
+}
 
 header($bounce . $vars);
-
-?>
