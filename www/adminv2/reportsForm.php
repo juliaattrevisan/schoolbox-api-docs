@@ -15,7 +15,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
  * Anyway, there are three reports: activity group login, as per Report_Factory
  * If you're not one of these reports...just die
  */
-if (!$_POST['bounce']) {
+if (!Report_Factory::isValidReport($_POST['bounce'])) {
     error(2);
 }
 
