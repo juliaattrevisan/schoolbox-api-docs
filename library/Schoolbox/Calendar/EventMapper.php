@@ -65,6 +65,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('series_id',self::TYPE_INTEGER,null,'seriesId');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('type', EventTypeMapper::class, 'eventTypeID', null, null, 'type', 'eventType');
+        $this->uses(
+            'class',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'class',
+            [Event::CLASS_EVENT, Event::CLASS_TASK,]
+        );
         $this->uses('title',self::TYPE_STRING);
         $this->uses('detail',self::TYPE_STRING);
         $this->uses('location',self::TYPE_STRING);

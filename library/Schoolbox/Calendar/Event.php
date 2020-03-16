@@ -24,6 +24,8 @@ use Schoolbox\ISoftDeletable;
 
 class Event implements ISoftDeletable
 {
+    public const CLASS_EVENT = 'event';
+    public const CLASS_TASK = 'task';
 
     public const ACCESS_PERSONAL = 1;
     public const ACCESS_GROUP = 2;
@@ -100,6 +102,17 @@ class Event implements ISoftDeletable
      * @var EventType
      */
     protected $type = null;
+
+    /**
+     * The class of the event.
+     *
+     * Currently there are two classes of event:
+     * * `self::CLASS_EVENT`: standard events (the default)
+     * * `self::CLASS_TASK`: tasks
+     *
+     * @var string
+     */
+    private $class = self::CLASS_EVENT;
 
     /**
      * Title of the event
@@ -750,6 +763,34 @@ class Event implements ISoftDeletable
     {
         return $this->type;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getClass(): string
+    {
+        return $this->class;
+    }
+
+
+    /**
+     * @param string $class
+     * @return self
+     * @throws \OutOfBoundsException if `$class` isn't a `self::CLASS_*` value
+     */
+    public function setClass(string $class): self
+    {
+        // Why doesn't PHP have enumerated types yet?
+        if (!in_array($class, [self::CLASS_EVENT, self::CLASS_TASK], true)) {
+            throw new \OutOfBoundsException(
+                sprintf('Class must be one of the `%s::CLASS_*` constants', __CLASS__)
+            );
+        }
+        $this->class = $class;
+        return $this;
+    }
+
 
     /**
      * Set end date
