@@ -52,12 +52,6 @@ class AcademicAchievementSummary extends AbstractMatrix
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                 $data['markedGrid']      = $feedback->getRubricMarkedGrid();
                 $data['capabilityMarks'] = $this->buildCapabilityMarks($data['markedGrid']);
-
-                // MYP students' comments will come from this assessment
-                if ($this->getAttributes()->isMyp()) {
-                    $data['comment']   = $feedback->getComment();
-                    $data['commentBy'] = $feedback->getReviewer();
-                }
             }
         }
         $data['dueDate'] = $dueWork->getDueAt();

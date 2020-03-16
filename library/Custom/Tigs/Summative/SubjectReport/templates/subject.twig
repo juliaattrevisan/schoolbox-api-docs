@@ -188,8 +188,6 @@ Data:
                 {% set commentData = aamData.data[unitSpecId] %}
             {% elseif attributes.isHsc %}
                 {% set commentData = hscTaskMarks.data[unitSpecId] %}
-            {% elseif attributes.isMyp %}
-                {% set commentData = aasData.data[unitSpecId] %}
             {% endif %}
             {% if commentData.comment %}
                 <div class="column island small-12 comments">

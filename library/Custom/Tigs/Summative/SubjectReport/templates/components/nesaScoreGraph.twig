@@ -24,7 +24,9 @@ Data:
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
         <h3 class="grade-heading {% if gradientClass %}has-gradient{% endif %}">{{ studentMark|default('-') }}</h3>
     </div>
-
+    {% if comment %}
+    <blockquote>{{ comment.comment|nl2br }}</blockquote>
+    {% endif %}
 
     {% autoescape 'js' %}
         <script type="text/javascript">

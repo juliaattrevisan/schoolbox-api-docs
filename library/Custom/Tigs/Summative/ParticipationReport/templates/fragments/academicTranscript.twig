@@ -223,9 +223,9 @@ Data:
                                 {% elseif attributes.isHsc %}
                                     {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
                                 {% elseif attributes.isMyp %}
-                                    {% set commentData = folderData.aasData.data[unitSpec.id] %}
+                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
+                                    {% set commentData = folderData.nesaGraphData.data.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                 {% endif %}
-
                                 {% if commentData.comment %}
                                     {% set commentFound = true %}
                                     {{ commentData.comment | nl2br }}
