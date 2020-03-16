@@ -238,7 +238,11 @@ class ZipFolder
                 if ($permission > UserAccess::ACCESS_DENY) {
                     $folderName     = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
-                    mkdir($folderLocation);
+                    if(!is_dir($folderLocation)) {
+                        if (!mkdir($folderLocation) && !is_dir($folderLocation)) {
+                            throw new \RuntimeException(sprintf('Directory "%s" was not created', $folderLocation));
+                        }
+                    }
                     $this->createDirectory($folderLocation, $folder, $permission, $depth + 1);
                 }
             }
@@ -254,7 +258,9 @@ class ZipFolder
     {
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
-        mkdir($this->tmpFolder);
+        if (!mkdir($this->tmpFolder) && !is_dir($this->tmpFolder)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpFolder));
+        }
 
         $this->createDirectory(
             $this->tmpFolder,
