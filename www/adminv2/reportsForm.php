@@ -33,11 +33,12 @@ foreach ($_POST as $post => $val) {
     }
 
     /* Replace slashes in search terms with a hyphen - for some reason
+     * Probably to disambiguate search terms from arg[] elements
     */
     $val = str_replace('/', '-', $val);
 
     if ($val) {
-        $vars .= "$post=$val,";
+        $vars .= "$post=$val&";
     }
 }
 
