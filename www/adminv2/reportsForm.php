@@ -1,12 +1,11 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 require_once __DIR__ . '/../../conf/core/require.php';
+
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /* This is a hidden input field; its absence causes this to exit early
@@ -34,11 +33,12 @@ foreach ($_POST as $post => $val) {
 
     /* Replace slashes in search terms with a hyphen - for some reason
      * Probably to disambiguate search terms from arg[] elements
+     * ...or dates
     */
     $val = str_replace('/', '-', $val);
 
     if ($val) {
-        $params[] = "$post=$val";
+        $params[] = "{$post}={$val}";
     }
 }
 
