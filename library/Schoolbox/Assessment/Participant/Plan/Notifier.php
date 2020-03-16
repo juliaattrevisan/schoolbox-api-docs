@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
@@ -29,6 +30,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -39,6 +41,10 @@ use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
+use function array_intersect;
+use function array_keys;
+use function array_key_exists;
+use function count;
 
 /**
  * Notifier for participation plans.
@@ -148,7 +154,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
-     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data
+     * @throws ServiceNotFound if somehow my assessment data
      *                                            source wasn't found
      */
     public function loadDependencies($dependencies = null): void
@@ -278,7 +284,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /**
          * No Change
          */
-        if ($diff === null || \count($diff) === 0) {
+        if ($diff === null || count($diff) === 0) {
             return;
         }
 
@@ -306,8 +312,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
          */
         $isPreviousHidden = false;
         if ($method === Mapper::METHOD_UPDATE
-            && \array_key_exists('assessment', $diff)
-            && \array_key_exists('workType', $diff['assessment'])) {
+            && array_key_exists('assessment', $diff)
+            && array_key_exists('workType', $diff['assessment'])) {
             try {
                 $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
                     $this->workTypeMapper->findById($diff['assessment']['workType'][1])->isStaffOrInstructorVisibleOnly();
@@ -419,11 +425,18 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($openDate->isPast()) {
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
+            /**
+             * Close date changed.
+             */
+            if ($this->dateChanged($planDiff, self::DATE_CLOSE, self::ANY)) {
+                $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
+            }
         }
     }
 
     /**
      * @inheritdoc
+     * @throws BaseMapper\Exception
      */
     public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
@@ -553,8 +566,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ServiceNotFound
+     * @throws DeletedException
      */
     public function notifyOpen(Model $plan): Envelope
     {
@@ -693,8 +706,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ServiceNotFound
+     * @throws DeletedException
      */
     public function notifyUpcoming(Model $plan): Envelope
     {
@@ -758,8 +771,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ServiceNotFound
+     * @throws DeletedException
      */
     public function notifyOverdue(Model $plan): Envelope
     {
@@ -825,8 +838,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ServiceNotFound
+     * @throws DeletedException
      */
     public function notifyClosed(Model $plan): Envelope
     {
@@ -943,8 +956,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param User       $effector
      * @param array|null $diff
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ServiceNotFound
+     * @throws DeletedException
+     * @throws BaseMapper\Exception
      */
     public function notifyUpdated(Model $plan, User $effector, array $diff = null): Envelope
     {
@@ -1123,7 +1137,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // generic: only if there's something left in the diff.
             // Not sure if there's any point to this notif, but raise it anyway
-            if (\array_intersect(\array_keys($assessmentDiff), ['type', 'weight', 'workType'])) {
+            if (array_intersect(array_keys($assessmentDiff), ['type', 'weight', 'workType'])) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
@@ -1255,9 +1269,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return IAssessable
-     * @throws \Aura\Di\Exception\ServiceNotFound  if for whatever reason I couldn't find the data source?
-     *                                             Should never happen.
-     * @throws \Schoolbox\Mapper\Exception\Deleted if item I'm getting notifs for is deleted
+     * @throws DeletedException if item I'm getting notifs for is deleted
      */
     private function retrieveAssessmentDomainModel(Model $plan): IAssessable
     {
@@ -1279,6 +1291,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $dataModel = $this->assessmentMapper->findById($assessment->getId());
         } catch (BaseMapper\Exception\Deleted $e) {
             $dataModel = $e->getDeletedObject();
+        } catch (BaseMapper\Exception $e) {
+            return null;
         }
         if ($dataModel->getDueWork()) {
             return "duework." . $dataModel->getDueWork()->getId();
@@ -1463,8 +1477,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return false;
         }
 
-        $current = new \Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
-        $previous = new \Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
+        $current = new Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
+        $previous = new Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
 
         if (!$current || !$previous) {
             return false;
