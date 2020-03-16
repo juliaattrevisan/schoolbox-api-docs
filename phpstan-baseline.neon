@@ -7161,11 +7161,6 @@ parameters:
 			path: library/Report/Exporter.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$reportType\\)\\: Unexpected token \"\\$reportType\", expected type at offset 33$#"
-			count: 1
-			path: library/Report/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 52$#"
 			count: 1
 			path: library/Report/Parent.php
