@@ -25,6 +25,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
+use Schoolbox\Assessment\Rubric\Util as RubricUtil;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Daemon;
@@ -41,8 +42,7 @@ $kernel = new Daemon\Kernel(
 );
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(new class extends App
-{
+$kernel->run(new class extends App {
     private const INDENT = '  ';
 
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
@@ -134,7 +134,7 @@ $kernel->run(new class extends App
         SELECT rl.id AS levelId,
                rd.id,
                a.id AS assessmentId
-        FROM       rubric_descriptor rd 
+        FROM       rubric_descriptor rd
         INNER JOIN rubric_level      rl ON rd.level_id = rl.id
         INNER JOIN submission_box    sb ON rl.box_id = sb.id
         INNER JOIN assessment         a ON sb.assessment_id = a.id
@@ -509,16 +509,27 @@ $kernel->run(new class extends App
                 $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
                 if (count($unitCapabilities) === 0) {
                     $this->log->debug(self::indent(2) . 'unit contains no capabilities: no action required');
-                    continue;
+                } else {
+                    // Must re-fetch the course row set after every unit, because
+                    // repairCapabilities may change the course's capabilities.
+                    $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
+                    $courseCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+
+                    $this->repairCapabilities($courseCapabilities, $unitCapabilities);
+
+                    // Now that clean up of capabilities is done, let's delete capabilities without indicators.
+                    // No indicators found for this capability. Delete it.
+                    $this->findRubricCapabilityQuery->execute(['folderId' => $unit->getFolder()->getId()]);
+                    $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+                    $this->deleteEmptyCapabilities($unitCapabilities);
                 }
-
-                // Must re-fetch the course row set after every unit, because
-                // repairCapabilities may change the course's capabilities.
-                $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
-                $courseCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
-
-                $this->repairCapabilities($courseCapabilities, $unitCapabilities);
+                // disable rubric for assessments which are not using rubric
+                $this->disableRubric($unit->getFolder()->getId());
             }
+
+            $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
+            $courseCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+            $this->deleteEmptyCapabilities($courseCapabilities);
         }
     }
 
@@ -535,7 +546,7 @@ $kernel->run(new class extends App
         foreach ($courseCapabilities as $courseCapabilityId => $courseCapabilityName) {
             $capabilityConflict = false;
             foreach ($unitCapabilities as $unitCapabilityId => $unitCapabilityName) {
-                if ($courseCapabilityName === $unitCapabilityName) {
+                if (RubricUtil::normalizeName($courseCapabilityName) === RubricUtil::normalizeName($unitCapabilityName)) {
                     $capabilityConflict = true;
                     $this->log->info(
                         sprintf(
@@ -544,7 +555,7 @@ $kernel->run(new class extends App
                         )
                     );
 
-                    $this->repairCapability($courseCapabilityId, $unitCapabilityId, $unitCapabilityName);
+                    $this->repairCapability($courseCapabilityId, $unitCapabilityId, $courseCapabilityName, $unitCapabilityName);
                     break;
                 }
             }
@@ -565,12 +576,14 @@ $kernel->run(new class extends App
      * Attempt to repair this unit capability by migrating its indicators, and
      * any usages therein, into the course capability.
      *
-     * @param int    $courseCapabilityId the ID of the course-level capability
-     * @param int    $unitCapabilityId   the ID of the unit-level capability
-     * @param string $capabilityName     the capability name (Logging only, and
-     *                                   the same for both course and unit)
+     * @param int    $courseCapabilityId   the ID of the course-level capability
+     * @param int    $unitCapabilityId     the ID of the unit-level capability
+     * @param string $courseCapabilityName the capability name (Logging only, and
+     *                                     the same for both course and unit)
+     * @param string $unitCapabilityName   the capability name (Logging only, and
+     *                                     the same for both course and unit)
      */
-    private function repairCapability(int $courseCapabilityId, int $unitCapabilityId, string $capabilityName): void
+    private function repairCapability(int $courseCapabilityId, int $unitCapabilityId, string $courseCapabilityName, string $unitCapabilityName): void
     {
         // Capability usages must be migrated from the unit to the course,
         // and deleted if there is a conflict.
@@ -600,8 +613,9 @@ $kernel->run(new class extends App
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
-                        'removed usage record for unit-level capability "%s", and replaced with equivalent course-level record (original mark-per-capability value not preserved)',
-                        $capabilityName
+                        'removed usage record for unit-level capability "%s", and replaced with equivalent course-level record "%s" (original mark-per-capability value not preserved)',
+                        $unitCapabilityName,
+                        $courseCapabilityName
                     )
                 );
             }
@@ -611,17 +625,22 @@ $kernel->run(new class extends App
         // Now clean up indicators
         $this->findRubricIndicatorQuery->execute(['capabilityId' => $unitCapabilityId]);
         $unitIndicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
+
+        // Compare each of the unit indicator names with course indicator names
         foreach ($unitIndicators as $unitIndicatorId => $unitIndicatorName) {
-            $matchingCourseIndicatorId = null;
+            $matchingCourseIndicatorId   = null;
+            $matchingCourseIndicatorName = '';
 
             // Need to refetch course indicators each iteration, because this
             // loop can change the indicators available.
             $this->findRubricIndicatorQuery->execute(['capabilityId' => $courseCapabilityId]);
             $courseIndicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
 
+            $normalizedUnitIndicatorName = RubricUtil::normalizeName($unitIndicatorName);
             foreach ($courseIndicators as $courseIndicatorId => $courseIndicatorName) {
-                if ($courseIndicatorName === $unitIndicatorName) {
-                    $matchingCourseIndicatorId = $courseIndicatorId;
+                if (RubricUtil::normalizeName($courseIndicatorName) === $normalizedUnitIndicatorName) {
+                    $matchingCourseIndicatorId   = $courseIndicatorId;
+                    $matchingCourseIndicatorName = $courseIndicatorName;
                     break;
                 }
             }
@@ -637,7 +656,7 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId, $unitIndicatorName);
+                $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId, $matchingCourseIndicatorName, $unitIndicatorName);
 
             } else {
                 // Indicator exists in unit, but not course.
@@ -670,12 +689,14 @@ $kernel->run(new class extends App
      * Attempt to repair this unit indicator by migrating its usages into the
      * course indicator.
      *
-     * @param int    $courseIndicatorId the ID of the course-level indicator
-     * @param int    $unitIndicatorId   the ID of the unit-level indicator
-     * @param string $indicatorName     the indicator name (Logging only, and
-     *                                  the same for both course and unit)
+     * @param int    $courseIndicatorId   the ID of the course-level indicator
+     * @param int    $unitIndicatorId     the ID of the unit-level indicator
+     * @param string $courseIndicatorName the indicator name (Logging only, and
+     *                                    the same for both course and unit)
+     * @param string $unitIndicatorName   the indicator name (Logging only, and
+     *                                    the same for both course and unit)
      */
-    private function repairIndicator(int $courseIndicatorId, int $unitIndicatorId, string $indicatorName): void
+    private function repairIndicator(int $courseIndicatorId, int $unitIndicatorId, string $courseIndicatorName, string $unitIndicatorName): void
     {
         $this->findRubricIndicatorUsageQuery
             ->execute(['unitIndicatorId' => $unitIndicatorId,]);
@@ -702,8 +723,9 @@ $kernel->run(new class extends App
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
-                        'removed and recreated usage record for indicator "%s", and replaced with equivalent course-level record ',
-                        $indicatorName
+                        'removed and recreated usage record for unit indicator "%s", and replaced with equivalent course-level indicator "%s" ',
+                        $unitIndicatorName,
+                        $courseIndicatorName
                     )
                 );
             }
@@ -756,7 +778,7 @@ $kernel->run(new class extends App
                     'removed %d and migrated %d descriptors from indicator "%s"',
                     $removedDescriptorCount,
                     $migratedDescriptorCount,
-                    $indicatorName
+                    $unitIndicatorName
                 )
             );
         }
@@ -770,6 +792,56 @@ $kernel->run(new class extends App
             ]);
     }
 
+    /**
+     * Finds capabilities without indicators and delete them
+     * @param array $capabilities
+     */
+    private function deleteEmptyCapabilities(array $capabilities): void
+    {
+        foreach ($capabilities as $capabilityId => $capabilityName) {
+            $this->findRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
+            $indicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
+            if (!empty($indicators)) {
+                continue;
+            }
+            $this->log->info(
+                sprintf(self::indent(1) . 'capability %s (%d) does not have any indicators: deleting',
+                    trim($capabilityName),
+                    $capabilityId)
+            );
+            // no indicators for this capability
+            $this->deleteRubricCapabilityQuery
+                ->execute([
+                    'now'              => $this->now,
+                    'unitCapabilityId' => $capabilityId,
+                ]);
+        }
+    }
+
+    /**
+     * @param $unitFolderId
+     */
+    private function disableRubric($unitFolderId): void
+    {
+        $sql       = '
+        SELECT sb.id
+        FROM submission_box sb
+        LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
+        WHERE sb.use_rubric = 1
+        AND sb.category = :folderId
+        GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0
+        ';
+        $statement = $this->db->executeQuery($sql, ['folderId' => $unitFolderId]);
+        $ids       = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $idString = implode(',', $ids);
+        $this->db->executeQuery("UPDATE submission_box set use_rubric = 0 WHERE id in ({$idString})");
+        $this->log->info(self::indent(2) . "submission boxes {$idString} in unit {$unitFolderId} are not using rubric: disabling Rubric");
+    }
 
     /**
      * Finds descriptors used by the indicator, grouped by assessment and then

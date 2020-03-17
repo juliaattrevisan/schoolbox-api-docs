@@ -5,7 +5,6 @@
  */
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
-use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
@@ -16,7 +15,6 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use UnexpectedValueException;
 
 /**
  * Mapper for rubric indicators.
@@ -156,6 +154,7 @@ class Mapper extends BaseMapper {
      *
      * @param Model $indicator
      * @return bool
+     * @throws MapperException
      */
     public function deleteCapability(Model $indicator)
     {
@@ -228,7 +227,7 @@ class Mapper extends BaseMapper {
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
-                    sprintf('Rubric indicator name "%s" is in use in its capability', $normalizedName)
+                    sprintf('Rubric indicator name "%s" is in use in its capability', $existingName)
                 );
             }
         }
@@ -245,7 +244,6 @@ class Mapper extends BaseMapper {
      *                              constants
      * @param bool      $cache      If false, bypass result cache
      * @return GenericCollection|Model[]
-     * @throws MapperException
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
     {
@@ -287,8 +285,7 @@ class Mapper extends BaseMapper {
      * @param string $name           The name of the indicator
      * @param string $capabilityName The name of the indicator's capability
      * @param bool   $cache          If false, bypass result cache
-     * @return Model
-     * @throws MapperException
+     * @return Model|null
      */
     public function findOneForParentByKey(
         int $parentId,
@@ -296,17 +293,24 @@ class Mapper extends BaseMapper {
         string $name,
         string $capabilityName,
         bool $cache = true
-    ): Model
-    {
-        return $this->findOneByColumnList(
+    ): ?Model {
+        $indicators               = $this->findByColumnList(
             [
-                'g.name'        => $capabilityName,
-                'name'          => $name,
                 'g.parent_type' => $parentType,
                 'g.parent_id'   => $parentId,
             ],
             ['cache' => $cache,]
         );
+        $normalizedCapabilityName = Util::normalizeName($capabilityName);
+        $normalizedIndicatorName  = Util::normalizeName($name);
+        foreach ($indicators as $indicator) {
+            /** @var Model $indicator */
+            if ($normalizedIndicatorName === Util::normalizeName($indicator->getName())
+                && $normalizedCapabilityName === Util::normalizeName($indicator->getCapability()->getName())) {
+                return $indicator;
+            }
+        }
+        return null;
     }
 
 
@@ -318,10 +322,9 @@ class Mapper extends BaseMapper {
      * @param string $name           The name of the indicator
      * @param string $capabilityName The name of the indicator's capability
      * @param bool   $cache          If false, bypass result cache
-     * @return Model
-     * @throws MapperException
+     * @return Model|null
      */
-    public function findOneForFolderByKey(int $folderId, string $name, string $capabilityName, bool $cache = true): Model
+    public function findOneForFolderByKey(int $folderId, string $name, string $capabilityName, bool $cache = true): ?Model
     {
         return $this->findOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $capabilityName, $cache);
     }
@@ -344,10 +347,7 @@ class Mapper extends BaseMapper {
      * @param string $capabilityName
      * @param bool   $cache
      * @return Model
-     * @throws BaseMapper\DefinitionException
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     public function findOrCreateOneForParentByKey(
         int $parentId,
@@ -357,29 +357,26 @@ class Mapper extends BaseMapper {
         bool $cache = true
     ): Model
     {
-        try {
-            return $this->findOneForParentByKey($parentId, $parentType, $name, $capabilityName, $cache);
-
-        } catch (MapperException\Deleted $e) {
-            // It was deleted; restore it
-            $item = $e->getDeletedObject();
-            $this->restoreSoftDeleted($item);
-            return $item;
-
-        } catch (MapperException $e) {
-            // Build it
-            /** @var CapabilityMapper $capabilityMapper */
-            $capabilityMapper = $this->getJoinMapper('capability');
-            /** @var NodeMapper $nodeMapper */
-            $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
-            $capability       = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache);
-            $indicator        = $this->createModel()
-                                     ->setCapability($capability)
-                                     ->setName($name)
-                                     ->setCurriculumNodes($nodeMapper->createCollection());
-            $this->save($indicator);
-            return $indicator;
+        // Try to find an indicator with the "same" name and capability name
+        $existing = $this->findOneForParentByKey($parentId, $parentType, $name, $capabilityName, $cache);
+        if ($existing) {
+            // Found
+            return $existing;
         }
+
+        // Couldn't find. Let's create one.
+        /** @var CapabilityMapper $capabilityMapper */
+        $capabilityMapper = $this->getJoinMapper('capability');
+        /** @var NodeMapper $nodeMapper */
+        $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
+        // Get a capability under which this indicator should be created
+        $capability = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache);
+        $indicator  = $this->createModel()
+                           ->setCapability($capability)
+                           ->setName($name)
+                           ->setCurriculumNodes($nodeMapper->createCollection());
+        $this->save($indicator);
+        return $indicator;
     }
 
 
