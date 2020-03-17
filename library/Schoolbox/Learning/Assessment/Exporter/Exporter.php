@@ -66,9 +66,11 @@ class Exporter
             'class code',
             'assessment title',
             'assessment item code',
+            'due date',
             'weight',
             'result',
-            'percentage',
+            'raw mark',
+            'comment',
         ];
 
         $data = [];
@@ -102,15 +104,15 @@ class Exporter
 
             foreach ($assessment->getAllParticipants() as $participant) {
                 /** @var Participant $participant */
-                $mark = $participant->getHumanReadableMark(true);
-                $percentage = $participant->getNormalisedMark(true);
+                $feedback = $participant->getAuthoritativeFeedback(true);
 
-                if (!$mark) {
+                if(!$feedback) {
                     continue;
                 }
 
-                // Strip percent sign from mark
-                $mark = str_replace('%', '', $participant->getHumanReadableMark(true));
+                $mark = $feedback->getHumanReadableMark();
+                $percentage = $feedback->getNormalisedMark();
+                $comment = $feedback->getComment();
 
                 // If this is a total mark, only show the actual mark (without '/ [total]')
                 //[$mark] = explode(' / ', $mark);
@@ -120,9 +122,11 @@ class Exporter
                     $headings[1] => $folderCode->getCode(),
                     $headings[2] => $assessmentTitle,
                     $headings[3] => $assessmentCode,
-                    $headings[4] => $weight,
-                    $headings[5] => $mark,
-                    $headings[6] => $percentage,
+                    $headings[4] => $participant->getDueDate()->getDatabaseDate(),
+                    $headings[5] => $weight,
+                    $headings[6] => $mark,
+                    $headings[7] => $percentage,
+                    $headings[8] => $comment
                 ];
             }
         }
