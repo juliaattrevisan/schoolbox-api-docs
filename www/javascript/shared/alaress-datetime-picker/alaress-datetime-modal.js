@@ -251,10 +251,17 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#adtp-modal-' + twigVars.id).find('.flatpickr-time');
         var html = '';
+        var checked = '';
+
+        /* Find out what the current all-day setting is and apply that
+         */
+        if ($('#' + pickerOptions.allDayInput).val() == 1) {
+            checked = 'checked';
+        }
 
         // Build an All Day switch if it's been set in the options
         if (pickerOptions.allDaySwitch === true) {
-            html += '<div class="time-switch" data-adtp-calendar-allday><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
+            html += '<div class="time-switch" data-adtp-calendar-allday><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" ' + checked + '>' +
                 '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
                 '</div>';
         }
