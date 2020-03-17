@@ -38,7 +38,7 @@ if(count($this->arg) < 2) {
 // url expected to be in the format:
 //   /adminv2/reports/reportType/reportVar/[sortBy/[sortDir/]][page|export]
 $reportType = $this->arg[0];
-$reportVar = $this->arg[1];
+$reportVar = urldecode($this->arg[1]);
 $exportToCSV = false;
 
 // default sorting

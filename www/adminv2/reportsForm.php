@@ -48,4 +48,4 @@ if ($vars === '') {
     $vars = 'all';
 }
 
-header($bounce . $vars);
+header($bounce . urlencode($vars));
