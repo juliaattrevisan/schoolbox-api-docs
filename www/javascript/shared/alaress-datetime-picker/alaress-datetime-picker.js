@@ -178,8 +178,6 @@
             .closest("#adtp-modal-" + pickerId)
             .find(".flatpickr-time");
 
-        console.log(adtp.getOptions());
-
         // All Day is on
         if (state === true) {
             $timeDiv.hide();
