@@ -22,7 +22,7 @@ class Report_Factory
     /**
      * Special char used in search vars to separate key-value pairs
      */
-    public const PARAM_SEPARATOR = ';';
+    public const PARAM_SEPARATOR = '||';
 
 
     /**
