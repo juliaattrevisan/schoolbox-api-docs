@@ -9,7 +9,6 @@
         props: [
             'userId',
             'eventTypes',
-            'taskTypeId',
             // TODO why do I have to pass this method around?
             'toMoment',
             'eventCreateUrl',
@@ -146,14 +145,14 @@
                         <h3>On <span>{{ displayDate }}</span></h3>
 
                         <label class="required" for="createEventBubbleTitle">
-                            Event Title
+                            Title
                         </label>
                         <input id="createEventBubbleTitle" name="title" type="text" v-model.trim="event.title" />
 
                         <label>
-                            Event Type
+                            Type
                             <select name="type" v-model="event.type">
-                                <option v-for="eventType in nonTaskEventTypes" :value="eventType.id">
+                                <option v-for="eventType in eventTypes" :value="eventType.id">
                                     {{ eventType.name }}
                                 </option>
                             </select>
@@ -176,7 +175,6 @@
                     <input name="userId" type="hidden" :value="userId" />
                     <input name="allDay" type="hidden" :value="Number(event.allDay)" />
                     <input name="date"   type="hidden" :value="formDate" />
-                    <input name="type"   type="hidden" :value="taskTypeId" />
 
                     <section>
                         <h3>Due <span>{{ displayDate }}</span></h3>
@@ -185,6 +183,15 @@
                             Task
                         </label>
                         <input id="createTaskBubbleTitle" name="title" type="text" v-model.trim="event.title" />
+
+                        <label>
+                            Type
+                            <select name="type" v-model="event.type">
+                                <option v-for="eventType in eventTypes" :value="eventType.id">
+                                    {{ eventType.name }}
+                                </option>
+                            </select>
+                        </label>
 
                         <label class="detail">
                             Note

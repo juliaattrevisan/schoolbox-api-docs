@@ -151,7 +151,6 @@ class Controller extends Base
                 '@calendar/calendar.twig',
                 [
                     'user'          => $user->getId() === null ? $this->getUser() : $user,
-                    'taskTypeId'    => $eventType->getTaskIdFromEvents(),
                     'groups'        => $groups,
                     'sources'       => $sourceList,
                     'campuses'      => $campus,

@@ -636,7 +636,6 @@
 
         <create-event-modal ref="createEvent"
                             :user-id="config.userId"
-                            :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
@@ -648,7 +647,6 @@
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
-                          :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"

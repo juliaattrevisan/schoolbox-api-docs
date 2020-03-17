@@ -18,7 +18,6 @@
         name: "view-event-modal",
         props: {
             toMoment: {},
-            taskTypeId: {},
             eventModifyFormUrl: {},
             eventModifyFormActionUrl: {},
             eventUpdateUrl: {},
