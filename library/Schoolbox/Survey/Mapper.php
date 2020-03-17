@@ -80,7 +80,7 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Model[] $results */
-        $results = [];
+        $collection = $this->createCollection();
 
         $idCol = $this->getIdentifierColumn();
         /** @var SurveyAttemptMapper $attemptMapper */
@@ -90,8 +90,8 @@ class Mapper extends BaseMapper
             if ($row['availability'] !== 'survey') {
                 continue;
             }
-            if (array_key_exists([$row[$idCol]], $results)) {
-                $model = $results[$row[$idCol]];
+            if ($collection->offsetExists($row[$idCol])) {
+                $model = $collection[$row[$idCol]];
             } else {
                 $model = $this->hydrate($row);
                 /** @var Folder $folder */
@@ -109,9 +109,11 @@ class Mapper extends BaseMapper
                 $attempt->setSurvey($model);
                 $model->getAttempts()->offsetSet($attempt->getId(), $attempt);
             }
+
+            $collection[$model->getId()] = $model;
         }
 
-        return $this->hydrateList($results);
+        return $collection;
     }
 
     /**
@@ -226,13 +228,13 @@ class Mapper extends BaseMapper
                         answer.answer     AS answers,
                         response.response AS selectedAnswers
             FROM        assess survey
-            JOIN        assess_section section ON section.deleted_at IS NULL AND 
+            JOIN        assess_section section ON section.deleted_at IS NULL AND
                         section.assess_id = survey.assess_id
-            JOIN        assess_question question ON question.deleted_at IS NULL AND 
+            JOIN        assess_question question ON question.deleted_at IS NULL AND
                         question.section_id = section.section_id
-            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND 
-                        attempt.assess_id = survey.assess_id AND 
-                        attempt.finish IS NOT NULL AND 
+            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND
+                        attempt.assess_id = survey.assess_id AND
+                        attempt.finish IS NOT NULL AND
                         attempt.attempt_id = (
                             SELECT    attempt_id
                             FROM      assess_attempt last_attempt
@@ -248,7 +250,7 @@ class Mapper extends BaseMapper
             WHERE       ".implode(' AND ', $pb->getWhere())."
             ORDER BY    attempt.user_id,
                         section.sequence,
-                        question.sequence            
+                        question.sequence
         ";
         $statement = $this->database->prepare($sql);
         $statement->execute($pb->getParams());
@@ -283,15 +285,15 @@ class Mapper extends BaseMapper
                             ORDER BY  last_attempt.attempt_id DESC
                             LIMIT 1
                         )
-            JOIN        assess_response response ON response.deleted_at IS NULL AND 
+            JOIN        assess_response response ON response.deleted_at IS NULL AND
                         response.attempt_id = attempt.attempt_id AND
                         response.section_id = section.section_id AND
-                        response.question_id = question.question_id 
-            JOIN        assess_answer answer ON answer.question_id = question.question_id                            
+                        response.question_id = question.question_id
+            JOIN        assess_answer answer ON answer.question_id = question.question_id
             WHERE       survey.deleted_at IS NULL AND
                         survey.assess_id = :survey_id AND
                         survey.availability = 'survey'
-            ORDER BY    section.sequence, 
+            ORDER BY    section.sequence,
                         question.sequence
         ";
 
