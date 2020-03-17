@@ -143,7 +143,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             renderHeatMapHelp();
 
             if (pickerOptions.allDaySwitch === true) {
-                $('#hideTime' + twigVars.id).click(function () {
+                if ($('#hideTime' + twigVars.id).is(':checked')) {
+                    adtp.setCalendarAllDay(true, twigVars.id);
+                }
+                else {
+                    adtp.setCalendarAllDay(false, twigVars.id);
+                }
+
+                $('#hideTime' + twigVars.id).on('click', function () {
                     if ($('#hideTime' + twigVars.id).is(':checked')) {
                         adtp.setCalendarAllDay(true, twigVars.id);
                     }
@@ -151,11 +158,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         adtp.setCalendarAllDay(false, twigVars.id);
                     }
                 });
-            }
-
-            // Fix Flatpickr display enableTime
-            if (pickerOptions.enableTime) {
-                $modal.find('.flatpickr-time').show();
             }
 
             if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
@@ -170,6 +172,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+
 
             // The size of something could have changed: reflow
             resizeCalendars();
