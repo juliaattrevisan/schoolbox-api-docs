@@ -211,7 +211,7 @@ class Feed
             $foldersWithWriteAccess = [];
             $access                 = Access::getInstance();
             foreach ($folderIds as $folderId) {
-                if ($access->isInstructor($this->user, (new Folder\Model())->setId($folderId))) {
+                if ($access->isInstructor($this->user, (new Folder\Model())->setId((int)$folderId))) {
                     $foldersWithWriteAccess[] = $folderId;
                 }
             }
