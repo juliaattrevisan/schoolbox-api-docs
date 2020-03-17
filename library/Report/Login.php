@@ -145,7 +145,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $filterString = $this->getIndexID();
 
         // explode across comma to get keypairs
-        $filterSplit = explode(',', $filterString);
+        $filterSplit = explode(Report_Factory::PARAM_SEPARATOR, $filterString);
         $resultFilter = array();
 
         foreach ($filterSplit as $split) {
