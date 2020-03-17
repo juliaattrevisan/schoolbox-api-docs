@@ -245,6 +245,9 @@ class Adapter {
         /* Combine it
          */
         $student = new Student();
+        if (is_array($currentResult['AlertMessage'])) {
+            $currentResult['AlertMessage'] = implode("\r\n", $currentResult['AlertMessage']);
+        }
         $student
             ->setId($currentResult['StudentID'])
             ->setGivenName($currentResult['StudentGiven1'])

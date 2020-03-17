@@ -363,10 +363,8 @@ class External_Synergetic_User implements External_UserInterface
             }
         }
 
-        // Implode all of the alert messages down to a single message seperate by line breaks
-
         if (!empty($student) && is_array($student['AlertMessage'])) {
-            $student['AlertMessage'] = implode("\n", array_unique(array_filter($student['AlertMessage'])));
+            $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
         }
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
