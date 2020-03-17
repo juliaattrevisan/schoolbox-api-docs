@@ -65,7 +65,15 @@
      * @returns {boolean}
      */
     adtp.getValue = function (input, attribute) {
+
+        /* input doesn't exist; was never in the dom
+         */
+        if (input === undefined) {
+            return false;
+        }
+
         var value = input.attr(attribute);
+
         // There is no such attribute, return false
         if (value === undefined) {
             return false;
@@ -169,6 +177,8 @@
         var $timeDiv = $("#pickerCalendar" + pickerId)
             .closest("#adtp-modal-" + pickerId)
             .find(".flatpickr-time");
+
+        console.log(adtp.getOptions());
 
         // All Day is on
         if (state === true) {
