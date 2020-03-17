@@ -81,6 +81,7 @@ class Javascript extends Base
                     'location'    => $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'class'       => $this->getEvent()->getEventClass(),
                     'type'        => $this->getEvent()->getEventType(),
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),

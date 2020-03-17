@@ -48,20 +48,20 @@ class Javascript extends Base
         if ($this->getEvent()->getAllDay()) {
             // Compensate for FullCalendar/vCal having exclusive end times
             $allDay = true;
-            $start = $this->getEvent()->getStartTime()->getDatabaseDate();
-            $end = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
+            $start  = $this->getEvent()->getStartTime()->getDatabaseDate();
+            $end    = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
         } else {
             $allDay = false;
-            $start = $this->getEvent()->getStartTime()->getDatabase();
-            $end = $this->getEvent()->getEndTime()->getDatabase();
+            $start  = $this->getEvent()->getStartTime()->getDatabase();
+            $end    = $this->getEvent()->getEndTime()->getDatabase();
         }
 
         //
         // Add campus list to list of classes
-        $classes = array(
+        $classes = [
             $this->getEvent()->getDerivedEventLevel(),
             'type' . $this->getEvent()->getType(),
-        );
+        ];
         if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
             $classes[] = 'source' . $connectorId;
         }
@@ -78,7 +78,7 @@ class Javascript extends Base
             $classes[] = implode(' ', $campus_list);
         }
 
-        $event = array(
+        $event = [
             'title'     => $this->getEvent()->getTitle(),
             'start'     => "$start",
             'end'       => "$end",
@@ -102,40 +102,41 @@ class Javascript extends Base
 
             /* Extra data that the Event Object doesn't directly support
              */
-            'data'      => array(
-                'meta'       => array(
+            'data'      => [
+                'meta'       => [
                     'eventId'     => $this->getEvent()->getEventId(),
                     'time'        => $this->getEvent()->getTime(),
                     'detail'      => \Scrub::html($this->getEvent()->getDetail()),
                     'location'    => $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'class'       => $this->getEvent()->getEventClass(),
                     'type'        => $this->getEvent()->getEventType(),
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getDerivedEventLevel(),
                     'completed'   => $this->getEvent()->getCompleted(),
-                ),
-                'links'      => array(
-                    'category' => array(
+                ],
+                'links'      => [
+                    'category' => [
                         'id'   => '',
                         'name' => '',
-                    ),
-                ),
-                'styles'     => array(
+                    ],
+                ],
+                'styles'     => [
                     'visible' => $cssClass,
-                ),
-                'attendance' => array(
+                ],
+                'attendance' => [
                     'icon'          => false,
                     'status'        => false,
                     'requestButton' => false,
                     'listButton'    => false,
-                ),
-                'custom'     => array(
+                ],
+                'custom'     => [
                     'modifyLink' => '/modules/eotc/manage/modify?eventID=' . $this->getEvent()->getEventId(),
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }

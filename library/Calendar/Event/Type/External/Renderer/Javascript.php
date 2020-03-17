@@ -15,12 +15,12 @@ class Javascript extends Base
     {
         /* Event attendance
          */
-        $hasIcon = false;
-        $hasStatus = false;
-        $hasListButton = false;
+        $hasIcon                    = false;
+        $hasStatus                  = false;
+        $hasListButton              = false;
         $hasAttendanceRequestButton = false;
 
-        $classes = Array();
+        $classes = [];
 
         if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
             $classes[] = 'source' . $connectorId;
@@ -28,7 +28,7 @@ class Javascript extends Base
 
         $classes[] = 'type' . $this->getEvent()->getType();
 
-        $event = array(
+        $event = [
             'title'     => $this->getEvent()->getTitle(),
             'start'     => $this->getEvent()->getStartTime()->getDatabase(),
             'end'       => $this->getEvent()->getEndTime()->getDatabase(),
@@ -52,39 +52,39 @@ class Javascript extends Base
 
             /* Extra data that the Event Object doesn't directly support
              */
-            'data'      => array(
-                'meta'       => array(
+            'data'      => [
+                'meta'       => [
                     'eventId'     => $this->getEvent()->getEventId(),
                     'time'        => $this->getEvent()->getTime(),
                     'detail'      => \Scrub::html($this->getEvent()->getDetail()),
                     'location'    => $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'class'       => $this->getEvent()->getEventClass(),
                     'type'        => $this->getEvent()->getEventType(),
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getEventClasses(),
                     'completed'   => false,
-                ),
+                ],
                 // Do I need this? TODO
-
 //                    'links'      => array(
 //                    'category' => array(
 //                    'id'   => $this->event->getCategoryId(),
 //                    'name' => $this->event->getCategoryName(),
 //                        )
 //                    ),
-                'styles'     => array(
+                'styles'     => [
                     'visible' => '',
-                ),
-                'attendance' => array(
+                ],
+                'attendance' => [
                     'icon'          => $hasIcon,
                     'status'        => $hasStatus,
                     'listButton'    => $hasListButton,
                     'requestButton' => $hasAttendanceRequestButton,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
