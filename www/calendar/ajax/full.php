@@ -12,7 +12,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 
 /** @var SitePage $this */
 $user_mapper = new \Schoolbox\UserMapper();
-$user = $user_mapper->findById($_GET['userId']);
+$user = $user_mapper->findByIdWithFallback($_GET['userId']);
 $viewer = $_SESSION['user'];
 
 try {
