@@ -608,36 +608,53 @@ class Calendar extends DeprecatedModel
         // get single events for the day
         // Don't get events for resources, get them separately.
         $query = "
-			SELECT DISTINCT event.id, event.series_id, event.owner,
-				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-				start_datetime, end_datetime, allday,
-				YEAR(event.start_datetime) AS year,
-				type, event.title, access, location, detail, attendance,
-				user.id as uid, user.title as userTitle, firstname, lastname,
-				eventType, eventColour,
-				event.publish_date,
-				folder.id AS categoryId, folder.name AS categoryName,
-				event.completed, author_id
-			FROM event
-			LEFT JOIN user ON event.author_id = user.id
-			LEFT JOIN luEventType ON type = eventTypeID
-			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-			LEFT JOIN event_user ON event.id = event_user.event_id AND access = ".EventModel::ACCESS_PERSONAL."
-			LEFT JOIN event_folder ON event.id = event_folder.event_id AND access = ".EventModel::ACCESS_GROUP."
-			LEFT JOIN folder ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL
-			LEFT JOIN event_group ON event.id = event_group.event_id AND access = ".EventModel::ACCESS_CAMPUS."
-			LEFT JOIN event_campus ON event.id = event_campus.event_id AND access = ".EventModel::ACCESS_CAMPUS."
-			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
-			WHERE
-			    event.deleted_at is NULL AND
-				resource_booking.id IS NULL
-				$access_query
-				$dateQuery
-				$filter_query
-			GROUP BY id
-			ORDER BY
-				event.start_datetime, event.end_datetime
-		";
+            SELECT DISTINCT
+                event.id,
+                event.series_id,
+                event.owner,
+                GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
+                start_datetime,
+                end_datetime,
+                allday,
+                YEAR(event.start_datetime) AS year,
+                type,
+                event.title,
+                access,
+                location,
+                detail,
+                attendance,
+                user.id as uid,
+                user.title as userTitle,
+                firstname,
+                lastname,
+                eventType,
+                event.class AS eventClass,
+                eventColour,
+                event.publish_date,
+                folder.id AS categoryId,
+                folder.name AS categoryName,
+                event.completed,
+                author_id
+            FROM event
+            LEFT JOIN user             ON event.author_id = user.id
+            LEFT JOIN luEventType      ON type = eventTypeID
+            LEFT JOIN resource_booking ON event.id = resource_booking.event_id
+            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = " . EventModel::ACCESS_PERSONAL . "
+            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = " . EventModel::ACCESS_GROUP . "
+            LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL
+            LEFT JOIN event_group      ON event.id = event_group.event_id    AND access = " . EventModel::ACCESS_CAMPUS . "
+            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = " . EventModel::ACCESS_CAMPUS . "
+            LEFT JOIN event_attendance ON event.id = event_attendance.event_id
+            WHERE
+                event.deleted_at is NULL AND
+                resource_booking.id IS NULL
+                $access_query
+                $dateQuery
+                $filter_query
+            GROUP BY id
+            ORDER BY
+                event.start_datetime, event.end_datetime
+        ";
 
         $allEvents = $this->db->getAll($query);
 
@@ -662,6 +679,7 @@ class Calendar extends DeprecatedModel
                 $event->setTitle($currentEvent['title']);
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
+                $event->setEventClass($currentEvent['eventClass']);
                 $event->setColour($currentEvent['eventColour']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);
