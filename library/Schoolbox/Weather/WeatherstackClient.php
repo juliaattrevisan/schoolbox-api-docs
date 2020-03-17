@@ -112,7 +112,7 @@ class WeatherstackClient
         try {
             $decodedResponse = json_decode($response, true);
         } catch (\RuntimeException $e) {
-            throw new \DomainException('Unable to read Weather API response', $response, $e);
+            throw new \DomainException('Unable to read Weather API response', 0, $e);
         }
 
         /* If the api wasn't correctly configured, $responseData returns an array
@@ -130,7 +130,7 @@ class WeatherstackClient
 
         // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
         // with a HTML payload. This happens for example if you hit a login wall, which redirected you to a login page.
-        throw new \DomainException("Unable to decode Weather API response: {$decodedResponse}", $response);
+        throw new \DomainException("Unable to decode Weather API response: {$decodedResponse}");
     }
 
 
