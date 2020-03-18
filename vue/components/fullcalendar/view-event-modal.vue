@@ -516,123 +516,119 @@
         </template>
 
         <template v-else>
-            <div class="row">
-                <div class="small-12">
-                    <template v-if="eventExtendedProps.links.path">
-                        <a :href="eventExtendedProps.links.path" title="Go to event page"><h2>{{ event.title }}</h2></a>
-                    </template>
-                    <template v-else>
-                        <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
-                    </template>
-                    <meta-list>
-                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
-                            {{ eventExtendedProps.booking.status.name }}
-                        </meta-item>
-                        <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">
-                            {{ eventExtendedProps.dateSpan }}
-                        </meta-item>
-                        <meta-item class="icon-location" v-if="eventExtendedProps.location">
-                            {{ eventExtendedProps.location }}
-                        </meta-item>
-                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">
-                            Posted by
-                            <a :href="'/search/user/' + String(eventExtendedProps.author.id)">
-                                {{ eventExtendedProps.author.name }}
-                            </a>
-                        </meta-item>
-                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">
-                            Reviewed by
-                            <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
-                                {{ eventExtendedProps.reviewer.name }}
-                            </a>
-                        </meta-item>
-                        <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
-                            Attendance: {{ eventExtendedProps.attendance.status }}
-                        </meta-item>
-                    </meta-list>
-                    <article>
-                        <span v-html="eventExtendedProps.detail"></span>
-                    </article>
+            <template v-if="eventExtendedProps.links.path">
+                <a :href="eventExtendedProps.links.path" title="Go to event page"><h2>{{ event.title }}</h2></a>
+            </template>
+            <template v-else>
+                <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
+            </template>
+            <meta-list>
+                <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
+                    {{ eventExtendedProps.booking.status.name }}
+                </meta-item>
+                <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">
+                    {{ eventExtendedProps.dateSpan }}
+                </meta-item>
+                <meta-item class="icon-location" v-if="eventExtendedProps.location">
+                    {{ eventExtendedProps.location }}
+                </meta-item>
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">
+                    Posted by
+                    <a :href="'/search/user/' + String(eventExtendedProps.author.id)">
+                        {{ eventExtendedProps.author.name }}
+                    </a>
+                </meta-item>
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">
+                    Reviewed by
+                    <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
+                        {{ eventExtendedProps.reviewer.name }}
+                    </a>
+                </meta-item>
+                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
+                    Attendance: {{ eventExtendedProps.attendance.status }}
+                </meta-item>
+            </meta-list>
+            <article>
+                <span v-html="eventExtendedProps.detail"></span>
+            </article>
 
-                    <template v-if="eventExtendedProps.booking.related.length">
-                        <h3>Related Bookings</h3>
-                        <ul>
-                            <li v-for="relatedBooking in eventExtendedProps.booking.related">
-                                ({{ relatedBooking.status.name }})
-                                <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
-                            </li>
-                        </ul>
-                    </template>
+            <template v-if="eventExtendedProps.booking.related.length">
+                <h3>Related Bookings</h3>
+                <ul>
+                    <li v-for="relatedBooking in eventExtendedProps.booking.related">
+                        ({{ relatedBooking.status.name }})
+                        <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
+                    </li>
+                </ul>
+            </template>
 
-                    <!--
-                        Temporary solution to prevent a mysterious error:
-                        schoolbox.min.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
-                        when there's a related booking. According to my research, it's not a sizzle error and  we'll
-                        need to update jQuery to 3.x. However, doing so may potentially open un new issues.
-                     -->
-                    <template v-else></template>
+            <!--
+                Temporary solution to prevent a mysterious error:
+                schoolbox.min.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
+                when there's a related booking. According to my research, it's not a sizzle error and  we'll
+                need to update jQuery to 3.x. However, doing so may potentially open un new issues.
+             -->
+            <template v-else></template>
 
-                    <!--
-                    <div v-if="eventExtendedProps.attendance.isAttendable">
-                        <dl>
-                            <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
-                            <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
-                        </dl>
-                    </div>
-                    -->
-                    <template v-if="eventExtendedProps.folder.id ||
-                    eventExtendedProps.links.view ||
-                    eventExtendedProps.attendance.actions.list.isAvailable ||
-                    eventExtendedProps.attendance.actions.toggle.isAvailable ||
-                    eventExtendedProps.links.modify ||
-                    eventExtendedProps.links.delete ||
-                    eventExtendedProps.classAttendance.url ||
-                    eventExtendedProps.booking.actions.length > 0">
-                        <div class="component-action">
-                            <section>
-                                <!-- Various buttons -->
-                                <span v-if="eventExtendedProps.folder.id">
-                                    <a class="button"
-                                       :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
-                                </span>
-                                <span v-if="eventExtendedProps.links.view">
-                                    <a class="button"
-                                       :href="eventExtendedProps.links.view">View More Details</a>
-                                </span>
-                                <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
-                                    <a class="button"
-                                       @click.prevent="toggleAttendance"
-                                       href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
-                                </span>
-                                <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
-                                    <a class="button"
-                                       :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
-                                </span>
-                                <span v-if="eventExtendedProps.classAttendance.url">
-                                    <a class="button"
-                                       :href="eventExtendedProps.classAttendance.url">Mark Attendance</a>
-                                </span>
-                                <span v-if="eventExtendedProps.links.modify">
-                                    <a class="button"
-                                       :href="eventExtendedProps.links.modify">Modify</a>
-                                </span>
-                                <span v-if="eventExtendedProps.links.delete">
-                                    <a class="button"
-                                       :href="eventExtendedProps.links.delete"
-                                       @click.prevent="$refs.eventDeleteModal.open">Delete</a>
-                                </span>
-                                <!-- Booking buttons: handle random events -->
-                                <span v-for="action in eventExtendedProps.booking.actions">
-                                    <a :class="buildBookingButtonClasses(action)"
-                                       :data-booking-action="String(action.action)"
-                                       @click="clickBookingButton($event)"
-                                       :href="action.href || '#'">{{ action.label }}</a>
-                                </span>
-                            </section>
-                        </div>
-                    </template>
-                </div>
+            <!--
+            <div v-if="eventExtendedProps.attendance.isAttendable">
+                <dl>
+                    <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
+                    <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
+                </dl>
             </div>
+            -->
+            <template v-if="eventExtendedProps.folder.id ||
+            eventExtendedProps.links.view ||
+            eventExtendedProps.attendance.actions.list.isAvailable ||
+            eventExtendedProps.attendance.actions.toggle.isAvailable ||
+            eventExtendedProps.links.modify ||
+            eventExtendedProps.links.delete ||
+            eventExtendedProps.classAttendance.url ||
+            eventExtendedProps.booking.actions.length > 0">
+                <div class="component-action">
+                    <section>
+                        <!-- Various buttons -->
+                        <span v-if="eventExtendedProps.folder.id">
+                            <a class="button"
+                               :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
+                        </span>
+                        <span v-if="eventExtendedProps.links.view">
+                            <a class="button"
+                               :href="eventExtendedProps.links.view">View More Details</a>
+                        </span>
+                        <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
+                            <a class="button"
+                               @click.prevent="toggleAttendance"
+                               href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
+                        </span>
+                        <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
+                            <a class="button"
+                               :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
+                        </span>
+                        <span v-if="eventExtendedProps.classAttendance.url">
+                            <a class="button"
+                               :href="eventExtendedProps.classAttendance.url">Mark Attendance</a>
+                        </span>
+                        <span v-if="eventExtendedProps.links.modify">
+                            <a class="button"
+                               :href="eventExtendedProps.links.modify">Modify</a>
+                        </span>
+                        <span v-if="eventExtendedProps.links.delete">
+                            <a class="button"
+                               :href="eventExtendedProps.links.delete"
+                               @click.prevent="$refs.eventDeleteModal.open">Delete</a>
+                        </span>
+                        <!-- Booking buttons: handle random events -->
+                        <span v-for="action in eventExtendedProps.booking.actions">
+                            <a :class="buildBookingButtonClasses(action)"
+                               :data-booking-action="String(action.action)"
+                               @click="clickBookingButton($event)"
+                               :href="action.href || '#'">{{ action.label }}</a>
+                        </span>
+                    </section>
+                </div>
+            </template>
         </template>
 
         <!-- Modals within a modal you say? Sure, why not? -->
