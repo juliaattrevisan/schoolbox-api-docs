@@ -533,15 +533,19 @@ class Controller extends Base
         $selectedTab = array_shift(array_keys($tabs));
 
         $tree = [];
+
         // Layout assessments in a tree for twig to render
-        foreach($filteredMarkbook->getAssessments() as $assessment) {
-            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId() && $tree[$assessment->getBaseContext()->getId()]['context'] ) {
-                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['context'] = $assessment->getContext();
-                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['assessments'][$assessment->getId()] = $assessment;
-            }
-            else {
-                $tree[$assessment->getContext()->getId()]['context'] = $assessment->getContext();
-                $tree[$assessment->getContext()->getId()]['assessments'][$assessment->getId()]['assessment'] = $assessment;
+        foreach ($filteredMarkbook->getAssessments() as $assessment) {
+            $id            = $assessment->getId();
+            $context       = $assessment->getContext();
+            $contextId     = $context->getId();
+            $baseContextId = $assessment->getBaseContext()->getId();
+            if ($tree[$baseContextId]['context'] && $contextId !== $baseContextId) {
+                $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
+                $tree[$baseContextId]['assessments'][$contextId]['assessments'][$id] = $assessment;
+            } else {
+                $tree[$contextId]['context']                        = $context;
+                $tree[$contextId]['assessments'][$id]['assessment'] = $assessment;
             }
         }
 
