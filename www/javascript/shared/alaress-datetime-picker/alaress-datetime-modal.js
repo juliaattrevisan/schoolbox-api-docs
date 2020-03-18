@@ -143,7 +143,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             renderHeatMapHelp();
 
             if (pickerOptions.allDaySwitch === true) {
-                $('#hideTime' + twigVars.id).click(function () {
+                if ($('#hideTime' + twigVars.id).is(':checked')) {
+                    adtp.setCalendarAllDay(true, twigVars.id);
+                }
+                else {
+                    adtp.setCalendarAllDay(false, twigVars.id);
+                }
+
+                $('#hideTime' + twigVars.id).on('click', function () {
                     if ($('#hideTime' + twigVars.id).is(':checked')) {
                         adtp.setCalendarAllDay(true, twigVars.id);
                     }
@@ -151,11 +158,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         adtp.setCalendarAllDay(false, twigVars.id);
                     }
                 });
-            }
-
-            // Fix Flatpickr display enableTime
-            if (pickerOptions.enableTime) {
-                $modal.find('.flatpickr-time').show();
             }
 
             if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
@@ -170,6 +172,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     applyHeatEverywhere(instance);
                 });
             }
+
 
             // The size of something could have changed: reflow
             resizeCalendars();
@@ -251,10 +254,17 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#adtp-modal-' + twigVars.id).find('.flatpickr-time');
         var html = '';
+        var checked = '';
+
+        /* Find out what the current all-day setting is and apply that
+         */
+        if ($('#' + pickerOptions.allDayInput).val() == 1) {
+            checked = 'checked';
+        }
 
         // Build an All Day switch if it's been set in the options
         if (pickerOptions.allDaySwitch === true) {
-            html += '<div class="time-switch" data-adtp-calendar-allday><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
+            html += '<div class="time-switch" data-adtp-calendar-allday><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" ' + checked + '>' +
                 '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
                 '</div>';
         }
