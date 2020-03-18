@@ -21,7 +21,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use SimpleXMLElement;
@@ -82,9 +82,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var TimetableCycleMapper
+     * @var TimetableCampusMapper
      */
-    private $timetableCycleMapper;
+    private $timetableCampusMapper;
 
 
     /**
@@ -104,7 +104,7 @@ class Classes implements IStrategy
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param TimetableCycleMapper   $timetableCycleMapper
+     * @param TimetableCampusMapper  $timetableCampusMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -115,7 +115,7 @@ class Classes implements IStrategy
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
-        TimetableCycleMapper $timetableCycleMapper
+        TimetableCampusMapper $timetableCampusMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -125,7 +125,7 @@ class Classes implements IStrategy
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
+        $this->timetableCampusMapper = $timetableCampusMapper;
     }
 
 
@@ -172,7 +172,7 @@ class Classes implements IStrategy
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $currentWeekOffset = (new WeekOffset($this->timetableCycleMapper))->findWeekOffset(\Alaress_Date_Format::now());
+        $currentWeekOffset = (new WeekOffset($this->timetableCampusMapper))->findWeekOffset(\Alaress_Date_Format::now());
 
         /* Can't determine which week we're in; can't import anything
          */

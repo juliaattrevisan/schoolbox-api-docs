@@ -9,7 +9,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
 use PDOException;
-use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -23,19 +23,19 @@ class WeekOffset
 {
 
     /**
-     * @var TimetableCycleMapper
+     * @var TimetableCampusMapper
      */
-    private $timetableCycleMapper;
+    private $timetableCampusMapper;
 
 
     /**
      * WeekOffset constructor.
      *
-     * @param TimetableCycleMapper $timetableCycleMapper
+     * @param TimetableCampusMapper $timetableCampusMapper
      */
-    public function __construct(TimetableCycleMapper $timetableCycleMapper)
+    public function __construct(TimetableCampusMapper $timetableCampusMapper)
     {
-        $this->timetableCycleMapper = $timetableCycleMapper;
+        $this->timetableCampusMapper = $timetableCampusMapper;
     }
 
 
@@ -50,6 +50,41 @@ class WeekOffset
      */
     public function findWeekOffset(Alaress_Date_Format $date): ?int
     {
+
+        /* Term goes between Start and Finish inclusively
+         *
+         * So long as term Start never equal a previous term's Finish
+         * this should be okay. If your term (timetable cycle) is set up
+         * like this:
+         *
+         * start: 27/01/2020
+         * finish: 20/03/2020
+         * current: 20/03/2020
+         *
+         * Then you're in that term. The next term should be:
+         *
+         * start: 21/03/2020
+         * finish: some other point in the future > 21/03/2020
+         */
+        $query = "
+            SELECT *
+            FROM {$this->timetableCampusMapper->getTable()}
+            WHERE start <= :currentDate
+            AND finish >= :currentDate
+            LIMIT 1
+        ";
+
+        $statement = $this->timetableCampusMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'currentDate' => $date->getDatabaseDate()
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $cycle = $this->timetableCampusMapper->hydrate($row);
+        print_r($query);
+        print_r($row);
+        print_r($cycle);
 //        $term = $this->$timetableCycleMapper->findForDate($date);
 //
 //        /* Term not found

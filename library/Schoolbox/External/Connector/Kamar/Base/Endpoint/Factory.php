@@ -297,20 +297,20 @@ class Factory
         /* Load all the Profile xmls
          */
         $registry = new Profile\Registry();
-
-        foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
-            $bus->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                $registry,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ));
-        }
+//
+//        foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
+//            $bus->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                new Batchxml(new Api($this->host . '/' . $xmlFile)),
+//                $registry,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ));
+//        }
 
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
          * Schools must do this via a timetableStructure import csv
@@ -334,7 +334,7 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper,
-                $this->timetableCycleMapper
+                $this->timetableCampusMapper
             ));
         }
 
