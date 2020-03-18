@@ -149,8 +149,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             return new Collection();
         }
 
-        $url = $this->tokenReplaceUrl($decodedConfig->getUrl());
-
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
@@ -161,7 +159,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 $this->getUser()->getRole()->getId()
             )
         ) {
-
             // Hit up Redis
             $allEvents = unserialize(
                 Alaress\Redis::getClientInstance()->get($decodedConfig->determineCacheKey($currentConfig->getId())),
@@ -169,6 +166,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             );
 
             if ($allEvents instanceof VCalendar) {
+                $start = new DateTime('@' . $startTimestamp);
+                $end   = new DateTime('@' . $endTimestamp);
                 foreach ($allEvents->getComponents() as $currentEvent) {
                     /* gloop returns a whole bunch of stuff all mixed up
                      *
@@ -177,8 +176,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                      */
                     if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
                         /** @var $currentEvent \Sabre\VObject\Component\VEvent */
-
-                        $isAdded = true;
+                        $isAdded = $currentEvent->isInTimeRange($start, $end);
                         if (is_callable($filterFunction)) {
                             $isAdded = $filterFunction($currentEvent, $decodedConfig);
                         }
