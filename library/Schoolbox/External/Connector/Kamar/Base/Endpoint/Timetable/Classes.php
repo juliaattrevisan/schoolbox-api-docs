@@ -159,15 +159,17 @@ class Classes implements IStrategy
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
-     * @param int              $weekOffset
      * @return SimpleXMLElement
      */
-    private function findCurrentCycle(SimpleXMLElement $timetable, int $weekOffset): SimpleXMLElement
+    private function findCurrentCycle(SimpleXMLElement $timetable): SimpleXMLElement
     {
+        $weeks = $timetable->xpath("week[contains(term, '{$this->currentTerm}')]");
 
-        /* TODO: Also use the <term> node
-         */
-        return $timetable->xpath("week[@index='{$weekOffset}']")[0];
+        if (\count($weeks) && isset($weeks[$this->currentWeekOffset])) {
+            return $weeks[$this->currentWeekOffset];
+        }
+
+        return null;
     }
 
 
