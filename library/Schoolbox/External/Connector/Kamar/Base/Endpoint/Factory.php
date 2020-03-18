@@ -331,7 +331,7 @@ class Factory
          */
         $weekOffsetCalculator = new WeekOffset(
             $this->timetableCampusMapper,
-            new \Alaress_Date_Format('2020-04-27', \Alaress_Date_Format::DATABASE_DATE_FORMAT),
+            new \Alaress_Date_Format(),
             $this->log
         );
 
