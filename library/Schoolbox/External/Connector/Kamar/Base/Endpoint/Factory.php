@@ -323,7 +323,9 @@ class Factory
          */
         $lookup = new Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
 
-        /* TODO: Potentially configurable
+        /* Week Offset, Term selection
+
+         * TODO: Potentially configurable
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
@@ -336,10 +338,9 @@ class Factory
         $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
         $currentTerm = $weekOffsetCalculator->findCurrentTerm();
 
-        $this->log->info(sprintf(
-            'Loading timetables using Week Offset %s which is actually week %s, Term %s',
+        $this->log->debug(sprintf(
+            'Loading timetables using Week Offset %s, Term %s',
                 $currentWeekOffset,
-                $currentWeekOffset+1,
                 $currentTerm
         ));
 
