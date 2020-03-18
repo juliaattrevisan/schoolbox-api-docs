@@ -9,6 +9,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
 use PDOException;
+use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -81,34 +82,9 @@ class WeekOffset
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        $cycle = $this->timetableCampusMapper->hydrate($row);
-        print_r($query);
-        print_r($row);
-        print_r($cycle);
-//        $term = $this->$timetableCycleMapper->findForDate($date);
-//
-//        /* Term not found
-//         */
-//        if (!$term->getId()) {
-//            return null;
-//        }
-//
-//        $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-//        $currentWeek = (int)date('W', $date->getUnixTimestamp());
-//
-//        /* Include the current week in calculations using a +1 offset
-//         * e.g. if term begins on 8/1/20,
-//         *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-//         *     11/1/20 is in week 2
-//         *     17/1/20 is in week 2
-//         *     21/2/20 is in week 3
-//         */
-//        $offset = $currentWeek - $startWeek + 1;
-//
-//        if ($offset > 0) {
-//            return $offset;
-//        }
+        /** @var TimetableCampus $cycle */
+        $timetableCampus = $this->timetableCampusMapper->hydrate($row);
 
-        return null;
+        return $timetableCampus->getStart()->diffInWeeks($date);
     }
 }
