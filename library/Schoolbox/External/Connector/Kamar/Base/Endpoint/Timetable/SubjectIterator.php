@@ -149,7 +149,7 @@ class SubjectIterator implements Iterator
             'student' => $students
         ];
 
-        $this->log->info(sprintf(
+        $this->log->debug(sprintf(
             'Processing day %s/%s/%s/%s with %s teachers for student %s',
             $this->day,
             "period with sequence {$sequence}",

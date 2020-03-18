@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
-use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -22,16 +21,16 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
+
 
 /**
  * Class Classes
  *
  * Import all the classes and their involvements for all the timetables in the xml
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\Isams\Base\Importer\Timetable
  */
 class Classes implements IStrategy
 {
@@ -163,7 +162,6 @@ class Classes implements IStrategy
             LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
             WHERE luCampus.deleted_at IS NULL
-
         ');
 
         $periods = [];
@@ -265,7 +263,7 @@ class Classes implements IStrategy
                  */
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Looking for ext_timetable_code %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],
@@ -316,8 +314,8 @@ class Classes implements IStrategy
      * @param array $class
      * @return ClassEntry
      * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function createTimetableClass(array $class): ClassEntry
     {
@@ -351,8 +349,8 @@ class Classes implements IStrategy
      * @param ClassEntry      $timetableClass
      * @return ClassPeriod
      * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
@@ -415,8 +413,8 @@ class Classes implements IStrategy
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
     {

@@ -269,7 +269,7 @@ class Classes implements IStrategy
                         continue;
                     }
 
-                    $this->log->info(sprintf(
+                    $this->log->debug(sprintf(
                         'Looking for ext_timetable_code %s, week %s, day %s, period with sequence %s',
                         $ext,
                         $this->currentWeekOffset,
