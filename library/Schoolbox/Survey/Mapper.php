@@ -79,7 +79,6 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Model[] $collection */
         $collection = $this->createCollection();
 
         $idCol = $this->getIdentifierColumn();
@@ -90,6 +89,7 @@ class Mapper extends BaseMapper
             if ($row['availability'] !== 'survey') {
                 continue;
             }
+            /** @var Model $model */
             if ($collection->offsetExists($row[$idCol])) {
                 $model = $collection[$row[$idCol]];
             } else {
