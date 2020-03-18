@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\CommandLineTool;
 
 use Alaress\Redis;
+use Calendar_Api_Cache;
+use Calendar_Api_Config_Connector_Interface;
 use Calendar_Api_Config_Connector_Vcal;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
@@ -28,13 +30,11 @@ class PreparseVcal extends CliTool\App
         // Find every active vCal config
         /** @var iterable&Calendar_Api_Config_Record[] $configs */
         $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $this->getLogger()->info(sprintf('Found %d calendar configurations', count($configs)));
 
         // Fetch it from file cache, then parse and store in Redis
         foreach ($configs as $config) {
-            $decodedConfig = $config->decodeConfig();
-            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
-                $this->cacheCalendar($decodedConfig);
-            }
+            $this->cacheCalendar($config);
         }
     }
 
@@ -47,12 +47,8 @@ class PreparseVcal extends CliTool\App
      */
     private function retrieveSource(Calendar_Api_Config_Connector_Vcal $config): ?string
     {
-        /* Load calendar from locker cache
-        * Cache step 1: cache load of VCAL file from URL
-        */
         $cache   = new \Calendar_Api_Cache();
         $headers = [];
-
         if ($config->getAuthorization()) {
             $headers = ['Authorization' => 'Bearer ' . $config->getAuthorization()];
         }
@@ -90,17 +86,49 @@ class PreparseVcal extends CliTool\App
     /**
      * Caches the calendar into a set of cached events.
      *
-     * @param Calendar_Api_Config_Connector_Vcal $config
+     * @param Calendar_Api_Config_Record $config
      */
-    private function cacheCalendar(Calendar_Api_Config_Connector_Vcal $config): void
+    private function cacheCalendar(Calendar_Api_Config_Record $config): void
     {
-        $source = $this->retrieveSource($config);
+        $this->getLogger()->debug(
+            sprintf(
+                'Caching calendar configuration #%d (%s)',
+                $config->getId(),
+                $config->getConnectorClass()
+            )
+        );
+        $decodedConfig = $config->decodeConfig();
+        if (!$decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
+            $this->getLogger()->debug(
+                sprintf(
+                    'Calendar configuration #%d is not a vCal config: skipping',
+                    $config->getId()
+                )
+            );
+            return;
+        }
 
+        $this->getLogger()->info(
+            sprintf(
+                'Retrieving raw vCal source for config #%d (%s)',
+                $config->getId(),
+                $decodedConfig->getUrl()
+            )
+        );
+        $source = $this->retrieveSource($decodedConfig);
+
+        $this->getLogger()->info(
+            sprintf(
+                'Parsing and caching raw vCal into events for config #%d (%s)',
+                $config->getId(),
+                $decodedConfig->getUrl()
+            )
+        );
         if (isset($source)) {
             Redis::getClientInstance()->setEx(
                 $decodedConfig->determineCacheKey($config->getId()),
                 Calendar_Api_Config_Connector_Vcal::CACHE_EXPIRY,
-                $this->convertSourceToEvents($source)
+                serialize($this->convertSourceToEvents($source))
             );
         }
     }
