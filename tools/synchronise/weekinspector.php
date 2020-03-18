@@ -10,7 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
-use Schoolbox\Assessment\Term;
+use Schoolbox\External\TimetableCampusMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -36,10 +36,9 @@ $app = new class extends CliTool\App {
 
 
     /**
-     * A year for which to search for a Term
-     * The dates are used as week offsets
+     * The term you're looking in
      */
-    private const OPT_LONG_YEAR = 'year:';
+    private const OPT_LONG_TERM = 'term:';
 
 
     /**
@@ -68,7 +67,7 @@ $app = new class extends CliTool\App {
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_YEAR,
+            self::OPT_LONG_TERM,
             self::OPT_LONG_CODE,
             self::OPT_LONG_SLOT,
             self::OPT_LONG_TEACHER,
@@ -94,24 +93,28 @@ among the forest of xml files.
 
 Otherwise it just reports when classes occur across the entire forest.
 
-Usage: php weekinspector.php --year {year} --code {code} [--slot {slot}] [--teachers {teachers}]
-        --year       a four digit int
+Note: You should upload the appropriate Timetable Structure csv first.
+This defines the Terms' start/finish dates via Timetable Cycle dates.
+Otherwise the week calculations are going to look completely wrong.
+
+Usage: php weekinspector.php --term {term} --code {code} [--slot {slot}] [--teachers {teachers}]
+        --term       an int
         --code       a class code string
         --slot       a slot index between 1 and 10
         --teachers   a teacher string
 
 Examples:
-    // All classes with code 13MATC
-    php weekinspector.php --year 2020 --code 13MATC
+    // All classes with code 13MATC in term 2
+    php weekinspector.php --term 2 --code 13MATC
 
-    // All slot 2 classes with code 13MATC
-    php weekinspector.php --year 2020 --code 13MATC --slot 2
+    // All slot 2 classes in term 2 with code 13MATC
+    php weekinspector.php --term 2 --code 13MATC --slot 2
 
-    // All classes with code 13MATC taught by JKE
-    php weekinspector.php --year 2020 --code 13MATC --teachers JKE
+    // All classes in term 2 with code 13MATC taught by JKE
+    php weekinspector.php --term 2 --code 13MATC --teachers JKE
 
-    // All slot 2 classes with code 13MATC taught by JKE
-    php weekinspector.php --year 2020 --code 13MATC --slot 2 --teachers JKE
+    // All slot 2 classes in term 2 with code 13MATC taught by JKE
+    php weekinspector.php --term 2 --code 13MATC --slot 2 --teachers JKE
 
 
 HELP;
@@ -120,11 +123,17 @@ HELP;
 
         /* Understand args
          */
-        $year = (int)$this->getOpt(self::OPT_LONG_YEAR);
+        $currentTerm = (int)$this->getOpt(self::OPT_LONG_TERM);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
-        $weekOffset = (new WeekOffset(Term\Mapper::getInstance()))->findWeekOffset(\Alaress_Date_Format::now());
 
-        $this->getLogger()->info("We are in week {$weekOffset}.");
+        $offsetCalculator = new WeekOffset(TimetableCampusMapper::getInstance(), \Alaress_Date_Format::now());
+        $weekOffset = $offsetCalculator->findWeekOffset();
+
+        $this->getLogger()->info(sprintf(
+            'We are in Week Offset %s, Term %s',
+            $weekOffset,
+            $currentTerm
+        ));
 
         /* Use the path specified in config
          */
@@ -145,7 +154,7 @@ HELP;
                 foreach ($timetables as $timetable) {
                     $studentId = $timetable->xpath('@student')[0];
 
-                    $weeks = $timetable->xpath("week[@index={$weekOffset}]");
+                    $weeks = $timetable->xpath("week[contains(term, '{$currentTerm}')]");
 
                     /* Find out if this week contains a particular class as per the cli args
                      */
@@ -156,7 +165,8 @@ HELP;
                             foreach ($subjects as $subject) {
                                 $subjectsNode = $subject->xpath('ancestor::subjects')[0];
                                 $slot = (string)$subjectsNode->xpath('@slot')[0];
-                                $day = (string)$subjectsNode->xpath('ancestor::day/@index')[0];
+                                $dayIndex = (string)$subjectsNode->xpath('ancestor::day/@index')[0];
+                                $weekIndex = (string)$week->xpath('@index')[0];
                                 $teachers = (string)$subject->teachers;
 
                                 $slotSpecified = (bool)$this->getOpt(self::OPT_LONG_SLOT);
@@ -169,9 +179,10 @@ HELP;
                                     (!$teacherSpecified && $slotSpecified && $slotMatches) ||
                                     (!$slotSpecified && !$teacherSpecified)) {
                                     $message = sprintf(
-                                        'Student %s, day %s, slot %s: Teachers: %s, Rooms: %s: %s',
+                                        'Student %s, week @index %s, day @index %s, slot %s: Teachers: %s, Rooms: %s: %s',
                                         $studentId,
-                                        $day,
+                                        (string)$week->xpath('@index')[0],
+                                        $dayIndex,
                                         $slot,
                                         $teachers,
                                         (string)$subject->rooms,
