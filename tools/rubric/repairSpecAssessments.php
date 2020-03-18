@@ -819,9 +819,9 @@ $kernel->run(new class extends App {
     }
 
     /**
-     * @param $unitFolderId
+     * @param int $unitFolderId
      */
-    private function disableRubric($unitFolderId): void
+    private function disableRubric(int $unitFolderId): void
     {
         $sql       = '
         SELECT sb.id
