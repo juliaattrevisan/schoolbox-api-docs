@@ -140,6 +140,7 @@
                     <input name="userId" type="hidden" :value="userId" />
                     <input name="allDay" type="hidden" :value="Number(event.allDay)" />
                     <input name="date"   type="hidden" :value="formDate" />
+                    <input name="class"  type="hidden" value="event" />
 
                     <section>
                         <h3>On <span>{{ displayDate }}</span></h3>
@@ -175,6 +176,7 @@
                     <input name="userId" type="hidden" :value="userId" />
                     <input name="allDay" type="hidden" :value="Number(event.allDay)" />
                     <input name="date"   type="hidden" :value="formDate" />
+                    <input name="class"  type="hidden" value="task" />
 
                     <section>
                         <h3>Due <span>{{ displayDate }}</span></h3>
