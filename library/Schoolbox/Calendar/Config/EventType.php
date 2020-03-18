@@ -42,32 +42,17 @@ class EventType extends Base
     }
 
     /**
-     * @return int|null
-     */
-    public function getTaskIdFromEvents(): ?int
-    {
-        foreach ($this->data as $type) {
-            if ($type['isTaskType']) {
-                return (int) $type['id'];
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @param GenericCollection $data
      * @return Collection
      */
     private function format(GenericCollection $data): Collection
     {
         return $data->map(
-            function (\Schoolbox\Calendar\EventType $v) {
+            static function (\Schoolbox\Calendar\EventType $v) {
                 return [
-                    'id'            => (int) $v->getId(),
-                    'name'          => $v->getType(),
-                    'color'         => $v->getColor(),
-//                    'isTaskType'    => $v->isTaskType(),
+                    'id'    => (int)$v->getId(),
+                    'name'  => $v->getType(),
+                    'color' => $v->getColor(),
                 ];
             }
         );

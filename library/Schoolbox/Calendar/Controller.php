@@ -14,8 +14,8 @@ use Calendar_Api_Config_Mapper;
 use Schoolbox\Calendar\Config\Campus;
 use Schoolbox\Calendar\Config\EventType;
 use Schoolbox\Calendar\Config\Filter;
-use Schoolbox\Calendar\Config\SourceList;
 use Schoolbox\Calendar\Config\Group;
+use Schoolbox\Calendar\Config\SourceList;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -70,12 +70,12 @@ class Controller extends Base
         ModuleChecker $moduleChecker,
         EventMapper $eventMapper
     ) {
-        $this->folderMapper         = $folderMapper;
-        $this->campusMapper         = $campusMapper;
-        $this->eventTypeMapper      = $eventTypeMapper;
-        $this->calApiConfigMapper   = $calApiConfigMapper;
-        $this->moduleChecker        = $moduleChecker;
-        $this->eventMapper          = $eventMapper;
+        $this->folderMapper       = $folderMapper;
+        $this->campusMapper       = $campusMapper;
+        $this->eventTypeMapper    = $eventTypeMapper;
+        $this->calApiConfigMapper = $calApiConfigMapper;
+        $this->moduleChecker      = $moduleChecker;
+        $this->eventMapper        = $eventMapper;
     }
 
     /**
@@ -113,8 +113,8 @@ class Controller extends Base
             $route = $this->getRouter()->generate(
                 'calendar.getCalendar',
                 [
-                    'selectedDate'  => $selectedDate,
-                    'userId'        => $user->getId()
+                    'selectedDate' => $selectedDate,
+                    'userId'       => $user->getId(),
                 ]
             );
         } else {
@@ -137,12 +137,11 @@ class Controller extends Base
      */
     private function buildResponse(User $user, ?string $selectedDate): void
     {
-        $groups           = (new Group($user, $this->folderMapper))->generate();
-        $campus           = (new Campus($user, $this->campusMapper))->generate();
-        $eventType        = (new EventType($this->eventTypeMapper))->generate();
-        $sourceList       = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
-        $filters          = (new Filter($this->getSession()))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
-
+        $groups       = (new Group($user, $this->folderMapper))->generate();
+        $campus       = (new Campus($user, $this->campusMapper))->generate();
+        $eventType    = (new EventType($this->eventTypeMapper))->generate();
+        $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
+        $filters      = (new Filter($this->getSession()))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->getUser()->getCalendarView()]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
@@ -150,14 +149,14 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@calendar/calendar.twig',
                 [
-                    'user'          => $user->getId() === null ? $this->getUser() : $user,
-                    'groups'        => $groups,
-                    'sources'       => $sourceList,
-                    'campuses'      => $campus,
-                    'eventTypes'    => $eventType,
-                    'calendarView'  => $calendarView,
-                    'filters'       => $filters,
-                    'selectedDate'  => $selectedDate ?? Alaress_Date_Format::now()
+                    'user'         => $user->getId() === null ? $this->getUser() : $user,
+                    'groups'       => $groups,
+                    'sources'      => $sourceList,
+                    'campuses'     => $campus,
+                    'eventTypes'   => $eventType,
+                    'calendarView' => $calendarView,
+                    'filters'      => $filters,
+                    'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
                 ]
             )
         );
