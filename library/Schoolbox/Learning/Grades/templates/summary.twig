@@ -105,9 +105,11 @@
                     <li>
                         <ul class="activity-list">
                             {% for assessment in assessmentTasks[folder.id] %}
-                                {% set participant = assessment.participantIfExtant(student) %}
                                 <li class="assessment">
-                                    {% include '@learningGrades/fragments/assessmentGrade.twig' with {assessment: assessment, participant: participant} only %}
+                                    {% include '@learningGrades/fragments/assessmentGrade.twig' with {
+                                        assessment:  assessment,
+                                        student:     student,
+                                    } only %}
                                 </li>
                             {% endfor %}
                         </ul>

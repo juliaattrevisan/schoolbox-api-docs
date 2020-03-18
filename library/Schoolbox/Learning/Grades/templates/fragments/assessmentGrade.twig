@@ -9,37 +9,51 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
+{% set participant = assessment ? assessment.participantIfExtant(student) : null %}
 
 <div class="flex-grade">
     <div class="small-12 card columns">
-        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: participant.user.id, student: participant.user}) %}
+        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+            assessmentId: assessment.id,
+            assessment:   assessment,
+            studentId:    student.id,
+            student:      student
+        }) %}
         {% if summaryRoute %}
             <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}</p>
             </a>
         {% else %}
+            <span class="{{ icon.renderClass(assessment) }}"></span>
             <p>{{ assessment.title }}</p>
         {% endif %}
         <p>
-            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: participant.user} only %}
+            {% include '@learningAssessment/fragments/statusLine.twig' with {
+                assessable: assessment,
+                student:    student
+            } only %}
             <span class="pipe meta">{{ assessment.typeName }}</span>
-            <span class="pipe meta">{{ dueDate.dueDate(assessment, participant.user) }}</span>
+            <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
             {% if assessment is quiz and participant.allResponses | length %}
             <span class="pipe meta">
-                <a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, assessment: assessment, userId: participant.user.id, user: participant.user}) }}"
-                   title="View Attempts">View Attempts</a>
+                <a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {
+                    assessmentId: assessment.id,
+                    assessment:   assessment,
+                    userId:       student.id,
+                    user:         student
+                }) }}" title="View Attempts">View Attempts</a>
             </span>
             {% endif %}
         </p>
     </div>
 
-    {% if assessment.isFeedbackVisibleToUser(USER) %}
+    {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
         {% set grade = assessment.humanReadableMark(participant, true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessable,
-                student: participant.user
+                student:    student
             } only %}
         {% elseif grade %}
             <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
@@ -60,41 +74,3 @@
         </div>
     {% endif %}
 {% endif %}
-
-
-{#                                <nav>#}
-{#                                    {% if assessment is dueWork and feedback and student.eportfolioEnable %}#}
-{#                                        {% if canSeeShowcaseButton %}#}
-{#                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"#}
-{#                                               title="Publish to ePortfolio"></a>#}
-{#                                            <form action="/eportfolio/showcase/modifyForm.php" method="post"#}
-{#                                                  data-publish-to-eportfolio-form="{{ assessment.id }}">#}
-{#                                                <input type="hidden" name="action" value="publish">#}
-{#                                                <input type="hidden" name="userId" value="{{ student.id }}">#}
-{#                                                <input type="hidden" name="assessmentId" value="{{ assessment.id }}">#}
-{#                                            </form>#}
-{#                                            <script type="text/javascript">#}
-{#                                                $(function () {#}
-{#                                                    #}{# Publish to ePortfolio #}
-{#                                                    $('[data-publish-to-eportfolio]').click(function (event) {#}
-{#                                                        event.preventDefault();#}
-
-{#                                                        var assessmentId = $(this).data('publishToEportfolio');#}
-
-{#                                                        $(this).confirmDialog({#}
-{#                                                            header: "Publish to ePortfolio Showcase",#}
-{#                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',#}
-{#                                                            confirmEvent: function () {#}
-{#                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({#}
-{#                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'#}
-{#                                                                });#}
-{#                                                            }#}
-{#                                                        });#}
-{#                                                    });#}
-{#                                                });#}
-{#                                            </script>#}
-{#                                        {% endif %}#}
-{#                                    {% endif %}#}
-{#                                </nav>#}
-
-
