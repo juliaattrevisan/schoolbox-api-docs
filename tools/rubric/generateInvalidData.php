@@ -94,7 +94,7 @@ $app = new class extends CliTool\App {
 
         // Case A : duplicate capabilities without indicators
         $courseSpecA = $this->createCourseSpec($testRootFolder, " {$suffix} A Course");
-        $unitSpecA   = $this->createUnitSpec($courseSpecA, "{$suffix} A Unit ");
+        $this->createUnitSpec($courseSpecA, "{$suffix} A Unit ");
 
         $this->createCapability($courseSpecA->getFolder(), "{$suffix} A Course Capability");
         $this->createCapability($courseSpecA->getFolder(), "{$suffix} A Course Capability\r\n");
@@ -151,11 +151,11 @@ $app = new class extends CliTool\App {
     }
 
     /**
-     * @param $parent
-     * @param $name
+     * @param Folder $parent
+     * @param string $name
      * @return Folder
      */
-    private function createFolder($parent, $name): Folder
+    private function createFolder(Folder $parent, string $name): Folder
     {
 
         $folder = $this->folderMapper->createModel()
@@ -175,11 +175,11 @@ $app = new class extends CliTool\App {
     }
 
     /**
-     * @param $parent
-     * @param $name
+     * @param Folder $parent
+     * @param string $name
      * @return CourseSpec
      */
-    private function createCourseSpec($parent, $name): CourseSpec
+    private function createCourseSpec(Folder $parent, string $name): CourseSpec
     {
         $courseFolder = $this->createFolder($parent, $name);
         $courseSpec   = $this->courseSpecMapper->createModel()
@@ -194,10 +194,10 @@ $app = new class extends CliTool\App {
 
     /**
      * @param CourseSpec $courseSpec
-     * @param            $name
+     * @param string     $name
      * @return UnitSpec
      */
-    private function createUnitSpec(CourseSpec $courseSpec, $name): UnitSpec
+    private function createUnitSpec(CourseSpec $courseSpec, string $name): UnitSpec
     {
         $unitSpecFolder = $this->createFolder($courseSpec->getFolder(), $name);
         $this->folderMapper->save($unitSpecFolder);
@@ -211,10 +211,10 @@ $app = new class extends CliTool\App {
 
     /**
      * @param Folder $folder
-     * @param        $name
+     * @param string $name
      * @return Capability
      */
-    private function createCapability(Folder $folder, $name): Capability
+    private function createCapability(Folder $folder, string $name): Capability
     {
         $capability = $this->capabilityMapper->createModel()
                                              ->setParentId($folder->getId())
@@ -234,10 +234,10 @@ $app = new class extends CliTool\App {
 
     /**
      * @param Capability $capability
-     * @param            $name
+     * @param string     $name
      * @return Indicator
      */
-    private function createIndicator(Capability $capability, $name): Indicator
+    private function createIndicator(Capability $capability, string $name): Indicator
     {
         $indicator = $this->indicatorMapper->createModel()
                                            ->setCapability($capability)

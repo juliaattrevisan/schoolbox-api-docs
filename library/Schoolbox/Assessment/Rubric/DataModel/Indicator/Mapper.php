@@ -287,13 +287,8 @@ class Mapper extends BaseMapper {
      * @param bool   $cache          If false, bypass result cache
      * @return Model|null
      */
-    public function findOneForParentByKey(
-        int $parentId,
-        string $parentType,
-        string $name,
-        string $capabilityName,
-        bool $cache = true
-    ): ?Model {
+    public function findOneForParentByKey(int $parentId, string $parentType, string $name, string $capabilityName, bool $cache = true): ?Model
+    {
         $indicators               = $this->findByColumnList(
             [
                 'g.parent_type' => $parentType,
