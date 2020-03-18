@@ -29,6 +29,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -541,6 +542,10 @@ class Controller extends Base
             $contextId     = $context->getId();
             $baseContextId = $assessment->getBaseContext()->getId();
             if ($tree[$baseContextId]['context'] && $contextId !== $baseContextId) {
+                // Is this a project? Ensure the assessment is always there.
+                if ($context instanceof Project) {
+                    $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
+                }
                 $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
                 $tree[$baseContextId]['assessments'][$contextId]['assessments'][$id] = $assessment;
             } else {
