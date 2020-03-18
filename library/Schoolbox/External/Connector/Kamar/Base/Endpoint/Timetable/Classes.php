@@ -166,7 +166,17 @@ class Classes implements IStrategy
         $weeks = $timetable->xpath("week[contains(term, '{$this->currentTerm}')]");
 
         if (\count($weeks) && isset($weeks[$this->currentWeekOffset])) {
-            return $weeks[$this->currentWeekOffset];
+            $week = $weeks[$this->currentWeekOffset];
+
+            if ($this->log) {
+                $this->log->info(sprintf(
+                    'Importing timetables from Week %s, Term %s',
+                    (string)$week->xpath('@index')[0],
+                    $this->currentTerm
+                ));
+            }
+
+            return $week;
         }
 
         return null;
@@ -197,12 +207,6 @@ class Classes implements IStrategy
 
             return;
         }
-
-        $this->log->info(sprintf(
-            'Importing timetables using week offset %s, term %s',
-            $this->currentWeekOffset,
-            $this->currentTerm
-        ));
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
