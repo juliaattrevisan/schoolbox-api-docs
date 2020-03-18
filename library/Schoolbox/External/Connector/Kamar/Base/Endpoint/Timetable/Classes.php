@@ -188,9 +188,18 @@ class Classes implements IStrategy
             return;
         }
 
+        /* Can't determine which term we're in; can't import anything
+         */
+        if (null === $this->currentTerm) {
+            $this->log->warning('Cannot determine term for timetable import.');
+
+            return;
+        }
+
         $this->log->info(sprintf(
-            'Importing timetables using week offset %s',
-            $this->currentWeekOffset
+            'Importing timetables using week offset %s, term %s',
+            $this->currentWeekOffset,
+            $this->currentTerm
         ));
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
