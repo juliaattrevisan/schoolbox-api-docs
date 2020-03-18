@@ -69,12 +69,11 @@ try {
         }
 
         //send headers
-        header("Content-Type: {$contentType}");
+        header("Content-Type: $contentType");
 
         $basename = $resource->getBasename();
 
-        header("Pragma: ");
-        header("Cache-control: {$cacheControl}");
+        header("Cache-control: $cacheControl");
         header("Content-Ranges: none");
         header("Content-Disposition: $attach filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
