@@ -334,7 +334,7 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper,
-                $this->termMapper
+                $this->timetableCycleMapper
             ));
         }
 

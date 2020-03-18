@@ -9,7 +9,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
 use PDOException;
-use Schoolbox\Assessment\Term;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -23,19 +23,19 @@ class WeekOffset
 {
 
     /**
-     * @var Term\Mapper
+     * @var TimetableCycleMapper
      */
-    private $termMapper;
+    private $timetableCycleMapper;
 
 
     /**
      * WeekOffset constructor.
      *
-     * @param Term\Mapper $termMapper
+     * @param TimetableCycleMapper $timetableCycleMapper
      */
-    public function __construct(Term\Mapper $termMapper)
+    public function __construct(TimetableCycleMapper $timetableCycleMapper)
     {
-        $this->termMapper = $termMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
     }
 
 
@@ -50,29 +50,29 @@ class WeekOffset
      */
     public function findWeekOffset(Alaress_Date_Format $date): ?int
     {
-        $term = $this->termMapper->findForDate($date);
-
-        /* Term not found
-         */
-        if (!$term->getId()) {
-            return null;
-        }
-
-        $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-        $currentWeek = (int)date('W', $date->getUnixTimestamp());
-
-        /* Include the current week in calculations using a +1 offset
-         * e.g. if term begins on 8/1/20,
-         *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-         *     11/1/20 is in week 2
-         *     17/1/20 is in week 2
-         *     21/2/20 is in week 3
-         */
-        $offset = $currentWeek - $startWeek + 1;
-
-        if ($offset > 0) {
-            return $offset;
-        }
+//        $term = $this->$timetableCycleMapper->findForDate($date);
+//
+//        /* Term not found
+//         */
+//        if (!$term->getId()) {
+//            return null;
+//        }
+//
+//        $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
+//        $currentWeek = (int)date('W', $date->getUnixTimestamp());
+//
+//        /* Include the current week in calculations using a +1 offset
+//         * e.g. if term begins on 8/1/20,
+//         *     8/1/20, 9/1/20 and 10/1/20 are in week 1
+//         *     11/1/20 is in week 2
+//         *     17/1/20 is in week 2
+//         *     21/2/20 is in week 3
+//         */
+//        $offset = $currentWeek - $startWeek + 1;
+//
+//        if ($offset > 0) {
+//            return $offset;
+//        }
 
         return null;
     }

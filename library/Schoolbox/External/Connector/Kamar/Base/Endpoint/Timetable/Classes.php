@@ -21,6 +21,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use SimpleXMLElement;
@@ -81,9 +82,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var Term\Mapper
+     * @var TimetableCycleMapper
      */
-    private $termMapper;
+    private $timetableCycleMapper;
 
 
     /**
@@ -103,7 +104,7 @@ class Classes implements IStrategy
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param Term\Mapper            $termMapper
+     * @param TimetableCycleMapper   $timetableCycleMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -114,7 +115,7 @@ class Classes implements IStrategy
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
-        Term\Mapper $termMapper
+        TimetableCycleMapper $timetableCycleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -124,7 +125,7 @@ class Classes implements IStrategy
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->termMapper = $termMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
     }
 
 
@@ -171,7 +172,7 @@ class Classes implements IStrategy
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset(\Alaress_Date_Format::now());
+        $currentWeekOffset = (new WeekOffset($this->timetableCycleMapper))->findWeekOffset(\Alaress_Date_Format::now());
 
         /* Can't determine which week we're in; can't import anything
          */
