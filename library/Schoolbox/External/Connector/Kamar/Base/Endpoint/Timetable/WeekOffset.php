@@ -30,13 +30,21 @@ class WeekOffset
 
 
     /**
+     * @var Alaress_Date_Format
+     */
+    private $date;
+
+
+    /**
      * WeekOffset constructor.
      *
      * @param TimetableCampusMapper $timetableCampusMapper
+     * @param Alaress_Date_Format   $date
      */
-    public function __construct(TimetableCampusMapper $timetableCampusMapper)
+    public function __construct(TimetableCampusMapper $timetableCampusMapper, Alaress_Date_Format $date)
     {
         $this->timetableCampusMapper = $timetableCampusMapper;
+        $this->date = $date;
     }
 
 
@@ -46,10 +54,9 @@ class WeekOffset
      *
      * Returns null when it can't be determined
      *
-     * @param Alaress_Date_Format $date
      * @return int|null
      */
-    public function findCurrentTerm(\Alaress_Date_Format $date): ?int
+    public function findCurrentTerm(): ?int
     {
         $cycles = $this->timetableCampusMapper->findAll()->sortBy('start', 'asc')->getAll();
 
@@ -58,7 +65,7 @@ class WeekOffset
         for ($i = 1; $i <= $n; $i++) {
             $currentCycle = $cycles[$i-1];
 
-            if ($currentCycle->getStart()->lte($date) && $currentCycle->getFinish()->gte($date)) {
+            if ($currentCycle->getStart()->lte($this->date) && $currentCycle->getFinish()->gte($this->date)) {
                 return $i;
             }
         }
@@ -71,12 +78,11 @@ class WeekOffset
      * Determine which week we're in, if possible
      * Returns null when it can't be determined
      *
-     * @param Alaress_Date_Format $date
      * @return int|null
      * @throws PDOException
      * @throws Exception
      */
-    public function findWeekOffset(Alaress_Date_Format $date): ?int
+    public function findWeekOffset(): ?int
     {
 
         /* Term goes between Start and Finish inclusively
@@ -104,7 +110,7 @@ class WeekOffset
 
         $statement = $this->timetableCampusMapper->getDatabase()->prepare($query);
         $statement->execute([
-            'currentDate' => $date->getDatabaseDate()
+            'currentDate' => $this->date->getDatabaseDate()
         ]);
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
@@ -113,7 +119,7 @@ class WeekOffset
             /** @var TimetableCampus $cycle */
             $timetableCampus = $this->timetableCampusMapper->hydrate($row);
 
-            return $timetableCampus->getStart()->diffInWeeks($date);
+            return $timetableCampus->getStart()->diffInWeeks($this->date);
         }
 
         return null;
