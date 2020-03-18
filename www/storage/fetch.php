@@ -19,23 +19,22 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $page = new SitePage;
 
+        $cacheControl = 'private';
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        if (!$resource->getMimetype()->getInline() || $_GET['save']) {
-            $attach = "attachment;";
-        } else {
-            $attach = "";
-        }
+        $attach = (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
+        $contentType = ($resource->getMime()) ?: 'application/octet-stream';
 
         $fileSystem = $resource->getFilesystem();
         if($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
             if($config->get('otfs_s3_presigned_urls_enabled')){
-                $s3AccessKey = trim($config->get('otfs_s3_cred_key') ?? "");
-                $s3SecretKey = trim($config->get('otfs_s3_cred_secret') ?? "");
-                $s3Region    = trim($config->get('otfs_s3_region') ?? "");
-                $s3Version   = trim($config->get('otfs_s3_version') ?? "");
-                $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? "");
+                $s3AccessKey = trim($config->get('otfs_s3_cred_key') ?? '');
+                $s3SecretKey = trim($config->get('otfs_s3_cred_secret') ?? '');
+                $s3Region    = trim($config->get('otfs_s3_region') ?? '');
+                $s3Version   = trim($config->get('otfs_s3_version') ?? '');
+                $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? '');
+
                 $s3Client = new Aws\S3\S3Client([
                     'credentials' => [
                         'key'    => $s3AccessKey,
@@ -56,12 +55,10 @@ try {
                 $cmd = $s3Client->getCommand('GetObject', [
                     'Bucket'                     => $s3Bucket,
                     'Key'                        => $resource->getPath(),
-                    //                    'ResponseCacheControl'       => '<string>',
+                    'ResponseCacheControl'       => $cacheControl,
                     'ResponseContentDisposition' => "$attach filename=\"{$resource->getBasename()}\"",
-                    //                    'ResponseContentEncoding'    => '<string>',
-                    //                    'ResponseContentLanguage'    => '<string>',
-                    //                    'ResponseContentType'        => '<string>',
-                    //                    'ResponseExpires'            => '+1 days',
+                    'ResponseContentType'        => $contentType,
+                    'ResponseExpires'            => Alaress_Date_Format::now()->addDays(1),
                 ]);
 
                 // Get the actual presigned-url
@@ -72,16 +69,12 @@ try {
         }
 
         //send headers
-        if ($resource->getMime()) {
-            header("Content-Type: {$resource->getMime()}");
-        } else {
-            header("Content-Type: application/octet-stream");
-        }
+        header("Content-Type: {$contentType}");
 
         $basename = $resource->getBasename();
 
         header("Pragma: ");
-        header("Cache-control: private");
+        header("Cache-control: {$cacheControl}");
         header("Content-Ranges: none");
         header("Content-Disposition: $attach filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
