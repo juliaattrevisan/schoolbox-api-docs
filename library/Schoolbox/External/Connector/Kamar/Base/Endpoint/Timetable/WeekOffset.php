@@ -9,6 +9,7 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
 use PDOException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\Mapper\Exception;
@@ -36,15 +37,23 @@ class WeekOffset
 
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $log;
+
+
+    /**
      * WeekOffset constructor.
      *
      * @param TimetableCampusMapper $timetableCampusMapper
      * @param Alaress_Date_Format   $date
+     * @param LoggerInterface|null  $log
      */
-    public function __construct(TimetableCampusMapper $timetableCampusMapper, Alaress_Date_Format $date)
+    public function __construct(TimetableCampusMapper $timetableCampusMapper, Alaress_Date_Format $date, LoggerInterface $log = null)
     {
         $this->timetableCampusMapper = $timetableCampusMapper;
         $this->date = $date;
+        $this->log = $log;
     }
 
 
@@ -65,7 +74,23 @@ class WeekOffset
         for ($i = 1; $i <= $n; $i++) {
             $currentCycle = $cycles[$i-1];
 
+            if ($this->log) {
+                $this->log->debug(sprintf(
+                    'Comparing %s <= %s <= %s',
+                    $currentCycle->getStart()->getDatabase(),
+                    $this->date->getDatabase(),
+                    $currentCycle->getFinish()->getDatabase()
+                ));
+            }
+
             if ($currentCycle->getStart()->lte($this->date) && $currentCycle->getFinish()->gte($this->date)) {
+                if ($this->log) {
+                    $this->log->debug(sprintf(
+                        'Using cycle id %s',
+                        $currentCycle->getCycle()->getId()
+                    ));
+                }
+
                 return $i;
             }
         }

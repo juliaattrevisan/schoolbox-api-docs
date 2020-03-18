@@ -327,10 +327,21 @@ class Factory
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
-        $weekOffsetCalculator = new WeekOffset($this->timetableCampusMapper, \Alaress_Date_Format::now());
+        $weekOffsetCalculator = new WeekOffset(
+            $this->timetableCampusMapper,
+            new \Alaress_Date_Format('2020-04-27', \Alaress_Date_Format::DATABASE_DATE_FORMAT),
+            $this->log
+        );
 
         $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
         $currentTerm = $weekOffsetCalculator->findCurrentTerm();
+
+        $this->log->info(sprintf(
+            'Loading timetables using Week Offset %s which is actually week %s, Term %s',
+                $currentWeekOffset,
+                $currentWeekOffset+1,
+                $currentTerm
+        ));
 
         /* Load all the Student Timetable xmls
          */
