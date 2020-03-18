@@ -9,6 +9,11 @@
  */
 class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_Abstract
 {
+    private const CACHE_KEY_BASE = 'vcal.%d';
+
+    // Cache expiry: 8 hours?
+    public const CACHE_EXPIRY = (60*60*8);
+
     /**
      * Hardcoded to match db
      *
@@ -197,5 +202,15 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * What's the key for cached data for this item?
+     *
+     * @return string
+     */
+    public function determineCacheKey(): string
+    {
+        return sprintf(self::CACHE_KEY_BASE, $this->id);
     }
 }
