@@ -79,7 +79,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Model[] $results */
+        /** @var Model[] $collection */
         $collection = $this->createCollection();
 
         $idCol = $this->getIdentifierColumn();

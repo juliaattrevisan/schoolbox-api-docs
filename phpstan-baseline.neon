@@ -8841,11 +8841,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section\\)\\: Unexpected token \"\\$section\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Admin/Factory.php
-
-		-
 			message: "#^Cannot call method add\\(\\) on null\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
