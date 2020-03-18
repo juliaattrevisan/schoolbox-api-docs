@@ -141,7 +141,7 @@ class WeekOffset
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
-            /** @var TimetableCampus $cycle */
+            /** @var TimetableCampus $timetableCampus */
             $timetableCampus = $this->timetableCampusMapper->hydrate($row);
 
             return $timetableCampus->getStart()->diffInWeeks($this->date);
