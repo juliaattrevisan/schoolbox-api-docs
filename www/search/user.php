@@ -178,7 +178,11 @@ function renderStudent(
     $externalUser = [];
     if ($user['synergy_id']) {
         $externalUser = $synUserHandler->getStudent($user['synergy_id']);
-        $externalUser['AlertMessages'] = is_array($externalUser['AlertMessage']) ? $externalUser['AlertMessage'] : [$externalUser['AlertMessage']];
+        if (is_array($externalUser['AlertMessage'])) {
+            $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
+        } else {
+            $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [$externalUser['AlertMessage']];
+        }
         if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
             $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
         }
