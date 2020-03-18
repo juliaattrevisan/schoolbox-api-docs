@@ -239,7 +239,7 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $cycle = $this->findCurrentCycle($timetable, $this->currentWeekOffset);
+            $cycle = $this->findCurrentCycle($timetable);
 
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
