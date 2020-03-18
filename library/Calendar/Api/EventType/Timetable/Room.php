@@ -117,7 +117,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 }
                 $dayNumber = $dayNumberList[$currentTimestamp][$campusId];
 
-                if ($room['DayNumber'] != $dayNumber) {
+                if ($room['DayNumber'] != $dayNumber || null === $room['PeriodStart'] || null === $room['PeriodEnd']) {
                     continue;
                 }
 
