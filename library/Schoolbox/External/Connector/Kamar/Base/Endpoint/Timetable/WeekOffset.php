@@ -41,6 +41,33 @@ class WeekOffset
 
 
     /**
+     * Figure out which term we're in
+     * Note that we use timetableCampus start and finish date to decide
+     *
+     * Returns null when it can't be determined
+     *
+     * @param Alaress_Date_Format $date
+     * @return int|null
+     */
+    public function findCurrentTerm(\Alaress_Date_Format $date): ?int
+    {
+        $cycles = $this->timetableCampusMapper->findAll()->sortBy('start', 'asc')->getAll();
+
+        $n = \count($cycles);
+
+        for ($i = 1; $i <= $n; $i++) {
+            $currentCycle = $cycles[$i-1];
+
+            if ($currentCycle->getStart()->lte($date) && $currentCycle->getFinish()->gte($date)) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * Determine which week we're in, if possible
      * Returns null when it can't be determined
      *

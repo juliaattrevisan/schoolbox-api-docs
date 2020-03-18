@@ -93,6 +93,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var int|null
+     */
+    private $currentTerm;
+
+
+    /**
      * TimetableClass constructor.
      *
      * @param LoggerInterface        $log
@@ -101,6 +107,7 @@ class Classes implements IStrategy
      * @param Batchxml               $timetableBatchXml
      * @param Lookup                 $lookup
      * @param int|null               $currentWeekOffset
+     * @param int|null               $currentTerm
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -112,6 +119,7 @@ class Classes implements IStrategy
         Batchxml $timetableBatchXml,
         Lookup $lookup,
         ?int $currentWeekOffset,
+        ?int $currentTerm,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -122,6 +130,7 @@ class Classes implements IStrategy
         $this->timetableBatchXml = $timetableBatchXml;
         $this->lookup = $lookup;
         $this->currentWeekOffset = $currentWeekOffset;
+        $this->currentTerm = $currentTerm;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -155,6 +164,9 @@ class Classes implements IStrategy
      */
     private function findCurrentCycle(SimpleXMLElement $timetable, int $weekOffset): SimpleXMLElement
     {
+
+        /* TODO: Also use the <term> node
+         */
         return $timetable->xpath("week[@index='{$weekOffset}']")[0];
     }
 
