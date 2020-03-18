@@ -98,7 +98,7 @@ class PreparseVcal extends CliTool\App
 
         if (isset($source)) {
             Redis::getClientInstance()->setEx(
-                $config->determineCacheKey(),
+                $decodedConfig->determineCacheKey($config->getId()),
                 Calendar_Api_Config_Connector_Vcal::CACHE_EXPIRY,
                 $this->convertSourceToEvents($source)
             );

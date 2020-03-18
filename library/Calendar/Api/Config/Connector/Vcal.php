@@ -207,10 +207,11 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     /**
      * What's the key for cached data for this item?
      *
+     * @param int $id The ID of the persisted connector config
      * @return string
      */
-    public function determineCacheKey(): string
+    public function determineCacheKey(int $id): string
     {
-        return sprintf(self::CACHE_KEY_BASE, $this->id);
+        return sprintf(self::CACHE_KEY_BASE, $id);
     }
 }
