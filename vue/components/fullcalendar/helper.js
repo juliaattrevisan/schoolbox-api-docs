@@ -140,7 +140,7 @@ export default class FullCalendarHelper {
      * @return {boolean}
      */
     isTask(event) {
-        return Number(event?.extendedProps?.data?.meta?.class) === EVENT_CLASS_TASK;
+        return event?.extendedProps?.data?.meta?.class === EVENT_CLASS_TASK;
     }
 
 
