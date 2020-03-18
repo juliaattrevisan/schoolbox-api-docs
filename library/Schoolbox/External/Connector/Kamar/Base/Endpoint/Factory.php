@@ -14,6 +14,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
@@ -322,6 +323,12 @@ class Factory
          */
         $lookup = new Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
 
+        /* TODO: Potentially configurable
+         * You could potentially make this configurable, giving the school an opportunity
+         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
+         */
+        $currentWeekOffset = (new WeekOffset($this->timetableCampusMapper))->findWeekOffset(\Alaress_Date_Format::now());
+
         /* Load all the Student Timetable xmls
          */
         foreach ($xml[Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
@@ -331,10 +338,10 @@ class Factory
                 $registry,
                 new Batchxml(new Api($this->host . '/' . $xmlFile)),
                 $lookup,
+                $currentWeekOffset,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->timetableCampusMapper
+                $this->classPeriodMapper
             ));
         }
 

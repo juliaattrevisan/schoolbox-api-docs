@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Assessment\Term;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -82,15 +81,15 @@ class Classes implements IStrategy
 
 
     /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
      * @var Lookup
      */
     private $lookup;
+
+
+    /**
+     * @var int|null
+     */
+    private $currentWeekOffset;
 
 
     /**
@@ -101,10 +100,10 @@ class Classes implements IStrategy
      * @param Registry               $registry
      * @param Batchxml               $timetableBatchXml
      * @param Lookup                 $lookup
+     * @param int|null               $currentWeekOffset
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param TimetableCampusMapper  $timetableCampusMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -112,20 +111,20 @@ class Classes implements IStrategy
         Registry $registry,
         Batchxml $timetableBatchXml,
         Lookup $lookup,
+        ?int $currentWeekOffset,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        TimetableCampusMapper $timetableCampusMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->registry = $registry;
         $this->timetableBatchXml = $timetableBatchXml;
         $this->lookup = $lookup;
+        $this->currentWeekOffset = $currentWeekOffset;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
     }
 
 
@@ -168,15 +167,10 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        /* TODO: Potentially configurable
-         * You could potentially make this configurable, giving the school an opportunity
-         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
-         */
-        $currentWeekOffset = (new WeekOffset($this->timetableCampusMapper))->findWeekOffset(\Alaress_Date_Format::now());
 
         /* Can't determine which week we're in; can't import anything
          */
-        if (null === $currentWeekOffset) {
+        if (null === $this->currentWeekOffset) {
             $this->log->warning('Cannot determine week index for timetable import.');
 
             return;
@@ -184,7 +178,7 @@ class Classes implements IStrategy
 
         $this->log->info(sprintf(
             'Importing timetables using week offset %s',
-            $currentWeekOffset
+            $this->currentWeekOffset
         ));
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
@@ -222,7 +216,7 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $cycle = $this->findCurrentCycle($timetable, $currentWeekOffset);
+            $cycle = $this->findCurrentCycle($timetable, $this->currentWeekOffset);
 
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
@@ -251,7 +245,7 @@ class Classes implements IStrategy
                     $this->log->info(sprintf(
                         'Looking for ext_timetable_code %s, week %s, day %s, period with sequence %s',
                         $ext,
-                        $currentWeekOffset,
+                        $this->currentWeekOffset,
                         $dayNum,
                         $subject['sequence']
                     ));
