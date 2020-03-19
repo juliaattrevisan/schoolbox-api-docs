@@ -14,6 +14,7 @@ namespace Schoolbox\Survey;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -79,7 +80,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Model[] $results */
+        /** @var Model[]&GenericCollection $collection */
         $collection = $this->createCollection();
 
         $idCol = $this->getIdentifierColumn();
