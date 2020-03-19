@@ -87,13 +87,19 @@ class Vcal
      */
     private function retrieveSource(CalendarConfig $config): ?string
     {
-        // TODO ignore cache, use cURL or what have you to get file
         $cache   = new Calendar_Api_Cache();
         $headers = [];
         if ($config->getAuthorization()) {
             $headers = ['Authorization' => 'Bearer ' . $config->getAuthorization()];
         }
-        return $cache->init($config->getUrl(), $headers)->getStreamContents();
+
+        // Don't actually store the file in cache.
+        // (Use the cache class because it contains logic for handling proxy
+        //  servers, failures, relative URLs and probably other stuff.)
+        $cache->init($config->getUrl(), $headers);
+        $source = $cache->getStreamContents();
+        $cache->invalidateCache();
+        return $source;
     }
 
 
