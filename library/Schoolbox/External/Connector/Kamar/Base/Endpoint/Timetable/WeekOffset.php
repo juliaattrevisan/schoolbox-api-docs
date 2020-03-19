@@ -63,9 +63,9 @@ class WeekOffset
      *
      * Returns null when it can't be determined
      *
-     * @return int|null
+     * @return array|null
      */
-    public function findCurrentTerm(): ?int
+    public function findCurrentTerm(): ?array
     {
         $cycles = $this->timetableCampusMapper->findAll()->sortBy('start', 'asc')->getAll();
 
@@ -91,7 +91,10 @@ class WeekOffset
                     ));
                 }
 
-                return $i;
+                return [
+                    'termIndex' => $i,
+                    'cycleId' => $currentCycle->getCycle()->getId()
+                ];
             }
         }
 

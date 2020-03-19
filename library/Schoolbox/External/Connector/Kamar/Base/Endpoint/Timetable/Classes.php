@@ -20,7 +20,6 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use SimpleXMLElement;
@@ -99,6 +98,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var int
+     */
+    private $currentCycleId;
+
+
+    /**
      * TimetableClass constructor.
      *
      * @param LoggerInterface        $log
@@ -108,6 +113,7 @@ class Classes implements IStrategy
      * @param Lookup                 $lookup
      * @param int|null               $currentWeekOffset
      * @param int|null               $currentTerm
+     * @param int                    $currentCycleId
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -120,6 +126,7 @@ class Classes implements IStrategy
         Lookup $lookup,
         ?int $currentWeekOffset,
         ?int $currentTerm,
+        int $currentCycleId,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -131,6 +138,7 @@ class Classes implements IStrategy
         $this->lookup = $lookup;
         $this->currentWeekOffset = $currentWeekOffset;
         $this->currentTerm = $currentTerm;
+        $this->currentCycleId = $currentCycleId;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -144,14 +152,15 @@ class Classes implements IStrategy
      * that don't exist in Timetable Structure for some reason
      *
      * @param string $ext
+     * @param int    $cycleId
      * @param array  $periods
      * @param string $day
-     * @param int $sequence
+     * @param int    $sequence
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $ext, array $periods, string $day, int $sequence): ?TimetablePeriod
+    private function findPeriod(string $ext, int $cycleId, array $periods, string $day, int $sequence): ?TimetablePeriod
     {
-        return $periods['ext'][$ext]['day'][$day]['period'][$sequence] ?? null;
+        return $periods['ext'][$ext]['cycle'][$cycleId]['day'][$day]['period'][$sequence] ?? null;
     }
 
 
@@ -263,7 +272,7 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['sequence']);
+                    $timetablePeriod = $this->findPeriod($ext, $this->currentCycleId, $periods, $dayNum, $subject['sequence']);
 
                     if (null === $timetablePeriod) {
                         continue;

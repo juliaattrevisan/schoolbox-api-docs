@@ -336,7 +336,13 @@ class Factory
         );
 
         $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
-        $currentTerm = $weekOffsetCalculator->findCurrentTerm();
+        $termSettings = $weekOffsetCalculator->findCurrentTerm();
+
+        /* Figure out which term number we're in, to navigate xml files' nodes
+         * Figure out which cycle we're in, when persisting data
+         */
+        $currentTerm = $termSettings['termIndex'];
+        $currentCycleId = $termSettings['cycleId'];
 
         $this->log->debug(sprintf(
             'Loading timetables using Week Offset %s, Term %s',
@@ -355,6 +361,7 @@ class Factory
                 $lookup,
                 $currentWeekOffset,
                 $currentTerm,
+                $currentCycleId,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
