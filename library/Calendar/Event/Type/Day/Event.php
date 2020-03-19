@@ -353,6 +353,10 @@ class Event extends EventBase
         return $this->path;
     }
 
+    /**
+     * @param string $path
+     * @return $this
+     */
     public function setPath(string $path): self
     {
         $this->path = $path;
