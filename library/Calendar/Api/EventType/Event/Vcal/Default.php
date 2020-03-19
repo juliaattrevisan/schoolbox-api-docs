@@ -10,6 +10,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Sabre\VObject\Component\VCalendar;
+use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
@@ -159,11 +160,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 $this->getUser()->getRole()->getId()
             )
         ) {
-            // Hit up Redis
-            $allEvents = unserialize(
-                Alaress\Redis::getClientInstance()->get($decodedConfig->determineCacheKey($currentConfig->getId())),
-                [VCalendar::class]
-            );
+            // Hit up the cache
+            $cache     = new Vcal(Alaress\Redis::getClientInstance());
+            $allEvents = $cache->read($decodedConfig);
 
             if ($allEvents instanceof VCalendar) {
                 $start = new DateTime('@' . $startTimestamp);
