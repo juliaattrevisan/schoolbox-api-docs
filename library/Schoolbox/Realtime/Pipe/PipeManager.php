@@ -139,7 +139,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         if ($fdOpen >= $this->fdLimit) {
             // we're about to go over our FD limit (which is fatal)
-            $this->log->warning("Open file descriptors has reached $fdOpen; rejecting client connection");
+            $this->log->error("Open file descriptors has reached $fdOpen; rejecting client connection");
             $this->closeConnectionWithReason($conn, 503);
             return;
         }
