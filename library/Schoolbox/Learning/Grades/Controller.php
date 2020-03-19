@@ -290,11 +290,21 @@ class Controller extends Base
 
         $yearUrl = $this->getYearUrl($viewee->getId());
 
+        /* Manufacture a special Term struct when viewing the Grades Summary screen
+         * This is an example of using a custom array instead of an object,
+         * and twig doesn't know the difference in the template (this is convenient)
+         *
+         * This isn't localised in the dropdown, so I guess I don't need to localise it here
+         */
+        $gradesSummaryTerm = [
+            'title' => "{$year} Grades Summary"
+        ];
+
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
-            'term'            => $term,
+            'term'            => $gradesSummaryTerm,
             'year'            => $year,
             'terms'           => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'         => $folders,
