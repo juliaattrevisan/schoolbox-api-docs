@@ -29,19 +29,13 @@ try {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
             if($config->get('otfs_s3_presigned_urls_enabled')){
-                $s3AccessKey = trim($config->get('otfs_s3_cred_key') ?? '');
-                $s3SecretKey = trim($config->get('otfs_s3_cred_secret') ?? '');
-                $s3Region    = trim($config->get('otfs_s3_region') ?? '');
-                $s3Version   = trim($config->get('otfs_s3_version') ?? '');
-                $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? '');
-
                 $s3Client = new Aws\S3\S3Client([
                     'credentials' => [
-                        'key'    => $s3AccessKey,
-                        'secret' => $s3SecretKey,
+                        'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
+                        'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
                     ],
-                    'region'      => $s3Region,
-                    'version'     => $s3Version,
+                    'region'      => trim($config->get('otfs_s3_region') ?? ''),
+                    'version'     => trim($config->get('otfs_s3_version') ?? ''),
                 ]);
 
                 /*
@@ -49,11 +43,9 @@ try {
                  * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
                  * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
                  */
-
-                // TODO implement other response headers
                  /** @var CommandInterface $cmd */
                 $cmd = $s3Client->getCommand('GetObject', [
-                    'Bucket'                     => $s3Bucket,
+                    'Bucket'                     => trim($config->get('otfs_s3_bucket') ?? ''),
                     'Key'                        => $resource->getPath(),
                     'ResponseCacheControl'       => $cacheControl,
                     'ResponseContentDisposition' => "$attach filename=\"{$resource->getBasename()}\"",
