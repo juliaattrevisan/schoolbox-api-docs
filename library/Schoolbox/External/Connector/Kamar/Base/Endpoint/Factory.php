@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Assessment\Term;
@@ -331,7 +332,7 @@ class Factory
          */
         $weekOffsetCalculator = new WeekOffset(
             $this->timetableCampusMapper,
-            new \Alaress_Date_Format(),
+            Alaress_Date_Format::now(),
             $this->log
         );
 

@@ -126,13 +126,32 @@ HELP;
         $currentTerm = (int)$this->getOpt(self::OPT_LONG_TERM);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
 
-        $offsetCalculator = new WeekOffset(TimetableCampusMapper::getInstance(), \Alaress_Date_Format::now());
-        $weekOffset = $offsetCalculator->findWeekOffset();
+        $weekOffsetCalculator = new WeekOffset(
+            TimetableCampusMapper::getInstance(),
+            \Alaress_Date_Format::now(),
+            $this->getLogger()
+        );
+
+        $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
+        $termSettings = $weekOffsetCalculator->findCurrentTerm();
+
+        /* Figure out which term number we're in, to navigate xml files' nodes
+         * Figure out which cycle we're in, when persisting data
+         */
+        $currentTerm = $termSettings['termIndex'];
+        $currentCycleId = $termSettings['cycleId'];
 
         $this->getLogger()->info(sprintf(
-            'We are in Week Offset %s, Term %s',
-            $weekOffset,
+            'We are in Week Offset %s for Term %s. This equates to being %s week(s) into Term %s',
+            $currentWeekOffset,
+            $currentTerm,
+            $currentWeekOffset+1,
             $currentTerm
+        ));
+
+        $this->getLogger()->info(sprintf(
+            'Imported classes should be associated with cycle_id %s which is described in sis_timetable_campus and sis_timetable_cycle',
+            $currentCycleId
         ));
 
         /* Use the path specified in config
