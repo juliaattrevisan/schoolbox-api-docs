@@ -123,7 +123,7 @@ HELP;
 
         /* Understand args
          */
-        $currentTerm = (int)$this->getOpt(self::OPT_LONG_TERM);
+        $selectedTerm = (int)$this->getOpt(self::OPT_LONG_TERM);
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
 
         $weekOffsetCalculator = new WeekOffset(
@@ -173,7 +173,7 @@ HELP;
                 foreach ($timetables as $timetable) {
                     $studentId = $timetable->xpath('@student')[0];
 
-                    $weeks = $timetable->xpath("week[contains(term, '{$currentTerm}')]");
+                    $weeks = $timetable->xpath("week[contains(term, '{$selectedTerm}')]");
 
                     /* Find out if this week contains a particular class as per the cli args
                      */
@@ -200,7 +200,7 @@ HELP;
                                     $message = sprintf(
                                         'Student %s, week @index %s, day @index %s, slot %s: Teachers: %s, Rooms: %s: %s',
                                         $studentId,
-                                        (string)$week->xpath('@index')[0],
+                                        $weekIndex,
                                         $dayIndex,
                                         $slot,
                                         $teachers,
