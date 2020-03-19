@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Collection;
 
@@ -30,8 +31,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
              */
             if ($config instanceof Calendar_Api_Config_Connector_ExternalConstrained) {
                 $config->setDuration($attribs['duration']);
-            }
-            elseif ($config instanceof Calendar_Api_Config_Connector_Vcal) {
+            } elseif ($config instanceof Calendar_Api_Config_Connector_Vcal) {
                 /* Add urls
                  */
                 $config->setUrl($attribs['url']);
@@ -111,6 +111,19 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             foreach ($allConfigs as $currentConfig) {
                 $currentConfig->activate();
                 Calendar_Api_Config_Mapper::getInstance()->save([$currentConfig]);
+            }
+        }
+
+        // Cache downloaded and parsed vCal for all vCal configs
+        /** @var SitePage $this */
+        $cache = new Vcal($this->getDi()->get('redis'));
+
+        /** @var iterable&Calendar_Api_Config_Record[] $configs */
+        $enabledConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        foreach ($enabledConfigs as $enabledConfig) {
+            $decodedConfig = $enabledConfig->decodeConfig();
+            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
+                $cache->write($decodedConfig);
             }
         }
     }
