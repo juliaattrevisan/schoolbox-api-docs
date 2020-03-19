@@ -48,4 +48,7 @@ MAILTO="support@schoolbox.com.au"
 # SIS Data Importer - every hour
 0 * * * *	www-data	php /usr/share/schoolboxdev/tools/synchronise/scheduler.php >> /var/lib/schoolboxdev/cache/logs/sis-scheduler.log 2>&1
 
+# Calendar: pre-parse any vCal files every 2 hours
+35 */2 * * *    www-data    /usr/share/schoolboxdev/tools/calendar/preparseVcalSubscription.php -v >> /var/lib/schoolboxdev/cache/logs/preparseVcalSubscription.log 2>&1
+
 # End of file - do not delete
