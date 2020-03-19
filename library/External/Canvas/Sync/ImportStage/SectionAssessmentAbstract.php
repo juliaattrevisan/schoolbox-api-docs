@@ -260,8 +260,6 @@ abstract class SectionAssessmentAbstract
                 // AdHoc/Group override => N sections (depending on which sections Group/AdHoc users are enrolled in)
                 /**
                  * Indexed by `section`.`sis_source_id`
-                 *
-                 * @var $overridesPerSection
                  */
                 $overridesPerSection = $this->buildOverridesPerSection($assessment, $courseSectionsData['sections'], $studentExternalIdUserIdMap);
 

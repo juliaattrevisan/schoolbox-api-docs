@@ -252,9 +252,9 @@ class Submission extends SectionAssignment
     /**
      * Deletes existing feedbacks which did not get synced
      * @param GenericCollection $existingFeedbacks
-     * @param                   $syncedFeedbackIds
+     * @param array             $syncedFeedbackIds
      */
-    private function deleteUnSynchronisedFeedbacks(GenericCollection $existingFeedbacks, $syncedFeedbackIds)
+    private function deleteUnSynchronisedFeedbacks(GenericCollection $existingFeedbacks, array $syncedFeedbackIds)
     {
         $deleteIds = array_diff($existingFeedbacks->getPropertyValues('id'), $syncedFeedbackIds);
         $this->returnedWorkMapper->deleteByColumn('id', $deleteIds);
@@ -287,10 +287,10 @@ class Submission extends SectionAssignment
 
     /**
      * Fetch canvas submissions (include marks) related to the given assignment
-     * @param $assignmentCanvasId
+     * @param int $assignmentCanvasId
      * @return array
      */
-    private function loadCanvasSubmissions($assignmentCanvasId): array
+    private function loadCanvasSubmissions(int $assignmentCanvasId): array
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->equals('assignment_dim.canvas_id', $assignmentCanvasId);
