@@ -532,8 +532,7 @@ class Controller extends Base
         /* Select the first of any combination of those elements
          */
         $selectedTab = array_shift(array_keys($tabs));
-
-        $tree = [];
+        $tree        = [];
 
         // Layout assessments in a tree for twig to render
         foreach ($filteredMarkbook->getAssessments() as $assessment) {
@@ -542,8 +541,14 @@ class Controller extends Base
             $contextId     = $context->getId();
             $baseContextId = $assessment->getBaseContext()->getId();
             if ($tree[$baseContextId]['context'] && $contextId !== $baseContextId) {
-                // Is this a project? Ensure the assessment is always there.
+                // Ensure projects and their participation are always in the
+                // base of the tree.
+                // This means that a project's mark will always show,
+                // even if it doesn't match the filter: but oh well.
                 if ($context instanceof Project) {
+                    $contexts = new GenericCollection(IAssessable::class);
+                    $contexts->add($context);
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($contexts, $viewee);
                     $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
                 }
                 $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
