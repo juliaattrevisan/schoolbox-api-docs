@@ -89,6 +89,13 @@ class Event extends EventBase
     private $attendance = false;
 
     /**
+     * URL path to further information or detail for event
+     * @var string
+     */
+    protected $path;
+
+
+    /**
      * Can someone attend this event
      *
      * @return bool
@@ -336,6 +343,24 @@ class Event extends EventBase
     public function isTask()
     {
         return $this->isTask;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function setPath(string $path): self
+    {
+        $this->path = $path;
+        return $this;
     }
 
 

@@ -516,7 +516,7 @@
             <div class="row">
                 <div class="small-12">
                     <template v-if="eventExtendedProps.links.path">
-                        <a :href="'/calendar/event/' + eventExtendedProps.eventId" title="Go to event page"><h2>{{ event.title }}</h2></a>
+                        <a :href="eventExtendedProps.links.path" title="Go to event page"><h2>{{ event.title }}</h2></a>
                     </template>
                     <template v-else>
                         <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>

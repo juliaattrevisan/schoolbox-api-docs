@@ -89,7 +89,7 @@ class Javascript extends Base
                         'id'   => $this->getEvent()->getCategoryId(),
                         'name' => $this->getEvent()->getCategoryName(),
                     ],
-                    'path' => $this->getRouter()->generate('calendarEvent.getEvent', ['eventId' => $this->getEvent()->getEventId()]),
+                    'path' => $this->getEvent()->getPath(),
                 ],
                 'styles'     => [
                     'visible' => $cssClass,
