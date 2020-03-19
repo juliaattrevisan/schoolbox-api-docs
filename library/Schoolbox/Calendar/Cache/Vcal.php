@@ -17,10 +17,17 @@ use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Reader;
 
 /**
- * Class Vcal
+ * Cache helper for vCal events.
  */
 class Vcal
 {
+    private const CACHE_KEY_BASE = 'vcal.%s';
+
+
+    // Cache expiry: 8 hours?
+    private const CACHE_EXPIRY = (60*60*8);
+
+
     /**
      * @var RedisClient
      */
@@ -49,8 +56,8 @@ class Vcal
 
         if (isset($source)) {
             $this->redis->setEx(
-                $config->determineCacheKey($config->getId()),
-                CalendarConfig::CACHE_EXPIRY,
+                $this->determineCacheKey($config),
+                self::CACHE_EXPIRY,
                 serialize($this->convertSourceToEvents($source))
             );
         }
@@ -66,7 +73,7 @@ class Vcal
     public function read(CalendarConfig $config): ?VCalendar
     {
         return unserialize(
-            $this->redis->get($config->determineCacheKey($config->getId())),
+            $this->redis->get($this->determineCacheKey($config)),
             [VCalendar::class]
         );
     }
@@ -114,5 +121,19 @@ class Vcal
                          new DateTimeImmutable('Jan 1 -1 year', $timezone),
                          new DateTimeImmutable('Dec 31 +1 year', $timezone)
                      );
+    }
+
+
+    /**
+     * Determine the cache key to read/write.
+     *
+     * @param CalendarConfig $config
+     * @return string
+     */
+    private function determineCacheKey(CalendarConfig $config): string
+    {
+        // Can't use config's PK, as it doesn't exist in the encoded object.
+        // We can only use its URL.
+        return sprintf(self::CACHE_KEY_BASE, hash('sha256', $config->getUrl()));
     }
 }
