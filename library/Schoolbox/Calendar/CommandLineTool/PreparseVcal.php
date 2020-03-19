@@ -9,8 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\CommandLineTool;
 
 use Alaress\Redis;
-use Calendar_Api_Cache;
-use Calendar_Api_Config_Connector_Interface;
 use Calendar_Api_Config_Connector_Vcal;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
