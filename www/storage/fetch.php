@@ -43,7 +43,7 @@ try {
                  * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
                  * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
                  */
-                $expires = Alaress_Date_Format::now()->addDays(1);
+                $expires = Alaress_Date_Format::now()->addDays(1)->__toString();
                  /** @var CommandInterface $cmd */
                 $cmd = $s3Client->getCommand('GetObject', [
                     'Bucket'                     => trim($config->get('otfs_s3_bucket') ?? ''),
