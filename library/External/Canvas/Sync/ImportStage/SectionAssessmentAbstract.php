@@ -422,9 +422,29 @@ abstract class SectionAssessmentAbstract
      *
      * @param int[] $assessmentImplIdsSynchronised
      * @throws Database\Exception
-     * @throws Mapper\Exception
      */
-    abstract protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void;
+    protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void
+    {
+        $candidateAssessmentIds = $this->getAssessableAssessmentIds();
+        if (!count($candidateAssessmentIds)) {
+            return;
+        }
+
+        $assessmentIdsToDelete = array_diff($candidateAssessmentIds, $assessmentImplIdsSynchronised);
+
+        $idColumn = $this->assessmentMapper->getIdentifierColumn();
+        foreach ($this->assessmentMapper->findByColumn($idColumn, $assessmentIdsToDelete) as $assessmentImpl) {
+            $this->deleteAssessableImpl($assessmentImpl);
+            $this->countAssessablesDeleted++;
+        }
+    }
+
+
+    /**
+     * Deletes given AssessableImpl
+     * @param Assessment\Model $assessmentImpl
+     */
+    abstract protected function deleteAssessableImpl(Assessment\Model $assessmentImpl): void;
 
 
     /**

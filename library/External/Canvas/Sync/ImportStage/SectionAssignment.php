@@ -375,24 +375,11 @@ class SectionAssignment extends SectionAssessmentAbstract
     }
 
 
-    /**
-     * @inheritDoc
-     */
-    protected function deleteUnSynchronisedAssessableImpl(array $assessmentImplIdsSynchronised): void
+    /** @inheritDoc */
+    protected function deleteAssessableImpl(Assessment\Model $assessmentImpl): void
     {
-        $candidateAssessmentIds = $this->getAssessableAssessmentIds();
-        if (!count($candidateAssessmentIds)) {
-            return;
-        }
-
-        $assessmentIdsToDelete = array_diff($candidateAssessmentIds, $assessmentImplIdsSynchronised);
-
-        $idColumn = $this->assessmentMapper->getIdentifierColumn();
-        foreach ($this->assessmentMapper->findByColumn($idColumn, $assessmentIdsToDelete) as $assessmentImpl) {
-            $this->log->debug("Deleting un-synchronised SubmissionBoxImpl (assessment.id: {$assessmentImpl->getId()})");
-            $this->assessmentMapper->softDeleteDueWork($assessmentImpl);
-            $this->countAssessablesDeleted++;
-        }
+        $this->log->debug("Deleting un-synchronised SubmissionBoxImpl (assessment.id: {$assessmentImpl->getId()})");
+        $this->assessmentMapper->softDeleteDueWork($assessmentImpl);
     }
 
 
