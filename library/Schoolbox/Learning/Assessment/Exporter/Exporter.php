@@ -18,7 +18,6 @@ use Schoolbox\Filter\Filters\Assessment\YearDue;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
@@ -106,13 +105,13 @@ class Exporter
                 /** @var Participant $participant */
                 $feedback = $participant->getAuthoritativeFeedback(true);
 
-                if(!$feedback) {
+                if (!$feedback) {
                     continue;
                 }
 
-                $mark = $feedback->getHumanReadableMark();
+                $mark       = $feedback->getHumanReadableMark();
                 $percentage = $feedback->getNormalisedMark();
-                $comment = $feedback->getComment();
+                $comment    = $feedback->getComment();
 
                 // If this is a total mark, only show the actual mark (without '/ [total]')
                 //[$mark] = explode(' / ', $mark);
@@ -156,7 +155,7 @@ class Exporter
         $filters     = [
             AssessmentType\Definition::class           => [
                 AssessmentType\Definition::KEY_DUE_WORK => AssessmentType\Definition::KEY_DUE_WORK,
-                AssessmentType\Definition::KEY_QUIZ => AssessmentType\Definition::KEY_QUIZ,
+                AssessmentType\Definition::KEY_QUIZ     => AssessmentType\Definition::KEY_QUIZ,
                 AssessmentType\Definition::KEY_PROJECT  => AssessmentType\Definition::KEY_PROJECT,
             ],
             NullableContext\UnitSpec\Definition::class => [],
