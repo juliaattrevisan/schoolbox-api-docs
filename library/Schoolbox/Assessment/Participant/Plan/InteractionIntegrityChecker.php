@@ -90,7 +90,11 @@ class InteractionIntegrityChecker
      * @param User             $student
      * @param Assessment\Model $assessment
      * @param string           $expireDateOffset
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws SchoolboxMapper\DefinitionException
      * @throws SchoolboxMapper\Exception
+     * @throws UnexpectedValueException
      */
     public function createPlanForResubmission(User $student, Assessment\Model $assessment, string $expireDateOffset): void
     {
@@ -116,7 +120,7 @@ class InteractionIntegrityChecker
             $newPlan = $this->planMapper->createModel()
                                         ->setIsDynamic(false)
                                         ->setAssessment($assessment)
-                                        ->setName('Resubmit')
+                                        ->setName("{$currentPlan->getName()} Resubmit ({$student->getFullName()})")
                                         ->setPublishDate($assessment->getPublishDate())
                                         ->setOpenDate($assessment->getOpenDate())
                                         ->setDueDate($assessment->getDueDate())
@@ -129,7 +133,7 @@ class InteractionIntegrityChecker
             // Custom plan shared with another student
             $newPlan = clone $currentPlan;
             $newPlan->setId(null)
-                    ->setName($currentPlan->getName() . ' Resubmit')
+                    ->setName("{$currentPlan->getName()} Resubmit ({$student->getFullName()})")
                     ->setCloseDate($possibleCloseDate);
             $this->planMapper->save($newPlan);
 
