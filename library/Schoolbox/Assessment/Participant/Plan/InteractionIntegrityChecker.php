@@ -115,12 +115,16 @@ class InteractionIntegrityChecker
             return;
         }
 
+        /* Define a new plan name because you've asked $student to resubmit
+         */
+        $newPlanName = "{$currentPlan->getName()} Resubmit ({$student->getFullName()})";
+
         if ($currentPlan->isDynamic()) {
             // Default plan - Create a new plan
             $newPlan = $this->planMapper->createModel()
                                         ->setIsDynamic(false)
                                         ->setAssessment($assessment)
-                                        ->setName("{$currentPlan->getName()} Resubmit ({$student->getFullName()})")
+                                        ->setName($newPlanName)
                                         ->setPublishDate($assessment->getPublishDate())
                                         ->setOpenDate($assessment->getOpenDate())
                                         ->setDueDate($assessment->getDueDate())
@@ -133,7 +137,7 @@ class InteractionIntegrityChecker
             // Custom plan shared with another student
             $newPlan = clone $currentPlan;
             $newPlan->setId(null)
-                    ->setName("{$currentPlan->getName()} Resubmit ({$student->getFullName()})")
+                    ->setName($newPlanName)
                     ->setCloseDate($possibleCloseDate);
             $this->planMapper->save($newPlan);
 
@@ -141,7 +145,18 @@ class InteractionIntegrityChecker
             $this->participantMapper->save($participant);
         } else {
             // Custom plan with this user only - Amending the close date
-            $participant->getPlan()->setCloseDate($possibleCloseDate);
+
+            /* If multiple people were already on a custom plan, and all those people are requested to resubmit,
+             * then one of the users in that set won't get their plan renamed; the getParticipants()->count()
+             * at this stage is 1. That presents a visual anomaly to an end user because everyone except one
+             * person will have a Resubmit plan, and that looks like something else happened.
+             *
+             * If you ask someone to resubmit, it should just rename the plan anyway.
+             */
+            $participant->getPlan()
+                        ->setName($newPlanName)
+                        ->setCloseDate($possibleCloseDate);
+
             $this->planMapper->save($participant->getPlan());
         }
     }
