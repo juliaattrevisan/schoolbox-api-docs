@@ -72,10 +72,14 @@ class Vcal
      */
     public function read(CalendarConfig $config): ?VCalendar
     {
-        return unserialize(
-            $this->redis->get($this->determineCacheKey($config)),
-            [VCalendar::class]
-        );
+        $cachedValue = $this->redis->get($this->determineCacheKey($config));
+        if (isset($cachedValue)) {
+            return unserialize(
+                $this->redis->get($this->determineCacheKey($config)),
+                [VCalendar::class]
+            );
+        }
+        return null;
     }
 
 
