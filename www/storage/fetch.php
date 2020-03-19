@@ -43,6 +43,7 @@ try {
                  * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
                  * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
                  */
+                $expires = Alaress_Date_Format::now()->addDays(1);
                  /** @var CommandInterface $cmd */
                 $cmd = $s3Client->getCommand('GetObject', [
                     'Bucket'                     => trim($config->get('otfs_s3_bucket') ?? ''),
@@ -50,11 +51,11 @@ try {
                     'ResponseCacheControl'       => $cacheControl,
                     'ResponseContentDisposition' => "$attach filename=\"{$resource->getBasename()}\"",
                     'ResponseContentType'        => $contentType,
-                    'ResponseExpires'            => Alaress_Date_Format::now()->addDays(1),
+                    'ResponseExpires'            => $expires,
                 ]);
 
                 // Get the actual presigned-url
-                $presignedUrl = $s3Client->createPresignedRequest($cmd, '+1 days')->getUri();
+                $presignedUrl = $s3Client->createPresignedRequest($cmd, $expires)->getUri();
                 header("Location: $presignedUrl", true, 302);
                 exit;
             }
