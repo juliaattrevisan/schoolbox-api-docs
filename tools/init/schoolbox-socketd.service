@@ -12,7 +12,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 Restart=on-failure
 RestartSec=2s
-LimitNOFILE=10240:10240
+LimitNOFILE=40960:40960
 Nice=5
 
 [Install]
