@@ -383,9 +383,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                 /* Entangle All Day settings for linked elements
                                  */
                                 if ($("#hideTime" + pickerId).is(":checked")) {
-                                    $("#hideTime" + opts.id).prop('checked', true);
+                                    adtp.setCalendarAllDay(true, opts.id);
                                 } else {
-                                    $("#hideTime" + opts.id).prop('checked', false);
+                                    adtp.setCalendarAllDay(false, opts.id);
                                 }
                             });
                         }
