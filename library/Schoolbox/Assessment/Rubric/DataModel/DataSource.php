@@ -1385,6 +1385,11 @@ class DataSource
         // Get Source Descriptors
         /** @var DescriptorModel[]|GenericCollection $srcDescriptors */
         $srcDescriptors  = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
+        if ($srcDescriptors->count() === 0) {
+            // no descriptors are set for source assessment
+            return false;
+        }
+
         $srcIndicators   = $indicatorMapper->createCollection();
         $srcCapabilities = $capabilityMapper->createCollection();
 

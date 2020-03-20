@@ -131,7 +131,7 @@ class Mapper extends BaseMapper
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
-                    sprintf('Rubric capability name "%s" is already in use in this folder', $normalizedName)
+                    sprintf('Rubric capability name "%s" is already in use in this folder', $existingName)
                 );
             }
         }
@@ -198,24 +198,30 @@ class Mapper extends BaseMapper
      * @param string $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param string $name       The name of the indicator
      * @param bool   $cache      If false, bypass result cache
-     * @return Model
-     * @throws MapperException
+     * @return Model|null
      */
     public function findOneForParentByName(
         int $parentId,
         string $parentType,
         string $name,
         bool $cache = true
-    ): Model
+    ): ?Model
     {
-        return $this->findOneByColumnList(
+        $capabilities   = $this->findByColumnList(
             [
                 'parent_id'   => $parentId,
                 'parent_type' => $parentType,
-                'name'        => $name,
             ],
             ['cache' => $cache,]
         );
+        $normalizedName = Util::normalizeName($name);
+        foreach ($capabilities as $capability) {
+            /** @var Model $capability */
+            if ($normalizedName === Util::normalizeName($capability->getName())) {
+                return $capability;
+            }
+        }
+        return null;
     }
 
 
@@ -225,10 +231,9 @@ class Mapper extends BaseMapper
      * @param int    $folderId  The folder ID to find for
      * @param string $name      The name of the capability
      * @param bool   $cache     If false, bypass result cache
-     * @return Model
-     * @throws MapperException
+     * @return Model|null
      */
-    public function findOneForFolderByName(int $folderId, string $name, bool $cache = true): Model
+    public function findOneForFolderByName(int $folderId, string $name, bool $cache = true): ?Model
     {
         return $this->findOneForParentByName($folderId, Model::PARENT_TYPE_CATEGORY, $name, $cache);
     }
@@ -255,26 +260,23 @@ class Mapper extends BaseMapper
         bool $cache = true
     ): Model
     {
-        try {
-            return $this->findOneForParentByName($parentId, $parentType, $name, $cache);
-        } catch (MapperException\Deleted $e) {
-            // It was deleted; restore it
-            $item = $e->getDeletedObject();
-            $this->restoreSoftDeleted($item);
-            return $item;
-
-        } catch (MapperException $e) {
-            // Create one
-            /** @var NodeMapper $nodeMapper */
-            $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
-            $item = $this->createModel()
-                         ->setParentId($parentId)
-                         ->setParentType($parentType)
-                         ->setName($name)
-                         ->setCurriculumNodes($nodeMapper->createCollection());
-            $this->save($item);
-            return $item;
+        // Try to find a capability with this name
+        $existing = $this->findOneForParentByName($parentId, $parentType, $name, $cache);
+        if ($existing) {
+            // Found
+            return $existing;
         }
+
+        // Couldn't find. Create one
+        /** @var NodeMapper $nodeMapper */
+        $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
+        $item       = $this->createModel()
+                           ->setParentId($parentId)
+                           ->setParentType($parentType)
+                           ->setName($name)
+                           ->setCurriculumNodes($nodeMapper->createCollection());
+        $this->save($item);
+        return $item;
     }
 
 

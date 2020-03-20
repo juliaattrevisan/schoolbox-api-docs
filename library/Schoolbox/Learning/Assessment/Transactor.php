@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -81,11 +82,13 @@ class Transactor
     /**
      * Figure out a returnUrl when creating/updating assessments
      *
-     *
      * @param IAssessable $assessment
      * @return array
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws RouteNotFound
      */
-    public function transact(IAssessable $assessment)
+    public function transact(IAssessable $assessment): array
     {
         $this->setAssessment($assessment);
 
@@ -113,7 +116,7 @@ class Transactor
                     throw new \InvalidArgumentException('Please select a valid context');
                 }
             } catch (MapperException $e) {
-                throw new \InvalidArgumentException('Please select a valid context', 0, $e);
+                throw new \InvalidArgumentException($e->getMessage(), 0, $e);
             }
         }
         /* Otherwise you came from the update screen, just go back there for now
