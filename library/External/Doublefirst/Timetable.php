@@ -109,6 +109,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 	            p.YearGroup = '{$studentDetails['YearGroupID']}' AND
                 p.DayOfWeek = 1
 	        ";
+            $yearGroupQuery = "YearGroup = '{$studentDetails['YearGroupID']}'";
         } else {
 
             /**
@@ -122,6 +123,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                     p.YearGroup IN ({$yearGroups}) AND
                     p.DayOfWeek = 1
     		";
+            $yearGroupQuery = "YearGroup IN ({$yearGroups})";
         }
 
         $query .= "ORDER BY PeriodNumber, BreakDuration DESC";
@@ -140,7 +142,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $queryTimes = "
             SELECT TOP 1 SchoolStartTime, NoOfPeriods
             FROM AttendancePeriodStructure
-            WHERE YearGroup = '{$studentDetails['YearGroupID']}'
+            WHERE {$yearGroupQuery}
             AND AcademicYear = '{$fileYear}'
             AND DayOfWeek = 1
         ";
