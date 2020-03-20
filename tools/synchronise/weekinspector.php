@@ -141,6 +141,20 @@ HELP;
         $currentTerm = $termSettings['termIndex'];
         $currentCycleId = $termSettings['cycleId'];
 
+        /* You need both of these to work stuff out
+         */
+        if (null === $currentTerm) {
+            $this->getLogger()->error('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
+            exit;
+        }
+
+        if (null === $currentCycleId) {
+            $this->getLogger()->error('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
+            exit;
+        }
+
+        /* Otherwise continue onwards
+         */
         $this->getLogger()->info(sprintf(
             'We are in Week Offset %s for Term %s. This equates to being %s week(s) into Term %s',
             $currentWeekOffset,

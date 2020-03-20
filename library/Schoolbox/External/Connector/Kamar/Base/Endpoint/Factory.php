@@ -345,6 +345,20 @@ class Factory
         $currentTerm = $termSettings['termIndex'];
         $currentCycleId = $termSettings['cycleId'];
 
+        /* You need both of these to work stuff out
+         */
+        if (null === $currentTerm) {
+            $this->log->error('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
+            exit;
+        }
+
+        if (null === $currentCycleId) {
+            $this->log->error('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
+            exit;
+        }
+
+        /* Otherwise continue onwards
+         */
         $this->log->debug(sprintf(
             'Loading timetables using Week Offset %s, Term %s',
                 $currentWeekOffset,

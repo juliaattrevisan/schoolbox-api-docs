@@ -168,9 +168,9 @@ class Classes implements IStrategy
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
-     * @return SimpleXMLElement
+     * @return null|SimpleXMLElement
      */
-    private function findCurrentCycle(SimpleXMLElement $timetable): SimpleXMLElement
+    private function findCurrentCycle(SimpleXMLElement $timetable): ?SimpleXMLElement
     {
         $weeks = $timetable->xpath("week[contains(term, '{$this->currentTerm}')]");
 
@@ -239,7 +239,7 @@ class Classes implements IStrategy
         /* If there aren't any timetables, log it and exit
          */
         if (!\count($timetables)) {
-            $this->log->warning('No timetables detected.');
+            $this->log->error('No timetables detected.');
             return;
         }
 
@@ -253,6 +253,11 @@ class Classes implements IStrategy
              * a convenient struct which we can then just ram home
              */
             $cycle = $this->findCurrentCycle($timetable);
+
+            if (!$cycle) {
+                $this->log->error('Unknown cycle; check installation steps.');
+                return;
+            }
 
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
