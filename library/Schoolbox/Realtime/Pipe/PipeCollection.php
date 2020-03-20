@@ -8,11 +8,12 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
+use Countable;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\SessionException;
 
-class PipeCollection
+class PipeCollection implements Countable
 {
 
     /** @var Pipe[] */
@@ -194,4 +195,13 @@ class PipeCollection
 
         return [];
     }
-} 
+
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->pipesBySocketKey);
+    }
+}

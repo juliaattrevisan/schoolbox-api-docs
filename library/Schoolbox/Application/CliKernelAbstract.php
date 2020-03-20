@@ -413,7 +413,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         }
 
         $limits = [
-            0 => Monolog\Logger::CRITICAL, // nil verbosity: exceptional behaviour only
+            0 => Monolog\Logger::ERROR,    // nil verbosity: exceptional behaviour only
             1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
             2 => Monolog\Logger::INFO,     // mod verbosity: most things
             3 => Monolog\Logger::DEBUG,     // max verbosity: EV-ER-Y-THING...

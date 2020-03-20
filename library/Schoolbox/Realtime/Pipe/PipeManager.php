@@ -135,11 +135,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public function onOpen(ConnectionInterface $conn)
     {
         // receive new connection, register a pipe based on it
-        $fdOpen = open_fd_count();
+        $pipeCount = $this->pipes->count();
+
+        $fdOpen = $pipeCount + 250; // just assume we have ~250 non pipe/socket file descriptors in use
 
         if ($fdOpen >= $this->fdLimit) {
             // we're about to go over our FD limit (which is fatal)
-            $this->log->warning("Open file descriptors has reached $fdOpen; rejecting client connection");
+            $this->log->error("Open file descriptors has reached $fdOpen; rejecting client connection");
             $this->closeConnectionWithReason($conn, 503);
             return;
         }
