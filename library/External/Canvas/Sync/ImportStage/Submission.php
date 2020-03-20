@@ -10,10 +10,10 @@ namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
-use External\Canvas\Sync\Bridge\CourseSection;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -33,26 +33,10 @@ use function implode;
 
 /**
  * Responsible for importing Submissions.
- *
  */
 class Submission extends SectionAssignment
 {
     use ModelSaveTrait;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var CourseSection */
-    private $courseSectionBridge;
-
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var IConnector */
-    private $schoolboxDb;
-
-    /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
 
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
@@ -60,15 +44,29 @@ class Submission extends SectionAssignment
     /** @var Assessment\MapperProxy */
     private $assessmentDataSource;
 
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var array */
-    private $dueWorkPlanCache;
-
     /** @var int */
     private $syncMarkCount;
 
+    /**
+     * @param IConnector                $canvasDb
+     * @param IConnector                $schoolboxDb
+     * @param External_ClassInterface   $externalClass
+     * @param string|null               $currentFileYear
+     * @param UnitImpl\Mapper           $unitImplMapper
+     * @param UnitSpec\Mapper           $unitSpecMapper
+     * @param SubmissionBoxMapper       $submissionBoxMapper
+     * @param Assessment\Mapper         $assessmentMapper
+     * @param Participant\Plan\Mapper   $planMapper
+     * @param Participant\Mapper        $participantMapper
+     * @param UserMapper                $userMapper
+     * @param LoggerInterface           $log
+     * @param Bridge\AssignmentDates    $assignmentDatesBridge
+     * @param Bridge\Course             $courseBridge
+     * @param Bridge\CourseSection      $courseSectionBridge
+     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @param ReturnedWorkMapper        $returnedWorkMapper
+     * @param Assessment\MapperProxy    $assessmentDataSource
+     */
     public function __construct(
         IConnector $canvasDb,
         IConnector $schoolboxDb,
@@ -108,17 +106,15 @@ class Submission extends SectionAssignment
             $assignmentOverrideBridge
         );
 
-        $this->canvasDb             = $canvasDb;
-        $this->schoolboxDb          = $schoolboxDb;
-        $this->submissionBoxMapper  = $submissionBoxMapper;
         $this->returnedWorkMapper   = $returnedWorkMapper;
         $this->assessmentDataSource = $assessmentDataSource;
-        $this->userMapper           = $userMapper;
-        $this->log                  = $log;
-        $this->courseSectionBridge  = $courseSectionBridge;
     }
 
 
+    /**
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     */
     public function synchronise(): void
     {
         $this->log->notice("Synchronising Canvas Submissions");
@@ -135,67 +131,133 @@ class Submission extends SectionAssignment
                 continue;
             }
             foreach ($coursesAssessmentData[$courseCanvasId] as $assessmentCanvasId => $canvasAssessment) {
+                $hasMarkToSync       = false;
                 $sbSubmissionBoxSpec = $this->submissionBoxMapper->findOneByColumn('external_id', $assessmentCanvasId);
 
-                $assessments       = $this->assessmentDataSource->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
+                $assessmentImpls   = $this->findAllImplementationsBySpecificationId($sbSubmissionBoxSpec->getAssessmentModel()->getId());
                 $canvasSubmissions = $this->loadCanvasSubmissions($assessmentCanvasId);
                 $this->log->info("Processing submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
 
-                // reset plan cache
-                $this->dueWorkPlanCache   = [];
-                $assessmentHasSubmissions = false;
-                foreach ($canvasSubmissions as $canvasSubmission) {
-                    $sbAssessments = $this->findCorrespondingAssessments($canvasSubmission, $assessments);
-                    foreach ($sbAssessments as $sbAssessment) {
-                        $assessmentHasSubmissions = true;
-
-                        try {
-                            $reviewee = $this->userMapper->findByExternalId($canvasSubmission['reviewee_id']);
-                        } catch (Mapper\Exception $e) {
-                            // If the reviewee (i.e. student) does not exist, skip this canvas submission
-                            $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) does not exist in Schoolbox");
-                            continue;
-                        }
-
-                        try {
-                            $reviewer = $this->userMapper->findByExternalId($canvasSubmission['reviewer_id']);
-                        } catch (Mapper\Exception $e) {
-                            $reviewer = $this->userMapper->findById($this->getSchoolboxAdminUserId());
-                        }
-                        $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()} [{$reviewee->getId()}]");
-
-                        $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $sbAssessment->getId());
-
-                        // ReturnWork version
-                        /** @var SubmissionBox\ReturnedWork $feedback */
-                        $feedback = $this->returnedWorkMapper->createModel();
-                        $feedback->setSubmissionBox($submissionBox)
-                                 ->setMarker($reviewer)
-                                 ->setOwner($reviewee)
-                                 ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-                                 ->setComment($canvasSubmission['comment'])
-                                 ->setHumanReadableMark($canvasSubmission['mark'])
-                                 ->setNormalizedMark($canvasSubmission['norm_mark'])
-                                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']));
-
-                        /* Cannot use mappers here to save because:
-                         * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
-                         * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
-                         */
-                        $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
-                        $this->syncMarkCount++;
+                /** @var IAssessable $assessmentImpl */
+                foreach ($assessmentImpls as $assessmentImpl) {
+                    // load participants
+                    $assessmentCollection = $this->assessmentDataSource->createCollection()->add($assessmentImpl);
+                    try {
+                        $result = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessmentCollection);
+                    } catch (\Exception $e) {
+                        $this->log->warning('Failed to load participant: ' . $e->getMessage() . ' ' . $e->getTraceAsString());
+                        continue;
                     }
-                }
+                    foreach ($result as $assessmentWithParticipants) {
+                        // should be only one
+                        $assessmentImpl = $assessmentWithParticipants;
+                    }
+                    // get existing marks for this assessment
+                    $submissionBox     = $this->submissionBoxMapper->findOneByColumn('assessment_id', $assessmentImpl->getId());
+                    $existingFeedbacks = $this->returnedWorkMapper->findByColumnList([
+                        'box_id' => $submissionBox->getId(),
+                    ]);
+                    $syncedFeedbackIds = [];
 
-                if (!$assessmentHasSubmissions) {
+                    foreach ($assessmentImpl->getPlans() as $plan) {
+                        /** @var Participant\Plan\Model $plan */
+                        foreach ($plan->getParticipants() as $participant) {
+                            foreach ($canvasSubmissions as $canvasSubmission) {
+                                if ($canvasSubmission['reviewee_id'] !== $participant->getUser()->getExternalId()) {
+                                    // current canvas submission is not for this participant
+                                    continue;
+                                }
+                                try {
+                                    $reviewee = $this->userMapper->findByExternalId($canvasSubmission['reviewee_id']);
+                                } catch (Mapper\Exception $e) {
+                                    // If the reviewee (i.e. student) does not exist, skip this canvas submission
+                                    $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) does not exist in Schoolbox");
+                                    continue;
+                                }
+
+                                try {
+                                    $reviewer = $this->userMapper->findByExternalId($canvasSubmission['reviewer_id']);
+                                } catch (Mapper\Exception $e) {
+                                    $reviewer = $this->userMapper->findById($this->getSchoolboxAdminUserId());
+                                }
+                                $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()} [{$reviewee->getId()}]");
+
+                                /** @var SubmissionBox\ReturnedWork $feedback */
+                                $feedback            = $this->syncFeedback(
+                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks
+                                );
+                                $syncedFeedbackIds[] = $feedback->getId();
+                                $this->syncMarkCount++;
+                                $hasMarkToSync = true;
+                            }
+                        }
+                    }
+                    $this->deleteUnSynchronisedFeedbacks($existingFeedbacks, $syncedFeedbackIds);
+                }
+                if (!$hasMarkToSync) {
                     $this->log->debug("This Canvas assignment has no marks to sync");
                 }
             }
         }
 
         $this->log->debug("{$this->syncMarkCount} marks processed.");
+    }
+
+    /**
+     * Finds or creates Schoolbox Feedback corresponding to the given canvas submission
+     * @param SubmissionBox     $submissionBox
+     * @param User              $reviewer
+     * @param User              $reviewee
+     * @param array             $canvasSubmission
+     * @param GenericCollection $existingFeedbacks
+     * @return SubmissionBox\ReturnedWork
+     * @throws Mapper\Exception
+     */
+    private function syncFeedback(SubmissionBox $submissionBox, User $reviewer, User $reviewee, array $canvasSubmission, GenericCollection $existingFeedbacks): SubmissionBox\ReturnedWork
+    {
+        /** @var SubmissionBox\ReturnedWork $existingFeedback */
+        foreach ($existingFeedbacks as $existingFeedback) {
+            // check whether the rest are the same
+            if ($existingFeedback->getOwner()->getId() === $reviewee->getId()
+                && $existingFeedback->getMarker()->getId() === $reviewer->getId()
+                && $existingFeedback->getComment() == $canvasSubmission['comment']
+                && $existingFeedback->getHumanReadableMark() == $canvasSubmission['mark']
+                && $existingFeedback->getNormalizedMark() == $canvasSubmission['norm_mark']
+            ) {
+                return $existingFeedback;
+            }
+        }
+
+        // Couldn't find. Creating a new feedback
+        $feedback = $this->returnedWorkMapper->createModel();
+        $feedback->setSubmissionBox($submissionBox)
+                 ->setMarker($reviewer)
+                 ->setOwner($reviewee)
+                 ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+                 ->setComment($canvasSubmission['comment'])
+                 ->setHumanReadableMark($canvasSubmission['mark'])
+                 ->setNormalizedMark($canvasSubmission['norm_mark'])
+                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
+                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
+                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']));
+
+        /* Cannot use mappers here to save because:
+         * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
+         * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
+         */
+        return $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
+    }
+
+
+    /**
+     * Deletes existing feedbacks which did not get synced
+     * @param GenericCollection $existingFeedbacks
+     * @param array             $syncedFeedbackIds
+     */
+    private function deleteUnSynchronisedFeedbacks(GenericCollection $existingFeedbacks, array $syncedFeedbackIds)
+    {
+        $deleteIds = array_diff($existingFeedbacks->getPropertyValues('id'), $syncedFeedbackIds);
+        $this->returnedWorkMapper->deleteByColumn('id', $deleteIds);
     }
 
     /**
@@ -207,11 +269,28 @@ class Submission extends SectionAssignment
     }
 
     /**
+     * Finds assessment impl from assessment spec
+     * @param int $assessmentSpecId
+     * @return GenericCollection|IAssessable[]
+     */
+    private function findAllImplementationsBySpecificationId(int $assessmentSpecId)
+    {
+        $query     = '
+                SELECT implementation_assessment_id
+                FROM assessment_specification_implementation
+                WHERE specification_assessment_id = :specId';
+        $statement = $this->schoolboxDb->executeQuery($query, ['specId' => $assessmentSpecId]);
+        $ids       = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+        return $this->assessmentDataSource->findAllByIds($ids);
+    }
+
+    /**
      * Fetch canvas submissions (include marks) related to the given assignment
-     * @param $assignmentCanvasId
+     * @param int $assignmentCanvasId
      * @return array
      */
-    private function loadCanvasSubmissions($assignmentCanvasId): array
+    private function loadCanvasSubmissions(int $assignmentCanvasId): array
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->equals('assignment_dim.canvas_id', $assignmentCanvasId);
@@ -255,38 +334,5 @@ class Submission extends SectionAssignment
         $sql = "SELECT id FROM user WHERE username = :username AND deleted_at IS NULL";
 
         return (int)$this->schoolboxDb->executeQuery($sql, ['username' => User::USERNAME_SCHOOLBOX_ADMIN])->fetchColumn();
-    }
-
-    /**
-     * Finds schoolbox objects to associate the canvas submission with
-     * @param $canvasSubmission
-     * @param $dueWorks
-     * @return IAssessable[]
-     */
-    private function findCorrespondingAssessments($canvasSubmission, $dueWorks): array
-    {
-        /** @var IAssessable[] $assessments */
-        $assessments = [];
-        foreach ($dueWorks as $dueWork) {
-            /** @var IAssessable $dueWork */
-            if (!key_exists($dueWork->getId(), $this->dueWorkPlanCache)) {
-                $dueWorkCollection = $this->assessmentDataSource->createCollection()->add($dueWork);
-                $result            = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($dueWorkCollection);
-                foreach ($result as $dueWorkWithParticipants) {
-                    // should be only one
-                    $dueWork = $dueWorkWithParticipants;
-                    $this->dueWorkPlanCache[$dueWork->getId()] = $dueWorkWithParticipants->getPlans();
-                }
-            }
-            foreach ($this->dueWorkPlanCache[$dueWork->getId()] as $plan) {
-                /** @var Participant\Plan\Model $plan */
-                foreach ($plan->getParticipants() as $participant) {
-                    if ($canvasSubmission['reviewee_id'] === $participant->getUser()->getExternalId()) {
-                        $assessments[] = $dueWork;
-                    }
-                }
-            }
-        }
-        return $assessments;
     }
 }
