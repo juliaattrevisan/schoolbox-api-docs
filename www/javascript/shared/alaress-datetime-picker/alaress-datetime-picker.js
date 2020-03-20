@@ -371,17 +371,28 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         if (options.allDayInput !== false) {
                             var linkedElements = getLinkedElements(element, options);
                             linkedElements.forEach(function (item) {
+                                var opts = adtp.getOptions(item);
+
                                 setValue(
                                     item,
-                                    adtp.getOptions(item),
+                                    opts,
                                     $("#hideTime" + pickerId).is(":checked"),
                                     true
                                 );
+
+                                /* Entangle All Day settings for linked elements
+                                 */
+                                if ($("#hideTime" + pickerId).is(":checked")) {
+                                    $("#hideTime" + opts.id).prop('checked', true);
+                                } else {
+                                    $("#hideTime" + opts.id).prop('checked', false);
+                                }
                             });
                         }
 
                         // Sync dates if applicable
                         element.trigger("datepickerChange");
+
                         adtp.syncDatesOnElement(element, options, "");
 
                         // Close modal
