@@ -297,7 +297,7 @@ class Controller extends Base
          * This isn't localised in the dropdown, so I guess I don't need to localise it here
          */
         $gradesSummaryTerm = [
-            'title' => "{$year} Grades Summary"
+            'title' => $year
         ];
 
         // Squish this mess out
