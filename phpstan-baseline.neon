@@ -7501,11 +7501,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Api/Curriculum.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\AbstractFile\\:\\:setHidden\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Atlas/AttachmentHandler/File.php
-
-		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Module.php
