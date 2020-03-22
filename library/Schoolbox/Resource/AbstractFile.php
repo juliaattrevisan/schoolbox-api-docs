@@ -12,7 +12,6 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\Model as Storage;
