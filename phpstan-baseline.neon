@@ -5471,11 +5471,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseSections.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$overridesPerSection\\)\\: Unexpected token \"\\$overridesPerSection\", expected type at offset 103$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$model\\)\\: Unexpected token \"\\$model\", expected type at offset 543$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
@@ -5694,21 +5689,6 @@ parameters:
 			message: "#^Access to undefined constant Schoolbox\\\\IMapper\\:\\:CALLBACK_POSTSAVE\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assignmentCanvasId\\)\\: Unexpected token \"\\$assignmentCanvasId\", expected type at offset 98$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$canvasSubmission\\)\\: Unexpected token \"\\$canvasSubmission\", expected type at offset 89$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dueWorks\\)\\: Unexpected token \"\\$dueWorks\", expected type at offset 121$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
 
 		-
 			message: "#^Variable \\$plan in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$participant$#"
@@ -8839,11 +8819,6 @@ parameters:
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section\\)\\: Unexpected token \"\\$section\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Admin/Factory.php
 
 		-
 			message: "#^Cannot call method add\\(\\) on null\\.$#"
