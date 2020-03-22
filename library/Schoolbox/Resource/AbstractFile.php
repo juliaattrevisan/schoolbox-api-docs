@@ -102,6 +102,15 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     }
 
     /**
+     * @param boolean $hidden
+     * @return self
+     */
+    public function setHidden($hidden)
+    {
+        return $this;
+    }
+
+    /**
      * Act as a proxy for the internal storage object
      *
      * @param string $name
