@@ -6,226 +6,231 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream\Post\Thumbnail;
 
+use SocialStream\Post\Player\Player;
 
 /**
  * Class Thumbnail
  * @package SocialStream\Post\Thumbnail
  */
-abstract class Thumbnail {
+abstract class Thumbnail
+{
 
-	/**
-	 * XML output
-	 *
-	 * @var null
-	 */
-	protected $xml = null;
+    /**
+     * XML output
+     *
+     * @var \DOMXPath|null
+     */
+    protected $xml = null;
 
-	/**
-	 * The url to fetch
-	 *
-	 * @var string
-	 */
-	protected $url = '';
+    /**
+     * The url to fetch
+     *
+     * @var string
+     */
+    protected $url = '';
 
-	/**
-	 * Next class to deal with the problem
-	 *
-	 * @var
-	 */
-	protected $next = false;
+    /**
+     * Next class to deal with the problem
+     *
+     * @var Player|bool
+     */
+    protected $next = false;
 
-	/**
-	 * An instance of FileType
-	 *
-	 * This checks whether a url contains a valid image or not
-	 * by checking file extension
-	 *
-	 * @var null
-	 */
-	protected $fileType = null;
+    /**
+     * An instance of FileType
+     *
+     * This checks whether a url contains a valid image or not
+     * by checking file extension
+     *
+     * @var \FileType|null
+     */
+    protected $fileType = null;
 
-	/**
-	 * The xpath query
-	 *
-	 * @var string
-	 */
-	protected $query = '';
+    /**
+     * The xpath query
+     *
+     * @var string
+     */
+    protected $query = '';
 
-	/**
-	 * These are the attributes that might contain a link
-	 * to an image you want to retrieve
-	 *
-	 * @var array
-	 */
-	protected $contentAttributes = array();
+    /**
+     * These are the attributes that might contain a link
+     * to an image you want to retrieve
+     *
+     * @var array
+     */
+    protected $contentAttributes = [];
 
-	/**
-	 * Constructor
-	 *
-	 * @param $xml
-	 * @param $url
-	 */
-	public function __construct($xml, $url) {
-		$this->setXml($xml);
-		$this->setUrl($url);
-		$this->setFileType(new \FileType($url));
-	}
+    /**
+     * Constructor
+     *
+     * @param $xml
+     * @param $url
+     */
+    public function __construct($xml, $url)
+    {
+        $this->setXml($xml);
+        $this->setUrl($url);
+        $this->setFileType(new \FileType($url));
+    }
 
-	/**
-	 * Subclasses define how to fetch thumbnails
-	 *
-	 * @return mixed
-	 */
-	public function fetchThumbnail() {
-		$allElements = $this->getXml()->query($this->getQuery());
+    /**
+     * Subclasses define how to fetch thumbnails
+     *
+     * @return mixed
+     */
+    public function fetchThumbnail()
+    {
+        $allElements = $this->getXml()->query($this->getQuery());
 
-		foreach($allElements as $currentElement) {
-			foreach($currentElement->attributes as $currentAttribute) {
-				if (in_array($currentAttribute->nodeName, $this->getContentAttributes())) {
-					$match = trim($currentAttribute->nodeValue);
+        foreach ($allElements as $currentElement) {
+            foreach ($currentElement->attributes as $currentAttribute) {
+                if (in_array($currentAttribute->nodeName, $this->getContentAttributes())) {
+                    $match = trim($currentAttribute->nodeValue);
+                    /* Derive absolute url if the image url is actually
+                     * specified relatively (www.google.com)
+                     */
+                    if ($match[0] == '/') {
+                        $bits = parse_url($this->getUrl());
+                        return 'http://' . $bits['host'] . $match;
+                    } else {
+                        return $match;
+                    }
+                }
+            }
+        }
 
-					/* Check this path for extension and if it is an image extension,
-					 * presume something useful was found
-					 */
-					$this->getFileType()->setPath($match);
+        /* Otherwise get the next class to deal with it
+         */
+        if ($this->getNext()) {
+            return $this->getNext()->fetchThumbnail();
+        }
 
-					if ($this->getFileType()->isImageExtension()) {
+        return '';
+    }
 
-						/* Derive absolute url if the image url is actually
-						 * specified relatively (www.google.com)
-						 */
-						if ($match[0] == '/') {
-							$bits = parse_url($this->getUrl());
-							$url = 'http://' . $bits['host'] . $match;
+    /* Getters/Setters
+     */
 
-							return $url;
-						}
-						else {
-							return $match;
-						}
-					}
-				}
-			}
-		}
+    /**
+     * Set next
+     *
+     * @param Player|bool $next
+     */
+    public function setNext($next): void
+    {
+        $this->next = $next;
+    }
 
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-	}
+    /**
+     * Get next
+     *
+     * @return Player|bool
+     */
+    public function getNext()
+    {
+        return $this->next;
+    }
 
-	/* Getters/Setters
-	 */
+    /**
+     * Set url
+     *
+     * @param string $url
+     */
+    protected function setUrl($url): void
+    {
+        $this->url = $url;
+    }
 
-	/**
-	 * Set next
-	 *
-	 * @param  $next
-	 */
-	public function setNext($next) {
-		$this->next = $next;
-	}
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    protected function getUrl(): string
+    {
+        return $this->url;
+    }
 
-	/**
-	 * Get next
-	 *
-	 * @return bool
-	 */
-	public function getNext() {
-		return $this->next;
-	}
+    /**
+     * Set file type
+     *
+     * @param \FileType|null $fileType
+     */
+    protected function setFileType($fileType): void
+    {
+        $this->fileType = $fileType;
+    }
 
-	/**
-	 * Set url
-	 *
-	 * @param $url
-	 */
-	protected function setUrl($url) {
-		$this->url = $url;
-	}
+    /**
+     * Get file type
+     *
+     * @return \FileType|null
+     */
+    protected function getFileType(): ?\FileType
+    {
+        return $this->fileType;
+    }
 
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	protected function getUrl() {
-		return $this->url;
-	}
+    /**
+     * Set xml
+     *
+     * @param \DOMXPath|null $xml
+     */
+    protected function setXml($xml): void
+    {
+        $this->xml = $xml;
+    }
 
-	/**
-	 * Set file type
-	 *
-	 * @param null $fileType
-	 */
-	protected function setFileType($fileType) {
-		$this->fileType = $fileType;
-	}
+    /**
+     * Get xml
+     *
+     * @return \DOMXPath|null
+     */
+    protected function getXml(): ?\DOMXPath
+    {
+        return $this->xml;
+    }
 
-	/**
-	 * Get file type
-	 *
-	 * @return null
-	 */
-	protected function getFileType() {
-		return $this->fileType;
-	}
+    /**
+     * Set content attributes
+     *
+     * @param array $contentAttributes
+     */
+    protected function setContentAttributes($contentAttributes): void
+    {
+        $this->contentAttributes = $contentAttributes;
+    }
 
-	/**
-	 * Set xml
-	 *
-	 * @param null $xml
-	 */
-	protected function setXml($xml) {
-		$this->xml = $xml;
-	}
+    /**
+     * Get content attributes
+     *
+     * @return array
+     */
+    protected function getContentAttributes(): array
+    {
+        return $this->contentAttributes;
+    }
 
-	/**
-	 * Get xml
-	 *
-	 * @return null
-	 */
-	protected function getXml() {
-		return $this->xml;
-	}
+    /**
+     * Set query
+     *
+     * @param string $query
+     */
+    protected function setQuery($query): void
+    {
+        $this->query = $query;
+    }
 
-	/**
-	 * Set content attributes
-	 *
-	 * @param array $contentAttributes
-	 */
-	protected function setContentAttributes($contentAttributes) {
-		$this->contentAttributes = $contentAttributes;
-	}
-
-	/**
-	 * Get content attributes
-	 *
-	 * @return array
-	 */
-	protected function getContentAttributes() {
-		return $this->contentAttributes;
-	}
-
-	/**
-	 * Set query
-	 *
-	 * @param string $query
-	 */
-	protected function setQuery($query) {
-		$this->query = $query;
-	}
-
-	/**
-	 * Get query
-	 *
-	 * @return string
-	 */
-	protected function getQuery() {
-		return $this->query;
-	}
+    /**
+     * Get query
+     *
+     * @return string
+     */
+    protected function getQuery(): string
+    {
+        return $this->query;
+    }
 }
