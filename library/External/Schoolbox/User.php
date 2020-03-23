@@ -484,12 +484,4 @@ class External_Schoolbox_User implements External_UserInterface
             WHERE     1=1 {$yearLevelQuery} {$formQuery} {$nameQuery} {$boardingQuery}
         ", $bindings)->fetchAll();
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }

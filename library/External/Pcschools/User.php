@@ -632,12 +632,4 @@ class External_Pcschools_User implements External_UserInterface
         }
         return $result;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }

@@ -388,10 +388,4 @@ interface External_UserInterface extends External\IConnector
      */
     public function getAllYearLevels(): array;
 
-    /**
-     * Returns allowed file types
-     * @param bool $quote
-     * @return string|null
-     */
-    public function getAllowedFileTypes(bool $quote): ?string;
 }

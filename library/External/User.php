@@ -181,12 +181,4 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
-    }
 }

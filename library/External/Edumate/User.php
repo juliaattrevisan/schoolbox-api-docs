@@ -467,12 +467,4 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         return [];
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }

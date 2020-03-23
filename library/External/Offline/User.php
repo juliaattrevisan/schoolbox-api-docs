@@ -150,12 +150,4 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     {
         return [];
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }

@@ -435,12 +435,4 @@ class External_Isams_User implements External_UserInterface
         ";
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }

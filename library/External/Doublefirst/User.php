@@ -1051,12 +1051,4 @@ class External_Doublefirst_User implements External_UserInterface
     {
         return $this->groupHandler;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllowedFileTypes(bool $quote): ?string
-    {
-        return null;
-    }
 }
