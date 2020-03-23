@@ -387,5 +387,4 @@ interface External_UserInterface extends External\IConnector
      * @return array [['Code' => string, 'Description' => string], ...]
      */
     public function getAllYearLevels(): array;
-
 }
