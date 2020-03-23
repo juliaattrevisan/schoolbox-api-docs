@@ -1,0 +1,145 @@
+<html lang="en">
+    <head>
+        <link rel="shortcut icon" type="image/png" href="/images/core/icons/fail-whale-16x16.png"/>
+        <title>Schoolbox is currently unavailable</title>
+        <script>
+            const MAX_TIMEOUT_PERIOD = 60;      // Don't back-off to less frequent checks than this
+
+            // Variables
+            let timeoutPeriod  = 10,            // How much time to delay before rechecking service status
+                timeoutCounter = timeoutPeriod; // How much time left until next check
+
+
+            // DOM elements
+            let counterLabel,
+                maintenanceMessage,
+                refreshMessage;
+
+            /**
+             * Initial setup on page load
+             */
+            function init() {
+                counterLabel = document.getElementById('count_seconds');
+                maintenanceMessage = document.getElementById('message');
+                refreshMessage = document.getElementById('refresh');
+                timedRefresh();
+            }
+
+            /**
+             * Executed every 1000ms
+             */
+            function timedRefresh() {
+                counterLabel.innerHTML = timeoutCounter.toString(); // Update the DOM element
+                if (timeoutCounter === 0) {
+                    checkServiceRestored();
+                } else {
+                    setTimeout(timedRefresh, 1000);                 // Re-schedule
+                }
+                timeoutCounter--;                                   // Decrement counter
+            }
+
+            /**
+             * Returns whether the server is back up
+             * @return boolean
+             */
+            function checkServiceRestored() {
+                let xHttp = new XMLHttpRequest();
+                xHttp.addEventListener("load", onXHttpResponse);
+                xHttp.open("GET", "/ping");
+                xHttp.send();
+            }
+
+            /**
+             * Handle a xHttp response
+             */
+            function onXHttpResponse() {
+                if (200 === this.status) {
+                    // Otherwise prompt the user to refresh to re-post so they don't lose their work
+                    maintenanceMessage.className = 'hide';
+                    refreshMessage.className = '';
+                    window.location.reload(true);
+                } else if (503 === this.status) {
+                    // Still down. Apply exponential back-off, reset timeout counter, but not more than the max
+                    resetRetry(true);
+                } else {
+                    // Something went wrong. Don't limit the exponential back-off
+                    resetRetry(false);
+                }
+            }
+
+            /**
+             * Reset the retry counter
+             *
+             * @param {boolean} limitBackOff
+             */
+            function resetRetry(limitBackOff) {
+                timeoutPeriod *= 2;
+                if (limitBackOff) {
+                    timeoutPeriod = Math.min(timeoutPeriod, MAX_TIMEOUT_PERIOD);
+                }
+                timeoutCounter = timeoutPeriod;
+                timedRefresh();
+            }
+
+            window.onload = init;
+        </script>
+        <style>
+            html {
+                color: #0066B0;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .row {
+                text-align: center;
+            }
+
+            .image-wrap {
+                display: inline-block;
+            }
+
+            p {
+                font-size: 20px;
+                line-height: 30px;
+            }
+
+            .retry {
+                font-style: italic;
+                opacity: 0.5;
+            }
+
+            #refresh {
+                color: forestgreen;
+            }
+
+            .hide {
+                display: none;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <div class="row">
+                <div class="image-wrap">
+                    <img src="/images/core/fail-whale.png" width="527" height="447" alt="Sad whale">
+                </div>
+            </div>
+            <div class="row">
+                <div id="message">
+                    <h2>Don't panic!</h2>
+                    <p>
+                        We apologise that due to current high volumes of traffic we are unable to process your request
+                        at this time. Please wait for a minute then try refreshing your page. This problem is generally
+                        temporary and will pass once traffic returns to normal. If this persists, please contact your
+                        IT department to let them know.
+                    </p>
+                    <p class="retry">Retrying in <span id="count_seconds"></span>...</p>
+                </div>
+                <div id="refresh" class="hide">
+                    <h2>Aaaaand we're back!</h2>
+                    <p>Resubmitting your request... hang tight...</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
