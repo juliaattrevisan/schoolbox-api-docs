@@ -2,6 +2,7 @@
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Resource\Folder;
 
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
@@ -95,16 +96,19 @@ class Component_Renderer
         $component->parseConfigForTemplate();
     }
 
+
     /**
      * Renders a template into the Sitepage within $component.
      *
-     * @param \Schoolbox\Resource\Folder\Model      $folder
+     * @param SitePage                              $page
+     * @param Folder\Model                          $folder
      * @param Component_Homepage_ControllerAbstract $component
      */
     public function renderHomepageComponent(
+        SitePage $page,
         Schoolbox\Resource\Folder\Model $folder,
         Component_Homepage_ControllerAbstract $component
-    ) {
+    ): void {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = 'component_' . $component->getInstance()->getId();
 
@@ -112,6 +116,7 @@ class Component_Renderer
 
         if ($component->execute() !== false) {
             $component->parseConfig();
+
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->parse($templateTarget, $templateHandle, true);
             }
@@ -133,6 +138,11 @@ class Component_Renderer
         $component->getPageTemplate()->setVar('SITE_LOCATION', Config::get('site_location'));
         $component->getPageTemplate()->setVar('RETURN_URL_NAME', Redirect::RETURN_URL);
         $component->getPageTemplate()->setVar('RETURN_URL', Redirect::encode('/homepage/' . $_POST["cid"]));
+
+        /* Localise terminologies
+         */
+        $page->localise();
+
         $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 

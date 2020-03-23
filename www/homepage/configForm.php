@@ -114,7 +114,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
         $folder = $folderMapper->findById($_POST['cid']);
         $renderer = new Component_Renderer();
-        $renderer->renderHomepageComponent($folder, $component);
+        $renderer->renderHomepageComponent($page, $folder, $component);
     } // AJAX Save homepage colours
     elseif ($_POST['cid'] && is_array($_POST['colors'])) {
         $homepage = new Homepage($_POST['cid']);
@@ -196,7 +196,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
-                $renderer->renderHomepageComponent($folder, $controller);
+                $renderer->renderHomepageComponent($page, $folder, $controller);
                 exit;
             } else {
                 SitePage::localRedir("/homepage/" . $_GET['cid']);
