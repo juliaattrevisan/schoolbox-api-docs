@@ -1986,6 +1986,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $defaults = [
             'deleted' => true,
+            'order'   => [],
         ];
         $options = array_merge($defaults, $options);
 
