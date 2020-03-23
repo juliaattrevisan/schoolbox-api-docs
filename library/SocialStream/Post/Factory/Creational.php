@@ -540,9 +540,9 @@ class Creational extends AbstractFactory
      */
     private function spawnThumbnailFromHomepage($homepage)
     {
-        $thumbnailUrl = 'icon:folder.png';
+        $thumbnailUrl = 'icon:folder.svg';
         if ($homepage->hasHomepage()) {
-            $thumbnailUrl = 'icon:home.png';
+            $thumbnailUrl = 'icon:home.svg';
         }
         $this->product->setThumbnail($thumbnailUrl);
     }
