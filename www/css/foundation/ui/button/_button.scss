@@ -50,11 +50,6 @@ a[disabled], a.disabled {
 		}
 	}
 
-	&.expand {
-		font-size: $base-font-size;
-		font-weight: $font-weight-semibold;
-	}
-
 	&.icon {
 		@extend .no-text;
 		max-width: $global-button-height;
@@ -128,6 +123,9 @@ input[type="submit"]{
 	@extend .expand;
 	color: $submit-button-color;
 	background-color: $submit-button-bg-color;
+    font-size: $base-font-size;
+    font-weight: $font-weight-semibold;
+    line-height: 1.5;
 	&:hover, &:focus {
 		color: $submit-button-color;
 		background-color: $submit-button-bg-hover;
@@ -151,6 +149,8 @@ input[type="submit"]{
 a.submit,
 button.submit {
 	@extend input[type="submit"];
+    font-size: $base-font-size;
+    font-weight: $font-weight-semibold;
 	.splash {
 		background-color: $submit-button-color;
 	}

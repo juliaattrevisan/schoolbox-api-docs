@@ -26,21 +26,23 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{SECTION_NAME}</h2>
-        <section class="content">
-            <!-- BEGIN question -->
-            <div>
+        <!-- BEGIN question -->
+        <section>
+            <div class="content">
                 <h3>Q{QUESTION_INDEX})</h3>
-
                 <article>{QUESTION_QUESTION}</article>
 
                 <!-- BEGIN graph -->
                 <!-- END graph -->
-
-                <a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-export">Export CSV</a>
-                <a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button icon-view">View All Responses</a>
             </div>
-            <!-- END question -->
+            <div class="component-action">
+                <section>
+                    <a href='/survey/export/csv/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button">Export CSV</a>
+                    <a href='/survey/resultsForQuestion/{ASSESS_ID}/{QUESTION_QUESTION_ID}/{QUESTION_INDEX}' class="button">View All Responses</a>
+                </section>
+            </div>
         </section>
+        <!-- END question -->
     </div>
 </div>
 <!-- END section -->
