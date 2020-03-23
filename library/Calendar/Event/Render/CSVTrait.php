@@ -7,6 +7,7 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventInterface;
 
 /**
@@ -39,7 +40,7 @@ trait CSVTrait
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
-        /** @var EventInterface $event */
+        /** @var Event $event */
         $event = $this->getEvent();
         $data  = [
             $event->getStartTime()->getLocalShort(),
