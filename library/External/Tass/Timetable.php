@@ -13,15 +13,9 @@ class External_Tass_Timetable implements External_TimetableInterface
     use External_MssqlConnector;
 
     /**
-     * @var MSSQL
-     */
-    private $database;
-
-    /**
      * Keeps track of calendar day events
      */
     private $tassDay;
-
 
     /**
      * @var Group
@@ -177,30 +171,34 @@ class External_Tass_Timetable implements External_TimetableInterface
         $params = [
             'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
             'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
+            'externalId'   => $externalUserId,
+            'dayNumber'    => $dayNumber,
         ];
 
         if ($this->groupHandler->isStudent($userId)) {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code,ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc
+            $query = 'SELECT room_code, tch_code, ttmast.sub_code,ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
                         JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                         JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
-                                AND studsub.stud_code = '{$this->database->quote($externalUserId)}'
-                                AND day_code = '$dayNumber'
+                                AND studsub.stud_code = :externalID
+                                AND day_code = :dayNumber
                                 AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                 AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
-                        ORDER BY prd_code";
+                        ORDER BY prd_code';
         } else {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
+            $query = 'SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
-                            AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '{$this->database->quote($externalUserId)}'
-                            AND day_code = '$dayNumber'
-                         ORDER BY prd_code";
+                            AND ttmast.cmpy_code = :cmpyCode
+                            AND tch_code = :externalID
+                            AND day_code = :dayNumber
+                         ORDER BY prd_code';
+
+            $params['cmpyCode'] = $this->getCampusCode($campus);
         }
 
         $statement = $this->getConnector()->executeQuery($query, $params);
@@ -264,29 +262,32 @@ class External_Tass_Timetable implements External_TimetableInterface
         $params = [
             'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
             'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
+            'externalID'   => $externalUserId,
         ];
 
         if ($this->groupHandler->isStudent($userId)) {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code,  ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc, day_code
+            $query = 'SELECT room_code, tch_code, ttmast.sub_code,  ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
                             JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                             JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
-                                    AND studsub.stud_code = '{$this->database->quote($externalUserId)}'
+                                    AND studsub.stud_code = :externalID
                                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
-                            ORDER BY prd_code, day_code";
+                            ORDER BY prd_code, day_code';
 
         } else {
-            $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
+            $query = 'SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
-                            AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '{$this->database->quote($externalUserId)}'
-                         ORDER BY prd_code, day_code";
+                            AND ttmast.cmpy_code = :cmpyCode
+                            AND tch_code = :externalID
+                         ORDER BY prd_code, day_code';
+            $params['cmpyCode'] = $this->getCampusCode($campus);
+
         }
 
         $dayCount  = $timetabledef['dayCount'];
