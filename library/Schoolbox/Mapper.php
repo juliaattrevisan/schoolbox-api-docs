@@ -2459,6 +2459,11 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
+        // Only apply the default order by if there's a limit or offset option.
+        // This is because ordering a result is likely to create a temp table.
+        if (!isset($options['limit']) && !isset($options['offset'])) {
+            $options['order'] = $options['order'] ?? [];
+        }
         $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
