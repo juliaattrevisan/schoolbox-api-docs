@@ -21,3 +21,12 @@ UPDATE component_config_definition ccd
 SET default_value = 'Rubric Capabilities and Indicators'
 WHERE ccd.key = 'componentname'
 AND ccd.default_value = 'Course Criteria'
+LIMIT 1;
+
+-- Update the description in the component palette
+UPDATE component_definition
+SET
+    name = 'Rubric Capabilities and Indicators',
+    description = 'View and edit the rubric capablities and indicators for this subject or course.'
+WHERE class = 'Component_Homepage_RubricController'
+LIMIT 1;
