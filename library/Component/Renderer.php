@@ -126,7 +126,6 @@ class Component_Renderer
          */
         $component->getPageTemplate()->setVar('ID', (string)$folder->getId());
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
-        $component->getPageTemplate()->setVar('SITE_LOCATION', Config::get('site_location'));
         $component->getPageTemplate()->setVar('RETURN_URL_NAME', Redirect::RETURN_URL);
         $component->getPageTemplate()->setVar('RETURN_URL', Redirect::encode('/homepage/' . $_POST["cid"]));
 
