@@ -124,10 +124,12 @@ class Component_Renderer
 
         /* Accumulate folder codes
          */
-        $component->getPageTemplate()->setVar('ID', (string)$folder->getId());
-        $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
-        $component->getPageTemplate()->setVar('RETURN_URL_NAME', Redirect::RETURN_URL);
-        $component->getPageTemplate()->setVar('RETURN_URL', Redirect::encode('/homepage/' . $_POST["cid"]));
+        $component->getPageTemplate()->setVar([
+            'ID' => (string)$folder->getId(),
+            'HEADING' => Scrub::text($folder->getName()),
+            'RETURN_URL_NAME' => Redirect::RETURN_URL,
+            'RETURN_URL', Redirect::encode('/homepage/' . $_POST['cid'])
+        ]);
 
         /* Localise terminologies
          */
