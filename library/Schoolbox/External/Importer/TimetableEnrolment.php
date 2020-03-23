@@ -126,7 +126,7 @@ class TimetableEnrolment extends AbstractImporter
             }
 
             $result[] = (new ClassInvolvement())
-                ->setUser($student)
+                ->setExternalId($studentCode)
                 ->setClass($class);
         }
         return $result;
@@ -165,8 +165,8 @@ class TimetableEnrolment extends AbstractImporter
                     $enrolment->setClass($class);
                 }
 
-                $user = $enrolment->getUser();
-                $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$user->getExternalId()."')";
+                $externalId = $enrolment->getExternalId();
+                $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$externalId."')";
             } elseif (!$class->getId() && !isset($createdClasses[$class->getCode()])) {
                 $createdClasses[$class->getCode()] = true;
             }
