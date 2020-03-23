@@ -124,16 +124,8 @@ class Component_Renderer
 
         /* Accumulate folder codes
          */
-        $temp = [];
-
-        foreach ($folder->getCodes() as $currentCode) {
-            $temp[] = $currentCode->getCode();
-        }
-
-        $folderCodes = implode(', ', $temp);
-
         $component->getPageTemplate()->setVar('ID', (string)$folder->getId());
-        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
+        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folder->getCodeString())));
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
         $component->getPageTemplate()->setVar('SITE_LOCATION', Config::get('site_location'));
         $component->getPageTemplate()->setVar('RETURN_URL_NAME', Redirect::RETURN_URL);
