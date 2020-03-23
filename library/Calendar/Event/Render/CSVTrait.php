@@ -7,6 +7,8 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Type\EventInterface;
+
 /**
  * Default CSV rendering for all types of Calendar events.
  *
@@ -15,6 +17,21 @@ namespace Calendar\Event\Render;
 trait CSVTrait
 {
     /**
+     * @var \HTMLPurifier
+     */
+    private $htmlPurifier;
+
+    /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
      * Render this event out as CSV data
      * @return string
      */
@@ -22,26 +39,57 @@ trait CSVTrait
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
+        /** @var EventInterface $event */
         $event = $this->getEvent();
-
-        $data = array(
+        $data  = [
             $event->getStartTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getStartTime()->getUsingFormat('H:i'),
             $event->getEndTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getEndTime()->getUsingFormat('H:i'),
             $event->getAllday() ? 1 : 0,
             $event->getTitle(),
-            $event->getDetail(),
+            $this->getHtmlPurifier()->purify($event->getDetail()),
             $event->getLocation(),
             $event->getType(),
             empty($event->getPublishDate()) ? '' : $event->getPublishDate()->getLocalShort(),
             $event->canAttend() ? 1 : 0,
-        );
+        ];
 
         fputcsv($fd, $data);
         rewind($fd);
         $row = fread($fd, 10000);
 
         return $row;
+    }
+
+    /**
+     * @return \HTMLPurifier
+     */
+    protected function getHtmlPurifier(): \HTMLPurifier
+    {
+        if (!$this->htmlPurifier) {
+            $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
+            $htmlPurifierConfig->set('Cache.SerializerPath', $this->cacheDir);
+            $htmlPurifierConfig->set('URI.Base', $this->baseUrl);
+            $htmlPurifierConfig->set('URI.MakeAbsolute', true);
+            $this->htmlPurifier = new \HTMLPurifier($htmlPurifierConfig);
+        }
+        return $this->htmlPurifier;
+    }
+
+    /**
+     * @param string $baseUrl
+     */
+    public function setBaseUrl(string $baseUrl): void
+    {
+        $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * @param string $cacheDir
+     */
+    public function setCacheDir(string $cacheDir): void
+    {
+        $this->cacheDir = $cacheDir;
     }
 }
