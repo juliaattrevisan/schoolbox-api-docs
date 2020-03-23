@@ -53,12 +53,18 @@
              * Handle a xHttp response
              */
             function onXHttpResponse() {
+
+                /* php-fpm might crash due to excessive requests
+                 * I guess it could return any of these http codes when overrun
+                 */
+                let unavailableCodes = [500, 501, 502, 504, 505, 506, 507, 508, 510, 511];
+
                 if (200 === this.status) {
                     // Otherwise prompt the user to refresh to re-post so they don't lose their work
                     maintenanceMessage.className = 'hide';
                     refreshMessage.className = '';
                     window.location.reload(true);
-                } else if (503 === this.status) {
+                } else if (-1 !== unavailableCodes.indexOf(this.status)) {
                     // Still down. Apply exponential back-off, reset timeout counter, but not more than the max
                     resetRetry(true);
                 } else {
