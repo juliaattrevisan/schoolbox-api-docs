@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Term;
 use Alaress_Date_Format;
 use PDOException;
 use RangeException;
-use Schoolbox\Collection;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
