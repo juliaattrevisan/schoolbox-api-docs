@@ -29,6 +29,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -531,17 +532,30 @@ class Controller extends Base
         /* Select the first of any combination of those elements
          */
         $selectedTab = array_shift(array_keys($tabs));
+        $tree        = [];
 
-        $tree = [];
         // Layout assessments in a tree for twig to render
-        foreach($filteredMarkbook->getAssessments() as $assessment) {
-            if($assessment->getContext()->getId() != $assessment->getBaseContext()->getId() && $tree[$assessment->getBaseContext()->getId()]['context'] ) {
-                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['context'] = $assessment->getContext();
-                $tree[$assessment->getBaseContext()->getId()]['assessments'][$assessment->getContext()->getId()]['assessments'][$assessment->getId()] = $assessment;
-            }
-            else {
-                $tree[$assessment->getContext()->getId()]['context'] = $assessment->getContext();
-                $tree[$assessment->getContext()->getId()]['assessments'][$assessment->getId()]['assessment'] = $assessment;
+        foreach ($filteredMarkbook->getAssessments() as $assessment) {
+            $id            = $assessment->getId();
+            $context       = $assessment->getContext();
+            $contextId     = $context->getId();
+            $baseContextId = $assessment->getBaseContext()->getId();
+            if ($tree[$baseContextId]['context'] && $contextId !== $baseContextId) {
+                // Ensure projects and their participation are always in the
+                // base of the tree.
+                // This means that a project's mark will always show,
+                // even if it doesn't match the filter: but oh well.
+                if ($context instanceof Project) {
+                    $contexts = new GenericCollection(IAssessable::class);
+                    $contexts->add($context);
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($contexts, $viewee);
+                    $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
+                }
+                $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
+                $tree[$baseContextId]['assessments'][$contextId]['assessments'][$id] = $assessment;
+            } else {
+                $tree[$contextId]['context']                        = $context;
+                $tree[$contextId]['assessments'][$id]['assessment'] = $assessment;
             }
         }
 
