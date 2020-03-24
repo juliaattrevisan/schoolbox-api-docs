@@ -22,7 +22,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
 
         if($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
-                            SELECT    COUNT(*) 
+                            SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
                             WHERE     IEP.ID = vStudents.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
@@ -78,23 +78,23 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.EnglishSecondFlag,
                 $learningPlanQuery
             FROM        dbo.vStudents vStudents
-            LEFT JOIN   CommunityAlerts ON 
-                            CommunityAlerts.ID = StudentID AND 
+            LEFT JOIN   CommunityAlerts ON
+                            CommunityAlerts.ID = StudentID AND
                             (
-                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom IS NULL OR
                                 CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
-                            ) AND 
+                            ) AND
                             (
-                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo IS NULL OR
                                 CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
                             )
             LEFT JOIN   luForm ON vStudents.StudentForm = luForm.Code
             LEFT JOIN   luTutor ON vStudents.StudentTutor = luTutor.Code
-            LEFT JOIN   luYearLevel ON 
-                            vStudents.StudentCampus = luYearLevel.Campus AND 
+            LEFT JOIN   luYearLevel ON
+                            vStudents.StudentCampus = luYearLevel.Campus AND
                             vStudents.StudentYearLevel = luYearLevel.Code
-            LEFT JOIN   luHouse House ON 
-                            StudentCampus = House.Campus AND 
+            LEFT JOIN   luHouse House ON
+                            StudentCampus = House.Campus AND
                             StudentHouse = House.Code
 
             JOIN        FileSemesters Semester ON
@@ -140,7 +140,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
         // Implode all of the alert messages down to a single message seperate by line breaks
 
         if (!empty($student) && is_array($student['AlertMessage'])) {
-            $student['AlertMessage'] = implode("\n", array_unique(array_filter($student['AlertMessage'])));
+            $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
         }
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups

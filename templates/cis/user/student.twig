@@ -15,7 +15,7 @@
             {# Only staff may view contact alerts #}
             {% if showContactsAlert %}
                 <div class="alert-box alert icon-alert no-margin">
-                    {{ message }}
+                    {{ message | nl2br }}
                 </div>
             {% endif %}
         {% endblock contacts_alert %}
