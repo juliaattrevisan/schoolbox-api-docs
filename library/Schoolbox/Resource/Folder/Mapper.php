@@ -1369,7 +1369,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
 
-        $query .= ' ORDER BY `c.id` ASC';
+        // Don't order this query for now, as this creates temp tables.
+        // Instead, order the collection after hydration and retrieval.
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
@@ -1471,7 +1472,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $codeModel->setFolder($collection[$id]);
             }
         }
-        $collection->reindex();
+        $collection->sortBy('id', 'asc')->reindex();
         return $collection;
     }
 
