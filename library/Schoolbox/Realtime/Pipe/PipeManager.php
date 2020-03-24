@@ -15,13 +15,11 @@ use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\CommunicationException;
-use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
-//use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Pipe\Action\IAction;
 use Schoolbox\Realtime\Pipe\Action;
@@ -200,16 +198,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onClose(ConnectionInterface $conn)
     {
-        if ($conn->httpRequest instanceof RequestInterface) {
-            // Explicitly close the descriptor to the temporary-file associated with the request that initiated this
-            // connection.  Before this fix, we were running out of file descriptors because they were never being
-            // released due to a bug in the vendor implementation.
-            $conn->httpRequest->getBody()->close();
-        }
-
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
         $key = Pipe::getSocketKeyForConnection($conn);
         $this->pipes->unregisterPipe($key);
+
+        // And finally send a close message to the connection that requested a close
+        $conn->close();
     }
 
 
