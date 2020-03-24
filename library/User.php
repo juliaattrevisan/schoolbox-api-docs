@@ -88,8 +88,7 @@ class User extends DeprecatedModel
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     LEFT JOIN superusers ON user.id = superusers.id
                 WHERE user.id = '" . $this->db->quote($id) . "'
-                AND user.deleted_at IS NULL
-                ORDER BY userCampus.defaultCampus DESC";
+                AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
     }
 
@@ -102,8 +101,7 @@ class User extends DeprecatedModel
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
                 WHERE user.username = " . $this->db->smartQuote($username) . "
-                AND user.deleted_at IS NULL
-                ORDER BY userCampus.defaultCampus DESC";
+                AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
     }
 
@@ -118,7 +116,7 @@ class User extends DeprecatedModel
     public function getUserCampus($id)
     {
         $campusList  = array();
-        $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id' ORDER BY defaultCampus DESC";
+        $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id'";
         $this->db->query($campusquery);
         if ($this->db->countRows() > 0) {
             while ($campus = $this->db->getNextArray()) {
@@ -141,8 +139,7 @@ class User extends DeprecatedModel
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                 WHERE user.synergy_id = '$sid'
-                AND user.deleted_at IS NULL
-                ORDER BY userCampus.defaultCampus DESC";
+                AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
     }
 
@@ -169,7 +166,6 @@ class User extends DeprecatedModel
         } else {
             $query .= "group_id = '$gid'";
         }
-        $query .= " ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -200,6 +196,8 @@ class User extends DeprecatedModel
 
     /**
      * Search the user table for particular user(s)
+     *
+     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
      *
      * @param        $keyword
      * @param int    $offset
@@ -250,7 +248,7 @@ class User extends DeprecatedModel
             SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
             FROM `user`
             LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
+            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid
             LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
             WHERE $wherePart
         ";
@@ -266,6 +264,8 @@ class User extends DeprecatedModel
 
     /**
      * Search for exact matches, e.g. "zane" rather than LIKE
+     *
+     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
      *
      * @param        $keyword
      * @param int    $offset
@@ -298,7 +298,7 @@ class User extends DeprecatedModel
         $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                    LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
+                    LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     WHERE ( firstname = '$keyword'
                     OR lastname = '$keyword'
@@ -318,6 +318,18 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
+    /**
+     * Find a user based on a keyword, for an AJAX response.
+     *
+     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
+     *
+     * @param       $keyword
+     * @param int   $group
+     * @param array $residentialHouseIds
+     * @param bool  $limit
+     * @return array|bool
+     * @throws Exception
+     */
     public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false)
     {
         //search for a user based on at least one of the above fields
@@ -338,11 +350,10 @@ class User extends DeprecatedModel
                 luCampus.name as campusName
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
-            LEFT JOIN userCampus defaultCampus
-              ON user.id = defaultCampus.uid
-              AND defaultCampus.defaultCampus IS TRUE
+            LEFT JOIN userCampus
+              ON user.id = userCampus.uid
             LEFT JOIN luCampus
-              ON defaultCampus.campus = luCampus.id
+              ON userCampus.campus = luCampus.id
             WHERE user.deleted_at IS NULL
             AND
         ";
