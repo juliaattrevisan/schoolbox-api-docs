@@ -34,6 +34,13 @@ class Controller extends ConfigController
 {
 
     /**
+     * Default message if you happen to have the status report open
+     * but you got your settings arbitrarily reset
+     */
+    private const DEFAULT_UNKNOWN_DATA_SOURCE = 'Unknown data source selected.';
+
+
+    /**
      * Landing Page for Direct Import
      *
      * @throws ServiceNotFound
@@ -115,18 +122,20 @@ class Controller extends ConfigController
     {
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
-        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+        $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
 
         $isReachable = false;
 
-        try {
-            $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        if ('' !== $type) {
+            try {
+                $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
 
-            if ($status) {
-                $isReachable = $status->isReachable();
+                if ($status) {
+                    $isReachable = $status->isReachable();
+                }
+            } catch (\DomainException|\InvalidArgumentException $e) {
+                // noop
             }
-        } catch (\DomainException|\InvalidArgumentException $e) {
-            // noop
         }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@adminImportIndex/schoolData/status.twig', [
@@ -142,19 +151,21 @@ class Controller extends ConfigController
     {
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
-        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+        $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
 
         $report = null;
-        $message = null;
+        $message = self::DEFAULT_UNKNOWN_DATA_SOURCE;
 
-        try {
-            $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+        if ('' !== $type) {
+            try {
+                $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
 
-            if ($status) {
-                $report = $status->getReport();
+                if ($status) {
+                    $report = $status->getReport();
+                }
+            } catch (\DomainException|\InvalidArgumentException $e) {
+                $message = $e->getMessage();
             }
-        } catch (\DomainException|\InvalidArgumentException $e) {
-            $message = $e->getMessage();
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
