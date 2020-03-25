@@ -46,10 +46,9 @@ class CSVExporter implements IExporter
         echo implode(',', $csvFormat) . "\n";
 
         $baseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
-        $cacheDir = Config::get('xml_dir') . '/../purifier/';
 
         foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_CSV, null, $baseUrl, $cacheDir);
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_CSV, null, $baseUrl);
         }
     }
 }
