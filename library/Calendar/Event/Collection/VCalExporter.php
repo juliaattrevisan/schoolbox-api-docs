@@ -37,8 +37,9 @@ class VCalExporter implements IExporter
         // Output base calendar, and output its start and end separately
         echo trim(str_replace('END:VCALENDAR', '', $vCalendar->serialize())) . "\r\n";
 
+        $baseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
         foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL);
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL, null, $baseUrl);
         }
 
         echo "END:VCALENDAR";

@@ -111,11 +111,12 @@ class Renderer
      * @param EventInterface $event
      * @param string         $format
      * @param string|null    $returnStr
+     * @param string|null    $baseUrl
      *
      * @return mixed
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderEvent($event, $format, ?string $returnStr = null)
+    public function renderEvent($event, $format, ?string $returnStr = null, ?string $baseUrl = null)
     {
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
@@ -127,6 +128,9 @@ class Renderer
         );
         if ($returnStr && method_exists($renderObj, 'setReturnStr')) {
             $renderObj->setReturnStr($returnStr);
+        }
+        if ($baseUrl && method_exists($renderObj, 'setBaseUrl')) {
+            $renderObj->setBaseUrl($baseUrl);
         }
         return $renderObj->render();
     }

@@ -35,12 +35,16 @@ trait VObjectTrait
      */
     private $textConverter;
 
+    /**
+     * @var string
+     */
+    private $baseUrl;
 
     /**
      * Render this event
      *
      * @return string
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function render(): string
     {
@@ -118,7 +122,19 @@ trait VObjectTrait
     {
         if (!$this->textConverter) {
             $this->textConverter = new Html\ToText();
+            if ($this->baseUrl) {
+                $this->textConverter->setBaseUrl($this->baseUrl);
+            }
         }
         return $this->textConverter;
+    }
+
+
+    /**
+     * @param string $baseUrl
+     */
+    public function setBaseUrl(string $baseUrl): void
+    {
+        $this->baseUrl = $baseUrl;
     }
 }

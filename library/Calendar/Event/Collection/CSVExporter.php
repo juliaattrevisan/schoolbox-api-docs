@@ -2,14 +2,15 @@
 /**
  * Collection_Exporter
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Calendar\Event\Collection;
 
 use Calendar\Event\Type\EventBase;
+use Config;
 
 class CSVExporter implements IExporter
 {
@@ -27,7 +28,8 @@ class CSVExporter implements IExporter
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: filename=' . $filename . '.csv');
 
-        $csvFormat = array( 'start_date',
+        $csvFormat = [
+            'start_date',
             'start_time',
             'finish_date',
             'finish_time',
@@ -38,13 +40,15 @@ class CSVExporter implements IExporter
             'event_type',
             'publish_date',
             'attendance',
-        );
+        ];
 
-		// Output base calendar, and output its start and end separately
-		echo implode(',', $csvFormat)."\n";
+        // Output base calendar, and output its start and end separately
+        echo implode(',', $csvFormat) . "\n";
 
-		foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_CSV);
-		}
-	}
+        $baseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
+
+        foreach ($renderer->getAllEvents() as $currentEvent) {
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_CSV, null, $baseUrl);
+        }
+    }
 }

@@ -7,6 +7,8 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Type\Day\Event;
+
 /**
  * Default CSV rendering for all types of Calendar events.
  *
@@ -15,6 +17,11 @@ namespace Calendar\Event\Render;
 trait CSVTrait
 {
     /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
      * Render this event out as CSV data
      * @return string
      */
@@ -22,26 +29,32 @@ trait CSVTrait
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
+        /** @var Event $event */
         $event = $this->getEvent();
-
-        $data = array(
+        $data  = [
             $event->getStartTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getStartTime()->getUsingFormat('H:i'),
             $event->getEndTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getEndTime()->getUsingFormat('H:i'),
             $event->getAllday() ? 1 : 0,
             $event->getTitle(),
-            $event->getDetail(),
+            \Scrub::htmlAbsoluteUri($event->getDetail(), $this->baseUrl),
             $event->getLocation(),
             $event->getType(),
             empty($event->getPublishDate()) ? '' : $event->getPublishDate()->getLocalShort(),
             $event->canAttend() ? 1 : 0,
-        );
+        ];
 
         fputcsv($fd, $data);
         rewind($fd);
-        $row = fread($fd, 10000);
+        return fread($fd, 10000);
+    }
 
-        return $row;
+    /**
+     * @param string $baseUrl
+     */
+    public function setBaseUrl(string $baseUrl): void
+    {
+        $this->baseUrl = $baseUrl;
     }
 }
