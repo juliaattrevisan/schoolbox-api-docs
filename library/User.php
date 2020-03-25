@@ -197,8 +197,6 @@ class User extends DeprecatedModel
     /**
      * Search the user table for particular user(s)
      *
-     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
-     *
      * @param        $keyword
      * @param int    $offset
      * @param int    $limit
@@ -245,11 +243,9 @@ class User extends DeprecatedModel
         /* Allow search on synergy id
          */
         $query = "
-            SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
+            SELECT user.*, groups.name AS group_name
             FROM `user`
             LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid
-            LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
             WHERE $wherePart
         ";
         $query .= " ORDER BY lastname, firstname ASC
@@ -264,8 +260,6 @@ class User extends DeprecatedModel
 
     /**
      * Search for exact matches, e.g. "zane" rather than LIKE
-     *
-     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
      *
      * @param        $keyword
      * @param int    $offset
@@ -295,11 +289,9 @@ class User extends DeprecatedModel
         }
 
         // retrieve results
-        $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
+        $query = "SELECT user.*, groups.name AS group_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                    LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid
-                    LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     WHERE ( firstname = '$keyword'
                     OR lastname = '$keyword'
                     OR username = '$keyword' )
