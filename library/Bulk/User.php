@@ -3,6 +3,8 @@
 /**
  * Bulk_User
  *
+ * @deprecated use `\Schoolbox\External\Importer\User` instead
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
