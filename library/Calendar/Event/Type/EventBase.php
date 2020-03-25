@@ -87,7 +87,7 @@ abstract class EventBase implements EventInterface
      *
      * @var string
      */
-    private $eventClass = EventModel::CLASS_EVENT;
+    private $eventClass = EventModel::VARIANT_EVENT;
 
     /**
      * The ID of the calendar connector this event came from

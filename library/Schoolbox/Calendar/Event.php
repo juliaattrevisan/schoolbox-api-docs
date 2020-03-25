@@ -24,8 +24,8 @@ use Schoolbox\ISoftDeletable;
 
 class Event implements ISoftDeletable
 {
-    public const CLASS_EVENT = 'event';
-    public const CLASS_TASK = 'task';
+    public const VARIANT_EVENT = 'event';
+    public const VARIANT_TASK  = 'task';
 
     public const ACCESS_PERSONAL = 1;
     public const ACCESS_GROUP = 2;
@@ -104,15 +104,15 @@ class Event implements ISoftDeletable
     protected $type = null;
 
     /**
-     * The class of the event.
+     * The variant of the event.
      *
-     * Currently there are two classes of event:
-     * * `self::CLASS_EVENT`: standard events (the default)
-     * * `self::CLASS_TASK`: tasks
+     * Currently there are two variants of event:
+     * * `self::VARIANT_EVENT`: standard events (the default)
+     * * `self::VARIANT_TASK`: tasks
      *
      * @var string
      */
-    private $class = self::CLASS_EVENT;
+    private $variant = self::VARIANT_EVENT;
 
     /**
      * Title of the event
@@ -768,26 +768,26 @@ class Event implements ISoftDeletable
     /**
      * @return string
      */
-    public function getClass(): string
+    public function getVariant(): string
     {
-        return $this->class;
+        return $this->variant;
     }
 
 
     /**
-     * @param string $class
+     * @param string $variant
      * @return self
-     * @throws \OutOfBoundsException if `$class` isn't a `self::CLASS_*` value
+     * @throws \OutOfBoundsException if `$class` isn't a `self::VARIANT_*` value
      */
-    public function setClass(string $class): self
+    public function setVariant(string $variant): self
     {
         // Why doesn't PHP have enumerated types yet?
-        if (!in_array($class, [self::CLASS_EVENT, self::CLASS_TASK], true)) {
+        if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK], true)) {
             throw new \OutOfBoundsException(
-                sprintf('Class must be one of the `%s::CLASS_*` constants', __CLASS__)
+                sprintf('Class must be one of the `%s::VARIANT_*` constants', __CLASS__)
             );
         }
-        $this->class = $class;
+        $this->variant = $variant;
         return $this;
     }
 
