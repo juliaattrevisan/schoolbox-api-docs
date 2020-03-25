@@ -8791,16 +8791,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\External\\\\ClassInvolvement\\:\\:setUser\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\External\\\\ClassInvolvement\\:\\:getUser\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
 			message: "#^Variable \\$enrolmentItems might not be defined\\.$#"
 			count: 2
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
