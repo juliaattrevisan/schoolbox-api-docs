@@ -38,7 +38,7 @@ $event
     ->setCampusCollection(new Collection())
     ->setRoleCollection(new Collection())
     ->setType($type)
-    ->setVariant($_POST['class'])
+    ->setVariant($_POST['variant'])
     ->setTitle($_POST['title'])
     ->setLocation($_POST['location'])
     ->setAttendance($_POST['attendance'])

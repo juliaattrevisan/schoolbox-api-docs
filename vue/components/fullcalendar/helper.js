@@ -1,7 +1,7 @@
 import {toMoment} from '@fullcalendar/moment'
 
-const EVENT_CLASS_EVENT = 'event';
-const EVENT_CLASS_TASK = 'task';
+const EVENT_VARIANT_EVENT = 'event';
+const EVENT_VARIANT_TASK  = 'task';
 
 /**
  * Helper for Vue.js FullCalendar implementations:
@@ -140,7 +140,7 @@ export default class FullCalendarHelper {
      * @return {boolean}
      */
     isTask(event) {
-        return event?.extendedProps?.data?.meta?.class === EVENT_CLASS_TASK;
+        return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANT_TASK;
     }
 
 
