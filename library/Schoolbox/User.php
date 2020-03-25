@@ -1056,7 +1056,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         /* $this->children was never initialised for this user
-         * Their descendents are inclusive; continue
+         * Their descendents are inconclusive; continue
          */
         if (null !== $this->children) {
             foreach ($this->children as $currentChild) {
