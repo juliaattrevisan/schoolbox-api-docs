@@ -8,7 +8,6 @@
 namespace Calendar\Event\Render;
 
 use Calendar\Event\Type\Day\Event;
-use Calendar\Event\Type\EventInterface;
 
 /**
  * Default CSV rendering for all types of Calendar events.
@@ -18,19 +17,9 @@ use Calendar\Event\Type\EventInterface;
 trait CSVTrait
 {
     /**
-     * @var \HTMLPurifier
-     */
-    private $htmlPurifier;
-
-    /**
      * @var string
      */
     private $baseUrl;
-
-    /**
-     * @var string
-     */
-    private $cacheDir;
 
     /**
      * Render this event out as CSV data
@@ -49,7 +38,7 @@ trait CSVTrait
             $event->getAllday() ? '' : $event->getEndTime()->getUsingFormat('H:i'),
             $event->getAllday() ? 1 : 0,
             $event->getTitle(),
-            $this->getHtmlPurifier()->purify($event->getDetail()),
+            \Scrub::htmlAbsoluteUri($event->getDetail(), $this->baseUrl),
             $event->getLocation(),
             $event->getType(),
             empty($event->getPublishDate()) ? '' : $event->getPublishDate()->getLocalShort(),
@@ -58,24 +47,7 @@ trait CSVTrait
 
         fputcsv($fd, $data);
         rewind($fd);
-        $row = fread($fd, 10000);
-
-        return $row;
-    }
-
-    /**
-     * @return \HTMLPurifier
-     */
-    protected function getHtmlPurifier(): \HTMLPurifier
-    {
-        if (!$this->htmlPurifier) {
-            $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
-            $htmlPurifierConfig->set('Cache.SerializerPath', $this->cacheDir);
-            $htmlPurifierConfig->set('URI.Base', $this->baseUrl);
-            $htmlPurifierConfig->set('URI.MakeAbsolute', true);
-            $this->htmlPurifier = new \HTMLPurifier($htmlPurifierConfig);
-        }
-        return $this->htmlPurifier;
+        return fread($fd, 10000);
     }
 
     /**
@@ -84,13 +56,5 @@ trait CSVTrait
     public function setBaseUrl(string $baseUrl): void
     {
         $this->baseUrl = $baseUrl;
-    }
-
-    /**
-     * @param string $cacheDir
-     */
-    public function setCacheDir(string $cacheDir): void
-    {
-        $this->cacheDir = $cacheDir;
     }
 }
