@@ -44,7 +44,6 @@ trait VObjectTrait
      * Render this event
      *
      * @return string
-     * @return string
      * @throws \Exception
      */
     public function render(): string
