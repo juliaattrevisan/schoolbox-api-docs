@@ -1285,17 +1285,25 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $getSubjects
      * @param int  $accessLevel
      * @param bool $exactAccess
+     * @param bool $requireHomepage
      * @param bool $idsOnly
      * @return PDOStatement
      * @throws DefinitionException
      */
-    private function findForUserQuery(User $user, bool $getSubjects, int $accessLevel, bool $exactAccess, bool $idsOnly): PDOStatement
-    {
+    private function findForUserQuery(
+        User $user,
+        bool $getSubjects,
+        int $accessLevel,
+        bool $exactAccess,
+        bool $requireHomepage,
+        bool $idsOnly
+    ): PDOStatement {
         $query = $idsOnly
             ? "
                 SELECT DISTINCT c.id
                 FROM {$this->getTable()} c
                 INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
+                LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
                 WHERE c.deleted_at IS NULL
             "
             : "
@@ -1316,11 +1324,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         } else {
             $query .= ' AND a.type >= :access';
         }
-        $params = array(
+        if ($requireHomepage) {
+            $query .= ' AND h.id IS NOT NULL';
+        }
+        $params = [
             'user'    => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'access'  => $accessLevel,
-        );
+        ];
 
         // TODO Currently incorrectly shows all classes for Staff, regardless of requested access. See SA-7364
         if ($this->fetchClassesFromExternalSis($getSubjects, $user, $accessLevel, $exactAccess)) {
@@ -1345,6 +1356,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             SELECT DISTINCT c.id
                             FROM {$this->getTable()} c
                             INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+                            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
                             WHERE c.deleted_at IS NULL
                         "
                         : "
@@ -1359,6 +1371,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
                             WHERE c.deleted_at IS NULL
                         ";
+                    if ($requireHomepage) {
+                        $subjectQuery .= ' AND h.id IS NOT NULL';
+                    }
                     $subjectQueryParts = [];
                     if (!empty($category_codes)) {
                         $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
@@ -1401,6 +1416,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $get_subjects
      * @param int  $access_level
      * @param bool $exactAccess
+     * @param bool $requireHomepage
      * @return array
      * @throws DefinitionException
      */
@@ -1408,9 +1424,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         User $user,
         $get_subjects = true,
         $access_level = UserAccess::ACCESS_READ,
-        $exactAccess = false
+        $exactAccess = false,
+        $requireHomepage = false
     ): array {
-        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess, true);
+        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess, $requireHomepage, true);
         $ids       = [];
         while ($id = $statement->fetchColumn()) {
             $ids[$id] = $id;
@@ -1441,7 +1458,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $exactAccess = false,
         $requireHomepage = false
     ) {
-        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess, false);
+        $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess, $requireHomepage, false);
 
         /** @var Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->getJoinMapper('codes');
@@ -1469,11 +1486,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Does folder have a group, and we haven't attached it yet?
             $groupId = $row['g.cid'];
             if(!$folder->getGroup() && isset($groupId)){
-                // if list requires homepage and this group does not have it, skip.
-                if ($requireHomepage && (!isset($homepageId) || $homepageId === null)) {
-                    $collection->offsetUnset($id);
-                    continue;
-                }
+                // if list requires homepage and this group does not have it,
+                // it will not have been included anyway.
+//                if ($requireHomepage && (!isset($homepageId) || $homepageId === null)) {
+//                    $collection->offsetUnset($id);
+//                    continue;
+//                }
                 /** @var Group $group */
                 $group = $this->hydrateJoin($row, 'groups', 'g');
                 $folder->setGroup($group);
