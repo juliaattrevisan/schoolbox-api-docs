@@ -1047,26 +1047,22 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         /* Parents were never initialised for $child
          * Their ancestry is inconclusive; return false
          */
-        if (null === $child->getParents()) {
-            return false;
-        }
-
-        foreach ($child->getParents() as $parent) {
-            if ($parent->getId() == $this->getId()) {
-                return true;
+        if (null !== $child->getParents()) {
+            foreach ($child->getParents() as $parent) {
+                if ($parent->getId() == $this->getId()) {
+                    return true;
+                }
             }
         }
 
         /* $this->children was never initialised for this user
          * Their descendents are inclusive; return false
          */
-        if (null === $this->children) {
-            return false;
-        }
-
-        foreach ($this->children as $currentChild) {
-            if ($currentChild->getId() == $child->getId()) {
-                return true;
+        if (null !== $this->children) {
+            foreach ($this->children as $currentChild) {
+                if ($currentChild->getId() == $child->getId()) {
+                    return true;
+                }
             }
         }
 
