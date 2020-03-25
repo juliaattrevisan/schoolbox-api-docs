@@ -1821,6 +1821,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
 
+        // Make sure that a course is not being moved direct into a course
+        if ($movedFolder->hasCourseSpecification() && $parentFolder->hasCourseSpecification()) {
+            throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
+        }
+
         $folderMapper->save($movedFolder->setParent($parentFolder));
     }
 

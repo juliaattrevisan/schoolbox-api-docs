@@ -118,19 +118,25 @@
                         // Ensure the node I'm dragging onto is one I have write access to
                         if (operation === 'move_node') {
                             var permission = node_parent.original.li_attr['data-permission'];
-                            if (!(permission == 'write' || permission == 'full')) {
+                            if (!(permission === 'write' || permission === 'full')) {
                                 return false;
                             }
 
                             // Cannot move a file to root
-                            if("file" == node.type && 0 == node_parent.id){
+                            if("file" === node.type && 0 === node_parent.id){
                                 return false;
                             }
 
                             // also check that you're not trying to drag onto a file
-                            if (node_parent.original.type == 'file' || node_parent.original.type == 'link'  ) {
+                            if (node_parent.original.type === 'file' || node_parent.original.type === 'link') {
                                 return false;
                             }
+
+                            // also check that we're not dragging a course into a course
+                            if (node.type === 'course' && node_parent.type === 'course') {
+                                return false;
+                            }
+
                         }
                         return true;
                     },
