@@ -92,7 +92,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             $ids        = $componentInstanceMapper->save($newComp);
-            $instanceID = $ids[0];
+            $instanceID = $newComp->getId();
 
             $componentInstanceMapper->cascadeSequence($_POST['cid']);
         } else {
@@ -106,7 +106,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $component = $factory->buildComponent($instance);
 
         if (!($component instanceof Component_ControllerAbstract)) {
-            die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
+            exit();
         }
 
         $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
