@@ -1045,7 +1045,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function isParentOf(User $child): bool
     {
         /* Parents were never initialised for $child
-         * Their ancestry is inconclusive; return false
+         * Their ancestry is inconclusive; continue
          */
         if (null !== $child->getParents()) {
             foreach ($child->getParents() as $parent) {
@@ -1056,7 +1056,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         /* $this->children was never initialised for this user
-         * Their descendents are inclusive; return false
+         * Their descendents are inclusive; continue
          */
         if (null !== $this->children) {
             foreach ($this->children as $currentChild) {
