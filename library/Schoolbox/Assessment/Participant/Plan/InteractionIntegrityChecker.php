@@ -117,7 +117,7 @@ class InteractionIntegrityChecker
 
         /* Define a new plan name because you've asked $student to resubmit
          */
-        $newPlanName = "{$currentPlan->getName()} Resubmit ({$student->getFullName()})";
+        $newPlanName = "Resubmit ({$student->getFullName()})";
 
         if ($currentPlan->isDynamic()) {
             // Default plan - Create a new plan
