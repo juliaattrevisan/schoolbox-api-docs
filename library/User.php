@@ -499,10 +499,8 @@ class User extends DeprecatedModel
                 return false;
             }
         }
-        $campusArray   = $user['campus'];
-        $defaultCampus = $user['defaultCampus'];
+        $campusArray = $user['campus'];
         unset($user['campus']);
-        unset($user['defaultCampus']);
         /* Check if $user['su'] exists and not equal to null
               */
         if (isset($user['su'])) {
@@ -527,9 +525,8 @@ class User extends DeprecatedModel
             $this->db->delete('userCampus', 'uid', $user['id']);
             foreach ($campusArray as $campus) {
                 $insertCampus = array(
-                    'uid'           => $user['id'],
-                    'campus'        => $campus,
-                    'defaultCampus' => $campus == $defaultCampus ? 1 : 0
+                    'uid'    => $user['id'],
+                    'campus' => $campus,
                 );
                 $this->db->insert('userCampus', $insertCampus);
             }
