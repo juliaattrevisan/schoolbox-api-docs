@@ -24,7 +24,10 @@ $excludeID = $_GET['excludeID'];
 $keyword = $_GET['query'];
 $groupID = $_GET['groupID'];
 $roleTypeID = $_GET['roleTypeID'];
-$showCampus = !empty($_GET['showCampus']);
+// The showCampus parameter does nothing now default campuses are gone.
+// It may be restored later, but don't count on it.
+//$showCampus = !empty($_GET['showCampus']);
+$showCampus = false;
 $residentialHouseID = $_GET['residentialHouseID'];
 
 if (!empty($residentialHouseID)) {

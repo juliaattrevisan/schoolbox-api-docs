@@ -337,15 +337,9 @@ class User extends DeprecatedModel
                 year,
                 local_email,
                 alt_email,
-                synergy_id,
-                luCampus.id as campusId,
-                luCampus.name as campusName
+                synergy_id
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
-            LEFT JOIN userCampus
-              ON user.id = userCampus.uid
-            LEFT JOIN luCampus
-              ON userCampus.campus = luCampus.id
             WHERE user.deleted_at IS NULL
             AND
         ";
