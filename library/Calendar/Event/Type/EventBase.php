@@ -81,13 +81,13 @@ abstract class EventBase implements EventInterface
     protected $eventType = '';
 
     /**
-     * What class of event is this?
+     * What variant of event is this?
      *
-     * Defaults to the standard event class, but may also be a task.
+     * Defaults to the standard event variant, but may also be a task.
      *
      * @var string
      */
-    private $eventClass = EventModel::VARIANT_EVENT;
+    private $eventVariant = EventModel::VARIANT_EVENT;
 
     /**
      * The ID of the calendar connector this event came from
@@ -396,19 +396,19 @@ abstract class EventBase implements EventInterface
     /**
      * @return string
      */
-    public function getEventClass(): string
+    public function getEventVariant(): string
     {
-        return $this->eventClass;
+        return $this->eventVariant;
     }
 
 
     /**
-     * @param string $eventClass
+     * @param string $eventVariant
      * @return self
      */
-    public function setEventClass(string $eventClass): self
+    public function setEventVariant(string $eventVariant): self
     {
-        $this->eventClass = $eventClass;
+        $this->eventVariant = $eventVariant;
         return $this;
     }
 

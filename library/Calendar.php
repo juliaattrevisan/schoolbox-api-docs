@@ -628,7 +628,7 @@ class Calendar extends DeprecatedModel
                 firstname,
                 lastname,
                 eventType,
-                event.class AS eventClass,
+                event.variant AS eventVariant,
                 eventColour,
                 event.publish_date,
                 folder.id AS categoryId,
@@ -679,7 +679,7 @@ class Calendar extends DeprecatedModel
                 $event->setTitle($currentEvent['title']);
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
-                $event->setEventClass($currentEvent['eventClass']);
+                $event->setEventVariant($currentEvent['eventVariant']);
                 $event->setColour($currentEvent['eventColour']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);

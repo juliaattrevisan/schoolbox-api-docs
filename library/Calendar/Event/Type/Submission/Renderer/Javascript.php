@@ -105,7 +105,7 @@ class Javascript extends Base
             'detail'         => Scrub::html($event->getDetail()),
             'location'       => '',
             'eventType'      => 'type' . $event->getType(),
-            'class'          => $this->getEvent()->getEventClass(),
+            'variant'        => $event->getEventVariant(),
             'type'           => $event->getEventType(),
             'author'         => $event->getAuthorName(),
             'authorId'       => $event->getAuthorId(),
