@@ -46,6 +46,7 @@ class CalendarCest
         $createEventRequest->setFormParam('allDay', 1);
         $createEventRequest->setFormParam('date', date('d-m-Y'));
         $createEventRequest->setFormParam('title', $title);
+        $createEventRequest->setFormParam('variant', 'event');
         $createEventRequest->setFormParam('type', Calendar\Event::ACCESS_PERSONAL);
 
         $i->amGoingTo('Send request to create calendar event on full calendar page');
