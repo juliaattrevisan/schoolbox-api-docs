@@ -124,11 +124,7 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                 }
 
                 if ($cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'] || $cat['wiki']) {
-                    if ($catInfo['code']) {
-                        $this->setVar("NEW_CATEGORY_NAME", $catInfo['name'] . ' (' . $catInfo['code'] . ')');
-                    } else {
-                        $this->setVar("NEW_CATEGORY_NAME", $catInfo['name']);
-                    }
+                    $this->setVar("NEW_CATEGORY_NAME", $catInfo['name']);
                     $this->parse("new_category", "category_block", true);
                     $flag = 1;
                 }
