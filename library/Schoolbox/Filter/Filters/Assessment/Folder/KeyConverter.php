@@ -73,7 +73,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        return $this->folderMapper->countAll();
+        return $this->folderMapper->countAll(['deleted' => true]);
     }
 
 
