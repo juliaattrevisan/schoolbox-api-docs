@@ -729,20 +729,18 @@ class Group extends DeprecatedModel
         $homepageJoin = $requireHomepage ? ' JOIN homepage_config ON folder.id = homepage_config.cid ' : '';
 
         $query = "
-			SELECT
-			folder.name, folder.id, type,
-			GROUP_CONCAT(cc.code) as code
-			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
-			$homepageJoin
-			WHERE userAccess.uid = '$userID'
-			AND userAccess.sid = folder.id
-			AND userAccess.service = '" . $this->_service . "'
-			AND userAccess.type >= '$accessType'
-			AND folder.deleted_at IS NULL
-			$exclude_part
-			GROUP BY folder.id
-			ORDER BY folder.name
-		";
+            SELECT
+                folder.name,
+                folder.id,
+                userAccess.type
+            FROM folder
+            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = '{$this->db->quote($this->_service)}'
+            $homepageJoin
+            WHERE userAccess.uid = '{$this->db->quote($userID)}'
+            AND userAccess.type >= '{$this->db->quote($accessType)}'
+            AND folder.deleted_at IS NULL
+            $exclude_part
+        ";
 
         $this->db->query($query);
         while ($result = $this->db->getNextArray()) {
