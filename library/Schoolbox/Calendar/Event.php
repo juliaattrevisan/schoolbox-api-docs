@@ -24,6 +24,8 @@ use Schoolbox\ISoftDeletable;
 
 class Event implements ISoftDeletable
 {
+    public const VARIANT_EVENT = 'event';
+    public const VARIANT_TASK  = 'task';
 
     public const ACCESS_PERSONAL = 1;
     public const ACCESS_GROUP = 2;
@@ -100,6 +102,17 @@ class Event implements ISoftDeletable
      * @var EventType
      */
     protected $type = null;
+
+    /**
+     * The variant of the event.
+     *
+     * Currently there are two variants of event:
+     * * `self::VARIANT_EVENT`: standard events (the default)
+     * * `self::VARIANT_TASK`: tasks
+     *
+     * @var string
+     */
+    private $variant = self::VARIANT_EVENT;
 
     /**
      * Title of the event
@@ -750,6 +763,34 @@ class Event implements ISoftDeletable
     {
         return $this->type;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getVariant(): string
+    {
+        return $this->variant;
+    }
+
+
+    /**
+     * @param string $variant
+     * @return self
+     * @throws \OutOfBoundsException if `$class` isn't a `self::VARIANT_*` value
+     */
+    public function setVariant(string $variant): self
+    {
+        // Why doesn't PHP have enumerated types yet?
+        if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK], true)) {
+            throw new \OutOfBoundsException(
+                sprintf('Class must be one of the `%s::VARIANT_*` constants', __CLASS__)
+            );
+        }
+        $this->variant = $variant;
+        return $this;
+    }
+
 
     /**
      * Set end date

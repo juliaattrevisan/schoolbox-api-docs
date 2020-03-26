@@ -28,13 +28,13 @@ class Javascript extends Base
      */
     public function render(): string
     {
-        $event = $this->deriveCore();
+        $event         = $this->deriveCore();
         $event['data'] = [
             'meta'       => $this->deriveMeta(),
             'links'      => $this->deriveLinks(),
             'styles'     => $this->deriveStyles(),
             'attendance' => $this->deriveAttendance(),
-            'custom'     => $this->deriveCustom()
+            'custom'     => $this->deriveCustom(),
         ];
 
 
@@ -51,20 +51,20 @@ class Javascript extends Base
 
         /* Congeal all that stuff
          */
-        $start = $event->getStartTime()->getDatabaseDate();
+        $start  = $event->getStartTime()->getDatabaseDate();
         $allDay = $event->getAllday();
         if (!$allDay) {
             $start .= ' ' . $event->getStartTime()->getDatabaseTime();
         }
 
         $data = [
-            'title' => $event->getTitle(),
-            'start' => $start,
-            'end' => '',
+            'title'     => $event->getTitle(),
+            'start'     => $start,
+            'end'       => '',
 
             /* Whether you can edit this event or not
              */
-            'editable' => $this->isEditable(),
+            'editable'  => $this->isEditable(),
 
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
@@ -72,11 +72,11 @@ class Javascript extends Base
              * Schoolbox usage would be that all events are not
              * allDay events
              */
-            'allDay' => $allDay,
+            'allDay'    => $allDay,
 
             /* Colour of the event
              */
-            'color' => $event->getColour(),
+            'color'     => $event->getColour(),
             'className' => $event->getEventClasses(),
         ];
 
@@ -93,30 +93,31 @@ class Javascript extends Base
      */
     protected function deriveMeta()
     {
-        $event      = $this->getEvent();
-        $assessable = $event->getAssessment();
-        $workType   = $assessable->getWorkType();
+        $event        = $this->getEvent();
+        $assessable   = $event->getAssessment();
+        $workType     = $assessable->getWorkType();
         $folderColour = $assessable->getContext()->getFolder()->getColour();
 
         return [
-            'eventId'   => $event->getEventId(),
-            'time'      => $event->getTime(),
-            'title'     => $assessable->getTitle(),
-            'detail'    => Scrub::html($event->getDetail()),
-            'location'  => '',
-            'eventType' => 'type' . $event->getType(),
-            'type'      => $event->getEventType(),
-            'author'    => $event->getAuthorName(),
-            'authorId'  => $event->getAuthorId(),
-            'level'     => $event->getEventClasses(),
-            'completed' => false,
-            'folderName'=> $assessable->getContext()->getFolder()->getTitle(),
-            'folderId'  => $assessable->getContext()->getFolder()->getId(),
-            'workType'  => $workType ? $workType->getName() : null,
-            'workTypeId'=> $workType ? $workType->getId() : null,
-            'weighted'  => $assessable->getWeight() ? 1 : 0,
+            'eventId'        => $event->getEventId(),
+            'time'           => $event->getTime(),
+            'title'          => $assessable->getTitle(),
+            'detail'         => Scrub::html($event->getDetail()),
+            'location'       => '',
+            'eventType'      => 'type' . $event->getType(),
+            'variant'        => $event->getEventVariant(),
+            'type'           => $event->getEventType(),
+            'author'         => $event->getAuthorName(),
+            'authorId'       => $event->getAuthorId(),
+            'level'          => $event->getEventClasses(),
+            'completed'      => false,
+            'folderName'     => $assessable->getContext()->getFolder()->getTitle(),
+            'folderId'       => $assessable->getContext()->getFolder()->getId(),
+            'workType'       => $workType ? $workType->getName() : null,
+            'workTypeId'     => $workType ? $workType->getId() : null,
+            'weighted'       => $assessable->getWeight() ? 1 : 0,
             'assessmentType' => $assessable->getFamilyName(),
-            'colour' => $folderColour ? $folderColour->getAsRgba() : null,
+            'colour'         => $folderColour ? $folderColour->getAsRgba() : null,
         ];
     }
 

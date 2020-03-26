@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access;
 use Schoolbox\Calendar\EventMapper;
@@ -18,31 +19,32 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$user = $_SESSION['user'];
+$user    = $_SESSION['user'];
 $ownerId = $_POST['userId'];
-$owner = UserMapper::getInstance()->findById($ownerId);
+$owner   = UserMapper::getInstance()->findById($ownerId);
 
 $event = new Event();
 
 if (is_numeric($_POST['type'])) {
     $type = EventTypeMapper::getInstance()->createModel()->setId($_POST['type']);
-}
-else {
+} else {
     $type = EventTypeMapper::getInstance()->findAll()->first();
 }
 
-$event->setOwner($owner)
-	->setAuthor($user)
-	->setAccess(Event::ACCESS_PERSONAL)
-	->setCampusCollection(new Collection())
-	->setRoleCollection(new Collection())
-	->setType($type)
-	->setTitle($_POST['title'])
-	->setLocation($_POST['location'])
-	->setAttendance($_POST['attendance'])
-	->setDetail($_POST['detail'])
-	->setPublishDateTime(null)
-	->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
+$event
+    ->setOwner($owner)
+    ->setAuthor($user)
+    ->setAccess(Event::ACCESS_PERSONAL)
+    ->setCampusCollection(new Collection())
+    ->setRoleCollection(new Collection())
+    ->setType($type)
+    ->setVariant($_POST['variant'])
+    ->setTitle($_POST['title'])
+    ->setLocation($_POST['location'])
+    ->setAttendance($_POST['attendance'])
+    ->setDetail($_POST['detail'])
+    ->setPublishDateTime(null)
+    ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 
 /* Give all-day events a time, so that update.php can calculate the minuteDelta appropriately
  * without adding a 12-hour offset

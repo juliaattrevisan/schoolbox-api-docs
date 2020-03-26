@@ -12,6 +12,7 @@
 namespace Calendar\Event\Type;
 
 use Alaress_Date_Format;
+use Schoolbox\Calendar\Event as EventModel;
 
 abstract class EventBase implements EventInterface
 {
@@ -78,6 +79,15 @@ abstract class EventBase implements EventInterface
      * @var string
      */
     protected $eventType = '';
+
+    /**
+     * What variant of event is this?
+     *
+     * Defaults to the standard event variant, but may also be a task.
+     *
+     * @var string
+     */
+    private $eventVariant = EventModel::VARIANT_EVENT;
 
     /**
      * The ID of the calendar connector this event came from
@@ -382,6 +392,25 @@ abstract class EventBase implements EventInterface
         return $this->eventType;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getEventVariant(): string
+    {
+        return $this->eventVariant;
+    }
+
+
+    /**
+     * @param string $eventVariant
+     * @return self
+     */
+    public function setEventVariant(string $eventVariant): self
+    {
+        $this->eventVariant = $eventVariant;
+        return $this;
+    }
 
 
     /**

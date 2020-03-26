@@ -15,15 +15,13 @@ use Schoolbox\UserMapper;
 
 abstract class Calendar_Layout_Full_Abstract
 {
-    /** @var Calendar $calendarHandler */
-    protected $calendarHandler = null;
-    protected $page            = null;
-    protected $date            = '';
-    protected $categoryList    = [];
-    protected $templateFile    = '';
-    protected $selected        = [];
-    protected $selectedDate    = null;
-    protected $startOfWeek     = null;
+    protected $page         = null;
+    protected $date         = '';
+    protected $categoryList = [];
+    protected $templateFile = '';
+    protected $selected     = [];
+    protected $selectedDate = null;
+    protected $startOfWeek  = null;
 
     /** @var Calendar_Api_EventType_Interface Actual connector instance */
     protected $api;
@@ -107,7 +105,7 @@ abstract class Calendar_Layout_Full_Abstract
      */
     protected function setupSelectedDayMonthYear(): void
     {
-        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->date);
+        [$selectedDay, $selectedMonth, $selectedYear] = explode("-", $this->date);
 
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
@@ -226,24 +224,15 @@ abstract class Calendar_Layout_Full_Abstract
                 $typeList->map(
                     function (EventType $v) {
                         return [
-                            'id'         => $v->getId(),
-                            'name'       => $v->getType(),
-                            'color'      => $v->getColor(),
-                            'isTaskType' => $v->isTaskType(),
+                            'id'    => $v->getId(),
+                            'name'  => $v->getType(),
+                            'color' => $v->getColor(),
                         ];
                     }
                 )
             )
         );
         $this->page->setVar('SOURCES_JSON', json_encode($sourceList));
-
-
-        // output task type too
-        foreach ($typeList as $type) {
-            if ($type->isTaskType()) {
-                $this->page->setVar('TASK_TYPE_ID', $type->getId());
-            }
-        }
 
 
         // Output selected filters as JSON

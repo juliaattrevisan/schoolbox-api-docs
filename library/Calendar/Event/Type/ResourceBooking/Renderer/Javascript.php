@@ -26,7 +26,7 @@ class Javascript extends Base
     {
         // Resource bookings are never all day events.
         $start = $this->getEvent()->getStartTime()->getDatabase();
-        $end = $this->getEvent()->getEndTime()->getDatabase();
+        $end   = $this->getEvent()->getEndTime()->getDatabase();
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.
@@ -44,51 +44,51 @@ class Javascript extends Base
 
         // Show booking butonyes I have permission to view
         /** @var Booking\Model $booking */
-        $booking = $this->getEvent()->getBooking();
-        $bookingButtons = array();
+        $booking        = $this->getEvent()->getBooking();
+        $bookingButtons = [];
 
         // Modify butonye
         $editUrl = $this->getEditURL();
         if ($editUrl !== false) {
-            $bookingButtons[] = array(
+            $bookingButtons[] = [
                 'label'  => 'Modify',
                 'class'  => 'icon-modify',
                 'href'   => $editUrl,
                 'action' => 'modify',
-            );
+            ];
         }
 
         // Cancel butonye
         $cancelUrl = $this->getCancelURL();
         if ($cancelUrl !== false) {
-            $bookingButtons[] = array(
+            $bookingButtons[] = [
                 'label'  => 'Delete',
                 'class'  => 'icon-delete',
                 'href'   => $cancelUrl,
                 'action' => 'cancel',
-            );
+            ];
         }
 
         // Approve butonye (if not already approved)
         $approveUrl = $this->getApproveURL();
         if ($approveUrl !== false) {
-            $bookingButtons[] = array(
+            $bookingButtons[] = [
                 'label'  => 'Approve',
                 'class'  => 'icon-tick',
                 'href'   => $approveUrl,
                 'action' => 'approve',
-            );
+            ];
         }
 
         // Rejected butonye (if not already rejected)
         $rejectUrl = $this->getRejectURL();
         if ($rejectUrl !== false) {
-            $bookingButtons[] = array(
+            $bookingButtons[] = [
                 'label'  => 'Reject',
                 'class'  => 'icon-close',
                 'href'   => $rejectUrl,
                 'action' => 'reject',
-            );
+            ];
         }
 
         // Related booking display
@@ -97,8 +97,8 @@ class Javascript extends Base
             $reviewHref = $this->getRouteIfAuthorized(
                 'resourceItem.read',
                 [
-                    'id' => $relatedBooking->getResource()->getId(),
-                    'format' => ''
+                    'id'     => $relatedBooking->getResource()->getId(),
+                    'format' => '',
                 ]
             );
             if ($reviewHref) {
@@ -106,10 +106,10 @@ class Javascript extends Base
             }
             $relatedBookings[] = [
                 'title'  => $relatedBooking->getResource()->getName(),
-                'item'   => array(
+                'item'   => [
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
-                ),
+                ],
                 'status' => $relatedBooking->getStatus()->jsonSerialize(),
                 'href'   => $reviewHref,
             ];
@@ -133,7 +133,7 @@ class Javascript extends Base
         // if either are there.
 
         $detail = $this->getEvent()->getDetail();
-        $event = array(
+        $event  = [
             'resourceId' => $booking->getResource()->getId(),
             'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,
@@ -158,43 +158,44 @@ class Javascript extends Base
 
             /* Extra data that the Event Object doesn't directly support
              */
-            'data'       => array(
-                'meta'       => array(
+            'data'       => [
+                'meta'       => [
                     'eventId'     => $this->getEvent()->getEventId(),
                     'time'        => $this->getEvent()->getTime(),
                     'detail'      => Scrub::html($detail),
                     'location'    => $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'variant'     => $this->getEvent()->getEventVariant(),
                     'type'        => $this->getEvent()->getEventType(),
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getEventClasses(),
                     'completed'   => $this->getEvent()->getCompleted(),
                     'seriesId'    => $this->getEvent()->getBooking()->getEvent()->getSeriesId(),
-                ),
-                'links'      => array(),
-                'styles'     => array(
+                ],
+                'links'      => [],
+                'styles'     => [
                     'visible' => '',
-                ),
-                'attendance' => array(
+                ],
+                'attendance' => [
                     'icon'          => false,
                     'status'        => false,
                     'requestButton' => false,
                     'listButton'    => false,
-                ),
-                'booking'    => array(
-                    'item'     => array(
+                ],
+                'booking'    => [
+                    'item'     => [
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
                         'name' => $this->getEvent()->getBooking()->getResource()->getName(),
-                    ),
+                    ],
                     'status'   => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
                     'related'  => $relatedBookings,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }

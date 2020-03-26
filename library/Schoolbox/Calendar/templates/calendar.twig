@@ -32,7 +32,6 @@
     window.fullCalendarConfig = {
         userId:             Number('{{ user.id }}'),
         token:              '{{ user.key }}',
-        taskTypeId:         Number('{{ taskTypeId }}'),
         sources:            {{ sources | json_encode | raw }},
         eventTypes:         {{ eventTypes | json_encode | raw }},
         groups:             {{ groups | json_encode | raw }},

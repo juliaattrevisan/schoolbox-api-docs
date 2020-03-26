@@ -1,9 +1,10 @@
 <script>
-    import RevealModal from '@schoolbox/reveal-modal'
-    import MetaList    from '@schoolbox/meta/list'
-    import MetaItem    from '@schoolbox/meta/item'
-    import axios       from 'axios';
-    import qs          from 'qs';
+    import RevealModal        from '@schoolbox/reveal-modal'
+    import MetaList           from '@schoolbox/meta/list'
+    import MetaItem           from '@schoolbox/meta/item'
+    import axios              from 'axios';
+    import qs                 from 'qs';
+    import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
     const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
@@ -18,7 +19,6 @@
         name: "view-event-modal",
         props: {
             toMoment: {},
-            taskTypeId: {},
             eventModifyFormUrl: {},
             eventModifyFormActionUrl: {},
             eventUpdateUrl: {},
@@ -40,6 +40,9 @@
             return {
                 event: {},
             }
+        },
+        beforeMount() {
+            this.helper = new FullCalendarHelper(this, this.window.fullCalendarConfig, this.window.jQuery);
         },
         computed: {
             window: () => window,
@@ -116,7 +119,7 @@
                         url: data?.classAttendance?.url,
                     },
                     task: {
-                        isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
+                        isTask: this.helper.isTask(event),
                         completed: metadata?.completed,
                     },
                     links: {

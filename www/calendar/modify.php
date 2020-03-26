@@ -1,10 +1,11 @@
 <?php
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Event\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use Schoolbox\Calendar\Event\Access;
 
 if (isset($this)) {
     $this->pageNotFound();
@@ -27,15 +28,15 @@ $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 $page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
 $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
-/** @var Schoolbox\User  $currentUser */
+/** @var Schoolbox\User $currentUser */
 $currentUser = $_SESSION['user'];
 
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
     try {
-        $userMapper = new UserMapper();
+        $userMapper   = new UserMapper();
         $selectedUser = $userMapper->findById($_GET['userId']);
     } catch (\Exception $e) {
-        error(31);
+        error(ErrorMapper::ERROR_USER_NOT_FOUND);
     }
 } else {
     $selectedUser = $currentUser;
@@ -49,7 +50,7 @@ if (is_numeric($_GET['eventID'])) {
     try {
         $event = $mapper->findById($_GET['eventID']);
     } catch (\Exception $e) {
-        error(160);
+        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
         exit;
     }
 
@@ -58,7 +59,7 @@ if (is_numeric($_GET['eventID'])) {
     $eventAccess = new Access(FolderAccess::getInstance());
 
     if ($eventAccess->checkExisting($currentUser, $event) == false) {
-        error(34);
+        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
     }
 
     /* Default values
@@ -68,7 +69,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Preselected campuses
      */
-    $selectedCampuses = array();
+    $selectedCampuses = [];
     $allCampuses      = $event->getCampusCollection();
 
     foreach ($allCampuses as $currentCampus) {
@@ -77,7 +78,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Preselected roles
      */
-    $selectedRoles = array();
+    $selectedRoles = [];
     $allRoles      = $event->getRoleCollection();
 
     foreach ($allRoles as $currentRole) {
@@ -97,29 +98,29 @@ if (is_numeric($_GET['eventID'])) {
      * Hide advanced options by default
      */
     $page->setVar(
-        array(
+        [
             'FUNCTION'       => 'Update',
             'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
-        )
+        ]
     );
 
     $page->setVar(
-        array(
-            'EVENT_ID'             => $event->getId(),
-            'EVENT_USER_ID'        => $event->getOwner()->getId(),
-            'EVENT_AUTHOR_ID'      => $event->getAuthor()->getId(),
-            'EVENT_TITLE'          => Scrub::text($event->getTitle()),
-            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
-            'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
-            'EVENT_ATTENDANCE'     => $event->getAttendance() ? 'checked="checked"' : '',
-            'EVENT_START_DATE'     => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
-            'EVENT_END_DATE'       => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
-            'EVENT_PUBLISH_DATE'   => Scrub::text($publishDate),
-            'EVENT_LOCATION'       => Scrub::text($event->getLocation()),
-            'EVENT_DETAIL'         => Scrub::text($event->getDetail()),
-            'EVENT_REDIRECT'       => $event->setupRedirect(
+        [
+            'EVENT_ID'                        => $event->getId(),
+            'EVENT_USER_ID'                   => $event->getOwner()->getId(),
+            'EVENT_AUTHOR_ID'                 => $event->getAuthor()->getId(),
+            'EVENT_TITLE'                     => Scrub::text($event->getTitle()),
+            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
+            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
+            'EVENT_ATTENDANCE'                => $event->getAttendance() ? 'checked="checked"' : '',
+            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
+            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
+            'EVENT_PUBLISH_DATE'              => Scrub::text($publishDate),
+            'EVENT_LOCATION'                  => Scrub::text($event->getLocation()),
+            'EVENT_DETAIL'                    => Scrub::text($event->getDetail()),
+            'EVENT_REDIRECT'                  => $event->setupRedirect(
                 urldecode($_GET['returnTo']),
                 $event->getStartDateTime()->getURLDate(),
                 $_GET['homepageId'],
@@ -127,11 +128,11 @@ if (is_numeric($_GET['eventID'])) {
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-            'RETURN_STR' => '&returnTo='.$_GET['returnTo'].
-                ($_GET['userId']?"&userId=".$_GET['userId']:"").
-                ($_GET['homepageId']?"&homepageId=".$_GET['homepageId']:"").
-                ($_GET['returnDate']?"&returnDate=".$_GET['returnDate']:"")
-        )
+            'RETURN_STR'                      => '&returnTo=' . $_GET['returnTo'] .
+                ($_GET['userId'] ? "&userId=" . $_GET['userId'] : "") .
+                ($_GET['homepageId'] ? "&homepageId=" . $_GET['homepageId'] : "") .
+                ($_GET['returnDate'] ? "&returnDate=" . $_GET['returnDate'] : ""),
+        ]
     );
 
     $page->parse('delete_button_block', 'delete_button');
@@ -139,7 +140,7 @@ if (is_numeric($_GET['eventID'])) {
     /* Recurrence
      */
     // Is there a recurrence? If so don't show the repeat selector.
-    $recurrence = array();
+    $recurrence = [];
     if ($event->getSeriesId()) {
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
         $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
@@ -173,70 +174,65 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Preselected campus
      */
-    $selectedCampuses = array($_SESSION['campus'][0]);
+    $selectedCampuses = [$_SESSION['campus'][0]];
 
     /* Preselected roles
      */
-    $selectedRoles = array();
+    $selectedRoles = [];
 
     /* Miscellaneous setvarring
      * Hide advanced options by default
      */
     $page->setVar(
-        array(
+        [
             'FUNCTION'       => 'Add',
             'SHOW_ADVANCED'  => 'none',
             'ADVANCED_SHOW'  => '',
             'ADVANCED_CLOSE' => 'hidden',
-        )
+        ]
     );
 
     $page->setVar(
-        array(
-            'EVENT_ID'             => '',
-            'EVENT_USER_ID'        => $selectedUser->getId(),
-            'EVENT_AUTHOR_ID'      => $currentUser->getId(),
-            'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
-            'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
-            'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
-            'EVENT_ATTENDANCE'     => '',
-            'EVENT_START_DATE'     => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
-            'EVENT_END_DATE'       => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
-            'EVENT_PUBLISH_DATE'   => Alaress_Date_Format::now()->getLocal(),
-            'EVENT_LOCATION'       => '',
-            'EVENT_DETAIL'         => '',
-            'EVENT_REDIRECT'       => $event->setupRedirect(
+        [
+            'EVENT_ID'                        => '',
+            'EVENT_USER_ID'                   => $selectedUser->getId(),
+            'EVENT_AUTHOR_ID'                 => $currentUser->getId(),
+            'EVENT_TITLE'                     => isset($_GET['title']) ? $_GET['title'] : '',
+            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
+            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
+            'EVENT_ATTENDANCE'                => '',
+            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
+            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
+            'EVENT_PUBLISH_DATE'              => Alaress_Date_Format::now()->getLocal(),
+            'EVENT_LOCATION'                  => '',
+            'EVENT_DETAIL'                    => '',
+            'EVENT_REDIRECT'                  => $event->setupRedirect(
                 $_GET['returnTo'],
-                ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
+                ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-        )
+        ]
     );
 
     /* Recurrence
      */
     $page->setVar(
-        array(
+        [
             'recurring_reminder_block' => '',
-            'delete_button_block'      => ''
-        )
+            'delete_button_block'      => '',
+        ]
     );
 
     $page->parse('recurring_dates_block', 'recurring_dates');
 }
 
-/* Event Types (except tasks)
+/* Event Types
  */
 $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-$allEventTypes           = $calendarEventTypeMapper->findAll()->filter(
-    function ($eventType) {
-        /** @var \Schoolbox\Calendar\EventType $eventType */
-        return !$eventType->isTaskType();
-    }
-);
+$allEventTypes           = $calendarEventTypeMapper->findAll();
 $page->setVar('type_select_block', '');
 $page->setVar('type_no_select_block', '');
 $page->dropDown(
@@ -244,20 +240,12 @@ $page->dropDown(
     $allEventTypes,
     $defaultTypeId,
     'type_select',
-    array(
+    [
         'id'   => 'EVENT_EVENTTYPE_ID',
-        'type' => 'EVENT_EVENTTYPE_NAME'
-    )
+        'type' => 'EVENT_EVENTTYPE_NAME',
+    ]
 );
-// Is this a task? Don't show the event type
-// (You shouldn't even be here if this is a task)
-if ($event->getType()->isTaskType()) {
-    $page->setVar('EVENT_EVENTTYPE_ID', $event->getType()->getId());
-    $page->setVar('EVENT_EVENTTYPE_NAME', $event->getType()->getType());
-    $page->parse('type_no_select_block', 'type_no_select');
-} else {
-    $page->parse('type_select_block', 'type_select');
-}
+$page->parse('type_select_block', 'type_select');
 
 /**
  * Group (Folder) selection
@@ -281,7 +269,7 @@ $alreadyInFolderList = $event->getCategoryCollection();
 
 /* Get data about the Folders
  */
-$tempFolderIds = array();
+$tempFolderIds = [];
 
 foreach ($alreadyInFolderList as $current) {
     $tempFolderIds[] = $current->getCategoryId();
@@ -297,7 +285,7 @@ if (isset($_GET['homepageId']) && !in_array($_GET['homepageId'], $tempFolderIds)
     }
 }
 
-$allFolders = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
+$allFolders = $folderMapper->findByColumnList(['id' => $tempFolderIds]);
 
 /**
  * Dedupe and make synonymous
@@ -309,13 +297,13 @@ $allFolderList = $folderMapper->createCollection();
 
 /* A simple stack of ids for checkboxes which should already be ticked
  */
-$previousInvolvement = array();
+$previousInvolvement = [];
 
 /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
  */
 foreach ($calendarUserFolderList as $current) {
     $currentId = $current->getId();
-    if (in_array($currentId, $currentUserFolderIds, false) || $currentUser->isSuperuser() ) {
+    if (in_array($currentId, $currentUserFolderIds, false) || $currentUser->isSuperuser()) {
         $allFolderList[$currentId] = $current;
     }
 }
@@ -332,11 +320,11 @@ foreach ($allFolders as $currentFolder) {
 
 /* Group checkbox array when using Group Event Level
  */
-if(\count($allFolderList)) {
+if (\count($allFolderList)) {
 
     // Order by title
     $allFolderList->sortByCallback(
-        function(Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
+        function (Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
             return strnatcasecmp($a->getTitle(), $b->getTitle());
         }
     );
@@ -356,11 +344,11 @@ if(\count($allFolderList)) {
         }
 
         $page->setVar(
-            array(
+            [
                 'EVENT_GROUP_ID'          => $folderId,
                 'EVENT_GROUP_NAME'        => Scrub::text($currentFolder->getTitle()),
-                'EVENT_GROUP_ID_SELECTED' => $selected
-            )
+                'EVENT_GROUP_ID_SELECTED' => $selected,
+            ]
         );
 
         $page->parse('event_group_drop_block', 'event_group_drop', true);
@@ -386,22 +374,22 @@ $page->dropDown(
     new \Schoolbox\Calendar\EventLevelCollection($allFolderList->getAll(), $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
-    array(
+    [
         'id'   => 'EVENT_EVENTLEVEL_ID',
         'name' => 'EVENT_EVENTLEVEL_NAME',
-    )
+    ]
 );
 
 /* Campus Checkbox Array when using Campus Event Level
  */
 if ($campusList->count()) {
-    $allCampuses = array();
+    $allCampuses = [];
 
     foreach ($campusList as $current) {
-        $allCampuses[] = array(
+        $allCampuses[] = [
             'id'   => $current->getId(),
-            'name' => $current->getName()
-        );
+            'name' => $current->getName(),
+        ];
     }
 
     $page->checkList(
@@ -409,10 +397,10 @@ if ($campusList->count()) {
         $allCampuses,
         $selectedCampuses,
         TEMPLATE_content,
-        array(
+        [
             'id'   => 'EVENT_CAMPUS_ID',
             'name' => 'EVENT_CAMPUS_NAME',
-        )
+        ]
     );
 } else {
     $page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
@@ -428,13 +416,13 @@ $roleList   = $roleMapper->findAll();
  * This really needs to be updated - why is checkList behaviour different to
  * the dropDown one when it comes to collections?
  */
-$allRoles = array();
+$allRoles = [];
 
 foreach ($roleList as $current) {
-    $allRoles[] = array(
+    $allRoles[] = [
         'id'   => $current->getId(),
-        'name' => $current->getName()
-    );
+        'name' => $current->getName(),
+    ];
 }
 
 $page->checkList(
@@ -442,16 +430,16 @@ $page->checkList(
     $allRoles,
     $selectedRoles,
     TEMPLATE_content,
-    array(
+    [
         'id'   => 'EVENT_ROLE_ID',
-        'name' => 'EVENT_ROLE_NAME'
-    )
+        'name' => 'EVENT_ROLE_NAME',
+    ]
 );
 
 /* Pass Personal const for ui elements
  */
 $page->setVar([
-    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL
+    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL,
 ]);
 
 $page->outputPage();

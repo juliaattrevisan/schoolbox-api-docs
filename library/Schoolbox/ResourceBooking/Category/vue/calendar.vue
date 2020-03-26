@@ -316,7 +316,6 @@
         />
 
         <view-event-modal ref="event"
-                          :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"

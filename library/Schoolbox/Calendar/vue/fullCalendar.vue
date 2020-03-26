@@ -389,18 +389,6 @@
             },
 
             /**
-             * Is the given event a task or not? This affects how it's rendered.
-             *
-             * @param event
-             * @return {boolean}
-             */
-            isTask(event) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading`)
-                return this.helper.isTask(event);
-            },
-
-            /**
              * Check if current display is list
              */
             currentViewIsList() {
@@ -636,7 +624,6 @@
 
         <create-event-modal ref="createEvent"
                             :user-id="config.userId"
-                            :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
@@ -648,7 +635,6 @@
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
-                          :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"

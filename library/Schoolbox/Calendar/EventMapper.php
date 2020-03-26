@@ -49,7 +49,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->joins('owner', UserMapper::class,'id',self::TYPE_MODEL, null, 'owner','owner');
 
         $this->hasJoin('owner', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'owner',
             'other_key' => 'id',
         ));
@@ -65,6 +65,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('series_id',self::TYPE_INTEGER,null,'seriesId');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('type', EventTypeMapper::class, 'eventTypeID', null, null, 'type', 'eventType');
+        $this->uses(
+            'variant',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'variant',
+            [Event::VARIANT_EVENT, Event::VARIANT_TASK,]
+        );
         $this->uses('title',self::TYPE_STRING);
         $this->uses('detail',self::TYPE_STRING);
         $this->uses('location',self::TYPE_STRING);
@@ -73,18 +80,18 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('allday',self::TYPE_INTEGER,null,'allDay');
 
         $this->hasJoin('author', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+            'mapper'    => UserMapper::class,
             'this_key'  => 'author_id',
             'other_key' => 'id',
         ));
 
         $this->hasJoin('personal', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
+            'mapper'    => Relation\PersonalMapper::class,
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
         $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
+            'mapper'    => Relation\CategoryMapper::class,
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
@@ -102,13 +109,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         );
 
         $this->hasJoin('role', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
+            'mapper'    => Relation\RoleMapper::class,
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
 
         $this->hasJoin('roles', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
+            'mapper'    => Relation\RoleMapper::class,
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));

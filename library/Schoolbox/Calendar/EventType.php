@@ -11,8 +11,8 @@ namespace Schoolbox\Calendar;
 
 use JsonSerializable;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Sequential;
 
 class EventType implements ISoftDeletable, JsonSerializable, Sequential
 {
@@ -126,11 +126,13 @@ class EventType implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * Is this the "Task" event type?
      *
+     * @deprecated An event's task status is now an attribute of the event
+     * @see        `Event::$class`, `Event::CLASS_EVENT`, `Event::CLASS_TASK`
      * @return bool
      */
     public function isTaskType()
     {
-        return $this->getType() == 'Task';
+        return $this->getType() === 'Task';
     }
 
     /**

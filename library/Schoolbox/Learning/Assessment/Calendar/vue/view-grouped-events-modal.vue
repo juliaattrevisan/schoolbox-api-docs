@@ -9,7 +9,6 @@
         name: "view-grouped-events-modal",
         props: {
             toMoment: {},
-            taskTypeId: {},
             eventModifyFormUrl: {},
             eventModifyFormActionUrl: {},
             eventUpdateUrl: {},
