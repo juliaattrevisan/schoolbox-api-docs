@@ -13,6 +13,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -36,15 +37,21 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @var FolderMapper
+     */
+    protected $folderMapper;
+
+
+    /**
      * @param Filter\Model $filter
-     * @param Collection   $folderIds
+     * @param FolderMapper $folderMapper
      * @param Access       $access
      */
-    public function __construct(Filter\Model $filter, Collection $folderIds, Access $access)
+    public function __construct(Filter\Model $filter, FolderMapper $folderMapper, Access $access)
     {
         parent::__construct($filter);
-        $this->folderIds = $folderIds->shallowClone();
-        $this->access    = $access;
+        $this->folderMapper = $folderMapper;
+        $this->access       = $access;
     }
 
 
@@ -57,7 +64,7 @@ class KeyConverter extends AbstractKeyConverter
     public function getItem(string $key, User $user, string $page): int
     {
         $this->assertValidKey($key, $user, $page);
-        return $this->folderIds[$key];
+        return (int)$key;
     }
 
 
@@ -68,7 +75,11 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems(): Collection
     {
-        return $this->folderIds->shallowClone();
+        // remove later
+        return (new Collection($this->folderMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(static function ($folderId) {
+                return $folderId;
+            });
     }
 
 
@@ -77,9 +88,12 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if (!$this->folderIds->offsetExists($key)) {
+        if (!$this->folderMapper->countByColumn($this->folderMapper->getIdentifierColumn(), $key)) {
             throw new InvalidArgumentException("No Folder ID found for key: $key");
         }
+//        if (!$this->folderIds->offsetExists($key)) {
+//            throw new InvalidArgumentException("No Folder ID found for key: $key");
+//        }
 
         switch ($page) {
             case Filter\Page\Model::PAGE_CLASS_MARK_BOOK:

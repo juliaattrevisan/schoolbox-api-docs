@@ -131,12 +131,12 @@ class Factory extends FolderFilter\Factory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(static function ($folderId) {
-                return $folderId;
-            });
-
-        // Inject the folder mapper in here
-        return new KeyConverter($filter, $folderIds, $this->getAccess(), $this->getFolderMapper());
+//        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
+//            ->indexByCallback(static function ($folderId) {
+//                return $folderId;
+//            });
+//
+//        // Inject the folder mapper in here
+        return new KeyConverter($filter, $this->getFolderMapper(), $this->getAccess());
     }
 }

@@ -26,31 +26,6 @@ use Schoolbox\User;
 class KeyConverter extends BaseKeyConverter
 {
     /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-
-    /**
-     * Constructor
-     *
-     * @param Filter\Model  $filter
-     * @param Collection    $folderIds
-     * @param Access        $access
-     * @param Folder\Mapper $folderMapper
-     */
-    public function __construct(
-        Filter\Model $filter,
-        Collection $folderIds,
-        Access $access,
-        Folder\Mapper $folderMapper
-    ) {
-        parent::__construct($filter, $folderIds, $access);
-        $this->folderMapper = $folderMapper;
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
