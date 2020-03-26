@@ -2404,7 +2404,12 @@ abstract class Mapper implements IMapper, Serializable
     public function countByColumnList($columnList, $options = array())
     {
         try {
-            $stmt = $this->selectScalarByColumnList('COUNT(*)', $columnList, $options);
+            $stmt = $this->selectScalarByColumnList(
+                'COUNT(*)',
+                $columnList,
+                $options,
+                $this->isJoinRequired(null, $columnList, $options)
+            );
             return (int)$stmt->fetchColumn();
         } catch (UnderflowException $e) {
             return 0;
@@ -2425,7 +2430,12 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function isUnique($columnList, $currentId)
     {
-        $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifierColumn(), $columnList);
+        $query = $this->selectScalarByColumnList(
+            $this->getTable() . '.' . $this->getIdentifierColumn(),
+            $columnList,
+            [],
+            $this->isJoinRequired(null, $columnList, [])
+        );
         $query->execute();
         while (($dupeId = $query->fetchColumn()) !== false) {
             if ($currentId == $dupeId) {
@@ -2461,6 +2471,12 @@ abstract class Mapper implements IMapper, Serializable
     ) {
         $select = "SELECT $selection";
 
+        // Only apply the default order by if there's a limit or offset option.
+        // This is because ordering a result is likely to create a temp table.
+        if (!isset($options['limit']) && !isset($options['offset'])) {
+            $options['order'] = $options['order'] ?? [];
+        }
+
         // grab a from string if using joins.
         // Fall back to just selecting from this table.
         $from = '';
@@ -2471,11 +2487,6 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
-        // Only apply the default order by if there's a limit or offset option.
-        // This is because ordering a result is likely to create a temp table.
-        if (!isset($options['limit']) && !isset($options['offset'])) {
-            $options['order'] = $options['order'] ?? [];
-        }
         $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
@@ -2504,6 +2515,37 @@ abstract class Mapper implements IMapper, Serializable
         $statement = $this->prepareSelect($select, $from, $pb, [], $options);
         $statement->execute();
         return $statement;
+    }
+
+
+    /**
+     * Does this column list and set of options require joining onto any other
+     * table?
+     *
+     * If any of the columns in the selection, WHERE or ORDER BY are in a joined
+     * table, then a join is required.
+     *
+     * @param string|null $selection
+     * @param array       $columnList
+     * @param array       $options
+     * @return bool
+     */
+    private function isJoinRequired(?string $selection, array $columnList, array $options): bool
+    {
+        if (strpos($selection ?? '', '.') !== false) {
+            return true;
+        }
+        foreach ($columnList as $column => $value) {
+            if (strpos($column, '.') !== false) {
+                return true;
+            }
+        }
+        foreach ($options['order'] ?? [] as $column => $value) {
+            if (strpos($column, '.') !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -2541,7 +2583,12 @@ abstract class Mapper implements IMapper, Serializable
     public function findIdsByColumnList(array $columnList, array $options = []): array
     {
         try {
-            $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifierColumn(), $columnList, $options);
+            $stmt = $this->selectScalarByColumnList(
+                'DISTINCT ' . $this->getTable() . '.' . $this->getIdentifierColumn(),
+                $columnList,
+                $options,
+                $this->isJoinRequired(null, $columnList, $options)
+            );
         } catch (UnderflowException $e) {
             return [];
         }
@@ -3941,10 +3988,15 @@ abstract class Mapper implements IMapper, Serializable
      *                   'limit' or 'offset')
      * @return array
      */
-    public function findDistinct($column, $columnList = array(), $options = array()): array
+    public function findDistinct($column, $columnList = [], $options = []): array
     {
         try {
-            $stmt = $this->selectScalarByColumnList("DISTINCT $column", $columnList, $options);
+            $stmt = $this->selectScalarByColumnList(
+                "DISTINCT $column",
+                $columnList,
+                $options,
+                $this->isJoinRequired($column, $columnList, $options)
+            );
         } catch (UnderflowException $e) {
             return [];
         }
