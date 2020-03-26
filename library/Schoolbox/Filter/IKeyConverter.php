@@ -14,9 +14,10 @@ use Schoolbox\GenericCollection;
  * Knows how to map between an option.key and the item
  * represented by the key, and get the key from an item
  *
- * Must know about all possible items so it can decide whether a filter needs to be applied
+ * Must know how many possible items in each filter, so it can decide whether a
+ * filter needs to be applied
  *
- * @see AbstractKeyConverter::getAllPossibleItems()
+ * @see AbstractKeyConverter::possibleItemCount()
  */
 interface IKeyConverter
 {
