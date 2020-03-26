@@ -313,8 +313,6 @@ class User extends DeprecatedModel
     /**
      * Find a user based on a keyword, for an AJAX response.
      *
-     * TODO replace this with a mapper search, as this can't reliably fetch only one campus
-     *
      * @param       $keyword
      * @param int   $group
      * @param array $residentialHouseIds
