@@ -51,4 +51,12 @@ interface IKeyConverter
      * @return Collection|int[]|string[] (intentionally not a GenericCollection)
      */
     public function getAllPossibleItems(): Collection;
+
+
+    /**
+     * Get the number of possible items for this filter.
+     *
+     * @return int
+     */
+    public function possibleItemCount(): int;
 }
