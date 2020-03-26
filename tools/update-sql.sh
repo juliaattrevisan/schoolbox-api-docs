@@ -178,11 +178,11 @@ do
                 echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
                 if [[ $scriptcmd == *".sql" ]]
                 then
-                    mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
+                    mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script;
                     # Check for and report errors
                     if [ $? -ne 0 ];
                     then
-                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
+                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script" >&2;
                         errorint=1;
                         errormsg="$errormsg,$script";
                     else
@@ -227,7 +227,7 @@ then
     errormsg=`echo $errormsg | cut -d',' -f2-100`;
     echo "$package""_update_error=$errorint" > /etc/facter/facts.d/"$package"_update.txt;
     echo "$package""_update_errormsg=$errormsg" >> /etc/facter/facts.d/"$package"_update.txt;
-    echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup.";
+    echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup." >&2;
 else
     echo "SQL updates completed";
 fi
