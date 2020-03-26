@@ -1,0 +1,40 @@
+{% extends '@core/user/student.twig' %}
+
+{% block specialAlert %}
+    {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
+    <span class="icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}"></span>
+    {% endif %}
+{% endblock specialAlert %}
+
+{% block englishSecond %}
+    {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
+    <span class="icon-eng-second-lang" title="English as an Additional Language"></span>
+    {% endif %}
+{% endblock englishSecond %}
+
+{% block medicalAlert %}
+    {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
+    <span class="icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}"></span>
+    {% endif %}
+{% endblock medicalAlert %}
+
+{% block individualEducationPlan %}
+    {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
+    <span class="icon-curriculum" title="Individual Education Plan"></span>
+    {% endif %}
+{% endblock individualEducationPlan %}
+
+{% block synergeticComments %}
+    {% if externalUser.Comment is not empty and showComments %}
+    <span class="icon-info" title="{{ externalUser.Comment | nl2br }}"></span>
+    {% endif %}
+{% endblock synergeticComments %}
+
+{% for message in externalUser.AlertMessages %}
+    {% block contacts_alert %}
+        {# Only staff may view contact alerts #}
+        {% if showContactsAlert %}
+            <span class="icon-alert" title="{{ message | nl2br }}"></span>
+        {% endif %}
+    {% endblock contacts_alert %}
+{% endfor %}
