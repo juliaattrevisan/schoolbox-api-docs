@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
+use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Assessment\Term;
@@ -14,6 +15,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
@@ -322,6 +324,47 @@ class Factory
          */
         $lookup = new Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
 
+        /* Week Offset, Term selection
+
+         * TODO: Potentially configurable
+         * You could potentially make this configurable, giving the school an opportunity
+         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
+         */
+        $weekOffsetCalculator = new WeekOffset(
+            $this->timetableCampusMapper,
+            Alaress_Date_Format::now(),
+            $this->log
+        );
+
+        $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
+        $termSettings = $weekOffsetCalculator->findCurrentTerm();
+
+        /* Figure out which term number we're in, to navigate xml files' nodes
+         * Figure out which cycle we're in, when persisting data
+         */
+        $currentTerm = $termSettings['termIndex'];
+        $currentCycleId = $termSettings['cycleId'];
+
+        /* You need both of these to work stuff out
+         */
+        if (null === $currentTerm) {
+            $this->log->error('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
+            exit;
+        }
+
+        if (null === $currentCycleId) {
+            $this->log->error('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
+            exit;
+        }
+
+        /* Otherwise continue onwards
+         */
+        $this->log->debug(sprintf(
+            'Loading timetables using Week Offset %s, Term %s',
+                $currentWeekOffset,
+                $currentTerm
+        ));
+
         /* Load all the Student Timetable xmls
          */
         foreach ($xml[Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
@@ -331,10 +374,12 @@ class Factory
                 $registry,
                 new Batchxml(new Api($this->host . '/' . $xmlFile)),
                 $lookup,
+                $currentWeekOffset,
+                $currentTerm,
+                $currentCycleId,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->termMapper
+                $this->classPeriodMapper
             ));
         }
 

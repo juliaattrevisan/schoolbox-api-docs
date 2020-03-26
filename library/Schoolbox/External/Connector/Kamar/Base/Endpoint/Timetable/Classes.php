@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Assessment\Term;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -81,15 +80,27 @@ class Classes implements IStrategy
 
 
     /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-
-    /**
      * @var Lookup
      */
     private $lookup;
+
+
+    /**
+     * @var int|null
+     */
+    private $currentWeekOffset;
+
+
+    /**
+     * @var int|null
+     */
+    private $currentTerm;
+
+
+    /**
+     * @var int
+     */
+    private $currentCycleId;
 
 
     /**
@@ -100,10 +111,12 @@ class Classes implements IStrategy
      * @param Registry               $registry
      * @param Batchxml               $timetableBatchXml
      * @param Lookup                 $lookup
+     * @param int|null               $currentWeekOffset
+     * @param int|null               $currentTerm
+     * @param int                    $currentCycleId
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param Term\Mapper            $termMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -111,20 +124,24 @@ class Classes implements IStrategy
         Registry $registry,
         Batchxml $timetableBatchXml,
         Lookup $lookup,
+        ?int $currentWeekOffset,
+        ?int $currentTerm,
+        int $currentCycleId,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        Term\Mapper $termMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->registry = $registry;
         $this->timetableBatchXml = $timetableBatchXml;
         $this->lookup = $lookup;
+        $this->currentWeekOffset = $currentWeekOffset;
+        $this->currentTerm = $currentTerm;
+        $this->currentCycleId = $currentCycleId;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->termMapper = $termMapper;
     }
 
 
@@ -135,14 +152,15 @@ class Classes implements IStrategy
      * that don't exist in Timetable Structure for some reason
      *
      * @param string $ext
+     * @param int    $cycleId
      * @param array  $periods
      * @param string $day
-     * @param int $sequence
+     * @param int    $sequence
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $ext, array $periods, string $day, int $sequence): ?TimetablePeriod
+    private function findPeriod(string $ext, int $cycleId, array $periods, string $day, int $sequence): ?TimetablePeriod
     {
-        return $periods['ext'][$ext]['day'][$day]['period'][$sequence] ?? null;
+        return $periods['ext'][$ext]['cycle'][$cycleId]['day'][$day]['period'][$sequence] ?? null;
     }
 
 
@@ -150,12 +168,27 @@ class Classes implements IStrategy
      * Find the current week node for a given $studentId
      *
      * @param SimpleXMLElement $timetable
-     * @param int              $weekOffset
-     * @return SimpleXMLElement
+     * @return null|SimpleXMLElement
      */
-    private function findCurrentCycle(SimpleXMLElement $timetable, int $weekOffset): SimpleXMLElement
+    private function findCurrentCycle(SimpleXMLElement $timetable): ?SimpleXMLElement
     {
-        return $timetable->xpath("week[@index='{$weekOffset}']")[0];
+        $weeks = $timetable->xpath("week[contains(term, '{$this->currentTerm}')]");
+
+        if (\count($weeks) && isset($weeks[$this->currentWeekOffset])) {
+            $week = $weeks[$this->currentWeekOffset];
+
+            if ($this->log) {
+                $this->log->info(sprintf(
+                    'Importing timetables from Week %s, Term %s',
+                    (string)$week->xpath('@index')[0],
+                    $this->currentTerm
+                ));
+            }
+
+            return $week;
+        }
+
+        return null;
     }
 
 
@@ -167,24 +200,22 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        /* TODO: Potentially configurable
-         * You could potentially make this configurable, giving the school an opportunity
-         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
-         */
-        $currentWeekOffset = (new WeekOffset($this->termMapper))->findWeekOffset((int)date('Y'));
 
         /* Can't determine which week we're in; can't import anything
          */
-        if (null === $currentWeekOffset) {
+        if (null === $this->currentWeekOffset) {
             $this->log->warning('Cannot determine week index for timetable import.');
 
             return;
         }
 
-        $this->log->info(sprintf(
-            'Importing timetables using week offset %s',
-            $currentWeekOffset
-        ));
+        /* Can't determine which term we're in; can't import anything
+         */
+        if (null === $this->currentTerm) {
+            $this->log->warning('Cannot determine term for timetable import.');
+
+            return;
+        }
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -208,7 +239,7 @@ class Classes implements IStrategy
         /* If there aren't any timetables, log it and exit
          */
         if (!\count($timetables)) {
-            $this->log->warning('No timetables detected.');
+            $this->log->error('No timetables detected.');
             return;
         }
 
@@ -221,7 +252,12 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $cycle = $this->findCurrentCycle($timetable, $currentWeekOffset);
+            $cycle = $this->findCurrentCycle($timetable);
+
+            if (!$cycle) {
+                $this->log->error('Unknown cycle; check installation steps.');
+                return;
+            }
 
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
@@ -241,16 +277,16 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $dayNum, $subject['sequence']);
+                    $timetablePeriod = $this->findPeriod($ext, $this->currentCycleId, $periods, $dayNum, $subject['sequence']);
 
                     if (null === $timetablePeriod) {
                         continue;
                     }
 
-                    $this->log->info(sprintf(
-                        'Looking for ext_timetable_code %s, week %s, day %s, period with sequence %s',
+                    $this->log->debug(sprintf(
+                        'Looking for ext_timetable_code %s, Week Offset %s, Day %s, period with sequence %s',
                         $ext,
-                        $currentWeekOffset,
+                        $this->currentWeekOffset,
                         $dayNum,
                         $subject['sequence']
                     ));

@@ -7,8 +7,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
+use Alaress_Date_Format;
 use PDOException;
-use Schoolbox\Assessment\Term;
+use Psr\Log\LoggerInterface;
+use Schoolbox\External\TimetableCampus;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -22,19 +25,80 @@ class WeekOffset
 {
 
     /**
-     * @var Term\Mapper
+     * @var TimetableCampusMapper
      */
-    private $termMapper;
+    private $timetableCampusMapper;
+
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $date;
+
+
+    /**
+     * @var LoggerInterface|null
+     */
+    private $log;
 
 
     /**
      * WeekOffset constructor.
      *
-     * @param Term\Mapper $termMapper
+     * @param TimetableCampusMapper $timetableCampusMapper
+     * @param Alaress_Date_Format   $date
+     * @param LoggerInterface|null  $log
      */
-    public function __construct(Term\Mapper $termMapper)
+    public function __construct(TimetableCampusMapper $timetableCampusMapper, Alaress_Date_Format $date, LoggerInterface $log = null)
     {
-        $this->termMapper = $termMapper;
+        $this->timetableCampusMapper = $timetableCampusMapper;
+        $this->date = $date;
+        $this->log = $log;
+    }
+
+
+    /**
+     * Figure out which term we're in
+     * Note that we use timetableCampus start and finish date to decide
+     *
+     * Returns null when it can't be determined
+     *
+     * @return array|null
+     */
+    public function findCurrentTerm(): ?array
+    {
+        $cycles = $this->timetableCampusMapper->findAll()->sortBy('start', 'asc')->getAll();
+
+        $n = \count($cycles);
+
+        for ($i = 1; $i <= $n; $i++) {
+            $currentCycle = $cycles[$i-1];
+
+            if ($this->log) {
+                $this->log->debug(sprintf(
+                    'Comparing %s <= %s <= %s',
+                    $currentCycle->getStart()->getDatabase(),
+                    $this->date->getDatabase(),
+                    $currentCycle->getFinish()->getDatabase()
+                ));
+            }
+
+            if ($currentCycle->getStart()->lte($this->date) && $currentCycle->getFinish()->gte($this->date)) {
+                if ($this->log) {
+                    $this->log->debug(sprintf(
+                        'Using cycle id %s',
+                        $currentCycle->getCycle()->getId()
+                    ));
+                }
+
+                return [
+                    'termIndex' => $i,
+                    'cycleId' => $currentCycle->getCycle()->getId()
+                ];
+            }
+        }
+
+        return null;
     }
 
 
@@ -42,34 +106,48 @@ class WeekOffset
      * Determine which week we're in, if possible
      * Returns null when it can't be determined
      *
-     * @param int $year
      * @return int|null
-     * @throws Exception
      * @throws PDOException
+     * @throws Exception
      */
-    public function findWeekOffset(int $year): ?int
+    public function findWeekOffset(): ?int
     {
-        $terms = $this->termMapper->findForYear($year);
 
-        if ($terms->count()) {
-            $term = $terms->first();
-            $now = \Alaress_Date_Format::now();
+        /* Term goes between Start and Finish inclusively
+         *
+         * So long as term Start never equal a previous term's Finish
+         * this should be okay. If your term (timetable cycle) is set up
+         * like this:
+         *
+         * start: 27/01/2020
+         * finish: 20/03/2020
+         * current: 20/03/2020
+         *
+         * Then you're in that term. The next term should be:
+         *
+         * start: 21/03/2020
+         * finish: some other point in the future > 21/03/2020
+         */
+        $query = "
+            SELECT *
+            FROM {$this->timetableCampusMapper->getTable()}
+            WHERE start <= :currentDate
+            AND finish >= :currentDate
+            LIMIT 1
+        ";
 
-            $startWeek = (int)date('W', $term->getStart()->getUnixTimestamp());
-            $currentWeek = (int)date('W', $now->getUnixTimestamp());
+        $statement = $this->timetableCampusMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'currentDate' => $this->date->getDatabaseDate()
+        ]);
 
-            /* Include the current week in calculations using a +1 offset
-             * e.g. if term begins on 8/1/20,
-             *     8/1/20, 9/1/20 and 10/1/20 are in week 1
-             *     11/1/20 is in week 2
-             *     17/1/20 is in week 2
-             *     21/2/20 is in week 3
-             */
-            $offset = $currentWeek - $startWeek + 1;
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-            if ($offset > 0) {
-                return $offset;
-            }
+        if ($row) {
+            /** @var TimetableCampus $timetableCampus */
+            $timetableCampus = $this->timetableCampusMapper->hydrate($row);
+
+            return $timetableCampus->getStart()->diffInWeeks($this->date);
         }
 
         return null;

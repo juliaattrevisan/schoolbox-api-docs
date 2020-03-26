@@ -8,8 +8,8 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use PDOException;
 use RangeException;
-use Schoolbox\Collection;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -75,14 +75,17 @@ class Mapper extends BaseMapper
         return $this->findForDate(Alaress_Date_Format::now());
     }
 
+
     /**
      * Find whichever term is current for this date.
      *
      * @param Alaress_Date_Format $date Get the term for this date.
      *
      * @return Model
+     * @throws BaseMapper\Exception
+     * @throws PDOException
      */
-    public function findForDate(Alaress_Date_Format $date)
+    public function findForDate(Alaress_Date_Format $date): Model
     {
         $query = "
             SELECT   {$this->getColumnString()}
@@ -94,40 +97,13 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(['date' => $date->getDatabaseDate(),]);
         $result = $statement->fetch();
-        /** @var Model $model */
+
         // Nothing? Either throw exception or return an empty item
+
+        /** @var Model $model */
         $model = $result ? $this->hydrate($result) : $this->createModel();
+
         return $model;
-    }
-
-
-    /**
-     * Find first term for a year.
-     *
-     * @param int $year
-     * @return Collection
-     * @throws BaseMapper\Exception
-     * @throws \PDOException
-     */
-    public function findForYear(int $year): Collection
-    {
-        $query = "
-            SELECT   {$this->getColumnString()}
-            FROM     {$this->getTable()}
-            WHERE    year(`start`) <= :year AND (year(`actual_finish`) >= :year OR `actual_finish` IS NULL)
-            ORDER BY `start` ASC
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(['year' => $year]);
-        $results = $statement->fetchAll();
-
-        $collection = new Collection();
-
-        foreach ($results as $row) {
-            $collection->add($this->hydrate($row));
-        }
-
-        return $collection;
     }
 
 
