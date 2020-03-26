@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -25,7 +26,7 @@ class AssessmentNotDeleted extends AbstractAssessableRule
     {
         $assessable = $this->findAssessable($params);
         if ($assessable->isDeleted()) {
-            throw new InvalidPath("Assessment (id: {$assessable->getId()}) is deleted");
+            throw new Unauthorized("Assessment (id: {$assessable->getId()}) is deleted");
         }
     }
 }
