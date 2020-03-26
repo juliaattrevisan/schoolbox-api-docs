@@ -61,7 +61,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        // add 1, for KEY_NONE
+        // +1 for KEY_NONE
         return $this->workTypeIds->count() + 1;
     }
 
