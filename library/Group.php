@@ -747,6 +747,12 @@ class Group extends DeprecatedModel
             $catList[] = $result;
         }
 
+        // Sort after select so as not to create a temp table.
+        // Not sure if this is any better than ORDER BY,
+        usort($catList, static function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
         return $catList;
     }
 
