@@ -2446,16 +2446,28 @@ abstract class Mapper implements IMapper, Serializable
      * @param  string $selection
      * @param  array  $columnList
      * @param  array  $options
+     * @param  bool   $useJoins   If true: use any joins from `getFromString`.
+     *                            Otherwise, query only this mapper's table:
+     *                            this is faster, but may miss information.
      *
      * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
      * @return PDOStatement
      */
-    protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
-    {
+    protected function selectScalarByColumnList(
+        $selection,
+        array $columnList,
+        array $options = [],
+        bool $useJoins = true
+    ) {
         $select = "SELECT $selection";
 
-        // grab a from string if it hasn't been implemented yet
-        if (!($from = $this->getFromString())) {
+        // grab a from string if using joins.
+        // Fall back to just selecting from this table.
+        $from = '';
+        if ($useJoins) {
+            $from = $this->getFromString();
+        }
+        if ($from === '') {
             $from = "FROM {$this->getTable()}";
         }
 
