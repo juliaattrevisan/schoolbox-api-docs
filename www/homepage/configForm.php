@@ -106,7 +106,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $component = $factory->buildComponent($instance);
 
         if (!($component instanceof Component_ControllerAbstract)) {
-            exit();
+            exit("<div class='alert alert-box'>Couldn't create component.</div>");
         }
 
         $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
