@@ -52,7 +52,7 @@ class KeyConverter extends BaseKeyConverter
 
             // Start building the list of selected items
             // Only select folders which are available for this user's role type
-            $selectedItems    = $this->getAllPossibleItems()->emptyClone();
+            $selectedItems    = new Collection();
             $anySelected      = false;
             $pageModel        = $this->getFilter()->getPages()[$page];
             $availableOptions = [

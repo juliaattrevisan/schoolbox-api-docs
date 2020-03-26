@@ -81,10 +81,8 @@ class KeyConverter extends Filter\AbstractKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
     {
-        /** @var Collection|int[] $allItems */
-        $allItems       = $this->getAllPossibleItems();
-        $availableItems = $allItems->emptyClone();
-        $selectedItems  = $allItems->emptyClone();
+        $availableItems = new Collection();
+        $selectedItems  = new Collection();
 
         // No available selections?
         if (0 === $availableSelections->count()) {
@@ -107,12 +105,12 @@ class KeyConverter extends Filter\AbstractKeyConverter
         if ((1 === $selectedItems->count() && $selectedItems->keyExists(Definition::KEY_NONE)) ||
             (1 === $availableItems->count() && $availableItems->keyExists(Definition::KEY_NONE))) {
             // return an empty set. ie assessments not in this context
-            return $allItems->emptyClone();
+            return new Collection();
         }
 
         // todo this is different to parent logic
         // All concrete items plus the '(none)' option
-        $countAll       = $allItems->count() + 1;
+        $countAll       = $this->possibleItemCount() + 1;
         $countSelected  = $selectedItems->count();
         $countAvailable = $availableItems->count();
 
