@@ -47,7 +47,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem(string $key, User $user, string $page): ?int
     {
-        if(Definition::KEY_NONE === $key){
+        if (Definition::KEY_NONE === $key) {
             return null;
         }
         $this->assertValidKey($key, $user, $page);

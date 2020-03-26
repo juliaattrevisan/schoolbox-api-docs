@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter;
 
 
 /**
@@ -36,7 +36,7 @@ abstract class KeyConverter extends AbstractKeyConverter
         parent::__construct($filter);
 
         // Ensure invoker cannot mutate our collection's sorting or indexing after construction
-        $this->termIds = $termIds->shallowClone()->indexByCallback(function($val){
+        $this->termIds = $termIds->shallowClone()->indexByCallback(static function ($val) {
             return $val;
         });
     }

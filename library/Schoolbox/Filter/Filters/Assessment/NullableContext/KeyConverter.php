@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter;
 use Schoolbox\User;
 
 
@@ -121,7 +121,7 @@ class KeyConverter extends Filter\AbstractKeyConverter
         }
 
         // Are a subset of possible options available, and none of the subset were selected ?
-        if($countAll !== $countAvailable && 0 === $countSelected){
+        if ($countAll !== $countAvailable && 0 === $countSelected) {
             // Nothing selected is the same as all available options being selected.
             return $availableItems;
         }
@@ -129,7 +129,6 @@ class KeyConverter extends Filter\AbstractKeyConverter
         // Either not all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
     }
-
 
 
     /**

@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
@@ -47,7 +46,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        // TODO as above, assume this will never represent all
+        // TODO, for now just assuming the selections will never represent all capabilities and indicators in the system
         return 0;
     }
 

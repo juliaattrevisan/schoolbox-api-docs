@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 
 /**

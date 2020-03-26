@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 
 use InvalidArgumentException;
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\GenericCollection;

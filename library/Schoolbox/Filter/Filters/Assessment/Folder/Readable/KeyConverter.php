@@ -8,12 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter as BaseKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 /**
@@ -100,11 +97,12 @@ class KeyConverter extends BaseKeyConverter
                     ->mergeUnique(new Collection($userClasses))
                     ->mergeUnique(new Collection($userGroups))
                     ->mergeUnique(new Collection($otherClasses))
-                    ->mergeUnique(new Collection($otherGroups))
-                ;
+                    ->mergeUnique(new Collection($otherGroups));
             }
 
-            return $selectedItems->indexByCallback(static function ($v) { return $v; });
+            return $selectedItems->indexByCallback(static function ($v) {
+                return $v;
+            });
         }
         return parent::getSelectedItems($availableSelections, $user, $page);
     }

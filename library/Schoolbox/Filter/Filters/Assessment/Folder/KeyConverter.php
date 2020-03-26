@@ -85,9 +85,6 @@ class KeyConverter extends AbstractKeyConverter
         if (!$this->folderMapper->countByColumn($this->folderMapper->getIdentifierColumn(), $key)) {
             throw new InvalidArgumentException("No Folder ID found for key: $key");
         }
-//        if (!$this->folderIds->offsetExists($key)) {
-//            throw new InvalidArgumentException("No Folder ID found for key: $key");
-//        }
 
         switch ($page) {
             case Filter\Page\Model::PAGE_CLASS_MARK_BOOK:
