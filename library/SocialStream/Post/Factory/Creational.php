@@ -510,14 +510,6 @@ class Creational extends AbstractFactory
             $this->product->setUrl($url);
             $this->product->setThumbnail('icon:'.$file->getMimetype()->getIconFile());
         }
-
-//		/* Force icon representation for now
-//		 */
-//		$url = "/send.php?id={$file->getId()}&save=1";
-//		$this->product->setUrl($url);
-//
-//		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-//		$this->product->setThumbnail($chain->getResult());
     }
 
 
@@ -533,17 +525,15 @@ class Creational extends AbstractFactory
     }
 
     /**
-     * A homepage's icon will be a homepage icon, or a folder if it's not a
-     * visitable homepage.
+     * A homepage's icon will be the cover image, or nothing at all.
      *
      * @param Folder $homepage
      */
     private function spawnThumbnailFromHomepage($homepage)
     {
-        $thumbnailUrl = 'icon:folder.png';
-        if ($homepage->hasHomepage()) {
-            $thumbnailUrl = 'icon:home.png';
+        $cover = $homepage->getCoverImage();
+        if ($cover) {
+            $this->product->setThumbnail($url = "/storage/image.php?size=square64&hash={$cover->getHash()}");
         }
-        $this->product->setThumbnail($thumbnailUrl);
     }
 }

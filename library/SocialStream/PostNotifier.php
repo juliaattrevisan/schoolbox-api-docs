@@ -95,21 +95,11 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * @param SocialStream_Post_Abstract $post
      * @param User $author
      * @return string
      */
-    protected function getPostIcon(SocialStream_Post_Abstract $post, User $author): string
+    protected function getPostIcon(User $author): string
     {
-        if ($post instanceof \SocialStream_Post_Url) {
-            /** @param \SocialStream_Post_Url $post **/
-            return $post->determineIcon($this->iconSize);
-        } elseif ($post instanceof \SocialStream_Post_Image) {
-            if( $post->hasThumbnail() ) {
-                return "/socialstream/image.php?size={$this->iconSize}&id=" . $post->getPostId();
-            }
-        }
-        // string
         return "/portrait.php?size={$this->iconSize}&userId=" . $author->getExternalId();
     }
 
@@ -156,7 +146,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                     'cat'    => new CategoryParam($cat)
                 ]
             )
-            ->setIcon($this->getPostIcon($post, $author))
+            ->setIcon($this->getPostIcon($author))
             ->setHref($href)
             ->addTopic("sstream.{$post->getPostId()}.posted")
             ->setSeverity(Logger::NOTICE)
@@ -201,7 +191,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $href = '/homepage/' . $cat->getId();
-        $icon = $this->getPostIcon($post, $author);
+        $icon = $this->getPostIcon($author);
 
         // base config
         $bob->setHref($href)
