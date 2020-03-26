@@ -45,16 +45,6 @@ interface IKeyConverter
 
 
     /**
-     * Get all possible items for this filter (regardless of whether they are configured to be available).
-     *
-     * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
-     *
-     * @return Collection|int[]|string[] (intentionally not a GenericCollection)
-     */
-    public function getAllPossibleItems(): Collection;
-
-
-    /**
      * Get the number of possible items for this filter.
      *
      * @return int

@@ -149,17 +149,6 @@ class KeyConverter extends Filter\AbstractKeyConverter
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return $this->ids->shallowClone();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

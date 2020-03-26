@@ -69,21 +69,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        // remove later
-        return (new Collection($this->folderMapper->findAllIds(['deleted' => true])))
-            ->indexByCallback(static function ($folderId) {
-                return $folderId;
-            });
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

@@ -50,15 +50,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return $this->temporalStates->shallowClone();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

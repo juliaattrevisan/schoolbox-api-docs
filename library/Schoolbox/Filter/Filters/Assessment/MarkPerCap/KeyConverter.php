@@ -28,15 +28,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return new Collection(Definition::getStaticCustomKeys());
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

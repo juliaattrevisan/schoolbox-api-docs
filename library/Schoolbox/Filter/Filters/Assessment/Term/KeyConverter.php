@@ -54,17 +54,6 @@ abstract class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return $this->termIds->shallowClone();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

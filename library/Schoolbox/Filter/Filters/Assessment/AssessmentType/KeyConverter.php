@@ -49,15 +49,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return $this->assessmentTypes->shallowClone();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

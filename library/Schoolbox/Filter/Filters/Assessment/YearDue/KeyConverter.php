@@ -27,15 +27,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        return new Collection();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int

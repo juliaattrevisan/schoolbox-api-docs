@@ -43,16 +43,6 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
-     */
-    public function getAllPossibleItems(): Collection
-    {
-        // TODO, for now just assuming the selections will never represent all capabilities and indicators in the system
-        return new Collection();
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function possibleItemCount(): int
