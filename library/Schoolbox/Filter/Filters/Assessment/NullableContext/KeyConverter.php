@@ -162,6 +162,15 @@ class KeyConverter extends Filter\AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        return $this->ids->count();
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, User $user, string $page): void

@@ -36,6 +36,15 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        return 0;
+    }
+
+
+    /**
      * @inheritdoc
      * @throws \InvalidArgumentException If key is not numeric
      */

@@ -84,6 +84,15 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        return $this->folderMapper->countAll();
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, User $user, string $page): void

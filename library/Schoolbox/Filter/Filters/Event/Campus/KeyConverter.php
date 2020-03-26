@@ -55,6 +55,15 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        return $this->campusIds->count();
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, User $user, string $page): void

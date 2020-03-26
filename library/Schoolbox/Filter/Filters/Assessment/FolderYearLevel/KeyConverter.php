@@ -56,6 +56,16 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        // +1 for KEY_NONE
+        return $this->yearLevelIds->count() + 1;
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, User $user, string $page): void

@@ -37,6 +37,15 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
+    {
+        return count(Definition::getStaticCustomKeys());
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, User $user, string $page): void
