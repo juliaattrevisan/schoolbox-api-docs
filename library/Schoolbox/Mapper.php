@@ -2085,7 +2085,13 @@ abstract class Mapper implements IMapper, Serializable
     public function countByPredicates(Builder $pb, array $options = []): int
     {
         try {
-            $stmt = $this->selectScalarByPredicates("COUNT(DISTINCT {$this->table}.{$this->getIdentifierColumn()})", $pb, $options);
+            // None of these things matter when counting
+            unset($options['order'], $options['limit'], $options['offset']);
+            $stmt = $this->selectScalarByPredicates(
+                "COUNT(DISTINCT {$this->table}.{$this->getIdentifierColumn()})",
+                $pb,
+                $options
+            );
             return intval($stmt->fetchColumn());
         } catch (UnderflowException $e) {
             return 0;
@@ -2404,6 +2410,8 @@ abstract class Mapper implements IMapper, Serializable
     public function countByColumnList($columnList, $options = array())
     {
         try {
+            // None of these things matter when counting
+            unset($options['order'], $options['limit'], $options['offset']);
             $stmt = $this->selectScalarByColumnList(
                 'COUNT(*)',
                 $columnList,
