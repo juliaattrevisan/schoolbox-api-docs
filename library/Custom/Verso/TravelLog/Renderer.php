@@ -18,25 +18,36 @@ use Twig_Error_Syntax;
 Class Renderer
 {
 
-    // Student's Travel Log should be requested and displayed only for verso school;
+    /**
+     * Student's Travel Log should be requested and displayed only for verso school
+     * Note that this is the school code, not the site location
+     */
     private const VERSO_SCHOOL_CODE = 'verso';
 
+
+    /**
+     * API times out after this many seconds elapse
+     */
     private const DEFAULT_API_TIMEOUT = 300;
+
 
     /**
      * @var string
      */
     private $schoolCode;
 
+
     /**
      * @var ?string
      */
     private $clientId;
 
+
     /**
      * @var ?string
      */
     private $clientSecret;
+
 
     /**
      * @var string
@@ -46,10 +57,11 @@ Class Renderer
 
     /**
      * Renderer constructor.
-     * @param string                                      $schoolCode
-     * @param string|null                                 $clientId
-     * @param string|null                                 $clientSecret
-     * @param string                                      $cachingTimeout
+     *
+     * @param string      $schoolCode
+     * @param string|null $clientId
+     * @param string|null $clientSecret
+     * @param string|null $cachingTimeout
      */
     public function __construct(string $schoolCode, ?string $clientId, ?string $clientSecret, ?string $cachingTimeout)
     {
