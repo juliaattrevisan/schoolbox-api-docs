@@ -70,10 +70,10 @@ class Renderer
      */
     public function __construct(string $schoolCode, ?string $clientId, ?string $clientSecret, ?string $cachingTimeout)
     {
-        $this->schoolCode             = $schoolCode;
-        $this->clientId               = (string)$clientId;
-        $this->clientSecret           = (string)$clientSecret;
-        $this->cachingTimeout         = $cachingTimeout ?? self::DEFAULT_API_TIMEOUT;
+        $this->schoolCode     = $schoolCode;
+        $this->clientId       = (string)$clientId;
+        $this->clientSecret   = (string)$clientSecret;
+        $this->cachingTimeout = (int)$cachingTimeout ?: self::DEFAULT_API_TIMEOUT;
     }
 
 
