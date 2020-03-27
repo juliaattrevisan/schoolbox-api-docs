@@ -73,6 +73,9 @@ class Renderer
         $this->schoolCode     = $schoolCode;
         $this->clientId       = (string)$clientId;
         $this->clientSecret   = (string)$clientSecret;
+
+        /* You can't have a cachingTimeout of zero, but ok
+         */
         $this->cachingTimeout = (int)$cachingTimeout ?: self::DEFAULT_API_TIMEOUT;
     }
 
