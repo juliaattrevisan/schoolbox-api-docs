@@ -73,18 +73,18 @@ Class Renderer
 
 
     /**
-     * Render a twig fragment containing the TravelLog data for $childId
+     * Render a twig fragment containing the TravelLog data for $externalId
      *
      * @param Environment $twig
-     * @param string      $childId
+     * @param null|string $externalId
      * @return string
      * @throws Twig_Error_Loader
      * @throws Twig_Error_Runtime
      * @throws Twig_Error_Syntax
      */
-    public function render(Environment $twig, string $childId): string
+    public function render(Environment $twig, ?string $externalId): string
     {
-        $travelLogs = $this->getTravelLog($childId);
+        $travelLogs = $this->getTravelLog($externalId);
 
         return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
     }
@@ -93,13 +93,13 @@ Class Renderer
     /**
      * Returns array of student travel logs for verso school
      *
-     * @param null|string $childId
+     * @param null|string $externalId
      * @return array
      */
-    public function getTravelLog(?string $childId): array
+    public function getTravelLog(?string $externalId): array
     {
-        if ($this->isTravelLogAvailable($childId)) {
-            return (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($childId, $this->cachingTimeout);
+        if ($this->isTravelLogAvailable($externalId)) {
+            return (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
         }
 
         return [];
@@ -110,7 +110,7 @@ Class Renderer
      * Decide if a TravelLog can be produced for user $externalId
      * Must fulfil multiple criteria
      *
-     * @param string|null $externalId
+     * @param null|string $externalId
      * @return bool
      */
     public function isTravelLogAvailable(?string $externalId): bool
