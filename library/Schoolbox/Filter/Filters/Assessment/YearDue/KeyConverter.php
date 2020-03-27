@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 
 /**
@@ -27,11 +26,11 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return new Collection();
+        return 0;
     }
 
 

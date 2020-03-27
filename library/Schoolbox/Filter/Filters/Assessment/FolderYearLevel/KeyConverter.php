@@ -47,11 +47,12 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|int[]|null[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return $this->yearLevelIds->shallowClone()->offsetSet(Definition::KEY_NONE, null);
+        // +1 for KEY_NONE
+        return $this->yearLevelIds->count() + 1;
     }
 
 

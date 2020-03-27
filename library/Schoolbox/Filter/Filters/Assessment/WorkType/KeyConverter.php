@@ -47,7 +47,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem(string $key, User $user, string $page): ?int
     {
-        if(Definition::KEY_NONE === $key){
+        if (Definition::KEY_NONE === $key) {
             return null;
         }
         $this->assertValidKey($key, $user, $page);
@@ -57,13 +57,12 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return $this->workTypeIds->shallowClone()->offsetSet(Definition::KEY_NONE, null);
+        // +1 for KEY_NONE
+        return $this->workTypeIds->count() + 1;
     }
 
 

@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 
 use InvalidArgumentException;
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\GenericCollection;
@@ -131,12 +130,12 @@ class Factory extends FolderFilter\Factory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(static function ($folderId) {
-                return $folderId;
-            });
-
-        // Inject the folder mapper in here
-        return new KeyConverter($filter, $folderIds, $this->getAccess(), $this->getFolderMapper());
+//        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
+//            ->indexByCallback(static function ($folderId) {
+//                return $folderId;
+//            });
+//
+//        // Inject the folder mapper in here
+        return new KeyConverter($filter, $this->getFolderMapper(), $this->getAccess());
     }
 }

@@ -48,9 +48,8 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections, \Schoolbox\User $user, string $page): ?Collection
     {
-        $allItems       = $this->getAllPossibleItems();
-        $availableItems = $allItems->emptyClone();
-        $selectedItems  = $allItems->emptyClone();
+        $availableItems = new Collection();
+        $selectedItems  = new Collection();
 
         // No available selections?
         if (0 === $availableSelections->count()) {
@@ -68,7 +67,7 @@ abstract class AbstractKeyConverter implements IKeyConverter
             }
         }
 
-        $countAll       = $allItems->count();
+        $countAll       = $this->possibleItemCount();
         $countSelected  = $selectedItems->count();
         $countAvailable = $availableItems->count();
 

@@ -14,9 +14,10 @@ use Schoolbox\GenericCollection;
  * Knows how to map between an option.key and the item
  * represented by the key, and get the key from an item
  *
- * Must know about all possible items so it can decide whether a filter needs to be applied
+ * Must know how many possible items in each filter, so it can decide whether a
+ * filter needs to be applied
  *
- * @see AbstractKeyConverter::getAllPossibleItems()
+ * @see AbstractKeyConverter::possibleItemCount()
  */
 interface IKeyConverter
 {
@@ -44,11 +45,9 @@ interface IKeyConverter
 
 
     /**
-     * Get all possible items for this filter (regardless of whether they are configured to be available).
+     * Get the number of possible items for this filter.
      *
-     * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
-     *
-     * @return Collection|int[]|string[] (intentionally not a GenericCollection)
+     * @return int
      */
-    public function getAllPossibleItems(): Collection;
+    public function possibleItemCount(): int;
 }

@@ -46,11 +46,11 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return $this->eventTypeIds->shallowClone();
+        return $this->eventTypeIds->count();
     }
 
 

@@ -7,11 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\MarkPerCap;
 
-use function in_array;
 use InvalidArgumentException;
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
+use function in_array;
 
 class KeyConverter extends AbstractKeyConverter
 {
@@ -28,11 +27,11 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @return Collection|string[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return new Collection(Definition::getStaticCustomKeys());
+        return count(Definition::getStaticCustomKeys());
     }
 
 
@@ -41,7 +40,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if(in_array($key, Definition::getStaticCustomKeys(), true)){
+        if (in_array($key, Definition::getStaticCustomKeys(), true)) {
             return;
         }
         throw new InvalidArgumentException("Key appears invalid: '$key'");

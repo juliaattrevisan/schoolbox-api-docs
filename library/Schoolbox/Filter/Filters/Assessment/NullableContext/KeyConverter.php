@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter;
 use Schoolbox\User;
 
 
@@ -81,10 +81,8 @@ class KeyConverter extends Filter\AbstractKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections, User $user, string $page): ?Collection
     {
-        /** @var Collection|int[] $allItems */
-        $allItems       = $this->getAllPossibleItems();
-        $availableItems = $allItems->emptyClone();
-        $selectedItems  = $allItems->emptyClone();
+        $availableItems = new Collection();
+        $selectedItems  = new Collection();
 
         // No available selections?
         if (0 === $availableSelections->count()) {
@@ -107,12 +105,12 @@ class KeyConverter extends Filter\AbstractKeyConverter
         if ((1 === $selectedItems->count() && $selectedItems->keyExists(Definition::KEY_NONE)) ||
             (1 === $availableItems->count() && $availableItems->keyExists(Definition::KEY_NONE))) {
             // return an empty set. ie assessments not in this context
-            return $allItems->emptyClone();
+            return new Collection();
         }
 
         // todo this is different to parent logic
         // All concrete items plus the '(none)' option
-        $countAll       = $allItems->count() + 1;
+        $countAll       = $this->possibleItemCount() + 1;
         $countSelected  = $selectedItems->count();
         $countAvailable = $availableItems->count();
 
@@ -123,7 +121,7 @@ class KeyConverter extends Filter\AbstractKeyConverter
         }
 
         // Are a subset of possible options available, and none of the subset were selected ?
-        if($countAll !== $countAvailable && 0 === $countSelected){
+        if ($countAll !== $countAvailable && 0 === $countSelected) {
             // Nothing selected is the same as all available options being selected.
             return $availableItems;
         }
@@ -131,7 +129,6 @@ class KeyConverter extends Filter\AbstractKeyConverter
         // Either not all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
     }
-
 
 
     /**
@@ -151,13 +148,11 @@ class KeyConverter extends Filter\AbstractKeyConverter
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return $this->ids->shallowClone();
+        return $this->ids->count();
     }
 
 

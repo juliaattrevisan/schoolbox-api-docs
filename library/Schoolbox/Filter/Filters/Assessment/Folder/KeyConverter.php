@@ -13,6 +13,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -36,15 +37,21 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
+     * @var FolderMapper
+     */
+    protected $folderMapper;
+
+
+    /**
      * @param Filter\Model $filter
-     * @param Collection   $folderIds
+     * @param FolderMapper $folderMapper
      * @param Access       $access
      */
-    public function __construct(Filter\Model $filter, Collection $folderIds, Access $access)
+    public function __construct(Filter\Model $filter, FolderMapper $folderMapper, Access $access)
     {
         parent::__construct($filter);
-        $this->folderIds = $folderIds->shallowClone();
-        $this->access    = $access;
+        $this->folderMapper = $folderMapper;
+        $this->access       = $access;
     }
 
 
@@ -57,18 +64,16 @@ class KeyConverter extends AbstractKeyConverter
     public function getItem(string $key, User $user, string $page): int
     {
         $this->assertValidKey($key, $user, $page);
-        return $this->folderIds[$key];
+        return (int)$key;
     }
 
 
     /**
-     * Return all available concrete items
-     *
-     * @return Collection|int[]
+     * @inheritDoc
      */
-    public function getAllPossibleItems(): Collection
+    public function possibleItemCount(): int
     {
-        return $this->folderIds->shallowClone();
+        return $this->folderMapper->countAll(['deleted' => true]);
     }
 
 
@@ -77,7 +82,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if (!$this->folderIds->offsetExists($key)) {
+        if (!$this->folderMapper->countByColumn($this->folderMapper->getIdentifierColumn(), $key)) {
             throw new InvalidArgumentException("No Folder ID found for key: $key");
         }
 

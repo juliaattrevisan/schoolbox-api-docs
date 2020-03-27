@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -54,11 +53,7 @@ abstract class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(static function ($folderId) {
-                return $folderId;
-            });
-        return new KeyConverter($filter, $folderIds, $this->getAccess());
+        return new KeyConverter($filter, $this->folderMapper, $this->getAccess());
     }
 
 
