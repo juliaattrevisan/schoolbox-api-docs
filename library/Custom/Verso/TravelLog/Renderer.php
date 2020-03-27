@@ -89,25 +89,13 @@ class Renderer
      */
     public function render(Environment $twig, ?string $externalId): string
     {
-        $travelLogs = $this->getTravelLog($externalId);
+        $travelLogs = [];
 
-        return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
-    }
-
-
-    /**
-     * Returns array of student travel logs for verso school
-     *
-     * @param null|string $externalId
-     * @return array
-     */
-    public function getTravelLog(?string $externalId): array
-    {
         if ($this->isTravelLogAvailable($externalId)) {
-            return (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
+            $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
         }
 
-        return [];
+        return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
     }
 
 

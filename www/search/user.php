@@ -461,7 +461,7 @@ function renderStudent(
     );
 
     // Get the data from Verso API.
-    $travelLogs = $travelLogRenderer->getTravelLog($user->getExternalId());
+    $travelLogs = $travelLogRenderer->render($page->getTwig(), $user->getExternalId());
 
     $page->setVar(
         'OUTPUT',
