@@ -2517,6 +2517,8 @@ abstract class Mapper implements IMapper, Serializable
         $select = "SELECT $selection";
 
         // grab a from string if it hasn't been implemented yet
+        // I cannot tell from a predicate builder if it touches tables outside
+        // this mapper's table, so I must include joins if present.
         if (!($from = $this->getFromString())) {
             $from = "FROM {$this->getTable()}";
         }
