@@ -72,16 +72,9 @@ Class Renderer
      */
     public function render(Environment $twig, string $childId): string
     {
-        if ($this->isTravelLogAvailable($childId)) {
-            $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($childId, $this->cachingTimeout);
+        $travelLogs = $this->getTravelLog($childId);
 
-            if (isset($travelLogs['data']) && !empty($travelLogs['data'])) {
-                return $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]);
-            }
-        }
-
-        return '';
-
+        return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
     }
 
 
