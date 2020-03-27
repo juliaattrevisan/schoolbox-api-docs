@@ -119,6 +119,6 @@ class Renderer
         return
             ($this->schoolCode === self::VERSO_SCHOOL_CODE) &&
             ($this->clientId !== '' && $this->clientSecret !== '') &&
-            (null !== $externalId);
+            ('' !== (string)$externalId);
     }
 }
