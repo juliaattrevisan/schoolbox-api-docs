@@ -9,9 +9,9 @@ namespace Custom\Verso\TravelLog;
 
 use Alaress\Redis;
 use Twig\Environment;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Class Renderer
@@ -84,11 +84,11 @@ class Renderer
      * Render a twig fragment containing the TravelLog data for $externalId
      *
      * @param Environment $twig
-     * @param null|string $externalId
+     * @param string|null $externalId
      * @return string
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Runtime
-     * @throws Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function render(Environment $twig, ?string $externalId): string
     {
