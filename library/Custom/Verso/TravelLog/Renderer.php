@@ -11,6 +11,9 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
 
 Class Renderer
 {
@@ -58,16 +61,18 @@ Class Renderer
 
 
     /**
+     * Render a twig fragment containing the TravelLog data for $childId
+     *
      * @param Environment $twig
      * @param string      $childId
      * @return string
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * @throws Twig_Error_Loader
+     * @throws Twig_Error_Runtime
+     * @throws Twig_Error_Syntax
      */
     public function render(Environment $twig, string $childId): string
     {
-        if ($this->isVerso() && $this->isCredentialValid()) {
+        if ($this->isTravelLogAvailable($childId)) {
             $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($childId, $this->cachingTimeout);
 
             if (isset($travelLogs['data']) && !empty($travelLogs['data'])) {
@@ -79,37 +84,40 @@ Class Renderer
 
     }
 
+
     /**
      * Returns array of student travel logs for verso school
      *
-     * @param string $childId
+     * @param null|string $childId
      * @return array
      */
-    public function getTravelLog(string $childId): array
+    public function getTravelLog(?string $childId): array
     {
-        if ($this->isVerso() && $this->isCredentialValid()) {
+        if ($this->isTravelLogAvailable($childId)) {
             return (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($childId, $this->cachingTimeout);
         }
+
         return [];
     }
 
-    /**
-     *
-     * @return bool
-     */
-    private function isVerso(): bool
-    {
-        return $this->schoolCode === self::VERSO_SCHOOL_CODE;
-    }
 
     /**
+     * Decide if a TravelLog can be produced for user $externalId
+     * Must fulfil multiple criteria
      *
-     * Check whether credentials were provided and are not null
+     * @param string|null $externalId
      * @return bool
      */
-    private function isCredentialValid(): bool
+    public function isTravelLogAvailable(?string $externalId): bool
     {
-        return ($this->clientId !== '' && $this->clientSecret !== '');
-    }
 
+        /* 1. school_code must be set to "verso" (note that site_location is VIST...)
+         * 2. api credentials must exist (they can be incorrect, but they must exist)
+         * 3. an external id must exist
+         */
+        return
+            ($this->schoolCode === self::VERSO_SCHOOL_CODE) &&
+            ($this->clientId !== '' && $this->clientSecret !== '') &&
+            (null !== $externalId);
+    }
 }
