@@ -2532,20 +2532,35 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function isJoinRequired(?string $selection, array $columnList, array $options): bool
     {
-        if (strpos($selection ?? '', '.') !== false) {
+        if ($this->isJoinRequiredOnColumn($selection)) {
             return true;
         }
         foreach ($columnList as $column => $value) {
-            if (strpos($column, '.') !== false) {
+            if ($this->isJoinRequiredOnColumn($column)) {
                 return true;
             }
         }
-        foreach ($options['order'] ?? [] as $column => $value) {
-            if (strpos($column, '.') !== false) {
-                return true;
+        if (is_iterable($options['order'])) {
+            foreach ($options['order'] as $column => $value) {
+                if ($this->isJoinRequiredOnColumn($column)) {
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+
+    /**
+     * Is a join required on this column?
+     *
+     * @param mixed $column Anything could be passed in an order options array,
+     *                      so account for anything.
+     * @return bool
+     */
+    private function isJoinRequiredOnColumn($column): bool
+    {
+        return is_string($column) && strpos($column, '.') !== false;
     }
 
 
