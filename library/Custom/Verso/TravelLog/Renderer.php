@@ -3,19 +3,24 @@
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Custom\Verso\TravelLog;
 
 use Alaress\Redis;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig_Error_Loader;
 use Twig_Error_Runtime;
 use Twig_Error_Syntax;
 
-Class Renderer
+/**
+ * Class Renderer
+ *
+ * Render a TravelLog data set for a given student $externalId
+ *
+ * @package Custom\Verso\TravelLog
+ */
+class Renderer
 {
 
     /**
