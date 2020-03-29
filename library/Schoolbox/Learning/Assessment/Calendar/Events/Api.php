@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -83,6 +82,7 @@ class Api implements Calendar_Api_EventType_Interface
     public function getEvents($startTimestamp, $endTimestamp)
     {
         $assessments = $this->assessmentDataSource->findAllBetweenDates(
+            $this->user,
             Alaress_Date_Format::newFromTimestamp($startTimestamp),
             Alaress_Date_Format::newFromTimestamp($endTimestamp),
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
@@ -94,7 +94,7 @@ class Api implements Calendar_Api_EventType_Interface
 
         $stack = new Collection();
         foreach ($assessments as $assessment) {
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, false)) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
                 continue;
             }
 

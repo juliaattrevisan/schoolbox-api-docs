@@ -571,19 +571,21 @@ class MapperProxy
     /**
      * Find every assessment due between one of these dates.
      *
+     * @param User                $user
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @param array|null          $ids If provided, restrict search to these IDs
      * @return GenericCollection|IAssessable[]
      */
     public function findAllBetweenDates(
+        User $user,
         Alaress_Date_Format $from,
         Alaress_Date_Format $to,
         array $ids = null
     ): GenericCollection {
         $options['due_after']  = $from;
         $options['due_before'] = $to;
-        $builder               = $this->convertOptionsToPredicateBuilder($options, false);
+        $builder               = $this->convertOptionsToPredicateBuilder($options, true);
 
         if (isset($ids)) {
             if (empty($ids)) {
@@ -594,7 +596,7 @@ class MapperProxy
             // otherwise, build predicates for the non-empty list of IDs
             $builder->in('id', $ids);
         }
-        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicatesForParticipant($builder, $user, $options));
     }
 
 
