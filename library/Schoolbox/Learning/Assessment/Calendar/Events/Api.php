@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -116,7 +117,7 @@ class Api implements Calendar_Api_EventType_Interface
 
         try {
             $assessment = $this->assessmentDataSource->findById($eventId);
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, false)) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
                 return $stack;
             }
             $event      = $this->transformAssessmentToEvent($assessment, $this->user);
@@ -143,11 +144,13 @@ class Api implements Calendar_Api_EventType_Interface
     {
         try {
             $participation = $assessment->getParticipant($student);
+            $dueDate = $participation->getDueDate();
+            $description = $participation->getDescription();
         } catch (UnexpectedValueException $e) {
-            return null;
+            $dueDate = $assessment->getDueAt();
+            $description = $assessment->getDescription();
         }
 
-        $dueDate = $participation->getDueDate();
 
         // Can't show an event if I don't know when to show it
         if (!$dueDate || $dueDate instanceof Alaress_Date_NullDate) {
@@ -168,7 +171,7 @@ class Api implements Calendar_Api_EventType_Interface
         // All assessment events can be populated identically now
         $event->setEventId($assessment->getId());
         $event->setTitle($assessment->getTitle());
-        $event->setDetail($participation->getDescription());
+        $event->setDetail($description);
         $event->setPublishDate($assessment->getPublishAt());
         $event->setResourceId($assessment->getId());
         $folderColour = $assessment->getContext()->getFolder()->getColour();
