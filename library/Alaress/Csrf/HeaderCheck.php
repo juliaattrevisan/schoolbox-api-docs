@@ -79,6 +79,11 @@ class HeaderCheck
             )
         );
 
+        // If we have no way to match referrer let them pass
+        if(count($sources) === 0) {
+            return true;
+        }
+
         // Check each combination; if any match, we have a match
         foreach ($sources as $source) {
             foreach ($targets as $target) {

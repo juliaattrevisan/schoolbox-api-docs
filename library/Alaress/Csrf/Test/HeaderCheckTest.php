@@ -86,7 +86,7 @@ class HeaderCheckTest extends TestCase
                 'serverVars' => [
                     'HTTP_HOST' => '192.168.36.10',
                 ],
-                'expectedResult' => false,
+                'expectedResult' => true,
             ],
             'noTarget' => [
                 'serverVars' => [
@@ -96,14 +96,14 @@ class HeaderCheckTest extends TestCase
             ],
             'noSourceOrTarget' => [
                 'serverVars' => [],
-                'expectedResult' => false,
+                'expectedResult' => true,
             ],
             'malformedOrigin' => [
                 'serverVars' => [
                     'HTTP_ORIGIN' => 'file://',
                     'HTTP_HOST'   => '192.168.36.10',
                 ],
-                'expectedResult' => false,
+                'expectedResult' => true,
             ],
         ];
     }
@@ -167,7 +167,7 @@ class HeaderCheckTest extends TestCase
             'noSource' => [
                 'serverVars' => [],
                 'validHost' => '192.168.36.10',
-                'expectedResult' => false,
+                'expectedResult' => true,
             ],
         ];
     }
