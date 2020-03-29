@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -147,10 +147,13 @@ class Pipe implements PipeInterface
 	}
 
     /**
+     * Extract the websocket request from out of the connection interface.
+     *
      * @param ConnectionInterface $conn
      * @return RequestInterface
+     * @throws \TypeError if somehow the websocket request doesn't exist
      */
-	protected static function extractWebSocketRequest(ConnectionInterface $conn)
+	public static function extractWebSocketRequest(ConnectionInterface $conn): RequestInterface
     {
         // kosher according to http://socketo.me/docs/migration-3
         return $conn->httpRequest;
@@ -188,4 +191,4 @@ class Pipe implements PipeInterface
     }
 
 
-} 
+}
