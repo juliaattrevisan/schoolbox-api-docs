@@ -146,6 +146,7 @@ class Definition extends Filter\AbstractDefinition
                         self::KEY_CUSTOM_UPCOMING,
                         self::KEY_CUSTOM_OPEN,
                         self::KEY_CUSTOM_OVERDUE,
+                        self::KEY_CUSTOM_CLOSED,
                     ], true)) {
                         $cleanedPageOptions->offsetUnset($idx);
                     }
