@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -97,7 +98,7 @@ class Api implements Calendar_Api_EventType_Interface
                 continue;
             }
 
-            $event = $this->transformAssessmentToEvent($assessment);
+            $event = $this->transformAssessmentToEvent($assessment, $this->user);
             if ($event) {
                 $stack->add($event);
             }
@@ -118,7 +119,7 @@ class Api implements Calendar_Api_EventType_Interface
             if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, false)) {
                 return $stack;
             }
-            $event      = $this->transformAssessmentToEvent($assessment);
+            $event      = $this->transformAssessmentToEvent($assessment, $this->user);
             if ($event) {
                 $stack->add($event);
             }
@@ -135,11 +136,18 @@ class Api implements Calendar_Api_EventType_Interface
      * TODO consider putting this somewhere common, where the other assessment event renderers can use it
      *
      * @param IAssessable $assessment
+     * @param User        $student
      * @return EventInterface|null
      */
-    private function transformAssessmentToEvent(IAssessable $assessment): ?EventInterface
+    private function transformAssessmentToEvent(IAssessable $assessment, User $student): ?EventInterface
     {
-        $dueDate = $assessment->getDueAt();
+        try {
+            $participation = $assessment->getParticipant($student);
+        } catch (UnexpectedValueException $e) {
+            return null;
+        }
+
+        $dueDate = $participation->getDueDate();
 
         // Can't show an event if I don't know when to show it
         if (!$dueDate || $dueDate instanceof Alaress_Date_NullDate) {
@@ -160,7 +168,7 @@ class Api implements Calendar_Api_EventType_Interface
         // All assessment events can be populated identically now
         $event->setEventId($assessment->getId());
         $event->setTitle($assessment->getTitle());
-        $event->setDetail($assessment->getDescription());
+        $event->setDetail($participation->getDescription());
         $event->setPublishDate($assessment->getPublishAt());
         $event->setResourceId($assessment->getId());
         $folderColour = $assessment->getContext()->getFolder()->getColour();
