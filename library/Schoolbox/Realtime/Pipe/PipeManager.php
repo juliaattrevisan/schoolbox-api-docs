@@ -670,6 +670,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
             $this->sendHeader($pipe, 401);
+            $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
         }
 
