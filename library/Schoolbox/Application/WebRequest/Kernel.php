@@ -487,7 +487,7 @@ class Kernel extends WebKernelAbstract
             // TODO replace the call to Sitepage::error() method
             /** @var \SitePage $page */
             $page = $di->get('layoutEngine');
-            $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
+            $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Your request has been blocked as we suspect you have submitted this from the another location. If you intended to submit this, and you are still receiving this error, please check your browser plugins and disable any that you do not need.', 403);
         }
 
 
