@@ -100,9 +100,18 @@ class Pipe implements PipeInterface
     /**
      * @return void
      */
-	public function close() {
-		$this->socketConnection->close();
-	}
+    public function close()
+    {
+        // TODO I am not sure whether this needs to happen if calling $this->socketConnection->close()
+        // Explicitly close the descriptor to the temp file associated with the
+        // request that initiated this connection.
+        // Before this fix, we were running out of file descriptors because they
+        // were never being released due to a bug in the vendor implementation.
+        self::extractWebSocketRequest($this->socketConnection)->getBody()->close();
+
+        // And close the socket connection itself
+        $this->socketConnection->close();
+    }
 
 	/**
 	 * @param string $data
@@ -153,7 +162,7 @@ class Pipe implements PipeInterface
      * @return RequestInterface
      * @throws \TypeError if somehow the websocket request doesn't exist
      */
-	public static function extractWebSocketRequest(ConnectionInterface $conn): RequestInterface
+	protected static function extractWebSocketRequest(ConnectionInterface $conn): RequestInterface
     {
         // kosher according to http://socketo.me/docs/migration-3
         return $conn->httpRequest;

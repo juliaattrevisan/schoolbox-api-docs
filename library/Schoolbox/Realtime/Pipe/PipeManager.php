@@ -198,16 +198,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onClose(ConnectionInterface $conn)
     {
-        // Explicitly close the descriptor to the temp file associated with the
-        // request that initiated this connection.
-        // Before this fix, we were running out of file descriptors because they
-        // were never being released due to a bug in the vendor implementation.
-        Pipe::extractWebSocketRequest($conn)->getBody()->close();
-
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
-        $key  = Pipe::getSocketKeyForConnection($conn);
-        $pipe = $this->pipes->getPipeBySocketKey($key);
-        $this->pipes->unregisterPipe($key);
+        $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
+        $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
+        $this->pipes->unregisterPipe($socketKeyForConnection);
         $pipe->close();
     }
 
