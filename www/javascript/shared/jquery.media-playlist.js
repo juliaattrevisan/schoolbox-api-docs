@@ -28,7 +28,7 @@
              * (if there is one.)
              */
             if (self.settings.autoNext) {
-                self.playerElement.data('mediaelementplayer').$media.on('ended.mediaPlaylist', function (event) {
+                self.playerElement.on('ended.mediaPlaylist', function (event) {
                     // Get list of hrefs in the playlist,
                     // look for current ID in that list,
                     // play the next one if there is one.
@@ -60,7 +60,6 @@
      */
     MediaPlaylist.prototype.loadTrack = function(href, autoplay) {
         var player = this.playerElement.data('mediaelementplayer');
-        player.pause();
         player.setSrc(href);
 
         // Find the requested track in the playlist
@@ -70,6 +69,7 @@
         if (playlistLink.length) {
             this.playerTitle.text(playlistLink.text());
         }
+        player.load();
         if (autoplay) {
             player.play();
         }
