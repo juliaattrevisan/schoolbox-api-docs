@@ -205,11 +205,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         Pipe::extractWebSocketRequest($conn)->getBody()->close();
 
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
-        $key = Pipe::getSocketKeyForConnection($conn);
+        $key  = Pipe::getSocketKeyForConnection($conn);
+        $pipe = $this->pipes->getPipeBySocketKey($key);
         $this->pipes->unregisterPipe($key);
-
-        // And finally send a close message to the connection that requested a close
-        $conn->close();
+        $pipe->close();
     }
 
 
