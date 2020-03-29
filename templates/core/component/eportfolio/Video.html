@@ -12,9 +12,9 @@
                 // setting video plugin's poster doesn't work as expected,
                 // so set the video's poster directly
                 videoElement.attr('poster', $poster);
-                video.pause();
                 video.setSrc($target);
                 video.setPoster($poster);
+                video.load();
             });
         });
     </script>
@@ -26,7 +26,6 @@
             <section>
                 <!-- BEGIN default_video -->
                 <video data-videocomponent
-                       controls
                        preload="none"
                        poster="/cms/videoThumb.php?type=myfile&id={DEFAULT_VIDEO_ID}&size=poster"
                        height="400"
