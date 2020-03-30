@@ -23,15 +23,31 @@ use Alaress\Web\Output;
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
     /**
-     * Set generic cache headers.
+     * Set the cache's max age in the response header.
      *
      * @param int $maxAge Allow the response to be this many seconds old before
      *                    it is stale.
      */
-    public function setCacheHeaders(int $maxAge): void
+    public function setCacheMaxAge(int $maxAge): void
     {
         header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
         header_remove('Pragma');
+    }
+
+
+    /**
+     * Set the cache's max age in the response header, from a config value.
+     *
+     * @param string $configName Set the max age to the value of this config,
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function setCacheMaxAgeFromConfig(string $configName): void
+    {
+        /** @var IConfigLoader $config */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $config = $this->get('config');
+        $maxAge = $config->get($configName);
+        $this->setCacheMaxAge((int)$maxAge);
     }
 
 
