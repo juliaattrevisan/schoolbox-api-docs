@@ -10,6 +10,8 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
+header('Cache-Control: max-age=10800, private');
+
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
@@ -25,6 +27,7 @@ try {
         $image->stream();
         exit;
     }
+} catch (Exception $e) {
+    // fall through
 }
-catch (Exception $e) { }
 SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], 404);

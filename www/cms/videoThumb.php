@@ -8,11 +8,14 @@
  * @link        https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
 use Schoolbox\Video\QueueMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+header('Cache-Control: max-age=10800, private');
 
 $type = $_GET['type'];
 $id   = $_GET['id'];
@@ -20,8 +23,7 @@ $id   = $_GET['id'];
 // If no size was specified, assume thumbnail else poster
 if (strlen($_GET['size']) === 0) {
     $size = 'thumbnail';
-}
-else {
+} else {
     $size = 'poster';
 }
 
@@ -72,10 +74,9 @@ if (isset($type) && isset($id)) {
     try {
         // Try to find a video record with associated poster and thumbnail links
 
-        if($size == 'poster') {
+        if ($size == 'poster') {
             $imageFilename = $videoQueue->getPosterPath();
-        }
-        else {
+        } else {
             $imageFilename = $videoQueue->getThumbnailPath();
         }
 
@@ -86,9 +87,9 @@ if (isset($type) && isset($id)) {
             /** \League\Flysystem\File $image */
             $image = $filesystem->get($imageFilename);
 
-            header('Cache-Control: max-age=10800, private');
-            header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-            header('Pragma: private');
+//            header('Cache-Control: max-age=10800, private');
+//            header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+//            header('Pragma: private');
             header('Content-Type: image/jpeg');
             /** @noinspection PhpUndefinedMethodInspection */
             header("Content-Length: {$image->getSize()}");

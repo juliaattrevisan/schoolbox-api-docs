@@ -2,16 +2,19 @@
 /**
  * ${NAME}
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+
 use Alaress\Image\Cache;
 use Alaress\Image\Processor;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+header('Cache-Control: max-age=10800, private');
 
 /* Preserve old checks
  */
@@ -29,11 +32,11 @@ try {
 }
 
 if (isset($_GET['key'])) {
-    $key = $_GET['key'];
+    $key       = $_GET['key'];
     $transform = new \Alaress\Image\Transformation\Storage();
 
 } elseif (isset($_GET['width']) && isset($_GET['height'])) {
-    $key = $_GET['width'] . 'x' . $_GET['height'];
+    $key       = $_GET['width'] . 'x' . $_GET['height'];
     $transform = new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']);
 
 } else {
