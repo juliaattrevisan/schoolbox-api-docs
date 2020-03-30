@@ -25,7 +25,7 @@ class TeamsController extends AbstractController implements InternalInterface
     /**
      * The icon for this controller; appears in the accordion
      */
-    private const ICON = 'icon-progress';
+    private const ICON = 'progress';
 
 
     /**
