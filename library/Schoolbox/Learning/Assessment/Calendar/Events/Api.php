@@ -83,9 +83,9 @@ class Api implements Calendar_Api_EventType_Interface
     public function getEvents($startTimestamp, $endTimestamp)
     {
         $assessments = $this->assessmentDataSource->findAllBetweenDates(
-            $this->user,
             Alaress_Date_Format::newFromTimestamp($startTimestamp),
             Alaress_Date_Format::newFromTimestamp($endTimestamp),
+            $this->visibility ? $this->user : null,
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
