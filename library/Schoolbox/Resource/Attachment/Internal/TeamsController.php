@@ -23,6 +23,18 @@ class TeamsController extends AbstractController implements InternalInterface
 {
 
     /**
+     * The icon for this controller; appears in the accordion
+     */
+    private const ICON = 'icon-progress';
+
+
+    /**
+     * The name of this controller; appears in the accordion
+     */
+    private const LABEL = 'Microsoft Teams Meetings';
+
+
+    /**
      * @param bool          $multi
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
@@ -52,7 +64,7 @@ class TeamsController extends AbstractController implements InternalInterface
      */
     public function getIcon()
     {
-        return 'icon-progress';
+        return self::ICON;
     }
 
     /**
@@ -60,7 +72,7 @@ class TeamsController extends AbstractController implements InternalInterface
      */
     public function getLabel()
     {
-        return 'Microsoft Teams Meetings';
+        return self::LABEL;
     }
 
     /**
