@@ -30,7 +30,7 @@ class Factory {
      * external
      * External filesystems only
      */
-    const EXTERNAL = 'external.webdav,external.google,external.office';
+    const EXTERNAL = 'external.webdav,external.google,external.office,external.teams';
 
     /**
      * Default configuration of resource picker filesystems
@@ -47,7 +47,8 @@ class Factory {
         'external' => [
             'webdav' => External\WebdavController::class,
             'google' => External\GoogleController::class,
-            'office' => External\Office365Controller::class
+            'office' => External\Office365Controller::class,
+            'teams' => External\TeamsController::class
         ]
     ];
 
