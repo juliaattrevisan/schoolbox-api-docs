@@ -517,7 +517,7 @@ abstract class Kernel
         $di->set(
             'commsNewsArticleResolver',
             $di->lazy(
-                function () use ($di) {
+                static function () use ($di) {
                     /**
                      * @var IConnector                            $db
                      * @var External_UserInterface                $externalUser
@@ -536,7 +536,7 @@ abstract class Kernel
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
                     $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
                     $userMapper       = $mapperFactory->get(UserMapper::class);
-                    $articleResolver  = new News\Audience\ArticleResolver(
+                    return new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
                         $strategyFactory->getValidRelationshipEntityMap(),
                         $db,
@@ -551,8 +551,6 @@ abstract class Kernel
                         ),
                         $strategyFactory->makeAllSimpleStrategies()
                     );
-
-                    return $articleResolver;
                 }
             )
         );
