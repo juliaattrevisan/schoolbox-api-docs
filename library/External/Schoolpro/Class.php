@@ -48,7 +48,7 @@ class External_Schoolpro_Class implements External_ClassInterface
 
             foreach ($this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]) as $currentStudent) {
                 $student = [
-                    'synergy_id'              => $currentStudent['ID'],
+                    'synergy_id'              => (string)$currentStudent['ID'],
                     'firstname'               => $currentStudent['Firstname'],
                     'lastname'                => $currentStudent['Surname'],
                     'yearlevel '              => $currentStudent['YearLevel'],
@@ -74,7 +74,7 @@ class External_Schoolpro_Class implements External_ClassInterface
                 [
                     'pUserName'  => 'alaress',
                     'pUserPass'  => 'alaress',
-                    'pSchoolNum' => $student['synergy_id'],
+                    'pSchoolNum' => (int)$student['synergy_id'],
                 ]
             );
 
