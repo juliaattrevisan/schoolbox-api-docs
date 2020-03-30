@@ -18,7 +18,7 @@ class Factory {
      * internal
      * Publicly-accessible filesystems
      */
-    const INTERNAL = 'internal.upload,internal.usermedia,internal.browse';
+    const INTERNAL = 'internal.upload,internal.usermedia,internal.browse,internal.teams';
 
     /**
      * internal-myfile
@@ -43,11 +43,12 @@ class Factory {
             'usermedia' => Internal\UsermediaController::class,
             'browse'    => Internal\BrowseController::class,
             'myfile'    => Internal\MyfileController::class,
+            'teams'     => Internal\TeamsController::class
         ],
         'external' => [
             'webdav' => External\WebdavController::class,
             'google' => External\GoogleController::class,
-            'office' => External\Office365Controller::class
+            'office' => External\Office365Controller::class,
         ]
     ];
 
