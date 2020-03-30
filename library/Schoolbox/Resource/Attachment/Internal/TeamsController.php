@@ -79,7 +79,7 @@ class TeamsController extends AbstractController implements InternalInterface
         }
 
         $this->teamsUrl = (string)$conf->get('teams_url');
-        $this->domain = $conf->get('site_hostname') . '.' . $conf->get('site_domain');
+        $this->domain = '' !== $conf->get('site_hostname') ? $conf->get('site_hostname') . '.' . $conf->get('site_domain') : $conf->get('site_domain');
     }
 
 
