@@ -1,5 +1,15 @@
+<script type="text/javascript" src="/javascript/components/jquery/dist/jquery.min.js"></script>
+
 <script>
-    // window.top.postMessage(JSON.stringify({data: {docs:'mog'}}), location.origin);
+    $(function() {
+        $('#microsoft-teams').on('load', function () {
+            let meetingUrl = $(this).contents().find('#meetingUrl').html();
+
+            console.log(JSON.stringify({data: {docs: meetingUrl}}));
+
+            window.top.postMessage(JSON.stringify({data: {docs: meetingUrl}}), location.origin);
+        });
+    });
 </script>
 
-<iframe src="{TEAMS_URL}" style="width:100%;height:100%;border:0;"></iframe>
+<iframe id='microsoft-teams' src="{TEAMS_URL}" style="width:100%;height:100%;border:0;"></iframe>
