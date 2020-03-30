@@ -1,3 +1,17 @@
-Microsoft Teams Meetings html goes here, I guess
+<p>
+    Microsoft Teams Meetings html goes here, I guess
+</p>
+
+<p>
+    Options chosen need to be postMessage()'d to window.top, so that some other javascript
+    listening for it can receive and process it accordingly - witnessed in google.html
+</p>
 
 <p><strong>{TEAMS_TEST}</strong></p>
+
+
+<script>
+        window.top.postMessage(JSON.stringify({data: {docs:'mog'}}), location.origin);
+</script>
+
+<p><a id="teamsTest" href="https://www.schoolbox.com.au">Test Link</a></p>
