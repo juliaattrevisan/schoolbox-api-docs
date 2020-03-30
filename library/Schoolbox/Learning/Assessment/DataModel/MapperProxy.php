@@ -573,17 +573,19 @@ class MapperProxy
      *
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
-     * @param array|null          $ids If provided, restrict search to these IDs
+     * @param User|null           $user Participant can be optionally provided to filter to CAP dates
+     * @param array|null          $ids If provided, restrict search to these (filtered) assessment IDs
      * @return GenericCollection|IAssessable[]
      */
     public function findAllBetweenDates(
         Alaress_Date_Format $from,
         Alaress_Date_Format $to,
+        ?User $user = null,
         array $ids = null
     ): GenericCollection {
         $options['due_after']  = $from;
         $options['due_before'] = $to;
-        $builder               = $this->convertOptionsToPredicateBuilder($options, false);
+        $builder               = $this->convertOptionsToPredicateBuilder($options, $user instanceof User);
 
         if (isset($ids)) {
             if (empty($ids)) {
@@ -594,6 +596,12 @@ class MapperProxy
             // otherwise, build predicates for the non-empty list of IDs
             $builder->in('id', $ids);
         }
+
+        //If a participant has been provided make sure we hydrate CAP
+        if($user instanceof User) {
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicatesForParticipant($builder, $user, $options));
+        }
+
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
