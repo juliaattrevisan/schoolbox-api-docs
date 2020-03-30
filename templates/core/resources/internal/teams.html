@@ -5,9 +5,7 @@
         $('#microsoft-teams').on('load', function () {
             let meetingUrl = $(this).contents().find('#meetingUrl').html();
 
-            console.log(JSON.stringify({data: {docs: meetingUrl}}));
-
-            window.top.postMessage(JSON.stringify({data: {docs: meetingUrl}}), location.origin);
+            window.top.postMessage(JSON.stringify({data: {meetingUrl: meetingUrl} }), location.origin);
         });
     });
 </script>
