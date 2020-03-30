@@ -43,7 +43,7 @@
             <h1>{{ record.getHeading }}</h1>
         </div>
     </div>
-    {% if isRouteAuthorized('blog.getModify', { blog: blog, folder: record.getFolder }) %}
+    {% if isRouteAuthorized('blog.getModify', { blog: record, folder: record.getFolder }) %}
     <nav>
         <a class="icon icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"></a>
     </nav>
@@ -102,13 +102,14 @@
             </ul>
         </section>
         {% endif %}
-        {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
+        {% if isRouteAuthorized('blog.postCommentInsert', { blog: record, folder: record.getFolder }) %}
         <form id="commentForm" method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
-            <label class="content">
-                <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
-            </label>
-
-            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+            <section class="content">
+                <label>
+                    <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                </label>
+            </section>
+            <input type="submit" class="button expand submit" name="comment" value="Add comment"/>
         </form>
         {% endif %}
     </div>
