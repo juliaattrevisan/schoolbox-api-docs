@@ -3,7 +3,7 @@ INSERT INTO `config`
 VALUES (
        'teams_enabled',
        0,
-       'Microsoft Teams',
+       'Enable Microsoft Teams Meetings Integration',
        "If toggled to 'ON' users can create links from Microsoft Teams",
        (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
        null,
