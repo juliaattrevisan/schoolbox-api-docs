@@ -51,13 +51,17 @@ class TeamsController extends AbstractController implements InternalInterface
         }
     }
 
+
     /**
      * @inheritDoc
      */
     protected function pparse(SitePage $page)
     {
-        // TODO: Implement pparse() method.
+        $page->setVar([
+            'TEAMS_TEST' => 'Test'
+        ]);
     }
+
 
     /**
      * @inheritDoc
@@ -67,6 +71,7 @@ class TeamsController extends AbstractController implements InternalInterface
         return self::ICON;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -74,6 +79,7 @@ class TeamsController extends AbstractController implements InternalInterface
     {
         return self::LABEL;
     }
+
 
     /**
      * @inheritDoc
