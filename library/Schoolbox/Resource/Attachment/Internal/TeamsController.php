@@ -35,6 +35,14 @@ class TeamsController extends AbstractController implements InternalInterface
 
 
     /**
+     * Url to load the Microsoft Teams React App
+     *
+     * @var string
+     */
+    private $teamsUrl;
+
+
+    /**
      * @param bool          $multi
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
@@ -44,11 +52,23 @@ class TeamsController extends AbstractController implements InternalInterface
     {
         parent::__construct($multi, $mimeFilter);
 
+        if (!$conf) {
+            throw new OutOfRangeException('Config not supplied.');
+        }
+
         /* Decide if  Microsoft Teams is enabled
          */
         if (!(bool)$conf->get('teams_enabled')) {
             throw new OutOfRangeException('Microsoft Teams not enabled');
         }
+
+        /* Must supply a url
+         */
+        if ('' === (string)$conf->get('teams_url')) {
+            throw new OutOfRangeException('Microsoft Teams app url not provided');
+        }
+
+        $this->teamsUrl = (string)$conf->get('teams_url');
     }
 
 
@@ -58,7 +78,7 @@ class TeamsController extends AbstractController implements InternalInterface
     protected function pparse(SitePage $page)
     {
         $page->setVar([
-            'TEAMS_TEST' => 'Test'
+            'TEAMS_URL' => $this->teamsUrl
         ]);
     }
 
