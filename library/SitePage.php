@@ -618,10 +618,10 @@ class SitePage extends Page
         $options['code'] = $code;
         $options         = array_intersect_key($options, $query);
 
-        // The redirect should be cached, but for how long?
-        // Also Pragma gets in the way of caching
-        header('Cache-Control: max-age=10800, private');
-        header_remove('Pragma');
+//        // The redirect should be cached, but for how long?
+//        // Also Pragma gets in the way of caching
+//        header('Cache-Control: max-age=10800, private');
+//        header_remove('Pragma');
 
         static::localRedir("/images/fail.php?" . http_build_query($options), false, 307);
     }
