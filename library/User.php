@@ -197,7 +197,7 @@ class User extends DeprecatedModel
     /**
      * Search the user table for particular user(s)
      *
-     * @param        $keyword
+     * @param string $keyword
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
@@ -261,7 +261,7 @@ class User extends DeprecatedModel
     /**
      * Search for exact matches, e.g. "zane" rather than LIKE
      *
-     * @param        $keyword
+     * @param string $keyword
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
@@ -313,10 +313,10 @@ class User extends DeprecatedModel
     /**
      * Find a user based on a keyword, for an AJAX response.
      *
-     * @param       $keyword
-     * @param int   $group
-     * @param array $residentialHouseIds
-     * @param bool  $limit
+     * @param string $keyword
+     * @param int    $group
+     * @param array  $residentialHouseIds
+     * @param bool   $limit
      * @return array|bool
      * @throws Exception
      */
