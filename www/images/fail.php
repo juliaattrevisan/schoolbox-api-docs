@@ -8,11 +8,19 @@
  */
 
 use Alaress\Image\Cache;
-use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Implementation\Imagine;
+use Alaress\Image\Processor\Freeform;
+use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+// Use the type of transform to determine the timeout
+$kernel->setCacheMaxAgeFromConfig(
+    $_GET['transform_type'] === 'portrait'
+        ? ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT
+        : ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT
+);
 
 //
 // Get the code, then the image path from the code.
@@ -57,7 +65,7 @@ switch ($_GET['transform_type']) {
         } catch (\OutOfBoundsException $e) {
             $transform_key = 'profile';
         }
-        $cache_key     = "portrait-$transform_key";
+        $cache_key = "portrait-$transform_key";
         break;
 
     case 'storage':
@@ -68,11 +76,11 @@ switch ($_GET['transform_type']) {
         } catch (\OutOfBoundsException $e) {
             $transform_key = 'maxsize';
         }
-        $cache_key     = "storage-$transform_key";
+        $cache_key = "storage-$transform_key";
         break;
 
     default:
-        $width     = intval($_GET['width'])  ?: 100;
+        $width     = intval($_GET['width']) ?: 100;
         $height    = intval($_GET['height']) ?: 100;
         $transform = new \Alaress\Image\Transformation\MyImage($width, $height);
         $cache_key = "{$width}x{$height}";
