@@ -22,6 +22,18 @@ use Alaress\Web\Output;
  */
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
+    /**
+     * Set generic cache headers.
+     *
+     * @param int $maxAge Allow the response to be this many seconds old before
+     *                    it is stale.
+     */
+    public function setCacheHeaders(int $maxAge): void
+    {
+        header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
+        header_remove('Pragma');
+    }
+
 
     /**
      * Shutdown handler for either exceptions or fatal errors
