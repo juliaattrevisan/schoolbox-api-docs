@@ -170,7 +170,7 @@ class Mapper extends BaseMapper
 
             // Get all folders the person has permissions to
 
-            $folderIds = $folderMapper->findForUser($this->getSessionUser(), true)->getColumnValues('id');
+            $folderIds = $folderMapper->findFolderIdsForUser($this->getSessionUser(), true);
 
             // Find all the surveys on these pages
 

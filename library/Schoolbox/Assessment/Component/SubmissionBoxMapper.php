@@ -512,10 +512,8 @@ class SubmissionBoxMapper extends BaseMapper
         /** @var Schoolbox\Resource\Folder\Mapper $catMap */
         $catMap = $this->getJoinMapper('category');
         $catMap->setExternalUser(new \External_User());
-        $categories = array();
-        foreach ($catMap->findForUser($user, true) as $cat) {
-            $categories[] = $cat->getId();
-        }
+        $categories = $catMap->findFolderIdsForUser($user, true);
+
         if (!in_array($box->getCategory()->getId(), $categories)) {
             // 403 forbidden error
             throw new Schoolbox\Resource\Exception('Access denied', Schoolbox\Resource\Exception::CODE_ACCESS_DENIED);

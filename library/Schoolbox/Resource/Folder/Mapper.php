@@ -1325,7 +1325,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $query .= ' AND a.type >= :access';
         }
         if ($requireHomepage) {
-            $query .= ' AND h.id IS NOT NULL';
+            $query .= ' AND h.cid IS NOT NULL';
         }
         $params = [
             'user'    => $user->getId(),
@@ -1372,7 +1372,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             WHERE c.deleted_at IS NULL
                         ";
                     if ($requireHomepage) {
-                        $subjectQuery .= ' AND h.id IS NOT NULL';
+                        $subjectQuery .= ' AND h.cid IS NOT NULL';
                     }
                     $subjectQueryParts = [];
                     if (!empty($category_codes)) {
@@ -1434,7 +1434,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         $result = array_keys($ids);
-        sort($result);
         return $result;
     }
 
@@ -1506,7 +1505,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $codeModel->setFolder($collection[$id]);
             }
         }
-        $collection->sortBy('id', 'asc')->reindex();
+        $collection->reindex();
         return $collection;
     }
 
