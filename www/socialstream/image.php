@@ -17,6 +17,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 header('Cache-Control: max-age=10800, private');
+header_remove('Pragma');
 
 $postId = $_GET['id'];
 $size   = $_GET['size'];

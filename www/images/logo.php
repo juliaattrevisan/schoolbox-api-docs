@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 header('Cache-Control: max-age=10800, private');
+header_remove('Pragma');
 
 $placeholders = [
     'skin_logo_login'  => '/core/logo.png',

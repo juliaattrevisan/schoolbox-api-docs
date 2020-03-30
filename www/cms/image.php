@@ -19,6 +19,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 
 header('Cache-Control: max-age=10800, private');
+header_remove('Pragma');
 
 /* Preserve old checks
  */
