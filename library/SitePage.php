@@ -2,12 +2,12 @@
 
 use Alaress\Web\Output;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class SitePage extends Page
 {
@@ -572,15 +572,15 @@ class SitePage extends Page
     /**
      * Redirects to a broken image with a given size.
      *
-     * @param int $width Width of image to show
+     * @param int $width  Width of image to show
      * @param int $height Height of image to show
-     * @param int $code The HTTP error number
+     * @param int $code   The HTTP error number
      */
     public static function redirectToBrokenImageOfSize($width, $height, $code = 500)
     {
         static::redirectToBrokenImage(
             $code,
-            array('width' => $width, 'height' => $height,)
+            ['width' => $width, 'height' => $height,]
         );
     }
 
@@ -588,36 +588,42 @@ class SitePage extends Page
      * Redirects to a broken image with a given transform.
      *
      * @param string $transform_type A string corresponding to an Alaress_Image_Transformation_Abstract instance
-     * @param string $transform A key associated with a list of transforms to execute upon an image
-     * @param int $code The HTTP error number
+     * @param string $transform      A key associated with a list of transforms to execute upon an image
+     * @param int    $code           The HTTP error number
      */
     public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500)
     {
         static::redirectToBrokenImage(
             $code,
-            array('transform_type' => $transform_type, 'transform' => $transform,)
+            ['transform_type' => $transform_type, 'transform' => $transform,]
         );
     }
 
     /**
      * Redirects to a broken image.
      *
-     * @param int $code The HTTP error number
+     * @param int   $code    The HTTP error number
      * @param array $options Options for the size and transformation of the
      *                       broken image.
      */
-    public static function redirectToBrokenImage($code = 500, $options = array())
+    public static function redirectToBrokenImage($code = 500, $options = [])
     {
-        $query = array(
-            'code' => true,
-            'width' => true,
-            'height' => true,
-            'transform' => true,
+        $query           = [
+            'code'           => true,
+            'width'          => true,
+            'height'         => true,
+            'transform'      => true,
             'transform_type' => true,
-        );
+        ];
         $options['code'] = $code;
-        $options = array_intersect_key($options, $query);
-        static::localRedir("/images/fail.php?" . http_build_query($options));
+        $options         = array_intersect_key($options, $query);
+
+        // The redirect should be cached, but for how long?
+        // Also Pragma gets in the way of caching
+        header('Cache-Control: max-age=10800, private');
+        header_remove('Pragma');
+
+        static::localRedir("/images/fail.php?" . http_build_query($options), false, 307);
     }
 
 
