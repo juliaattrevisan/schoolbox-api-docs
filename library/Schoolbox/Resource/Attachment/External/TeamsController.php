@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Attachment\External;
 
+use OutOfRangeException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
 
@@ -19,6 +21,23 @@ use SitePage;
  */
 class TeamsController extends AbstractController implements ExternalInterface
 {
+
+    /**
+     * @param bool          $multi
+     * @param string        $mimeFilter
+     * @param IConfigLoader $conf
+     * @throws OutOfRangeException
+     */
+    public function __construct($multi, $mimeFilter = null, $conf = null)
+    {
+        parent::__construct($multi, $mimeFilter);
+
+        /* Decide if  Microsoft Teams is enabled
+         */
+        if (!(bool)$conf->get('teams_enabled')) {
+            throw new OutOfRangeException('Microsoft Teams not enabled');
+        }
+    }
 
     /**
      * @inheritDoc
