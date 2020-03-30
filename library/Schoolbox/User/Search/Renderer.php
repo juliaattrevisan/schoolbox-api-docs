@@ -82,9 +82,8 @@ class Renderer extends Handler
                     'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
                     'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
                     'USER_POSITION_TITLE' => $user['position_title'],
-                    'USER_SEARCH_CAMPUS' => Scrub::text(
-                        stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
-                    ),
+                    // For now, do not output a user's campus
+                    'USER_SEARCH_CAMPUS' => '',
                     'USER_SEARCH_GROUP' => Scrub::text($user['group_name'])
                 ));
 
