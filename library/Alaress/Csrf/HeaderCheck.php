@@ -112,7 +112,7 @@ class HeaderCheck
         // otherwise it thinks a naked IP or hostname is a path.
         $scheme = parse_url($url, PHP_URL_SCHEME);
         if (false === $scheme) {
-            return null;
+            return 'invalid';
         }
         if (null === $scheme) {
             $url = 'http://'.$url;
@@ -121,7 +121,7 @@ class HeaderCheck
         // Now get a host
         $host = parse_url($url, PHP_URL_HOST);
         if (false === $host) {
-            return null;
+            return 'invalid';
         }
         return $host;
     }

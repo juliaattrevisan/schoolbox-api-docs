@@ -103,7 +103,7 @@ class HeaderCheckTest extends TestCase
                     'HTTP_ORIGIN' => 'file://',
                     'HTTP_HOST'   => '192.168.36.10',
                 ],
-                'expectedResult' => true,
+                'expectedResult' => false,
             ],
         ];
     }
