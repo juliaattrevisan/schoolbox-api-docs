@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Attachment\External;
+namespace Schoolbox\Resource\Attachment\Internal;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
@@ -19,7 +19,7 @@ use SitePage;
  *
  * @package Schoolbox\Resource\Attachment\External
  */
-class TeamsController extends AbstractController implements ExternalInterface
+class TeamsController extends AbstractController implements InternalInterface
 {
 
     /**
