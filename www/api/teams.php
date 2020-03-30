@@ -12,4 +12,4 @@ declare(strict_types=1);
  *
  * We then have more control over how to process the url from then on
  */
-echo sprintf( '<div id="meetingUrl">%s</div>', $_GET['meetingUrl']);
+echo sprintf( '<div id="meetingUrl" style="display:none">%s</div>', $_GET['meetingUrl']);
