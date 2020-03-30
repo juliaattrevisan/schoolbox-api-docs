@@ -19,6 +19,8 @@ use Alaress\Database\Predicate;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 use InvalidArgumentException;
 use Schoolbox\Comms\News;
+use function array_keys;
+use function array_map;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -49,6 +51,12 @@ class ArticleResolver implements IArticleResolver
     /** @var GenericCollection|News\Audience\Segment\ISimpleStrategy[] */
     private $simpleStrategies;
 
+    /** @var Complex\Mapper */
+    private $complexMapper;
+
+    /** @var News\Mapper */
+    private $articleMapper;
+
 
     /**
      * @param bool[]                        $validNullEntities
@@ -72,6 +80,8 @@ class ArticleResolver implements IArticleResolver
         $this->folderMapper       = $folderMapper;
         $this->relationshipFilter = $relationshipFilter;
         $this->simpleStrategies   = $simpleStrategies;
+        $this->complexMapper      = Complex\Mapper::getInstance(); // TODO inject
+        $this->articleMapper      = News\Mapper::getInstance(); // TODO inject
     }
 
 
@@ -182,17 +192,16 @@ class ArticleResolver implements IArticleResolver
             FROM comms_news_audience
             WHERE parent_id IS NULL AND ({$simpleClause})
 
-            UNION 
+            UNION
 
             SELECT parent.comms_news_article_id
-            FROM comms_news_audience comms_news_audience
+            FROM comms_news_audience
             JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
             WHERE ({$complexClause})
             GROUP BY comms_news_audience.parent_id
             HAVING COUNT(comms_news_audience.parent_id) = 2;
         ";
-        $hydrator = News\Audience\Mapper::getInstance()->getColumnScalarHydrator('comms_news_article_id');
-        return array_map([$hydrator, 'hydrate'], $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN));
+        return array_map('intval', $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN));
     }
 
 
@@ -266,169 +275,179 @@ class ArticleResolver implements IArticleResolver
 
 
     /**
-     * Helper function to build a predicate.
-     *
-     * Empty collections will be converted to 'IS NULL' predicates.
-     *
-     * If entity value is NULL or empty, checks current business rules to determine if that is a valid value
-     *
-     * @param Collection|string[]   $whereClauses
-     * @param Collection|mixed[]    $whereParams
-     * @param int                   $paramSuffix So we can distinguish bound args for self and related users.
-     * @param string                $entityType
-     * @param null|array|string|int $entityValue
-     * @param string                $relationship
+     * @inheritdoc
+     * @throws InvalidArgumentException
+     * @throws Predicate\InvalidColumnException
+     * @throws Database\Exception
      */
-    private function buildClause(
-        Collection $whereClauses,
-        Collection $whereParams,
-        int $paramSuffix,
+    public function findArticlesForAudience(
         string $entityType,
         $entityValue,
-        string $relationship
-    ): void {
-        // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
-        if (!$this->validNullEntities[$entityType] && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
-            return;
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
+        // Simple equality case
+        if (Strategy\Composite::getEntityType() !== $entityType) {
+            return $this->findArticlesForSimpleAudience($entityType, $entityValue, $relationship, $publishedOnly, $orderBy, $limit);
         }
 
-        $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
-        $colRelationship = Mapper::FIELD_RELATIONSHIP;
-        $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
-
-        if (null === $entityValue) {
-            $predicate = 'IS NULL';
-        } else {
-            // Convert even single items to sets of 1 for consistent treatment
-            if (!\is_iterable($entityValue)) {
-                $entityValue = [$entityValue];
-            }
-            if (!\count($entityValue)) {
-                $predicate = 'IS NULL';
-            } else {
-                $prefix       = "{$entityType}_{$paramSuffix}";
-                $params       = Predicate\Builder::getArrayParameters($entityValue, $prefix);
-                $placeholders = Predicate\Builder::getArrayPlaceholders($entityValue, $prefix);
-                $predicate    = "IN {$placeholders}";
-                foreach ($params as $placeholder => $val) {
-                    $whereParams[$placeholder] = $val;
-                }
-            }
+        // Complex intersect case
+        if (!\is_array($entityValue) || count($entityValue) !== 2) {
+            throw new InvalidArgumentException('If performing a complex search, $entityValue must be an array of two type:value pairs');
         }
+        [$entityType1, $entityType2] = array_keys($entityValue);
 
-        $table = Mapper::TABLE_NAME;
-        $whereClauses->add("($table.$colEntityType = '$entityType' AND $table.$colRelationship = '$relationship' AND $table.$colEntityValue {$predicate})");
+        return $this->findArticlesForComplexAudience(
+            $entityType1,
+            $entityValue[$entityType1],
+            $entityType2,
+            $entityValue[$entityType2],
+            $relationship,
+            $publishedOnly,
+            $orderBy,
+            $limit
+        );
     }
 
 
     /**
-     * @inheritdoc
-     * @throws InvalidArgumentException
+     * Returns article ids matching specified simple audience
+     *
+     * @param string      $entityType
+     * @param string|null $entityValue
+     * @param string|null $relationship NULL means don't filter by
+     * @param bool        $publishedOnly
+     * @param array       $orderBy
+     * @param int|null    $limit
+     * @return int[]
+     * @throws Database\Exception
      * @throws Predicate\InvalidColumnException
-     * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
-     * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, bool $publishedOnly = true, array $orderBy = [], int $limit = null): array
-    {
-        // Simple equality case
-        if (Strategy\Composite::getEntityType() !== $entityType) {
-            $pb = $this->db
-                ->buildPredicateBuilder(Mapper::TABLE_NAME)
-                ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
-                ->isNull(Mapper::FIELD_PARENT_ID)
-                ->isNull('comms_news_article.deleted_at');
+    private function findArticlesForSimpleAudience(
+        string $entityType,
+        ?string $entityValue,
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
 
-            if (null === $entityValue) {
-                $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
-            } else {
-                $pb->equals(Mapper::FIELD_ENTITY_VALUE, $entityValue);
-            }
-
-            if (null !== $relationship) {
-                $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
-            }
-
-            if ($publishedOnly) {
-                // TODO inject mapper dependency
-                $publishedPb = News\Mapper::getInstance()->getPredicatePublished();
-                $pb          = $pb->all($publishedPb);
-            }
-
-            $whereClause = \implode(' AND ', $pb->getWhere());
-
-            $sql = "
-                SELECT DISTINCT comms_news_article_id
-                FROM comms_news_audience
-                INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
-                WHERE {$whereClause}";
-
-            if (\count($orderBy)) {
-                $sql .= "
-                    {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
-            }
-
-            if (null !== $limit) {
-                $sql .= "
-                    LIMIT :limit";
-                $pb->putParam('limit', $limit);
-            }
-
-            return $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
-        }
-
-        // Complex intersect case
-        if (!\is_array($entityValue)) {
-            throw new InvalidArgumentException('If performing a complex search, $entityValue must be an array of type:value pairs');
-        }
-
-        if (!\count($entityValue)) {
+        // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
+        if (null === $entityValue && !$this->validNullEntities[$entityType]) {
             return [];
         }
 
-        /* Must match all elements/children of composite rule.
-         * eg A1 = [folder:x ∩ role:y ∩ year:z]
-         * findArticlesForAudience([folder:x ∩ role:y]) should not return A1,  as there may be users
-         * in that audience who have year != z and hence should not see article.
-         */
-        $whereClauses = new Collection();
-        $whereParams  = new Collection();
+        $pb = $this->db
+            ->buildPredicateBuilder(Mapper::TABLE_NAME)
+            ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
+            ->isNull('comms_news_article.deleted_at');
 
-        /** @var array $entityValue */
-        foreach ($entityValue as $type => $value) {
-            $this->buildClause($whereClauses, $whereParams, 0, $type, $value, Model::RELATIONSHIP_SELF);
+        if (null === $entityValue) {
+            $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
+        } else {
+            $pb->equals(Mapper::FIELD_ENTITY_VALUE, $entityValue);
         }
 
-        $whereClause = \implode(' OR ', $whereClauses->getAll());
+        if (null !== $relationship) {
+            $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
+        }
 
-        // TODO investigate re-writing this to perform matchCount == availableCount before joining to parent composite rule to get article ids
+        if ($publishedOnly) {
+            $publishedPb = $this->articleMapper->getPredicatePublished();
+            $pb->all($publishedPb);
+        }
+
+        $whereClause = \implode(' AND ', $pb->getWhere());
+
+        // If we are not filtering by relationship, we may be duplicates, which we'll need to filter out.
+        // If we are specifying the relationship, we can avoid the DISTINCT, and hence avoid a temp table.
+        $distinct = null === $relationship ? 'DISTINCT' : '';
+
         $sql = "
-            SELECT t1.comms_news_article_id
-            FROM comms_news_audience t1
-            JOIN (
-              -- Get child segments that match the target audience
-              SELECT parent_id, count(*) AS child_count
-              FROM comms_news_audience
-              WHERE {$whereClause}
-              AND parent_id IS NOT NULL
-              GROUP BY parent_id
-            ) t2 ON t1.id = t2.parent_id
-            JOIN (
-              -- Group all child segments by parent to get count of parents' children.
-              -- If count-matching children == count-available children, then composite segment is a match
-              SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
-            ) t3 ON t1.id = t3.parent_id AND t2.child_count = t3.child_count
+            SELECT {$distinct} comms_news_article_id
+            FROM comms_news_audience
+            INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
+            WHERE {$whereClause}";
+
+        if (\count($orderBy)) {
+            $sql .= "
+                {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
+        }
+
+        if (null !== $limit) {
+            $sql .= "
+                LIMIT :limit";
+            $pb->putParam('limit', $limit);
+        }
+
+        $hydrator = $this->articleMapper->getColumnScalarHydrator($this->articleMapper->getIdentifierColumn());
+        return array_map([
+            $hydrator,
+            'hydrate',
+        ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /**
+     * @param string      $entityType1
+     * @param string|null $entityValue1
+     * @param string      $entityType2
+     * @param string|null $entityValue2
+     * @param string|null $relationship
+     * @param bool        $publishedOnly
+     * @param array       $orderBy
+     * @param int|null    $limit
+     * @return int[]
+     * @throws Database\Exception
+     * @throws Predicate\InvalidColumnException
+     */
+    private function findArticlesForComplexAudience(
+        string $entityType1,
+        ?string $entityValue1,
+        string $entityType2,
+        ?string $entityValue2,
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
+
+        $pb = $this->complexMapper->getCombinationMatchPredicate($entityType1, $entityValue1, $entityType2, $entityValue2);
+
+        if ($relationship !== null) {
+            $pb->equals(Complex\Mapper::FIELD_RELATIONSHIP, $relationship);
+        }
+        if ($publishedOnly) {
+            $pb->all($this->articleMapper->getPredicatePublished());
+        }
+        $pb = $this->articleMapper->getPredicateBuilder()->all($pb);
+
+        // If we are not filtering by relationship, we may be duplicates, which we'll need to filter out.
+        // If we are specifying the relationship, we can avoid the DISTINCT, and hence avoid a temp table.
+        $distinct = null === $relationship ? 'DISTINCT' : '';
+
+        $sql = "
+            SELECT {$distinct} comms_news_article.id
+            FROM comms_news_article
+            JOIN comms_news_audience_complex ON comms_news_audience_complex.comms_news_article_id = comms_news_article.id
+            WHERE {$pb->getWhere()[0]}
         ";
 
-        // Check the exact intersect
-        $articleIds = $this->db->executeQuery($sql, $whereParams->getAll())->fetchAll(PDO::FETCH_COLUMN);
-
-        // Check more generally-audienced articles
-        /** @var array $entityValue */
-        foreach ($entityValue as $type => $value) {
-            // Note we don't pass ORDER BY or LIMIT recursively
-            /** @noinspection SlowArrayOperationsInLoopInspection */
-            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship, $publishedOnly, $orderBy, $limit));
+        if (\count($orderBy)) {
+            $sql .= "\n{$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
         }
-        return \array_unique($articleIds);
+
+        if (null !== $limit) {
+            $sql .= "
+                LIMIT :limit";
+            $pb->putParam('limit', $limit);
+        }
+        $hydrator = $this->articleMapper->getColumnScalarHydrator($this->articleMapper->getIdentifierColumn());
+        return array_map([
+            $hydrator,
+            'hydrate',
+        ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
     }
 }
