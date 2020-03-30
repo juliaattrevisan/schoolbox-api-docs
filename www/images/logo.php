@@ -11,12 +11,11 @@ use Alaress\Image\Cache;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
+use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-
-header('Cache-Control: max-age=10800, private');
-header_remove('Pragma');
+$kernel->setCacheMaxAgeFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 $placeholders = [
     'skin_logo_login'  => '/core/logo.png',

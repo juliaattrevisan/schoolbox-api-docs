@@ -12,13 +12,12 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-
-header('Cache-Control: max-age=10800, private');
-header_remove('Pragma');
+$kernel->setCacheMaxAgeFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
 
 /** @var IConfigLoader $config */
 $config = $kernel->getDependencyInjector()->get('config');

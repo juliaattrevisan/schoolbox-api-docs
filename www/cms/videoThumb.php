@@ -8,15 +8,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
 use Schoolbox\Video\QueueMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-
-header('Cache-Control: max-age=10800, private');
-header_remove('Pragma');
+$kernel->setCacheMaxAgeFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 $type = $_GET['type'];
 $id   = $_GET['id'];

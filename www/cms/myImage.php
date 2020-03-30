@@ -10,12 +10,11 @@
 use Alaress\Image\Cache;
 use Alaress\Image\Processor;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-
-header('Cache-Control: max-age=10800, private');
-header_remove('Pragma');
+$kernel->setCacheMaxAgeFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 /* Preserve old checks
  */

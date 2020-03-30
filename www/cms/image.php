@@ -13,13 +13,12 @@ use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
-
-header('Cache-Control: max-age=10800, private');
-header_remove('Pragma');
+$kernel->setCacheMaxAgeFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 /* Preserve old checks
  */
