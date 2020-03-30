@@ -187,6 +187,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                 /* Microsoft Teams meetings url format
                                                  */
                                                 fields.url.setValue(message.data.meetingUrl);
+
+                                                /* Shut modal, go back to Dialog
+                                                 */
+                                                $('#file-picker').foundation('reveal', 'close');
                                             } else {
 
                                                 // The file was rejected, probably cause it was the wrong mimetype.
