@@ -60,7 +60,7 @@ class TeamsController extends AbstractController implements InternalInterface
      */
     public function getLabel()
     {
-        return 'Microsoft Teams';
+        return 'Microsoft Teams Meetings';
     }
 
     /**
