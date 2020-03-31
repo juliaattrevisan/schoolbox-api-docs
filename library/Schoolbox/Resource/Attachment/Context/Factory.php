@@ -99,7 +99,7 @@ class Factory
         /* Unrecognised context; use default options
          * (Alternatively return empty array?)
          */
-        if (!isset($this->options[$this->context])) {
+        if (!isset(self::OPTIONS[$this->context])) {
             return self::OPTIONS[self::DEFAULT_FILESYSTEM];
         }
 
