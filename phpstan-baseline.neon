@@ -11131,11 +11131,6 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/AbstractController.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$context\\)\\: Unexpected token \"\\$context\", expected type at offset 72$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Context/Factory.php
-
-		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\BrowseController has an unused parameter \\$conf\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/BrowseController.php
