@@ -30,9 +30,9 @@ $this->setVar([
 $factory = new Schoolbox\Resource\Attachment\Factory();
 
 // TODO use DI version
-$factory->setSource($location, $source)
+$factory->setSource($source)
         ->setMimeFilter($mime)
         ->allowMulti($multi)
         ->setConfig($this->getDi()->get('config'));
 
-$factory->build()->parse($this);
+$factory->build($source)->parse($this);

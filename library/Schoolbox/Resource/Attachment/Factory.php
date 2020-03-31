@@ -110,19 +110,16 @@ class Factory
 
 
     /**
-     * @throws OutOfRangeException
+     * @param string $source
      * @return ControllerInterface
+     * @throws OutOfRangeException
      */
-    public function build()
+    public function build(string $source): ControllerInterface
     {
-        if (isset($this->classmap[$this->source])) {
-            $classname = $this->classmap[$this->source];
-        } else {
-            $classname = sprintf(self::DEFAULT_NAME_PATTERN, ucfirst($this->source));
-        }
+        $classname = $this->classmap[$source] ?? sprintf(self::DEFAULT_NAME_PATTERN, ucfirst($source));
 
         if (!class_exists($classname)) {
-            throw new OutOfRangeException("No controller found for {$this->source}");
+            throw new OutOfRangeException("No controller found: {$source}");
         }
 
         $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta);
@@ -138,23 +135,18 @@ class Factory
     /**
      * @return ControllerInterface[]
      */
-    public function getMappedControllers()
+    public function getMappedControllers(): array
     {
         $controllers = [];
 
-        foreach($this->classmap as $data) {
-            foreach($data as $source => $class) {
-                $this->setSource($source);
-
-                try {
-                    $controllers[] = $this->build();
-                } catch (OutOfRangeException $e) {
-                    // oh well
-                }
+        foreach ($this->classmap as $source => $controller) {
+            try {
+                $controllers[] = $this->build($source);
+            } catch (OutOfRangeException $e) {
+                // oh well
             }
         }
 
         return $controllers;
     }
-
 }
