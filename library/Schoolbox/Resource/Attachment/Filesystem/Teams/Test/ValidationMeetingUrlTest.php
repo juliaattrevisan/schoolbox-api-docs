@@ -23,7 +23,7 @@ use Schoolbox\Resource\Attachment\Filesystem\Teams\ValidTeamsMeetingUrl;
  *
  * @package Schoolbox\Resource\Attachment\Filesystem\Teams\Test
  */
-class ValidationMeetingUrl extends TestCase
+class ValidationMeetingUrlTest extends TestCase
 {
 
     /**
