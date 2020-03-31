@@ -91,15 +91,11 @@ class Factory
     {
 
         /* Default context; use default options!
+         *
+         * or, unrecognised context; use default options
+         * (Alternatively return empty array? not sure how/why this might manifest)
          */
-        if (!$this->context) {
-            return self::OPTIONS[self::DEFAULT_FILESYSTEM];
-        }
-
-        /* Unrecognised context; use default options
-         * (Alternatively return empty array?)
-         */
-        if (!isset(self::OPTIONS[$this->context])) {
+        if (!$this->context || !isset(self::OPTIONS[$this->context])) {
             return self::OPTIONS[self::DEFAULT_FILESYSTEM];
         }
 
