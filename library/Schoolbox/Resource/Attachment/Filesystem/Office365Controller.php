@@ -13,7 +13,7 @@ use Schoolbox\Resource\Attachment\NavigatorController;
 /**
  * Class Office365Controller
  *
- * @package Schoolbox\Resource\Attachment\External
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class Office365Controller extends NavigatorController
 {

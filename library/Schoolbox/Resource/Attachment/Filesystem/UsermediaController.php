@@ -16,7 +16,7 @@ use SitePage;
  *
  * @see https://w3c.github.io/mediacapture-main/getusermedia.html
  *
- * @package Schoolbox\Resource\Attachment\Internal
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class UsermediaController extends AbstractController
 {

@@ -13,7 +13,7 @@ use Schoolbox\Resource\Attachment\NavigatorController;
 /**
  * Class WebdavController
  *
- * @package Schoolbox\Resource\Attachment\External
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class WebdavController extends NavigatorController
 {

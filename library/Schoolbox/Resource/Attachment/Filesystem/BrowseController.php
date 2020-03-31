@@ -13,7 +13,7 @@ use Schoolbox\Resource\Attachment\NavigatorController;
 /**
  * Class BrowseController
  *
- * @package Schoolbox\Resource\Attachment\Internal
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class BrowseController extends NavigatorController
 {

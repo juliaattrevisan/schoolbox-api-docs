@@ -17,7 +17,7 @@ use SitePage;
  *
  * Microsoft Teams segment in the File Picker modal
  *
- * @package Schoolbox\Resource\Attachment\External
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class TeamsController extends AbstractController
 {
@@ -25,7 +25,7 @@ class TeamsController extends AbstractController
     /**
      * The icon for this controller; appears in the accordion
      */
-    private const ICON = 'progress';
+    private const ICON = 'microsoft-teams';
 
 
     /**

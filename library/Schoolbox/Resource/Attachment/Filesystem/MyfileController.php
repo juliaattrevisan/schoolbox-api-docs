@@ -11,7 +11,7 @@ use Schoolbox\Resource\Attachment\NavigatorController;
 /**
  * Class MyfileController
  *
- * @package Schoolbox\Resource\Attachment\Internal
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class MyfileController extends NavigatorController
 {

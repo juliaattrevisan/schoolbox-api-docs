@@ -14,7 +14,7 @@ use SitePage;
 /**
  * Class GoogleController
  *
- * @package Schoolbox\Resource\Attachment\External
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class GoogleController extends AbstractController
 {

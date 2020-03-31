@@ -12,7 +12,7 @@ use SitePage;
 /**
  * Class UploadController
  *
- * @package Schoolbox\Resource\Attachment\Internal
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
 class UploadController extends AbstractController
 {
