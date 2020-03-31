@@ -18,27 +18,39 @@ use Schoolbox\L10n\RosettaStone;
 class Factory
 {
 
-    const DEFAULT_NAME_PATTERN = '\\Schoolbox\\Resource\\Attachment\\Filesystem\\%sController';
+    /**
+     * Filesystem controllers follow this nomenclature
+     */
+    private const DEFAULT_NAME_PATTERN = '\\Schoolbox\\Resource\\Attachment\\Filesystem\\%sController';
 
-    /** @var array */
+
+    /**
+     * @var array
+     */
     protected $classmap;
 
-    /** @var string */
-    protected $location;
 
-    /** @var string */
-    protected $source;
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $mime;
 
-    /** @var bool */
+
+    /**
+     * @var bool
+     */
     protected $multi;
 
-    /** @var IConfigLoader */
+
+    /**
+     * @var IConfigLoader
+     */
     protected $conf;
 
-    /** @var RosettaStone */
+
+    /**
+     * @var RosettaStone
+     */
     protected $rosetta;
 
 
@@ -49,19 +61,9 @@ class Factory
     {
         $this->classmap = $classmap;
 
-        $this->setSource('')
+        $this
              ->setMimeFilter(null)
              ->allowMulti(false);
-    }
-
-    /**
-     * @param string $source
-     * @return self
-     */
-    public function setSource($source)
-    {
-        $this->source   = $source;
-        return $this;
     }
 
 
@@ -69,7 +71,7 @@ class Factory
      * @param string $mime
      * @return self
      */
-    public function setMimeFilter($mime)
+    public function setMimeFilter($mime): self
     {
         $this->mime = $mime;
         return $this;
@@ -80,7 +82,7 @@ class Factory
      * @param bool $multi
      * @return self
      */
-    public function allowMulti($multi)
+    public function allowMulti($multi): self
     {
         $this->multi = $multi;
         return $this;
@@ -91,7 +93,7 @@ class Factory
      * @param IConfigLoader $conf
      * @return self
      */
-    public function setConfig(IConfigLoader $conf)
+    public function setConfig(IConfigLoader $conf): self
     {
         $this->conf = $conf;
         return $this;
@@ -102,7 +104,7 @@ class Factory
      * @param RosettaStone $rosetta
      * @return self
      */
-    public function setRosetta(RosettaStone $rosetta)
+    public function setRosetta(RosettaStone $rosetta): self
     {
         $this->rosetta = $rosetta;
         return $this;
