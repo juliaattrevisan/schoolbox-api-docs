@@ -25,7 +25,7 @@ class ValidTeamsMeetingUrl
     /**
      * Microsoft Teams meetings have this basic prefix
      */
-    private const MEETINGURL_REGEX = '/^https:\/\/teams\.microsoft\.com\/l\/meetup-join/';
+    private const MEETINGURL_PATTERN = 'https://teams.microsoft.com/l/meetup-join/';
 
 
     /**
@@ -36,6 +36,6 @@ class ValidTeamsMeetingUrl
      */
     public function isSatisifiedBy(string $url)
     {
-        return preg_match(self::MEETINGURL_REGEX, $url);
+        return stripos($url, self::MEETINGURL_PATTERN) === 0;
     }
 }
