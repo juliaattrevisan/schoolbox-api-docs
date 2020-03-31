@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Attachment\Context;
 
 use Schoolbox\Resource\Attachment\Filesystem;
@@ -18,27 +17,6 @@ use Schoolbox\Resource\Attachment\Filesystem;
  */
 class Factory
 {
-
-    /**
-     * internal
-     * Publicly-accessible filesystems
-     */
-    private const INTERNAL = 'internal.upload,internal.usermedia,internal.browse,internal.teams';
-
-
-    /**
-     * internal-myfile
-     * Publicly-accessible filesystems plus My File
-     */
-    private const INTERNAL_MYFILE = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
-
-
-    /**
-     * external
-     * External filesystems only
-     */
-    private const EXTERNAL = 'external.webdav,external.google,external.office';
-
 
     /**
      * Default configuration of resource picker filesystems
