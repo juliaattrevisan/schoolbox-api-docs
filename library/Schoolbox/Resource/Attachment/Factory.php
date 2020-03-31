@@ -143,7 +143,9 @@ class Factory
             try {
                 $controllers[] = $this->build($source);
             } catch (OutOfRangeException $e) {
-                // oh well
+
+                /* Suppress filesystems whose controllers couldn't spawn
+                 */
             }
         }
 
