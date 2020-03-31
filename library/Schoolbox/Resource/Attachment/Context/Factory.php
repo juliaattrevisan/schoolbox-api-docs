@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
 
 namespace Schoolbox\Resource\Attachment\Context;
 
@@ -6,31 +11,35 @@ use Schoolbox\Resource\Attachment\External;
 use Schoolbox\Resource\Attachment\Internal;
 
 /**
- * Factory
+ * Class Factory
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * Produce controllers which present each of the modal's accordions
+ *
+ * @package Schoolbox\Resource\Attachment\Context
  */
-class Factory {
+class Factory
+{
 
     /**
      * internal
      * Publicly-accessible filesystems
      */
-    const INTERNAL = 'internal.upload,internal.usermedia,internal.browse,internal.teams';
+    private const INTERNAL = 'internal.upload,internal.usermedia,internal.browse,internal.teams';
+
 
     /**
      * internal-myfile
      * Publicly-accessible filesystems plus My File
      */
-    const INTERNAL_MYFILE = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
+    private const INTERNAL_MYFILE = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
+
 
     /**
      * external
      * External filesystems only
      */
-    const EXTERNAL = 'external.webdav,external.google,external.office';
+    private const EXTERNAL = 'external.webdav,external.google,external.office';
+
 
     /**
      * Default configuration of resource picker filesystems
@@ -52,22 +61,26 @@ class Factory {
         ]
     ];
 
+
     /**
      * Context macro
      *
      * @var string
      */
-    private $context = '';
+    private $context;
+
 
     /**
      * Constructor
      *
      * Factory constructor.
-     * @param $context
+     *
+     * @param string $context
      */
-    public function __construct($context) {
-        $this->setContext($context);
+    public function __construct(string $context) {
+        $this->context = $context;
     }
+
 
     /**
      * Manufacture a restricted set of filesystemType/filesystem options
@@ -75,94 +88,51 @@ class Factory {
      * by $defaultOptions only to truncate them out later...thus, maybe
      * all this should be done inside the Attachment Factory instead.
      */
-    public function produce() {
-        $defaultOptions = $this->getDefaultOptions();
+    public function produce(): array
+    {
+        $defaultOptions = $this->defaultOptions;
 
         /* Default context; use default options!
          */
-        if (!$this->getContext()) {
+        if (!$this->context) {
             return $defaultOptions;
         }
+
         /* Specific (selective usage) context
          * Display nothing if you try an unlisted context
          */
-        else {
-            switch($this->getContext()) {
-                case 'internal':
-                    $filesystemFilter = self::INTERNAL;
-                    break;
+        switch($this->context) {
+            case 'internal':
+                $filesystemFilter = self::INTERNAL;
+                break;
 
-                case 'internal-myfile':
-                    $filesystemFilter = self::INTERNAL_MYFILE;
-                    break;
+            case 'internal-myfile':
+                $filesystemFilter = self::INTERNAL_MYFILE;
+                break;
 
-                case 'external':
-                    $filesystemFilter = self::EXTERNAL;
-                    break;
+            case 'external':
+                $filesystemFilter = self::EXTERNAL;
+                break;
 
-                default:
-                    $filesystemFilter = '';
-                    break;
-            }
-
-            /* Interpret context string
-             */
-            $filteredOptions = array();
-
-            $allFilesystemFilters = explode(',', $filesystemFilter);
-
-            /* Manufacture a restricted set
-             */
-            foreach ($allFilesystemFilters as $currentFilter) {
-                list($filesystemType, $filesystem) = explode('.', $currentFilter);
-
-                $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
-            }
-
-            return $filteredOptions;
+            default:
+                $filesystemFilter = '';
+                break;
         }
-    }
 
-    /* Getters/Setters
-     */
+        /* Interpret context string
+         */
+        $filteredOptions = [];
 
-    /**
-     * Get default options
-     *
-     * @return array
-     */
-    private function getDefaultOptions()
-    {
-        return $this->defaultOptions;
-    }
+        $allFilesystemFilters = explode(',', $filesystemFilter);
 
-    /**
-     * Set default options
-     *
-     * @param array $defaultOptions
-     */
-    private function setDefaultOptions($defaultOptions)
-    {
-        $this->defaultOptions = $defaultOptions;
-    }
+        /* Manufacture a restricted set
+         */
+        foreach ($allFilesystemFilters as $currentFilter) {
+            [$filesystemType, $filesystem] = explode('.', $currentFilter);
 
-    /**
-     * Get context
-     *
-     * @return string
-     */
-    private function getContext()
-    {
-        return $this->context;
-    }
+            $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
+        }
 
-    /**
-     * Set context
-     *
-     * @param string $context
-     */
-    private function setContext($context)
-    {
-        $this->context = $context;
+        return $filteredOptions;
     }
 }
