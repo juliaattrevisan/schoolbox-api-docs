@@ -11056,11 +11056,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Pipe/PipeInterface.php
 
 		-
-			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$httpRequest\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
-
-		-
 			message: "#^Instantiated class Schoolbox\\\\Realtime\\\\Pipe\\\\ConnectionException not found\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
