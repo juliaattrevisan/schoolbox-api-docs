@@ -43,6 +43,16 @@ class TeamsController extends AbstractController implements InternalInterface
 
 
     /**
+     * Where this schoolbox instance currently resides
+     * We set up a redirect to dump the meeting url on our own doorstep
+     * This tells us which doorstep to dump upon
+     *
+     * @var string
+     */
+    private $domain;
+
+
+    /**
      * @param bool          $multi
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
@@ -69,6 +79,7 @@ class TeamsController extends AbstractController implements InternalInterface
         }
 
         $this->teamsUrl = (string)$conf->get('teams_url');
+        $this->domain = '' !== $conf->get('site_hostname') ? $conf->get('site_hostname') . '.' . $conf->get('site_domain') : $conf->get('site_domain');
     }
 
 
@@ -78,7 +89,8 @@ class TeamsController extends AbstractController implements InternalInterface
     protected function pparse(SitePage $page)
     {
         $page->setVar([
-            'TEAMS_URL' => $this->teamsUrl
+            'TEAMS_URL' => $this->teamsUrl,
+            'DOMAIN' => $this->domain
         ]);
     }
 
