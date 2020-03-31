@@ -19,11 +19,17 @@ class Factory
 {
 
     /**
+     * Provide this set of controllers by default
+     */
+    private const DEFAULT_FILESYSTEM = 'files';
+
+
+    /**
      * Default configuration of resource picker filesystems
      *
      * @var array
      */
-    private $options = [
+    private const OPTIONS = [
 
         /* Controllers for the Link modal
          */
@@ -52,13 +58,6 @@ class Factory
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
         ],
-
-        /* Controllers for when we're not sure what was asked of us
-         * You can add controllers here to expand the options
-         */
-        'default' => [
-            'upload'    => Filesystem\UploadController::class,
-        ]
     ];
 
 
@@ -94,18 +93,18 @@ class Factory
         /* Default context; use default options!
          */
         if (!$this->context) {
-            return $this->options['default'];
+            return self::OPTIONS[self::DEFAULT_FILESYSTEM];
         }
 
         /* Unrecognised context; use default options
          * (Alternatively return empty array?)
          */
         if (!isset($this->options[$this->context])) {
-            return $this->options['default'];
+            return self::OPTIONS[self::DEFAULT_FILESYSTEM];
         }
 
         /* Context provided; use whatever that specification is
          */
-        return $this->options[$this->context];
+        return self::OPTIONS[$this->context];
     }
 }
