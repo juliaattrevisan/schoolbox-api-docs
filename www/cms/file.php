@@ -136,43 +136,45 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-} elseif ($this->arg[0] == 'multicat') {
-    /* Upload a file to multiple categories */
 
-    $this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
-    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
-    $this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
-
-    $this->setTitle('Upload a File to Multiple Locations');
-    $this->setTab('resources');
-
-    $output = array(
-        'MAX_FILE_SIZE'    => Config::get('max_file_size'),
-        'VISIBLE_SELECTED' => (Config::get('file_default_to_hidden') ? '' : 'checked'),
-    );
-
-    $this->setVar($output);
-
-    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
-
-    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
-
-    if (is_array($categoryList) && count($categoryList)) {
-        foreach ($categoryList as $category) {
-            $output = array(
-                'CATEGORY_NAME' => Scrub::text($category['name']) . ($category['code'] ? ' (' . $category['code'] . ')' : ''),
-                'CATEGORY_ID'   => $category['id'],
-            );
-
-            $this->setVar($output);
-
-            $this->parse('category_list_block', 'category_list', true);
-        }
-
-        $this->setVar('no_categories_block', '');
-    } else {
-        error(154);
-    }
+    // Multi-folder upload has not been supported since the new resource browser debuted
+//} elseif ($this->arg[0] == 'multicat') {
+//    /* Upload a file to multiple categories */
+//
+//    $this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
+//    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+//    $this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
+//
+//    $this->setTitle('Upload a File to Multiple Locations');
+//    $this->setTab('resources');
+//
+//    $output = array(
+//        'MAX_FILE_SIZE'    => Config::get('max_file_size'),
+//        'VISIBLE_SELECTED' => (Config::get('file_default_to_hidden') ? '' : 'checked'),
+//    );
+//
+//    $this->setVar($output);
+//
+//    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+//
+//    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
+//
+//    if (is_array($categoryList) && count($categoryList)) {
+//        foreach ($categoryList as $category) {
+//            $output = array(
+//                'CATEGORY_NAME' => Scrub::text($category['name']) . ($category['code'] ? ' (' . $category['code'] . ')' : ''),
+//                'CATEGORY_ID'   => $category['id'],
+//            );
+//
+//            $this->setVar($output);
+//
+//            $this->parse('category_list_block', 'category_list', true);
+//        }
+//
+//        $this->setVar('no_categories_block', '');
+//    } else {
+//        error(154);
+//    }
 
 } else {
     error(2);

@@ -661,13 +661,13 @@ class MapperProxy
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
         // Find this user's folders from folder mapper
-        $classFolderIds = $folderMapper->findForUser(
+        $classFolderIds = $folderMapper->findFolderIdsForUser(
             $student,
             // Only actual students have classes
             $student->getRole()->isStudent() && !$student->getHideTimetable(),
             UserAccess::ACCESS_READ,
             true
-        )->getPropertyValues('id');
+        );
 
         // Build a list of parameters to pass to findAllForFolderId
         $options['due_after']  = $from;

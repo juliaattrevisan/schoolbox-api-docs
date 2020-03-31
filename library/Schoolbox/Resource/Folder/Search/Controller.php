@@ -64,13 +64,13 @@ class Controller extends BaseController
     public function getFolderSearch(): void
     {
         $userClassIds = array_map('intval', array_column($this->getSession()->get('subjects') ?? [], 'id'));
-        $userGroupIds = $this->folderMapper->findForUser(
+        $userGroupIds = $this->folderMapper->findFolderIdsForUser(
             $this->getUser(),
             false,
             UserAccess::ACCESS_READ,
             false,
             true
-        )->getPropertyValues('id');
+        );
 
         $response = [];
         $types    = (array)$this->request->query->get('types', []);

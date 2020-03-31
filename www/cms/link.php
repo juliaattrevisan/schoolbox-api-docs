@@ -105,41 +105,43 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'class' => 'active',
         ]
     ]);
-}
-elseif ($this->arg[0] == 'multicat') {
-    /* Upload a link to multiple categories */
 
-    $this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
-    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
-
-    $this->setTitle('Upload a Link to Multiple Locations');
-    $this->setTab('resources');
-
-    $groupHandler = new Group;
-    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
-
-    if (is_array($categoryList) && count($categoryList)) {
-        foreach ($categoryList as $category) {
-            $name = $category['name'];
-
-            /* Optionally append the categoryCode if one exists
-             */
-            if (strlen(trim($category['code']))) {
-                $name .= ' (' . $category['code'] . ')';
-            }
-
-            $this->setVar(
-                array(
-                    'CATEGORY_NAME' => Scrub::text($name),
-                    'CATEGORY_ID'   => Scrub::text($category['id']),
-                )
-            );
-
-            $this->parse('category_list_block', 'category_list', true);
-        }
-    } else {
-        error(154);
-    }
+    // Multi-folder upload has not been supported since the new resource browser debuted
+//}
+//elseif ($this->arg[0] == 'multicat') {
+//    /* Upload a link to multiple categories */
+//
+//    $this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
+//    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+//
+//    $this->setTitle('Upload a Link to Multiple Locations');
+//    $this->setTab('resources');
+//
+//    $groupHandler = new Group;
+//    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
+//
+//    if (is_array($categoryList) && count($categoryList)) {
+//        foreach ($categoryList as $category) {
+//            $name = $category['name'];
+//
+//            /* Optionally append the categoryCode if one exists
+//             */
+//            if (strlen(trim($category['code']))) {
+//                $name .= ' (' . $category['code'] . ')';
+//            }
+//
+//            $this->setVar(
+//                array(
+//                    'CATEGORY_NAME' => Scrub::text($name),
+//                    'CATEGORY_ID'   => Scrub::text($category['id']),
+//                )
+//            );
+//
+//            $this->parse('category_list_block', 'category_list', true);
+//        }
+//    } else {
+//        error(154);
+//    }
 } else {
     error(2);
 }

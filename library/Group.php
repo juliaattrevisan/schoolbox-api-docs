@@ -699,8 +699,8 @@ class Group extends DeprecatedModel
     /*
      * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
      *
-     * @see Schoolbox\Resource\FolderMapper->getForUser() for an implementation
-     *      that uses the mapper classes.
+     * @see `\Schoolbox\Resource\Folder\Mapper::findForUser`
+     *      for an implementation that uses the mapper classes.
      */
     function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = UserAccess::ACCESS_READ, $requireHomepage = false)
     {
@@ -729,25 +729,29 @@ class Group extends DeprecatedModel
         $homepageJoin = $requireHomepage ? ' JOIN homepage_config ON folder.id = homepage_config.cid ' : '';
 
         $query = "
-			SELECT
-			folder.name, folder.id, type,
-			GROUP_CONCAT(cc.code) as code
-			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
-			$homepageJoin
-			WHERE userAccess.uid = '$userID'
-			AND userAccess.sid = folder.id
-			AND userAccess.service = '" . $this->_service . "'
-			AND userAccess.type >= '$accessType'
-			AND folder.deleted_at IS NULL
-			$exclude_part
-			GROUP BY folder.id
-			ORDER BY folder.name
-		";
+            SELECT
+                folder.name,
+                folder.id,
+                userAccess.type
+            FROM folder
+            INNER JOIN userAccess on folder.id = userAccess.sid AND userAccess.service = '{$this->db->quote($this->_service)}'
+            $homepageJoin
+            WHERE userAccess.uid = '{$this->db->quote($userID)}'
+            AND userAccess.type >= '{$this->db->quote($accessType)}'
+            AND folder.deleted_at IS NULL
+            $exclude_part
+        ";
 
         $this->db->query($query);
         while ($result = $this->db->getNextArray()) {
             $catList[] = $result;
         }
+
+        // Sort after select so as not to create a temp table.
+        // Not sure if this is any better than ORDER BY,
+        usort($catList, static function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
 
         return $catList;
     }
