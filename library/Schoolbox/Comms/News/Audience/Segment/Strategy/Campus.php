@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function array_unique;
 
 class Campus extends SimpleStrategy
 {
@@ -99,17 +100,20 @@ class Campus extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        $values = [];
+        $values      = [];
+        $isValidNull = self::isValidNullEntityValue();
         foreach ($users as $user) {
             $campuses = $user->getCampusCollection();
             if (!\count($campuses)) {
-                $values[] = null;
+                if ($isValidNull) {
+                    $values[] = null;
+                }
             } else {
                 foreach ($campuses as $campus) {
                     $values[$campus->getId()] = $campus->getId();
                 }
             }
         }
-        return $values;
+        return array_unique($values);
     }
 }

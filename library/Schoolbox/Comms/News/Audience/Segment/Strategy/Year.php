@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function array_filter;
 
 class Year extends SimpleStrategy
 {
@@ -53,7 +54,7 @@ class Year extends SimpleStrategy
             SELECT DISTINCT
               year AS id,
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
-              '{$entityType}' AS entity_type, 
+              '{$entityType}' AS entity_type,
               null as entity_meta
             FROM `user`
             WHERE deleted_at IS NULL
@@ -101,6 +102,12 @@ class Year extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        return \array_unique($users->getPropertyValues('year'));
+        $yearLevels = $users->getPropertyValues('year');
+        if (!self::isValidNullEntityValue()) {
+            $yearLevels = array_filter($yearLevels, static function (?string $yearLevel): bool {
+                return $yearLevel !== null;
+            });
+        }
+        return \array_unique($yearLevels);
     }
 }

@@ -82,6 +82,9 @@ interface ISimpleStrategy extends IStrategy
     /**
      * Returns a set of entity_values from a set of users, suitable for insertion into SQL queries
      *
+     * If NULL is not a valid value, then it will not be returned in the array, regardless of whether
+     * a user's value would otherwise be/include null
+     *
      * @param GenericCollection|User[] $users
      * @return string[]|null[]
      */
