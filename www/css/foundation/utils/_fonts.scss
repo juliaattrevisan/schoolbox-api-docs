@@ -452,6 +452,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-microsoft-teams:before {
+    content: "\e916";
+    font-family: $font-family-icon;
+}
+
 .icon-mic:before {
     content: '\e641';
     font-family: $font-family-icon;
