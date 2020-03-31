@@ -12,10 +12,12 @@ namespace Alaress\Csrf;
  * CSRF header check.
  *
  * Implements the CSRF header check as prescribed in
- * https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Verifying_Same_Origin_with_Standard_Headers
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#verifying-origin-with-standard-headers
  */
 class HeaderCheck
 {
+    private const INVALID_HOSTNAME = 'invalid';
+
     /**
      * Server vars ($_SERVER)
      *
@@ -58,7 +60,7 @@ class HeaderCheck
      *
      * @return bool
      */
-    public function verifyRequestOrigin() : bool
+    public function verifyRequestOrigin(): bool
     {
         $sources = array_filter(
             array_map(
@@ -79,9 +81,20 @@ class HeaderCheck
             )
         );
 
+        // If we have no way to match referrer let them pass
+        if (count($sources) === 0) {
+            return true;
+        }
+
         // Check each combination; if any match, we have a match
         foreach ($sources as $source) {
+            if ($source === self::INVALID_HOSTNAME) {
+                continue;
+            }
             foreach ($targets as $target) {
+                if ($target === self::INVALID_HOSTNAME) {
+                    continue;
+                }
                 if ($source === $target) {
                     return true;
                 }
@@ -96,7 +109,7 @@ class HeaderCheck
      * @param null|string $url
      * @return null|string The host name, or null if there's none in `$url`
      */
-    private function getHostName(?string $url) : ?string
+    private function getHostName(?string $url): ?string
     {
         // Empty? Return empty
         if (null === $url) {
@@ -107,16 +120,16 @@ class HeaderCheck
         // otherwise it thinks a naked IP or hostname is a path.
         $scheme = parse_url($url, PHP_URL_SCHEME);
         if (false === $scheme) {
-            return null;
+            return self::INVALID_HOSTNAME;
         }
         if (null === $scheme) {
-            $url = 'http://'.$url;
+            $url = 'http://' . $url;
         }
 
         // Now get a host
         $host = parse_url($url, PHP_URL_HOST);
         if (false === $host) {
-            return null;
+            return self::INVALID_HOSTNAME;
         }
         return $host;
     }
