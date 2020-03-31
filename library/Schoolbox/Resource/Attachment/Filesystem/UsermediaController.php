@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-namespace Schoolbox\Resource\Attachment\Internal;
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;

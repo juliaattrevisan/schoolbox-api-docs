@@ -7,8 +7,7 @@
 
 namespace Schoolbox\Resource\Attachment\Context;
 
-use Schoolbox\Resource\Attachment\External;
-use Schoolbox\Resource\Attachment\Internal;
+use Schoolbox\Resource\Attachment\Filesystem;
 
 /**
  * Class Factory
@@ -66,11 +65,11 @@ class Factory
         /* Controllers for the Link modal
          */
         'link' => [
-            'upload'    => Internal\UploadController::class,
-            'usermedia' => Internal\UsermediaController::class,
-            'browse'    => Internal\BrowseController::class,
-            'myfile'    => Internal\MyfileController::class,
-            'teams'     => Internal\TeamsController::class
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'teams'     => Filesystem\TeamsController::class
         ]
     ];
 

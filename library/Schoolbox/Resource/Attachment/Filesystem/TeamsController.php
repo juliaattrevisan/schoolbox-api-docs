@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Attachment\Internal;
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
