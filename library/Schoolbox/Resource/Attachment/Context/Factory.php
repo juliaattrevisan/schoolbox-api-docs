@@ -37,7 +37,6 @@ class Factory
             'upload'    => Filesystem\UploadController::class,
             'usermedia' => Filesystem\UsermediaController::class,
             'browse'    => Filesystem\BrowseController::class,
-            'myfile'    => Filesystem\MyfileController::class,
             'teams'     => Filesystem\TeamsController::class
         ],
 
