@@ -1,21 +1,21 @@
 <?php
 /**
- * An attachment controller for user media (audio/video recordings).
- *
- * @see https://w3c.github.io/mediacapture-main/getusermedia.html
- *
- * @author      Amri Sannang <amri.sannang@alaress.com.au>
+ * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Attachment\Internal;
-
 
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
 
-class UsermediaController extends AbstractController implements InternalInterface {
+/**
+ * Class UploadController
+ *
+ * @package Schoolbox\Resource\Attachment\Internal
+ */
+class UploadController extends AbstractController
+{
 
     /**
      * @param SitePage $page
@@ -28,12 +28,12 @@ class UsermediaController extends AbstractController implements InternalInterfac
             $mime = "'{$this->mimeFilter}'";
         }
 
-        $page->setVar(
-            array(
-                'MAX_FILES'      => $this->multi ? '32' : '1',
-                'ACCEPTED_FILES' => $mime
-            )
-        );
+        $page->setVar(array(
+            'MAX_FILES'      => $this->multi ? '32' : '1',
+            'ACCEPTED_FILES' => $mime,
+            'SESSION_NAME'   => session_name(),
+            'SESSION_ID'     => session_id(),
+        ));
     }
 
 
@@ -42,7 +42,7 @@ class UsermediaController extends AbstractController implements InternalInterfac
      */
     public function getLabel()
     {
-        return 'Recording';
+        return 'Upload file' . ($this->multi ? 's' : '');
     }
 
 
@@ -54,12 +54,13 @@ class UsermediaController extends AbstractController implements InternalInterfac
         return self::RENDER_INLINE;
     }
 
+
     /**
      * @return string
      */
     public function getIcon()
     {
-        return 'mic';
+        return 'upload';
     }
 
 }

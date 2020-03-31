@@ -47,17 +47,30 @@ class Factory
      * @var array
      */
     private $defaultOptions = [
-        'internal' => [
+
+        /* Legacy aliases
+         * I think we can actually remove these, but for now, I'm going to hold on
+         */
+//        'internal' => [
+//            'upload'    => Internal\UploadController::class,
+//            'usermedia' => Internal\UsermediaController::class,
+//            'browse'    => Internal\BrowseController::class,
+//            'myfile'    => Internal\MyfileController::class,
+//        ],
+//        'external' => [
+//            'webdav' => External\WebdavController::class,
+//            'google' => External\GoogleController::class,
+//            'office' => External\Office365Controller::class,
+//        ],
+
+        /* Controllers for the Link modal
+         */
+        'link' => [
             'upload'    => Internal\UploadController::class,
             'usermedia' => Internal\UsermediaController::class,
             'browse'    => Internal\BrowseController::class,
             'myfile'    => Internal\MyfileController::class,
             'teams'     => Internal\TeamsController::class
-        ],
-        'external' => [
-            'webdav' => External\WebdavController::class,
-            'google' => External\GoogleController::class,
-            'office' => External\Office365Controller::class,
         ]
     ];
 
@@ -90,49 +103,22 @@ class Factory
      */
     public function produce(): array
     {
-        $defaultOptions = $this->defaultOptions;
 
         /* Default context; use default options!
          */
         if (!$this->context) {
-            return $defaultOptions;
+            return $this->defaultOptions;
         }
 
-        /* Specific (selective usage) context
-         * Display nothing if you try an unlisted context
+        /* Unrecognised context; use default options
+         * (Alternatively return empty array?)
          */
-        switch($this->context) {
-            case 'internal':
-                $filesystemFilter = self::INTERNAL;
-                break;
-
-            case 'internal-myfile':
-                $filesystemFilter = self::INTERNAL_MYFILE;
-                break;
-
-            case 'external':
-                $filesystemFilter = self::EXTERNAL;
-                break;
-
-            default:
-                $filesystemFilter = '';
-                break;
+        if (!isset($this->defaultOptions[$this->context])) {
+            return $this->defaultOptions;
         }
 
-        /* Interpret context string
+        /* Context provided; use whatever that specification is
          */
-        $filteredOptions = [];
-
-        $allFilesystemFilters = explode(',', $filesystemFilter);
-
-        /* Manufacture a restricted set
-         */
-        foreach ($allFilesystemFilters as $currentFilter) {
-            [$filesystemType, $filesystem] = explode('.', $currentFilter);
-
-            $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
-        }
-
-        return $filteredOptions;
+        return $this->defaultOptions[$this->context];
     }
 }

@@ -1,25 +1,28 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Attachment\External;
-
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\NavigatorController;
 
-class Office365Controller extends NavigatorController implements ExternalInterface
+/**
+ * Class Office365Controller
+ *
+ * @package Schoolbox\Resource\Attachment\External
+ */
+class Office365Controller extends NavigatorController
 {
 
     /**
      * @param bool          $multi
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
+     * @throws OutOfRangeException
      */
     public function __construct($multi, $mimeFilter = null, $conf = null)
     {

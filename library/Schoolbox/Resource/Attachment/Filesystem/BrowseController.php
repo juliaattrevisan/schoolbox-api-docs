@@ -1,19 +1,22 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-namespace Schoolbox\Resource\Attachment\Internal;
-
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\NavigatorController;
 
-class BrowseController extends NavigatorController implements InternalInterface {
+/**
+ * Class BrowseController
+ *
+ * @package Schoolbox\Resource\Attachment\Internal
+ */
+class BrowseController extends NavigatorController
+{
 
     /** @var RosettaStone */
     protected $rosetta;

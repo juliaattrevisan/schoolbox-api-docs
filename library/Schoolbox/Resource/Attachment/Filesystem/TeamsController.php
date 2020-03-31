@@ -19,7 +19,7 @@ use SitePage;
  *
  * @package Schoolbox\Resource\Attachment\External
  */
-class TeamsController extends AbstractController implements InternalInterface
+class TeamsController extends AbstractController
 {
 
     /**

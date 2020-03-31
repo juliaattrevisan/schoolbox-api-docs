@@ -1,25 +1,29 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Attachment\External;
-
 
 use DomainException;
 use OutOfRangeException;
 use Schoolbox\Resource\Attachment\NavigatorController;
 
-class WebdavController extends NavigatorController implements ExternalInterface {
-
+/**
+ * Class WebdavController
+ *
+ * @package Schoolbox\Resource\Attachment\External
+ */
+class WebdavController extends NavigatorController
+{
 
     /**
      * @param bool   $multi
      * @param string $mimeFilter
      * @throws OutOfRangeException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function __construct($multi, $mimeFilter = null)
     {
