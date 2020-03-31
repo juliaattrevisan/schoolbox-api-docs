@@ -105,6 +105,13 @@ class HeaderCheckTest extends TestCase
                 ],
                 'expectedResult' => false,
             ],
+            'malformedOriginAndHost' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'file://',
+                    'HTTP_HOST'   => 'file://',
+                ],
+                'expectedResult' => false,
+            ],
         ];
     }
 
