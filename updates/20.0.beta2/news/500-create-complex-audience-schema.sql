@@ -15,8 +15,8 @@ CREATE TABLE comms_news_audience_complex(
 ) CHARACTER SET utf8mb4;
 
 -- Migrate records
-INSERT INTO comms_news_audience_complex(comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, entity_value_2, relationship)
-    SELECT cna.comms_news_article_id, cna1.entity_type, cna1.entity_value, cna2.entity_type, cna2.entity_value, cna.relationship
+INSERT INTO comms_news_audience_complex(comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, entity_value_2)
+    SELECT cna.comms_news_article_id, cna1.entity_type, cna1.entity_value, cna2.entity_type, cna2.entity_value
     FROM comms_news_audience cna
     JOIN comms_news_audience cna1 ON cna1.parent_id = cna.id
     JOIN comms_news_audience cna2 ON cna2.parent_id = cna.id AND cna1.id < cna2.id;
@@ -31,5 +31,5 @@ ALTER TABLE comms_news_audience
     DROP INDEX idx_comms_news_audience_parent_type_value_relationship,
     DROP COLUMN id,
     DROP COLUMN parent_id,
-    ADD PRIMARY KEY pk_comms_news_audience_article_type_value_relationship (comms_news_article_id, entity_type, entity_value, relationship);
+    ADD UNIQUE INDEX idx_comms_news_audience_article_type_value_relationship (comms_news_article_id, entity_type, entity_value, relationship);
 
