@@ -1,18 +1,20 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-namespace Schoolbox\Resource\Attachment\Internal;
-
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Schoolbox\Resource\Attachment\NavigatorController;
 
-class MyfileController extends NavigatorController implements InternalInterface {
-
+/**
+ * Class MyfileController
+ *
+ * @package Schoolbox\Resource\Attachment\Filesystem
+ */
+class MyfileController extends NavigatorController
+{
 
     /**
      * @param bool $multi

@@ -72,7 +72,7 @@
                       window.top.postMessage(JSON.stringify({text: 'Collecting files from Google, please wait...'}), location.origin);
                       jQuery.ajax({
                           type: 'POST',
-                          url: '/ajax/resource/external/google',
+                          url: '/ajax/resource/filesystem/google',
                           headers: {
                             'Authorization': token.token_type + ' ' + token.access_token
                           },

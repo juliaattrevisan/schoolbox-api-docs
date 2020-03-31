@@ -1,11 +1,11 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
+use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
 use Schoolbox\Resource\Attachment\Context\Factory as ResourceContextFactory;
 
@@ -20,7 +20,6 @@ if (empty($this)) {
 $this->setAjax();
 
 $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
-
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
 $multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
@@ -35,15 +34,21 @@ $filteredOptions = $context->produce();
 // register our known defaults
 $factory = new ResourceAttachmentFactory($filteredOptions);
 
+/** @var IConfigLoader $configLoader */
+$configLoader = $this->getDi()->get('config');
+
+/** @var RosettaStone $rosettaStone */
+$rosettaStone = $this->getDi()->get('l10n');
+
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
-        ->setConfig($this->getDi()->get('config'))
-        ->setRosetta($this->getDi()->get('l10n'));
+        ->setConfig($configLoader)
+        ->setRosetta($rosettaStone);
 
 foreach ($factory->getMappedControllers() as $controller) {
 
     // the first controller found will be considered the 'default'
-    if(!$this->getVar('DEFAULT_VIEW')) {
+    if (!$this->getVar('DEFAULT_VIEW')) {
          $this->setVar('DEFAULT_VIEW', $controller->getSlug());
     }
 
@@ -54,6 +59,7 @@ foreach ($factory->getMappedControllers() as $controller) {
         'SRC_URL'    => $controller->getUrl(),
         'SRC_METHOD' => $controller->getRenderMethod()
     ));
+
     $this->parse('source_block', 'source', true);
 }
 

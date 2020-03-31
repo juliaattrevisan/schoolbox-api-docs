@@ -1,33 +1,36 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
-namespace Schoolbox\Resource\Attachment\External;
-
-
-use OutOfRangeException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\NavigatorController;
 
-class Office365Controller extends NavigatorController implements ExternalInterface
+/**
+ * Class BrowseController
+ *
+ * @package Schoolbox\Resource\Attachment\Filesystem
+ */
+class BrowseController extends NavigatorController
 {
+
+    /** @var RosettaStone */
+    protected $rosetta;
 
     /**
      * @param bool          $multi
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
+     * @param RosettaStone  $rosetta
      */
-    public function __construct($multi, $mimeFilter = null, $conf = null)
+    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null)
     {
         parent::__construct($multi, $mimeFilter);
-
-        if (!$conf->get('office365_tenant')) {
-            throw new OutOfRangeException("Office 365 tenancy not specified");
-        }
+        $this->rosetta = $rosetta;
     }
 
 
@@ -36,7 +39,7 @@ class Office365Controller extends NavigatorController implements ExternalInterfa
      */
     public function getLabel()
     {
-        return 'Office 365';
+        return $this->rosetta->translate('resource', true, true);
     }
 
 
@@ -54,7 +57,7 @@ class Office365Controller extends NavigatorController implements ExternalInterfa
      */
     public function getIcon()
     {
-        return 'office-365';
+        return 'files';
     }
 
 }

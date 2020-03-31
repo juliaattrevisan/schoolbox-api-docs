@@ -1,22 +1,23 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-namespace Schoolbox\Resource\Attachment\External;
-
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
-use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
 
-class GoogleController extends AbstractController implements ExternalInterface {
-
+/**
+ * Class GoogleController
+ *
+ * @package Schoolbox\Resource\Attachment\Filesystem
+ */
+class GoogleController extends AbstractController
+{
     const SCOPE_PREFIX   = 'https://www.googleapis.com/auth/';
     const VIEW_PREFIX    = 'google.picker.ViewId.';
     const FEATURE_PREFIX = 'google.picker.Feature.';

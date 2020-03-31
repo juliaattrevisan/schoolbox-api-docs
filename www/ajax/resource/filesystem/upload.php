@@ -1,9 +1,12 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
+ */
+
+/* Steve Notes: I think this is a dead file?
  */
 
 if (empty($this)) {
@@ -16,7 +19,7 @@ if (empty($this)) {
 
 $this->setAjax();
 
-$this->setFile(TEMPLATE_content, '/resources/internal/upload.html');
+$this->setFile(TEMPLATE_content, '/resources/filesystem/upload.html');
 
 switch(strtolower($this->arg[0])) {
     case 'single':

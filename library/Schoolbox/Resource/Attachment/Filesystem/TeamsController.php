@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Attachment\Internal;
+namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
@@ -17,15 +17,15 @@ use SitePage;
  *
  * Microsoft Teams segment in the File Picker modal
  *
- * @package Schoolbox\Resource\Attachment\External
+ * @package Schoolbox\Resource\Attachment\Filesystem
  */
-class TeamsController extends AbstractController implements InternalInterface
+class TeamsController extends AbstractController
 {
 
     /**
      * The icon for this controller; appears in the accordion
      */
-    private const ICON = 'progress';
+    private const ICON = 'microsoft-teams';
 
 
     /**

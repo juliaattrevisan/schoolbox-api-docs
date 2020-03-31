@@ -42,7 +42,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 return '/storage/image.php?hash=' + hash;
             },
             regex: /^\/storage\/image/
-        }
+        },
     };
 
     /**
@@ -134,7 +134,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             fields.aspectRatioValue.setValue(fields.width.getValue() / fields.height.getValue());
         }
     }
-    
+
     /**
      * Inject image into editor panel with modifiers applied
      *
@@ -302,7 +302,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
         return element;
     }
-    
+
     /**
      * A macro to all the fields in the Dialog
      * (because it's such a longwinded way to retrieve them)
@@ -554,6 +554,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
+                                        allowedFilesystems: 'files',
                                         allowedFiles: 'image/*,audio/*,video/*',
                                         previousModal: previousModal
                                     });

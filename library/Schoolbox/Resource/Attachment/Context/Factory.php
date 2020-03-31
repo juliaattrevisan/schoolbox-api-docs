@@ -1,73 +1,84 @@
 <?php
-
-namespace Schoolbox\Resource\Attachment\Context;
-
-use Schoolbox\Resource\Attachment\External;
-use Schoolbox\Resource\Attachment\Internal;
-
 /**
- * Factory
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Factory {
+namespace Schoolbox\Resource\Attachment\Context;
+
+use Schoolbox\Resource\Attachment\Filesystem;
+
+/**
+ * Class Factory
+ *
+ * Produce controllers which present each of the modal's accordions
+ *
+ * @package Schoolbox\Resource\Attachment\Context
+ */
+class Factory
+{
 
     /**
-     * internal
-     * Publicly-accessible filesystems
+     * Provide this set of controllers by default
      */
-    const INTERNAL = 'internal.upload,internal.usermedia,internal.browse,internal.teams';
+    private const DEFAULT_FILESYSTEM = 'files';
 
-    /**
-     * internal-myfile
-     * Publicly-accessible filesystems plus My File
-     */
-    const INTERNAL_MYFILE = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
-
-    /**
-     * external
-     * External filesystems only
-     */
-    const EXTERNAL = 'external.webdav,external.google,external.office';
 
     /**
      * Default configuration of resource picker filesystems
      *
      * @var array
      */
-    private $defaultOptions = [
-        'internal' => [
-            'upload'    => Internal\UploadController::class,
-            'usermedia' => Internal\UsermediaController::class,
-            'browse'    => Internal\BrowseController::class,
-            'myfile'    => Internal\MyfileController::class,
-            'teams'     => Internal\TeamsController::class
+    private const OPTIONS = [
+
+        /* Controllers for the Link modal
+         */
+        'link' => [
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'teams'     => Filesystem\TeamsController::class
         ],
-        'external' => [
-            'webdav' => External\WebdavController::class,
-            'google' => External\GoogleController::class,
-            'office' => External\Office365Controller::class,
-        ]
+
+        /* Controllers for File-related modals
+         *
+         * This primarily affects the "video/audio" and "image" buttons in ckeditor
+         * as those both use schoolboxresource.js
+         *
+         * These might currently differ a little to alpha.schoolbox.com.au
+         * because I haven't figured out how to configure webdav/office to compare
+         */
+        'files' => [
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'webdav'    => Filesystem\WebdavController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ],
     ];
+
 
     /**
      * Context macro
      *
      * @var string
      */
-    private $context = '';
+    private $context;
+
 
     /**
      * Constructor
      *
      * Factory constructor.
-     * @param $context
+     *
+     * @param string $context
      */
-    public function __construct($context) {
-        $this->setContext($context);
+    public function __construct(string $context) {
+        $this->context = $context;
     }
+
 
     /**
      * Manufacture a restricted set of filesystemType/filesystem options
@@ -75,94 +86,20 @@ class Factory {
      * by $defaultOptions only to truncate them out later...thus, maybe
      * all this should be done inside the Attachment Factory instead.
      */
-    public function produce() {
-        $defaultOptions = $this->getDefaultOptions();
+    public function produce(): array
+    {
 
         /* Default context; use default options!
+         *
+         * or, unrecognised context; use default options
+         * (Alternatively return empty array? not sure how/why this might manifest)
          */
-        if (!$this->getContext()) {
-            return $defaultOptions;
+        if (!$this->context || !isset(self::OPTIONS[$this->context])) {
+            return self::OPTIONS[self::DEFAULT_FILESYSTEM];
         }
-        /* Specific (selective usage) context
-         * Display nothing if you try an unlisted context
+
+        /* Context provided; use whatever that specification is
          */
-        else {
-            switch($this->getContext()) {
-                case 'internal':
-                    $filesystemFilter = self::INTERNAL;
-                    break;
-
-                case 'internal-myfile':
-                    $filesystemFilter = self::INTERNAL_MYFILE;
-                    break;
-
-                case 'external':
-                    $filesystemFilter = self::EXTERNAL;
-                    break;
-
-                default:
-                    $filesystemFilter = '';
-                    break;
-            }
-
-            /* Interpret context string
-             */
-            $filteredOptions = array();
-
-            $allFilesystemFilters = explode(',', $filesystemFilter);
-
-            /* Manufacture a restricted set
-             */
-            foreach ($allFilesystemFilters as $currentFilter) {
-                list($filesystemType, $filesystem) = explode('.', $currentFilter);
-
-                $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
-            }
-
-            return $filteredOptions;
-        }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get default options
-     *
-     * @return array
-     */
-    private function getDefaultOptions()
-    {
-        return $this->defaultOptions;
-    }
-
-    /**
-     * Set default options
-     *
-     * @param array $defaultOptions
-     */
-    private function setDefaultOptions($defaultOptions)
-    {
-        $this->defaultOptions = $defaultOptions;
-    }
-
-    /**
-     * Get context
-     *
-     * @return string
-     */
-    private function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * Set context
-     *
-     * @param string $context
-     */
-    private function setContext($context)
-    {
-        $this->context = $context;
+        return self::OPTIONS[$this->context];
     }
 }

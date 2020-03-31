@@ -1,10 +1,10 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+use Schoolbox\IConfigLoader;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
@@ -17,22 +17,24 @@ if (count($this->arg) < 3) {
     error(2);
     exit;
 }
-$location = $this->arg[0];
-$source   = $this->arg[1];
-$multi    = $this->arg[2] == 'multi';
-$mime     = $_GET['mime'];
+
+$source = $this->arg[1];
+$multi  = $this->arg[2] === 'multi';
+$mime   = $_GET['mime'];
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
     'SITE_LOCATION' => $this->site,
 ]);
 
-$factory = new Schoolbox\Resource\Attachment\Factory();
+/** @var IConfigLoader $configLoader */
+$configLoader = $this->getDi()->get('config');
 
-// TODO use DI version
-$factory->setSource($location, $source)
-        ->setMimeFilter($mime)
-        ->allowMulti($multi)
-        ->setConfig($this->getDi()->get('config'));
-
-$factory->build()->parse($this);
+/* Parse individual template in the accordion
+ */
+(new Schoolbox\Resource\Attachment\Factory())
+    ->setMimeFilter($mime)
+    ->allowMulti($multi)
+    ->setConfig($configLoader)
+    ->build($source)
+    ->parse($this);

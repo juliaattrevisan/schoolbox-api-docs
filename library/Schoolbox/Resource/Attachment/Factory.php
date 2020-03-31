@@ -1,66 +1,69 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Attachment;
-
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 
-class Factory {
+/**
+ * Class Factory
+ *
+ * @package Schoolbox\Resource\Attachment
+ */
+class Factory
+{
 
-    const DEFAULT_NAME_PATTERN = '\\Schoolbox\\Resource\\Attachment\\%s\\%sController';
+    /**
+     * Filesystem controllers follow this nomenclature
+     */
+    private const DEFAULT_NAME_PATTERN = '\\Schoolbox\\Resource\\Attachment\\Filesystem\\%sController';
 
-    /** @var array */
+
+    /**
+     * @var array
+     */
     protected $classmap;
 
-    /** @var string */
-    protected $location;
 
-    /** @var string */
-    protected $source;
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $mime;
 
-    /** @var bool */
+
+    /**
+     * @var bool
+     */
     protected $multi;
 
-    /** @var IConfigLoader */
+
+    /**
+     * @var IConfigLoader
+     */
     protected $conf;
 
-    /** @var RosettaStone */
+
+    /**
+     * @var RosettaStone
+     */
     protected $rosetta;
 
 
     /**
      * @param array $classmap
      */
-    public function __construct(array $classmap = array())
+    public function __construct(array $classmap = [])
     {
         $this->classmap = $classmap;
 
-        $this->setSource('', '')
+        $this
              ->setMimeFilter(null)
              ->allowMulti(false);
-    }
-
-    /**
-     * @param string $location
-     * @param string $source
-     * @return self
-     */
-    public function setSource($location, $source)
-    {
-        $this->location = $location;
-        $this->source   = $source;
-        return $this;
     }
 
 
@@ -68,7 +71,7 @@ class Factory {
      * @param string $mime
      * @return self
      */
-    public function setMimeFilter($mime)
+    public function setMimeFilter($mime): self
     {
         $this->mime = $mime;
         return $this;
@@ -79,7 +82,7 @@ class Factory {
      * @param bool $multi
      * @return self
      */
-    public function allowMulti($multi)
+    public function allowMulti($multi): self
     {
         $this->multi = $multi;
         return $this;
@@ -90,7 +93,7 @@ class Factory {
      * @param IConfigLoader $conf
      * @return self
      */
-    public function setConfig(IConfigLoader $conf)
+    public function setConfig(IConfigLoader $conf): self
     {
         $this->conf = $conf;
         return $this;
@@ -101,7 +104,7 @@ class Factory {
      * @param RosettaStone $rosetta
      * @return self
      */
-    public function setRosetta(RosettaStone $rosetta)
+    public function setRosetta(RosettaStone $rosetta): self
     {
         $this->rosetta = $rosetta;
         return $this;
@@ -109,25 +112,22 @@ class Factory {
 
 
     /**
-     * @throws OutOfRangeException
+     * @param string $source
      * @return ControllerInterface
+     * @throws OutOfRangeException
      */
-    public function build()
+    public function build(string $source): ControllerInterface
     {
-        if (isset($this->classmap[$this->location][$this->source])) {
-            $classname = $this->classmap[$this->location][$this->source];
-        } else {
-            $classname = sprintf(self::DEFAULT_NAME_PATTERN, ucfirst($this->location), ucfirst($this->source));
-        }
+        $classname = $this->classmap[$source] ?? sprintf(self::DEFAULT_NAME_PATTERN, ucfirst($source));
 
         if (!class_exists($classname)) {
-            throw new OutOfRangeException("No controller found for " . implode(':', array($this->location, $this->source)));
+            throw new OutOfRangeException("No controller found: {$source}");
         }
 
         $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta);
 
         if (!$controller instanceof ControllerInterface) {
-            throw new OutOfRangeException("Controller does not implement ControllerInterface");
+            throw new OutOfRangeException('Controller does not implement ControllerInterface');
         }
 
         return $controller;
@@ -137,20 +137,20 @@ class Factory {
     /**
      * @return ControllerInterface[]
      */
-    public function getMappedControllers()
+    public function getMappedControllers(): array
     {
-        $controllers = array();
-        foreach($this->classmap as $location => $data) {
-            foreach($data as $source => $class) {
-                $this->setSource($location, $source);
-                try {
-                    $controllers[] = $this->build();
-                } catch (OutOfRangeException $e) {
-                    // oh well
-                }
+        $controllers = [];
+
+        foreach ($this->classmap as $source => $controller) {
+            try {
+                $controllers[] = $this->build($source);
+            } catch (OutOfRangeException $e) {
+
+                /* Suppress filesystems whose controllers couldn't spawn
+                 */
             }
         }
+
         return $controllers;
     }
-
-} 
+}
