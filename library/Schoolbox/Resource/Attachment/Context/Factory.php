@@ -45,7 +45,7 @@ class Factory
      *
      * @var array
      */
-    private $defaultOptions = [
+    private $options = [
 
         /* Legacy aliases
          * I think we can actually remove these, but for now, I'm going to hold on
@@ -110,18 +110,18 @@ class Factory
         /* Default context; use default options!
          */
         if (!$this->context) {
-            return $this->defaultOptions['default'];
+            return $this->options['default'];
         }
 
         /* Unrecognised context; use default options
          * (Alternatively return empty array?)
          */
-        if (!isset($this->defaultOptions[$this->context])) {
-            return $this->defaultOptions['default'];
+        if (!isset($this->options[$this->context])) {
+            return $this->options['default'];
         }
 
         /* Context provided; use whatever that specification is
          */
-        return $this->defaultOptions[$this->context];
+        return $this->options[$this->context];
     }
 }
