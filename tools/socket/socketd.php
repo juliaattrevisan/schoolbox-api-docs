@@ -66,8 +66,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
 
-    $wss    = new Ratchet\WebSocket\WsServer($pipeManager);
-    $https  = new HttpServer($wss);
+    $wss = new Ratchet\WebSocket\WsServer($pipeManager);
+    $wss->enableKeepAlive($loop);
+    $https = new HttpServer($wss);
 
     // IOServer::factory cannot be used because it creates a new event loop,
     // which is never started.

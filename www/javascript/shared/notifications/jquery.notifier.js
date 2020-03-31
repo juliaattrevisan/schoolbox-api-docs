@@ -65,8 +65,7 @@
         return this.each(function() {
 
             // detect websocket support
-            var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
-            if (support == null || settings.transport == 'poll') {
+            if (window.WebSocket === undefined || settings.transport === 'poll') {
                 console.warn('Websockets are not supported, cannot get notifications');
             }
 
@@ -75,11 +74,11 @@
              * @private
              */
             function establishConnection() {
-                conn = new window[support](url);
-                conn.onopen = onOpen;
-                conn.onerror = onError;
+                conn           = new window.WebSocket(url);
+                conn.onopen    = onOpen;
+                conn.onerror   = onError;
                 conn.onmessage = onMessage;
-                conn.onclose = onClose;
+                conn.onclose   = onClose;
 
                 if(settings.debug) { console.log('Created new socket connection'); }
             }

@@ -68,6 +68,7 @@ class PipeCollection implements Countable
             }
         } catch (SessionException $e) {
             $this->unregisterPipe($socketKey);
+            $pipe->close();
             // rethrow
             throw $e;
         }
