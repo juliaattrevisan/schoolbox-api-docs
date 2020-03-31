@@ -117,7 +117,9 @@ class Factory
     public function build(string $source): ControllerInterface
     {
         $classname = $this->classmap[$source] ?? sprintf(self::DEFAULT_NAME_PATTERN, ucfirst($source));
-
+var_dump($source);
+var_dump($this->classmap);
+var_dump($classname);
         if (!class_exists($classname)) {
             throw new OutOfRangeException("No controller found: {$source}");
         }

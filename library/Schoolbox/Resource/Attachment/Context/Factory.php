@@ -70,6 +70,10 @@ class Factory
             'browse'    => Filesystem\BrowseController::class,
             'myfile'    => Filesystem\MyfileController::class,
             'teams'     => Filesystem\TeamsController::class
+        ],
+
+        'default' => [
+            'upload'    => Filesystem\UploadController::class,
         ]
     ];
 
@@ -106,14 +110,14 @@ class Factory
         /* Default context; use default options!
          */
         if (!$this->context) {
-            return $this->defaultOptions;
+            return $this->defaultOptions['default'];
         }
 
         /* Unrecognised context; use default options
          * (Alternatively return empty array?)
          */
         if (!isset($this->defaultOptions[$this->context])) {
-            return $this->defaultOptions;
+            return $this->defaultOptions['default'];
         }
 
         /* Context provided; use whatever that specification is
