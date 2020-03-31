@@ -47,21 +47,6 @@ class Factory
      */
     private $options = [
 
-        /* Legacy aliases
-         * I think we can actually remove these, but for now, I'm going to hold on
-         */
-//        'internal' => [
-//            'upload'    => Internal\UploadController::class,
-//            'usermedia' => Internal\UsermediaController::class,
-//            'browse'    => Internal\BrowseController::class,
-//            'myfile'    => Internal\MyfileController::class,
-//        ],
-//        'external' => [
-//            'webdav' => External\WebdavController::class,
-//            'google' => External\GoogleController::class,
-//            'office' => External\Office365Controller::class,
-//        ],
-
         /* Controllers for the Link modal
          */
         'link' => [
@@ -72,6 +57,27 @@ class Factory
             'teams'     => Filesystem\TeamsController::class
         ],
 
+        /* Controllers for File-related modals
+         *
+         * This primarily affects the "video/audio" and "image" buttons in ckeditor
+         * as those both use schoolboxresource.js
+         *
+         * These might currently differ a little to alpha.schoolbox.com.au
+         * because I haven't figured out how to configure webdav/office to compare
+         */
+        'files' => [
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'webdav'    => Filesystem\WebdavController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ],
+
+        /* Controllers for when we're not sure what was asked of us
+         * You can add controllers here to expand the options
+         */
         'default' => [
             'upload'    => Filesystem\UploadController::class,
         ]
