@@ -398,7 +398,7 @@ class Controller extends Base
         $this->updateArticleAttributes($article, $data);
 
         // Update article with proposed audience. Cache existing audience for later efficient persistence
-        $existingAudience = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty())->shallowClone();
+        $existingAudience = $article->getAudience()->shallowClone();
 
         if (!$article->isApproved()) {
             $this->updateArticleAudience($article, $data['audience']);
