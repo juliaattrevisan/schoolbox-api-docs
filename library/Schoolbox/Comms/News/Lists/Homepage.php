@@ -44,7 +44,7 @@ class Homepage extends Base
     {
         $articleIds = $this->articleResolver->findArticlesForAudience(
             Folder::getEntityType(),
-            $params->getFolderId(),
+            $params->getFolderId() === null ? null : (string)$params->getFolderId(),
             Audience\Model::RELATIONSHIP_SELF,
             true,
             [
