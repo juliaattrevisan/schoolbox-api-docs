@@ -17,7 +17,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
  *
  * We then have more control over how to process the url from then on
  */
-$url = $_GET['meetingUrl'];
+$url = $_GET['meetingUrl'] ?? '';
 
 /* Check that the meeting url var is set and contains an actual Microsoft Teams meeting url
  * ...just in case
