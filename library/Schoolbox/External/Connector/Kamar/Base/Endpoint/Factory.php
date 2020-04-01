@@ -240,38 +240,38 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
-        /* Profile and student timetable xmls come with a datetime suffix
-         *
-         * Timetable Composite requires access across multiple xml files cross-referencing nodes
-         * in profile xml so you can identify who is in a class ($container)
-         */
-        $dirhandle = opendir($this->host);
-
-        $xml = [
-            Receiver::XML_FULL => [],
-            Receiver::XML_STUDENTTIMETABLES => []
-        ];
-
-        /* Make a stack of profile xmls (full_ ... .xml)
-         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
-         */
-        $numFiles = 0;
-
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
-                    $xml[Receiver::XML_FULL][] = $xmlFile;
-                    $numFiles++;
-                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-                    $numFiles++;
-                }
-
-                /* TODO: Potentially manage stafftimetables_xxxx.xml files
-                 * TODO: Potentially manage part_xxxx.xml files
-                 */
-            }
-        }
+//        /* Profile and student timetable xmls come with a datetime suffix
+//         *
+//         * Timetable Composite requires access across multiple xml files cross-referencing nodes
+//         * in profile xml so you can identify who is in a class ($container)
+//         */
+//        $dirhandle = opendir($this->host);
+//
+//        $xml = [
+//            Receiver::XML_FULL => [],
+//            Receiver::XML_STUDENTTIMETABLES => []
+//        ];
+//
+//        /* Make a stack of profile xmls (full_ ... .xml)
+//         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
+//         */
+//        $numFiles = 0;
+//
+//        while ($xmlFile = readdir($dirhandle)) {
+//            if ($xmlFile !== '.' && $xmlFile !== '..') {
+//                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
+//                    $xml[Receiver::XML_FULL][] = $xmlFile;
+//                    $numFiles++;
+//                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
+//                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
+//                    $numFiles++;
+//                }
+//
+//                /* TODO: Potentially manage stafftimetables_xxxx.xml files
+//                 * TODO: Potentially manage part_xxxx.xml files
+//                 */
+//            }
+//        }
 
         /* If there aren't any files to process, do nothing
          */
