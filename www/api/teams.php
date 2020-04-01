@@ -37,5 +37,3 @@ if ((new ValidTeamsMeetingUrl())->isSatisifiedBy($url)) {
         <p>Please contact your system administrator.</p>
     ";
 }
-
-
