@@ -32,7 +32,15 @@ try {
             if($config->get('otfs_s3_presigned_urls_enabled')){
 
                 $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
-                $presignedUrl = (new Stream($config, $resource, $signedUrlExpiration, $attach, $contentType))->getPresignedUrl();
+
+                $presignedUrl = (new Stream(
+                    $config,
+                    $signedUrlExpiration,
+                    $attach,
+                    $contentType,
+                    $resource->getPath(),
+                    $resource->getBasename()
+                ))->getPresignedUrl();
 
                 // Instruct browser to cache redirect to presigned URL.
                 // Browser will request a new presigned URL when old one expires.

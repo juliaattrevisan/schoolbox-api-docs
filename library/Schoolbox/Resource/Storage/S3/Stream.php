@@ -15,7 +15,6 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\Model as ResourceStorageModel;
 
 class Stream
 {
@@ -28,11 +27,6 @@ class Stream
      * @var S3Client
      */
     private $s3Client;
-
-    /**
-     * @var ResourceStorageModel
-     */
-    private $resource;
 
     /**
      * @var string|string
@@ -50,19 +44,38 @@ class Stream
     private $contentType;
 
     /**
+     * @var string
+     */
+    private $resourcePath;
+
+    /**
+     * @var string
+     */
+    private $resourceBaseName;
+
+    /**
      * Stream constructor.
      *
-     * @param IConfigLoader        $config
-     * @param ResourceStorageModel $resource
-     * @param string               $signedUrlExpiration
-     * @param string               $attachmentType
-     * @param string               $contentType
+     * @param IConfigLoader $config
+     * @param string        $signedUrlExpiration
+     * @param string        $attachmentType
+     * @param string        $contentType
+     * @param string        $resourcePath
+     * @param string        $resourceBaseName
      */
-    public function __construct(IConfigLoader $config, ResourceStorageModel $resource,
-                                string $signedUrlExpiration, string $attachmentType, string $contentType)
-    {
+    public function __construct(IConfigLoader $config,
+                                string $signedUrlExpiration,
+                                string $attachmentType,
+                                string $contentType,
+                                string $resourcePath,
+                                string $resourceBaseName
+    ) {
         $this->config = $config;
-        $this->resource = $resource;
+        $this->signedUrlExpiration = $signedUrlExpiration;
+        $this->attachmentType = $attachmentType;
+        $this->contentType = $contentType;
+        $this->resourcePath = $resourcePath;
+        $this->resourceBaseName = $resourceBaseName;
 
         $this->s3Client = new S3Client([
             'credentials' => [
@@ -72,10 +85,6 @@ class Stream
             'region'      => trim($config->get('otfs_s3_region') ?? ''),
             'version'     => trim($config->get('otfs_s3_version') ?? ''),
         ]);
-
-        $this->signedUrlExpiration = $signedUrlExpiration;
-        $this->attachmentType = $attachmentType;
-        $this->contentType = $contentType;
     }
 
     /**
@@ -118,9 +127,20 @@ class Stream
     }
 
     /**
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function getPresignedUrl()
+    {
+        return $this->s3Client->createPresignedRequest($this->getObject(), $this->signedUrlExpiration)->getUri();
+    }
+
+    /**
      * Overriding Response Header Values
      * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
      * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
+     *
+     * @param string $resourcePath
+     * @param string $resourceBaseName
      *
      * @return mixed+
      */
@@ -128,20 +148,13 @@ class Stream
     {
         return $this->s3Client->getCommand('GetObject', [
             'Bucket'                     => trim($this->config->get('otfs_s3_bucket') ?? ''),
-            'Key'                        => $this->resource->getPath(),
+            'Key'                        => $this->resourcePath,
             # By default, the browser should never cache the file. Only cache if user explicitly requests it.
             'ResponseCacheControl'       => ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
-            'ResponseContentDisposition' => "$this->attachmentType filename=\"{$this->resource->getBasename()}\"",
+            'ResponseContentDisposition' => "$this->attachmentType filename=\"{$this->resourceBaseName}\"",
             'ResponseContentType'        => $this->contentType,
             'ResponseExpires'            => $this->cacheExpiration,
         ]);
-    }
 
-    /**
-     * @return \Psr\Http\Message\UriInterface
-     */
-    public function getPresignedUrl()
-    {
-        return $this->s3Client->createPresignedRequest($this->getObject(), $this->signedUrlExpiration)->getUri();
     }
 }
