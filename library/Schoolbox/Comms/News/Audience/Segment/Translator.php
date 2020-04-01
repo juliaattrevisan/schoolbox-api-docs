@@ -7,8 +7,8 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
@@ -16,6 +16,9 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use PDO;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use UnexpectedValueException;
+use function array_merge;
+use function array_unique;
 
 /**
  * Render human-readable representations of audience segment entity values.
@@ -112,38 +115,54 @@ class Translator
      *
      * @param News\Model $article
      * @return $this
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
      * @throws InsufficientHydrationException
+     * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
-     * @throws \UnexpectedValueException
+     * @throws \UnderflowException
      */
     public function buildCache(News\Model $article): self
     {
-        $segmentIds = [];
+        // Extract all entity types and values from article's audiences
+        $entityTypesAndValues = [];
         /** @var ISimpleStrategy[] $strategiesInUse */
         $strategiesInUse = new GenericCollection(ISimpleStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
-                $segmentIds[] = $segment->getId();
-                $strategiesInUse[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
+                $entityType  = $segment->getEntityType();
+                $entityValue = $segment->getEntityValue();
+                if ($entityValue === null) {
+                    continue;
+                }
+                $entityTypesAndValues[$entityType][] = $entityValue;
+                $strategiesInUse[$entityType]        = $this->strategyFactory->makeStrategy($entityType);
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
-                $segmentIds[] = $childSegment->getId();
-                $entityType = $childSegment->getEntityType();
-                $strategiesInUse[$entityType] = $this->strategyFactory->makeStrategy($entityType);
+                $entityType  = $childSegment->getEntityType();
+                $entityValue = $childSegment->getEntityValue();
+                if ($entityValue === null) {
+                    continue;
+                }
+                $entityTypesAndValues[$entityType][] = $entityValue;
+                $strategiesInUse[$entityType]        = $this->strategyFactory->makeStrategy($entityType);
             }
         }
 
-        if (!\count($segmentIds)) {
+        if (!\count($entityTypesAndValues)) {
             return $this;
         }
 
-        $bindings  = Builder::getBindings($segmentIds, 'id');
         $sqlPieces = [];
-        foreach ($strategiesInUse as $strategy) {
-            $sqlPieces[] = "({$strategy->getTranslateSql($bindings->getPlaceholder())})";
+        $params    = [];
+        foreach ($strategiesInUse as $entityType => $strategy) {
+            $entityValues = array_unique($entityTypesAndValues[$entityType]);
+            $translateSql = $strategy->getTranslateSql($entityValues);
+            $sqlPieces[]  = $translateSql->getSql();
+            $params[]     = $translateSql->getParams();
         }
-        $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), $bindings->getParams());
+        $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), array_merge(...$params));
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
