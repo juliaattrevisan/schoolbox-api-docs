@@ -100,27 +100,9 @@ class Factory
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var TimetableCampusMapper
      */
     private $timetableCampusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
 
 
     /**
@@ -142,12 +124,6 @@ class Factory
 
 
     /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-
-    /**
      * Factory constructor.
      *
      * @param LoggerInterface                 $log
@@ -159,14 +135,10 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param CampusMapper                    $campusMapper
      * @param TimetableCampusMapper           $timetableCampusMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
-     * @param Term\Mapper                     $termMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -184,14 +156,10 @@ class Factory
 
         /* Timetable pieces
          */
-        CampusMapper $campusMapper,
         TimetableCampusMapper $timetableCampusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        Term\Mapper $termMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -208,14 +176,10 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->campusMapper = $campusMapper;
         $this->timetableCampusMapper = $timetableCampusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->termMapper = $termMapper;
     }
 
 

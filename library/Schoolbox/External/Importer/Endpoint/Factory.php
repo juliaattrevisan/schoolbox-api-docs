@@ -157,14 +157,10 @@ class Factory
 
                     /* Timetable pieces
                      */
-                    CampusMapper::getInstance(),
                     TimetableCampusMapper::getInstance(),
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    Term\Mapper::getInstance()
+                    ClassPeriodMapper::getInstance()
                 ))->produce();
 
             case self::SENTRAL:
