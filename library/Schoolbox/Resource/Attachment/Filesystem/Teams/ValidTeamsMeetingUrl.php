@@ -25,7 +25,7 @@ class ValidTeamsMeetingUrl
     /**
      * Microsoft Teams meetings have this basic prefix
      */
-    private const MEETINGURL_PATTERN = 'https://teams.microsoft.com/l/meetup-join/';
+    private const MEETINGURL_PATTERN = 'https://teams.microsoft.com';
 
 
     /**
