@@ -11,7 +11,6 @@ use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
