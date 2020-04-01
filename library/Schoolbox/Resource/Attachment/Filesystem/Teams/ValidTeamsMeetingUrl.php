@@ -24,6 +24,11 @@ class ValidTeamsMeetingUrl
 
     /**
      * Microsoft Teams meetings have this basic prefix
+     *
+     * Note: If we need to, we can loosen this further to anything on the microsoft domain:
+     * e.g. https://(.*).microsoft.com/
+     *
+     * I can't imagine it'd go anywhere else given who this third party is
      */
     private const MEETINGURL_PATTERN = 'https://teams.microsoft.com';
 
