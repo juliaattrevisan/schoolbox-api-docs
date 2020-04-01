@@ -240,6 +240,11 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
+        $analysis = (new Preconditions($this->host))->analyse();
+
+        print_r($analysis);
+        die();
+
 //        /* Profile and student timetable xmls come with a datetime suffix
 //         *
 //         * Timetable Composite requires access across multiple xml files cross-referencing nodes

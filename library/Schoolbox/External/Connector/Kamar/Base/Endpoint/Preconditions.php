@@ -70,7 +70,7 @@ class Preconditions
      *
      * @return array
      */
-    private function analyse(): array
+    public function analyse(): array
     {
         /* Profile and student timetable xmls come with a datetime suffix
          *
@@ -101,15 +101,21 @@ class Preconditions
                     $analysis[self::ANALYSIS_XML][Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
                 }
 
-                // TODO amend lastarrival
-                // partial xmls could still be arriving, so we need to include their arrival
-                // times as part of our analysis. a profile or studenttimetable xml might arrive
-                // after these partials
+                /* partial xmls could still be arriving, so we need to include their arrival
+                 * times as part of our analysis. A profile or studenttimetable xml might arrive
+                 * after these partials
+                 */
+                $lastArrival = filectime("{$this->host}/{$xmlFile}");
+
+                if ((null === $analysis[self::ANALYSIS_LASTARRIVAL]) || ($analysis[self::ANALYSIS_LASTARRIVAL] < $lastArrival)) {
+                    $analysis[self::ANALYSIS_LASTARRIVAL] = $lastArrival;
+                }
 
                 /* noop
                  *
                  * Ignore all partial xmls which kamar sends at us
                  * These are micro-updates that are sent whenever people use the kamar system
+                 * We don't need to use them (yet)
                  */
             }
         }
