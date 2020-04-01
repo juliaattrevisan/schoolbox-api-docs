@@ -22,6 +22,7 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -187,6 +188,7 @@ class Factory
      * @return GenericCollection
      * @throws RuntimeException
      * @throws UnexpectedValueException
+     * @throws Exception
      */
     public function produce(): GenericCollection
     {
