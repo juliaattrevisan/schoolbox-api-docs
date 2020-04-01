@@ -581,7 +581,7 @@ abstract class Kernel
                             $externalClass,
                             $di->get('mapperFactory')->get(UserAccessMapper::class)
                         ),
-                        $di->get('mapperFactory')->get(News\Audience\Mapper::class),
+                        $di->get('mapperFactory')->get(News\Audience\Simple\Mapper::class),
                         $folderMapper
                     );
 
