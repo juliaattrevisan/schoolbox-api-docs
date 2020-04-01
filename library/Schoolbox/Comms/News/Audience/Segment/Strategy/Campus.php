@@ -7,10 +7,13 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_unique;
+use function implode;
 
 class Campus extends SimpleStrategy
 {
@@ -62,18 +65,21 @@ class Campus extends SimpleStrategy
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    /** @inheritdoc */
+    public function getTranslateSql(array $entityValues): Audience\Segment\TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
-            FROM comms_news_audience cna
-            INNER JOIN luCampus ON cna.entity_type = '{$entityType}' AND cna.entity_value = luCampus.id
-            WHERE cna.id IN ($segmentIdsPlaceholder) AND luCampus.deleted_at IS NULL
-        ";
+
+        $pb = (new Builder(new Quoter(), 'luCampus'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        return new Audience\Segment\TranslateSql(
+            "SELECT '{$entityType}' entity_type, id entity_value, name name FROM luCampus WHERE {$whereClause}",
+            $pb->getParams()
+        );
     }
 
     /**

@@ -7,8 +7,10 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
 
 /**
  * A simple strategy has extra functionality over a standard strategy
@@ -64,10 +66,12 @@ interface ISimpleStrategy extends IStrategy
      * used to prepopulate selectize's values from a known set of audiencing segments,
      * but present it in a nice way via a twig fragment
      *
-     * @param string $segmentIdsPlaceholder eg ':id_1, :id_2, :id_3';
-     * @return string
+     * @param string[] $entityValues Non null entity values
+     * @return TranslateSql
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string;
+    public function getTranslateSql(array $entityValues): TranslateSql;
 
     /**
      * An sql fragment that's used to generate a list of folders which the user has read+ access,

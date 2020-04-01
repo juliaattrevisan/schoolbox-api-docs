@@ -7,13 +7,16 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use PDO;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+use function implode;
 
 class PastoralGroup extends SimpleStrategy
 {
@@ -67,18 +70,21 @@ class PastoralGroup extends SimpleStrategy
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    /** @inheritdoc */
+    public function getTranslateSql(array $entityValues): Audience\Segment\TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN pastoral_group ON entity_type = '{$entityType}' AND cna.entity_value = pastoral_group.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
-        ";
+
+        $pb = (new Builder(new Quoter(), 'pastoral_group'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        return new Audience\Segment\TranslateSql(
+            "SELECT '{$entityType}' entity_type, id entity_value, name COLLATE utf8mb4_general_ci name FROM pastoral_group WHERE {$whereClause}",
+            $pb->getParams()
+        );
     }
 
 

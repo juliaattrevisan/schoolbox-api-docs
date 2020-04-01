@@ -7,10 +7,14 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_filter;
+use function implode;
 
 class Year extends SimpleStrategy
 {
@@ -67,15 +71,27 @@ class Year extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name
-            FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.year
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+
+        $pb = (new Builder(new Quoter(), 'user'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $sql         = "
+            SELECT
+                '{$entityType}' entity_type,
+                id entity_value,
+                IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) name
+            FROM user WHERE {$whereClause}
         ";
+
+        return new TranslateSql(
+            $sql,
+            $pb->getParams()
+        );
     }
 
 

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -42,9 +43,9 @@ class ResHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
-        return ''; // TODO
+        return new TranslateSql('', []); // TODO
     }
 
 

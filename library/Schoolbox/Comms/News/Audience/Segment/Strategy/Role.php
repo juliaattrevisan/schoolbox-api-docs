@@ -7,9 +7,13 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function implode;
 
 class Role extends SimpleStrategy
 {
@@ -70,15 +74,20 @@ class Role extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, groups.name AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN groups ON cna.entity_type = '{$entityType}' AND cna.entity_value = groups.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
-        ";
+
+        $pb = (new Builder(new Quoter(), 'groups'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        return new TranslateSql(
+            "SELECT '{$entityType}' entity_type, id entity_value, name name FROM `groups` WHERE {$whereClause}",
+            $pb->getParams()
+        );
     }
 
     /**

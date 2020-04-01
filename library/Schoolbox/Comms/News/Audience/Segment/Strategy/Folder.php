@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
@@ -19,6 +21,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
 use UnderflowException;
+use function implode;
 
 class Folder extends SimpleStrategy
 {
@@ -116,7 +119,7 @@ class Folder extends SimpleStrategy
         $query = '
             SELECT cid
             FROM perms
-            WHERE gid = ' . $user->getRole()->getId() . ' 
+            WHERE gid = ' . $user->getRole()->getId() . '
             AND type > ' . UserAccess::ACCESS_DENY;
 
         return $query;
@@ -132,33 +135,28 @@ class Folder extends SimpleStrategy
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    /** @inheritdoc */
+    public function getTranslateSql(array $entityValues): Audience\Segment\TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT cna1.entity_type, cna1.entity_value, f.name
-            FROM 
-            (SELECT folder.id,
-                CONCAT(name,  
-                CASE
-                WHEN COUNT(code) > 0
-                THEN CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')')
-                ELSE ''
-                END) AS name
+
+        $pb = (new Builder(new Quoter(), 'folder'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        $sql = "
+            SELECT
+                '{$entityType}' entity_type,
+                folder.id entity_value,
+                CONCAT(name, IF(COUNT(code) > 0, CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')'), '')) name
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-            WHERE folder.id IN 
-                (SELECT DISTINCT entity_value
-                FROM comms_news_audience cna2
-                WHERE entity_type = '{$entityType}'
-                AND cna2.id IN ($segmentIdsPlaceholder))
-            AND folder.deleted_at IS NULL
-            GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '{$entityType}'
+            WHERE {$whereClause}
+            GROUP BY folder.id
         ";
+        return new Audience\Segment\TranslateSql($sql, $pb->getParams());
     }
 
 
@@ -228,8 +226,8 @@ class Folder extends SimpleStrategy
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (folder.name LIKE :{$searchPlaceholder} OR folder_code.code LIKE :{$searchPlaceholder})";
 
         return "
-            SELECT folder.id, 
-                CONCAT(folder.name,  
+            SELECT folder.id,
+                CONCAT(folder.name,
                     CASE
                     WHEN COUNT(folder_code.code) > 0
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')

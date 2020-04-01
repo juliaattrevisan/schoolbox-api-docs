@@ -7,10 +7,14 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_unique;
+use function implode;
 
 class SchoolHouse extends SimpleStrategy
 {
@@ -62,15 +66,20 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, house.house AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN house ON cna.entity_type = '{$entityType}' AND cna.entity_value = house.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
-        ";
+
+        $pb = (new Builder(new Quoter(), 'house'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        return new TranslateSql(
+            "SELECT '{$entityType}' entity_type, id entity_value, house name FROM house WHERE {$whereClause}",
+            $pb->getParams()
+        );
     }
 
 
