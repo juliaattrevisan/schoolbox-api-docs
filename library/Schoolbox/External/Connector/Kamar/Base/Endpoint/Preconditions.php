@@ -151,7 +151,7 @@ class Preconditions
         /* Now check if we haven't received files recently
          * If we didn't receive any files in the last ARRIVAL_THRESHOLD seconds, go import
          */
-        if ($minProfileXml && $minTimetableXml && $lastArrival < (time() - self::ARRIVAL_THRESHOLD)) {
+        if ($minProfileXml && $minTimetableXml && $lastArrival && $lastArrival < (time() - self::ARRIVAL_THRESHOLD)) {
             return $analysis[self::ANALYSIS_XML];
         }
 
