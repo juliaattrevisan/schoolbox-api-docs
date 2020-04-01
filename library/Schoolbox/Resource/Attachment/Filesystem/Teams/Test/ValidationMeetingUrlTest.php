@@ -54,7 +54,7 @@ class ValidationMeetingUrlTest extends TestCase
             ],
 
             'Valid Example 2' => [
-                'https://teams.microsoft.com anything you might imagine, like an obama speech or something',
+                'https://teams.microsoft.com/anything you might imagine, like an obama speech or something',
                 true
             ],
 
@@ -85,6 +85,11 @@ class ValidationMeetingUrlTest extends TestCase
 
             'Invalid Example 4' => [
                 '    ',
+                false
+            ],
+
+            'Invalid Example 5' => [
+                'https://teams.microsoft.com-malicious-website.com/',
                 false
             ],
         ];
