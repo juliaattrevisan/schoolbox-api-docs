@@ -31,9 +31,20 @@ class ValidScheduleExecution
      */
     public function isSatisfiedBy(string $frequency, int $now): bool
     {
+
+        /* If the frequency is Schoolbox Managed, just do it
+         * The importer should run whenever it's configured to run and we have a custom crontab for this usage
+         * Functionally this is identical to Hourly in that it means "whenever schoolbox told it to run"
+         *
+         * This option is here for ui feedback, basically so if questions are asked of Support they know
+         * to look at the setup in crontab
+         */
+        if ($frequency === Scheduler::SB) {
+            return true;
+        }
+
         /* If the frequency is hourly, just do it
-         * We'll make the assumption that Support won't configure it
-         * to run more frequently than hourly anyway
+         * By default, this is the crontab configuration for sisImporter
          */
         if ($frequency === Scheduler::HOURLY) {
             return true;
