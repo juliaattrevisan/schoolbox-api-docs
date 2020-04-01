@@ -227,7 +227,7 @@ class Result extends Base
         /* Find a list of folders that are in an article's audience
          * See if there's an intersection; if there is, you can see the article
          */
-        $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
+        $audienceMapper = \Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance();
 
         $result = $audienceMapper->getDatabase()->query("
             SELECT comms_news_article_id, entity_value
@@ -282,7 +282,7 @@ class Result extends Base
                 `{$mapper->getTable()}` `n`
             INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
             WHERE
-                n.deleted_at IS NULL 
+                n.deleted_at IS NULL
                 AND n.accepted_at IS NOT NULL
                 AND n.publish_at < NOW()
                 AND n.rejected_at IS NULL
