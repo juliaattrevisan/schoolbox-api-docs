@@ -47,6 +47,12 @@ class Preconditions
 
 
     /**
+     * If nothing arrived within these many seconds, good to go for importing
+     */
+    private const ARRIVAL_THRESHOLD = 3600;
+
+
+    /**
      * The place where kamar files end up
      *
      * @var string
@@ -139,17 +145,14 @@ class Preconditions
         $xml = $analysis[self::ANALYSIS_XML];
         $lastArrival = $analysis[self::ANALYSIS_LASTARRIVAL];
 
-        $minProfileXml = \count($xml[Receiver::XML_FULL]) > self::MIN_PROFILE_XML;
-        $minTimetableXml = \count($xml[Receiver::XML_STUDENTTIMETABLES]) > self::MIN_TIMETABLE_XML;
+        $minProfileXml = \count($xml[Receiver::XML_FULL]) >= self::MIN_PROFILE_XML;
+        $minTimetableXml = \count($xml[Receiver::XML_STUDENTTIMETABLES]) >= self::MIN_TIMETABLE_XML;
 
-        if ($minProfileXml && $minTimetableXml) {
-
-            /* Now check if we haven't received files recently
-             */
-
-            // TODO check arrival times
-            // if (diff now, $lastArrival > 30 min) return xml array;
-            // else return []
+        /* Now check if we haven't received files recently
+         * If we didn't receive any files in the last ARRIVAL_THRESHOLD seconds, go import
+         */
+        if ($minProfileXml && $minTimetableXml && $lastArrival < (time() - self::ARRIVAL_THRESHOLD)) {
+            return $analysis[self::ANALYSIS_XML];
         }
 
         return [];
