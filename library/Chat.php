@@ -73,7 +73,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $logs;
     }
 
-
     /**
      * Create a log entry which remembers what people typed.
      *
@@ -164,7 +163,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $this->db->query($query);
     }
 
-
     /**
      * Removes content
      *
@@ -183,7 +181,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $this->db->query($query);
     }
-
 
     /**
      * @param $categoryID
