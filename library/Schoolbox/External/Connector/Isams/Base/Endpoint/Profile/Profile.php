@@ -193,7 +193,7 @@ class Profile implements IStrategy
         /** @var Student $student */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
-            $username = trim((string)$student->SchoolCode);
+            $username = trim((string)$student->UserName);
             $firstname = trim((string)$student->Forename);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
@@ -201,17 +201,6 @@ class Profile implements IStrategy
             $form = trim((string)$student->Form);
             $academicHouse = trim((string)$student->AcademicHouse);
             $dob = strtotime(trim((string)$student->DOB));
-
-            /* Students without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             /* Find out if this externalId already has a student profile
              * If one already exists, load it, update it, then save it
@@ -652,21 +641,14 @@ class Profile implements IStrategy
          */
         foreach ($parents as $parent) {
             $externalId = trim((string)$parent->xpath('@PersonId')[0]);
-            $username = trim((string)$parent->EmailAddress);
+
+            /* Assign parents' usernames in UPS
+             */
+            $username = '';
+
             $firstname = trim((string)$parent->Forename);
             $lastname = trim((string)$parent->Surname);
             $relationship = trim((string)$parent->RelationshipRaw);
-
-            /* Parents without usernames are skipped
-             */
-            if (!\strlen($username)) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for parent %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
@@ -762,17 +744,6 @@ class Profile implements IStrategy
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
             $lastname = trim((string)$staff->Surname);
-
-            /* Staff without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for staff %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
