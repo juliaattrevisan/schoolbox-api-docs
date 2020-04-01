@@ -46,10 +46,7 @@ class IsMemberOfArticleAudience extends ArticleAttribute
         }
         $article = $this->findArticleInParams($params);
 
-        // TODO this is too crudely implemented. We have a hydrated article and user. See SA-7431
-        $usersInAudience = $this->userResolver->findUsersForArticle($article);
-
-        if (!\in_array($user->getId(), $usersInAudience, true)) {
+        if (!$this->userResolver->isUserInAudience($user, $article)) {
             throw new Unauthorized("User {$user->getId()} is not in the audience of article {$article->getId()}");
         }
     }
