@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-use Schoolbox\Resource\Attachment\Internal\Teams\ValidTeamsMeetingUrl;
+use Schoolbox\Resource\Attachment\Filesystem\Teams\ValidTeamsMeetingUrl;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();

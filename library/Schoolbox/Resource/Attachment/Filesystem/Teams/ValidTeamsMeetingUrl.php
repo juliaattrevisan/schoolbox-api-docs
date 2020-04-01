@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Attachment\Internal\Teams;
+namespace Schoolbox\Resource\Attachment\Filesystem\Teams;
 
 /**
  * Class ValidTeamsMeetingUrl
