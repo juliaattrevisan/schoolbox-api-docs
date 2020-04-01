@@ -53,6 +53,19 @@ class ValidationMeetingUrlTest extends TestCase
                 true
             ],
 
+            'Valid Example 2' => [
+                'https://teams.microsoft.com anything you might imagine, like an obama speech or something',
+                true
+            ],
+
+            /* This is actually some other url format that you get when you visit teams.microsoft.com directly
+             * It'll be allowed as a result of the url restrictions loosening up
+             */
+            'Valid Example 3' => [
+                'https://teams.microsoft.com/_#/l/meetup-join/19:meeting_OWQ3ZWUzMDYtZmYwZS00OTdlLWI3OGUtNDI2MjFiNDg1ZTE0@thread.v2/0?context=%7B%22Tid%22:%229a9eb3a6-27e2-43bf-8831-37e8d0cc2265%22,%22Oid%22:%22de300b48-7335-4d63-9180-1f22d1396656%22%7D&anon=true&deeplinkId=713824fe-e5f3-4548-de24-43f61199fa78',
+                true
+            ],
+
             /* Add other cases that you expect to be invalid
              */
             'Invalid Example 1' => [
@@ -61,21 +74,16 @@ class ValidationMeetingUrlTest extends TestCase
             ],
 
             'Invalid Example 2' => [
-                'https://teams.microsoft.com/_#/l/meetup-join/19:meeting_OWQ3ZWUzMDYtZmYwZS00OTdlLWI3OGUtNDI2MjFiNDg1ZTE0@thread.v2/0?context=%7B%22Tid%22:%229a9eb3a6-27e2-43bf-8831-37e8d0cc2265%22,%22Oid%22:%22de300b48-7335-4d63-9180-1f22d1396656%22%7D&anon=true&deeplinkId=713824fe-e5f3-4548-de24-43f61199fa78',
-                false
-            ],
-
-            'Invalid Example 3' => [
                 'https://www.schoolbox.comm.au',
                 false
             ],
 
-            'Invalid Example 4' => [
+            'Invalid Example 3' => [
                 '',
                 false
             ],
 
-            'Invalid Example 5' => [
+            'Invalid Example 4' => [
                 '    ',
                 false
             ],
