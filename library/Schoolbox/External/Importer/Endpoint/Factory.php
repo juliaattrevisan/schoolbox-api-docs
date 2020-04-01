@@ -25,6 +25,7 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -102,6 +103,7 @@ class Factory
      * @throws UnexpectedValueException
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function produce(?string $file, string $type): ?GenericCollection
     {
