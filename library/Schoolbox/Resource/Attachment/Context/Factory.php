@@ -69,8 +69,6 @@ class Factory
 
 
     /**
-     * Constructor
-     *
      * Factory constructor.
      *
      * @param string $context
@@ -81,10 +79,8 @@ class Factory
 
 
     /**
-     * Manufacture a restricted set of filesystemType/filesystem options
-     * before passing it into Factory. I still need the classnames mapped
-     * by $defaultOptions only to truncate them out later...thus, maybe
-     * all this should be done inside the Attachment Factory instead.
+     * Manufacture a set of predetermined filesystemType/filesystem options
+     * before passing it into Factory.
      */
     public function produce(): array
     {
