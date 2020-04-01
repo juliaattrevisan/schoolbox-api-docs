@@ -11,6 +11,7 @@ use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
 /**
@@ -91,6 +92,7 @@ class Scheduler
      * @throws UnexpectedValueException
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function run(int $now): void
     {
