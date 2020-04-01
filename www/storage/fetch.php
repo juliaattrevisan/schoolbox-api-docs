@@ -7,7 +7,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aws\CommandInterface;
 use League\Flysystem;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
@@ -20,47 +19,37 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $page = new SitePage;
 
-        $cacheControl = 'private';
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $attach = (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
+        $attachmentType = (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
-
+        $basename = $resource->getBasename();
         $fileSystem = $resource->getFilesystem();
-        if($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
+
+        if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
-            if($config->get('otfs_s3_presigned_urls_enabled')){
 
+            if ($config->get('otfs_s3_presigned_urls_enabled')) {
                 $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
 
-                $presignedUrl = (new Stream(
+                $streamS3 = new Stream(
                     $config,
                     $signedUrlExpiration,
-                    $attach,
+                    $attachmentType,
                     $contentType,
                     $resource->getPath(),
-                    $resource->getBasename()
-                ))->getPresignedUrl();
+                    $basename
+                );
 
-                // Instruct browser to cache redirect to presigned URL.
-                // Browser will request a new presigned URL when old one expires.
-                header('HTTP/1.1 301 Moved Permanently');
-                header('Cache-Control: private');
-                header("Expires: $signedUrlExpiration");
-                header("Location: $presignedUrl", true, 301);
-                header_remove('pragma');
-                exit;
+                $streamS3->download($streamS3->getPresignedUrl());
             }
         }
 
         //send headers
         header("Content-Type: $contentType");
-
-        $basename = $resource->getBasename();
-
-        header("Cache-control: $cacheControl");
+        header("Cache-control: private");
         header("Content-Ranges: none");
-        header("Content-Disposition: $attach filename=\"$basename\"");
+        header("Content-Disposition: $attachmentType; filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
         fpassthru($resource->readStream());
         exit;

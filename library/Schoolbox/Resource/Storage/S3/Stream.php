@@ -127,14 +127,6 @@ class Stream
     }
 
     /**
-     * @return \Psr\Http\Message\UriInterface
-     */
-    public function getPresignedUrl()
-    {
-        return $this->s3Client->createPresignedRequest($this->getObject(), $this->signedUrlExpiration)->getUri();
-    }
-
-    /**
      * Overriding Response Header Values
      * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
      * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
@@ -151,10 +143,34 @@ class Stream
             'Key'                        => $this->resourcePath,
             # By default, the browser should never cache the file. Only cache if user explicitly requests it.
             'ResponseCacheControl'       => ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
-            'ResponseContentDisposition' => "$this->attachmentType filename=\"{$this->resourceBaseName}\"",
+            'ResponseContentDisposition' => "$this->attachmentType; filename=\"{$this->resourceBaseName}\"",
             'ResponseContentType'        => $this->contentType,
             'ResponseExpires'            => $this->cacheExpiration,
         ]);
-
     }
+
+    /**
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function getPresignedUrl()
+    {
+        return $this->s3Client->createPresignedRequest($this->getObject(), $this->signedUrlExpiration)->getUri();
+    }
+
+    /**
+     * @param string $preSignedUrl
+     */
+    public function download(string $preSignedUrl)
+    {
+        // Instruct browser to cache redirect to presigned URL.
+        // Browser will request a new presigned URL when old one expires.
+        header('HTTP/1.1 301 Moved Permanently');
+        header('Cache-Control: private');
+        header("Expires: $this->signedUrlExpiration");
+        header("Location: $preSignedUrl", true, 301);
+        header_remove('pragma');
+
+        exit;
+    }
+
 }

@@ -9,13 +9,16 @@
 //rather than just octet stream
 
 //includes
+use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Error\Mapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
+use Schoolbox\Resource\Storage\S3\Stream;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
-
 
 if (is_numeric($_GET['id'])) {
     $page = new SitePage;
@@ -23,10 +26,11 @@ if (is_numeric($_GET['id'])) {
     $fileHandler = false;
     $fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
 
+
     if (isset($_GET['folder'])) {
 
         if ($groupHandler->getPermission($_GET['id']) < UserAccess::ACCESS_READ) {
-            error(5);
+            error(Mapper::ERROR_PERM_DOWNLOAD_FILE);
         }
 
         $config = array(
@@ -42,28 +46,50 @@ if (is_numeric($_GET['id'])) {
             $file = $fileMapper->findById($_GET['id']);
 
             if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-                error(5);
+                error(Mapper::ERROR_PERM_DOWNLOAD_FILE);
             }
 
             LogMapper::getInstance()->logRead($file, $_SESSION['user']);
         } catch (Schoolbox\Mapper\Exception $e) {
-            error(41);
+            error(Mapper::ERROR_FILE_NOT_FOUND);
         }
     }
 
-    if (!$file->getMimetype()->getInline() || $_GET['save'])
-        $attach = "attachment;";
-    else
-        $attach = "";
+    $attachmentType = (!$file->getMimetype()->getInline() || $_GET['save']) ? 'attachment' : '';
+    $contentType = ($file->getMime()) ?: 'application/octet-stream';
+    $baseName = $file->getBasename();
+    $fileSystem = $file->getStorage()->getFilesystem();
+
+    if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+
+        if ($config->get('otfs_s3_presigned_urls_enabled')) {
+            $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
+
+            $streamS3 = new Stream(
+                $config,
+                $signedUrlExpiration,
+                $attachmentType,
+                $contentType,
+                $file->getPath(),
+                $baseName
+            );
+
+            $streamS3->download($streamS3->getPresignedUrl());
+        }
+    }
+
 
     //send headers
-    header("Content-Type: {$file->getMime()}");
+    header("Content-Type: $contentType");
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
-    header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
+    header("Content-Disposition: $attachmentType; filename=\"" . $baseName . "\"");
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;
 }
-error(2);
+
+error(Mapper::ERROR_FILE_NOT_FOUND);
