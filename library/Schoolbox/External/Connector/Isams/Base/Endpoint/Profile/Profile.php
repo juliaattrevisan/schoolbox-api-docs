@@ -202,17 +202,6 @@ class Profile implements IStrategy
             $academicHouse = trim((string)$student->AcademicHouse);
             $dob = strtotime(trim((string)$student->DOB));
 
-            /* Students without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
-
             /* Find out if this externalId already has a student profile
              * If one already exists, load it, update it, then save it
              * Otherwise make a new one for the given id
@@ -657,17 +646,6 @@ class Profile implements IStrategy
             $lastname = trim((string)$parent->Surname);
             $relationship = trim((string)$parent->RelationshipRaw);
 
-            /* Parents without usernames are skipped
-             */
-            if (!\strlen($username)) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for parent %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
-
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
@@ -762,17 +740,6 @@ class Profile implements IStrategy
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
             $lastname = trim((string)$staff->Surname);
-
-            /* Staff without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for staff %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
