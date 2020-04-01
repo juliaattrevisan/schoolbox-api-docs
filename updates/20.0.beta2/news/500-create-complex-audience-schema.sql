@@ -24,10 +24,10 @@ INSERT INTO comms_news_audience_complex(comms_news_article_id, entity_type_1, en
 DELETE FROM comms_news_audience WHERE parent_id IS NOT NULL OR entity_type = 'composite' ORDER BY entity_type = 'composite';
 
 -- Remove old index and FK, and add new PK constraint (unique index + enables row ID)
-ALTER IGNORE TABLE comms_news_audience DROP FOREIGN KEY fk_comms_news_audience_comms_news_article_id;
-ALTER IGNORE TABLE comms_news_audience DROP FOREIGN KEY fk_comms_news_audience_parent_id;
-ALTER IGNORE TABLE comms_news_audience DROP INDEX idx_comms_news_audience_parent_type_value_relationship;
-ALTER IGNORE TABLE comms_news_audience DROP COLUMN id,
-ALTER IGNORE TABLE comms_news_audience DROP COLUMN parent_id;
+ALTER TABLE comms_news_audience DROP FOREIGN KEY fk_comms_news_audience_comms_news_article_id;
+ALTER TABLE comms_news_audience DROP FOREIGN KEY fk_comms_news_audience_parent_id;
+ALTER TABLE comms_news_audience DROP INDEX idx_comms_news_audience_parent_type_value_relationship;
+ALTER TABLE comms_news_audience DROP COLUMN id;
+ALTER TABLE comms_news_audience DROP COLUMN parent_id;
 ALTER IGNORE TABLE comms_news_audience ADD UNIQUE INDEX idx_comms_news_audience_article_type_value_relationship (comms_news_article_id, entity_type, entity_value, relationship);
 
