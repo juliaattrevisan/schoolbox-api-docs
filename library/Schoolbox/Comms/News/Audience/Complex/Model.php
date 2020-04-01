@@ -10,29 +10,12 @@ namespace Schoolbox\Comms\News\Audience\Complex;
 use Schoolbox\Comms\News;
 
 /**
- * Data layer representation of composite/complex news audience segments
+ * Data layer representation of composite/complex news audience segments.
+ *
+ * These do not have a relationship modifier, they are always implicitly targeted to 'self'
  */
 class Model
 {
-    // Any audience modifier?
-    public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15
-    public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
-    public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
-
-    /**
-     * Returns the set of valid relationship modifiers
-     *
-     * @return string[]
-     */
-    public static function getRelationships(): array
-    {
-        return [
-            self::RELATIONSHIP_SELF,
-            self::RELATIONSHIP_PARENTS_OF,
-            self::RELATIONSHIP_TEACHERS_OF,
-        ];
-    }
-
     /** @var News\Model() */
     private $commsNewsArticle;
 
@@ -47,9 +30,6 @@ class Model
 
     /** @var null|string */
     private $entityValue2;
-
-    /** @var string */
-    private $relationship;
 
 
     /**
@@ -148,25 +128,6 @@ class Model
     public function setEntityValue2(?string $entityValue2): self
     {
         $this->entityValue2 = $entityValue2;
-        return $this;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getRelationship(): ?string
-    {
-        return $this->relationship;
-    }
-
-
-    /**
-     * @param string $relationship
-     * @return $this
-     */
-    public function setRelationship(string $relationship): self
-    {
-        $this->relationship = $relationship;
         return $this;
     }
 }
