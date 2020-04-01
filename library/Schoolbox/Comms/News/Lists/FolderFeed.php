@@ -44,7 +44,7 @@ class FolderFeed
     {
         return $this->articleResolver->findArticlesForAudience(
             Strategy\Folder::getEntityType(),
-            $folderId,
+            (string)$folderId,
             News\Audience\Model::RELATIONSHIP_SELF
         );
     }
