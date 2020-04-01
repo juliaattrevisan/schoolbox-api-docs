@@ -312,7 +312,7 @@ class Submission extends SectionAssignment
             LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             LEFT JOIN submission_fact ON submission_fact.submission_id = submission_dim.id
             LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id
-            LEFT JOIN pseudonym_dim as reviewer ON submission_dim.grader_id = reviewer.user_id = submission_dim.grader_id AND reviewer.workflow_state = 'active'
+            LEFT JOIN pseudonym_dim as reviewer ON reviewer.user_id = submission_dim.grader_id AND reviewer.workflow_state = 'active'
             LEFT JOIN pseudonym_dim as reviewee ON reviewee.user_id = submission_dim.user_id AND reviewee.workflow_state = 'active'
 
             WHERE {$whereClause}
