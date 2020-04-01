@@ -240,48 +240,14 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
-        $analysis = (new Preconditions($this->host))->analyse();
-
-        print_r($analysis);
-        die();
-
-//        /* Profile and student timetable xmls come with a datetime suffix
-//         *
-//         * Timetable Composite requires access across multiple xml files cross-referencing nodes
-//         * in profile xml so you can identify who is in a class ($container)
-//         */
-//        $dirhandle = opendir($this->host);
-//
-//        $xml = [
-//            Receiver::XML_FULL => [],
-//            Receiver::XML_STUDENTTIMETABLES => []
-//        ];
-//
-//        /* Make a stack of profile xmls (full_ ... .xml)
-//         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
-//         */
-//        $numFiles = 0;
-//
-//        while ($xmlFile = readdir($dirhandle)) {
-//            if ($xmlFile !== '.' && $xmlFile !== '..') {
-//                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
-//                    $xml[Receiver::XML_FULL][] = $xmlFile;
-//                    $numFiles++;
-//                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
-//                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-//                    $numFiles++;
-//                }
-//
-//                /* TODO: Potentially manage stafftimetables_xxxx.xml files
-//                 * TODO: Potentially manage part_xxxx.xml files
-//                 */
-//            }
-//        }
+        /* Check that the xml payloads meet a variety of preconditions before importing
+         */
+        $xml = (new Preconditions($this->host))->getXmlFiles();
 
         /* If there aren't any files to process, do nothing
          */
-        if (!$numFiles) {
-            $this->log->info('No xml files here; noop');
+        if (empty($xml)) {
+            $this->log->info('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
 
             return $bus;
         }

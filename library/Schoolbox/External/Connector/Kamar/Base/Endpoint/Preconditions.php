@@ -76,7 +76,7 @@ class Preconditions
      *
      * @return array
      */
-    public function analyse(): array
+    private function analyse(): array
     {
         /* Profile and student timetable xmls come with a datetime suffix
          *
@@ -133,7 +133,7 @@ class Preconditions
     /**
      * Return a set of xml files if all the preconditions pass
      */
-    private function getXmlFiles(): array
+    public function getXmlFiles(): array
     {
 
         /* Examine the Receiver's data at this moment
