@@ -193,7 +193,7 @@ class Profile implements IStrategy
         /** @var Student $student */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
-            $username = trim((string)$student->SchoolCode);
+            $username = trim((string)$student->UserName);
             $firstname = trim((string)$student->Forename);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
@@ -641,7 +641,11 @@ class Profile implements IStrategy
          */
         foreach ($parents as $parent) {
             $externalId = trim((string)$parent->xpath('@PersonId')[0]);
-            $username = trim((string)$parent->EmailAddress);
+
+            /* Assign parents' usernames in UPS
+             */
+            $username = '';
+
             $firstname = trim((string)$parent->Forename);
             $lastname = trim((string)$parent->Surname);
             $relationship = trim((string)$parent->RelationshipRaw);
