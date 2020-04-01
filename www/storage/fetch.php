@@ -48,7 +48,8 @@ try {
                 $cmd = $s3Client->getCommand('GetObject', [
                     'Bucket'                     => trim($config->get('otfs_s3_bucket') ?? ''),
                     'Key'                        => $resource->getPath(),
-                    'ResponseCacheControl'       => $cacheControl,
+                    # By default, the browser should never cache the file. Only cache if user explicitly requests it.
+                    'ResponseCacheControl'       => ($_GET['cache'] ?? '0') ? "private" : "no-store",
                     'ResponseContentDisposition' => "$attach filename=\"{$resource->getBasename()}\"",
                     'ResponseContentType'        => $contentType,
                     'ResponseExpires'            => $expires,
@@ -56,7 +57,14 @@ try {
 
                 // Get the actual presigned-url
                 $presignedUrl = $s3Client->createPresignedRequest($cmd, $expires)->getUri();
-                header("Location: $presignedUrl", true, 302);
+
+                // Instruct browser to cache redirect to presigned URL.
+                // Browser will request a new presigned URL when old one expires.
+                header('HTTP/1.1 301 Moved Permanently');
+                header('Cache-Control: private');
+                header("Expires: $expires");
+                header("Location: $presignedUrl", true, 301);
+                header_remove('pragma');
                 exit;
             }
         }
