@@ -9,14 +9,17 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
 use PDO;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Folder\NNIAN;
+use Schoolbox\User;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use function trigger_error;
 
 /**
  * Responsible for:
@@ -311,5 +314,14 @@ class UserResolver implements IUserResolver
             default:
                 throw new UnexpectedValueException("Entity type not recognised: {$entityType}");
         }
+    }
+
+
+    /** @inheritDoc */
+    public function isUserInAudience(User $user, News\Model $article): bool
+    {
+        // TODO: Implement isUserInAudience() method.
+        trigger_error("not yet implemented");
+        return false;
     }
 }
