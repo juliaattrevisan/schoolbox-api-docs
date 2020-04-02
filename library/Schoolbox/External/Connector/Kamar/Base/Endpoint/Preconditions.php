@@ -83,8 +83,6 @@ class Preconditions
          * Timetable Composite requires access across multiple xml files cross-referencing nodes
          * in profile xml so you can identify who is in a class ($container)
          */
-        $dirhandle = opendir($this->host);
-
         $analysis = [
             self::ANALYSIS_XML =>[
                 Receiver::XML_FULL => [],
@@ -99,31 +97,31 @@ class Preconditions
         /* Make a stack of profile xmls (full_ ... .xml)
          * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
          */
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
-                    $analysis[self::ANALYSIS_XML][Receiver::XML_FULL][] = $xmlFile;
-                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $analysis[self::ANALYSIS_XML][Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-                }
+        foreach (glob($this->host . '/*.xml') as $filepath) {
+            $xmlFile = basename($filepath);
 
-                /* partial xmls could still be arriving, so we need to include their arrival
-                 * times as part of our analysis. A profile or studenttimetable xml might arrive
-                 * after these partials
-                 */
-                $lastArrival = filectime("{$this->host}/{$xmlFile}");
-
-                if ((null === $analysis[self::ANALYSIS_LASTARRIVAL]) || ($analysis[self::ANALYSIS_LASTARRIVAL] < $lastArrival)) {
-                    $analysis[self::ANALYSIS_LASTARRIVAL] = $lastArrival;
-                }
-
-                /* noop
-                 *
-                 * Ignore all partial xmls which kamar sends at us
-                 * These are micro-updates that are sent whenever people use the kamar system
-                 * We don't need to use them (yet)
-                 */
+            if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
+                $analysis[self::ANALYSIS_XML][Receiver::XML_FULL][] = $xmlFile;
+            } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
+                $analysis[self::ANALYSIS_XML][Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
             }
+
+            /* partial xmls could still be arriving, so we need to include their arrival
+             * times as part of our analysis. A profile or studenttimetable xml might arrive
+             * after these partials
+             */
+            $lastArrival = filemtime($filepath);
+
+            if ((null === $analysis[self::ANALYSIS_LASTARRIVAL]) || ($analysis[self::ANALYSIS_LASTARRIVAL] < $lastArrival)) {
+                $analysis[self::ANALYSIS_LASTARRIVAL] = $lastArrival;
+            }
+
+            /* noop
+             *
+             * Ignore all partial xmls which kamar sends at us
+             * These are micro-updates that are sent whenever people use the kamar system
+             * We don't need to use them (yet)
+             */
         }
 
         return $analysis;
