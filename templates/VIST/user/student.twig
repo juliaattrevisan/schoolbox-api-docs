@@ -1,7 +1,7 @@
 {% extends '@core/user/student.twig' %}
 
 {% block travel_logs %}
-    {% if showDetails and travelLogs|length %}
+    {% if showDetails %}
         {{ travelLogs | raw }}
     {% endif %}
 {% endblock travel_logs %}
