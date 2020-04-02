@@ -41,7 +41,7 @@ use Schoolbox\UserMapper;
         \Schoolbox\Resource\Storage\Mapper::getInstance(),
         \Schoolbox\Comms\News\Topic\Mapper::getInstance(),
         \Schoolbox\Comms\News\Mapper::getInstance(),
-        \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
+        \Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Mapper::getInstance(),
         \Schoolbox\Comms\News\Statistics\Cumulative\Mapper::getInstance()
     ))->generate(1, 24*7*4*4, 0.35, 5, 67, 25);
@@ -90,7 +90,7 @@ class Obama
     private $newsMapper;
 
     /**
-     * @var News\Audience\Mapper
+     * @var News\Audience\Simple\Mapper
      */
     private $audienceMapper;
 
@@ -197,7 +197,7 @@ class Obama
      * @param Storage\Mapper                    $storageMapper
      * @param News\Topic\Mapper                 $topicMapper
      * @param News\Mapper                       $newsMapper
-     * @param News\Audience\Mapper              $audienceMapper
+     * @param News\Audience\Simple\Mapper       $audienceMapper
      * @param News\Statistics\Mapper            $statisticsMapper
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      */
@@ -207,7 +207,7 @@ class Obama
         Storage\Mapper $storageMapper,
         News\Topic\Mapper $topicMapper,
         News\Mapper $newsMapper,
-        News\Audience\Mapper $audienceMapper,
+        News\Audience\Simple\Mapper $audienceMapper,
         News\Statistics\Mapper $statisticsMapper,
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
     ) {
@@ -571,7 +571,6 @@ class Obama
      */
     private function createAudience(News\Model $model): void
     {
-        /** @var News\Audience\Model $audience */
         $audience = $this->audienceMapper->createModel();
         $audience->setCommsNewsArticle($model)
                  ->setEntityType('user')
