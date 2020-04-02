@@ -6,8 +6,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Thumbnail;
 
+use Schoolbox\File\MimetypeMapper;
 use SocialStream\Post\Player\Player;
 
 /**
@@ -66,8 +68,8 @@ abstract class Thumbnail
     /**
      * Constructor
      *
-     * @param $xml
-     * @param $url
+     * @param \DOMXPath|null $xml
+     * @param string         $url
      */
     public function __construct($xml, $url)
     {
@@ -89,14 +91,16 @@ abstract class Thumbnail
             foreach ($currentElement->attributes as $currentAttribute) {
                 if (in_array($currentAttribute->nodeName, $this->getContentAttributes())) {
                     $match = trim($currentAttribute->nodeValue);
-                    /* Derive absolute url if the image url is actually
-                     * specified relatively (www.google.com)
-                     */
-                    if ($match[0] == '/') {
-                        $bits = parse_url($this->getUrl());
-                        return 'http://' . $bits['host'] . $match;
-                    } else {
-                        return $match;
+                    if (self::isImage($match)) {
+                        /* Derive absolute url if the image url is actually
+                         * specified relatively (www.google.com)
+                         */
+                        if ($match[0] == '/') {
+                            $bits = parse_url($this->getUrl());
+                            return 'http://' . $bits['host'] . $match;
+                        } else {
+                            return $match;
+                        }
                     }
                 }
             }
@@ -232,5 +236,26 @@ abstract class Thumbnail
     protected function getQuery(): string
     {
         return $this->query;
+    }
+
+    /**
+     * Checks whether the url is image
+     * @param string $url
+     * @return bool
+     */
+    protected static function isImage(string $url): bool
+    {
+        /* If it has at least the right extension, download it directly
+         */
+        if (($filename = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME))) {
+            try {
+                $file = MimetypeMapper::getInstance()->getByFilename($filename);
+                if ($file->isImage()) {
+                    return true;
+                }
+            } catch (\Exception $e) {
+            }
+        }
+        return false;
     }
 }
