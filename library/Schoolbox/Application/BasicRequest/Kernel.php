@@ -208,27 +208,28 @@ class Kernel extends WebKernelAbstract
         if (!$session->isStarted()) {
             $session->start();
         }
+
         // install sentry
-        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-        $sentryClient = null;
+        $sentryClient  = null;
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
                 /** @var \Schoolbox\Instance $sb */
                 $sb = $di->get('instance');
-                // fall back to site_location if site_school_code not set
-                $options = [
+                \Sentry\init([
+                    'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
                     'environment' => $sb->getType(),
-                    'tags' => [
-                        'php_version' => PHP_VERSION,
-                        'site_version' => $sb->getVersion(),
+                ]);
+                \Sentry\configureScope(static function (\Sentry\State\Scope $scope) use ($sb): void {
+                    // fall back to site_location if site_school_code not set
+                    $scope->setTags([
+                        'php_version'      => PHP_VERSION,
+                        'site_version'     => $sb->getVersion(),
                         'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
-                    ]
-                ];
-                $sentryClient = new \Raven_Client("https://{$sentryToken}@sentry.io/{$sentryProject}", $options);
-                $sentryClient->install();
-            } catch (\Raven_Exception $e) {
-                // do nothing; sentry is not installed
+                    ]);
+                });
+                $sentryClient = \Sentry\SentrySdk::getCurrentHub();
             } catch (Di\Exception\ServiceNotFound $e) {
                 // do nothing; sentry is not installed
             }
