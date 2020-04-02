@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
@@ -45,6 +46,9 @@ class Factory
         $schoolCode = ucwords($config->get('site_location'));
 
         $classBase = "{$prefixBase}\\Base\\{$type}";
+        if ('tass' === $config->get('external_type') && ExternalConnectorFactory::EXTERNAL_SYNC === $type) {
+            $classVersion = "{$prefixBase}\\{$config->get('external_tass_version')}\\{$type}";
+        }
         $classSchool = "{$prefixBase}\\{$schoolCode}\\{$type}";
 
         // Return in preference:
@@ -53,6 +57,9 @@ class Factory
         // * Offline connector
         if (class_exists($classSchool)) {
             return new $classSchool($config, $databaseExternal);
+        }
+        if (isset($classVersion) && class_exists($classVersion)) {
+            return new $classVersion($config, $databaseExternal);
         }
         if (class_exists($classBase)) {
             return new $classBase($config, $databaseExternal);
