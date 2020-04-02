@@ -776,6 +776,7 @@ class Healthcheck
             "TimetableMaster",
             "TimetableMatrix",
             "TimetableParameters",
+            "TimeTableTermCalendar",
             "VLContact",
             "VLContactAddress",
             "VLContactEmail",
