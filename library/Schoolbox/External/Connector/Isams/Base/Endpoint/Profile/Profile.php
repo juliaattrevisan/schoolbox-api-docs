@@ -21,6 +21,7 @@ use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
+use SimpleXMLElement;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -190,7 +191,9 @@ class Profile implements IStrategy
 
         $students = $this->batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        /** @var Student $student */
+        /* $student is a stdclass derived from xml data,
+         * it's not a Normalised Data Structure object here
+         */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
             $username = trim((string)$student->UserName);
@@ -427,7 +430,7 @@ class Profile implements IStrategy
 
         return [
             'id' => null,
-            'name' => null
+            'name' => null,
         ];
     }
 
@@ -453,7 +456,7 @@ class Profile implements IStrategy
 
         return [
             'id' => null,
-            'name' => null
+            'name' => null,
         ];
     }
 
@@ -478,7 +481,7 @@ class Profile implements IStrategy
 
         return [
             'id' => null,
-            'name' => null
+            'name' => null,
         ];
     }
 
@@ -505,7 +508,7 @@ class Profile implements IStrategy
 
         return [
             'id' => $id,
-            'name' => $name
+            'name' => $name,
         ];
     }
 
@@ -638,6 +641,9 @@ class Profile implements IStrategy
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
+         *
+         * $parent is a stdclass derived from xml data,
+         * it's not a Normalised Data Structure object here
          */
         foreach ($parents as $parent) {
             $externalId = trim((string)$parent->xpath('@PersonId')[0]);
@@ -738,7 +744,9 @@ class Profile implements IStrategy
     {
         $staffs = $this->batchxml->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
-        /** @var Staff $staff */
+        /* $staff is a stdclass derived from xml data,
+         * it's not a Normalised Data Structure object here
+         */
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
             $username = trim((string)$staff->UserName);
