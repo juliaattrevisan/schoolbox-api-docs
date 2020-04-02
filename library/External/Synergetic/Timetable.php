@@ -240,8 +240,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
-     * @return String
+     * @param string $dayNumber
+     * @return string
      */
     public function getDayName($dayNumber): string
     {
