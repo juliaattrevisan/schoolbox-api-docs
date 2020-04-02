@@ -19,10 +19,9 @@ interface IUserResolver
      *
      * @param \Schoolbox\Comms\News\Model $article
      * @param bool                        $excludeMuted
-     * @param bool                        $includeAuthor set this true to add author to users
      * @return int[]
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false, bool $includeAuthor = false): array;
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false): array;
 
 
     /**
