@@ -14,8 +14,9 @@ $spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domai
 
 
 $settingsInfo = array (
+    'debug' => (bool)Config::get('saml_debug'),
     'idp' => [
-        'entityId' => Config::get('saml_sso_url') ?: Config::get('saml_idp_metadata_url'),
+        'entityId' =>  Config::get('saml_entityid') ?: Config::get('saml_idp_metadata_url'),
         'singleSignOnService' => array (
             'url' => Config::get('saml_sso_url'),
         ),
