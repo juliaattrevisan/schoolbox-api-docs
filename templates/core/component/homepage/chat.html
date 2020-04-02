@@ -57,12 +57,12 @@
                 <i class="icon-chat"></i>
 
                 <!-- BEGIN empty_read -->
-                <p>There is no active chat at this time. <a href="/homepage/chatArchive/{ID}/">View the chat archive</a> or <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants">view the chat participants</a>.</p>
+                <p>There is no active chat at this time. <a href="/homepage/chatArchive/{ID}/">View the chat archive</a>.</p>
                 <!-- END empty_read -->
 
                 <!-- BEGIN empty_write -->
                 <p>
-                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> to allow users to have conversations on this page, or <a href="/homepage/chatArchive/{ID}/">view the chat archive</a> or <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants">the chat participants</a>.
+                    <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Activate the chat</a> to allow users to have conversations on this page, or <a href="/homepage/chatArchive/{ID}/">view the chat archive</a>.
                 </p>
                 <!-- END empty_write -->
 
@@ -80,11 +80,15 @@
                         </div>
                         <input type="submit" value="Send Message" data-chat-send>
                     </form>
-
                     <div class="chat-error hide"></div>
                 </div>
-
+                <div class="component-action">
+                    <section>
+                        <a href="#" data-reveal-id="component{COMPONENT_INSTANCE_ID}-participants" class="button">View Participants</a>
+                    </section>
+                </div>
             </section>
+
             <!-- END chat -->
 
             <div data-reveal id="component{COMPONENT_INSTANCE_ID}-participants" class="reveal-modal">
