@@ -18,6 +18,7 @@ use RangeException;
 use RuntimeException;
 use Monolog;
 use Alaress\Lumberjack;
+use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
 
 /**
@@ -376,7 +377,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @return bool
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    protected function addRavenHandler(Lumberjack\Logger $logger): bool
+    protected function addSentryHandler(Lumberjack\Logger $logger): bool
     {
         if (!$this->getDependencyInjector()->has('sentry')) {
             // If Sentry is not available, don't attempt to log to it
@@ -384,12 +385,12 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         }
 
         /** @var HubInterface $sentryClient */
-        $sentryClient = $this->getDependencyInjector()->get('sentry');
-        $ravenHandler = new RavenHandler($sentryClient, Monolog\Logger::CRITICAL);
+        $sentryClient  = $this->getDependencyInjector()->get('sentry');
+        $sentryHandler = new SentryHandler($sentryClient, Monolog\Logger::CRITICAL);
         /** @var Monolog\Formatter\LineFormatter $formatter */
-        $formatter = $ravenHandler->getFormatter();
+        $formatter = $sentryHandler->getFormatter();
         $formatter->includeStacktraces();
-        $logger->pushHandler($ravenHandler);
+        $logger->pushHandler($sentryHandler);
         return true;
     }
 
