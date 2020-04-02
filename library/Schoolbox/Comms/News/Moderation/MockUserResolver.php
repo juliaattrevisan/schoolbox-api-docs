@@ -62,5 +62,13 @@ class MockUserResolver implements IUserResolver
 
     }
 
-
+    /**
+     * Returns the user ids of all news moderators (users with FULL access to NEWS service)
+     *
+     * @return int[]
+     */
+    public function getGlobalNewsModerators(): array
+    {
+        return [13];
+    }
 }

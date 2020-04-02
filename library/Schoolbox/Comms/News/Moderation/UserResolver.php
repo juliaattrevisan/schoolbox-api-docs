@@ -13,6 +13,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Comms\News\Audience;
 use PDO;
 use Schoolbox\Comms\News\Audience\Segment\EntityType;
+use function array_map;
 
 /**
  * Responsible for:
@@ -103,4 +104,15 @@ class UserResolver implements IUserResolver
         return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->getPropertyValues('id');
     }
 
+
+    /** @inheritDoc */
+    public function getGlobalNewsModerators(): array
+    {
+        $sql          = "SELECT uid FROM userAccess WHERE service = :service AND type >= :type";
+        $moderatorIds = $this->db->executeQuery(
+            $sql,
+            ['service' => UserAccess::SERVICE_NEWS, 'type' => UserAccess::ACCESS_FULL]
+        )->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $moderatorIds);
+    }
 }

@@ -19,4 +19,11 @@ interface IUserResolver
      */
     public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article, bool $includeFolderWriteUsers = true): array;
 
+
+    /**
+     * Returns the user ids of all news moderators (users with FULL access to NEWS service)
+     *
+     * @return int[]
+     */
+    public function getGlobalNewsModerators(): array;
 }
