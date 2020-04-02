@@ -2,12 +2,16 @@
 
 class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-
     /**
      * @var Group
      */
     private $group;
 
+    /**
+     * How long since the user's last action in chat before they are considered
+     * inactive?
+     */
+    private const CHAT_POLL_EXPIRY = '-9 seconds';
 
     /**
      * Chat constructor.
@@ -73,7 +77,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $logs;
     }
 
-
     /**
      * Create a log entry which remembers what people typed.
      *
@@ -127,11 +130,15 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function get_users($category_id)
     {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
-        $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
-                  FROM chat_poll
-                  LEFT JOIN `user` ON chat_poll.user_id = user.id
-                  LEFT JOIN `groups` ON user.`group_id` = groups.`id`
-                  WHERE `category_id` = $category_id";
+        $time  = new DateTime(self::CHAT_POLL_EXPIRY);
+        $query = "
+            SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
+            FROM chat_poll
+            LEFT JOIN `user` ON chat_poll.user_id = user.id
+            LEFT JOIN `groups` ON user.`group_id` = groups.`id`
+            WHERE `category_id` = $category_id
+            AND chat_poll.time >= '{$this->db->quote($time->format('Y-m-d H:i:s'))}'
+        ";
 
         $users = $this->db->getAll($query);
 
@@ -155,7 +162,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function prune_users($category_id)
     {
-        $time = new DateTime('-9 seconds');
+        $time = new DateTime(self::CHAT_POLL_EXPIRY);
 
         $query = "DELETE FROM chat_poll
                   WHERE time < '" . $time->format('Y-m-d H:i:s') . "'
@@ -163,7 +170,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         return $this->db->query($query);
     }
-
 
     /**
      * Removes content
@@ -183,7 +189,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $this->db->query($query);
     }
-
 
     /**
      * @param $categoryID

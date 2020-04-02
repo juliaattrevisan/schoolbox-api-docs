@@ -54,7 +54,7 @@ class AjaxChat {
         $this->chatHandler = new Chat();
         $this->homepageHandler = new Homepage($this->catID);
 
-        $this->output = '';
+        $this->output = [];
 
         if($this->componentID) {
             /** @var Component_Instance[] $inst */
@@ -142,9 +142,10 @@ class AjaxChat {
     private function poll() {
         $this->chatHandler->update_poll($this->catID, $this->userID);
 
-        // Return list of active users
-        $this->chatHandler->prune_users($this->catID);
+        // Do not prune users anymore: get_users only gets new users
+//        $this->chatHandler->prune_users($this->catID);
 
+        // Return list of active users
         $users = $this->chatHandler->get_users($this->catID);
 
         if (empty($users)) {
@@ -154,37 +155,29 @@ class AjaxChat {
             $staffPresent = false;
 
             // ignore all of these checks if the chat is disabled.
-            if($this->getConfig('state') == 'Active') {
+            if ($this->getConfig('state') === 'Active' && !$this->groupHandler->isStaff()) {
+                // If I am not personally a staff member,
+                // iterate and find out if any of the users are
+                foreach ($users as &$user) {
+                    if ($user['group_type'] === Role::STAFF) {
 
-                // am I personally a staff member?
-                if(!$this->groupHandler->isStaff()) {
+                        $msg[] = $user['group_type'];
 
-                    // no? ok, iterate and find out if any of the users are
-                    foreach($users as &$user) {
-                        if($user['group_type'] == Role::STAFF) {
-
-                            $msg[] = $user['group_type'];
-
-                            $staffPresent = true;
-                        }
-                        unset($user['group_type']);
+                        $staffPresent = true;
                     }
-
-                    // deactivate the chat if no staff members
-                    if(!$staffPresent) {
-                        $this->config['state']->setValue('Inactive');
-                    }
+                    unset($user['group_type']);
                 }
-                else {
-                    // yes? set the flag
-                    $this->config['state']->setValue('Active');
-                }
+                unset($user);
 
-                $this->saveConfig();
+                // deactivate the chat if no staff members
+                if (!$staffPresent) {
+                    $this->config['state']->setValue('Inactive');
+                    $this->saveConfig();
+                }
             }
         }
 
-        $this->output['users'] = $users;
+        $this->output['users']  = $users;
         $this->output['config'] = $this->getConfig();
 
     }
