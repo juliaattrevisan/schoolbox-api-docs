@@ -8601,11 +8601,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dir\\)\\: Unexpected token \"\\$dir\", expected type at offset 54$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Receiver.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Connector\\\\IConnector\\:\\:executeQueryIterator\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/External/Connector/Maze/Cas/Sync.php
