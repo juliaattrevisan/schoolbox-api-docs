@@ -47,15 +47,15 @@ class Factory
 
         // Segment must be linked to an article or parent segment, but not both
         $validContext = new Specification\ExclusiveOr([
-            new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_COMMS_NEWS_ARTICLE_ID), null),
+            new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_COMMS_NEWS_ARTICLE_ID), null),
             new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_PARENT_ID), null),
         ]);
 
         // All segments must have an entity type
-        $hasEntityType = new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), null));
+        $hasEntityType = new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_ENTITY_TYPE), null));
 
         // All segments must have a relationship modifier
-        $hasRelationship = new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_RELATIONSHIP), null));
+        $hasRelationship = new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_RELATIONSHIP), null));
 
         // Segment's tree height must be valid
         $validTreeHeight = new ValidTreeHeight(Audience\Model::DEPTH_SEGMENT_TREE_MAX);
@@ -64,7 +64,7 @@ class Factory
         // * must have children
         // * cannot be children of another composite segment
         $compositeWithChildren = new Specification\Conjunction([
-            new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType()),
+            new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType()),
             new HasChildren(),
             new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_PARENT_ID), null),
         ]);
@@ -72,7 +72,7 @@ class Factory
         // Simple segments:
         // * cannot have children
         $simpleWithoutChildren = new Specification\Conjunction([
-            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType())),
+            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType())),
             new Specification\Negation(new HasChildren()),
         ]);
         $compositeOrSimple     = new Specification\ExclusiveOr([$compositeWithChildren, $simpleWithoutChildren]);
@@ -82,7 +82,7 @@ class Factory
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
         $notInvalidNull = new Specification\Disjunction([
-            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), null)),
+            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Simple\Mapper::FIELD_ENTITY_TYPE), null)),
             new ValidNullEntity($this->validNullEntities),
         ]);
 

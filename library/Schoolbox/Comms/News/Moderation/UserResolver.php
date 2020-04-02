@@ -10,8 +10,7 @@ namespace Schoolbox\Comms\News\Moderation;
 use Alaress\Database;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
-use Schoolbox\Comms\News\Audience\Model as Audience;
+use Schoolbox\Comms\News\Audience;
 use PDO;
 use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
@@ -21,7 +20,7 @@ use Schoolbox\Comms\News\Audience\Segment\EntityType;
  */
 class UserResolver implements IUserResolver
 {
-    /** @var AudienceMapper */
+    /** @var Audience\Mapper */
     private $audienceMapper;
 
     /** @var UserAccessMapper */
@@ -31,11 +30,11 @@ class UserResolver implements IUserResolver
     private $db;
 
     /**
-     * @param AudienceMapper                $audienceMapper
+     * @param Audience\Mapper                $audienceMapper
      * @param UserAccessMapper              $userAccessMapper
      */
     public function __construct(
-        AudienceMapper $audienceMapper,
+        Audience\Mapper $audienceMapper,
         UserAccessMapper $userAccessMapper,
         Database\Connector\IConnector $db
     ) {
@@ -71,17 +70,17 @@ class UserResolver implements IUserResolver
             return $moderators;
         }
 
-        $rootSegments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
+        $rootSegments = $this->audienceMapper->findByColumn(Audience\Simple\Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
         if ($rootSegments->count() !== 1) {
             // non-trivial case, more than one segment
             return $moderators;
         }
 
-        /** @var Audience $segment */
+        /** @var Audience\Model $segment */
         $segment = $rootSegments->first();
 
-        if ($segment->getEntityType() !== \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
+        if ($segment->getEntityType() !== \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() || $segment->getRelationship() !== Audience\Model::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
             return $moderators;
         }

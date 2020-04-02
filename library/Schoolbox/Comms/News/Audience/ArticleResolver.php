@@ -481,18 +481,18 @@ class ArticleResolver implements IArticleResolver
         }
 
         $pb = $this->db
-            ->buildPredicateBuilder(Mapper::TABLE_NAME)
-            ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
+            ->buildPredicateBuilder(Simple\Mapper::TABLE_NAME)
+            ->equals(Simple\Mapper::FIELD_ENTITY_TYPE, $entityType)
             ->isNull('comms_news_article.deleted_at');
 
         if (null === $entityValue) {
-            $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
+            $pb->isNull(Simple\Mapper::FIELD_ENTITY_VALUE);
         } else {
-            $pb->equals(Mapper::FIELD_ENTITY_VALUE, $entityValue);
+            $pb->equals(Simple\Mapper::FIELD_ENTITY_VALUE, $entityValue);
         }
 
         if (null !== $relationship) {
-            $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
+            $pb->equals(Simple\Mapper::FIELD_RELATIONSHIP, $relationship);
         }
 
         if ($publishedOnly) {
@@ -514,7 +514,7 @@ class ArticleResolver implements IArticleResolver
 
         if (count($orderBy)) {
             $sql .= "
-                {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
+                {$this->folderMapper::buildOrderByClause(Simple\Mapper::TABLE_NAME, $orderBy, $this->db)}";
         }
 
         if (null !== $limit) {
@@ -567,7 +567,7 @@ class ArticleResolver implements IArticleResolver
         ";
 
         if (count($orderBy)) {
-            $sql .= "\n{$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
+            $sql .= "\n" . Complex\Mapper::buildOrderByClause(Complex\Mapper::TABLE_NAME, $orderBy, $this->db);
         }
 
         if (null !== $limit) {
