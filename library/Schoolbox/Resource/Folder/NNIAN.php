@@ -109,7 +109,7 @@ class NNIAN
      * This includes all folders from the specified folder to the NNIAN, inclusive.
      * The first item will be the passed in folder, the last item will be the NNIAN folder.
      *
-     * @param Model $folder
+     * @param Model $folder Must have folder.id hydrated
      * @return GenericCollection<Model>|Model[] Indexed by folder.id
      * @throws DefinitionException
      * @throws Deleted
