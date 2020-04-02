@@ -87,16 +87,23 @@ class External_Doublefirst_Helper
             return 0;
         }
 
-        $query =
-            "
-            SELECT      StartDate,
-                        EndDate
-            FROM        SchoolTerms
-            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59' AND
-                        EndDate >= '" . $date->getDatabaseDate() . " 00:00:00'
+        $query = "
+            SELECT     st.StartDate,
+                       st.EndDate,
+                       ttc.StartTimeTableWeek
+            FROM       SchoolTerms st
+            INNER JOIN TimeTableTermCalendar ttc ON ttc.TermID = st.TermID and ttc.SchoolID = st.SchoolID
+            WHERE      st.StartDate <= :startDate
+            AND        st.EndDate   >= :endDate
         ";
 
-        $term = $this->getDatabase()->getRow($query);
+        $term = $this->getDatabase()->getRow(
+            $query,
+            [
+                'startDate' => $date->endOfDay()->getDatabase(),
+                'endDate'   => $date->startOfDay()->getDatabase(),
+            ]
+        );
 
         // If we couldn't find a matching term in Doublefirst, just bomb out here.
 
@@ -106,14 +113,21 @@ class External_Doublefirst_Helper
 
             $query =
                 "
-	            SELECT      TOP 1 StartDate,
-	                        EndDate
-	            FROM        SchoolTerms
-	            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59'
-			    ORDER BY 	StartDate DESC
+                SELECT TOP 1 st.StartDate,
+                             st.EndDate,
+                             ttc.StartTimeTableWeek
+                FROM         SchoolTerms st
+                INNER JOIN   TimeTableTermCalendar ttc ON ttc.TermID = st.TermID and ttc.SchoolID = st.SchoolID
+                WHERE        st.StartDate <= :startDate
+			    ORDER BY     st.StartDate DESC
 	        ";
 
-            $term = $this->getDatabase()->getRow($query);
+            $term = $this->getDatabase()->getRow(
+                $query,
+                [
+                    'startDate' => $date->endOfDay()->getDatabase(),
+                ]
+            );
         }
 
         $start = new \Alaress_Date_Format(strtotime($term['StartDate']), 'U');
@@ -121,14 +135,8 @@ class External_Doublefirst_Helper
         // Grab the year for use in later query
 
         $year = $start->getYear();
-
-        /**
-         * TODO: We are going to assume all terms start on week 1 as there doesn't appear to be any field that says it could
-         * be otherwise. Need to look into this.
-         */
-
-        $week = 1;
-        $day = date("w", strtotime($term['StartDate']));
+        $week = (int)$term['StartTimeTableWeek'];
+        $day  = date("w", strtotime($term['StartDate']));
 
         // We convert the date fo julian so we can iterate days easily in a for loop.
 
