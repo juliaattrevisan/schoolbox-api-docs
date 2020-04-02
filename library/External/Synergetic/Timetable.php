@@ -28,7 +28,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /** @var MSSQL $database */
     private $database;
 
-    /** @var External_UserInterface */
+    /** @var External_User */
     private $externalUser;
 
     /** @var array */
@@ -628,15 +628,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     /**
      * @param string      $externalUserId
-     * @param             $userId
-     * @param             $dayNumber
+     * @param int         $userId
+     * @param int         $dayNumber
      * @param string|null $fileType
      * @param string      $fileSemester
      * @param string      $fileYear
      * @param Campus      $campus
      * @return array
      */
-    private function getTimetablePeriods(string $externalUserId, $userId, $dayNumber, ?string $fileType, string $fileSemester, string $fileYear, Campus $campus): array
+    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?string $fileType, string $fileSemester, string $fileYear, Campus $campus): array
     {
         $campusString = $campus->getExtTimetableCode();
 
@@ -835,11 +835,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     /**
      * Sorts timetable by period start
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
-    public function sortTimetable($a, $b)
+    public function sortTimetable(array $a, array $b): int
     {
         $aTime = strtotime($a['periodStart']);
         $bTime = strtotime($b['periodStart']);
