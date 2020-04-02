@@ -1725,7 +1725,7 @@ dl {
 
 // Profiles
 .profile {
-    .alert-box, span {
+    .alert-box {
         margin: 0 0 0.75rem 0.75rem;
         @media #{$small-only} {
             margin: 0 0 0.75rem 0;
