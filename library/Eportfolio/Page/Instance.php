@@ -10,6 +10,7 @@ use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 {
@@ -293,7 +294,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 }
 
                 if ($this->getPage()->getDi()->has('sentry')) {
-                    /** @var Raven_Client $sentry */
+                    /** @var HubInterface $sentry */
                     $sentry = $this->getPage()->getDi()->get('sentry');
                     $sentry->captureException($e);
                 }

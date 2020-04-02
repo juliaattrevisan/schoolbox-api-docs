@@ -10,7 +10,6 @@ namespace Schoolbox\Application;
 use Database;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
-use Monolog\Handler\RavenHandler;
 use PDOException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
