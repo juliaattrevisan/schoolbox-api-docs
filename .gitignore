@@ -2,7 +2,7 @@
 updates/sql_updates.sql
 data/
 www/conf/conf.php
-www/test.php
+/www/test*.php
 www/test.xml
 .vagrant
 Vagrantfile
