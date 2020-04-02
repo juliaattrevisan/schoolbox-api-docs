@@ -1,27 +1,27 @@
 {% extends '@core/user/student.twig' %}
 
 {% block specialAlert %}
-{#    {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}#}
+    {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
     <div class="alert-box-icon highlight">
         <span class="icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}"></span>
     </div>
-{#    {% endif %}#}
+    {% endif %}
 {% endblock specialAlert %}
 
 {% block englishSecond %}
-{#    {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}#}
+    {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
     <div class="alert-box-icon highlight">
         <span class="icon-eng-second-lang" title="English as an Additional Language"></span>
     </div>
-{#    {% endif %}#}
+    {% endif %}
 {% endblock englishSecond %}
 
 {% block medicalAlert %}
-{#    {% if externalUser.StudentMedicalAlert and showMedicalAlert %}#}
+    {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
     <div class="alert-box-icon alert">
         <span class="icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}"></span>
     </div>
-{#    {% endif %}#}
+    {% endif %}
 {% endblock medicalAlert %}
 
 {% block individualEducationPlan %}
