@@ -2,6 +2,6 @@
 
 {% block travel_logs %}
     {% if showDetails and travelLogs|length %}
-        {{ travelLogs | purify }}
+        {{ travelLogs | raw }}
     {% endif %}
 {% endblock travel_logs %}
