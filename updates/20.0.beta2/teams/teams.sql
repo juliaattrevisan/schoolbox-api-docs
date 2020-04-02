@@ -21,7 +21,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`)
 VALUES (
     'teams_url',
-    '',
+    'https://msteams.schoolbox.cloud',
     'Microsoft Teams Meetings Integration App Url',
     "The url where Microsoft Teams App is installed",
     (SELECT id FROM `lu_config_field` WHERE `field` = 'input'),
