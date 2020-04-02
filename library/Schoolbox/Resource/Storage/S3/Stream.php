@@ -70,12 +70,12 @@ class Stream
                                 string $resourcePath,
                                 string $resourceBaseName
     ) {
-        $this->config = $config;
-        $this->signedUrlExpiration = $signedUrlExpiration;
-        $this->attachmentType = $attachmentType;
-        $this->contentType = $contentType;
-        $this->resourcePath = $resourcePath;
-        $this->resourceBaseName = $resourceBaseName;
+        $this->config               = $config;
+        $this->signedUrlExpiration  = $signedUrlExpiration;
+        $this->attachmentType       = $attachmentType;
+        $this->contentType          = $contentType;
+        $this->resourcePath         = $resourcePath;
+        $this->resourceBaseName     = $resourceBaseName;
 
         $this->s3Client = new S3Client([
             'credentials' => [
@@ -131,9 +131,6 @@ class Stream
      * https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html
      * https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#getobject
      *
-     * @param string $resourcePath
-     * @param string $resourceBaseName
-     *
      * @return mixed+
      */
     private function getObject()
@@ -150,27 +147,31 @@ class Stream
     }
 
     /**
+     * Generate object's pre-signed URL
+     *
      * @return \Psr\Http\Message\UriInterface
      */
-    public function getPresignedUrl()
+    public function getPresignedUrl(): \Psr\Http\Message\UriInterface
     {
         return $this->s3Client->createPresignedRequest($this->getObject(), $this->signedUrlExpiration)->getUri();
     }
 
     /**
+     * Download the S3 object based from pre-signed URL
+     *
      * @param string $preSignedUrl
+     * @param string $cacheControl
      */
-    public function download(string $preSignedUrl)
+    public function download(string $preSignedUrl, string $cacheControl = 'private'): void
     {
         // Instruct browser to cache redirect to presigned URL.
         // Browser will request a new presigned URL when old one expires.
         header('HTTP/1.1 301 Moved Permanently');
-        header('Cache-Control: private');
-        header("Expires: $this->signedUrlExpiration");
-        header("Location: $preSignedUrl", true, 301);
+        header('Cache-Control: ' . $cacheControl);
+        header('Expires: ' . $this->signedUrlExpiration);
+        header('Location: ' . $preSignedUrl, true, 301);
         header_remove('pragma');
 
         exit;
     }
-
 }
