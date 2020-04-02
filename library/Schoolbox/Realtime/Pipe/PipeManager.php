@@ -202,7 +202,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
         $this->pipes->unregisterPipe($socketKeyForConnection);
-        $pipe->close();
+        if(null !== $pipe) {
+            $pipe->close();
+        }
     }
 
 
