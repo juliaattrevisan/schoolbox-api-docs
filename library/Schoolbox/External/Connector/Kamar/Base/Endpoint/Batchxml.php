@@ -69,12 +69,6 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
-        /* If you need to see the raw xml data from your chosen endpoint
-         * you can drop a printxml() here, which does some minor formatting to
-         * make it vaguely bearable to read
-         *
-         * $this->printXml();
-         */
         if (!$this->nodes) {
             $xml = $this->api->retrieveDocument();
 
