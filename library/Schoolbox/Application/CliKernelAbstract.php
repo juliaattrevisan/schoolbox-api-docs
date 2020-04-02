@@ -15,10 +15,10 @@ use PDOException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
-use Raven_Client;
 use RuntimeException;
 use Monolog;
 use Alaress\Lumberjack;
+use Sentry\State\HubInterface;
 
 /**
  * Common implementation for all Cli Kernels
@@ -383,9 +383,9 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             return false;
         }
 
-        /** @var Raven_Client $ravenClient */
-        $ravenClient  = $this->getDependencyInjector()->get('sentry');
-        $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
+        /** @var HubInterface $sentryClient */
+        $sentryClient = $this->getDependencyInjector()->get('sentry');
+        $ravenHandler = new RavenHandler($sentryClient, Monolog\Logger::CRITICAL);
         /** @var Monolog\Formatter\LineFormatter $formatter */
         $formatter = $ravenHandler->getFormatter();
         $formatter->includeStacktraces();

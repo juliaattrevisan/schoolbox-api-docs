@@ -26,6 +26,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 use Schoolbox\UserMapper;
 use Crell\ApiProblem\ApiProblem;
+use Sentry\State\HubInterface;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -72,11 +73,11 @@ function getConnector(string $className)
  * @param string            $class   The class to build
  * @param array             $params  Params to pass into its constructor
  * @param bool              $enabled Is this class enabled? 404 if not
- * @param null|Raven_Client $sentry  If something goes wrong, report it here
+ * @param null|HubInterface $sentry  If something goes wrong, report it here
  * @return Calendar_Api_EventType_Interface
  * @throws ReflectionException if $class doesn't exist
  */
-function buildApiClass(string $class, array $params, bool $enabled, ?Raven_Client $sentry): Calendar_Api_EventType_Interface
+function buildApiClass(string $class, array $params, bool $enabled, ?HubInterface $sentry): Calendar_Api_EventType_Interface
 {
     if (!$enabled) {
         // Not enabled; this is fine
@@ -187,7 +188,7 @@ try {
     }
 
     // Report errors in this thing
-    /** @var Raven_Client|null $sentry */
+    /** @var HubInterface|null $sentry */
     $sentry = $kernel->getDependencyInjector()->has('sentry')
         ? $kernel->getDependencyInjector()->get('sentry')
         : null;

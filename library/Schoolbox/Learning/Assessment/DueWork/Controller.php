@@ -13,7 +13,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use Schoolbox\Learning\DueWork\StateMapper;
-use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
@@ -734,7 +733,6 @@ class Controller extends Assessment\Controller
             } catch (\DomainException $e) {
 
                 // Report errors in this thing
-                /** @var Raven_Client|null $sentry */
                 if ($this->getDi()->has('sentry')) {
                     $this->getDi()->get('sentry')->captureException($e);
                 }

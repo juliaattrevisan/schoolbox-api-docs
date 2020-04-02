@@ -11,6 +11,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use \Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Sentry\State\HubInterface;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
@@ -457,7 +458,7 @@ foreach ($componentCollection as $component) {
         }
 
         if ($this->getDi()->has('sentry')) {
-            /** @var Raven_Client $sentry */
+            /** @var HubInterface $sentry */
             $sentry = $this->getDi()->get('sentry');
             $sentry->captureException($e);
         }

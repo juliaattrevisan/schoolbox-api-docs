@@ -21,7 +21,7 @@ use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Raven_Client;
+use Sentry\State\HubInterface;
 
 abstract class Base {
     /**
@@ -66,7 +66,7 @@ abstract class Base {
     /**
      * Null if the SB instance is not configured to use Sentry, or if unable to instantiate Sentry.
      *
-     * @var null|Raven_Client
+     * @var null|HubInterface
      */
     private $sentry;
 
@@ -505,9 +505,9 @@ abstract class Base {
 
 
     /**
-     * @param null|Raven_Client $sentry
+     * @param null|HubInterface $sentry
      */
-    public function setSentry(?Raven_Client $sentry)
+    public function setSentry(?HubInterface $sentry)
     {
         $this->sentry = $sentry;
     }
@@ -521,21 +521,16 @@ abstract class Base {
      * Method signature is intentionally vague to abstract away exception reporting implementation
      * in the event we want to switch it out in the future.
      *
-     * @param \Throwable $e    The exception you wish to report
-     * @param array|null $data Any extra data you wish to include in report
+     * @param \Throwable $e The exception you wish to report
      * @return bool
      */
-    protected function captureException(\Throwable $e, array $data = null): bool
+    protected function captureException(\Throwable $e): bool
     {
         // Not installed?
-        if (!$this->sentry instanceof Raven_Client) {
+        if (!$this->sentry instanceof HubInterface) {
             return false;
         }
-
-        // Suppress this inspection:
-        // Sentry doesn't have proper typedefs anyway so it doesn't matter
-        /** @noinspection PhpParamsInspection */
-        $this->sentry->captureException($e, $data);
+        $this->sentry->captureException($e);
         return true;
     }
 }
