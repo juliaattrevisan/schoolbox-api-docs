@@ -9,7 +9,6 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -59,7 +58,7 @@ class HaveReadPermToAudience extends ArticleAttribute
         /* Needs audience hydration into $article
          * Otherwise it throws the Unauthorized exception
          */
-        $audienceSegments = Mapper::getInstance()->findForArticles([$article->getId()]);
+        $audienceSegments = Audience\Mapper::getInstance()->findForArticles([$article->getId()]);
         $article->setAudience($audienceSegments);
 
         if (!$audience || !$audience->count()) {
