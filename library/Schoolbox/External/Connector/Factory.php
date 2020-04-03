@@ -46,7 +46,7 @@ class Factory
         $schoolCode = ucwords($config->get('site_location'));
 
         $classBase = "{$prefixBase}\\Base\\{$type}";
-        if ('tass' === $config->get('external_type') && ExternalConnectorFactory::EXTERNAL_SYNC === $type) {
+        if ('tass' === $config->get('external_type') && ExternalConnectorFactory::EXTERNAL_SYNC === $type && $config->get('external_tass_version')) {
             $classVersion = "{$prefixBase}\\{$config->get('external_tass_version')}\\{$type}";
         }
         $classSchool = "{$prefixBase}\\{$schoolCode}\\{$type}";

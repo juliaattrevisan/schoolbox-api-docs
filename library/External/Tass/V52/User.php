@@ -93,13 +93,13 @@ class External_Tass_V52_User extends External_Tass_User
      */
     public function getStudentContactList(array $externalUserIds): array
     {
-        if (empty($externalUserId)) {
+        if (empty($externalUserIds)) {
             return [];
         }
         $idList = implode(',', array_map([$this->database, 'smartQuote'], $externalUserIds));
 
         $charIndexQuery = [];
-        foreach ($externalUserId as $externalId) {
+        foreach ($externalUserIds as $externalId) {
             $charIndexQuery[] = "(CHARINDEX(','+ '{$this->database->quote($externalId)}' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
         }
         $charIndexQueryString = implode(' OR ', $charIndexQuery);
@@ -118,7 +118,7 @@ class External_Tass_V52_User extends External_Tass_User
             SELECT DISTINCT
                 '{$prefix[$i]}' + RTRIM(parent.par_code)
                                          AS StudentContactID,
-                pa.title                 AS StudentContactTitle,
+                pd.title                 AS StudentContactTitle,
                 RTRIM(pd.preferred_name) AS StudentContactPreferred,
                 RTRIM(pd.surname)        AS StudentContactSurname,
                 COALESCE(RTRIM(pa.e_mail), RTRIM(pa.e_mail2))
@@ -152,7 +152,7 @@ class External_Tass_V52_User extends External_Tass_User
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
-                AND pa.add_num IN ($addressNumber[$i],'1')
+                AND pa.add_num IN ({$addressNumber[$i]},'1')
             WHERE stud_code IN ({$idList})
             ";
 
@@ -161,7 +161,7 @@ class External_Tass_V52_User extends External_Tass_User
             SELECT DISTINCT
                 '{$prefix[$i]}' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                          AS StudentContactID,
-                pa.title                 AS StudentContactTitle,
+                pd.title                 AS StudentContactTitle,
                 RTRIM(pd.preferred_name) AS StudentContactPreferred,
                 RTRIM(pd.surname)        AS StudentContactSurname,
                 COALESCE(RTRIM(pa.e_mail), RTRIM(pa.e_mail2))
@@ -195,7 +195,7 @@ class External_Tass_V52_User extends External_Tass_User
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
-                AND pa.add_num IN ($addressNumber[$i],'1')
+                AND pa.add_num IN ({$addressNumber[$i]},'1')
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
             WHERE $charIndexQueryString
         ";

@@ -42,7 +42,7 @@ class External_DatabaseFactory
             } else {
                 $databaseClasses[] = "External_" . ucfirst($databaseName) . "_" . ucfirst(Config::get('site_location')) . "_" . $databaseType;
                 // Enable school-specific connection classes
-                if ('tass' === $databaseName && 'User' === $databaseType) {
+                if ('tass' === $databaseName && 'User' === $databaseType && Config::get('external_tass_version')) {
                     $databaseClasses[] = "External_" . ucfirst($databaseName) . '_' . Config::get('external_tass_version') . "_" . $databaseType;
                 }
                 $databaseClasses[] = "External_" . ucfirst($databaseName) . "_" . $databaseType;
