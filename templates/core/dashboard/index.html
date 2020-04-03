@@ -35,9 +35,10 @@
                  * A callback which you use to deal with the url produced
                  * by interacting with the modal
                  *
-                 * @param url
+                 * @param url     string  the url to which you linked
+                 * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
                  */
-                onSelect: function(url) {
+                onSelect: function(url, dialog) {
                     console.log(url);
                 }
             };
@@ -89,7 +90,7 @@
                 if (message.data != undefined) {
                     if (0 in message.data && 'hash' in message.data[0]) {
                         $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                            config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id));
+                            config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id), null);
 
                             /* Shut modal
                              */
@@ -99,12 +100,20 @@
 
                         /* Microsoft Teams meetings url format
                          */
-                        config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl));
+                        config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), null);
 
                         /* Shut modal
                          */
                         $('#file-picker').foundation('reveal', 'close');
+                    } else {
+
+                        // The file was rejected, probably cause it was the wrong mimetype.
+                        // Do nothing
                     }
+                } else {
+
+                    /* Connecting to your Google Drive
+                     */
                 }
             });
         });

@@ -20,9 +20,65 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
             /* Prefix for linking to Files
              */
-            file: '/send.php?id='
+            file: '/send.php?id=',
+
+            /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
+             */
+            meetingUrl: ''
+        },
+
+        /**
+         * A callback which you use to deal with the url produced
+         * by interacting with the modal
+         *
+         * @param url     string  the url to which you linked
+         * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+         */
+        onSelect: function(url, dialog) {
+
+            /* Manufacture link url based on whether it was
+             * a file or a folder
+             *
+             * Assign link text to be same as url for now
+             * User can change it to whatever they want
+             */
+            var fields = dialogFields(dialog);
+
+            fields.url.setValue(url);
+
+            $('#participant-customise-modal').css('z-index', '10000');
         }
     };
+
+
+    /**
+     * Construct a url from the pieces provided
+     * Depending on what you chose, the url is constructed a bit specially
+     * sorry
+     *
+     * @param type        string  data type [folder, myfolder, file, meetingUrl]
+     * @param filesystem  string  typically 'store' as a special case usage
+     * @param val         string  a file id or a meeting url
+     * @return url        string  the url to which you are linking
+     */
+    function processSelection(type, filesystem, val) {
+        var url;
+
+        if (type == 'folder') {
+            url = config.url.folder + val;
+        } else if (type == 'myfolder') {
+            url = config.url.myfolder + val;
+        } else if (filesystem == 'store') {
+            url = config.url.storage + val;
+        } else if (type =='meetingUrl') {
+            url = config.url.meetingUrl + val;
+        } else {
+            url = config.url.file + val;
+        }
+
+        return url;
+    }
+
 
     /**
      * Inject link into editor panel with modifiers applied
@@ -70,6 +126,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
         return element;
     }
+
 
     /**
      * A macro to all the fields in the Dialog
@@ -127,8 +184,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();
-                                    var fields = dialogFields(dialog);
-
                                     var domId = $(this).attr('domId');
                                     var previousModal = $('#'+domId).closest('.cke_dialog');
                                     previousModal.addClass('hide');
@@ -154,39 +209,17 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                         if (message.data != undefined) {
                                             if (0 in message.data && 'hash' in message.data[0]) {
                                                 $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                                                    fields.id.setValue(responseText.id);
-                                                    fields.type.setValue(responseText.type);
-                                                    fields.filesystem.setValue(responseText.filesystem);
-
-                                                    /* Manufacture link url based on whether it was
-                                                     * a file or a folder
-                                                     *
-                                                     * Assign link text to be same as url for now
-                                                     * User can change it to whatever they want
-                                                     */
-                                                    if (fields.type.getValue() == 'folder') {
-                                                        fields.url.setValue(config.url.folder + fields.id.getValue());
-                                                    }
-                                                    else if (fields.type.getValue() == 'myfolder') {
-                                                        fields.url.setValue(config.url.myfolder + fields.id.getValue());
-                                                    }
-                                                    else if (fields.filesystem.getValue() == 'store') {
-                                                        fields.url.setValue(config.url.storage + fields.id.getValue());
-                                                    }
-                                                    else {
-                                                        fields.url.setValue(config.url.file + fields.id.getValue());
-                                                    }
+                                                    config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id),dialog);
 
                                                     /* Shut modal, go back to Dialog
                                                      */
                                                     $('#file-picker').foundation('reveal', 'close');
-                                                    $('#participant-customise-modal').css('z-index', '10000');
                                                 });
                                             } else if ('meetingUrl' in message.data) {
 
                                                 /* Microsoft Teams meetings url format
                                                  */
-                                                fields.url.setValue(message.data.meetingUrl);
+                                                config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), dialog);
 
                                                 /* Shut modal, go back to Dialog
                                                  */
