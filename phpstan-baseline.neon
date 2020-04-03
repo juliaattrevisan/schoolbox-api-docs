@@ -6166,16 +6166,6 @@ parameters:
 			path: library/External/Synergetic/Markbook.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Synergetic/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @throws with type InvalidArgumentException\\|MssqlQueryException is not subtype of Throwable$#"
-			count: 1
-			path: library/External/Synergetic/Timetable.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
 			count: 1
 			path: library/External/Synergetic/User.php

@@ -8,6 +8,7 @@
 
 use Alaress\Cache;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
@@ -19,10 +20,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     const FORMAT_ISO8601 = 126;
 
+    /**
+     * Default File Type used by dbo.spsTimetable
+     */
+    private const DEFAULT_FILE_TYPE = 'A';
+
     /** @var MSSQL $database */
     private $database;
 
-    /** @var External_UserInterface */
+    /** @var External_User */
     private $externalUser;
 
     /** @var array */
@@ -78,7 +84,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-        $args = [ $externalUserId, $campus, $day, $date ];
+        $args = [$externalUserId, $campus, $day, $date];
         $key  = sprintf('%d-%s-%d-%s', $externalUserId === null ? '' : $externalUserId, $campus->getExtTimetableCode(), $day, $date);
 
         return self::$timetableDefinitionCache->get($key, $args);
@@ -182,15 +188,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $statement->bindInputs([
             'TimetableGroup' => $campus->getExtTimetableCode(),
-            'Date' => date('Y-m-d', $date)
+            'Date'           => date('Y-m-d', $date),
         ]);
 
         $currentDay = null;
 
         $outputs['CurrentDay'] = [
-            'value' => &$currentDay,
-            'type' => PDO::PARAM_INT,
-            'length' => 4
+            'value'  => &$currentDay,
+            'type'   => PDO::PARAM_INT,
+            'length' => 4,
         ];
 
         $statement->bindOutputs($outputs);
@@ -211,7 +217,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function isDateWithinCurrentFileSemester(int $date): bool
     {
-        $query = '
+        $query      = '
             SELECT COUNT(*)
             FROM   FileSemesters
             WHERE  FileYear                 =  :year
@@ -234,15 +240,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
-     * @return String
+     * @param string $dayNumber
+     * @return string
      */
     public function getDayName($dayNumber): string
     {
-        $query = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
+        $query  = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
         $result = $this->getDatabase()->getRow($query);
 
-        if($result['Description']) {
+        if ($result['Description']) {
             return $result['Description'];
         }
 
@@ -348,7 +354,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         // get available day numbers
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        $dayNumbers = array_map(
+        $dayNumbers   = array_map(
             function ($r) {
                 return $r['DayNumber'];
             },
@@ -372,8 +378,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             AND t.FileYear = '%s'
             AND t.TimetableGroup = '%s'
             AND t.DayNumber = '%d'
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, ".self::FORMAT_ISO8601."), 10), t.TimeFrom) < '%d'
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, ".self::FORMAT_ISO8601."), 10), t.TimeTo) > '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, " . self::FORMAT_ISO8601 . "), 10), t.TimeFrom) < '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, " . self::FORMAT_ISO8601 . "), 10), t.TimeTo) > '%d'
         ";
 
         return $this->getDatabase()->getRow(
@@ -417,114 +423,137 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $periodList = [];
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
+        $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
 
-        if (!is_array($timetabledef['desc'])) {
+        if (!is_array($timetableDef['desc'])) {
             return [];
         }
+
+        $timetable = [];
 
         $campusString = $campus->getExtTimetableCode();
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
-        $statement = $this->database->prepareProcedure('dbo.spsTimetable');
-        $statement->bindInputs(
-            [
-                'FileYear' => $fileYear,
-                'FileSemester' => $fileSemester,
-                'ID' => $externalUserId,
-                'Date' => $date->getDatabaseDate(),
-                'IncludeStaffScheduleFlag' => 1,
-                'CheckAttendancesExistFlag' => 1,
-                'IncludeSparesFlag' => 0,
-                'IncludeRecessFlag' => 0
-            ]
-        );
-
-        $iterator = $statement->getIterator();
-
-        $count = 0;
+        $allowedFileTypes = $this->getAllowedFileTypes();
+        // If the file type is not provided, set it to 'A'
+        if (empty($allowedFileTypes)) {
+            $allowedFileTypes = [self::DEFAULT_FILE_TYPE];
+        }
 
         $periodsForSequenceIds = [];
-        foreach ($iterator as $spRow) {
-            if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                // There is a SeqLinkedTo field, which is only set for linked classes.
-                $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
-                $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
-                if (isset($sequenceId) && $multiPeriodAttendance) {
-                    $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
-                }
-                $periodList[] = [
-                    'Room'                      => $spRow['Room'],
-                    'Description'               => $spRow['ClassDescription'],
-                    'PeriodNumber'              => $spRow['Period'],
-                    'ClassCampus'               => $spRow['ClassCampus'],
-                    'ClassCode'                 => $spRow['ClassCode'],
-                    'FileType'                  => $spRow['FileType'],
-                    'SubstituteFlag'            => $spRow['SubstituteFlag'],
-                    'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
-                    'PeriodSequence'            => $sequenceId,
-                    'AttendancePeriods'         => [$spRow['Period']],
-                    'AttendanceMarked'          => $spRow['IsMarkedFlag'],
-                    'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
-                    'ClassCancelled'            => $spRow['ClassCancelledFlag'],
-                    'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
-                ];
-            }
-            $count++;
-        }
-
-        // Sort the periods and period sequences for niceness
-        usort(
-            $periodList,
-            static function ($a, $b) {
-                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
-            }
-        );
-        foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
-            sort($periodsForSequenceId);
-            $periodsForSequenceId = array_unique($periodsForSequenceId);
-        }
-        unset($periodsForSequenceId);
-
-        // Merge period numbers for attendance all together
-        foreach ($periodList as &$period) {
-            $periodSequence = $period['PeriodSequence'];
-            if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
-                $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
-
-                // Clear the list of periods for sequence IDs, so that later
-                // classes in the sequence don't get an attendance link.
-                $periodsForSequenceIds[$periodSequence] = [];
-            }
-        }
-        unset($period);
-
-        if ($count == 0) {
-            // Fall back to getDayTimetable()
-            return $this->getDayTimetable(
-                $externalUserId,
-                $userId,
-                $campus,
-                $dayNumber
+        // pvTimetableDefinitionAll
+        foreach ($allowedFileTypes as $fileType) {
+            $periodList = [];
+            $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
+            $statement->bindInputs(
+                [
+                    'FileType'                  => $fileType,
+                    'FileYear'                  => $fileYear,
+                    'FileSemester'              => $fileSemester,
+                    'ID'                        => $externalUserId,
+                    'Date'                      => $date->getDatabaseDate(),
+                    'IncludeStaffScheduleFlag'  => 1,
+                    'CheckAttendancesExistFlag' => 1,
+                    'IncludeSparesFlag'         => 0,
+                    'IncludeRecessFlag'         => 0,
+                    'WhereIsFlag'               => 1,
+                ]
             );
+
+            $iterator = $statement->getIterator();
+            foreach ($iterator as $spRow) {
+                // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
+                if ($spRow['FileType'] !== $fileType) {
+                    continue;
+                }
+                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                    // There is a SeqLinkedTo field, which is only set for linked classes.
+                    $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
+                    $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
+                    if (isset($sequenceId) && $multiPeriodAttendance) {
+                        $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
+                    }
+                    $periodList[] = [
+                        'Room'                      => $spRow['Room'],
+                        'Description'               => $spRow['ClassDescription'],
+                        'PeriodNumber'              => $spRow['Period'],
+                        'ClassCampus'               => $spRow['ClassCampus'],
+                        'ClassCode'                 => $spRow['ClassCode'],
+                        'FileType'                  => $spRow['FileType'],
+                        'SubstituteFlag'            => $spRow['SubstituteFlag'],
+                        'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
+                        'PeriodSequence'            => $sequenceId,
+                        'AttendancePeriods'         => [$spRow['Period']],
+                        'AttendanceMarked'          => $spRow['IsMarkedFlag'],
+                        'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
+                        'ClassCancelled'            => $spRow['ClassCancelledFlag'],
+                        'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
+                    ];
+                }
+            }
+
+            // Sort the periods and period sequences for niceness
+            usort(
+                $periodList,
+                static function ($a, $b) {
+                    return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+                }
+            );
+            foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
+                sort($periodsForSequenceId);
+                $periodsForSequenceId = array_unique($periodsForSequenceId);
+            }
+            unset($periodsForSequenceId);
+
+            // Merge period numbers for attendance all together
+            foreach ($periodList as &$period) {
+                $periodSequence = $period['PeriodSequence'];
+                if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
+                    $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
+
+                    // Clear the list of periods for sequence IDs, so that later
+                    // classes in the sequence don't get an attendance link.
+                    $periodsForSequenceIds[$periodSequence] = [];
+                }
+            }
+            unset($period);
+
+            if (empty($periodList)) {
+                // Fall back to getDayTimetable()
+                $periodList = $this->getTimetablePeriods($externalUserId, $userId, $dayNumber, $fileType, $fileSemester, $fileYear, $campus);
+            }
+
+            // Add classes into it
+            $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
         }
+        usort($timetable, [$this, 'sortTimetable']);
+        return $timetable;
+    }
 
-        //for each period
-        $timetable = array();
-
-        // Build the timetable
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-            $timetable[$x]['class']          = array();
+    /**
+     * @param array $timetableDef
+     * @param array $periodList
+     * @param array $timetable
+     * @return array
+     */
+    private function appendPeriodsToTimetable(array $timetableDef, array $periodList, array $timetable)
+    {
+        if (empty($timetable)) {
+            // Initialize the array
+            foreach ($timetableDef['desc'] as $x => $name) {
+                $timetable[$x] =
+                    [
+                        'periodName'     => $timetableDef['desc'][$x],
+                        'periodStart'    => $timetableDef['start'][$x],
+                        'periodEnd'      => $timetableDef['end'][$x],
+                        'periodNumber'   => $timetableDef['number'][$x],
+                        'periodSequence' => $timetableDef['sequence'][$x],
+                        'class'          => [],
+                    ];
+            }
         }
-
         // Add classes into it
         foreach ($periodList as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
@@ -532,34 +561,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['class'][$desc['ClassCode']])
                 ) {
-                    $timetable[$x]['class'][$desc['ClassCode']] = array(
+                    $timetable[$x]['class'][$desc['ClassCode']] = [
                         'description'       => $desc['Description'],
                         'code'              => $desc['ClassCode'],
                         'campus'            => $desc['ClassCampus'],
                         'room'              => $desc['Room'],
                         'staffID'           => $desc['StaffID'],
                         'FileType'          => $desc['FileType'],
-                        'SubstituteFlag'    => $desc['SubstituteFlag'],
-                        'SubstitutedFlag'   => $desc['SubstitutedFlag'],
-                        'AttendanceMarked'  => $desc['AttendanceMarked'],
-                        'AttendanceEnabled' => $desc['AttendanceEnabled'] && !$desc['ClassCancelled'],
-                        'AttendancePeriods' => $desc['AttendancePeriods'],
-                        'ClassCancelled'    => $desc['ClassCancelled'],
-                    );
+                        // The fields below are from spsTimetable procedure
+                        'SubstituteFlag'    => $desc['SubstituteFlag'] ?? null,
+                        'SubstitutedFlag'   => $desc['SubstitutedFlag'] ?? null,
+                        'AttendanceMarked'  => $desc['AttendanceMarked'] ?? null,
+                        'AttendanceEnabled' => isset($desc['AttendanceEnabled']) ? $desc['AttendanceEnabled'] && !$desc['ClassCancelled'] : false,
+                        'AttendancePeriods' => $desc['AttendancePeriods'] ?? null,
+                        'ClassCancelled'    => $desc['ClassCancelled'] ?? null,
+                    ];
                     break;
                 }
             }
         }
-
-        if (is_array($timetable)) {
-            usort($timetable, array($this, 'sortTimetable'));
-        }
-
         return $timetable;
-
     }
-
-
 
     /**
      * @inheritDoc
@@ -573,13 +595,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string    $externalUserId
+     * @param string $externalUserId
      * @param int    $userId
      * @param Campus $campus
      * @param int    $dayNumber
      * @param string $date
      * @throws InvalidArgumentException
-     * @throws MssqlQueryException
      * @return array
      */
     private function fetchDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
@@ -587,16 +608,49 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
+        $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
-        if (!is_array($timetabledef)) {
+        if (!is_array($timetableDef['desc'])) {
             return [];
         }
 
-        $campusString = $campus->getExtTimetableCode();
-
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $periodList   = $this->getTimetablePeriods($externalUserId, $userId, $dayNumber, null, $fileSemester, $fileYear, $campus);
+
+        $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, []);
+        if (is_array($timetable)) {
+            usort($timetable, [$this, 'sortTimetable']);
+        }
+
+        return $timetable;
+    }
+
+    /**
+     * @param string      $externalUserId
+     * @param int         $userId
+     * @param int         $dayNumber
+     * @param string|null $fileType
+     * @param string      $fileSemester
+     * @param string      $fileYear
+     * @param Campus      $campus
+     * @return array
+     */
+    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?string $fileType, string $fileSemester, string $fileYear, Campus $campus): array
+    {
+        $campusString = $campus->getExtTimetableCode();
+
+        // Get fileType to limit the data to
+        $allowedFileTypes = $this->getAllowedFileTypes();
+        if ($fileType && (empty($allowedFileTypes) || in_array($fileType, $allowedFileTypes))) {
+            $allowedFileTypes = [$fileType];
+        }
+        $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
+                $this->database,
+                'quote',
+            ], $allowedFileTypes)) . "'";
+        $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
+
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
@@ -620,12 +674,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				(StudentClasses.ID='$externalUserId' AND
 				Timetable.DayNumber = '$dayNumber' AND
 				Timetable.TimetableGroup = '$campusString' AND
+				{$allowedFileTypeSql}
 				StudentClasses.StartDate <= getdate() AND
 				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
 				ORDER BY Timetable.PeriodNumber";
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
-				Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode
+				Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,
+				Timetable.PeriodNumber as AttendancePeriod
 				FROM dbo.SubjectClasses SubjectClasses,
 				dbo.Timetable Timetable
 				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
@@ -636,55 +692,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				SubjectClasses.FileSemester='" . $fileSemester . "' AND
 				SubjectClasses.FileYear='" . $fileYear . "' AND
 				Timetable.TimetableGroup = '$campusString' AND
+				{$allowedFileTypeSql}
 				Timetable.StaffID='$externalUserId' AND
 				Timetable.DayNumber = '$dayNumber'
 				ORDER BY Timetable.PeriodNumber";
         }
 
         $statement = $this->getDatabase()->query($query);
-
-        //for each period
-        $timetable = array();
-
-        // Build the timetable
-        if(is_array($timetabledef['desc'])) {
-            foreach ($timetabledef['desc'] as $x => $name) {
-                $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-                $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-                $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-                $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
-                $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-                $timetable[$x]['class'] = array();
-            }
-        }
-
-        // Add classes into it
-        while ($desc = $statement->fetch()) {
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
-                ) {
-                    $timetable[$x]['class'][$desc['ClassCode']] = array(
-                        'description' => $desc['Description'],
-                        'code'        => $desc['ClassCode'],
-                        'campus'      => $desc['ClassCampus'],
-                        'room'        => $desc['Room'],
-                        'staffID'     => $desc['StaffID'],
-                    );
-                    break;
-                }
-            }
-        }
-
-        if (is_array($timetable)) {
-            usort($timetable, array($this, 'sortTimetable'));
-        }
-
-        return $timetable;
-
+        return $statement->fetchAll();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
@@ -701,6 +721,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+
+        $allowedFileTypes    = $this->getAllowedFileTypes();
+        $quotedFileTypes     = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
+                $this->getDatabase(),
+                'quote',
+            ], $allowedFileTypes)) . "'";
+        $allowedFileTypesSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
+
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
@@ -726,6 +754,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						((Timetable.FileSemester=" . $fileSemester . ") AND
 						(Timetable.FileYear=" . $fileYear . ") AND
 						Timetable.TimetableGroup = '$campusString' AND
+						{$allowedFileTypesSql}
 						(StudentClasses.ID='$externalUserId'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . "
@@ -752,6 +781,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						SubjectClasses.FileYear='" . $fileYear . "' AND
 						Timetable.TimetableGroup = '$campusString' AND
 						Timetable.StaffID='$externalUserId' AND
+						{$allowedFileTypesSql}
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         }
@@ -761,7 +791,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement = $this->getDatabase()->query($query);
 
         // Build the timetable
-        $timetable = array();
+        $timetable = [];
         foreach ($timetabledef['desc'] as $x => $name) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
@@ -769,7 +799,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
             // Fill in each day with blanks
-            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
+            $timetable[$x]['day'] = array_fill(1, $dayCount, []);
         }
 
         // Add classes for each day into it
@@ -780,7 +810,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])
                 ) {
-                    $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] = array(
+                    $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] = [
                         'description'    => $desc['Description'],
                         'code'           => $desc['ClassCode'],
                         'campus'         => $desc['ClassCampus'],
@@ -789,20 +819,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'staffFirstname' => $desc['StaffPreferredName'],
                         'staffSurname'   => $desc['StaffSurname'],
                         'staffTitle'     => $desc['StaffTitle'],
-                    );
+                    ];
                     break;
                 }
             }
         }
 
         if (is_array($timetable)) {
-            usort($timetable, array($this, 'sortTimetable'));
+            usort($timetable, [$this, 'sortTimetable']);
         }
         return $timetable;
 
     }
 
-    public function sortTimetable($a, $b)
+
+    /**
+     * Sorts timetable by period start
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    public function sortTimetable(array $a, array $b): int
     {
         $aTime = strtotime($a['periodStart']);
         $bTime = strtotime($b['periodStart']);
@@ -820,11 +857,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @param Campus $campus
      * @return int
      */
-    public function getTotalDays(Campus $campus) {
+    public function getTotalDays(Campus $campus)
+    {
 
-        if(! isset($this->days[$campus->getExtTimetableCode()])) {
+        if (!isset($this->days[$campus->getExtTimetableCode()])) {
 
-            $query = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
+            $query  = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
             $result = $this->getDatabase()->getRow($query);
 
             $this->days[$campus->getExtTimetableCode()] = $result['CycleDays'];
@@ -873,25 +911,25 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 		";
         $query = strtr(
             $query,
-            array(
+            [
                 ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
                 ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
                 ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $filteredRoomCodes)),
-            )
+            ]
         );
 
         // Jam the timetable definition in.
-        $campusList          = array();
-        $campusTimetableList = array();
-        $result              = array();
-        foreach ($this->database->getAll($query) ?: array() as $row) {
+        $campusList          = [];
+        $campusTimetableList = [];
+        $result              = [];
+        foreach ($this->database->getAll($query) ?: [] as $row) {
             $timetableDay  = $row['DayNumber'];
             $timetableCode = $row['TimetableGroup'];
 
             // Load the campus for this code if I haven't tried already
             if (!isset($campusList[$timetableCode])) {
                 try {
-                    $campusList[$timetableCode] = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
+                    $campusList[$timetableCode] = CampusMapper::getInstance()->findOneByColumn(
                         'ext_timetable_code',
                         $timetableCode
                     );
@@ -936,6 +974,17 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
         }
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAllowedFileTypes()
+    {
+        if (!$this->externalUser->getDatabase() instanceof External_Synergetic_User) {
+            return [];
+        }
+        return $this->externalUser->getDatabase()->getAllowedFileTypes();
     }
 
     /**

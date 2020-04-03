@@ -6,8 +6,10 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\IBuilder as PredicateBuilder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class External_Synergetic_User implements External_UserInterface
 {
@@ -36,9 +38,7 @@ class External_Synergetic_User implements External_UserInterface
      * @inheritdoc
      * @param User $user
      * @return Storage\Model|null
-     * @throws InvalidArgumentException
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws \Schoolbox\File\Exception
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getPortrait(User $user): ?Storage\Model
@@ -72,7 +72,7 @@ class External_Synergetic_User implements External_UserInterface
                 (
                     // This field is nullable in the database. Only replace an existing SB photo if date is set, and is later that the SB version
                     isset($photo['ModifiedDate']) &&
-                    $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))
+                    $user->getPortrait()->getCreatedAt()->lt(Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))
                 )
             ) {
 
@@ -97,7 +97,7 @@ class External_Synergetic_User implements External_UserInterface
                  */
                 $user->setPortrait($portrait);
 
-                \Schoolbox\UserMapper::getInstance()->save($user);
+                UserMapper::getInstance()->save($user);
             }
 
             /* Then return the latest Storage\Model instance
@@ -112,7 +112,7 @@ class External_Synergetic_User implements External_UserInterface
          */
         $user->setPortrait(null);
 
-        \Schoolbox\UserMapper::getInstance()->save($user);
+        UserMapper::getInstance()->save($user);
 
         return null;
     }
@@ -589,7 +589,7 @@ class External_Synergetic_User implements External_UserInterface
         $contactList = [];
 
         foreach ($iteratorContacts as $contact) {
-
+            /** @var array $contact */
             // Remove invalid and silent contact details
 
             if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1 || $contact['ShareHomeAddressFlag'] != 1) {
@@ -770,24 +770,22 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * If Synergetic Filetypes were provided, filter based on the value given
      *
-     * @return string|null
+     * @return array
      */
-    private function getAllowedFileTypes(): ?string
+    public function getAllowedFileTypes(): array
     {
         $allowedFileTypes = trim($this->config->get('external_synergetic_allowed_file_types') ?? '');
 
         if (!$allowedFileTypes) {
-            return null;
+            return [];
         }
 
         /* Check that everything is in the correct format, removing empty values
          */
         $values = explode(',', $allowedFileTypes);
         $values = array_map('trim', $values);
-        $values = array_filter($values);
-        $values = "'" . implode("','", $values) . "'";
 
-        return $values;
+        return array_filter($values);
     }
 
 
@@ -805,13 +803,14 @@ class External_Synergetic_User implements External_UserInterface
 
         /* Filter by filetype
          */
-        $allowedFileTypesSql = '';
-        $allowedFileTypes = $this->getAllowedFileTypes();
+        $allowedFileTypeArray = $this->getAllowedFileTypes();
+        $allowedFileTypes     = empty($allowedFileTypeArray) ? '' : "'" . implode("','", array_map([
+                $this,
+                'quote',
+            ], $allowedFileTypeArray)) . "'";
 
         if ($user->getRole()->isStudent()) {
-            if (null !== $allowedFileTypes) {
-                $allowedFileTypesSql = " AND luFileType.Code IN ({$allowedFileTypes})";
-            }
+            $allowedFileTypesSql = empty($allowedFileTypes) ? '' : " AND luFileType.Code IN ({$allowedFileTypes})";
 
             // Retrieve student subjects
             $sql = "
@@ -839,9 +838,7 @@ class External_Synergetic_User implements External_UserInterface
                                   SubjectClasses.Description ASC
             ";
         } else if ($user->getRole()->isStaff()) {
-            if (null !== $allowedFileTypes) {
-                $allowedFileTypesSql = "WHERE luFileType.Code IN ({$allowedFileTypes})";
-            }
+            $allowedFileTypesSql = empty($allowedFileTypes) ? '' : " WHERE luFileType.Code IN ({$allowedFileTypes})";
 
             // Retrieve staff subjects
             $sql = "
@@ -1089,6 +1086,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $fileYearSemester = $this->findFileYearAndSemester();
 
+        /** @var PredicateBuilder $predicateBuilder */
         $predicateBuilder = $this->getConnector()
             ->buildPredicateBuilder('StudentYears')
             ->equals('StudentYears.FileYear', $fileYearSemester['year'])
@@ -1122,6 +1120,7 @@ class External_Synergetic_User implements External_UserInterface
         $forms = [];
 
         foreach ($iteratorForms as $form) {
+            /** @var array $form */
             $forms[] = $this->clearInvalidValues($form);
         }
 
