@@ -1,3 +1,19 @@
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script>
+    $(function() {
+        $('#cat').on('click', function(event) {
+            $.fn.schoolboxResource({
+                allowedFilesystems: 'link'
+            });
+        });
+    });
+</script>
+
+
+<a id="cat">Test activator</a>
+
+
 <div class="row">
     <div class="small-12 island">
         {component_position_top}
