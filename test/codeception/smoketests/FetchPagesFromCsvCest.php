@@ -8,6 +8,7 @@ use Codeception\Exception\ConditionalAssertionFailed;
 use Codeception\TestInterface;
 use IntegrationTester;
 use Payload;
+use Codeception\Scenario;
 
 class FetchPagesFromCsvCest
 {
@@ -33,7 +34,6 @@ class FetchPagesFromCsvCest
         #Might not need this login any more as I think this runs each test, so the login differs each test now.
         #$i->loginAdmin(); #we logged in as alaress
     }
-    
 
     /**
      * Fail test to ensure we can get a 404 response from schoolbox.
@@ -123,17 +123,23 @@ class FetchPagesFromCsvCest
      *
      */
 
-    public function getAllThePages(IntegrationTester $i, $senario, \Codeception\Example $example)
+    public function getAllThePages(IntegrationTester $i, Scenario $scenario, \Codeception\Example $example)
     {
         # TODO split out tests into one per persona, each test sends a parameter to the url provider which determines the dataset.
         #GIVEN
         $persona      = $example[2];
         $url          = $example[3];
         $expected_result = $example[4];
+        
+        /*
+         * Due to the data from example url being so huge, over ride the feature to include an extra 
+         * line with the details that can be huge. What user is doing, Persona, URL
+        */
+        $scenario->setFeature($scenario->getFeature() . PHP_EOL . 'Scenario: ' . $example[1] . ' | ' . $persona . ' | ' . $url);
 
         if($expected_result=='IGNORE')
         {
-            $senario->skip('Test ignored');
+            $scenario->skip('Test ignored');
         }
 
         if(!isset($this->users[$persona]))
