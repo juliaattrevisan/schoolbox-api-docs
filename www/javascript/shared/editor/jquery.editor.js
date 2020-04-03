@@ -328,7 +328,7 @@
     $.fn.schoolboxLink = function(options) {
         options = options || {};
 
-        let config = $.extend($.fn.schoolboxModalConfig(options), {
+        var config = $.extend($.fn.schoolboxModalConfig(options), {
             element: $(this),
 
             /* Other elements of this object literal as a result of merging with defaults:
