@@ -361,7 +361,7 @@ class Mapper extends BaseMapper
             JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
                   {$planJoin}
             WHERE {$where}
-            
+
             UNION
 
             SELECT DISTINCT a.id
@@ -388,7 +388,7 @@ class Mapper extends BaseMapper
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
                   {$planJoin}
             WHERE {$where}
-            
+
             ORDER BY id ASC
         ";
 
@@ -581,6 +581,10 @@ class Mapper extends BaseMapper
         }
         $params       = Builder::getArrayParameters($folderIds, 'folder');
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+        $builderWhere = $builder->getWhere();
+        if (!empty($builderWhere)) {
+            $placeholders .= ' AND ' . implode(' AND ', $builderWhere);
+        }
 
         // Get assessments the student is participating in
         $idQuery = "
@@ -603,11 +607,11 @@ class Mapper extends BaseMapper
             LEFT JOIN participant_plan pp ON assessment.id = pp.assessment_id
             LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
             WHERE uicf.id IN {$placeholders}
-            
+
             UNION
-            
+
             SELECT `p_a`.`assessment_id`
-            FROM project_assessment `p_a` 
+            FROM project_assessment `p_a`
             JOIN `project` AS `p` ON `p`.`id` = `p_a`.`project_id`
             JOIN assessment ON assessment.id = p.assessment_id
             JOIN assessment_course_unit_implementation AS `v_ui` ON `v_ui`.`assessment_id` = `assessment`.id
@@ -616,11 +620,11 @@ class Mapper extends BaseMapper
             LEFT JOIN participant_plan pp ON `p_a`.`assessment_id` = pp.assessment_id
             LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
             WHERE `uic`.`folder_id` IN {$placeholders}
-            
+
             UNION
-            
+
             SELECT `p_a`.`assessment_id`
-            FROM project_assessment `p_a` 
+            FROM project_assessment `p_a`
             JOIN `project` AS `p` ON `p`.`id` = `p_a`.`project_id`
             JOIN assessment ON assessment.id = p.assessment_id
             JOIN assessment_folder AS `v_f`ON `v_f`.`assessment_id` = `assessment`.`id`
@@ -628,6 +632,7 @@ class Mapper extends BaseMapper
             LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
             WHERE `v_f`.`folder_id` IN {$placeholders}
         ";
+
         $idStatement = $this->getDatabase()->prepare($idQuery);
         $idStatement->execute(array_merge($params, $builder->getParams()));
         $idList = array_merge(array_column($idStatement->fetchAll(), 'id'), $includeIds);
