@@ -4,8 +4,104 @@
 <script>
     $(function() {
         $('#cat').on('click', function(event) {
+            var config = {
+                url: {
+                    /* Find information about a node/resource
+                     */
+                    nodeinfo: '/editor/nodeInfo.php',
+
+                    /* Prefix for linking to Folders
+                     */
+                    folder: '/homepage/',
+
+                    /* Prefix for linking to MyFolders
+                     */
+                    myfolder: '/my-files/',
+
+                    /* Prefix for link to Storage hash
+                     */
+                    storage: '/storage/fetch.php?hash=',
+
+                    /* Prefix for linking to Files
+                     */
+                    file: '/send.php?id=',
+
+                    /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
+                     */
+                    meetingUrl: ''
+                },
+            };
+
+
+            /**
+             * Construct a url from the pieces provided
+             * Depending on what you chose, the url is constructed a bit specially
+             * sorry
+             *
+             * @param type       string  data type [folder, myfolder, file, meetingUrl]
+             * @param filesystem string  typically 'store' as a special case usage
+             * @param val        string  a file id or a meeting url
+
+             *
+             * @return url string   the url to which you are linking
+             */
+            function processSelection(type, filesystem, val) {
+                var url;
+
+                if (type == 'folder') {
+                    url = config.url.folder + val;
+                } else if (type == 'myfolder') {
+                    url = config.url.myfolder + val;
+                } else if (filesystem == 'store') {
+                    url = config.url.storage + val;
+                } else if (type =='meetingUrl') {
+                    url = config.url.meetingUrl + val;
+                } else {
+                    url = config.url.file + val;
+                }
+
+                return url;
+            }
+
             $.fn.schoolboxResource({
-                allowedFilesystems: 'folder'
+                allowedFilesystems: 'link'
+            });
+
+            $(window).unbind('message').on('message', function (event) {
+                var message;
+
+                try {
+                    message = JSON.parse(event.originalEvent.data);
+                } catch (err) {
+                    message = event.originalEvent.data;
+                }
+
+                /* Find out how to render this file
+                 */
+                if (message.data != undefined) {
+                    if (0 in message.data && 'hash' in message.data[0]) {
+                        $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                            var url = processSelection(responseText.type, responseText.filesystem, responseText.id);
+
+                            console.log(url);
+
+                            /* Shut modal
+                             */
+                            $('#file-picker').foundation('reveal', 'close');
+                        });
+                    } else if ('meetingUrl' in message.data) {
+
+                        /* Microsoft Teams meetings url format
+                         */
+                        var url = processSelection('meetingUrl', '', message.data.meetingUrl);
+
+                        console.log(url);
+
+                        /* Shut modal
+                         */
+                        $('#file-picker').foundation('reveal', 'close');
+                    }
+                }
             });
         });
     });
