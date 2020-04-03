@@ -188,7 +188,8 @@
     /**
      * Pass whatever you chose in the modal to the window messaging thing
      *
-     * @param config           object
+     * @param config  object  a configuration object literal
+     * @param dialog  object  the cke dialog to update (use null if you aren't in a cke context)
      */
     $.fn.schoolboxMessage = function(config, dialog) {
 
@@ -303,10 +304,10 @@
              * A callback which you use to deal with the url produced
              * by interacting with the modal
              *
-             * @param url           string  the url to which you linked
-             * @param dialogFields  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+             * @param url     string  the url to which you linked
+             * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
              */
-            onSelect: function(url, dialogFields) {
+            onSelect: function(url, dialog) {
                 return url;
             }
         }, options);
