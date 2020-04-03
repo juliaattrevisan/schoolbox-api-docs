@@ -21,7 +21,7 @@ class External_Synergetic_Class implements External_ClassInterface
     private $database;
 
     /**
-     * @var External_UserInterface
+     * @var External_User
      */
     private $externalUser;
 
@@ -102,6 +102,14 @@ class External_Synergetic_Class implements External_ClassInterface
             return [];
         }
 
+        // Get fileType to limit the data to
+        $allowedFileTypes = $this->getAllowedFileTypes();
+        $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
+                $this->database,
+                'quote',
+            ], $allowedFileTypes)) . "'";
+        $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " AND StudentClasses.FileType IN ({$quotedFileTypes}) ";
+
         $classQuery = $this->getClassCodeQuery($classCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
@@ -138,6 +146,7 @@ class External_Synergetic_Class implements External_ClassInterface
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
             AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) > 0)
+            {$allowedFileTypeSql}
         ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";
 
         return $this->clearInvalidValues(
@@ -291,7 +300,7 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
-     * @param $database
+     * @param MSSQL $database
      */
     private function setDatabase($database)
     {
@@ -320,5 +329,16 @@ class External_Synergetic_Class implements External_ClassInterface
     public function setExternalUser(External_UserInterface $externalUser)
     {
         $this->externalUser = $externalUser;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAllowedFileTypes()
+    {
+        if ($this->externalUser->getDatabase() instanceof External_Synergetic_User) {
+            return [];
+        }
+        return $this->externalUser->getDatabase()->getAllowedFileTypes();
     }
 }

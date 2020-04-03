@@ -522,7 +522,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             if (empty($periodList)) {
                 // Fall back to getDayTimetable()
-                $periodList = $this->getTimetablePeriods($externalUserId, $userId, $dayNumber, $fileType, $fileSemester, $fileYear, $campus);
+                $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, $fileType, $fileSemester, $fileYear, $campus);
             }
 
             // Add classes into it
@@ -616,7 +616,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
-        $periodList   = $this->getTimetablePeriods($externalUserId, $userId, $dayNumber, null, $fileSemester, $fileYear, $campus);
+        $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, null, $fileSemester, $fileYear, $campus);
 
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, []);
         if (is_array($timetable)) {
