@@ -1095,6 +1095,7 @@ class MapperProxy
      *   (see AssessmentType::TYPE_* constants)
      * * converts "window_open" and "window_close" to a window inside which
      *   to find due assessments
+     * * converts "ids" to a set of assessment IDs to restrict the result to
      *
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
@@ -1123,6 +1124,12 @@ class MapperProxy
             $publishDateColumn = "$aTable.publish_date";
             $dueDateColumn     = "$aTable.due_date";
             $closeDateColumn   = "$aTable.close_date";
+        }
+
+
+        // IDs
+        if (is_iterable($options['ids'] ?? null)) {
+            $builder->in("$aTable.id", $options['ids']);
         }
 
 
