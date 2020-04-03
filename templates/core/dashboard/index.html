@@ -30,6 +30,16 @@
                      */
                     meetingUrl: ''
                 },
+
+                /**
+                 * A callback which you use to deal with the url produced
+                 * by interacting with the modal
+                 *
+                 * @param url
+                 */
+                onSelect: function(url) {
+                    console.log(url);
+                }
             };
 
 
@@ -38,12 +48,10 @@
              * Depending on what you chose, the url is constructed a bit specially
              * sorry
              *
-             * @param type       string  data type [folder, myfolder, file, meetingUrl]
-             * @param filesystem string  typically 'store' as a special case usage
-             * @param val        string  a file id or a meeting url
-
-             *
-             * @return url string   the url to which you are linking
+             * @param type        string  data type [folder, myfolder, file, meetingUrl]
+             * @param filesystem  string  typically 'store' as a special case usage
+             * @param val         string  a file id or a meeting url
+             * @return url        string  the url to which you are linking
              */
             function processSelection(type, filesystem, val) {
                 var url;
@@ -81,9 +89,7 @@
                 if (message.data != undefined) {
                     if (0 in message.data && 'hash' in message.data[0]) {
                         $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                            var url = processSelection(responseText.type, responseText.filesystem, responseText.id);
-
-                            console.log(url);
+                            config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id));
 
                             /* Shut modal
                              */
@@ -93,9 +99,7 @@
 
                         /* Microsoft Teams meetings url format
                          */
-                        var url = processSelection('meetingUrl', '', message.data.meetingUrl);
-
-                        console.log(url);
+                        config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl));
 
                         /* Shut modal
                          */
