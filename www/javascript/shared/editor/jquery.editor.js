@@ -310,8 +310,49 @@
                 return url;
             }
         }, options);
-    }
+    };
 
+
+    /**
+     * Plugin
+     *
+     * The schoolboxLink plugin assembles the picker modal out of the the required parts
+     * schoolboxResource, schoolboxMessage, schoolboxMessageConfig and returns you a url
+     * for the thing you chose or provided via that modal
+     *
+     * Using the onSelect() callback allows you to deal with the url in some special way
+     *
+     * @param options  object
+     */
+    $.fn.schoolboxLink = function(options) {
+        options = options || {};
+
+        let config = $.extend($.fn.schoolboxModalConfig(options), {
+            element: $(this),
+
+            /* Other elements of this object literal as a result of merging with defaults:
+             *
+             * url: ...
+             * onSelect: function() ...
+             */
+        });
+
+        /* When $(element) is clicked, spawn modal and process selection
+         * as per the callback you optionally specified via constructor
+         */
+        $(config.element).on('click', function() {
+
+            /* Select something from the Resource Browser
+             */
+            $.fn.schoolboxResource({
+                allowedFilesystems: 'link'
+            });
+
+            /* Send the message up and deal with the dialog, if one was specified
+             */
+            $.fn.schoolboxMessage(config, null);
+        });
+    }
 }(jQuery));
 
 (function($) {
@@ -540,3 +581,21 @@
     });
 
 })(jQuery);
+
+
+
+(function() {
+
+    /**
+     * Plugin
+     *
+     * @param options
+     */
+    $.fn.plugin = function(options) {
+        options = options || {};
+
+        let config = init(options, $(this));
+
+
+    }
+}(jQuery));

@@ -3,22 +3,10 @@
 
 <script>
     $(function() {
-        $('#cat').on('click', function(event) {
-            var config = $.fn.schoolboxModalConfig({
-                onSelect: function(url, dialog) {
-                    console.log(url);
-                }
-            });
-
-            /* Select something from the Resource Browser
-             */
-            $.fn.schoolboxResource({
-                allowedFilesystems: 'link'
-            });
-
-            /* Send the message up and deal with the dialog, if one was specified
-             */
-            $.fn.schoolboxMessage(config, null);
+        $('#cat').schoolboxLink({
+            onSelect: function(url, dialog) {
+                console.log(url);
+            }
         });
     });
 </script>
