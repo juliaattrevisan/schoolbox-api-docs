@@ -336,7 +336,7 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     private function getAllowedFileTypes()
     {
-        if ($this->externalUser->getDatabase() instanceof External_Synergetic_User) {
+        if (!$this->externalUser->getDatabase() instanceof External_Synergetic_User) {
             return [];
         }
         return $this->externalUser->getDatabase()->getAllowedFileTypes();
