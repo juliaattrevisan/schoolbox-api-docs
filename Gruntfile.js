@@ -67,6 +67,7 @@ var jsSrc = {
         'www/javascript/shared/sidemenu/jquery.scroll-to.js',
 
         // CKEditor
+        'www/javascript/shared/editor/jquery.modal.js',
         'www/javascript/shared/editor/jquery.proxy-replacement.js',
         'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
 
