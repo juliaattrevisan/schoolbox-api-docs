@@ -112,7 +112,7 @@ class HeaderCheck
     private function getHostName(?string $url): ?string
     {
         // Empty? Return empty
-        if (null === $url) {
+        if (null === $url || $url === 'null' || $url === '') {
             return null;
         }
 
