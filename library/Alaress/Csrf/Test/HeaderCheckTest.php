@@ -105,6 +105,20 @@ class HeaderCheckTest extends TestCase
                 ],
                 'expectedResult' => false,
             ],
+            'nullOrigin' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'null',
+                    'HTTP_HOST'   => '192.168.36.10',
+                ],
+                'expectedResult' => true,
+            ],
+            'emptyOrigin' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => '',
+                    'HTTP_HOST'   => '192.168.36.10',
+                ],
+                'expectedResult' => true,
+            ],
             'malformedOriginAndHost' => [
                 'serverVars' => [
                     'HTTP_ORIGIN' => 'file://',
