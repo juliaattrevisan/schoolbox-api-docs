@@ -1,31 +1,6 @@
 CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
-    var config = {
-        url: {
-            /* Find information about a node/resource
-             */
-            nodeinfo: '/editor/nodeInfo.php',
-
-            /* Prefix for linking to Folders
-             */
-            folder: '/homepage/',
-
-            /* Prefix for linking to MyFolders
-             */
-            myfolder: '/my-files/',
-
-            /* Prefix for link to Storage hash
-             */
-            storage: '/storage/fetch.php?hash=',
-
-            /* Prefix for linking to Files
-             */
-            file: '/send.php?id=',
-
-            /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
-             */
-            meetingUrl: ''
-        },
+    var config = $.fn.schoolboxModalConfig({
 
         /**
          * A callback which you use to deal with the url produced
@@ -48,7 +23,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
             $('#participant-customise-modal').css('z-index', '10000');
         }
-    };
+    });
 
 
     /**

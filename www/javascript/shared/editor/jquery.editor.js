@@ -263,6 +263,55 @@
         });
     };
 
+
+    /**
+     * Spawn a modal config object literal with auxiliary options such
+     * as the onSelect callback
+     *
+     * @param options
+     * @returns {*}
+     */
+    $.fn.schoolboxModalConfig = function(options) {
+        return $.extend({
+            url: {
+                /* Find information about a node/resource
+                 */
+                nodeinfo: '/editor/nodeInfo.php',
+
+                /* Prefix for linking to Folders
+                 */
+                folder: '/homepage/',
+
+                /* Prefix for linking to MyFolders
+                 */
+                myfolder: '/my-files/',
+
+                /* Prefix for link to Storage hash
+                 */
+                storage: '/storage/fetch.php?hash=',
+
+                /* Prefix for linking to Files
+                 */
+                file: '/send.php?id=',
+
+                /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
+                 */
+                meetingUrl: ''
+            },
+
+            /**
+             * A callback which you use to deal with the url produced
+             * by interacting with the modal
+             *
+             * @param url           string  the url to which you linked
+             * @param dialogFields  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+             */
+            onSelect: function(url, dialogFields) {
+                return url;
+            }
+        }, options);
+    }
+
 }(jQuery));
 
 (function($) {

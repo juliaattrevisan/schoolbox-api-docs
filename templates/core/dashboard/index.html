@@ -4,44 +4,11 @@
 <script>
     $(function() {
         $('#cat').on('click', function(event) {
-            var config = {
-                url: {
-                    /* Find information about a node/resource
-                     */
-                    nodeinfo: '/editor/nodeInfo.php',
-
-                    /* Prefix for linking to Folders
-                     */
-                    folder: '/homepage/',
-
-                    /* Prefix for linking to MyFolders
-                     */
-                    myfolder: '/my-files/',
-
-                    /* Prefix for link to Storage hash
-                     */
-                    storage: '/storage/fetch.php?hash=',
-
-                    /* Prefix for linking to Files
-                     */
-                    file: '/send.php?id=',
-
-                    /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
-                     */
-                    meetingUrl: ''
-                },
-
-                /**
-                 * A callback which you use to deal with the url produced
-                 * by interacting with the modal
-                 *
-                 * @param url     string  the url to which you linked
-                 * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
-                 */
+            var config = $.fn.schoolboxModalConfig({
                 onSelect: function(url, dialog) {
                     console.log(url);
                 }
-            };
+            });
 
             /* Select something from the Resource Browser
              */
