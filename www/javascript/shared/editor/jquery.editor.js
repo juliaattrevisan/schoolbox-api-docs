@@ -183,6 +183,86 @@
             });
         }
     };
+
+
+    /**
+     * Pass whatever you chose in the modal to the window messaging thing
+     *
+     * @param config           object
+     */
+    $.fn.schoolboxMessage = function(config, dialog) {
+
+        /**
+         * Construct a url from the pieces provided
+         * Depending on what you chose, the url is constructed a bit specially
+         * sorry
+         *
+         * @param type        string  data type [folder, myfolder, file, meetingUrl]
+         * @param filesystem  string  typically 'store' as a special case usage
+         * @param val         string  a file id or a meeting url
+         * @return url        string  the url to which you are linking
+         */
+        function processSelection(type, filesystem, val) {
+            var url;
+
+            if (type == 'folder') {
+                url = config.url.folder + val;
+            } else if (type == 'myfolder') {
+                url = config.url.myfolder + val;
+            } else if (filesystem == 'store') {
+                url = config.url.storage + val;
+            } else if (type =='meetingUrl') {
+                url = config.url.meetingUrl + val;
+            } else {
+                url = config.url.file + val;
+            }
+
+            return url;
+        }
+
+        $(window).unbind('message').on('message', function(event) {
+            var message;
+
+            try {
+                message = JSON.parse(event.originalEvent.data);
+            } catch (err) {
+                message = event.originalEvent.data;
+            }
+
+            /* Find out how to render this file
+             */
+            if (message.data != undefined) {
+                if (0 in message.data && 'hash' in message.data[0]) {
+                    $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id),dialog);
+
+                        /* Shut modal, go back to Dialog
+                         */
+                        $('#file-picker').foundation('reveal', 'close');
+                    });
+                } else if ('meetingUrl' in message.data) {
+
+                    /* Microsoft Teams meetings url format
+                     */
+                    config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), dialog);
+
+                    /* Shut modal, go back to Dialog
+                     */
+                    $('#file-picker').foundation('reveal', 'close');
+                } else {
+
+                    // The file was rejected, probably cause it was the wrong mimetype.
+                    // Do nothing
+                }
+            }
+            else {
+
+                /* Connecting to your Google Drive
+                 */
+            }
+        });
+    };
+
 }(jQuery));
 
 (function($) {
