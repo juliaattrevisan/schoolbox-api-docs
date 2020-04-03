@@ -4,54 +4,42 @@
 <script type="text/javascript">
     $(function() {
 
-        /* Round-Trip
+        /* Schoolbox CkE Wrapper
          */
         $.fn.alaressEditor({
-            targetElements: $('#bart')
-//            start: function(element) {
-//
-//                /* Add special unique buttons
-//                 */
-//                CKEDITOR.instances['bart'].addCommand("insertMedia", { // create named command
-//                    exec: function(editorInstance) {
-//
-//                        var sel = editorInstance.getSelection();
-//                        var element = sel && sel.getSelectedElement();
-//
-//                        /* If an image is selected, edit its properties
-//                         */
-//                        if (element !== null) {
-//                        }
-//                        /* Otherwise, spawn a Resource Browzer picker
-//                         */
-//                        else {
-//                            var url = '/test.php?ajax=1';
-//                            var data = {};
-//
-//                            $.post(url, data, function(responseText) {
-//                                var content = '';
-//                                var response = $.parseJSON(responseText);
-//
-//                                if (response.type == 'image') {
-//                                    content = '<img src="/storage/image.php?hash='+response.hash+'" alt="'+response.name+'" />';
-//                                }
-//
-//                                editorInstance.insertHtml(content, 'html');
-//                            });
-//                        }
-//                    }
-//                });
-//
-//                CKEDITOR.instances['bart'].ui.addButton('AddMedia', { // add new button and bind our command
-//                    label: "Insert Media",
-//                    command: 'insertMedia',
-//                    toolbar: 'schoolbox',
-//                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
-//                });
-//            }
+            targetElements: $('#defaultCKEditor')
         });
 
-        /* You can try using jquery selectors to feed a
+
+        /* Custom Plugins
+         *
+         * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
+         * http://docs.ckeditor.com/#!/api/CKEDITOR.ui-method-addButton
+         */
+        $.fn.alaressEditor({
+            targetElements: $('#customPlugin'),
+            start: function(element) {
+
+                /* Add special unique buttons
+                 */
+                CKEDITOR.instances['customPlugin'].addCommand("exampleCommand", { // create named command
+                    exec: function(editorInstance) {
+                        alert(editorInstance.getData());
+                    }
+                });
+
+                CKEDITOR.instances['customPlugin'].ui.addButton('SomeGenericIdentifier', { // add new button and bind our command
+                    label: "Example Label",
+                    command: 'exampleCommand',
+                    toolbar: 'schoolbox',
+                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+                });
+            }
+        });
+
+
+        /* Selector Test
+         * You can try using jquery selectors to feed a
          * jquery collection to targetElements.
          *
          * Each textarea or element must have an id or name
@@ -59,31 +47,6 @@
          */
         $.fn.alaressEditor({
             targetElements: $('textarea[name=green]')
-        });
-
-        /* Spawn a pseudo plugin
-         * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
-         * http://docs.ckeditor.com/#!/api/CKEDITOR.ui-method-addButton
-         */
-        $.fn.alaressEditor({
-            targetElements: $('#mort'),
-            start: function(element) {
-
-                /* Add special unique buttons
-                 */
-                CKEDITOR.instances['mort'].addCommand("exampleCommand", { // create named command
-                    exec: function(editorInstance) {
-                        alert(editorInstance.getData());
-                    }
-                });
-
-                CKEDITOR.instances['mort'].ui.addButton('SomeGenericIdentifier', { // add new button and bind our command
-                    label: "Example Label",
-                    command: 'exampleCommand',
-                    toolbar: 'schoolbox',
-                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
-                });
-            }
         });
     });
 </script>
@@ -134,7 +97,11 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Custom Plugin, Ajax Round Trip</h2>
+        <h2 class="subheader">Schoolbox CKE Wrapper</h2>
+        <p class="meta">
+            This is the default usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
+            Link, Embed Video/Audio, Iframe. You can test their usage here.
+        </p>
     </div>
     <div class="small-12 island">
         <form action="/testAjax.php" method="post">
@@ -142,7 +109,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            <textarea id='bart' name='bart' rows="10"></textarea>
+                            <textarea id='defaultCKEditor' name='defaultCKEditor' rows="10"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -155,7 +122,11 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">"Plugins"</h2>
+        <h2 class="subheader">Custom Plugins</h2>
+        <p class="meta">
+            There's a James button in the toolbar which has a custom action on it. Type something in the editor, then
+            click the button.
+        </p>
     </div>
     <div class="small-12 island">
         <form action="/test.php" method="post">
@@ -163,7 +134,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            <textarea id='mort' name='mort' rows="10"></textarea>
+                            <textarea id='customPlugin' name='customPlugin' rows="10"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -176,7 +147,11 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Generic Usage</h2>
+        <h2 class="subheader">Selector Test</h2>
+        <p class="meta">
+            CKEditors can be selected by their name or id. You can tinker with the javascript to see what effect
+            it has on this set of input fields.
+        </p>
     </div>
     <div class="small-12 island">
         <form action="/test.php" method="post">
@@ -185,7 +160,7 @@
                     <div class="small-12 columns">
                         <label>
                             id='cat', name='red'
-                            <textarea id='cat' name="red" rows="10"></textarea>
+                            <textarea id='cat' name="red" rows="5"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -194,7 +169,7 @@
                     <div class="small-12 columns">
                         <label>
                             id='dog', name='blue'
-                            <textarea id='dog' name="blue" rows="10"></textarea>
+                            <textarea id='dog' name="blue" rows="5"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -203,7 +178,7 @@
                     <div class="small-12 columns">
                         <label>
                             id='horse', name='green'
-                            <textarea id='horse' name="green" rows="10"></textarea>
+                            <textarea id='horse' name="green" rows="5"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -212,7 +187,7 @@
                     <div class="small-12 columns">
                         <label>
                             id='komodo' name='gold'
-                            <textarea id="komodo" name="gold" rows="10"></textarea>
+                            <textarea id="komodo" name="gold" rows="5"></textarea>
                         </label>
                     </div>
                 </fieldset>
