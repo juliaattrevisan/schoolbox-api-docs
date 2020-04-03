@@ -40,6 +40,12 @@ class Factory
             'teams'     => Filesystem\TeamsController::class
         ],
 
+        /* Folders only, which roughly equates to the socialstream picker
+         */
+        'folder' => [
+            'browse'    => Filesystem\BrowseController::class,
+        ],
+
         /* Controllers for File-related modals
          *
          * This primarily affects the "video/audio" and "image" buttons in ckeditor
