@@ -11,6 +11,14 @@
         });
 
 
+        /* Schoolbox Link Modal
+         */
+        $('#modalLinkButton').schoolboxLink({
+            onSelect: function(url, dialog) {
+                $('#modalLinkTarget').val(url);
+            }
+        });
+
         /* Custom Plugins
          *
          * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
@@ -89,8 +97,6 @@
                     </div>
                 </fieldset>
             </section>
-
-            <input type="submit" value="Submit" />
         </form>
     </div>
 </div>
@@ -114,9 +120,22 @@
                     </div>
                 </fieldset>
             </section>
-
-            <input type="submit" value="Submit" />
         </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Schoolbox Link Modal</h2>
+        <p class="meta">
+            This plugin allows you to arbitrarily spawn a Mr Matt Modal, generate a link to a resource, then postprocess
+            the url to that resource in whatever way you need.
+        </p>
+
+        <div class="input-group">
+            <input id="modalLinkTarget" type="text" />
+            <a id="modalLinkButton" class="button icon-link">Browser</a>
+        </div>
     </div>
 </div>
 
@@ -139,8 +158,6 @@
                     </div>
                 </fieldset>
             </section>
-
-            <input type="submit" value="Submit" />
         </form>
     </div>
 </div>
@@ -192,8 +209,6 @@
                     </div>
                 </fieldset>
             </section>
-
-            <input type="submit" value="Submit" />
         </form>
     </div>
 </div>
