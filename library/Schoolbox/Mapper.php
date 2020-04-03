@@ -2550,7 +2550,7 @@ abstract class Mapper implements IMapper, Serializable
                 return true;
             }
         }
-        if (is_iterable($options['order'])) {
+        if (is_iterable($options['order'] ?? null)) {
             foreach ($options['order'] as $column => $value) {
                 if ($this->isJoinRequiredOnColumn($column)) {
                     return true;
