@@ -317,12 +317,13 @@ class Controller extends Base
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 
+        // If there's a huge number of IDs, we may need to chunk them and query
+        // on each chunk.
+        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
         $allWork = $this->assessmentDataSource
-            ->findAllByIds($this->assessmentIdFinder->findIdsByFilters($filters))
+            ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids])
             ->sortByCallback(new DueDateSortStrategy($student));
 
-        // Only show work that student has permission to view, and can accept their submission
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection($allWork, $student);
         $visibility = new Visibility($this->access);
         /** @var IAssessable[]|GenericCollection $upcomingWork */
         $upcomingWork = $allWork
