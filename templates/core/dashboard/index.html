@@ -5,15 +5,33 @@
     $(function() {
         $('#cat').schoolboxLink({
             onSelect: function(url, dialog) {
-                console.log(url);
+                $('#target').val(url);
             }
         });
     });
 </script>
 
 
-<a id="cat">Test activator</a>
+<div class="row">
+    <div class="small-12 columns">
+        <a id="cat" style='float:right' class="button icon-link">Picker thing</a>
+        <input id="target" style="width:80%;" type="text" />
 
+        <div>
+            <pre>
+Usage:
+
+$(function() {
+    $('#cat').schoolboxLink({
+        onSelect: function(url, dialog) {
+            $('#target').val(url);
+        }
+    });
+});
+            </pre>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="small-12 island">
