@@ -75,6 +75,8 @@ class External_Tass_Class implements External_ClassInterface {
             WHERE semester = '{$fileSemester}'
                 AND yr_study = '{$fileYear}'
                 AND next_yr_ind != 'F'
+                AND student.doe <= GETDATE()
+                AND (student.dol IS NULL OR student.dol >= GETDATE())
                 AND ( $classQuery )
             ORDER BY lastname, firstname";
 
