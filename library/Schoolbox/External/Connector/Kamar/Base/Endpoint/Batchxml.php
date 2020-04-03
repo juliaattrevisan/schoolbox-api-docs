@@ -69,12 +69,6 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
-        /* If you need to see the raw xml data from your chosen endpoint
-         * you can drop a printxml() here, which does some minor formatting to
-         * make it vaguely bearable to read
-         *
-         * $this->printXml();
-         */
         if (!$this->nodes) {
             $xml = $this->api->retrieveDocument();
 
@@ -89,21 +83,10 @@ class Batchxml
                 /* Kamar returned some sort of error message, not xml
                  * Display the first 200 chars of the broken data
                  */
-                throw new RuntimeException("{$e->getMessage()}, {$this->api->getPath()}\n\n" . substr($xml,0, self::DEBUG_CHARS));
+                throw new RuntimeException("{$e->getMessage()}, {$path}\n\n" . substr($xml,0, self::DEBUG_CHARS));
             }
         }
 
         return $this->nodes->xpath($path);
-    }
-
-    /**
-     * Use this to print a vaguely-formatted version to a file for manual inspection
-     *
-     * e.g. php sisImporter.php > test.xml
-     */
-    private function printXml(): void
-    {
-        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"], $this->api->retrieveDocument()));
-        die();
     }
 }

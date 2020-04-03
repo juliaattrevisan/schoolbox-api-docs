@@ -10,8 +10,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Assessment\Term;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -19,9 +17,9 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCampusMapper;
-use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -100,27 +98,9 @@ class Factory
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var TimetableCampusMapper
      */
     private $timetableCampusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
 
 
     /**
@@ -142,12 +122,6 @@ class Factory
 
 
     /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-
-    /**
      * Factory constructor.
      *
      * @param LoggerInterface                 $log
@@ -159,14 +133,10 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param CampusMapper                    $campusMapper
      * @param TimetableCampusMapper           $timetableCampusMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
-     * @param Term\Mapper                     $termMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -184,14 +154,10 @@ class Factory
 
         /* Timetable pieces
          */
-        CampusMapper $campusMapper,
         TimetableCampusMapper $timetableCampusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        Term\Mapper $termMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -208,14 +174,10 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->campusMapper = $campusMapper;
         $this->timetableCampusMapper = $timetableCampusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->termMapper = $termMapper;
     }
 
 
@@ -223,6 +185,7 @@ class Factory
      * @return GenericCollection
      * @throws RuntimeException
      * @throws UnexpectedValueException
+     * @throws Exception
      */
     public function produce(): GenericCollection
     {
@@ -240,43 +203,14 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
-        /* Profile and student timetable xmls come with a datetime suffix
-         *
-         * Timetable Composite requires access across multiple xml files cross-referencing nodes
-         * in profile xml so you can identify who is in a class ($container)
+        /* Check that the xml payloads meet a variety of preconditions before importing
          */
-        $dirhandle = opendir($this->host);
-
-        $xml = [
-            Receiver::XML_FULL => [],
-            Receiver::XML_STUDENTTIMETABLES => []
-        ];
-
-        /* Make a stack of profile xmls (full_ ... .xml)
-         * Make a stack of student timetable xmls (studenttimetables_ ... .xml)
-         */
-        $numFiles = 0;
-
-        while ($xmlFile = readdir($dirhandle)) {
-            if ($xmlFile !== '.' && $xmlFile !== '..') {
-                if (strpos($xmlFile, Receiver::XML_FULL) !== false) {
-                    $xml[Receiver::XML_FULL][] = $xmlFile;
-                    $numFiles++;
-                } elseif (strpos($xmlFile, Receiver::XML_STUDENTTIMETABLES) !== false) {
-                    $xml[Receiver::XML_STUDENTTIMETABLES][] = $xmlFile;
-                    $numFiles++;
-                }
-
-                /* TODO: Potentially manage stafftimetables_xxxx.xml files
-                 * TODO: Potentially manage part_xxxx.xml files
-                 */
-            }
-        }
+        $xml = (new Preconditions($this->host))->getXmlFiles();
 
         /* If there aren't any files to process, do nothing
          */
-        if (!$numFiles) {
-            $this->log->info('No xml files here; noop');
+        if (empty($xml)) {
+            $this->log->info('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
 
             return $bus;
         }

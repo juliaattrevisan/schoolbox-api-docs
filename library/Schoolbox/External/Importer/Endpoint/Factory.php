@@ -11,7 +11,6 @@ use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
@@ -25,6 +24,7 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -102,6 +102,7 @@ class Factory
      * @throws UnexpectedValueException
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function produce(?string $file, string $type): ?GenericCollection
     {
@@ -157,14 +158,10 @@ class Factory
 
                     /* Timetable pieces
                      */
-                    CampusMapper::getInstance(),
                     TimetableCampusMapper::getInstance(),
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    Term\Mapper::getInstance()
+                    ClassPeriodMapper::getInstance()
                 ))->produce();
 
             case self::SENTRAL:
