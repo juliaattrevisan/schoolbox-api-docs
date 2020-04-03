@@ -358,25 +358,25 @@
 
 (function($) {
 
-	/**
-	 * Unified Editor interface
-	 *
-	 * @param options
-	 */
-	$.fn.alaressEditor = function(options) {
-		options = options || {};
+    /**
+     * Unified Editor interface
+     *
+     * @param options
+     */
+    $.fn.alaressEditor = function(options) {
+        options = options || {};
 
-		var config = init(options);
+        var config = init(options);
 
-		start();
+        start();
 
-		/**
-		 * Init
-		 *
-		 * @param options
-		 * @returns {*}
-		 */
-		function init(options) {
+        /**
+         * Init
+         *
+         * @param options
+         * @returns {*}
+         */
+        function init(options) {
 
             /* These are the default CKEDITOR.config values
              * You can find more at http://docs.ckeditor.com/#!/api/CKEDITOR.config
@@ -494,12 +494,12 @@
             };
 
             return $.extend(defaults, derived, options);
-		}
+        }
 
-		/**
-		 * Disturb the sleeping dragon
-		 */
-		function start() {
+        /**
+         * Disturb the sleeping dragon
+         */
+        function start() {
             config.load();
 
             $.each(config.targetElements, function(index, element) {
@@ -525,7 +525,7 @@
                     applyCallbacks(name, element);
                 }
             });
-		}
+        }
 
         /**
          * Apply setup, ckeditor spawn, and change events
@@ -564,7 +564,7 @@
                 }
             });
         }
-	};
+    };
 
     // Remove unsupported table options on table properties dialog open
     CKEDITOR.on('dialogDefinition', function(ev) {
@@ -582,21 +582,3 @@
     });
 
 })(jQuery);
-
-
-
-(function() {
-
-    /**
-     * Plugin
-     *
-     * @param options
-     */
-    $.fn.plugin = function(options) {
-        options = options || {};
-
-        let config = init(options, $(this));
-
-
-    }
-}(jQuery));
