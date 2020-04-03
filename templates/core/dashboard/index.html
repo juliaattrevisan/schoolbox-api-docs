@@ -14,12 +14,19 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <a id="cat" style='float:right' class="button icon-link">Picker thing</a>
-        <input id="target" style="width:80%;" type="text" />
+        <div class="input-group">
+            <input id="target" type="text" />
+            <a id="cat" class="button icon-link">Picker thing</a>
+        </div>
 
         <div>
             <pre>
 Usage:
+
+&lt;div class="input-group">
+    &lt;input id="target" type="text" />
+    &lt;a id="cat" class="button icon-link">Picker thing&lt;/a>
+&lt;/div>
 
 $(function() {
     $('#cat').schoolboxLink({
