@@ -12,7 +12,8 @@
             <tr>
                 <td>{{ log.event_type|capitalize }}</td>
                 <td>
-                    <span class="{{ log.direction == 'in' ? 'reviewed' : 'submitted-late' }} label">{{ log.direction ==  'in' ? 'enter' : 'exit' }} </span> {{ log.location_tag }}
+                    <span class="{{ log.direction|lower == 'in' ? 'reviewed' : 'submitted-late' }} label">
+                        {{ log.direction|lower == 'in' ? 'enter' : 'exit' }}</span> {{ log.location_tag }}
                 </td>
                 <td>{{ log.timestamp|date('h:i a') }}</td>
             </tr>

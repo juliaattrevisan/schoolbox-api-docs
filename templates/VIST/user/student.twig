@@ -2,6 +2,6 @@
 
 {% block travel_logs %}
     {% if showDetails %}
-        {% include 'versoTravelLog.twig' %}
+        {{ travelLogs | raw }}
     {% endif %}
 {% endblock travel_logs %}
