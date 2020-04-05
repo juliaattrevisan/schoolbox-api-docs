@@ -80,9 +80,9 @@
                 // setting video plugin's poster doesn't work as expected,
                 // so set the video's poster directly
                 videoElement.attr('poster', $poster);
-                video.pause();
                 video.setSrc($target);
                 video.setPoster($poster);
+                video.load();
             });
         });
     </script>
