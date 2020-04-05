@@ -23,12 +23,16 @@ use Alaress\Web\Output;
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
     /**
-     * Set the cache's max age in the response header.
+     * Output a "Cache-Control: max-age" response header. This instructs the
+     * browser to cache (and not re-request) this response until it reaches the
+     * max age.
      *
-     * @param int $maxAge Allow the response to be this many seconds old before
-     *                    it is stale.
+     * Also removes the "Pragma" header, as this conflicts with Cache-Control.
+     *
+     * @param int $maxAge The number of seconds to instruct the browser to cache
+     *                    this response for.
      */
-    public function setCacheMaxAge(int $maxAge): void
+    public function outputCacheControlMaxAgeHeader(int $maxAge): void
     {
         header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
         header_remove('Pragma');
@@ -36,18 +40,20 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
 
     /**
-     * Set the cache's max age in the response header, from a config value.
+     * Output a "Cache-Control: max-age" response header, for an amount of time
+     * based on a config value.
      *
-     * @param string $configName Set the max age to the value of this config,
+     * @see outputCacheControlMaxAgeHeader
+     * @param string $configName Set the max age to the value of this config.
      * @noinspection PhpDocMissingThrowsInspection
      */
-    public function setCacheMaxAgeFromConfig(string $configName): void
+    public function outputCacheControlMaxAgeHeaderFromConfig(string $configName): void
     {
         /** @var IConfigLoader $config */
         /** @noinspection PhpUnhandledExceptionInspection */
         $config = $this->get('config');
         $maxAge = $config->get($configName);
-        $this->setCacheMaxAge((int)$maxAge);
+        $this->outputCacheControlMaxAgeHeader((int)$maxAge);
     }
 
 

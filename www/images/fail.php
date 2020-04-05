@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 // Use the type of transform to determine the timeout
-$kernel->setCacheMaxAgeFromConfig(
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(
     $_GET['transform_type'] === 'portrait'
         ? ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT
         : ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT
