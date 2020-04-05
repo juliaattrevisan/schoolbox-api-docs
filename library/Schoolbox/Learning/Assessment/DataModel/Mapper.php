@@ -459,8 +459,8 @@ class Mapper extends BaseMapper
     protected function getSelectStringForParticipant(User $user): string
     {
         return $this->getSelectString() . "
-            LEFT JOIN participant_plan ON participant_plan.assessment_id = assessment.id
-            LEFT JOIN participant ON participant.participant_plan_id = participant_plan.id AND participant.user_id = {$user->getId()}
+            LEFT JOIN participant_plan pp ON pp.assessment_id = assessment.id
+            LEFT JOIN participant ON participant.participant_plan_id = pp.id AND participant.user_id = {$user->getId()}
         ";
     }
 

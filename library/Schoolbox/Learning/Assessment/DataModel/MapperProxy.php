@@ -1117,9 +1117,9 @@ class MapperProxy
 
         // Are we interested in the custom plan dates, or the assessment dates?
         if ($usePlanDates) {
-            $publishDateColumn = new Coalesce(['participant_plan.publish_date', "$aTable.publish_date"]);
-            $dueDateColumn     = new Coalesce(['participant_plan.due_date', "$aTable.due_date"]);
-            $closeDateColumn   = new Coalesce(['participant_plan.close_date', "$aTable.close_date"]);
+            $publishDateColumn = new Coalesce(['pp.publish_date', "$aTable.publish_date"]);
+            $dueDateColumn     = new Coalesce(['pp.due_date', "$aTable.due_date"]);
+            $closeDateColumn   = new Coalesce(['pp.close_date', "$aTable.close_date"]);
         } else {
             $publishDateColumn = "$aTable.publish_date";
             $dueDateColumn     = "$aTable.due_date";
