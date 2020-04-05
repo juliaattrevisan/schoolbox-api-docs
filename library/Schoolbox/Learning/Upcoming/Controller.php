@@ -15,6 +15,7 @@ use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
@@ -323,16 +324,21 @@ class Controller extends Base
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
         $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
-        $allWork = $this->assessmentDataSource
-            ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids])
-            ->sortByCallback(new DueDateSortStrategy($student));
+        if(count($ids) > 0) {
+            $allWork = $this->assessmentDataSource
+                ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids])
+                ->sortByCallback(new DueDateSortStrategy($student));
 
-        $visibility = new Visibility($this->access);
-        /** @var IAssessable[]|GenericCollection $upcomingWork */
-        $upcomingWork = $allWork
-            ->filter(function (IAssessable $assessable) use ($student, $visibility) {
-                return $visibility->isVisibleToUser($assessable, $student, false);
-            })->limit(self::UPCOMING_WORK_LIMIT);
+            $visibility = new Visibility($this->access);
+            /** @var IAssessable[]|GenericCollection $upcomingWork */
+            $upcomingWork = $allWork
+                ->filter(function (IAssessable $assessable) use ($student, $visibility) {
+                    return $visibility->isVisibleToUser($assessable, $student, false);
+                })->limit(self::UPCOMING_WORK_LIMIT);
+        }
+        else {
+            $upcomingWork = new Collection();
+        }
 
         // Get list of folders current user is permitted to visit
         $readableFolders = [];
