@@ -1095,6 +1095,7 @@ class MapperProxy
      *   (see AssessmentType::TYPE_* constants)
      * * converts "window_open" and "window_close" to a window inside which
      *   to find due assessments
+     * * converts "ids" to a set of assessment IDs to restrict the result to
      *
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
@@ -1116,13 +1117,19 @@ class MapperProxy
 
         // Are we interested in the custom plan dates, or the assessment dates?
         if ($usePlanDates) {
-            $publishDateColumn = new Coalesce(['participant_plan.publish_date', "$aTable.publish_date"]);
-            $dueDateColumn     = new Coalesce(['participant_plan.due_date', "$aTable.due_date"]);
-            $closeDateColumn   = new Coalesce(['participant_plan.close_date', "$aTable.close_date"]);
+            $publishDateColumn = new Coalesce(['pp.publish_date', "$aTable.publish_date"]);
+            $dueDateColumn     = new Coalesce(['pp.due_date', "$aTable.due_date"]);
+            $closeDateColumn   = new Coalesce(['pp.close_date', "$aTable.close_date"]);
         } else {
             $publishDateColumn = "$aTable.publish_date";
             $dueDateColumn     = "$aTable.due_date";
             $closeDateColumn   = "$aTable.close_date";
+        }
+
+
+        // IDs
+        if (is_iterable($options['ids'] ?? null)) {
+            $builder->in("$aTable.id", $options['ids']);
         }
 
 

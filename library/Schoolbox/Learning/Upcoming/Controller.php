@@ -15,6 +15,7 @@ use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
@@ -317,18 +318,27 @@ class Controller extends Base
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 
-        $allWork = $this->assessmentDataSource
-            ->findAllByIds($this->assessmentIdFinder->findIdsByFilters($filters))
-            ->sortByCallback(new DueDateSortStrategy($student));
+        // Only fetch assessments that haven't closed
+        $filters[Filters\Assessment\TemporalState\Definition::class]->offsetUnset(Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_CLOSED);
 
-        // Only show work that student has permission to view, and can accept their submission
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection($allWork, $student);
-        $visibility = new Visibility($this->access);
-        /** @var IAssessable[]|GenericCollection $upcomingWork */
-        $upcomingWork = $allWork
-            ->filter(function (IAssessable $assessable) use ($student, $visibility) {
-                return $visibility->isVisibleToUser($assessable, $student, false);
-            })->limit(self::UPCOMING_WORK_LIMIT);
+        // If there's a huge number of IDs, we may need to chunk them and query
+        // on each chunk.
+        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
+        if(count($ids) > 0) {
+            $allWork = $this->assessmentDataSource
+                ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids])
+                ->sortByCallback(new DueDateSortStrategy($student));
+
+            $visibility = new Visibility($this->access);
+            /** @var IAssessable[]|GenericCollection $upcomingWork */
+            $upcomingWork = $allWork
+                ->filter(function (IAssessable $assessable) use ($student, $visibility) {
+                    return $visibility->isVisibleToUser($assessable, $student, false);
+                })->limit(self::UPCOMING_WORK_LIMIT);
+        }
+        else {
+            $upcomingWork = new Collection();
+        }
 
         // Get list of folders current user is permitted to visit
         $readableFolders = [];
