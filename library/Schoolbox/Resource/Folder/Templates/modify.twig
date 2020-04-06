@@ -36,7 +36,7 @@
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ config.site_version }}"></script>
 
-
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
 
@@ -159,12 +159,8 @@
         {% endif %}
 
         {% if folder.id %}
-            $('[data-template]').change(function(event) {
-                if ($('[data-template]').val() != 0) {
-                    $('[data-template-warning]').removeClass('hide');
-                } else {
-                    $('[data-template-warning]').addClass('hide');
-                }
+            $('[data-template]').change(function() {
+                $("[data-template-warning]").toggleClass("hide", Number(this.value) === 0);
             });
         {% endif %}
 
@@ -189,11 +185,13 @@
 
         }, 'Class codes may not exceed 20 characters.');
 
-        {% if action == 'Modify' %}
+        {% if folder.id %}
             {# Warn user that changing inherit permissions will destroy this group #}
-            $("#inherit").change(function() {
-                $("[data-alert-permissions]").toggleClass("hide", !this.checked);
-            });
+            {% if not folder.getInherit  %}
+                $("#inherit").change(function() {
+                    $("[data-alert-permissions]").toggleClass("hide", !this.checked);
+                });
+            {% endif %}
 
             {#
                 Warn user that permission recursion will delete role/group/class permissions if inherit is ON
@@ -219,6 +217,7 @@
 
     });
 </script>
+{% endautoescape %}
 
 {# Breadcrumbs #}
 
