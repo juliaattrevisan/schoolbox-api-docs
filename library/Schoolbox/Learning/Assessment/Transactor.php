@@ -166,8 +166,12 @@ class Transactor
              * If Similarity Check was previously disabled, but has now been enabled,
              * Then attempt to retrofit all the previous submissions
              */
-            if (($this->assessment instanceof DueWork\Model) && !$before['assessment']['similarityCheckEnabled'] && $assessment->getSimilarityCheckEnabled()) {
-                (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+            if (($this->assessment instanceof DueWork\Model) && !$before['assessment']['similarityCheckEnabled']) {
+
+                /** @var DueWork\Model $assessment */
+                if ($assessment->getSimilarityCheckEnabled()) {
+                    (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+                }
             }
 
             $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
