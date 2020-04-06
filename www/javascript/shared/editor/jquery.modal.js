@@ -345,6 +345,7 @@
 
         var config = $.extend($.fn.schoolboxModalConfig(options), {
             element: $(this),
+            allowedFilesystems: 'link',
 
             /* Other elements of this object literal as a result of merging with defaults:
              *
@@ -361,7 +362,7 @@
             /* Select something from the Resource Browser
              */
             $.fn.schoolboxResource({
-                allowedFilesystems: 'link'
+                allowedFilesystems: config.allowedFilesystems
             });
 
             /* Send the message up and deal with the dialog, if one was specified
