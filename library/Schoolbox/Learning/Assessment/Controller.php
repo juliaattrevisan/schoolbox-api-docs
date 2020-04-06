@@ -9,8 +9,11 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
+use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -37,6 +40,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /** @var Term\Mapper */
     private $termMapper;
 
+
+    /**
+     * @var Plagscan\Mapper
+     */
+    private $plagscanMapper;
+
+
+    /**
+     * @var SingleFile\Mapper
+     */
+    private $submissionFileMapper;
+
+
     /**
      * Controller constructor.
      *
@@ -49,6 +65,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param BreadcrumbFactory      $bakery
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
+     * @param Plagscan\Mapper        $plagscanMapper
+     * @param SingleFile\Mapper      $submissionFileMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -59,13 +77,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        Plagscan\Mapper $plagscanMapper,
+        SingleFile\Mapper $submissionFileMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
-        $this->bakery          = $bakery;
-        $this->workTypeMapper  = $workTypeMapper;
-        $this->termMapper      = $termMapper;
+        $this->bakery               = $bakery;
+        $this->workTypeMapper       = $workTypeMapper;
+        $this->termMapper           = $termMapper;
+        $this->plagscanMapper       = $plagscanMapper;
+        $this->submissionFileMapper = $submissionFileMapper;
     }
+
 
     /**
      * Redirect the standard assessment URL to a user specific version
@@ -218,16 +241,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param IAssessable $assessment
+     * @throws DefinitionException
+     * @throws RouteNotFound
      * @throws \Alaress\Web\Controller\Exception
+     * @throws LogicException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postUpdateAssessment(IAssessable $assessment)
+    public function postUpdateAssessment(IAssessable $assessment): void
     {
         /* Modify particular fields
          * This is accessed when you tick Skip Unsubmitted in the Inline Grader
          */
         if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
             $this->patchUpdateAssessment($assessment);
+
             return;
         }
 
@@ -239,9 +266,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $this->getRequest()->post,
                 $assessment
             );
+
             $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
-        }
-        catch (DomainException $e) {
+        } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
 
             /* Return Early to let mage deal with error messages

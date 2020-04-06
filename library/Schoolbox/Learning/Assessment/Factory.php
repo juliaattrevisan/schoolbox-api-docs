@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use DomainException;
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
@@ -40,6 +41,7 @@ use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use UnexpectedValueException;
 
 class Factory
 {
@@ -127,7 +129,7 @@ class Factory
      * @param User $creator
      * @param      $post (an array of post vars from the create/update forms)
      * @param      $assessmentType
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function __construct(User $creator, $post, $assessmentType) {
 
@@ -180,7 +182,7 @@ class Factory
 
             // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
             if ($maxMark === 0.0) {
-                throw new \UnexpectedValueException('Please provide maximum available marks greater than 0');
+                throw new UnexpectedValueException('Please provide maximum available marks greater than 0');
             }
             $this->setMaxMark($maxMark);
         }
@@ -229,8 +231,11 @@ class Factory
      *
      * @param IAssessable|null $assessment
      * @return IAssessable
+     * @throws InvalidArgumentException
+     * @throws DomainException
+     * @throws UnexpectedValueException
      */
-    public function produce(IAssessable $assessment = null)
+    public function produce(IAssessable $assessment = null): IAssessable
     {
         if ($assessment instanceof IAssessable) {
             return $this->produceFromExistingAssessment($assessment);
@@ -239,19 +244,21 @@ class Factory
         return $this->produceNew();
     }
 
+
     /**
      * Produce object
      *
      * @return IAssessable
-     * @throws \DomainException
+     * @throws DomainException
      * @throws InvalidArgumentException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
-    private function produceNew()
+    private function produceNew(): IAssessable
     {
         // Instantiate empty Assessment model
         $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->context);
-        if($assessment instanceof Project){
+
+        if ($assessment instanceof Project){
             $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
 
@@ -261,16 +268,17 @@ class Factory
         return $this->produceFromExistingAssessment($assessment);
     }
 
+
     /**
      * Produce object from an existing assessment
      *
      * @param IAssessable $assessment
      * @return IAssessable
-     * @throws \DomainException
+     * @throws DomainException
      * @throws InvalidArgumentException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
-    private function produceFromExistingAssessment(IAssessable $assessment)
+    private function produceFromExistingAssessment(IAssessable $assessment): IAssessable
     {
         if ($this->context) {
             // This class property is only set on CREATE, and is not hydrated
@@ -283,7 +291,6 @@ class Factory
                 $this->getGradingScheme(),
                 $this->getSummator()
             );
-
         } elseif ($assessment instanceof DueWork) {
             $decorator = new DueWorkDecorator(
                 $this->getAcceptOnline(),
@@ -298,14 +305,12 @@ class Factory
                 $this->getSelfReviewable(),
                 $this->getSimilarityCheckEnabled()
             );
-
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
                 $this->getUrl(),
                 $this->getAttachedFile()
             );
-
         } elseif ($assessment instanceof Quiz) {
             $decorator = new QuizDecorator(
                 $this->getDurationHours(),
@@ -313,14 +318,13 @@ class Factory
                 $this->getMaxAttempts(),
                 $this->getCompletionMessage()
             );
-
         } else {
-            throw new \DomainException('Please select an assessment type');
+            throw new DomainException('Please select an assessment type');
         }
 
         /* Check required data
          */
-        if (!strlen(trim($this->getTitle()))) {
+        if (trim($this->getTitle()) === '') {
             $typeName = strtolower($assessment->getTypeName());
             throw new InvalidArgumentException("Please set a title for this {$typeName}");
         }

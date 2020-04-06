@@ -10,8 +10,10 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use LogicException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -157,7 +159,7 @@ class ListController extends Web\Controller\Base
      * @throws Deleted
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
@@ -368,9 +370,8 @@ class ListController extends Web\Controller\Base
      * @return array
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws Exception
-     * @throws Deleted
-     * @throws \LogicException
+     * @throws RouteNotFound
+     * @throws LogicException
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
@@ -387,12 +388,10 @@ class ListController extends Web\Controller\Base
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
              */
-            $assessmentType = $postData['assessmentType'];
-            $assessmentFactory = new Factory($user, $postData, $assessmentType);
+            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType']);
             $assessment = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
-            $assessmentId = $assessment->getId();
 
             // assessment is saved; persist plans
 
