@@ -50,12 +50,23 @@ class Retrofit
 
         /* For the given $assessmentId, find all the student_submission records
          * and from there, find all the student_submission_file_id values
-         */
-
-        /* Once you have those, reduce the set to ones which don't already have a plagscan_document
+         *
+         * Once you have those, reduce the set to ones which don't already have a plagscan_document
          * row in the db; you can't tell when the retrofit will occur so some submissions might already
-         * have made their way to plagscan already. This reduced set is the candidate set of ids
+         * have made their way to plagscan already. This reduced set is the candidate set of ids who
+         * need to be given a plagscan_document record
          */
+        $query = '
+            SELECT ssf.*
+            FROM assessment a
+            INNER JOIN submission_box sb ON a.id = sb.assessment_id
+            INNER JOIN student_submission ss ON sb.id = ss.box_id
+            INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+            LEFT JOIN plagscan_document pd ON ssf.id = pd.student_submission_file_id
+            WHERE a.id = :assessmentId
+            AND pd.id IS NULL
+            ORDER BY ssf.id
+        ';
 
         /* Create a new plagscan stub for each candidate student_submission_file_id
          * Set its status to QUEUED which primes them for submit.php to execute
