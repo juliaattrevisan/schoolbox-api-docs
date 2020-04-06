@@ -15,7 +15,7 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Resource\Storage\S3\Stream;
+use Schoolbox\Resource\Storage\S3\PreSignedUrl;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
@@ -55,10 +55,11 @@ if (is_numeric($_GET['id'])) {
         }
     }
 
-    $attachmentType = (!$file->getMimetype()->getInline() || $_GET['save']) ? 'attachment' : '';
+    $attachmentType = (!$file->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
     $contentType = ($file->getMime()) ?: 'application/octet-stream';
-    $baseName = $file->getBasename();
+    $basename = $file->getBasename();
     $fileSystem = $file->getStorage()->getFilesystem();
+    $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
     if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
         /** @var IConfigLoader $config */
@@ -67,16 +68,19 @@ if (is_numeric($_GET['id'])) {
         if ($config->get('otfs_s3_presigned_urls_enabled')) {
             $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
 
-            $streamS3 = new Stream(
+            $expires = Alaress_Date_Format::now()->addDays(1)->__toString();
+
+            $preSignedUrl = new PreSignedUrl(
                 $config,
-                $signedUrlExpiration,
+                $expires,
                 $attachmentType,
                 $contentType,
                 $file->getPath(),
-                $baseName
+                $basename,
+                $cacheControl
             );
 
-            $streamS3->download($streamS3->getPresignedUrl());
+            $preSignedUrl->download($preSignedUrl->generate());
         }
     }
 
@@ -86,7 +90,7 @@ if (is_numeric($_GET['id'])) {
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
-    header("Content-Disposition: $attachmentType; filename=\"" . $baseName . "\"");
+    header("Content-Disposition: $attachmentType filename=\"" . $basename . "\"");
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;

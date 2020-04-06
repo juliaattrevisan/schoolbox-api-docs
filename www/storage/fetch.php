@@ -10,7 +10,7 @@
 use League\Flysystem;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Stream;
+use Schoolbox\Resource\Storage\S3\PreSignedUrl;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -24,24 +24,26 @@ try {
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $basename = $resource->getBasename();
         $fileSystem = $resource->getFilesystem();
+        $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
         if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 
             if ($config->get('otfs_s3_presigned_urls_enabled')) {
-                $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
+                $expires = Alaress_Date_Format::now()->addDays(1)->__toString();
 
-                $streamS3 = new Stream(
+                $preSignedUrl = new PreSignedUrl(
                     $config,
-                    $signedUrlExpiration,
+                    $expires,
                     $attachmentType,
                     $contentType,
                     $resource->getPath(),
-                    $basename
+                    $basename,
+                    $cacheControl
                 );
 
-                $streamS3->download($streamS3->getPresignedUrl());
+                $preSignedUrl->download($preSignedUrl->generate());
             }
         }
 
@@ -49,7 +51,7 @@ try {
         header("Content-Type: $contentType");
         header("Cache-control: private");
         header("Content-Ranges: none");
-        header("Content-Disposition: $attachmentType; filename=\"$basename\"");
+        header("Content-Disposition: $attachmentType filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
         fpassthru($resource->readStream());
         exit;
