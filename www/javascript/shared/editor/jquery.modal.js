@@ -344,16 +344,25 @@
     $.fn.schoolboxLink = function(options) {
         options = options || {};
 
-        var config = $.extend($.fn.schoolboxModalConfig(options), {
-            element: $(this),
-            allowedFilesystems: 'link',
+        var config = $.extend(
+
+            /* Default filesystem is 'link' for this usage
+             */
+            {
+                element: $(this),
+                allowedFilesystems: 'link',
+            },
+
+            /* Combine with modal configuration requirements
+             */
+            $.fn.schoolboxModalConfig(options)
 
             /* Other elements of this object literal as a result of merging with defaults:
              *
              * url: ...
              * onSelect: function() ...
              */
-        });
+        );
 
         /* When $(element) is clicked, spawn modal and process selection
          * as per the callback you optionally specified via constructor
