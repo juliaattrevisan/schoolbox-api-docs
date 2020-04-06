@@ -156,12 +156,16 @@
                 });
             });
 
-        {% endif %}
-
-        {% if folder.id %}
-            $('[data-template]').change(function() {
-                $("[data-template-warning]").toggleClass("hide", Number(this.value) === 0);
-            });
+            // Template input: show a warning if changing would delete content.
+            // * it never will if it currently has No Homepage
+            // * otherwise, if it's not "keep existing" it will
+            var templateInput = $('[data-template]'),
+                templateValue = Number(templateInput.val());
+            if (templateValue !== -1) {
+                templateInput.change(function() {
+                    $("[data-template-warning]").toggleClass("hide", Number(this.value) === templateValue);
+                });
+            }
         {% endif %}
 
         // If the folder is inheriting permissions need to remove the required attribute from group fields
