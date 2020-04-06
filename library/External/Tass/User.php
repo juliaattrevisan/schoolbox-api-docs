@@ -390,7 +390,7 @@ class External_Tass_User implements External_UserInterface
         $query = "
             SELECT curr_sem
             FROM ttparms
-            WHERE cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            WHERE cmpy_code = {$this->companyCode}
         ";
         $currentSemester = $this->database->getOne($query);
         return $currentSemester === null ? null : (string)$currentSemester;
@@ -405,7 +405,7 @@ class External_Tass_User implements External_UserInterface
         $query = "
             SELECT curr_year
             FROM ttparms
-            WHERE cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            WHERE cmpy_code = {$this->companyCode}
         ";
         $currentYear = $this->database->getOne($query);
         return $currentYear === null ? null : (string)$currentYear;
