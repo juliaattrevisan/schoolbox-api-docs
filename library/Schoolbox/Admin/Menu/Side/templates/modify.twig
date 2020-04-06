@@ -2,18 +2,6 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-role="openResourceBrowser"]').click(function(e) {
-            e.preventDefault();
-            $('[data-role="resourceBrowser"]').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('input[name="url"]').val(url);
-                }
-            });
-        });
-
         $('[data-cancel]').click(function () {
             window.location.href = '{{ routeLookup('adminMenuSide.getIndex') }}';
             return false;
@@ -88,9 +76,18 @@
                             Destination URL
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
                         </label>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    onSelect: function(url, dialog) {
+                                        $('input[name="url"]').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
                             <input name="url" type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url }}">
-                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                            <a id="modalLinkButton" class="button icon-link">Browser</a>
                         </div>
                     </div>
                     <div class="small-11 columns">
@@ -174,7 +171,7 @@
         if (allChecked) {
             $('#campus-all').prop('checked', true);
         }
-        
+
         $('[data-campus]').change(function() {
             $('#campus-all').prop('checked', false);
         });
