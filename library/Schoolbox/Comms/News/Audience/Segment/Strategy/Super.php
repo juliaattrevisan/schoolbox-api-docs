@@ -7,9 +7,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
+use function count;
+use function in_array;
 
 class Super extends SimpleStrategy
 {
@@ -67,5 +72,36 @@ class Super extends SimpleStrategy
             }
         }
         return [];
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        // In theory, targeting:
+        // * NULL   => not superuser
+        // * 'true' => is superuser
+        // If we have both, we have a complete set, and can short-circuit
+        if ($targetNull && in_array(self::ENTITY_VALUE, $filtered, true)) {
+            return new UserResolutionSql('', $this->newPb($paramPrefix)->isNull("$userTableAlias.deleted_at"));
+        }
+
+        $suAlias  = "su_$paramPrefix";
+        $joinType = $targetNull ? "LEFT" : '';
+        $join     = "$joinType JOIN superusers $suAlias ON $userTableAlias.id = $suAlias.id";
+
+        $pb = $this->newPb($paramPrefix)->isNull("$userTableAlias.deleted_at");
+        if ($targetNull) {
+            $pb->isNull("$suAlias.id");
+        }
+        $pb = $this->newPb($paramPrefix)->all($pb);
+
+        return new UserResolutionSql($join, $pb);
     }
 }

@@ -8,8 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function count;
+use function in_array;
 
 class ResHouse extends SimpleStrategy
 {
@@ -71,5 +74,27 @@ class ResHouse extends SimpleStrategy
             }
         }
         return $values;
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$userTableAlias.residential_house_id");
+        }
+        if (count($filtered)) {
+            $pb->in("$userTableAlias.residential_house_id", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql('', $pb);
     }
 }

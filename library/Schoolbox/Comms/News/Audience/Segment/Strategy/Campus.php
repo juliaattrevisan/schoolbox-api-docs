@@ -10,10 +10,12 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_unique;
 use function implode;
+use function in_array;
 
 class Campus extends SimpleStrategy
 {
@@ -121,5 +123,31 @@ class Campus extends SimpleStrategy
             }
         }
         return array_unique($values);
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $userCampusAlias = "uc_$paramPrefix";
+        $joinType        = $targetNull ? "LEFT JOIN" : "JOIN";
+        $join            = "$joinType userCampus $userCampusAlias ON $userTableAlias.id = $userCampusAlias.uid";
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$userCampusAlias.uid");
+        }
+        if (count($filtered)) {
+            $pb->in("$userCampusAlias.campus", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql($join, $pb);
     }
 }

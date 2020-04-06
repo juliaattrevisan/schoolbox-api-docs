@@ -8,8 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function count;
+use function in_array;
 
 class Service extends SimpleStrategy
 {
@@ -70,5 +73,43 @@ class Service extends SimpleStrategy
             $values[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
         }
         return $values;
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $uaAlias = "ua_$paramPrefix";
+
+        $pb = $this->newPb($paramPrefix);
+        foreach ($filtered as $entityValue) {
+            [$service, $sid, $type] = \explode('.', $entityValue);
+            $innerPb = $this->newPb($paramPrefix);
+            if ('*' !== $service) {
+                $innerPb->equals("$uaAlias.service", $service);
+            }
+            if ('*' !== $sid) {
+                $innerPb->equals("$uaAlias.sid", $sid);
+            }
+            if ('*' !== $type) {
+                $innerPb->equals("$uaAlias.type", $type);
+            }
+            $pb->all($innerPb);
+        }
+        if ($targetNull) {
+            $pb->isNull("$uaAlias.uid");
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        $joinType = $targetNull ? "LEFT" : "";
+        $join     = "$joinType JOIN userAccess $uaAlias ON $userTableAlias.id = $uaAlias.uid";
+
+        return new UserResolutionSql($join, $pb);
     }
 }

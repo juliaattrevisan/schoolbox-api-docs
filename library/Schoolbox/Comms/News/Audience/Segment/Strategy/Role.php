@@ -11,9 +11,12 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function count;
 use function implode;
+use function in_array;
 
 class Role extends SimpleStrategy
 {
@@ -110,5 +113,18 @@ class Role extends SimpleStrategy
             $values[$user->getRole()->getId()] = $user->getRole()->getId();
         }
         return $values;
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        return new UserResolutionSql('', $this->newPb($paramPrefix)->in("$userTableAlias.group_id", $filtered));
     }
 }

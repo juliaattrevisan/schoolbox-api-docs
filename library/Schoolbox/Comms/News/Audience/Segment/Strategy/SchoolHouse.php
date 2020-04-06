@@ -11,10 +11,13 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_unique;
+use function count;
 use function implode;
+use function in_array;
 
 class SchoolHouse extends SimpleStrategy
 {
@@ -116,5 +119,27 @@ class SchoolHouse extends SimpleStrategy
             }
         }
         return array_unique($values);
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$userTableAlias.house");
+        }
+        if (count($filtered)) {
+            $pb->in("$userTableAlias.house", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql('', $pb);
     }
 }

@@ -12,17 +12,21 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use PDO;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+use function count;
 use function implode;
+use function in_array;
 
 class PastoralGroup extends SimpleStrategy
 {
 
     /** @var IConnector */
     private $db;
+
 
     public static function getEntityType(): string
     {
@@ -117,5 +121,31 @@ class PastoralGroup extends SimpleStrategy
         ";
 
         return $this->db->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $pgmAlias = "pgm_$paramPrefix";
+        $joinType = $targetNull ? "LEFT" : "";
+        $join     = "$joinType JOIN pastoral_group_member $pgmAlias ON $pgmAlias.user_id = $userTableAlias.id";
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$pgmAlias.user_id");
+        }
+        if (count($filtered)) {
+            $pb->in("$pgmAlias.group_id", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql($join, $pb);
     }
 }

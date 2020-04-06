@@ -9,7 +9,11 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
+use External_Class;
+use External_ClassInterface;
+use PDO;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -21,7 +25,10 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
 use UnderflowException;
+use function array_merge;
+use function count;
 use function implode;
+use function in_array;
 
 class Folder extends SimpleStrategy
 {
@@ -37,6 +44,9 @@ class Folder extends SimpleStrategy
 
     /** @var External_UserInterface */
     private $externalUser;
+
+    /** @var External_ClassInterface */
+    private $externalClass;
 
     /**
      * Set of subject data arrays, grouped by user.id
@@ -209,12 +219,12 @@ class Folder extends SimpleStrategy
             $roleAccess = $this->findFolderIdsWithRoleAccess($user, UserAccess::ACCESS_WRITE);
 
             // Combine the two
-            $folderMembership = \array_unique(\array_merge($groupAndClassMembership, $roleAccess));
+            $folderMembership = \array_unique(array_merge($groupAndClassMembership, $roleAccess));
 
             /* If I have zero elements in my folderMembership, boot me out - there's nothing to fetch
              * I'm restricted from seeing any folders
              */
-            if (!\count($folderMembership)) {
+            if (!count($folderMembership)) {
                 return null;
             }
 
@@ -322,12 +332,12 @@ class Folder extends SimpleStrategy
                 $subjectList = $this->externalUser->getSubjectList($user);
             }
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $subjectLists = \array_merge($subjectLists, $subjectList);
+            $subjectLists = array_merge($subjectLists, $subjectList);
         }
 
         $classFolderIds = $this->folderMapper->findAllBySubjectList($subjectLists)->getPropertyValues('id');
 
-        return \array_unique(\array_merge($groupFolderIds, $classFolderIds));
+        return \array_unique(array_merge($groupFolderIds, $classFolderIds));
     }
 
 
@@ -361,5 +371,133 @@ class Folder extends SimpleStrategy
                                      ->greaterThanOrEqualTo('type', $accessLevel);
 
         return $this->roleAccessMapper->findScalarByPredicates('cid', $pb);
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        // For performance reasons, it is faster to UNION the GROUP + CLASS members, rather than LEFT JOIN them.
+        // This is incompatible with the interface's return type. Therefore we will just resolve the user ids,
+        // and return a predicate to match these directly. In any event, the overhead of fetching the class members
+        // from the sis is much higher than this double tap.
+        $userIds = $this->getUserIdsForFolders($filtered, $targetNull);
+        if (!count($userIds)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        return new UserResolutionSql('', $this->newPb($paramPrefix)->in("$userTableAlias.id", $userIds));
+    }
+
+
+    /**
+     * @param string[] $filtered
+     * @param bool     $targetNull
+     * @return int[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function getUserIdsForFolders(array $filtered, bool $targetNull): array
+    {
+        // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
+        $quoter    = new Quoter();
+        $groupJoin = $targetNull ? 'LEFT' : '';
+        $groupPb   = (new Builder($quoter, ''));
+        if (count($filtered)) {
+            $groupInPb = (new Builder($quoter, ''))
+                ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
+                ->in('ua.sid', $filtered)
+                ->notEquals('ua.type', UserAccess::ACCESS_DENY);
+            if ($targetNull) {
+                // null + filtered
+                $groupPb->any(
+                    (new Builder($quoter, ''))
+                        ->all($groupInPb)
+                        ->isNull('ua.uid')
+                );
+            } else {
+                // Just in $filtered
+                $groupPb = $groupInPb;
+            }
+        } else {
+            // just null
+            $groupPb->isNull('ua.uid');
+        }
+        $groupWhere = implode(' AND ', $groupPb->getWhere());
+        $sql        = "
+            SELECT ua.uid id
+            FROM user u
+            {$groupJoin} JOIN userAccess ua ON u.id = ua.uid
+            WHERE ({$groupWhere})
+            AND u.deleted_at IS NULL
+        ";
+        $params     = $groupPb->getParams();
+
+        // Associated with the class, regardless of role type.
+        // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
+        if (count($filtered)) {
+            $codes = $this->getFolderCodes($filtered);
+
+            if (count($codes)) {
+                $externalIds = [];
+                foreach ($this->getExternalClass()->getStudents(implode(',', $codes)) as $student) {
+                    $externalIds[] = $student['synergy_id'];
+                }
+                foreach ($this->getExternalClass()->getTeachers(implode(',', $codes)) as $teacherExternalId) {
+                    $externalIds[] = $teacherExternalId;
+                }
+                if (count($externalIds)) {
+                    $classPb = (new Builder($quoter, ''))
+                        ->in('u.synergy_id', $externalIds);
+                    $sql     .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]} AND u.deleted_at IS NULL";
+                    $params  = array_merge($params, $classPb->getParams());
+                }
+            }
+        }
+
+        return $this->folderMapper->getDatabase()->query($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Returns all folder codes for the specified folders
+     *
+     * @param string[] $folderIds
+     * @return string[]
+     */
+    private function getFolderCodes(array $folderIds): array
+    {
+        if (!count($folderIds)) {
+            return [];
+        }
+
+        $bindings = Builder::getBindings($folderIds, 'fid');
+        return $this->folderMapper->getDatabase()->query("
+            SELECT code
+            FROM folder_code fc
+            JOIN folder f ON fc.folder_id = f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL
+            WHERE f.id IN ({$bindings->getPlaceholder()})",
+            $bindings->getParams()
+        )->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Lazy getter
+     *
+     * @return External_ClassInterface
+     */
+    private function getExternalClass(): External_ClassInterface
+    {
+        if (!$this->externalClass) {
+            $this->externalClass = new External_Class();
+        }
+        return $this->externalClass;
     }
 }

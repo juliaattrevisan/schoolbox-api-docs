@@ -11,6 +11,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use function implode;
@@ -119,5 +120,15 @@ class User extends SimpleStrategy
     public function getValues(GenericCollection $users): array
     {
         return \array_unique($users->getPropertyValues('id'));
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
+    {
+        // no need for join or to filter out null values (all users have IDs)
+        $join = '';
+        $pb   = $this->newPb($paramPrefix)->in("{$userTableAlias}.id", $entityValues);
+        return new UserResolutionSql($join, $pb);
     }
 }

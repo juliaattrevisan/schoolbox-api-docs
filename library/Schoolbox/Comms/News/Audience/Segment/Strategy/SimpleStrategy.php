@@ -7,6 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -146,5 +150,60 @@ abstract class SimpleStrategy implements ISimpleStrategy
     protected function getAccess(): Access
     {
         return $this->access;
+    }
+
+
+    /**
+     * Return a new Predicate Builder
+     *
+     * @param string $paramPrefix
+     * @param string $table
+     * @return Builder
+     */
+    protected function newPb(string $paramPrefix, string $table = ''): Builder
+    {
+        // Prefix cannot start with digit
+        return (new Builder(new Quoter(), $table))->setParamPrefix($paramPrefix);
+    }
+
+
+    /**
+     * Return a UserResolution that will cause the query optimiser to detect an impossible WHERE clause
+     *
+     * In reality this should be called very infrequently, and exists just to maintain the interface.
+     * It can occur when policy changes. Eg if a segment targets "campus:NULL", and we then disable targeting
+     * of users without a campus, this will be used to ensure no users are matched.
+     *
+     * @param string $userTableAlias
+     * @param string $uniquePrefix
+     * @return UserResolutionSql
+     * @throws InvalidColumnException
+     */
+    protected function buildImpossibleUserResolution(string $userTableAlias, string $uniquePrefix): UserResolutionSql
+    {
+        return new UserResolutionSql(
+            '',
+            $this->newPb($uniquePrefix)->all(
+                $this->newPb($uniquePrefix)
+                     ->equals("{$userTableAlias}.id", 1)
+                     ->equals("{$userTableAlias}.id", 2)
+            ));
+    }
+
+
+    /**
+     * Convenience method to filter out any null values from an array
+     *
+     * @param null[]|string[] $entityValues
+     * @return string[]
+     */
+    protected function filterOutNullValues(array $entityValues): array
+    {
+        foreach ($entityValues as $idx => $value) {
+            if ($value === null) {
+                unset($entityValues[$idx]);
+            }
+        }
+        return $entityValues;
     }
 }
