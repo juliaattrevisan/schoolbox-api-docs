@@ -579,12 +579,18 @@ class Mapper extends BaseMapper
         if (\count($folderIds) === 0) {
             return $this->createCollection();
         }
-        $params       = Builder::getArrayParameters($folderIds, 'folder');
+
+        $participantUserId = $participantUser->getId();
+        $params            = array_merge(
+            Builder::getArrayParameters($folderIds, 'folder'),
+            [
+                'user_1' => $participantUserId,
+                'user_2' => $participantUserId,
+                'user_3' => $participantUserId,
+                'user_4' => $participantUserId,
+            ]
+        );
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
-        $builderWhere = $builder->getWhere();
-        if (!empty($builderWhere)) {
-            $placeholders .= ' AND ' . implode(' AND ', $builderWhere);
-        }
 
         // Get assessments the student is participating in
         $idQuery = "
@@ -593,7 +599,7 @@ class Mapper extends BaseMapper
             JOIN `assessment_folder` AS `v_f`  ON `f`.`id` = `v_f`.`folder_id`
             JOIN `assessment` ON `assessment`.`id` = `v_f`.`assessment_id`
             LEFT JOIN participant_plan pp ON assessment.id = pp.assessment_id
-            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = :user_1
             WHERE f.id IN {$placeholders}
 
             UNION
@@ -605,7 +611,7 @@ class Mapper extends BaseMapper
             JOIN `assessment_course_unit_implementation` AS `v_ui` ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
             JOIN `assessment` ON `assessment`.`id` = `v_ui`.`assessment_id`
             LEFT JOIN participant_plan pp ON assessment.id = pp.assessment_id
-            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = :user_2
             WHERE uicf.id IN {$placeholders}
 
             UNION
@@ -618,7 +624,7 @@ class Mapper extends BaseMapper
             JOIN `course_unit_implementation` AS `ui` ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
             JOIN course_implementation AS `uic` ON `uic`.`id` = `ui`.course_implementation_id
             LEFT JOIN participant_plan pp ON `p_a`.`assessment_id` = pp.assessment_id
-            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = :user_3
             WHERE `uic`.`folder_id` IN {$placeholders}
 
             UNION
@@ -629,12 +635,12 @@ class Mapper extends BaseMapper
             JOIN assessment ON assessment.id = p.assessment_id
             JOIN assessment_folder AS `v_f`ON `v_f`.`assessment_id` = `assessment`.`id`
             LEFT JOIN participant_plan pp ON `p_a`.`assessment_id` = pp.assessment_id
-            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            LEFT JOIN participant pt ON pp.id = pt.participant_plan_id AND pt.user_id = :user_4
             WHERE `v_f`.`folder_id` IN {$placeholders}
         ";
 
         $idStatement = $this->getDatabase()->prepare($idQuery);
-        $idStatement->execute(array_merge($params, $builder->getParams()));
+        $idStatement->execute($params);
         $idList = array_merge(array_column($idStatement->fetchAll(), 'id'), $includeIds);
 
         if (0 === \count($idList)) {
