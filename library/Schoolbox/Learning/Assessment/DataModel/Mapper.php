@@ -581,10 +581,6 @@ class Mapper extends BaseMapper
         }
         $params       = Builder::getArrayParameters($folderIds, 'folder');
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
-        $builderWhere = $builder->getWhere();
-        if (!empty($builderWhere)) {
-            $placeholders .= ' AND ' . implode(' AND ', $builderWhere);
-        }
 
         // Get assessments the student is participating in
         $idQuery = "
