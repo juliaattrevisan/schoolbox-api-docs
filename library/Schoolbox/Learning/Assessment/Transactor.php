@@ -134,7 +134,6 @@ class Transactor
         $this->assessment = $assessment;
 
         // Verify that the context of the assessment is valid
-        // TODO replace returnUrl values once I know what they should actually be
         $assessmentContext = $this->assessment->getContext();
 
         /* If you followed a creational link from a particular place,
@@ -144,14 +143,11 @@ class Transactor
             try {
                 if ($assessmentContext instanceof Folder) {
                     $returnUrl = $this->transactFolderContext();
-                }
-                elseif ($assessmentContext instanceof UnitImplementation) {
+                } elseif ($assessmentContext instanceof UnitImplementation) {
                     $returnUrl = $this->transactUnitImplementationContext();
-                }
-                elseif ($assessmentContext instanceof UnitSpecification) {
+                } elseif ($assessmentContext instanceof UnitSpecification) {
                     $returnUrl = $this->transactUnitSpecificationContext();
-                }
-                elseif ($assessmentContext instanceof Project) {
+                } elseif ($assessmentContext instanceof Project) {
                     $returnUrl = $this->transactProjectContext();
                 } else {
                     throw new InvalidArgumentException('Please select a valid context');
@@ -185,6 +181,7 @@ class Transactor
         ];
     }
 
+
     /**
      * Transact from Folder context
      *
@@ -203,7 +200,7 @@ class Transactor
          * It should be obtained from the routes
          * You only get contextId when you're Creating, not updating
          */
-        $context = $this->folderMapper->findById($this->getContextId());
+        $context = $this->folderMapper->findById($this->assessment->getContext()->getId());
 
         $this->assessmentMapperProxy->save($this->assessment);
 
@@ -223,7 +220,7 @@ class Transactor
      */
     private function transactUnitImplementationContext(): string
     {
-        $context = $this->unitImplementationMapper->findById($this->getContextId());
+        $context = $this->unitImplementationMapper->findById($this->assessment->getContext()->getId());
 
         $this->assessmentMapperProxy->save($this->assessment);
 
@@ -246,7 +243,7 @@ class Transactor
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context = $this->unitSpecificationMapper->findById($this->getContextId());
+        $context = $this->unitSpecificationMapper->findById($this->assessment->getContext()->getId());
 
         $this->assessmentMapperProxy->save($this->assessment);
 
@@ -276,18 +273,6 @@ class Transactor
         // TODO figure out what to do about this
         $this->assessmentMapperProxy->save($this->assessment);
 
-        return "/homepage/{$this->getContextId()}";
-    }
-
-
-     /* Getters/Setters
-     */
-
-    /**
-     * @return int
-     */
-    protected function getContextId(): int
-    {
-        return $this->assessment->getContext()->getId();
+        return "/homepage/{$this->assessment->getContext()->getId()}";
     }
 }
