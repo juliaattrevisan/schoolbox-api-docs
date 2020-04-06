@@ -2,7 +2,7 @@ INSERT INTO config (name, value, title, description, field_id, options, type_id,
 VALUES (
   'external_tass_version',
   '',
-  'Tass version',
+  'Tass Version',
   'Set Tass version',
   (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
   'V52;V52',
