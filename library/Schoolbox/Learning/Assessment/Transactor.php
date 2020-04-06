@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
+use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
@@ -18,6 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -187,8 +189,14 @@ class Transactor
      * Transact from Folder context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
-    private function transactFolderContext()
+    private function transactFolderContext(): string
     {
 
         /* TODO: Pass contextId as a param into this method
@@ -199,59 +207,78 @@ class Transactor
 
         $this->assessmentMapperProxy->save($this->assessment);
 
-        $returnUrl = "/homepage/{$context->getId()}";
-
-        return $returnUrl;
+        return "/homepage/{$context->getId()}";
     }
+
 
     /**
      * Transact from Unit Implementation context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    private function transactUnitImplementationContext()
+    private function transactUnitImplementationContext(): string
     {
         $context = $this->unitImplementationMapper->findById($this->getContextId());
+
         $this->assessmentMapperProxy->save($this->assessment);
 
         return "/homepage/{$context->getId()}";
     }
 
+
     /**
      * Transact from Unit Specification context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
      */
-    private function transactUnitSpecificationContext()
+    private function transactUnitSpecificationContext(): string
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
         $context = $this->unitSpecificationMapper->findById($this->getContextId());
+
         $this->assessmentMapperProxy->save($this->assessment);
 
         return $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
+
 
     /**
      * Transact from Project context
      *
      * Check that you don't spawn a Project in a Project
      *
+     * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws DomainException
      */
-    private function transactProjectContext()
+    private function transactProjectContext(): string
     {
         if ($this->assessment instanceof Project) {
-            throw new \DomainException('You cannot create nested projects.');
+            throw new DomainException('You cannot create nested projects.');
         }
 
         // TODO figure out what to do about this
         $this->assessmentMapperProxy->save($this->assessment);
 
-        return "/homepage/{$this->assessment->getContext()->getId()}";
+        return "/homepage/{$this->getContextId()}";
     }
+
 
      /* Getters/Setters
      */
