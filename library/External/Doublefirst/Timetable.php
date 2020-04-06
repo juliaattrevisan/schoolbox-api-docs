@@ -219,7 +219,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         if ($date == 0) {
             $date = \Alaress_Date_Format::now();
         } else {
-            $date = new \Alaress_Date_Format($date, "U");
+            $date = \Alaress_Date_Format::newFromTimestamp($date);
         }
 
         return $this->helper->getDayNumber($date);
