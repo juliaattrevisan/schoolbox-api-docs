@@ -1225,7 +1225,15 @@ abstract class Kernel
             'router'                        => $di->lazyGet('router'),
         ];
 
-        $di->set('transactor', $di->lazyNew(LearningAssessmentTransactor::class));
+        $di->set('transactor', $di->lazyNew(LearningAssessmentTransactor::class, [
+            $di->lazyNew(Folder\Mapper::class),
+            $di->lazyNew(\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper::class),
+            $di->lazyNew(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class),
+            $di->lazyNew(AssessmentDataSource::class),
+            $di->lazyNew(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
+            $di->lazyNew(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
+            $di->lazyGet('router')
+        ]));
 
         // Register default grade group
         $di->set(

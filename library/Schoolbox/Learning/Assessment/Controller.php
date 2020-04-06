@@ -12,8 +12,6 @@ use DomainException;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -42,18 +40,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
-     * @var Plagscan\Mapper
-     */
-    protected $plagscanMapper;
-
-
-    /**
-     * @var SingleFile\Mapper
-     */
-    protected $submissionFileMapper;
-
-
-    /**
      * Controller constructor.
      *
      * @param UserMapper             $userMapper
@@ -65,8 +51,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param BreadcrumbFactory      $bakery
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
-     * @param Plagscan\Mapper        $plagscanMapper
-     * @param SingleFile\Mapper      $submissionFileMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -77,16 +61,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource,
-        Plagscan\Mapper $plagscanMapper,
-        SingleFile\Mapper $submissionFileMapper
+        Participant\DataSource $participantDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
-        $this->bakery               = $bakery;
-        $this->workTypeMapper       = $workTypeMapper;
-        $this->termMapper           = $termMapper;
-        $this->plagscanMapper       = $plagscanMapper;
-        $this->submissionFileMapper = $submissionFileMapper;
+        $this->bakery         = $bakery;
+        $this->workTypeMapper = $workTypeMapper;
+        $this->termMapper     = $termMapper;
     }
 
 
