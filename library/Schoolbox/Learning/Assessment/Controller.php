@@ -26,6 +26,11 @@ use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 abstract class Controller extends ListController implements IAssessmentController
 {
 
@@ -64,6 +69,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Participant\DataSource $participantDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
+
         $this->bakery         = $bakery;
         $this->workTypeMapper = $workTypeMapper;
         $this->termMapper     = $termMapper;
