@@ -250,8 +250,7 @@
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
                     $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                        console.log(responseText);
-                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id),dialog);
+                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id), responseText.name, dialog);
 
                         /* Shut modal, go back to Dialog
                          */
@@ -261,7 +260,7 @@
 
                     /* Microsoft Teams meetings url format
                      */
-                    config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), dialog);
+                    config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), 'Microsoft Teams Meeting', dialog);
 
                     /* Shut modal, go back to Dialog
                      */
@@ -321,9 +320,10 @@
              * by interacting with the modal
              *
              * @param url     string  the url to which you linked
+             * @param name    string  user-facing name of the thing you linked
              * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
              */
-            onSelect: function(url, dialog) {
+            onSelect: function(url, name, dialog) {
                 return url;
             }
         }, options);

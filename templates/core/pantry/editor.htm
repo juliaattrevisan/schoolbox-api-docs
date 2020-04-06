@@ -14,8 +14,9 @@
         /* Schoolbox Link Modal
          */
         $('#modalLinkButton').schoolboxLink({
-            onSelect: function(url, dialog) {
+            onSelect: function(url, name, dialog) {
                 $('#modalLinkTarget').val(url);
+                $('#modalLinkName').text(name);
             }
         });
 
@@ -116,6 +117,8 @@
             <input id="modalLinkTarget" type="text" />
             <a id="modalLinkButton" class="button icon-link">Browser</a>
         </div>
+
+        <p>Current selection: <span id="modalLinkName">none</span></p>
     </div>
 </div>
 

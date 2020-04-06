@@ -56,7 +56,7 @@
     $(function() {
         $('#modalLinkButton-src-{COMPONENT_HANDLE}').schoolboxLink({
             allowedFilesystems: 'folder',
-            onSelect: function(url, dialog) {
+            onSelect: function(url, name, dialog) {
                 const pageFolderId = parseInt('{ID}');
                 const categoryId = parseInt(url.replace('/homepage/', ''));
                 const label = $('#text-{COMPONENT_HANDLE}');

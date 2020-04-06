@@ -7,7 +7,7 @@
     $(function() {
         $('#modalLinkButton-{{ name }}').schoolboxLink({
             allowedFilesystems: 'folder',
-            onSelect: function(url, dialog) {
+            onSelect: function(url, name, dialog) {
                 $('#{{ name }}').val(url);
             }
         });
