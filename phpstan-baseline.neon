@@ -6126,11 +6126,6 @@ parameters:
 			path: library/External/Schoolpro/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 18$#"
-			count: 1
-			path: library/External/Synergetic/Class.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$assessmentID\\)\\: Unexpected token \"\\$assessmentID\", expected type at offset 211$#"
 			count: 1
 			path: library/External/Synergetic/Markbook.php
