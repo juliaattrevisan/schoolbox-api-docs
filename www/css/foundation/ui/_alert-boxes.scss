@@ -87,6 +87,28 @@ $alert-default-background: darken($body-bg, 10%);
     display: none;
 }
 
+.alert-box-icon {
+    @extend .alert-box;
+    display: inline-block;
+    padding: .25rem .5rem;
+
+    [class^='icon-'],
+    [class*=' icon-'] {
+    &:before {
+            color: $white;
+            padding-right: 0;
+        }
+    }
+    &.highlight {
+        [class^='icon-'],
+        [class*=' icon-'] {
+            &:before {
+                color: $accent-foreground;
+            }
+        }
+    }
+}
+
 // Toast pop-up alert...
 // A less obnoxious pop-up alert
 .toast {
