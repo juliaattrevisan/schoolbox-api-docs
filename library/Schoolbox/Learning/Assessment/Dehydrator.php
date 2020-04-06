@@ -171,8 +171,9 @@ class Dehydrator
         // TODO would be more polite to put in its own helper, but ram it in here for now
         if ($assessment instanceof DueWorkModel) {
             $dehydrated += [
-                'acceptOnline'      => $assessment->getAcceptOnline(),
-                'selfReviewability' => $assessment->getSelfReviewability(),
+                'acceptOnline'           => $assessment->getAcceptOnline(),
+                'selfReviewability'      => $assessment->getSelfReviewability(),
+                'similarityCheckEnabled' => $assessment->getSimilarityCheckEnabled()
             ];
         }
 
