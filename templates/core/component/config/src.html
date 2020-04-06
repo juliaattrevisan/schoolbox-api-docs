@@ -1,69 +1,17 @@
 <script type="text/javascript" src="/component/javascript/availableByCategory.js"></script>
-<script type="text/javascript">
-  $(function () {
-    /* Modal for URL homepage selection
-     */
-
-    // $('#launch-browser-{COMPONENT_HANDLE}').on('click', function(e) {
-    //   e.preventDefault();
-    //   var pageFolderId = parseInt('{ID}');
-
-    //   $('#resource-browser').socialstreamBrowser({
-    //     title: 'Choose a source',
-    //     categoryId: Number('{COMPONENT_CONFIG_SRC_CID}'),
-    //     mimeFilter: false,
-    //     submitCallback: function(url, filename, metadata) {
-    //
-    //       var src = $('#src-{COMPONENT_HANDLE}');
-    //       var lbl = $('#text-{COMPONENT_HANDLE}');
-    //       var nodeId = parseInt(metadata.nodeId);
-    //
-    //       // If user selected current page, then set label to 'Local', otherwise set to selected folder's name
-    //       src.val(nodeId === pageFolderId ? '' : url);
-    //       lbl.attr('href', url).text(nodeId === pageFolderId ? 'Local' : filename);
-
-    //       // Update a select box.
-    //       // How that's done depends on exactly what type it is: textbox or tile
-    //       var select = $('#src-{COMPONENT_HANDLE}').closest('form')
-    //               .find('select[data-uses-source]');
-    //
-    //       if (select.length) {
-    //           var categoryId = src.val().toString().replace('/homepage/', '');
-    //           // No folder found in the source? Just use whatever folder this component is on
-    //           if (categoryId === '') {
-    //               categoryId = nodeId;
-    //           }
-    //           select.each(function() {
-    //               var element = $(this);
-    //               src.availableByCategory({
-    //                   categoryId: categoryId,
-    //                   target: element,
-    //                   payload: {
-    //                       type: element.attr('name')
-    //                   }
-    //               });
-    //           })
-    //       }
-    //     }
-    //   });
-    // });
-
-
-  });
-</script>
-
 <script>
     $(function() {
         $('#modalLinkButton-src-{COMPONENT_HANDLE}').schoolboxLink({
             allowedFilesystems: 'folder',
             onSelect: function(url, name, dialog) {
-                const pageFolderId = parseInt('{ID}');
-                const categoryId = parseInt(url.replace('/homepage/', ''));
+                const currentFolderId = parseInt('{ID}');
+                const folderId = parseInt(url.replace('/homepage/', ''));
                 const label = $('#text-{COMPONENT_HANDLE}');
 
                 // If user selected current page, then set label to 'Local',
                 // otherwise set to selected folder's name
-                if (pageFolderId === categoryId) {
+
+                if (currentFolderId === folderId) {
                     label.text('Local');
                 } else {
                     label.text(name);
@@ -71,7 +19,26 @@
 
                 label.attr('href', url);
 
+                /* Save the actual value
+                 */
                 $('#src-{COMPONENT_HANDLE}').val(url);
+
+                // Update a select box.
+                // How that's done depends on exactly what type it is: textbox or tile
+
+                const select = $('#src-{COMPONENT_HANDLE}').closest('form').find('select[data-uses-source]');
+
+                if (select.length) {
+                    select.each(function() {
+                        $('#src-{COMPONENT_HANDLE}').availableByCategory({
+                            categoryId: folderId,
+                            target: $(this),
+                            payload: {
+                                type: $(this).attr('name')
+                            }
+                        });
+                    })
+                }
             }
         });
     });
