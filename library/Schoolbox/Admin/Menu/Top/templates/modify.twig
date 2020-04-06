@@ -3,18 +3,6 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-role="openResourceBrowser"]').click(function(e) {
-            e.preventDefault();
-            $('[data-role="resourceBrowser"]').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('input[name="url"]').val(url);
-                }
-            });
-        });
-
         $('[data-cancel]').click(function () {
             window.location.href = '{{ routeLookup('adminMenuTop.getIndex') }}';
             return false;
@@ -86,9 +74,18 @@
                             Destination URL
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
                         </label>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    onSelect: function(url, dialog) {
+                                        $('input[name="url"]').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
-                            <input name="url" required type="text" value="{{ item.url }}">
-                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                            <input name="url" required type="text" value="{{ item.url }}" />
+                            <a id="modalLinkButton" class="button icon-link">Browser</a>
                         </div>
                     </div>
                     <div class="small-6 columns">
