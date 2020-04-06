@@ -1,80 +1,114 @@
 <?php
 /**
- * Transactor
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Learning\Assessment;
+
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use UnexpectedValueException;
+
+/**
+ * Class Transactor
  *
  * Saves an assessment, figures out a return url, returns a url to which you may redirect
  *
  * Unfortunately returnUrls depend on the saving of an assessment
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @package Schoolbox\Learning\Assessment
  */
-
-namespace Schoolbox\Learning\Assessment;
-
-use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
-use \Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use \Schoolbox\Mapper\Exception as MapperException;
-
 class Transactor
 {
+
     /**
      * @var IAssessable
      */
     protected $assessment;
+
 
     /**
      * @var FolderMapper
      */
     protected $folderMapper;
 
+
     /**
      * @var UnitImplementationMapper
      */
     private $unitImplementationMapper;
+
 
     /**
      * @var UnitSpecificationMapper
      */
     private $unitSpecificationMapper;
 
+
     /**
      * @var AssessmentMapperProxy
      */
     protected $assessmentMapperProxy;
+
+
+    /**
+     * @var DueWork\Response\File\Plagscan\Mapper
+     */
+    protected $plagscanMapper;
+
+
+    /**
+     * @var SingleFile\Mapper
+     */
+    protected $submissionFileMapper;
+
 
     /**
      * @var Router
      */
     protected $router;
 
+
     /**
      * Transactor constructor.
-     * @param FolderMapper $folderMapper
-     * @param UnitImplementationMapper $unitImplementationMapper
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param $router
+     *
+     * @param FolderMapper                          $folderMapper
+     * @param UnitImplementationMapper              $unitImplementationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param AssessmentMapperProxy                 $assessmentMapperProxy
+     * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
+     * @param SingleFile\Mapper                     $submissionFileMapper
+     * @param Router                                $router
      */
     public function __construct(
         FolderMapper $folderMapper,
         UnitImplementationMapper $unitImplementationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
+        DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
+        SingleFile\Mapper $submissionFileMapper,
         Router $router
     ) {
         $this->setFolderMapper($folderMapper);
         $this->setUnitImplementationMapper($unitImplementationMapper);
         $this->setUnitSpecificationMapper($unitSpecificationMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
+        $this->plagscanMapper = $plagscanMapper;
+        $this->submissionFileMapper = $submissionFileMapper;
         $this->setRouter($router);
     }
 
@@ -83,12 +117,17 @@ class Transactor
      * Figure out a returnUrl when creating/updating assessments
      *
      * @param IAssessable $assessment
+     * @param array       $before
      * @return array
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws RouteNotFound
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function transact(IAssessable $assessment): array
+    public function transact(IAssessable $assessment, array $before = []): array
     {
         $this->setAssessment($assessment);
 
@@ -113,16 +152,25 @@ class Transactor
                 elseif ($assessmentContext instanceof Project) {
                     $returnUrl = $this->transactProjectContext();
                 } else {
-                    throw new \InvalidArgumentException('Please select a valid context');
+                    throw new InvalidArgumentException('Please select a valid context');
                 }
             } catch (MapperException $e) {
-                throw new \InvalidArgumentException($e->getMessage(), 0, $e);
+                throw new InvalidArgumentException($e->getMessage(), 0, $e);
             }
         }
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
             $this->getAssessmentMapperProxy()->save($this->getAssessment());
+
+            /* Due Work has a special thing going on where it can upload to Plagscan
+             *
+             * If Similarity Check was previously disabled, but has now been enabled,
+             * Then attempt to retrofit all the previous submissions
+             */
+            if (($this->assessment instanceof DueWork\Model) && !$before['assessment']['similarityCheckEnabled'] && $assessment->getSimilarityCheckEnabled()) {
+                (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+            }
 
             $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->getAssessment()->getId()]);
         }

@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web;
@@ -37,7 +35,11 @@ use Traversable;
 use UnexpectedValueException;
 use Alaress_Date_Format;
 
-
+/**
+ * Class ListController
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 class ListController extends Web\Controller\Base
 {
 
@@ -385,36 +387,13 @@ class ListController extends Web\Controller\Base
             $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);
 
-            /* If we are updating this assessment, and
-             * If this is a Due Work, and
-             * if Similarity Check was previously disabled, but has now been enabled,
-             * Then attempt to retrofit all the previous submissions
-             */
-            $retrofit = false;
-
-            if ($assessment &&
-                $assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model &&
-                !$assessment->getSimilarityCheckEnabled() &&
-                trim($post['similarityCheckEnabled'] ?? '') === 'on') {
-
-                /* Retrofit plagscan docs
-                 */
-                $retrofit = true;
-            }
-
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
              */
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType']);
             $assessment = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->transactor->transact($assessment);
-
-            /* Attempt to retrofit all the previous submissions
-             */
-            if ($retrofit) {
-                (new Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
-            }
+            $transactionSummary = $this->transactor->transact($assessment, $before);
 
             // assessment is saved; persist plans
 
