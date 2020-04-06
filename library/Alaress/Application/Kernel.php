@@ -563,12 +563,14 @@ abstract class Kernel
                      * @var IConnector              $db
                      * @var External_UserInterface  $externalUser
                      * @var External_ClassInterface $externalClass
+                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
                      */
                     $db              = $di->get('databaseInternal');
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
                     $mapperFactory   = $di->get('mapperFactory');
                     $folderMapper    = $mapperFactory->get(Folder\Mapper::class);
+                    $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
                     return new News\Audience\UserResolver(
                         StrategyFactory::getValidNullEntities(),
                         $db,
@@ -582,7 +584,8 @@ abstract class Kernel
                             $di->get('mapperFactory')->get(UserAccessMapper::class)
                         ),
                         $di->get('mapperFactory')->get(News\Audience\Simple\Mapper::class),
-                        $folderMapper
+                        $folderMapper,
+                        $strategyFactory
                     );
                 }
             )
