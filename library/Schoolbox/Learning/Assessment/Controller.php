@@ -44,13 +44,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * @var Plagscan\Mapper
      */
-    private $plagscanMapper;
+    protected $plagscanMapper;
 
 
     /**
      * @var SingleFile\Mapper
      */
-    private $submissionFileMapper;
+    protected $submissionFileMapper;
 
 
     /**
