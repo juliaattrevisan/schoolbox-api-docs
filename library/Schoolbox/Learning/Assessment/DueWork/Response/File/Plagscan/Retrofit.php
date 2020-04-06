@@ -5,7 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+
+use PDOException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Mapper\Exception;
+use UnexpectedValueException;
 
 /**
  * Class Retrofit
@@ -22,19 +27,27 @@ class Retrofit
 {
 
     /**
-     * @var Plagscan\Mapper
+     * @var Mapper
      */
     private $plagscanMapper;
 
 
     /**
+     * @var SingleFile\Mapper
+     */
+    private $submissionFileMapper;
+
+
+    /**
      * Retrofit constructor.
      *
-     * @param Plagscan\Mapper $plagscanMapper
+     * @param Mapper   $plagscanMapper
+     * @param SingleFile\Mapper $submissionFileMapper
      */
-    public function __construct(Plagscan\Mapper $plagscanMapper)
+    public function __construct(Mapper $plagscanMapper, SingleFile\Mapper $submissionFileMapper)
     {
         $this->plagscanMapper = $plagscanMapper;
+        $this->submissionFileMapper = $submissionFileMapper;
     }
 
 
@@ -43,9 +56,12 @@ class Retrofit
      * have a plagscan_document associated
      *
      * @param int $assessmentId
-     * @return int
+     * @return void
+     * @throws PDOException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function retrofit(int $assessmentId): int
+    public function retrofit(int $assessmentId): void
     {
 
         /* For the given $assessmentId, find all the student_submission records
@@ -57,7 +73,7 @@ class Retrofit
          * need to be given a plagscan_document record
          */
         $query = '
-            SELECT ssf.*
+            SELECT ssf.id
             FROM assessment a
             INNER JOIN submission_box sb ON a.id = sb.assessment_id
             INNER JOIN student_submission ss ON sb.id = ss.box_id
@@ -68,9 +84,29 @@ class Retrofit
             ORDER BY ssf.id
         ';
 
+        $statement = $this->plagscanMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessmentId
+        ]);
+
+        /* There's probably a smarter way than this, but I can't remember it
+         */
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
         /* Create a new plagscan stub for each candidate student_submission_file_id
          * Set its status to QUEUED which primes them for submit.php to execute
          */
+        if (\count($ids)) {
+            $files = $this->submissionFileMapper->findByColumn('id', $ids);
+
+            foreach ($files as $file) {
+                $this->plagscanMapper->saveNewPlagscanStub($file);
+            }
+        }
 
         /* Wait for submit.php crontab to execute which handles the upload etc.
          */
