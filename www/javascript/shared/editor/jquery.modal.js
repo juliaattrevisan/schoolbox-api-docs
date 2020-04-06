@@ -250,6 +250,7 @@
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
                     $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                        console.log(responseText);
                         config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id),dialog);
 
                         /* Shut modal, go back to Dialog
