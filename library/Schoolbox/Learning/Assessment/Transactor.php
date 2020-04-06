@@ -103,13 +103,13 @@ class Transactor
         SingleFile\Mapper $submissionFileMapper,
         Router $router
     ) {
-        $this->setFolderMapper($folderMapper);
-        $this->setUnitImplementationMapper($unitImplementationMapper);
-        $this->setUnitSpecificationMapper($unitSpecificationMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
+        $this->folderMapper = $folderMapper;
+        $this->unitImplementationMapper = $unitImplementationMapper;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->plagscanMapper = $plagscanMapper;
         $this->submissionFileMapper = $submissionFileMapper;
-        $this->setRouter($router);
+        $this->router = $router;
     }
 
 
@@ -129,16 +129,16 @@ class Transactor
      */
     public function transact(IAssessable $assessment, array $before = []): array
     {
-        $this->setAssessment($assessment);
+        $this->assessment = $assessment;
 
         // Verify that the context of the assessment is valid
         // TODO replace returnUrl values once I know what they should actually be
-        $assessmentContext = $this->getAssessment()->getContext();
+        $assessmentContext = $this->assessment->getContext();
 
         /* If you followed a creational link from a particular place,
          * go back to that place
          */
-        if (!$this->getAssessment()->getId()) {
+        if (!$this->assessment->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
                     $returnUrl = $this->transactFolderContext();
@@ -161,7 +161,7 @@ class Transactor
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $this->getAssessmentMapperProxy()->save($this->getAssessment());
+            $this->assessmentMapperProxy->save($this->assessment);
 
             /* Due Work has a special thing going on where it can upload to Plagscan
              *
@@ -172,13 +172,13 @@ class Transactor
                 (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
             }
 
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->getAssessment()->getId()]);
+            $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
          */
         return [
-            'assessment' => $this->getAssessment(),
+            'assessment' => $this->assessment,
             Redirect::RETURN_URL => $returnUrl
         ];
     }
@@ -195,9 +195,9 @@ class Transactor
          * It should be obtained from the routes
          * You only get contextId when you're Creating, not updating
          */
-        $context   = $this->getFolderMapper()->findById($this->getContextId());
+        $context = $this->folderMapper->findById($this->getContextId());
 
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $this->assessmentMapperProxy->save($this->assessment);
 
         $returnUrl = "/homepage/{$context->getId()}";
 
@@ -212,8 +212,8 @@ class Transactor
      */
     private function transactUnitImplementationContext()
     {
-        $context   = $this->getUnitImplementationMapper()->findById($this->getContextId());
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $context = $this->unitImplementationMapper->findById($this->getContextId());
+        $this->assessmentMapperProxy->save($this->assessment);
 
         return "/homepage/{$context->getId()}";
     }
@@ -228,10 +228,10 @@ class Transactor
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context   = $this->getUnitSpecificationMapper()->findById($this->getContextId());
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $context = $this->unitSpecificationMapper->findById($this->getContextId());
+        $this->assessmentMapperProxy->save($this->assessment);
 
-        return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+        return $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
 
     /**
@@ -243,12 +243,12 @@ class Transactor
      */
     private function transactProjectContext()
     {
-        if ($this->getAssessment() instanceof Project) {
+        if ($this->assessment instanceof Project) {
             throw new \DomainException('You cannot create nested projects.');
         }
 
         // TODO figure out what to do about this
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $this->assessmentMapperProxy->save($this->assessment);
 
         return "/homepage/{$this->assessment->getContext()->getId()}";
     }
@@ -259,104 +259,8 @@ class Transactor
     /**
      * @return int
      */
-    protected function getContextId()
+    protected function getContextId(): int
     {
-        return $this->getAssessment()->getContext()->getId();
-    }
-
-    /**
-     * @return IAssessable
-     */
-    protected function getAssessment()
-    {
-        return $this->assessment;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     */
-    protected function setAssessment($assessment)
-    {
-        $this->assessment = $assessment;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param FolderMapper $folderMapper
-     */
-    protected function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * @return UnitImplementationMapper
-     */
-    protected function getUnitImplementationMapper()
-    {
-        return $this->unitImplementationMapper;
-    }
-
-    /**
-     * @param UnitImplementationMapper $unitImplementationMapper
-     */
-    protected function setUnitImplementationMapper($unitImplementationMapper)
-    {
-        $this->unitImplementationMapper = $unitImplementationMapper;
-    }
-
-    /**
-     * @return UnitSpecificationMapper
-     */
-    protected function getUnitSpecificationMapper()
-    {
-        return $this->unitSpecificationMapper;
-    }
-
-    /**
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     */
-    protected function setUnitSpecificationMapper($unitSpecificationMapper)
-    {
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
-    }
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     */
-    protected function setAssessmentMapperProxy($assessmentMapperProxy)
-    {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-    }
-
-    /**
-     * @return Router
-     */
-    protected function getRouter()
-    {
-        return $this->router;
-    }
-
-    /**
-     * @param Router $router
-     */
-    protected function setRouter($router)
-    {
-        $this->router = $router;
+        return $this->assessment->getContext()->getId();
     }
 }
