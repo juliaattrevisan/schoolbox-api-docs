@@ -48,6 +48,25 @@ interface ISimpleStrategy extends IStrategy
 
 
     /**
+     * Returns a data structure suitable for finding users in audiences of this type
+     *
+     * There are two elements of the return value:
+     * * a SQL fragment defining a JOIN to the provided user table alias
+     * * predicates to filter results of the userTable and this join. The caller will combine these using INTERSECTION.
+     *
+     * Note that we don't convert the WHERE to a JOIN, because in some cases we don't want any joins at all.
+     *
+     * @param string          $userTableAlias The user table's alias that any JOINs must reference
+     * @param string          $paramPrefix    Used to ensure PB params are unique result can be combined with others
+     * @param string[]|null[] $entityValues
+     * @return UserResolutionSql
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql;
+
+
+    /**
      * Translate this ITranslate instance from an entity_type to a human-readable version
      *
      * This sql fragment is used as part of a larger UNIONed query with other instances.
