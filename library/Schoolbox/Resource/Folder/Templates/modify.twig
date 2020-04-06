@@ -194,12 +194,8 @@
             Only superusers can recurse permission changes, and its only relevant on modification
         #}
         {% if user.isSuperuser and action == 'Modify' %}
-        $("#recursive-permissions, #inherit").change(function() {
-            if ($("#recursive-permissions").prop("checked") && $("#inherit").prop("checked")) {
-                $("[data-alert-permissions]").removeClass("hide");
-            } else {
-                $("[data-alert-permissions]").addClass("hide");
-            }
+        $("#recursive-permissions").change(function() {
+            $("[data-alert-recursive-permissions]").toggleClass("hide", !this.checked);
         });
         {% endif %}
 
@@ -333,8 +329,8 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <div data-alert-permissions="" class="alert-box warning hide">
-                                Warning! This will remove all role permissions, group memberships, and class codes from all subfolders.
+                            <div data-alert-recursive-permissions class="alert-box warning hide icon-alert">
+                                This will remove all role permissions, group memberships, and class codes from all subfolders.
                             </div>
                         </div>
                     {% endif %}
