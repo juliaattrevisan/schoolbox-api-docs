@@ -32,23 +32,6 @@
                 element.spectrum('set', null);
             }
         });
-
-        // Yes, this is a global variable, it's needed for the
-        // social stream browser to work
-        socialstreamSession = {categoryId: 0};
-        var socialstream_browser = form.find('[data-resource-browser]');
-        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            form.find('a[data-function="browse"]')
-                .click(
-                    function(event) {
-                        event.preventDefault();
-                        socialstream_browser.socialstreamBrowser({
-                            submitCallback: function(url) {
-                                form.find('input[name="link"]').val(url);
-                            }
-                        });
-                    });
-        }
     })
 })(jQuery);
 </script>
@@ -243,11 +226,18 @@
                             URL
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional link to this tile, linking it to either an external page or existing resource.">?</span>
                         </label>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    onSelect: function(url, dialog) {
+                                        $('#link').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
                             <input name="link" id="link" type="text" value="{{ item.link|e('html_attr') }}" placeholder="https://" />
-                            <a href="#" class="button icon-folder" data-function="browse">Browse Resources</a>
-                            {# Dialog for resource browser #}
-                            <div class="hide" data-resource-browser></div>
+                            <a id="modalLinkButton" class="button icon-link">Browser</a>
                         </div>
                     </div>
                     <div class="small-12 columns">
