@@ -64,6 +64,7 @@ class External_Tass_Helper
 
 
     /**
+     * Address number block ids (add_num) to filter paraddress table with
      * @return string
      */
     public function getAddNum()
