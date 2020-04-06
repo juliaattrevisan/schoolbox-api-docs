@@ -11,7 +11,7 @@ VALUES (
     (SELECT id FROM `lu_config_type` WHERE `type` = '3rd Party Services'),
     'true',
     'false',
-    'true',
+    'false',
     'settings'
 );
 
