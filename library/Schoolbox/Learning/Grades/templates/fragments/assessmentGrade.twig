@@ -35,14 +35,9 @@
             } only %}
             <span class="pipe meta">{{ assessment.typeName }}</span>
             <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-            {% if assessment is quiz and participant.allResponses | length %}
+            {% if assessment is quiz and summaryRoute and participant.allResponses | length %}
             <span class="pipe meta">
-                <a href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {
-                    assessmentId: assessment.id,
-                    assessment:   assessment,
-                    userId:       student.id,
-                    user:         student
-                }) }}" title="View Attempts">View Attempts</a>
+                <a href="{{ summaryRoute }}" title="View Attempts">View Attempts</a>
             </span>
             {% endif %}
         </p>
