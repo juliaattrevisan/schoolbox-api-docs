@@ -630,7 +630,7 @@ class Mapper extends BaseMapper
         ";
 
         $idStatement = $this->getDatabase()->prepare($idQuery);
-        $idStatement->execute(array_merge($params, $builder->getParams()));
+        $idStatement->execute($params);
         $idList = array_merge(array_column($idStatement->fetchAll(), 'id'), $includeIds);
 
         if (0 === \count($idList)) {
