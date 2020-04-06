@@ -10,30 +10,25 @@
 namespace SocialStream\Post\Thumbnail;
 
 
-class Direct extends Thumbnail {
+class Direct extends Thumbnail
+{
 
-	/**
-	 * Find itemprop='image'
-	 *
-	 * @return mixed
-	 */
-	public function fetchThumbnail() {
-
-		/* If it has at least the right extension, download it directly
-		 */
-        if(($filename = pathinfo(parse_url($this->getUrl(),PHP_URL_PATH),PATHINFO_BASENAME)) && preg_match('#^http#', $this->getUrl()) ) {
-            try {
-                $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
-                if($file->isImage()) {
-                    return $this->getUrl();
-                }
-            } catch (\Exception $e) { }
+    /**
+     * Find itemprop='image'
+     *
+     * @return mixed
+     */
+    public function fetchThumbnail()
+    {
+        if (self::isImage($this->getUrl()) && preg_match('#^http#', $this->getUrl())) {
+            return $this->getUrl();
         }
 
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-	}
+        /* Otherwise get the next class to deal with it
+         */
+        if ($this->getNext()) {
+            return $this->getNext()->fetchThumbnail();
+        }
+        return '';
+    }
 }
