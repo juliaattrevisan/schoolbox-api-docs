@@ -87,7 +87,7 @@ class ListController extends Web\Controller\Base
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
-        $this->setTransactor($transactor);
+        $this->transactor = $transactor;
         $this->participantDataSource = $participantDataSource;
     }
 
@@ -391,7 +391,7 @@ class ListController extends Web\Controller\Base
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType']);
             $assessment = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->getTransactor()->transact($assessment);
+            $transactionSummary = $this->transactor->transact($assessment);
 
             // assessment is saved; persist plans
 
@@ -721,25 +721,4 @@ class ListController extends Web\Controller\Base
         $this->access = $access;
         return $this;
     }
-
-
-    /**
-     * @return Transactor
-     */
-    protected function getTransactor()
-    {
-        return $this->transactor;
-    }
-
-
-    /**
-     * @param Transactor $transactor
-     * @return static
-     */
-    protected function setTransactor($transactor)
-    {
-        $this->transactor = $transactor;
-        return $this;
-    }
-
 }
