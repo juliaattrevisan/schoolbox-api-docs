@@ -225,7 +225,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         // Request re-submission, even when mark is not visible.
         $requestResubmission = $returnedWork->getResubmissionRequired();
         if (!$assessment
-            || $this->conf->get('restrict_parent_duework_access')
+            || $this->conf->get('restrict_parent_duework_access')  // hide due work
+            || $this->conf->get('restrict_student_submissions')    // hide due work detail
             || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT) || $requestResubmission)) {
             return $envelope;
         }
