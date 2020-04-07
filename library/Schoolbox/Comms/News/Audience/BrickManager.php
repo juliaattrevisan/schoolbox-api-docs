@@ -43,12 +43,10 @@ class BrickManager
      * @return GenericCollection|Brick[]
      * @throws Database\Exception
      * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
      */
     public function generateBricks(int $articleId): GenericCollection
     {
-        /** @var GenericCollection|Brick[] $bricks */
-        $bricks = new GenericCollection(Brick::class);
+        $bricks = Brick::createCollection();
 
         $this->addSimpleSegments($bricks, $articleId);
         $this->addComplexSegments($bricks, $articleId);
