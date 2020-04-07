@@ -8,14 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\CommandLineTool;
 
-use Alaress\Redis;
 use Calendar_Api_Config_Connector_Vcal;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
-use DateTime;
-use DateTimeZone;
-use Sabre\VObject\Component\VCalendar;
-use Sabre\VObject\Reader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Calendar\Cache\Vcal as VcalCache;
 
@@ -40,7 +35,7 @@ class PreparseVcal extends CliTool\App
         // Find every active vCal config
         /** @var iterable&Calendar_Api_Config_Record[] $configs */
         $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-        $this->getLogger()->info(sprintf('Found %d calendar configurations', count($configs)));
+        $this->getLogger()->debug(sprintf('Found %d calendar configurations', count($configs)));
 
         // Fetch it from file cache, then parse and store in Redis
         foreach ($configs as $config) {
