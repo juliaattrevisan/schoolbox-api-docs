@@ -64,7 +64,7 @@ class Retrofit
     public function retrofit(int $assessmentId): void
     {
 
-        /* For the given $assessmentId, find all the student_submission records
+        /* For the given $assessmentId, find the most recent student_submission records
          * and from there, find all the student_submission_file_id values
          *
          * Once you have those, reduce the set to ones which don't already have a plagscan_document
