@@ -1,20 +1,6 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
     $(function() {
-
-        /* Modal for URL homepage selection
-         */
-        $('#urlForm').on('click', '[data-browse-resources]', function() {
-            $('#resource-browser').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('#url').val(url);
-                }
-            });
-        });
-
         $('[data-delete]').click(function(event) {
             event.preventDefault();
 
@@ -71,10 +57,18 @@
                             URL
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The internet address for the website, eg. http://www.google.com. Relative URLs are allowed, and will resolve relative to this domain">?</span>
                         </label>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    onSelect: function(url, name, dialog) {
+                                        $('#url').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
                             <input type="text" name="url" id="url" size="40" maxlength="2048" value="{URL}" required />
-                            <a href="#" class="button icon-folder" data-browse-resources>Browse {TPL_LOCAL_RESOURCE_PLURAL_PC}</a>
-                            <div id="resource-browser" class="hide"></div>
+                            <a id="modalLinkButton" class="button icon-link">Browser</a>
                         </div>
                     </div>
                     <div class="small-12 columns">
