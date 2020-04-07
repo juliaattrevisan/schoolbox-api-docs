@@ -106,7 +106,14 @@ class RoleType extends SimpleStrategy
             case Audience\Model::RELATIONSHIP_SELF:
                 return $user->getRole() ? in_array($user->getRole()->getType(), $entityValues, true) : null;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
                 return null;
         }
         return null;

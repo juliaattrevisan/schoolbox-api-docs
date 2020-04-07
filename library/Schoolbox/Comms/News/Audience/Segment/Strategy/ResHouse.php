@@ -116,7 +116,14 @@ class ResHouse extends SimpleStrategy
                 }
                 return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
                 return null;
         }
         return null;

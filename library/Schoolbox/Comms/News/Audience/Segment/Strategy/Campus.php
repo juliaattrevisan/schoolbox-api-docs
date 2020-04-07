@@ -170,7 +170,14 @@ class Campus extends SimpleStrategy
                 $values = $this->getValues(User::createCollection()->add($user));
                 return count(array_intersect($values, $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
                 return null;
         }
         return null;

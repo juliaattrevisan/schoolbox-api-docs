@@ -517,7 +517,14 @@ class Folder extends SimpleStrategy
                 // Cannot conclude false, because groups are not provided
                 return count(array_intersect($values, $entityValues)) ? true : null;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
                 return null;
         }
         return null;
