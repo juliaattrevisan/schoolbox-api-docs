@@ -146,4 +146,23 @@ class SchoolHouse extends SimpleStrategy
 
         return new UserResolutionSql('', $pb);
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                if($user->getSchoolHouse() === null){
+                    return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+                }
+                return in_array($user->getSchoolHouse()->getId(), $entityValues, false);
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
+    }
 }

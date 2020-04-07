@@ -13,10 +13,12 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use PDO;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
+use Schoolbox\External\Subject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+use function array_intersect;
 use function count;
 use function implode;
 use function in_array;
@@ -151,5 +153,20 @@ class PastoralGroup extends SimpleStrategy
         $pb = $this->newPb($paramPrefix)->any($pb);
 
         return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
     }
 }

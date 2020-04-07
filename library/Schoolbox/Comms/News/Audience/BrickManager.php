@@ -11,7 +11,9 @@ use Alaress\Database;
 use InvalidArgumentException;
 use PDO;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use UnexpectedValueException;
+use function array_values;
 
 /**
  * Responsible for generating a set of Bricks for an article
@@ -50,6 +52,46 @@ class BrickManager
 
         $this->addSimpleSegments($bricks, $articleId);
         $this->addComplexSegments($bricks, $articleId);
+
+        return $bricks;
+    }
+
+
+    /**
+     * Generate a set of Bricks from an article's audience
+     *
+     * @param GenericCollection|Model[] $audience
+     * @return GenericCollection|Brick[]
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     * @throws InsufficientHydrationException
+     */
+    public function generateBricksFromAudience(GenericCollection $audience): GenericCollection
+    {
+        /** @var GenericCollection|Brick[] $bricks */
+        $bricks = new GenericCollection(Brick::class);
+
+        foreach($audience as $segment){
+            if($segment->isSimple()){
+                $newBrick = new Brick(
+                    [new Dimension($segment->getEntityType(), $segment->getEntityValue())],
+                    $segment->getRelationship()
+                );
+                $this->addNewBrick($bricks, $newBrick);
+                continue;
+            }
+            /** @var Model $child1 */
+            /** @var Model $child2 */
+            [$child1, $child2] = array_values($segment->getChildren()->getAll());
+            $newBrick = new Brick(
+                [
+                    new Dimension($child1->getEntityType(), $child1->getEntityValue()),
+                    new Dimension($child2->getEntityType(), $child2->getEntityValue()),
+                ],
+                $segment->getRelationship()
+            );
+            $this->addNewBrick($bricks, $newBrick);
+        }
 
         return $bricks;
     }

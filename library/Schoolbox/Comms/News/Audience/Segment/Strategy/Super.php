@@ -7,18 +7,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use UnderflowException;
 use function count;
 use function in_array;
 
 class Super extends SimpleStrategy
 {
-    public const ENTITY_VALUE = '1';
+    public const ENTITY_VALUE        = '1';  // is SU
+    public const ENTITY_VALUE_NOT_SU = '0';  // is not SU
+
     public static function getEntityType(): string
     {
         return 'super';
@@ -29,7 +30,7 @@ class Super extends SimpleStrategy
      */
     public static function isValidNullEntityValue(): bool
     {
-        // Only valid entityValue is TRUE (TODO update comment to reference where this is defined)
+        // Only valid entityValues are 0 or 1
         return false;
     }
 
@@ -107,5 +108,23 @@ class Super extends SimpleStrategy
         $pb = $this->newPb($paramPrefix)->all($pb);
 
         return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                return
+                    ($user->isSuperuser() && in_array(self::ENTITY_VALUE, $entityValues, true)) ||
+                    (!$user->isSuperuser() && in_array(self::ENTITY_VALUE_NOT_SU, $entityValues, true));
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
     }
 }

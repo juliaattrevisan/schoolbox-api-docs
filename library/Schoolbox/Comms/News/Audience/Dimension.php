@@ -29,7 +29,11 @@ use function sprintf;
  */
 class Dimension
 {
-    /** @var string */
+    /**
+     * A simple strategy entity type
+     *
+     * @var string
+     */
     private $type;
 
     /**

@@ -116,4 +116,19 @@ interface ISimpleStrategy extends IStrategy
      * @return string[]|null[]
      */
     public function getValues(GenericCollection $users): array;
+
+
+    /**
+     * Returns whether we can conclude that a user is a match against a set of entity values
+     * by examining supplied parameters only. Must not hit the DB. This method exists
+     * as a performance short-circuit that is called prior to hitting the DB as a method of last resort.
+     *
+     * Returns:
+     * * TRUE  - if user does match values
+     * * FALSE - if user does not match values
+     * * NULL  - if we cannot tell whether they values and relationship match from supplied parameters
+     *
+     * @return bool|null
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool;
 }

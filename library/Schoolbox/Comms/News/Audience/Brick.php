@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use InvalidArgumentException;
 use function array_diff;
 use function array_map;
 use function array_merge;
@@ -38,9 +39,13 @@ class Brick
     /**
      * @param array  $dimensions
      * @param string $relationship
+     * @throws InvalidArgumentException If no dimensions are supplied
      */
     public function __construct(array $dimensions, string $relationship)
     {
+        if (!count($dimensions)) {
+            throw new InvalidArgumentException("A brick must have 1 or more dimensions");
+        }
         $this->dimensions    = $dimensions;
         $this->relationships = [$relationship];
     }

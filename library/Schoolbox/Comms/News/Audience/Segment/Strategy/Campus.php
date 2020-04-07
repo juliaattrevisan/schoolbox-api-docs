@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function array_intersect;
 use function array_unique;
 use function implode;
 use function in_array;
@@ -153,5 +154,25 @@ class Campus extends SimpleStrategy
         $pb = $this->newPb($paramPrefix)->any($pb);
 
         return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                if($user->getCampusCollection() === null){
+                    return null;
+                }
+                $values = $this->getValues(User::createCollection()->add($user));
+                return count(array_intersect($values, $entityValues)) > 0;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
     }
 }

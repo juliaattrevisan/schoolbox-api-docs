@@ -390,8 +390,72 @@ class UserResolver implements IUserResolver
      */
     public function isUserInAudience(User $user, News\Model $article): bool
     {
-        // TODO This is not performant. We already have a hydrated user and article.
-        // TODO We should first examine the user and article to see if we can short-circuit a result, before hitting the DB.
-        return in_array($user->getId(), $this->findUsersForArticle($article), false);
+        $bricks = (new BrickManager($this->db))->generateBricksFromAudience($article->getAudience());
+
+        // If (user matches any brick) then they match audience.
+        // Elseif (any brick is unknown) then unknown if user matches audience, and fall back to slower DB query
+        // Else user does not match audience
+        $hasUnknown = false;
+        foreach ($bricks as $brick) {
+            foreach ($brick->getRelationships() as $relationship) {
+                $isMatch = $this->doesUserMatchDimensions($user, $brick->getDimensions(), $relationship);
+                if ($isMatch === true) {
+                    return true;
+                }
+                if ($isMatch === null) {
+                    $hasUnknown = true;
+                }
+            }
+        }
+
+        // If there are unknowns, we need to fall back to full DB search, otherwise conclude false
+        return $hasUnknown ? in_array($user->getId(), $this->findUsersForArticle($article), false) : false;
+    }
+
+
+    /**
+     * Returns whether a user matches a set of dimensions and specified relationship
+     *
+     * * If a user does not match any dimension, then they do not match the intersection of those dimensions.
+     * * If any dimension is unknown, we cannot conclude they will match
+     * * If all dimensions match, then user matches the set
+     *
+     * @param User        $user
+     * @param Dimension[] $dimensions
+     * @param string      $relationship
+     * @return bool|null
+     * @throws News\Exceptions\UnknownEntityTypeException
+     */
+    private function doesUserMatchDimensions(User $user, array $dimensions, string $relationship): ?bool
+    {
+        $hasUnknown = false;
+        foreach ($dimensions as $dimension) {
+            $matchesDimension = $this->doesUserMatchDimension($user, $dimension, $relationship);
+            if ($matchesDimension === false) {
+                return false;
+            }
+            if ($matchesDimension === null) {
+                $hasUnknown = true;
+            }
+        }
+        return $hasUnknown ? null : true;
+    }
+
+
+    /**
+     * Returns whether a user is in a Dimension's audience.
+     *
+     * Returns NULL if unknown.
+     *
+     * @param User      $user
+     * @param Dimension $dimension
+     * @param string    $relationship
+     * @return bool|null
+     * @throws News\Exceptions\UnknownEntityTypeException
+     */
+    private function doesUserMatchDimension(User $user, Dimension $dimension, string $relationship): ?bool
+    {
+        $strategy = $this->strategyFactory->makeSimpleStrategy($dimension->getType());
+        return $strategy->isUserInAudienceValues($user, $dimension->getValues(), $relationship);;
     }
 }

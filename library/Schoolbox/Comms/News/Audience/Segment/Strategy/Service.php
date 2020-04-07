@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
@@ -115,5 +116,20 @@ class Service extends SimpleStrategy
         $join     = "$joinType JOIN userAccess $uaAlias ON $userTableAlias.id = $uaAlias.uid";
 
         return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
     }
 }

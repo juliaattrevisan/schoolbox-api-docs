@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use PDO;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
+use Schoolbox\External\Subject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -30,6 +31,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
 use UnderflowException;
 use UnexpectedValueException;
+use function array_intersect;
 use function array_map;
 use function array_merge;
 use function array_unique;
@@ -652,5 +654,28 @@ class Folder extends SimpleStrategy
             $this->externalClass = new External_Class();
         }
         return $this->externalClass;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                if($user->getSubjectCollection() === null){
+                    return null;
+                }
+                $values = $user->getSubjectCollection()->map(static function(Subject $subject){
+                    return $subject->getId();
+                })->getAll();
+                // Cannot conclude false, because groups are not provided
+                return count(array_intersect($values, $entityValues)) ? true : null;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
     }
 }
