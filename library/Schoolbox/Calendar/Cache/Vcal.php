@@ -123,13 +123,13 @@ class Vcal
             $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
         }
 
-        // Expand to the start/end of the last/next year
+        // Expand 1 year in both directions
         $timezone = new DateTimeZone('UTC');
         /** @noinspection PhpUnhandledExceptionInspection */
         return Reader::read($source, Reader::OPTION_FORGIVING)
                      ->expand(
-                         new DateTimeImmutable('Jan 1 -1 year', $timezone),
-                         new DateTimeImmutable('Dec 31 +1 year', $timezone)
+                         new DateTimeImmutable('-1 year', $timezone),
+                         new DateTimeImmutable('+1 year', $timezone)
                      );
     }
 
