@@ -73,7 +73,7 @@ class Retrofit
          * need to be given a plagscan_document record
          */
         $query = '
-            SELECT ssf.id
+            SELECT ssf.*
             FROM assessment a
             INNER JOIN submission_box sb ON a.id = sb.assessment_id
             INNER JOIN student_submission ss ON sb.id = ss.box_id
@@ -89,23 +89,10 @@ class Retrofit
             'assessmentId' => $assessmentId
         ]);
 
-        /* There's probably a smarter way than this, but I can't remember it
-         */
-        $ids = [];
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $ids[] = $row['id'];
-        }
+            $file = $this->submissionFileMapper->hydrate($row);
 
-        /* Create a new plagscan stub for each candidate student_submission_file_id
-         * Set its status to QUEUED which primes them for submit.php to execute
-         */
-        if (\count($ids)) {
-            $files = $this->submissionFileMapper->findByColumn('id', $ids);
-
-            foreach ($files as $file) {
-                $this->plagscanMapper->saveNewPlagscanStub($file);
-            }
+            $this->plagscanMapper->saveNewPlagscanStub($file);
         }
 
         /* Wait for submit.php crontab to execute which handles the upload etc.
