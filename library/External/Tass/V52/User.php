@@ -29,14 +29,9 @@ class External_Tass_V52_User extends External_Tass_User
             WHERE
                   (pa.e_mail IS NOT NULL OR pa.e_mail2 IS NOT NULL) AND
                   s.stud_code IN ({$idList}) AND
-                  pa.cmpy_code = :companyCode AND
-                  pa.add_num IN (:addNum)
+                  pa.cmpy_code = {$this->companyCode} AND
+                  pa.add_num IN ({$addNum})
         ";
-
-        $params = [
-            'companyCode' => $this->companyCode,
-            'addNum'      => $addNum,
-        ];
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
@@ -47,36 +42,32 @@ class External_Tass_V52_User extends External_Tass_User
 
             $typeWhere = '';
             if (!empty($typeCode)) {
-                $typeWhere          = "AND scr.commtype_code IN (:typeCode) ";
-                $params['typeCode'] = $typeCode;
+                $typeWhere = "AND scr.commtype_code IN ({$typeCode}) ";
             }
 
-            $query                  .= "
+            $query .= "
                 UNION " .
                 "SELECT DISTINCT pa.par_code, pa.e_mail, pa.e_mail2, pa.add_num
                 FROM paraddress pa
                 INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
                     AND pa.cmpy_code = scr.cmpy_code
-                    AND scr.cmpy_code = :companyCode2
+                    AND scr.cmpy_code = {$this->companyCode}
                     AND pa.add_num = scr.add_num
                     {$typeWhere}
                 INNER JOIN student s ON scr.stud_code=s.stud_code AND scr.cmpy_code=s.cmpy_code
                 WHERE
                     pa.e_mail IS NOT NULL AND
                     s.stud_code IN ({$idList}) AND
-                    pa.cmpy_code = {:companyCode3} AND
-                    pa.add_num IN (:addNum2)
+                    pa.cmpy_code = {$this->companyCode} AND
+                    pa.add_num IN ({$addNum})
             ";
-            $params['companyCode2'] = $this->companyCode;
-            $params['companyCode3'] = $this->companyCode;
-            $params['addNum2']      = $addNum;
         }
 
         $statement = $this->database->query($query);
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             $currentEmailList = array_filter(array_map('trim', explode(';', $row['e_mail'])));
-            if (!empty(trim($row['e_mail2']))) {
+            if ($row['e_mail2'] && !empty(trim($row['e_mail2']))) {
                 $currentEmailList[] = trim($row['e_mail2']);
             }
             $i = 0;
