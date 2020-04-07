@@ -15,7 +15,6 @@ use InvalidArgumentException;
 use PDO;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
-use Schoolbox\External\Subject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -136,14 +135,13 @@ class Folder extends SimpleStrategy
      */
     public function getSearchSql(User $user): string
     {
-        $query = '
+        return '
             SELECT cid
             FROM perms
             WHERE gid = ' . $user->getRole()->getId() . '
             AND type > ' . UserAccess::ACCESS_DENY;
-
-        return $query;
     }
+
 
     /**
      * @inheritdoc
@@ -283,6 +281,7 @@ class Folder extends SimpleStrategy
         // Note we don't care about teacher/parent modifier. The user must still have READ perm to the page
         return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
     }
+
 
     /**
      * @@inheritdoc
@@ -503,6 +502,29 @@ class Folder extends SimpleStrategy
 
 
     /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch ($relationship) {
+            case Audience\Model::RELATIONSHIP_SELF:
+                if ($user->getSubjectCollection() === null) {
+                    return null;
+                }
+                $values = $user->getSubjectCollection()->map(static function (array $subject) {
+                    return $subject['id'];
+                })->getAll();
+                // Cannot conclude false, because groups are not provided
+                return count(array_intersect($values, $entityValues)) ? true : null;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                return null;
+        }
+        return null;
+    }
+
+
+    /**
      * Get folder members, optionally excluding users who have muted those folders
      *
      * @param string[] $nnianFolderIds
@@ -550,14 +572,15 @@ class Folder extends SimpleStrategy
         }
 
         $groupWhere = implode(' AND ', $groupPb->getWhere());
-        $sql        = "
+        $queries    = [];
+        $queries[]  = "
             SELECT ua.uid id
             FROM user u
             {$groupJoin} JOIN userAccess ua ON u.id = ua.uid
             WHERE ({$groupWhere})
             AND u.deleted_at IS NULL
         ";
-        $params     = [$groupPb->getParams()];
+        $allParams  = [$groupPb->getParams()];
 
         // Associated with the class, regardless of role type.
         // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
@@ -568,46 +591,99 @@ class Folder extends SimpleStrategy
                 if (count($mutedUsersPerFolder)) {
                     // We have mutes, therefore need to fetch student lists individually
                     foreach ($folderCodesPerFolderId as $folderId => $folderCodes) {
-                        $externalIds = $this->getFolderMembers($folderCodes);
-                        if (!count($externalIds)) {
-                            continue;
-                        }
-                        $classPb = (new Builder($quoter, ''))->setParamPrefix("_$folderId")->in('u.synergy_id', $externalIds);
-                        if (count($mutedUsersPerFolder[$folderId] ?? [])) {
-                            $classPb->notIn('u.id', $mutedUsersPerFolder[$folderId]);
-                        }
-                        $whereClause = implode(' AND ', $classPb->getWhere());
-                        $sql         .= " UNION SELECT u.id FROM user u WHERE {$whereClause} AND u.deleted_at IS NULL ";
-                        $params[]    = $classPb->getParams();
+                        $mutedUsers = $mutedUsersPerFolder[$folderId] ?? [];
+                        [$query, $params] = $this->getClassMembersSubQuery("_$folderId", $folderCodes, $mutedUsers);
+                        $queries[]   = $query;
+                        $allParams[] = $params;
                     }
                 } else {
                     // No mutes, we can aggregate codes
-                    $externalIds = $this->getFolderMembers(array_merge(...$folderCodesPerFolderId));
-                    if (count($externalIds)) {
-                        $classPb  = (new Builder($quoter, ''))->in('u.synergy_id', $externalIds);
-                        $sql      .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]} AND u.deleted_at IS NULL";
-                        $params[] = $classPb->getParams();
-                    }
+                    [$query, $params] = $this->getClassMembersSubQuery("", array_merge(...$folderCodesPerFolderId));
+                    $queries[]   = $query;
+                    $allParams[] = $params;
                 }
             }
         }
 
-        return $this->folderMapper->getDatabase()->query($sql, array_merge(...$params))->fetchAll(PDO::FETCH_COLUMN);
+        $sql = implode("\nUNION\n", $queries);
+        return $this->folderMapper->getDatabase()->query($sql, array_merge(...$allParams))->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
     /**
-     * Returns user external ids for a set of folder codes
+     * Build a SQL fragment and params that will fetch folder members from specified folder codes,
+     * optionally excluding specific users ids
+     *
+     * @param string   $paramPrefix
+     * @param string[] $folderCodes
+     * @param string[] $excludedUsers
+     * @return array
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function getClassMembersSubQuery(string $paramPrefix, array $folderCodes, array $excludedUsers = []): array
+    {
+        $studentExternalIds = $this->getStudentExternalIds($folderCodes);
+        $teacherExternalIds = $this->getTeacherExternalIds($folderCodes);
+        if (!count($studentExternalIds) && !count($teacherExternalIds)) {
+            return ['SELECT id FROM user WHERE false', []];
+        }
+        $quoter  = new Quoter();
+        $classPb = (new Builder($quoter, ''))->setParamPrefix($paramPrefix);
+        if (count($studentExternalIds)) {
+            $classPb->all(
+                (new Builder($quoter, ''))
+                    ->setParamPrefix($paramPrefix)
+                    ->in("u.synergy_id", $studentExternalIds)
+                    ->equals("g.group_type", \Schoolbox\Role::STUDENT)
+            );
+        }
+        if (count($teacherExternalIds)) {
+            $classPb->all(
+                (new Builder($quoter, ''))
+                    ->setParamPrefix($paramPrefix)
+                    ->in("u.synergy_id", $teacherExternalIds)
+                    ->equals("g.group_type", \Schoolbox\Role::STAFF)
+            );
+        }
+        if (count($excludedUsers)) {
+            $classPb->notIn('u.id', $excludedUsers);
+        }
+        $classPb->isNull("u.deleted_at");
+
+        $whereClause = implode(' AND ', $classPb->getWhere());
+        return [
+            "SELECT u.id FROM user u JOIN `groups` g ON g.id = u.group_id WHERE {$whereClause}",
+            $classPb->getParams(),
+        ];
+    }
+
+
+    /**
+     * Returns student external ids for a set of folder codes
      *
      * @param string[] $folderCodes
      * @return string[]
      */
-    private function getFolderMembers(array $folderCodes): array
+    private function getStudentExternalIds(array $folderCodes): array
     {
         $externalIds = [];
         foreach ($this->getExternalClass()->getStudents(implode(',', $folderCodes)) as $student) {
             $externalIds[] = $student['synergy_id'];
         }
+        return $externalIds;
+    }
+
+
+    /**
+     * Returns teacher external ids for a set of folder codes
+     *
+     * @param string[] $folderCodes
+     * @return string[]
+     */
+    private function getTeacherExternalIds(array $folderCodes): array
+    {
+        $externalIds = [];
         foreach ($this->getExternalClass()->getTeachers(implode(',', $folderCodes)) as $teacherExternalId) {
             $externalIds[] = $teacherExternalId;
         }
@@ -657,25 +733,4 @@ class Folder extends SimpleStrategy
     }
 
 
-    /**
-     * @inheritDoc
-     */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-    {
-        switch($relationship){
-            case Audience\Model::RELATIONSHIP_SELF:
-                if($user->getSubjectCollection() === null){
-                    return null;
-                }
-                $values = $user->getSubjectCollection()->map(static function(Subject $subject){
-                    return $subject->getId();
-                })->getAll();
-                // Cannot conclude false, because groups are not provided
-                return count(array_intersect($values, $entityValues)) ? true : null;
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                return null;
-        }
-        return null;
-    }
 }
