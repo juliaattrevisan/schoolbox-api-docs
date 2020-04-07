@@ -10,7 +10,7 @@
 $homepageId = $_POST['homepageId'];
 $name = $_POST['name'];
 
-$spawn = new \Etherpad\Spawnpoint($this);
+$spawn = new \Etherpad\Spawnpoint();
 $newPad = $spawn->spawn($name, $homepageId);
 
 /* Go to edit screen for now
