@@ -59,11 +59,15 @@ interface ISimpleStrategy extends IStrategy
      * @param string          $userTableAlias The user table's alias that any JOINs must reference
      * @param string          $paramPrefix    Used to ensure PB params are unique result can be combined with others
      * @param string[]|null[] $entityValues
+     * @param bool            $excludeMuted   Whether to exclude users who have muted the entity value
      * @return UserResolutionSql
-     * @throws InvalidColumnException
-     * @throws UnderflowException
      */
-    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql;
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql;
 
 
     /**

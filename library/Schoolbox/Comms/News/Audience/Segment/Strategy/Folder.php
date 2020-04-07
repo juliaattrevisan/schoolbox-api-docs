@@ -11,6 +11,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use External_Class;
 use External_ClassInterface;
+use InvalidArgumentException;
 use PDO;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
@@ -18,6 +19,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Message\RoutePermission;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\User;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Mapper;
@@ -25,10 +29,14 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
 use UnderflowException;
+use UnexpectedValueException;
+use function array_map;
 use function array_merge;
+use function array_unique;
 use function count;
 use function implode;
 use function in_array;
+use function sprintf;
 
 class Folder extends SimpleStrategy
 {
@@ -374,20 +382,41 @@ class Folder extends SimpleStrategy
     }
 
 
-    /** @inheritDoc */
-    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
-    {
+    /**
+     * @inheritDoc
+     * @param string $userTableAlias
+     * @param string $paramPrefix
+     * @param array  $entityValues
+     * @param bool   $excludeMuted
+     * @return UserResolutionSql
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
         $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
         $filtered   = $this->filterOutNullValues($entityValues);
         if (!$targetNull && !count($filtered)) {
             return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
         }
 
+        // Always fetch members from NNIAN folders
+        $filtered = $this->findNnianFolderIds($filtered);
+
         // For performance reasons, it is faster to UNION the GROUP + CLASS members, rather than LEFT JOIN them.
         // This is incompatible with the interface's return type. Therefore we will just resolve the user ids,
         // and return a predicate to match these directly. In any event, the overhead of fetching the class members
         // from the sis is much higher than this double tap.
-        $userIds = $this->getUserIdsForFolders($filtered, $targetNull);
+        $userIds = $this->getUserIdsForFolders($filtered, $targetNull, $excludeMuted);
         if (!count($userIds)) {
             return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
         }
@@ -397,16 +426,73 @@ class Folder extends SimpleStrategy
 
 
     /**
+     * In all cases, when a segment targets a folder, we fetch members from the folder's NNIAN.
+     * This is because:
+     * * a class/group never inherits permissions
+     * * if segment was targeted to class/group, but class/group has since become a subFolder of class/group, we do
+     *   want to fetch members of the new NNIAN folder
+     *
+     * @param string[] $folderIds
+     * @return string[]
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     */
+    private function findNnianFolderIds(array $folderIds): array
+    {
+        $nnian          = NNIAN::getInstance($this->folderMapper);
+        $nnianFolderIds = [];
+        foreach ($folderIds as $folderId) {
+            $folder = (new FolderModel())->setId((int)$folderId);
+            try{
+                $nnianFolder = $nnian->findNearestNonInheritingAncestralNode($folder);
+            } /** @noinspection BadExceptionsProcessingInspection */
+            catch (Mapper\Exception\Deleted $e){
+                // Ignore deleted folders
+                continue;
+            }
+
+            $nnianFolderIds[] = (string)$nnianFolder->getId();
+        }
+        return array_unique($nnianFolderIds);
+    }
+
+
+    /**
+     * Get folder members, optionally excluding users who have muted those folders
+     *
      * @param string[] $filtered
      * @param bool     $targetNull
+     * @param bool     $excludeMuted
      * @return int[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getUserIdsForFolders(array $filtered, bool $targetNull): array
+    private function getUserIdsForFolders(array $filtered, bool $targetNull, bool $excludeMuted): array
     {
+        $quoter = new Quoter();
+
+        /** @var string[][] $mutedUsersPerFolder */
+        $mutedUsersPerFolder = [];
+        if ($excludeMuted) {
+            $pb          = (new Builder($quoter, 'msg_reroute_override'))
+                ->in('msg_route_key', array_map(static function (string $folderId) {
+                    return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
+                }, $filtered))
+                ->equals('delivery', RoutePermission::MUTE);
+            $whereClause = implode(' AND ', $pb->getWhere());
+            $query       = $this->folderMapper->getDatabase()->query(
+                "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) folder_id, user_id FROM msg_reroute_override WHERE {$whereClause}",
+                $pb->getParams()
+            );
+            while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
+                $mutedUsersPerFolder[$folderId][] = $userId;
+            }
+        }
+
         // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
-        $quoter    = new Quoter();
         $groupJoin = $targetNull ? 'LEFT' : '';
         $groupPb   = (new Builder($quoter, ''));
         if (count($filtered)) {
@@ -429,6 +515,14 @@ class Folder extends SimpleStrategy
             // just null
             $groupPb->isNull('ua.uid');
         }
+        foreach ($mutedUsersPerFolder as $folderId => $userIds) {
+            foreach ($userIds as $userId) {
+                $groupPb->notAll((new Builder($quoter, ''))
+                    ->equals('ua.uid', $userId)
+                    ->equals('ua.sid', $folderId));
+            }
+        }
+
         $groupWhere = implode(' AND ', $groupPb->getWhere());
         $sql        = "
             SELECT ua.uid id
@@ -437,54 +531,89 @@ class Folder extends SimpleStrategy
             WHERE ({$groupWhere})
             AND u.deleted_at IS NULL
         ";
-        $params     = $groupPb->getParams();
+        $params     = [$groupPb->getParams()];
 
         // Associated with the class, regardless of role type.
         // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
         if (count($filtered)) {
-            $codes = $this->getFolderCodes($filtered);
+            $folderCodesPerFolderId = $this->getFolderCodes($filtered);
 
-            if (count($codes)) {
-                $externalIds = [];
-                foreach ($this->getExternalClass()->getStudents(implode(',', $codes)) as $student) {
-                    $externalIds[] = $student['synergy_id'];
-                }
-                foreach ($this->getExternalClass()->getTeachers(implode(',', $codes)) as $teacherExternalId) {
-                    $externalIds[] = $teacherExternalId;
-                }
-                if (count($externalIds)) {
-                    $classPb = (new Builder($quoter, ''))
-                        ->in('u.synergy_id', $externalIds);
-                    $sql     .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]} AND u.deleted_at IS NULL";
-                    $params  = array_merge($params, $classPb->getParams());
+            if (count($folderCodesPerFolderId)) {
+                if (count($mutedUsersPerFolder)) {
+                    // We have mutes, therefore need to fetch student lists individually
+                    foreach ($folderCodesPerFolderId as $folderId => $folderCodes) {
+                        $externalIds = $this->getFolderMembers($folderCodes);
+                        if (!count($externalIds)) {
+                            continue;
+                        }
+                        $classPb = (new Builder($quoter, ''))->setParamPrefix("_$folderId")->in('u.synergy_id', $externalIds);
+                        if (count($mutedUsersPerFolder[$folderId] ?? [])) {
+                            $classPb->notIn('u.id', $mutedUsersPerFolder[$folderId]);
+                        }
+                        $whereClause = implode(' AND ', $classPb->getWhere());
+                        $sql         .= " UNION SELECT u.id FROM user u WHERE {$whereClause} AND u.deleted_at IS NULL ";
+                        $params[]    = $classPb->getParams();
+                    }
+                } else {
+                    // No mutes, we can aggregate codes
+                    $externalIds = $this->getFolderMembers(array_merge(...$folderCodesPerFolderId));
+                    if (count($externalIds)) {
+                        $classPb  = (new Builder($quoter, ''))->in('u.synergy_id', $externalIds);
+                        $sql      .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]} AND u.deleted_at IS NULL";
+                        $params[] = $classPb->getParams();
+                    }
                 }
             }
         }
 
-        return $this->folderMapper->getDatabase()->query($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
+        return $this->folderMapper->getDatabase()->query($sql, array_merge(...$params))->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
     /**
-     * Returns all folder codes for the specified folders
+     * Returns user external ids for a set of folder codes
+     *
+     * @param string[] $folderCodes
+     * @return string[]
+     */
+    private function getFolderMembers(array $folderCodes): array
+    {
+        $externalIds = [];
+        foreach ($this->getExternalClass()->getStudents(implode(',', $folderCodes)) as $student) {
+            $externalIds[] = $student['synergy_id'];
+        }
+        foreach ($this->getExternalClass()->getTeachers(implode(',', $folderCodes)) as $teacherExternalId) {
+            $externalIds[] = $teacherExternalId;
+        }
+        return $externalIds;
+    }
+
+
+    /**
+     * Returns all folder codes for the specified folders, grouped by folder.id
      *
      * @param string[] $folderIds
-     * @return string[]
+     * @return string[][]
      */
     private function getFolderCodes(array $folderIds): array
     {
         if (!count($folderIds)) {
             return [];
         }
+        $folderCodesPerFolderId = [];
 
         $bindings = Builder::getBindings($folderIds, 'fid');
-        return $this->folderMapper->getDatabase()->query("
-            SELECT code
+        $query    = $this->folderMapper->getDatabase()->query("
+            SELECT f.id folder_id, code
             FROM folder_code fc
             JOIN folder f ON fc.folder_id = f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL
             WHERE f.id IN ({$bindings->getPlaceholder()})",
             $bindings->getParams()
-        )->fetchAll(PDO::FETCH_COLUMN);
+        );
+        while ([$folderId, $folderCode] = $query->fetch(PDO::FETCH_NUM)) {
+            $folderCodesPerFolderId[$folderId][] = $folderCode;
+        }
+        return $folderCodesPerFolderId;
     }
 
 

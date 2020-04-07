@@ -123,8 +123,12 @@ class SchoolHouse extends SimpleStrategy
 
 
     /** @inheritDoc */
-    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
-    {
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
         $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
         $filtered   = $this->filterOutNullValues($entityValues);
         if (!$targetNull && !count($filtered)) {

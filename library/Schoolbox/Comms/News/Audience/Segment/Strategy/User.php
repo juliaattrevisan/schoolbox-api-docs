@@ -124,8 +124,12 @@ class User extends SimpleStrategy
 
 
     /** @inheritDoc */
-    public function getUserResolveSql(string $userTableAlias, string $paramPrefix, array $entityValues): UserResolutionSql
-    {
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
         // no need for join or to filter out null values (all users have IDs)
         $join = '';
         $pb   = $this->newPb($paramPrefix)->in("{$userTableAlias}.id", $entityValues);
