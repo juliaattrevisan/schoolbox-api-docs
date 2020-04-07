@@ -47,6 +47,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('completed',self::TYPE_INTEGER);
         $this->uses('publish_date',self::TYPE_DATETIME,null,'publishDateTime');
         $this->joins('owner', UserMapper::class,'id',self::TYPE_MODEL, null, 'owner','owner');
+        $this->uses(
+            'variant',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'variant',
+            [Event::VARIANT_EVENT, Event::VARIANT_TASK,]
+        );
 
         $this->hasJoin('owner', array(
             'mapper'    => UserMapper::class,
@@ -65,13 +72,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('series_id',self::TYPE_INTEGER,null,'seriesId');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('type', EventTypeMapper::class, 'eventTypeID', null, null, 'type', 'eventType');
-        $this->uses(
-            'variant',
-            self::TYPE_STRING,
-            self::COLUMN_ENUM,
-            'variant',
-            [Event::VARIANT_EVENT, Event::VARIANT_TASK,]
-        );
         $this->uses('title',self::TYPE_STRING);
         $this->uses('detail',self::TYPE_STRING);
         $this->uses('location',self::TYPE_STRING);
