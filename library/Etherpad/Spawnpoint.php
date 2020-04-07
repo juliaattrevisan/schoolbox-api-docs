@@ -24,24 +24,25 @@ class Spawnpoint
     /**
      * @var string
      */
-	private $etherpadHost;
+    private $etherpadHost;
 
     /**
      * Constructor
      */
-	public function __construct() {
-		$this->authenticator = new Authenticator();
-		$this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001';
-	}
+    public function __construct()
+    {
+        $this->authenticator = new Authenticator();
+        $this->etherpadHost  = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001';
+    }
 
     /**
      * Spawn a new pad
      * Save a stub record in our local db too
      *
      * @param string $name
-     * @param int $homepageId
+     * @param int    $homepageId
      * @return \Etherpad\Pad
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function spawn($name, $homepageId)
     {
@@ -62,9 +63,9 @@ class Spawnpoint
              */
             $padName = md5(INSTANCE_ID . '_' . $name);
 
-			/* Create a new group pad
-			 */
-			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
+            /* Create a new group pad
+             */
+            $client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
@@ -73,7 +74,7 @@ class Spawnpoint
              */
             $groupResult = $client->createGroup();
 
-            if ($groupResult->getMessage() == 'ok') {
+            if ($groupResult->getMessage() === 'ok') {
                 $data    = $groupResult->getData();
                 $groupId = $data['groupID'];
 
@@ -81,7 +82,7 @@ class Spawnpoint
                  */
                 $createResult = $client->createGroupPad($groupId, $padName);
 
-                if ($createResult->getMessage() == 'ok') {
+                if ($createResult->getMessage() === 'ok') {
 
                     /* Get pad id to set to private and to pass it as a redirect element.
                      * Note that padId's come in the form g.abcdefg$padName
@@ -96,7 +97,7 @@ class Spawnpoint
 
                     /* Spawn a record in our own db
                      */
-                    $newPad = new \Etherpad\Pad();
+                    $newPad = new Pad();
                     $newPad->setName($name);
                     $newPad->setBody('');
                     $newPad->setPadId($padId);
@@ -105,15 +106,15 @@ class Spawnpoint
                     $newPad->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
                     $newPad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
-                    $padMapper = new \Etherpad\PadMapper();
+                    $padMapper = new PadMapper();
                     $padMapper->save($newPad);
 
                     return $newPad;
                 } else {
-                    throw new \Exception('Something strange happened when creating a new pad');
+                    throw new \RuntimeException('Something strange happened when creating a new pad');
                 }
             } else {
-                throw new \Exception('Something strange happened when creating a group id');
+                throw new \RuntimeException('Something strange happened when creating a group id');
             }
         } else {
             error(19);
@@ -150,9 +151,9 @@ class Spawnpoint
              */
             $padName = md5(INSTANCE_ID . '_' . $pad->getName());
 
-			/* Create a new group pad
-			 */
-			$client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
+            /* Create a new group pad
+             */
+            $client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
@@ -161,7 +162,7 @@ class Spawnpoint
              */
             $groupResult = $client->createGroup();
 
-            if ($groupResult->getMessage() == 'ok') {
+            if ($groupResult->getMessage() === 'ok') {
                 $data    = $groupResult->getData();
                 $groupId = $data['groupID'];
 
