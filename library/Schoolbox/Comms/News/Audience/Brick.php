@@ -167,6 +167,24 @@ class Brick
 
 
     /**
+     * @return Dimension[]
+     */
+    public function getDimensions(): array
+    {
+        return $this->dimensions;
+    }
+
+
+    /**
+     * @return string[]
+     */
+    public function getRelationships(): array
+    {
+        return $this->relationships;
+    }
+
+
+    /**
      * Returns a string representation of this brick, eg "[folder:1,2 ∩ role:3]^(self,parents_of)"
      *
      * @return string
