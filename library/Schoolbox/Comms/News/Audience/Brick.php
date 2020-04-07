@@ -15,13 +15,16 @@ use function count;
 use function implode;
 
 /**
- * A brick roughly equates to the javascript bricks displayed on the News create/update page.
+ * A brick is logically composed of:
+ * * a set of dimensions, and
+ * * a set of relationship modifiers
  *
- * This is a simpler version than that algorithm, as that algorithm provides more flexibility than we have
- * ended up providing to users.
+ * This class roughly corresponds to the javascript bricks displayed on the News create/update page.
  *
- * * We also don't implement any ordering preference when absorbing bricks/segments into bricks.
- * * There is no concept of relationship modifier, it is always implicitly 'self'
+ * This is a simpler version than that algorithm, as the JS algorithm provides more flexibility than we have
+ * ended up providing to users. Specifically having modifiers at both the brick and segment levels.
+ *
+ * A major function of Bricks is that they can be combined with other Bricks using degrees-of-freedom (DOF) analysis.
  */
 class Brick
 {
