@@ -36,7 +36,7 @@
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ config.site_version }}"></script>
 
-
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
 
@@ -156,16 +156,16 @@
                 });
             });
 
-        {% endif %}
-
-        {% if folder.id %}
-            $('[data-template]').change(function(event) {
-                if ($('[data-template]').val() != 0) {
-                    $('[data-template-warning]').removeClass('hide');
-                } else {
-                    $('[data-template-warning]').addClass('hide');
-                }
-            });
+            // Template input: show a warning if changing would delete content.
+            // * it never will if it currently has No Homepage
+            // * otherwise, if it's not "keep existing" it will
+            var templateInput = $('[data-template]'),
+                templateValue = Number(templateInput.val());
+            if (templateValue !== -1) {
+                templateInput.change(function() {
+                    $("[data-template-warning]").toggleClass("hide", Number(this.value) === templateValue);
+                });
+            }
         {% endif %}
 
         // If the folder is inheriting permissions need to remove the required attribute from group fields
@@ -189,18 +189,21 @@
 
         }, 'Class codes may not exceed 20 characters.');
 
-        {#
-            Warn user that permission recursion will delete role/group/class permissions if inherit is ON
-            Only superusers can recurse permission changes, and its only relevant on modification
-        #}
-        {% if user.isSuperuser and action == 'Modify' %}
-        $("#recursive-permissions, #inherit").change(function() {
-            if ($("#recursive-permissions").prop("checked") && $("#inherit").prop("checked")) {
-                $("[data-alert-permissions]").removeClass("hide");
-            } else {
-                $("[data-alert-permissions]").addClass("hide");
-            }
-        });
+        {% if folder.id %}
+            {# Warn user that changing inherit permissions will destroy this group #}
+            {% if not folder.getInherit  %}
+                $("#inherit").change(function() {
+                    $("[data-alert-permissions]").toggleClass("hide", !this.checked);
+                });
+            {% endif %}
+
+            {#
+                Warn user that permission recursion will delete role/group/class permissions if inherit is ON
+                Only superusers can recurse permission changes, and its only relevant on modification
+            #}
+            $("#recursive-permissions").change(function() {
+                $("[data-alert-recursive-permissions]").toggleClass("hide", !this.checked);
+            });
         {% endif %}
 
         {# YearLevel selectize. Populated syncronously with all YearLevels known #}
@@ -218,6 +221,7 @@
 
     });
 </script>
+{% endautoescape %}
 
 {# Breadcrumbs #}
 
@@ -277,8 +281,8 @@
 
                             </select>
                         </label>
-                        <div class="alert-box warning hide" data-template-warning>
-                            Warning! Changing the folders template will remove all existing components and content.
+                        <div class="alert-box warning hide icon-alert" data-template-warning>
+                            Changing the folders template will remove all existing components and content.
                         </div>
                     </div>
                     <div class="small-12 medium-6 columns">
@@ -323,6 +327,12 @@
                             <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {% if folder.getInherit %}checked{% endif %}{{ disabled }}/>
                             <label for="inherit" class="checkbox-label">Inherit permissions from '<a href="/homepage/{{ parent.getId }}">{{ parent.getName }}</a>' folder</label>
                         </div>
+
+                        <div class="small-12 columns">
+                            <div data-alert-permissions class="alert-box warning hide icon-alert">
+                                This will remove all role permissions, group memberships, and class codes from this folder.
+                            </div>
+                        </div>
                     {% endif %}
 
                     {# Only superusers can recurse permission changes, and its only relevant on modification #}
@@ -333,8 +343,8 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <div data-alert-permissions="" class="alert-box warning hide">
-                                Warning! This will remove all role permissions, group memberships, and class codes from all subfolders.
+                            <div data-alert-recursive-permissions class="alert-box warning hide icon-alert">
+                                This will remove all role permissions, group memberships, and class codes from all subfolders.
                             </div>
                         </div>
                     {% endif %}
