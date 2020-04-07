@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use function array_diff;
 use function array_map;
 use function array_merge;
@@ -26,9 +28,13 @@ use function implode;
  * ended up providing to users. Specifically having modifiers at both the brick and segment levels.
  *
  * A major function of Bricks is that they can be combined with other Bricks using degrees-of-freedom (DOF) analysis.
+ *
+ * @method static GenericCollection|Brick[] createCollection()
  */
 class Brick
 {
+    use CreateCollection;
+
     /** @var Dimension[] */
     private $dimensions;
 
