@@ -9,7 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use Alaress\Database\Predicate;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
+use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\Simple;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
@@ -17,9 +23,16 @@ use PDO;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\User;
+use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use function array_merge;
+use function array_unique;
+use function implode;
+use function in_array;
+use function sprintf;
 use function trigger_error;
+use const E_USER_ERROR;
 
 /**
  * Responsible for:
@@ -43,62 +56,171 @@ class UserResolver implements IUserResolver
     /** @var RelationshipFilterer */
     private $relationshipFilterer;
 
-    /** @var Mapper */
-    private $audienceMapper;
+    /** @var Simple\Mapper */
+    private $simpleSegmentMapper;
 
     /** @var FolderMapper */
     private $folderMapper;
+
+    /** @var Segment\StrategyFactory */
+    private $strategyFactory;
 
     /**
      * @param bool[]                        $validNullEntities
      * @param Database\Connector\IConnector $db
      * @param External_ClassInterface       $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
-     * @param Mapper                        $audienceMapper
-     * @param FolderMapper $folderMapper
+     * @param Simple\Mapper                 $simpleSegmentMapper
+     * @param FolderMapper                  $folderMapper
+     * @param Segment\StrategyFactory       $strategyFactory
      */
     public function __construct(
         array $validNullEntities,
         Database\Connector\IConnector $db,
         External_ClassInterface $externalClass,
         RelationshipFilterer $relationshipFilterer,
-        Mapper $audienceMapper,
-        FolderMapper $folderMapper
+        Simple\Mapper $simpleSegmentMapper,
+        FolderMapper $folderMapper,
+        Segment\StrategyFactory       $strategyFactory
     ) {
         $this->validNullEntities    = $validNullEntities;
         $this->db                   = $db;
         $this->externalClass        = $externalClass;
         $this->relationshipFilterer = $relationshipFilterer;
-        $this->audienceMapper       = $audienceMapper;
+        $this->simpleSegmentMapper  = $simpleSegmentMapper;
         $this->folderMapper         = $folderMapper;
+        $this->strategyFactory      = $strategyFactory;
     }
 
 
     /**
      * Returns the ids of users who are in the article's audience
      *
-     * @param \Schoolbox\Comms\News\Model $article
-     * @param bool $excludeMuted set this true to exclude users who has muted folders
-     * @param bool $includeAuthor set this true to add author to users (this is for notification)
+     * @param News\Model $article
+     * @param bool       $excludeMuted set this true to exclude users who has muted folders
      * @return int[]
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws Database\Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws LogicException
+     * @throws UnderflowException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
-     * @throws \UnderflowException
-     * @TODO This is too poorly implemented and needs to be optimised. See SA-7431
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false, bool $includeAuthor = false): array
+    public function findUsersForArticle(News\Model $article, bool $excludeMuted = false): array
     {
-        $userIds = [];
-        $rootSegments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
+        $bricks = (new BrickManager($this->db))->generateBricks($article->getId());
 
-        $authorId = $includeAuthor ? $article->getAuthor()->getId() : null;
-
-        foreach ($rootSegments as $rootAudienceSegment) {
-            // Root level segments are always a UNION
-            /** @noinspection SlowArrayOperationsInLoopInspection */
-            $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment, $excludeMuted, $authorId));
+        if(!$bricks->count()){
+            return [];
         }
-        return array_map('intval', \array_unique($userIds));
+
+        $subQueries   = [];
+        $allParams    = [];
+        $uniquePrefix = 0;
+        foreach ($bricks as $brick) {
+            foreach ($brick->getRelationships() as $relationship) {
+                [$sql, $params] = $this->buildDimensionsQuery(++$uniquePrefix, $relationship, $brick->getDimensions(), $excludeMuted);
+                $subQueries[] = $sql;
+                $allParams[]  = $params;
+            }
+        }
+
+        $sql = implode("\nUNION\n", $subQueries);
+
+        $users = [
+            Model::RELATIONSHIP_SELF        => [],
+            Model::RELATIONSHIP_PARENTS_OF  => [],
+            Model::RELATIONSHIP_TEACHERS_OF => [],
+        ];
+
+        $query = $this->db->executeQuery($sql, count($allParams) ? array_merge(...$allParams) : []);
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $users[$row['relationship']][] = (int)$row['id'];
+        }
+        return array_unique(array_merge(
+            $users[Model::RELATIONSHIP_SELF],
+            $this->applyRelationshipFilter($users[Model::RELATIONSHIP_PARENTS_OF], Model::RELATIONSHIP_PARENTS_OF),
+            $this->applyRelationshipFilter($users[Model::RELATIONSHIP_TEACHERS_OF], Model::RELATIONSHIP_TEACHERS_OF)
+        ));
+    }
+
+
+    /**
+     * Returns a SQL query + params where the query returns a single column named 'id', representing a user id.
+     *
+     * @param int         $subQueryId
+     * @param string      $relationship
+     * @param Dimension[] $dimensions
+     * @param bool        $excludeMuted
+     * @return array
+     * @throws InvalidColumnException
+     * @throws News\Exceptions\UnknownEntityTypeException
+     */
+    private function buildDimensionsQuery(int $subQueryId, string $relationship, array $dimensions, bool $excludeMuted): array
+    {
+        $userTableAlias = "user_{$subQueryId}";
+
+        $joins  = [];
+        $pb     = (new Predicate\Builder(new Quoter(), ''))->isNull("{$userTableAlias}.deleted_at");
+
+        // Special case if:
+        // * excluding muted audiences,
+        // * dimensions contain folder segments, and
+        // * dimensions not targeted to self.
+        // We must apply the relationship modifier before removing muted users
+        if($excludeMuted && $relationship !== Model::RELATIONSHIP_SELF){
+            $hasFolderAudience = false;
+            foreach($dimensions as $dimension){
+                if($dimension->getType() === News\Audience\Segment\Strategy\Folder::getEntityType()){
+                    $hasFolderAudience = true;
+                    break;
+                }
+            }
+            if($hasFolderAudience){
+                return $this->buildMutedDimensionsQuery($subQueryId, $relationship, $dimensions);
+            }
+        }
+
+        foreach($dimensions as $idx => $dimension){
+            $strategy = $this->strategyFactory->makeSimpleStrategy($dimension->getType());
+            $data     = $strategy->getUserResolutionSql($userTableAlias, "_{$subQueryId}_{$idx}", $dimension->getValues(), $excludeMuted);
+            $joins[]  = $data->getJoin();
+            $pb->all($data->getPb());
+        }
+
+        $joinClause = implode("\n", array_merge($joins));
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $sql = "
+            SELECT {$userTableAlias}.id, '{$relationship}' relationship
+            FROM user {$userTableAlias}
+            {$joinClause}
+            WHERE {$whereClause}
+        ";
+        return [$sql, $pb->getParams()];
+    }
+
+
+    /**
+     * Returns a SQL query + params where the query returns a single column named 'id', representing a user id.
+     *
+     * This is a special case where we need to resolve a relationship modifier, before stripping muted users
+     *
+     * @param int    $subQueryId
+     * @param string $relationship A non-self modifier
+     * @param array  $dimensions
+     * @return array
+     */
+    private function buildMutedDimensionsQuery(int $subQueryId, string $relationship, array $dimensions): array
+    {
+        // TODO, not yet implemented.
+        return ['SELECT u.id FROM user u WHERE FALSE', []];
+
+//        foreach($dimensions as $idx => $dimension){
+//            $strategy = $this->strategyFactory->makeSimpleStrategy($dimension->getType());
+//            $data     = $strategy->getUserResolutionSql($userTableAlias, "_{$subQueryId}_{$idx}", $dimension->getValues(), false);
+//            $joins[]  = $data->getJoin();
+//            $pb->all($data->getPb());
+//        }
     }
 
 
@@ -107,13 +229,12 @@ class UserResolver implements IUserResolver
      *
      * @param Model $audienceSegment
      * @param bool $excludeMuted
-     * @param int|null $authorId
      * @return int[]
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
-    private function findUsersForAudienceSegment(Model $audienceSegment, bool $excludeMuted = false, ?int $authorId = null): array
+    private function findUsersForAudienceSegment(Model $audienceSegment, bool $excludeMuted = false): array
     {
         $entityType = $audienceSegment->getEntityType();
 
@@ -127,14 +248,13 @@ class UserResolver implements IUserResolver
                         $entityValue = (string)NNIAN::getInstance($this->folderMapper)->findNearestNonInheritingAncestralNode($folder)->getId();
                     }
                 } catch (Exception $e) {
+                    trigger_error(E_USER_ERROR, $e->getMessage() . $e->getTraceAsString());
                     return [];
                 }
             }
             $userIds = $this->getUserIds($audienceSegment->getEntityType(), $entityValue);
             $userIds = $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
-            if ($authorId) {
-                $userIds[] = $authorId;
-            }
+
             // Exclude the users who has muted the current folder.
             if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
                 $parameters = [
@@ -153,17 +273,18 @@ class UserResolver implements IUserResolver
         }
 
         // Recursive composite case:
-        $pb = $this->audienceMapper->getPredicateBuilder()
-                                   ->equals(Mapper::FIELD_PARENT_ID, $audienceSegment->getId());
+        $pb = $this->simpleSegmentMapper->getPredicateBuilder()
+                                        ->equals(Mapper::FIELD_PARENT_ID, $audienceSegment->getId());
 
         $aggregateUsers = [];
         $firstRow       = true;
-        foreach ($this->audienceMapper->findByPredicates($pb) as $childSegment) {
+        foreach ($this->simpleSegmentMapper->findByPredicates($pb) as $childSegment) {
+            $userIds = $this->findUsersForAudienceSegment($childSegment, $excludeMuted);
             if ($firstRow) {
-                $aggregateUsers = $this->findUsersForAudienceSegment($childSegment, $excludeMuted, $authorId);
+                $aggregateUsers = $userIds;
                 $firstRow       = false;
             } else {
-                $aggregateUsers = \array_intersect($aggregateUsers, $this->findUsersForAudienceSegment($childSegment, $excludeMuted, $authorId));
+                $aggregateUsers = \array_intersect($aggregateUsers, $userIds);
             }
         }
 
@@ -177,8 +298,8 @@ class UserResolver implements IUserResolver
      * @param array  $userIds
      * @param string $relationship ['self', 'parents_of', 'teachers_of']
      * @return int[]
-     * @throws \UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws InvalidColumnException
      * @throws UnexpectedValueException If an unrecognised relationship modifier is encountered
      */
     private function applyRelationshipFilter(array $userIds, string $relationship): array
@@ -207,121 +328,26 @@ class UserResolver implements IUserResolver
      * @param string      $entityType
      * @param null|string $entityValue
      * @return int[]
-     * @throws UnexpectedValueException If an unrecognised entity type is passed
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
      */
     private function getUserIds(string $entityType, ?string $entityValue): array
     {
-        if (null === $entityValue) {
-            // Is null not a valid segment entity value?
-            if (!$this->validNullEntities[$entityType]) {
-                // Silently return empty set
-                return [];
-            }
-            $predicate  = 'IS NULL';
-            $parameters = null;
-        } else {
-            $predicate  = '= :entity_value';
-            $parameters = ['entity_value' => $entityValue];
-        }
-
-        // TODO This logic is tightly coupled to ArticleResolver::addClauses(). Snap each out into class behind interface (Segment\IStrategy) so coupled
-        // TODO  pairs have their implementations inside a single class in adjacent methods.
-
-        switch ($entityType) {
-            case Segment\Strategy\User::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.id {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Super::getEntityType():
-                return $this->db->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL', $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Campus::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userCampus uc ON u.id = uc.uid WHERE uc.campus {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Role::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\RoleType::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN groups g ON u.group_id = g.id WHERE g.group_type {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\SchoolHouse::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.house {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\ResHouse::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.residential_house_id {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Year::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.year {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Service::getEntityType():
-                if (null === $entityValue) {
-                    return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN userAccess ua ON u.id = ua.uid WHERE ua.uid {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                    ->fetchAll(PDO::FETCH_COLUMN);
-                }
-                [$service, $sid, $type] = \explode('.', $entityValue);
-                $whereClauses = [];
-                $parameters   = [];
-                if ('*' !== $service) {
-                    $whereClauses[]        = 'ua.service = :service';
-                    $parameters['service'] = $service;
-                }
-                if ('*' !== $sid) {
-                    $whereClauses[]    = 'ua.sid = :sid';
-                    $parameters['sid'] = $sid;
-                }
-                if ('*' !== $type) {
-                    $whereClauses[]     = 'ua.type = :type';
-                    $parameters['type'] = $type;
-                }
-                $whereClause = \count($whereClauses) ? \implode(' AND ', $whereClauses) : 'TRUE';
-                return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua ON u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\PastoralGroup::getEntityType():
-                return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)
-                                ->fetchAll(PDO::FETCH_COLUMN);
-            case Segment\Strategy\Folder::getEntityType():
-                // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
-                $groupPb = (new Database\Predicate\Builder($this->db, 'user'))
-                    ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
-                    ->equals('ua.sid', $entityValue)
-                    ->notEquals('ua.type', UserAccess::ACCESS_DENY);
-                $params      = $groupPb->getParams();
-                $whereClause = implode(' AND ', $groupPb->getWhere());
-                $sql         = "SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL";
-
-                // Associated with the class, regardless of role type.
-                // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
-                $codes = $this->db->executeQuery(
-                    "SELECT code FROM folder_code fc JOIN folder f ON fc.folder_id=f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL WHERE f.id= :folder_id",
-                    ['folder_id' => $entityValue])->fetchAll(PDO::FETCH_COLUMN);
-                if (\count($codes)) {
-                    $externalIds = [];
-                    foreach ($this->externalClass->getStudents(implode(',', $codes)) as $student) {
-                        $externalIds[] = $student['synergy_id'];
-                    }
-                    foreach ($this->externalClass->getTeachers(implode(',', $codes)) as $teacherExternalId) {
-                        $externalIds[] = $teacherExternalId;
-                    }
-                    if (\count($externalIds)) {
-                        $classPb = (new Database\Predicate\Builder($this->db, 'user'))
-                            ->in('u.synergy_id', $externalIds);
-                        $sql .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]}  AND u.deleted_at IS NULL";
-                        $params = \array_merge($params, $classPb->getParams());
-                    }
-                }
-                return $this->db->executeQuery($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
-            default:
-                throw new UnexpectedValueException("Entity type not recognised: {$entityType}");
-        }
+       return [];
     }
 
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @throws Database\Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws LogicException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
     public function isUserInAudience(User $user, News\Model $article): bool
     {
-        // TODO: Implement isUserInAudience() method.
-        trigger_error("not yet implemented");
-        return false;
+        // TODO This is not performant. We already have a hydrated user and article.
+        // TODO We should first examine the user and article to see if we can short-circuit a result, before hitting the DB.
+        return in_array($user->getId(), $this->findUsersForArticle($article), false);
     }
 }
