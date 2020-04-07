@@ -10051,11 +10051,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$router\\)\\: Unexpected token \"\\$router\", expected type at offset 277$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Transactor.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForToday\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php

@@ -107,8 +107,9 @@ class DehydratorTest extends TestCase
 
         // I'm only interested in the specific fields for this assessment type.
         $expected = [
-            'acceptOnline'      => $dueWork->getAcceptOnline(),
-            'selfReviewability' => $dueWork->getSelfReviewability(),
+            'acceptOnline'           => $dueWork->getAcceptOnline(),
+            'selfReviewability'      => $dueWork->getSelfReviewability(),
+            'similarityCheckEnabled' => $dueWork->getSimilarityCheckEnabled(),
         ];
         $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
@@ -465,18 +466,19 @@ class DehydratorTest extends TestCase
                 ],
             ],
             'assessment' => [
-                'id'                => $dueWork->getId(),
-                'type'              => $dueWork->getFamilyName(),
-                'title'             => $dueWork->getTitle(),
-                'weight'            => $dueWork->getWeight(),
-                'markVisibility'    => $dueWork->getMarkVisibility(),
-                'workType'          => null,
-                'acceptOnline'      => $dueWork->getAcceptOnline(),
-                'selfReviewability' => $dueWork->getSelfReviewability(),
-                'publishDate'       => $dueWork->getPublishAt()->getDatabase(),
-                'openDate'          => $dueWork->getOpenAt()->getDatabase(),
-                'dueDate'           => $dueWork->getDueAt()->getDatabase(),
-                'closeDate'         => $dueWork->getCloseAt()->getDatabase(),
+                'id'                     => $dueWork->getId(),
+                'type'                   => $dueWork->getFamilyName(),
+                'title'                  => $dueWork->getTitle(),
+                'weight'                 => $dueWork->getWeight(),
+                'markVisibility'         => $dueWork->getMarkVisibility(),
+                'workType'               => null,
+                'acceptOnline'           => $dueWork->getAcceptOnline(),
+                'selfReviewability'      => $dueWork->getSelfReviewability(),
+                'similarityCheckEnabled' => $dueWork->getSimilarityCheckEnabled(),
+                'publishDate'            => $dueWork->getPublishAt()->getDatabase(),
+                'openDate'               => $dueWork->getOpenAt()->getDatabase(),
+                'dueDate'                => $dueWork->getDueAt()->getDatabase(),
+                'closeDate'              => $dueWork->getCloseAt()->getDatabase(),
             ],
         ];
 
@@ -491,18 +493,19 @@ class DehydratorTest extends TestCase
     {
         $assessment = $this->getTestAssessment();
         $expectedAssessment = [
-            'id'                => 1,
-            'type'              => 'dueWork',
-            'title'             => 'Test Due Work',
-            'weight'            => 0,
-            'markVisibility'    => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
-            'workType'          => null,
-            'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
-            'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
-            'publishDate'       => '2018-01-01 00:00:00',
-            'openDate'          => '2018-01-02 00:00:00',
-            'dueDate'           => '2018-01-03 00:00:00',
-            'closeDate'         => '2018-01-04 00:00:00',
+            'id'                     => 1,
+            'type'                   => 'dueWork',
+            'title'                  => 'Test Due Work',
+            'weight'                 => 0,
+            'markVisibility'         => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
+            'workType'               => null,
+            'acceptOnline'           => DueWork::ACCEPT_ONLINE_MULTI,
+            'selfReviewability'      => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'similarityCheckEnabled' => false,
+            'publishDate'            => '2018-01-01 00:00:00',
+            'openDate'               => '2018-01-02 00:00:00',
+            'dueDate'                => '2018-01-03 00:00:00',
+            'closeDate'              => '2018-01-04 00:00:00',
         ];
         $expectedParticipants = [
             1 => [
@@ -587,18 +590,19 @@ class DehydratorTest extends TestCase
     {
         $assessment = $this->getTestAssessment();
         $expectedAssessment = [
-            'id'                => 1,
-            'type'              => 'dueWork',
-            'title'             => 'Test Due Work',
-            'weight'            => 0,
-            'markVisibility'    => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
-            'workType'          => null,
-            'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
-            'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
-            'publishDate'       => '2018-01-01 00:00:00',
-            'openDate'          => '2018-01-02 00:00:00',
-            'dueDate'           => '2018-01-03 00:00:00',
-            'closeDate'         => '2018-01-04 00:00:00',
+            'id'                     => 1,
+            'type'                   => 'dueWork',
+            'title'                  => 'Test Due Work',
+            'weight'                 => 0,
+            'markVisibility'         => DueWork::MARK_VISIBILITY_PARENT_STUDENT,
+            'workType'               => null,
+            'acceptOnline'           => DueWork::ACCEPT_ONLINE_MULTI,
+            'selfReviewability'      => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'similarityCheckEnabled' => false,
+            'publishDate'            => '2018-01-01 00:00:00',
+            'openDate'               => '2018-01-02 00:00:00',
+            'dueDate'                => '2018-01-03 00:00:00',
+            'closeDate'              => '2018-01-04 00:00:00',
         ];
         $expectedDynamicPlan = [
             'id'           => 1,
@@ -687,6 +691,7 @@ class DehydratorTest extends TestCase
             ->setAcceptsMultiple()
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
+            ->setSimilarityCheckEnabled(false)
             ->setTitle('Test Due Work')
             ->setDescription('This is a description of a test due work')
             ->setPublishAt(new \Alaress_Date_Format('2018-01-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))

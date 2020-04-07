@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
+use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -25,6 +26,11 @@ use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 abstract class Controller extends ListController implements IAssessmentController
 {
 
@@ -36,6 +42,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /** @var Term\Mapper */
     private $termMapper;
+
 
     /**
      * Controller constructor.
@@ -62,10 +69,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Participant\DataSource $participantDataSource
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
-        $this->bakery          = $bakery;
-        $this->workTypeMapper  = $workTypeMapper;
-        $this->termMapper      = $termMapper;
+
+        $this->bakery         = $bakery;
+        $this->workTypeMapper = $workTypeMapper;
+        $this->termMapper     = $termMapper;
     }
+
 
     /**
      * Redirect the standard assessment URL to a user specific version
@@ -218,16 +227,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param IAssessable $assessment
+     * @throws DefinitionException
+     * @throws RouteNotFound
      * @throws \Alaress\Web\Controller\Exception
+     * @throws LogicException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postUpdateAssessment(IAssessable $assessment)
+    public function postUpdateAssessment(IAssessable $assessment): void
     {
         /* Modify particular fields
          * This is accessed when you tick Skip Unsubmitted in the Inline Grader
          */
         if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
             $this->patchUpdateAssessment($assessment);
+
             return;
         }
 
@@ -239,9 +252,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $this->getRequest()->post,
                 $assessment
             );
+
             $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
-        }
-        catch (DomainException $e) {
+        } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
 
             /* Return Early to let mage deal with error messages

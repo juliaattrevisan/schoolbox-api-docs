@@ -1,81 +1,117 @@
 <?php
 /**
- * Transactor
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Learning\Assessment;
+
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use UnexpectedValueException;
+
+/**
+ * Class Transactor
  *
  * Saves an assessment, figures out a return url, returns a url to which you may redirect
  *
  * Unfortunately returnUrls depend on the saving of an assessment
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @package Schoolbox\Learning\Assessment
  */
-
-namespace Schoolbox\Learning\Assessment;
-
-use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
-use \Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use \Schoolbox\Mapper\Exception as MapperException;
-
 class Transactor
 {
+
     /**
      * @var IAssessable
      */
     protected $assessment;
+
 
     /**
      * @var FolderMapper
      */
     protected $folderMapper;
 
+
     /**
      * @var UnitImplementationMapper
      */
     private $unitImplementationMapper;
+
 
     /**
      * @var UnitSpecificationMapper
      */
     private $unitSpecificationMapper;
 
+
     /**
      * @var AssessmentMapperProxy
      */
     protected $assessmentMapperProxy;
+
+
+    /**
+     * @var DueWork\Response\File\Plagscan\Mapper
+     */
+    protected $plagscanMapper;
+
+
+    /**
+     * @var SingleFile\Mapper
+     */
+    protected $submissionFileMapper;
+
 
     /**
      * @var Router
      */
     protected $router;
 
+
     /**
      * Transactor constructor.
-     * @param FolderMapper $folderMapper
-     * @param UnitImplementationMapper $unitImplementationMapper
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param $router
+     *
+     * @param FolderMapper                          $folderMapper
+     * @param UnitImplementationMapper              $unitImplementationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param AssessmentMapperProxy                 $assessmentMapperProxy
+     * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
+     * @param SingleFile\Mapper                     $submissionFileMapper
+     * @param Router                                $router
      */
     public function __construct(
         FolderMapper $folderMapper,
         UnitImplementationMapper $unitImplementationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
+        DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
+        SingleFile\Mapper $submissionFileMapper,
         Router $router
     ) {
-        $this->setFolderMapper($folderMapper);
-        $this->setUnitImplementationMapper($unitImplementationMapper);
-        $this->setUnitSpecificationMapper($unitSpecificationMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setRouter($router);
+        $this->folderMapper = $folderMapper;
+        $this->unitImplementationMapper = $unitImplementationMapper;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->plagscanMapper = $plagscanMapper;
+        $this->submissionFileMapper = $submissionFileMapper;
+        $this->router = $router;
     }
 
 
@@ -83,232 +119,164 @@ class Transactor
      * Figure out a returnUrl when creating/updating assessments
      *
      * @param IAssessable $assessment
+     * @param array       $before
      * @return array
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws RouteNotFound
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function transact(IAssessable $assessment): array
+    public function transact(IAssessable $assessment, array $before = []): array
     {
-        $this->setAssessment($assessment);
+        $this->assessment = $assessment;
 
         // Verify that the context of the assessment is valid
-        // TODO replace returnUrl values once I know what they should actually be
-        $assessmentContext = $this->getAssessment()->getContext();
+        $assessmentContext = $this->assessment->getContext();
 
         /* If you followed a creational link from a particular place,
          * go back to that place
          */
-        if (!$this->getAssessment()->getId()) {
+        if (!$this->assessment->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
                     $returnUrl = $this->transactFolderContext();
-                }
-                elseif ($assessmentContext instanceof UnitImplementation) {
+                } elseif ($assessmentContext instanceof UnitImplementation) {
                     $returnUrl = $this->transactUnitImplementationContext();
-                }
-                elseif ($assessmentContext instanceof UnitSpecification) {
+                } elseif ($assessmentContext instanceof UnitSpecification) {
                     $returnUrl = $this->transactUnitSpecificationContext();
-                }
-                elseif ($assessmentContext instanceof Project) {
+                } elseif ($assessmentContext instanceof Project) {
                     $returnUrl = $this->transactProjectContext();
                 } else {
-                    throw new \InvalidArgumentException('Please select a valid context');
+                    throw new InvalidArgumentException('Please select a valid context');
                 }
             } catch (MapperException $e) {
-                throw new \InvalidArgumentException($e->getMessage(), 0, $e);
+                throw new InvalidArgumentException($e->getMessage(), 0, $e);
             }
         }
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $this->getAssessmentMapperProxy()->save($this->getAssessment());
+            $this->assessmentMapperProxy->save($this->assessment);
 
-            $returnUrl = $this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->getAssessment()->getId()]);
+            /* Due Work has a special thing going on where it can upload to Plagscan
+             *
+             * If Similarity Check was previously disabled, but has now been enabled,
+             * Then attempt to retrofit all the previous submissions
+             */
+            if (($this->assessment instanceof DueWork\Model) && !$before['assessment']['similarityCheckEnabled']) {
+
+                /** @var DueWork\Model $assessment */
+                if ($assessment->getSimilarityCheckEnabled()) {
+                    (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+                }
+            }
+
+            $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
         }
 
         /* The conclusion of how $returnUrl was derived
          */
         return [
-            'assessment' => $this->getAssessment(),
+            'assessment' => $this->assessment,
             Redirect::RETURN_URL => $returnUrl
         ];
     }
+
 
     /**
      * Transact from Folder context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
-    private function transactFolderContext()
+    private function transactFolderContext(): string
     {
 
         /* TODO: Pass contextId as a param into this method
          * It should be obtained from the routes
          * You only get contextId when you're Creating, not updating
          */
-        $context   = $this->getFolderMapper()->findById($this->getContextId());
+        $context = $this->folderMapper->findById($this->assessment->getContext()->getId());
 
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $this->assessmentMapperProxy->save($this->assessment);
 
-        $returnUrl = "/homepage/{$context->getId()}";
-
-        return $returnUrl;
+        return "/homepage/{$context->getId()}";
     }
+
 
     /**
      * Transact from Unit Implementation context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    private function transactUnitImplementationContext()
+    private function transactUnitImplementationContext(): string
     {
-        $context   = $this->getUnitImplementationMapper()->findById($this->getContextId());
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $context = $this->unitImplementationMapper->findById($this->assessment->getContext()->getId());
+
+        $this->assessmentMapperProxy->save($this->assessment);
 
         return "/homepage/{$context->getId()}";
     }
+
 
     /**
      * Transact from Unit Specification context
      *
      * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
      */
-    private function transactUnitSpecificationContext()
+    private function transactUnitSpecificationContext(): string
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
-        $context   = $this->getUnitSpecificationMapper()->findById($this->getContextId());
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $context = $this->unitSpecificationMapper->findById($this->assessment->getContext()->getId());
 
-        return $this->getRouter()->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
+        $this->assessmentMapperProxy->save($this->assessment);
+
+        return $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
+
 
     /**
      * Transact from Project context
      *
      * Check that you don't spawn a Project in a Project
      *
+     * @return string
+     * @throws LogicException
+     * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws DomainException
      */
-    private function transactProjectContext()
+    private function transactProjectContext(): string
     {
-        if ($this->getAssessment() instanceof Project) {
-            throw new \DomainException('You cannot create nested projects.');
+        if ($this->assessment instanceof Project) {
+            throw new DomainException('You cannot create nested projects.');
         }
 
         // TODO figure out what to do about this
-        $this->getAssessmentMapperProxy()->save($this->getAssessment());
+        $this->assessmentMapperProxy->save($this->assessment);
 
         return "/homepage/{$this->assessment->getContext()->getId()}";
-    }
-
-     /* Getters/Setters
-     */
-
-    /**
-     * @return int
-     */
-    protected function getContextId()
-    {
-        return $this->getAssessment()->getContext()->getId();
-    }
-
-    /**
-     * @return IAssessable
-     */
-    protected function getAssessment()
-    {
-        return $this->assessment;
-    }
-
-    /**
-     * @param IAssessable $assessment
-     */
-    protected function setAssessment($assessment)
-    {
-        $this->assessment = $assessment;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param FolderMapper $folderMapper
-     */
-    protected function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * @return UnitImplementationMapper
-     */
-    protected function getUnitImplementationMapper()
-    {
-        return $this->unitImplementationMapper;
-    }
-
-    /**
-     * @param UnitImplementationMapper $unitImplementationMapper
-     */
-    protected function setUnitImplementationMapper($unitImplementationMapper)
-    {
-        $this->unitImplementationMapper = $unitImplementationMapper;
-    }
-
-    /**
-     * @return UnitSpecificationMapper
-     */
-    protected function getUnitSpecificationMapper()
-    {
-        return $this->unitSpecificationMapper;
-    }
-
-    /**
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     */
-    protected function setUnitSpecificationMapper($unitSpecificationMapper)
-    {
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
-    }
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     */
-    protected function setAssessmentMapperProxy($assessmentMapperProxy)
-    {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-    }
-
-    /**
-     * @return Router
-     */
-    protected function getRouter()
-    {
-        return $this->router;
-    }
-
-    /**
-     * @param Router $router
-     */
-    protected function setRouter($router)
-    {
-        $this->router = $router;
     }
 }

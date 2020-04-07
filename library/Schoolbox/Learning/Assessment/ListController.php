@@ -1,17 +1,17 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use LogicException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -35,7 +35,11 @@ use Traversable;
 use UnexpectedValueException;
 use Alaress_Date_Format;
 
-
+/**
+ * Class ListController
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 class ListController extends Web\Controller\Base
 {
 
@@ -85,7 +89,7 @@ class ListController extends Web\Controller\Base
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
-        $this->setTransactor($transactor);
+        $this->transactor = $transactor;
         $this->participantDataSource = $participantDataSource;
     }
 
@@ -157,7 +161,7 @@ class ListController extends Web\Controller\Base
      * @throws Deleted
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
@@ -368,9 +372,8 @@ class ListController extends Web\Controller\Base
      * @return array
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws Exception
-     * @throws Deleted
-     * @throws \LogicException
+     * @throws RouteNotFound
+     * @throws LogicException
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
@@ -387,12 +390,10 @@ class ListController extends Web\Controller\Base
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
              */
-            $assessmentType = $postData['assessmentType'];
-            $assessmentFactory = new Factory($user, $postData, $assessmentType);
+            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType']);
             $assessment = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->getTransactor()->transact($assessment);
-            $assessmentId = $assessment->getId();
+            $transactionSummary = $this->transactor->transact($assessment, $before);
 
             // assessment is saved; persist plans
 
@@ -722,25 +723,4 @@ class ListController extends Web\Controller\Base
         $this->access = $access;
         return $this;
     }
-
-
-    /**
-     * @return Transactor
-     */
-    protected function getTransactor()
-    {
-        return $this->transactor;
-    }
-
-
-    /**
-     * @param Transactor $transactor
-     * @return static
-     */
-    protected function setTransactor($transactor)
-    {
-        $this->transactor = $transactor;
-        return $this;
-    }
-
 }
