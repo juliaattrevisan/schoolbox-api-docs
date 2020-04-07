@@ -6,17 +6,20 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream;
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 $postId = $_GET['id'];
-$size = $_GET['size'];
+$size   = $_GET['size'];
 
 try {
     $post = PostMapper::getInstance()->findById($postId);
@@ -39,7 +42,7 @@ $cache->initPost($post);
 $urlDetect = new UrlDetection($post->getUrl());
 
 if ($urlDetect->isStorageUrl()) {
-    $hash = $urlDetect->getHash();
+    $hash    = $urlDetect->getHash();
     $storage = Storage\Mapper::getInstance()->findByHash($hash);
 
 } else {
@@ -47,7 +50,7 @@ if ($urlDetect->isStorageUrl()) {
 }
 
 try {
-    $cache = new Image\Cache\Storage($storage, $size);
+    $cache     = new Image\Cache\Storage($storage, $size);
     $processor = new Image\Processor\Standard(
         $cache,
         new Image\Transformation\Storage(),

@@ -2,21 +2,23 @@
 /**
  * ${NAME}
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Application\BasicRequest\Kernel;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Image\Cache;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
+use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 /* Preserve old checks
  */
@@ -24,7 +26,7 @@ session_start();
 
 /* Choose a caching method to use
  */
-$key   = $_GET['width'] . 'x' . $_GET['height'];
+$key = $_GET['width'] . 'x' . $_GET['height'];
 
 try {
     $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
@@ -56,7 +58,6 @@ try {
     $imageProcessor->load()->stream();
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
 }

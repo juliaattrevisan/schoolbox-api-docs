@@ -77,9 +77,6 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     protected function outputHeaders()
     {
-        header('Cache-Control: max-age=10800, private');
-        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-        header('Pragma: private');
         $this->outputSpecificHeaders();
     }
 

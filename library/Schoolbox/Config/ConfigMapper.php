@@ -110,6 +110,9 @@ class ConfigMapper extends Mapper
 
     public const NAME_OTFS_ADAPTER = 'otfs_adapter';
 
+    public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
+    public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
+
 
     /**
      * @throws \InvalidArgumentException

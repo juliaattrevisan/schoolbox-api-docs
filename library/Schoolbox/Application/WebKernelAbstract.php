@@ -22,6 +22,40 @@ use Alaress\Web\Output;
  */
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
+    /**
+     * Output a "Cache-Control: max-age" response header. This instructs the
+     * browser to cache (and not re-request) this response until it reaches the
+     * max age.
+     *
+     * Also removes the "Pragma" header, as this conflicts with Cache-Control.
+     *
+     * @param int $maxAge The number of seconds to instruct the browser to cache
+     *                    this response for.
+     */
+    public function outputCacheControlMaxAgeHeader(int $maxAge): void
+    {
+        header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
+        header_remove('Pragma');
+    }
+
+
+    /**
+     * Output a "Cache-Control: max-age" response header, for an amount of time
+     * based on a config value.
+     *
+     * @see outputCacheControlMaxAgeHeader
+     * @param string $configName Set the max age to the value of this config.
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function outputCacheControlMaxAgeHeaderFromConfig(string $configName): void
+    {
+        /** @var IConfigLoader $config */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $config = $this->get('config');
+        $maxAge = $config->get($configName);
+        $this->outputCacheControlMaxAgeHeader((int)$maxAge);
+    }
+
 
     /**
      * Shutdown handler for either exceptions or fatal errors

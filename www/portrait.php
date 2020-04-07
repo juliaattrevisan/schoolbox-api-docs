@@ -12,16 +12,18 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
 
 /** @var IConfigLoader $config */
 $config = $kernel->getDependencyInjector()->get('config');
 
 /* If current user is not available return permission denied */
-if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
+if (!($_SESSION['user'] instanceof Schoolbox\User)) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 }
 
@@ -55,20 +57,17 @@ try {
     );
 
     $image->load()->stream();
-}
-/* When you cannot access the requested image (access denied)
- */
-catch (\RuntimeException $e) {
+} catch (\RuntimeException $e) {
+    /* When you cannot access the requested image (access denied)
+     */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
-}
-/* Image/Portrait not found
- */
-catch (\InvalidArgumentException $e) {
+} catch (\InvalidArgumentException $e) {
+    /* Image/Portrait not found
+     */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-}
-/* All other exceptions
- * BadMethodCallException
- */
-catch (Exception $e) {
+} catch (Exception $e) {
+    /* All other exceptions
+     * BadMethodCallException
+     */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
 }
