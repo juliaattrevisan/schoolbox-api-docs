@@ -55,7 +55,7 @@ class Vcal
         $source = $this->retrieveSource($config);
 
         if (isset($source)) {
-            $this->redis->setEx(
+            $this->redis->setex(
                 $this->determineCacheKey($config),
                 self::CACHE_EXPIRY,
                 serialize($this->convertSourceToEvents($source))
@@ -126,11 +126,14 @@ class Vcal
         // Expand 1 year in both directions
         $timezone = new DateTimeZone('UTC');
         /** @noinspection PhpUnhandledExceptionInspection */
-        return Reader::read($source, Reader::OPTION_FORGIVING)
-                     ->expand(
-                         new DateTimeImmutable('-1 year', $timezone),
-                         new DateTimeImmutable('+1 year', $timezone)
-                     );
+        $document = Reader::read($source, Reader::OPTION_FORGIVING);
+        if ($document instanceof VCalendar) {
+            $document->expand(
+                new DateTimeImmutable('-1 year', $timezone),
+                new DateTimeImmutable('+1 year', $timezone)
+            );
+        }
+        return $document;
     }
 
 
