@@ -10,43 +10,27 @@
 namespace Etherpad;
 
 
+use EtherpadLite\Client;
+
 class Spawnpoint
 {
-
-    /**
-     * The pad to respawn, from the local db
-     *
-     * @var null
-     */
-    private $pad = null;
-
     /**
      * An instance of etherpad authenticator
      *
      * @var Authenticator
      */
-    private $authenticator = null;
+    private $authenticator;
 
     /**
-     * A sitepage
-     *
-     * @var null
-     */
-    private $page = null;
-
-    /**
-     * @var string|null
+     * @var string
      */
 	private $etherpadHost;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $page
-	 */
-	public function __construct($page) {
-		$this->setPage($page);
-		$this->setAuthenticator(new \Etherpad\Authenticator());
+    /**
+     * Constructor
+     */
+	public function __construct() {
+		$this->authenticator = new Authenticator();
 		$this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001';
 	}
 
@@ -54,8 +38,8 @@ class Spawnpoint
      * Spawn a new pad
      * Save a stub record in our local db too
      *
-     * @param $name
-     * @param $homepageId
+     * @param string $name
+     * @param int $homepageId
      * @return \Etherpad\Pad
      * @throws \Exception
      */
@@ -64,7 +48,7 @@ class Spawnpoint
 
         /* Check that you have write permissions
          */
-        if ($this->getAuthenticator()->canCreate($homepageId)) {
+        if ($this->authenticator->canCreate($homepageId)) {
 
             /* Make life a bit easier for Etherpad by using a hashed version
              * of the name, rather than let it get urlencoded in some strange
@@ -139,18 +123,16 @@ class Spawnpoint
     /**
      * Reincarnate an EPL instance of a pad that exists in our local db
      *
-     * @throws \Exception
+     * @param Pad $pad
+     * @return Pad
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \RuntimeException
      */
-    public function respawn($pad)
+    public function respawn(Pad $pad)
     {
-
-        /* Remember the pad we tried to respawn
-         */
-        $this->setPad($pad);
-
         /* Check that you have write permissions
          */
-        $authenticator = new \Etherpad\Authenticator();
+        $authenticator = new Authenticator();
 
         /* All people with read access can respawn a document
          */
@@ -166,11 +148,11 @@ class Spawnpoint
              * the live and dev environments, so we use INSTANCE_ID to keep 'em
              * separated to some extent)
              */
-            $padName = md5(INSTANCE_ID . '_' . $this->getPad()->getName());
+            $padName = md5(INSTANCE_ID . '_' . $pad->getName());
 
 			/* Create a new group pad
 			 */
-			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
+			$client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
@@ -197,87 +179,24 @@ class Spawnpoint
 
                     /* Save new padId
                      */
-                    $padMapper = new \Etherpad\PadMapper();
-                    $this->getPad()->setPadId($padId);
-                    $padMapper->save($this->getPad());
+                    $padMapper = new PadMapper();
+                    $pad->setPadId($padId);
+                    $padMapper->save($pad);
 
                     /* Store the local db's body text into the newly-spawned
                      * etherpad/redis instance
                      */
                     $client->setHTML($padId, '<!DOCTYPE html><html><head></head><body>' . $pad->getBody() . '</body></html>');
 
-                    return $this->getPad();
+                    return $pad;
                 } else {
-                    throw new \Exception('Something strange happened when creating a new pad');
+                    throw new \RuntimeException('Something strange happened when creating a new pad');
                 }
             } else {
-                throw new \Exception('Something strange happened when creating a group id');
+                throw new \RuntimeException('Something strange happened when creating a group id');
             }
         } else {
             error(19);
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set pad
-     *
-     * @param null $pad
-     */
-    private function setPad($pad)
-    {
-        $this->pad = $pad;
-    }
-
-    /**
-     * Get pad
-     *
-     * @return null
-     */
-    private function getPad()
-    {
-        return $this->pad;
-    }
-
-    /**
-     * Set authenticator
-     *
-     * @param \Etherpad\Authenticator $authenticator
-     */
-    private function setAuthenticator($authenticator)
-    {
-        $this->authenticator = $authenticator;
-    }
-
-    /**
-     * Get authenticator
-     *
-     * @return \Etherpad\Authenticator
-     */
-    private function getAuthenticator()
-    {
-        return $this->authenticator;
-    }
-
-    /**
-     * Set page
-     *
-     * @param null $page
-     */
-    private function setPage($page)
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * Get page
-     *
-     * @return null
-     */
-    private function getPage()
-    {
-        return $this->page;
     }
 }
