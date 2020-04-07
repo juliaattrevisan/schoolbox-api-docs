@@ -38,7 +38,7 @@ class BrickManager
      * Generate a set of audience bricks for the specified article
      *
      * @param int $articleId
-     * @return GenericCollection
+     * @return GenericCollection|Brick[]
      * @throws Database\Exception
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
