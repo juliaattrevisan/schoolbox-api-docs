@@ -1,0 +1,81 @@
+<?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Calendar\CommandLineTool;
+
+use Calendar_Api_Config_Connector_Vcal;
+use Calendar_Api_Config_Mapper;
+use Calendar_Api_Config_Record;
+use Schoolbox\Application\CliTool;
+use Schoolbox\Calendar\Cache\Vcal as VcalCache;
+
+/**
+ * Pre-parse all vCal events.
+ */
+class PreparseVcal extends CliTool\App
+{
+    /**
+     * @var VcalCache
+     */
+    private $cache;
+
+
+    /**
+     * @inheritDoc
+     */
+    public function run(): void
+    {
+        $this->cache = new VcalCache($this->getDi()->get('redis'));
+
+        // Find every active vCal config
+        /** @var iterable&Calendar_Api_Config_Record[] $configs */
+        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $this->getLogger()->debug(sprintf('Found %d calendar configurations', count($configs)));
+
+        // Fetch it from file cache, then parse and store in Redis
+        foreach ($configs as $config) {
+            $this->cacheCalendar($config);
+        }
+    }
+
+
+    /**
+     * Caches the calendar into a set of cached events.
+     *
+     * @param Calendar_Api_Config_Record $config
+     */
+    private function cacheCalendar(Calendar_Api_Config_Record $config): void
+    {
+        $this->getLogger()->debug(
+            sprintf(
+                'Caching calendar configuration #%d (%s)',
+                $config->getId(),
+                $config->getConnectorClass()
+            )
+        );
+        $decodedConfig = $config->decodeConfig();
+        if (!$decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
+            $this->getLogger()->debug(
+                sprintf(
+                    'Calendar configuration #%d is not a vCal config: skipping',
+                    $config->getId()
+                )
+            );
+            return;
+        }
+
+        $this->getLogger()->info(
+            sprintf(
+                'Retrieving and caching raw vCal source for config #%d (%s)',
+                $config->getId(),
+                $decodedConfig->getUrl()
+            )
+        );
+        $this->cache->write($decodedConfig);
+    }
+}

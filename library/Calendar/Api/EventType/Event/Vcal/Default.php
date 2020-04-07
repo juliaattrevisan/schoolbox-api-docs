@@ -9,6 +9,8 @@
  */
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
+use Sabre\VObject\Component\VCalendar;
+use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
@@ -140,12 +142,13 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $currentConfig = $this->loadConnectorConfiguration();
         $decodedConfig = $currentConfig->decodeConfig();
 
-        /* Check URL is set */
-        if(!$decodedConfig->getUrl()) {
+        /* Check URL is set, and it's a vCal connector */
+        if (!$decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
             return new Collection();
         }
-
-        $url = $this->tokenReplaceUrl($decodedConfig->getUrl());
+        if (!$decodedConfig->getUrl()) {
+            return new Collection();
+        }
 
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
@@ -157,67 +160,13 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 $this->getUser()->getRole()->getId()
             )
         ) {
+            // Hit up the cache
+            $cache     = new Vcal(Alaress\Redis::getClientInstance());
+            $allEvents = $cache->read($decodedConfig);
 
-            /* Parse it all
-             */
-            try {
-                /* Load calendar from locker cache
-                * Cache step 1: cache load of VCAL file from URL
-                */
-                $cache  = new Calendar_Api_Cache();
-                $headers = [];
-
-                if($decodedConfig->getAuthorization()) {
-                    $headers = ['Authorization' => 'Bearer '.$decodedConfig->getAuthorization()];
-                }
-                $source = $cache->init($url, $headers)->getStreamContents();
-
-                // Cache step 2: Expand VCAL into event collection.
-                // The expanded events depend on the start and end time, not
-                // just the VCAL file.
-                /** @var \Sabre\VObject\Document $allEvents */
-                $allEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
-                    'vcal.' . $url,
-                    function ($params) {
-                        [$source, $startTimestamp, $endTimestamp] = $params;
-                        // You provided UTF-16? Proceed to UTF-8
-                        if (preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
-                            $source = mb_convert_encoding($source, 'UTF-8', 'UTF-16');
-                        } else {
-                            // Just remove UTF8 BOM if it exists
-                            $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
-                        }
-
-                        $allEvents = Sabre\VObject\Reader::read(
-                            $source,
-                            Sabre\VObject\Reader::OPTION_FORGIVING
-                        );
-                        if ($startTimestamp && $endTimestamp) {
-                            $allEvents = $allEvents->expand(
-                                new DateTime('@' . $startTimestamp),
-                                new DateTime('@' . $endTimestamp)
-                            );
-                        }
-                        return $allEvents;
-                    },
-                    [$source, $startTimestamp, $endTimestamp],
-                    $cache->getCachedTime()
-                );
-
-                // If that returned a string: it's retrieving a cached serialized version.
-                // Unserialize it.
-                // TODO remove this check in a later version
-                if (is_string($allEvents)) {
-                    $allEvents = unserialize($allEvents);
-                }
-            } catch (Exception $e) {
-                /* Some google calendars don't follow sabre's expected format?
-                echo $decodedConfig->getUrl();
-                echo $e->getMessage();
-                 */
-            }
-
-            if ($allEvents !== null) {
+            if ($allEvents instanceof VCalendar) {
+                $start = new DateTime('@' . $startTimestamp);
+                $end   = new DateTime('@' . $endTimestamp);
                 foreach ($allEvents->getComponents() as $currentEvent) {
                     /* gloop returns a whole bunch of stuff all mixed up
                      *
@@ -226,8 +175,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                      */
                     if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
                         /** @var $currentEvent \Sabre\VObject\Component\VEvent */
-
-                        $isAdded = true;
+                        $isAdded = $currentEvent->isInTimeRange($start, $end);
                         if (is_callable($filterFunction)) {
                             $isAdded = $filterFunction($currentEvent, $decodedConfig);
                         }
