@@ -35,15 +35,20 @@ class Spawnpoint
     private $page = null;
 
     /**
-     * Constructor
-     *
-     * @param $page
+     * @var string|null
      */
-    public function __construct($page)
-    {
-        $this->setPage($page);
-        $this->setAuthenticator(new \Etherpad\Authenticator());
-    }
+	private $etherpadHost;
+
+	/**
+	 * Constructor
+	 *
+	 * @param $page
+	 */
+	public function __construct($page) {
+		$this->setPage($page);
+		$this->setAuthenticator(new \Etherpad\Authenticator());
+		$this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001';
+	}
 
     /**
      * Spawn a new pad
@@ -73,9 +78,9 @@ class Spawnpoint
              */
             $padName = md5(INSTANCE_ID . '_' . $name);
 
-            /* Create a new group pad
-             */
-            $client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'));
+			/* Create a new group pad
+			 */
+			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
@@ -163,9 +168,9 @@ class Spawnpoint
              */
             $padName = md5(INSTANCE_ID . '_' . $this->getPad()->getName());
 
-            /* Create a new group pad
-             */
-            $client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'));
+			/* Create a new group pad
+			 */
+			$client = new \EtherpadLite\Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad

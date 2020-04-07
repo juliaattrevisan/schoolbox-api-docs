@@ -35,7 +35,7 @@ if ($authenticator->canCreate($pad->getHomepageId())) {
 
 	/* Save pad contents to db, just in case
 	 */
-	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'));
+	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token') ,defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
 	$getTextResult = $client->getHTML($pad->getPadId());
 
 	if ($getTextResult->getMessage() == 'ok') {

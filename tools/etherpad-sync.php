@@ -57,7 +57,7 @@ HELP;
         $allPads = $padMapper->findAll();
 
         // Save pad contents to db, just in case
-        $client = new EtherpadLite\Client($this->getConfig()->get('etherpad_api_token'));
+        $client = new EtherpadLite\Client($this->getConfig()->get('etherpad_api_token'), defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
         $logger->info(sprintf("Commencing etherpad sync, processing %d pads", count($allPads)));
 
         $db        = $this->getDatabaseInternal();
