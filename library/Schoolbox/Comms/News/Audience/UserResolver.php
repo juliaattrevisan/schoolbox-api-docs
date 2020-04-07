@@ -15,6 +15,7 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Comms\News;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use PDO;
@@ -79,9 +80,32 @@ class UserResolver implements IUserResolver
     {
         $bricks = (new BrickManager($this->db))->generateBricks($article->getId());
 
+        return $this->findUsersForBricks($bricks, $excludeMuted);
+    }
+
+
+    /**
+     * Returns the ids of users who match the specified audience bricks using UNION
+     *
+     * @param GenericCollection $bricks
+     * @param bool              $excludeMuted
+     * @return array
+     * @throws Database\Exception
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws Exception\InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws News\Exceptions\UnknownEntityTypeException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    private function findUsersForBricks(GenericCollection $bricks, bool $excludeMuted): array
+    {
         if (!$bricks->count()) {
             return [];
         }
+
 
         $subQueries   = [];
         $allParams    = [];
@@ -360,7 +384,7 @@ class UserResolver implements IUserResolver
      */
     private function applyRelationshipFilter(array $userIds, string $relationship): array
     {
-        if (!\count($userIds)) {
+        if (!count($userIds)) {
             return [];
         }
         if (Model::RELATIONSHIP_SELF === $relationship) {
@@ -390,12 +414,19 @@ class UserResolver implements IUserResolver
      */
     public function isUserInAudience(User $user, News\Model $article): bool
     {
+        // Convert segments to bricks for easier analysis
         $bricks = (new BrickManager($this->db))->generateBricksFromAudience($article->getAudience());
 
-        // If (user matches any brick) then they match audience.
-        // Elseif (any brick is unknown) then unknown if user matches audience, and fall back to slower DB query
-        // Else user does not match audience
-        $hasUnknown = false;
+        // Keep track of bricks we are unable to derive a conclusion for using currently available model graph
+        $unknownBricks = Brick::createCollection();
+
+        /* if(user matches any brick)
+         *   then user matches audience
+         * elseif(any brick match is unknown)
+         *   then we need to hit the DB to determine if user matches the unknown bricks
+         * else(user matches no bricks)
+         *   then user is not in audience
+         */
         foreach ($bricks as $brick) {
             foreach ($brick->getRelationships() as $relationship) {
                 $isMatch = $this->doesUserMatchDimensions($user, $brick->getDimensions(), $relationship);
@@ -403,13 +434,14 @@ class UserResolver implements IUserResolver
                     return true;
                 }
                 if ($isMatch === null) {
-                    $hasUnknown = true;
+                    // No need to collapse bricks here, they are already compressed.
+                    $unknownBricks->add(new Brick($brick->getDimensions(), $relationship));
                 }
             }
         }
 
-        // If there are unknowns, we need to fall back to full DB search, otherwise conclude false
-        return $hasUnknown ? in_array($user->getId(), $this->findUsersForArticle($article), false) : false;
+        // Resolve audience for indeterminate bricks, check if user is found
+        return in_array($user->getId(), $this->findUsersForBricks($unknownBricks, false), false);
     }
 
 
@@ -456,6 +488,6 @@ class UserResolver implements IUserResolver
     private function doesUserMatchDimension(User $user, Dimension $dimension, string $relationship): ?bool
     {
         $strategy = $this->strategyFactory->makeSimpleStrategy($dimension->getType());
-        return $strategy->isUserInAudienceValues($user, $dimension->getValues(), $relationship);;
+        return $strategy->isUserInAudienceValues($user, $dimension->getValues(), $relationship);
     }
 }
