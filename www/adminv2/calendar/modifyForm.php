@@ -122,8 +122,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
         $enabledConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
         foreach ($enabledConfigs as $enabledConfig) {
             $decodedConfig = $enabledConfig->decodeConfig();
-            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
-                $cache->write($decodedConfig);
+            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl()) {
+                try {
+                    $cache->write($decodedConfig);
+                } catch (InvalidArgumentException $e) {
+                    // There was a failure when writing the cache,
+                    // probably because no URL was set or it's inaccessible.
+                    // Continue
+                }
             }
         }
     }
