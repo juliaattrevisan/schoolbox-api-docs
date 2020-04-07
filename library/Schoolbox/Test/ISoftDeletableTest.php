@@ -18,6 +18,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\IMapper;
@@ -129,6 +130,7 @@ class ISoftDeletableTest extends TestCase
             SubjectMapper::class            => true,
             TagCloud\Mapper::class          => true,
             RubricDataSource::class         => true,
+            Audience\Mapper::class          => true,
 
             // Should be tested, but requires out-of-scope change, see SA-4936
             Component_InstanceMapper::class => true,
