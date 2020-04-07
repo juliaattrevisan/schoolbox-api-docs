@@ -49,12 +49,19 @@ class Spawnpoint
 
 
     /**
+     * @var string
+     */
+    private $apiToken;
+
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->authenticator = new Authenticator();
-        $this->etherpadHost  = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : self::ETHERPAD_LOCALHOST;
+        $this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : self::ETHERPAD_LOCALHOST;
+        $this->apiToken = (string)\Config::get('etherpad_api_token');
     }
 
 
@@ -68,6 +75,7 @@ class Spawnpoint
      * uses the same name as you - etherpad services are shared between
      * the live and dev environments, so we use INSTANCE_ID to keep 'em
      * separated to some extent)
+     *
      * @param string $name
      * @return string
      */
@@ -100,7 +108,7 @@ class Spawnpoint
 
             /* Create a new group pad
              */
-            $client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
+            $client = new Client($this->apiToken, $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
@@ -182,7 +190,7 @@ class Spawnpoint
 
             /* Create a new group pad
              */
-            $client = new Client(\Config::get('etherpad_api_token'), $this->etherpadHost);
+            $client = new Client($this->apiToken, $this->etherpadHost);
 
             /* Create a new pad, get group id
              * Create a group pad
