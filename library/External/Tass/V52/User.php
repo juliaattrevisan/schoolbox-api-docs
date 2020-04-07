@@ -5,6 +5,8 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+
 class External_Tass_V52_User extends External_Tass_User
 {
     /**
@@ -12,14 +14,14 @@ class External_Tass_V52_User extends External_Tass_User
      */
     public function getParentEmails(array $externalUserIds): array
     {
-        $emailList = [];
-        $idList    = implode(',', array_map([$this->database, 'smartQuote'], $externalUserIds));
+        $emailList  = [];
+        $idBindings = PredicateBuilder::getBindings($externalUserIds, 'externalId');
 
-        if (empty($idList)) {
+        if (empty($idBindings)) {
             return [];
         }
 
-        $addNum = $this->helper->getAddNum();
+        $addNumBindings = $this->helper->getAddNumBindings();
 
         $query = "
             SELECT pa.par_code, pa.e_mail, pa.e_mail2, pa.add_num
@@ -28,42 +30,56 @@ class External_Tass_V52_User extends External_Tass_User
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
             WHERE
                   (pa.e_mail IS NOT NULL OR pa.e_mail2 IS NOT NULL) AND
-                  s.stud_code IN ({$idList}) AND
-                  pa.cmpy_code = {$this->companyCode} AND
-                  pa.add_num IN ({$addNum})
+                  s.stud_code IN ({$idBindings->getPlaceholder()}) AND
+                  pa.cmpy_code = :companyCode AND
+                  pa.add_num IN ({$addNumBindings->getPlaceholder()})
         ";
+
+        $params = array_merge(
+            $idBindings->getParams(),
+            ['companyCode' => $this->companyCode,],
+            $addNumBindings->getParams()
+        );
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
          */
         if (Config::get('external_tass_commrules')) {
 
-            $typeCode = $this->helper->getTypeCode();
+            $typeCodeBindings = $this->helper->getTypeCodeBindings();
 
             $typeWhere = '';
-            if (!empty($typeCode)) {
-                $typeWhere = "AND scr.commtype_code IN ({$typeCode}) ";
+            if (!empty($typeCodeBindings)) {
+                $typeWhere = "AND scr.commtype_code IN ({$typeCodeBindings->getPlaceholder()}) ";
+                $params    = array_merge($params, $typeCodeBindings->getParams());
             }
 
-            $query .= "
+            $idBindingsComm         = PredicateBuilder::getBindings($externalUserIds, 'externalIdComm');
+            $addNumBindingsComm     = $this->helper->getAddNumBindings('addNumComm');
+            $query                  .= "
                 UNION " .
                 "SELECT DISTINCT pa.par_code, pa.e_mail, pa.e_mail2, pa.add_num
                 FROM paraddress pa
                 INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
                     AND pa.cmpy_code = scr.cmpy_code
-                    AND scr.cmpy_code = {$this->companyCode}
+                    AND scr.cmpy_code = :companyCode2
                     AND pa.add_num = scr.add_num
                     {$typeWhere}
                 INNER JOIN student s ON scr.stud_code=s.stud_code AND scr.cmpy_code=s.cmpy_code
                 WHERE
                     pa.e_mail IS NOT NULL AND
-                    s.stud_code IN ({$idList}) AND
-                    pa.cmpy_code = {$this->companyCode} AND
-                    pa.add_num IN ({$addNum})
+                    s.stud_code IN ({$idBindingsComm->getPlaceholder()}) AND
+                    pa.add_num IN ({$addNumBindingsComm->getPlaceholder()})
             ";
+            $params['companyCode2'] = $this->companyCode;
+            $params                 = array_merge(
+                $params,
+                $idBindingsComm->getParams(),
+                $addNumBindingsComm->getParams()
+            );
         }
 
-        $statement = $this->database->query($query);
+        $statement = $this->database->query($query, $params);
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             $currentEmailList = array_filter(array_map('trim', explode(';', $row['e_mail'])));
