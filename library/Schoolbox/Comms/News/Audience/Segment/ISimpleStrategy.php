@@ -126,8 +126,11 @@ interface ISimpleStrategy extends IStrategy
      * Returns:
      * * TRUE  - if user does match values
      * * FALSE - if user does not match values
-     * * NULL  - if we cannot tell whether they values and relationship match from supplied parameters
+     * * NULL  - if we cannot tell whether users matches values and relationship using supplied parameters
      *
+     * @param User   $user
+     * @param array  $entityValues
+     * @param string $relationship
      * @return bool|null
      */
     public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool;
