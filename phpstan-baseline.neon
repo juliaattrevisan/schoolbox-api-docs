@@ -3596,36 +3596,6 @@ parameters:
 			path: library/Etherpad/Session.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 44$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageId\\)\\: Unexpected token \"\\$homepageId\", expected type at offset 114$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 94$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
-			message: "#^Method Etherpad\\\\Spawnpoint\\:\\:spawn\\(\\) should return Etherpad\\\\Pad but return statement is missing\\.$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
-			message: "#^Cannot call method getName\\(\\) on null\\.$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
-			message: "#^Cannot call method setPadId\\(\\) on null\\.$#"
-			count: 1
-			path: library/Etherpad/Spawnpoint.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 48$#"
 			count: 1
 			path: library/Evaluation/Answer.php

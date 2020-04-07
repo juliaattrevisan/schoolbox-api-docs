@@ -41,10 +41,11 @@ class Spawnpoint
      *
      * @param string $name
      * @param int    $homepageId
-     * @return \Etherpad\Pad
+     * @return Pad
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function spawn($name, $homepageId)
+    public function spawn($name, $homepageId): ?Pad
     {
 
         /* Check that you have write permissions
@@ -125,11 +126,11 @@ class Spawnpoint
      * Reincarnate an EPL instance of a pad that exists in our local db
      *
      * @param Pad $pad
-     * @return Pad
+     * @return Pad|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws \RuntimeException
      */
-    public function respawn(Pad $pad)
+    public function respawn(Pad $pad): ?Pad
     {
         /* Check that you have write permissions
          */
