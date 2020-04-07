@@ -18,7 +18,6 @@ use Schoolbox\IHomepageCleanable;
 /**
  * @method static self getInstance()
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
- * @method Model createModel($idValue = null)
  */
 class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {

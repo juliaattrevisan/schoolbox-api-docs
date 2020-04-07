@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Audience\Simple;
 use InvalidArgumentException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Segment;
-use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 use Schoolbox\IHomepageCleanable;
 
 /**
