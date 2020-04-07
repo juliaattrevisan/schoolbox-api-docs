@@ -83,7 +83,7 @@ class Spawnpoint
      *
      * @param string $name
      * @param int    $homepageId
-     * @return Pad
+     * @return null|Pad
      * @throws InvalidArgumentException
      * @throws PDOException
      * @throws RuntimeException
@@ -168,11 +168,11 @@ class Spawnpoint
      * Reincarnate an EPL instance of a pad that exists in our local db
      *
      * @param Pad $pad
-     * @return Pad
+     * @return null|Pad
      * @throws Exception
      * @throws RuntimeException
      */
-    public function respawn(Pad $pad): Pad
+    public function respawn(Pad $pad): ?Pad
     {
         /* Check that you have write permissions
          * All people with read access can respawn a document
