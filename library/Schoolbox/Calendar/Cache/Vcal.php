@@ -74,10 +74,7 @@ class Vcal
     {
         $cacheKey = $this->determineCacheKey($config);
         if ($this->redis->exists($cacheKey)) {
-            return unserialize(
-                $this->redis->get($this->determineCacheKey($config)),
-                [VCalendar::class]
-            );
+            return unserialize($this->redis->get($cacheKey), [VCalendar::class]);
         }
         return null;
     }
