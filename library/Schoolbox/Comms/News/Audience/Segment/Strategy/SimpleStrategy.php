@@ -10,12 +10,15 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
+use function array_intersect;
+use function count;
 
 /**
  * Common logic and safe-defaults for simple (ie not composite) Audience segment strategies
@@ -123,6 +126,35 @@ abstract class SimpleStrategy implements ISimpleStrategy
                     $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE)
                 )
             );
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        // Default implementation.
+        // In most cases, the user and their children (if relevant), will have sufficient hydration.
+        switch ($relationship) {
+            case Audience\Model::RELATIONSHIP_SELF:
+                $users = User::createCollection()->add($user);
+                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if (!$user->getRole()->isParent()) {
+                    return false;
+                }
+                if ($user->getChildren() === null) {
+                    return null;
+                }
+                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if (!$user->getRole()->isStaff()) {
+                    return false;
+                }
+                return null;
+        }
+        return null;
     }
 
 

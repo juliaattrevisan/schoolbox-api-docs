@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
@@ -15,6 +15,8 @@ use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
+use function array_unique;
 use function count;
 use function implode;
 use function in_array;
@@ -111,13 +113,17 @@ class Role extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $values[$user->getRole()->getId()] = $user->getRole()->getId();
+            $values[] = $user->getRole()->getId();
         }
-        return $values;
+        return array_unique($values);
     }
 
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
     public function getUserResolutionSql(
         string $userTableAlias,
         string $paramPrefix,
@@ -131,28 +137,5 @@ class Role extends SimpleStrategy
         }
 
         return new UserResolutionSql('', $this->newPb($paramPrefix)->in("$userTableAlias.group_id", $filtered));
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-    {
-        switch($relationship){
-            case Audience\Model::RELATIONSHIP_SELF:
-                return $user->getRole() ? in_array((string)$user->getRole()->getId(), $entityValues, true) : null;
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
-                    return false;
-                }
-                return null;
-        }
-        return null;
     }
 }

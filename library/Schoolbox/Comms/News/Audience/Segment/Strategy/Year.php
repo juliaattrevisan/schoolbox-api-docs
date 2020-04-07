@@ -8,12 +8,14 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
 use function array_filter;
 use function count;
 use function implode;
@@ -131,7 +133,11 @@ class Year extends SimpleStrategy
     }
 
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
     public function getUserResolutionSql(
         string $userTableAlias,
         string $paramPrefix,
@@ -154,31 +160,5 @@ class Year extends SimpleStrategy
         $pb = $this->newPb($paramPrefix)->any($pb);
 
         return new UserResolutionSql('', $pb);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-    {
-        switch($relationship){
-            case Audience\Model::RELATIONSHIP_SELF:
-                if($user->getYear() === null){
-                    return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
-                }
-                return in_array($user->getYear(), $entityValues, false);
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
-                    return false;
-                }
-                return null;
-        }
-        return null;
     }
 }

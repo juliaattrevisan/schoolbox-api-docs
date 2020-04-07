@@ -511,23 +511,42 @@ class Folder extends SimpleStrategy
                 if ($user->getSubjectCollection() === null) {
                     return null;
                 }
-                $values = $user->getSubjectCollection()->map(static function (array $subject) {
-                    return $subject['id'];
-                })->getAll();
                 // Cannot conclude false, because groups are not provided
-                return count(array_intersect($values, $entityValues)) ? true : null;
+                return count(array_intersect($this->parseSubjectIds($user), $entityValues)) ? true : null;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
+                if (!$user->getRole()->isParent()) {
                     return false;
+                }
+                if ($user->getChildren() === null) {
+                    return null;
+                }
+                foreach ($user->getChildren() as $child) {
+                    if (count(array_intersect($this->parseSubjectIds($child), $entityValues))) {
+                        return true;
+                    }
                 }
                 return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
+                if (!$user->getRole()->isStaff()) {
                     return false;
                 }
                 return null;
         }
         return null;
+    }
+
+
+    /**
+     * Parse subject/class folder ids from a user's subject collection
+     *
+     * @param User $user
+     * @return array
+     */
+    private function parseSubjectIds(User $user): array
+    {
+        return $user->getSubjectCollection()->map(static function (array $subject) {
+            return $subject['id'];
+        })->getAll();
     }
 
 

@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
@@ -16,7 +15,6 @@ use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use function implode;
-use function in_array;
 
 class User extends SimpleStrategy
 {
@@ -136,28 +134,5 @@ class User extends SimpleStrategy
         $join = '';
         $pb   = $this->newPb($paramPrefix)->in("{$userTableAlias}.id", $entityValues);
         return new UserResolutionSql($join, $pb);
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function isUserInAudienceValues(\Schoolbox\User $user, array $entityValues, string $relationship): ?bool
-    {
-        switch($relationship){
-            case Audience\Model::RELATIONSHIP_SELF:
-                return in_array($user->getId(), $entityValues, false);
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
-                    return false;
-                }
-                return null;
-        }
-        return null;
     }
 }
