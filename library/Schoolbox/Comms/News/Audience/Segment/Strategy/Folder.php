@@ -410,13 +410,13 @@ class Folder extends SimpleStrategy
         }
 
         // Always fetch members from NNIAN folders
-        $filtered = $this->findNnianFolderIds($filtered);
+        $nnianFolderIds = $this->findNnianFolderIds($filtered);
 
         // For performance reasons, it is faster to UNION the GROUP + CLASS members, rather than LEFT JOIN them.
         // This is incompatible with the interface's return type. Therefore we will just resolve the user ids,
         // and return a predicate to match these directly. In any event, the overhead of fetching the class members
         // from the sis is much higher than this double tap.
-        $userIds = $this->getUserIdsForFolders($filtered, $targetNull, $excludeMuted);
+        $userIds = $this->getUserIdsForFolders($nnianFolderIds, $targetNull, $excludeMuted);
         if (!count($userIds)) {
             return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
         }
@@ -432,24 +432,28 @@ class Folder extends SimpleStrategy
      * * if segment was targeted to class/group, but class/group has since become a subFolder of class/group, we do
      *   want to fetch members of the new NNIAN folder
      *
-     * @param string[] $folderIds
-     * @return string[]
+     * @param string[]|null[] $folderIds
+     * @return string[]|null[]
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    private function findNnianFolderIds(array $folderIds): array
+    public function findNnianFolderIds(array $folderIds): array
     {
         $nnian          = NNIAN::getInstance($this->folderMapper);
         $nnianFolderIds = [];
         foreach ($folderIds as $folderId) {
+            if ($folderId === null) {
+                $nnianFolderIds[] = null;
+                continue;
+            }
             $folder = (new FolderModel())->setId((int)$folderId);
-            try{
+            try {
                 $nnianFolder = $nnian->findNearestNonInheritingAncestralNode($folder);
             } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Mapper\Exception\Deleted $e){
+            catch (Mapper\Exception\Deleted $e) {
                 // Ignore deleted folders
                 continue;
             }
@@ -461,44 +465,64 @@ class Folder extends SimpleStrategy
 
 
     /**
+     * Returns muted users per nnian folder.
+     *
+     * Mutes are always applied at the NNIAN level, regardless of whether a mute exists for the targeted folder,
+     * as it is always the NNIAN folder displayed to the user in their settings
+     *
+     * @param null[]|string[] $nnianFolderIds
+     * @return string[][]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getMutedUsersPerFolder(array $nnianFolderIds): array
+    {
+        $filtered = $this->filterOutNullValues($nnianFolderIds);
+        if (!count($filtered)) {
+            return [];
+        }
+        $mutedUsersPerFolder = [];
+
+        $pb          = (new Builder(new Quoter(), 'msg_reroute_override'))
+            ->in('msg_route_key', array_map(static function (string $folderId) {
+                return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
+            }, $filtered))
+            ->equals('delivery', RoutePermission::MUTE);
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $query       = $this->folderMapper->getDatabase()->query(
+            "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) folder_id, user_id FROM msg_reroute_override WHERE {$whereClause}",
+            $pb->getParams()
+        );
+        while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
+            $mutedUsersPerFolder[$folderId][] = $userId;
+        }
+        return $mutedUsersPerFolder;
+    }
+
+
+    /**
      * Get folder members, optionally excluding users who have muted those folders
      *
-     * @param string[] $filtered
+     * @param string[] $nnianFolderIds
      * @param bool     $targetNull
      * @param bool     $excludeMuted
      * @return int[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getUserIdsForFolders(array $filtered, bool $targetNull, bool $excludeMuted): array
+    private function getUserIdsForFolders(array $nnianFolderIds, bool $targetNull, bool $excludeMuted): array
     {
         $quoter = new Quoter();
 
-        /** @var string[][] $mutedUsersPerFolder */
-        $mutedUsersPerFolder = [];
-        if ($excludeMuted) {
-            $pb          = (new Builder($quoter, 'msg_reroute_override'))
-                ->in('msg_route_key', array_map(static function (string $folderId) {
-                    return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
-                }, $filtered))
-                ->equals('delivery', RoutePermission::MUTE);
-            $whereClause = implode(' AND ', $pb->getWhere());
-            $query       = $this->folderMapper->getDatabase()->query(
-                "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) folder_id, user_id FROM msg_reroute_override WHERE {$whereClause}",
-                $pb->getParams()
-            );
-            while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
-                $mutedUsersPerFolder[$folderId][] = $userId;
-            }
-        }
+        $mutedUsersPerFolder = $excludeMuted ? $this->getMutedUsersPerFolder($nnianFolderIds) : [];
 
         // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
         $groupJoin = $targetNull ? 'LEFT' : '';
         $groupPb   = (new Builder($quoter, ''));
-        if (count($filtered)) {
+        if (count($nnianFolderIds)) {
             $groupInPb = (new Builder($quoter, ''))
                 ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
-                ->in('ua.sid', $filtered)
+                ->in('ua.sid', $nnianFolderIds)
                 ->notEquals('ua.type', UserAccess::ACCESS_DENY);
             if ($targetNull) {
                 // null + filtered
@@ -535,8 +559,8 @@ class Folder extends SimpleStrategy
 
         // Associated with the class, regardless of role type.
         // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
-        if (count($filtered)) {
-            $folderCodesPerFolderId = $this->getFolderCodes($filtered);
+        if (count($nnianFolderIds)) {
+            $folderCodesPerFolderId = $this->getFolderCodes($nnianFolderIds);
 
             if (count($folderCodesPerFolderId)) {
                 if (count($mutedUsersPerFolder)) {
