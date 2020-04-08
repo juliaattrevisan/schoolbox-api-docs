@@ -35,7 +35,7 @@ class WebdavController extends NavigatorController
         }
 
         // disallow null: cast to '*/*'
-        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter);
+        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter, null, null, $useFolder);
     }
 
 
