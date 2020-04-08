@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
-use Alaress\Database\Quoter\IQuoter;
-use Alaress\IDatabase;
 use DomainException;
 use PDOException;
 use Schoolbox\GenericCollection;
@@ -54,13 +52,6 @@ class Mapper
     {
         $this->simpleMapper  = $simpleMapper;
         $this->complexMapper = $complexMapper;
-    }
-
-
-    /** @return IDatabase|IQuoter */
-    public function getDatabase(): IDatabase
-    {
-        return $this->simpleMapper->getDatabase();
     }
 
 
