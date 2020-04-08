@@ -85,12 +85,12 @@ class PastoralGroup extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
-        return new Audience\Segment\TranslateSql(
-            "SELECT '{$entityType}' entity_type, id entity_value, name COLLATE utf8mb4_general_ci name FROM pastoral_group WHERE {$whereClause}",
-            $pb->getParams()
-        );
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, name COLLATE utf8mb4_general_ci name
+            FROM pastoral_group
+            WHERE {$pb->getWhereIntersect()}
+        ";
+        return new Audience\Segment\TranslateSql($sql, $pb->getParams());
     }
 
 

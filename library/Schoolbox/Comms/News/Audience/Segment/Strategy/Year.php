@@ -84,13 +84,12 @@ class Year extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
         $sql         = "
             SELECT
                 '{$entityType}' entity_type,
                 id entity_value,
                 IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) name
-            FROM user WHERE {$whereClause}
+            FROM user WHERE {$pb->getWhereIntersect()}
         ";
 
         return new TranslateSql(

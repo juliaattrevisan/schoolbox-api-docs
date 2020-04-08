@@ -79,12 +79,12 @@ class SchoolHouse extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
-        return new TranslateSql(
-            "SELECT '{$entityType}' entity_type, id entity_value, house name FROM house WHERE {$whereClause}",
-            $pb->getParams()
-        );
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, house name
+            FROM house
+            WHERE {$pb->getWhereIntersect()}
+        ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
 

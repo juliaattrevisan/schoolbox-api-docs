@@ -88,12 +88,12 @@ class Role extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
-        return new TranslateSql(
-            "SELECT '{$entityType}' entity_type, id entity_value, name name FROM `groups` WHERE {$whereClause}",
-            $pb->getParams()
-        );
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, name name
+            FROM `groups`
+            WHERE {$pb->getWhereIntersect()}
+        ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
     /**

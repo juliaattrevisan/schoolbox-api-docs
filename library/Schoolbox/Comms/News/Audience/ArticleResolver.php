@@ -287,12 +287,11 @@ class ArticleResolver implements IArticleResolver
             // If we had $relatedAttributes, we can assume here that $relationship is non-null
             $pb->all($this->buildPredicate('simple', $relationship, $entityType, $entityValues));
         }
-        $pb = (new Predicate\Builder($this->db, ''))->any($pb);
 
         $sql = "
             SELECT comms_news_article_id
             FROM comms_news_audience simple
-            WHERE {$pb->getWhere()[0]}
+            WHERE {$pb->getWhereUnion()}
         ";
         return [$sql, $pb->getParams()];
     }
@@ -330,16 +329,15 @@ class ArticleResolver implements IArticleResolver
             ));
         }
 
-        $pb = (new Predicate\Builder($this->db, ''))->all(
-            (new Predicate\Builder($this->db, ''))
-                ->any($pb1)
-                ->any($pb2)
-        );
+        $pb = (new Predicate\Builder($this->db, ''))
+            ->any($pb1)
+            ->any($pb2);
+
 
         $sql = "
             SELECT comms_news_article_id
             FROM comms_news_audience_complex {$tableAlias}
-            WHERE {$pb->getWhere()[0]}
+            WHERE {$pb->getWhereIntersect()}
         ";
 
         return [$sql, $pb->getParams()];
@@ -502,8 +500,6 @@ class ArticleResolver implements IArticleResolver
             $pb->all($publishedPb);
         }
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
         // If we are not filtering by relationship, we may be duplicates, which we'll need to filter out.
         // If we are specifying the relationship, we can avoid the DISTINCT, and hence avoid a temp table.
         $distinct = null === $relationship ? 'DISTINCT' : '';
@@ -512,7 +508,7 @@ class ArticleResolver implements IArticleResolver
             SELECT {$distinct} comms_news_article_id
             FROM comms_news_audience
             INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
-            WHERE {$whereClause}";
+            WHERE {$pb->getWhereIntersect()}";
 
         if (count($orderBy)) {
             $sql .= "
@@ -559,13 +555,12 @@ class ArticleResolver implements IArticleResolver
         if ($publishedOnly) {
             $pb->all($this->articleMapper->getPredicatePublished());
         }
-        $pb = $this->articleMapper->getPredicateBuilder()->all($pb);
 
         $sql = "
             SELECT comms_news_article.id
             FROM comms_news_article
             JOIN comms_news_audience_complex ON comms_news_audience_complex.comms_news_article_id = comms_news_article.id
-            WHERE {$pb->getWhere()[0]}
+            WHERE {$pb->getWhereIntersect()}
         ";
 
         if (count($orderBy)) {

@@ -497,9 +497,8 @@ class Notifier extends AbstractModuleNotifier
                 return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
             }, $folderIds))
             ->equals('delivery', RoutePermission::MUTE);
-        $whereClause    = implode(' AND ', $pb->getWhere());
         $mutedFolderIds = $db->query(
-            "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) FROM msg_reroute_override WHERE {$whereClause}",
+            "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) FROM msg_reroute_override WHERE {$pb->getWhereIntersect()}",
             $pb->getParams()
         )->fetchAll(PDO::FETCH_COLUMN);
 

@@ -79,10 +79,8 @@ class Campus extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
         return new Audience\Segment\TranslateSql(
-            "SELECT '{$entityType}' entity_type, id entity_value, name name FROM luCampus WHERE {$whereClause}",
+            "SELECT '{$entityType}' entity_type, id entity_value, name name FROM luCampus WHERE {$pb->getWhereIntersect()}",
             $pb->getParams()
         );
     }

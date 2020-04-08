@@ -96,12 +96,12 @@ class User extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
-        return new TranslateSql(
-            "SELECT '{$entityType}' entity_type, id entity_value, CONCAT(firstname, ' ', lastname) name FROM user WHERE {$whereClause}",
-            $pb->getParams()
-        );
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, CONCAT(firstname, ' ', lastname) name
+            FROM user
+            WHERE {$pb->getWhereIntersect()}
+        ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
     /**

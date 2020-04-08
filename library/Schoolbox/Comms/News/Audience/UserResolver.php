@@ -233,12 +233,11 @@ class UserResolver implements IUserResolver
         }
 
         $joinClause  = implode("\n", array_merge($joins));
-        $whereClause = implode(' AND ', $pb->getWhere());
         $sql         = "
             SELECT {$userTableAlias}.id, '{$relationship}' relationship
             FROM user {$userTableAlias}
             {$joinClause}
-            WHERE {$whereClause}
+            WHERE {$pb->getWhereIntersect()}
         ";
         return [$sql, $pb->getParams()];
     }
@@ -315,12 +314,11 @@ class UserResolver implements IUserResolver
             return [null, []];
         }
 
-        $pb          = (new Predicate\Builder($this->db, $userTableAlias))
+        $pb  = (new Predicate\Builder($this->db, $userTableAlias))
             ->setParamPrefix("_{$subQueryId}_x")
             ->in("{$userTableAlias}.id", $relatedUsers)
             ->isNull("{$userTableAlias}.deleted_at");
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $sql         = "SELECT {$userTableAlias}.id FROM user {$userTableAlias} WHERE {$whereClause}";
+        $sql = "SELECT {$userTableAlias}.id FROM user {$userTableAlias} WHERE {$pb->getWhereIntersect()}";
 
         return [$sql, $pb->getParams()];
 
@@ -361,8 +359,7 @@ class UserResolver implements IUserResolver
             $userResSql        = $strategy->getUserResolutionSql('user', "", [$folderId], false);
             $join              = $userResSql->getJoin();
             $pb                = $userResSql->getPb();
-            $whereClause       = implode(' AND ', $pb->getWhere());
-            $sql               = "SELECT id FROM user {$join} WHERE {$whereClause} AND deleted_at IS NULL";
+            $sql               = "SELECT id FROM user {$join} WHERE {$pb->getWhereIntersect()} AND deleted_at IS NULL";
             $userIds           = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
             $relatedUsers      = $this->applyRelationshipFilter($userIds, $relationship);
             $allRelatedUsers[] = array_diff($relatedUsers, $mutedFolders[$folderId] ?? []);

@@ -162,8 +162,6 @@ class Folder extends SimpleStrategy
             ->setParamPrefix($entityType)
             ->in('id', $entityValues);
 
-        $whereClause = implode(' AND ', $pb->getWhere());
-
         $sql = "
             SELECT
                 '{$entityType}' entity_type,
@@ -171,7 +169,7 @@ class Folder extends SimpleStrategy
                 CONCAT(name, IF(COUNT(code) > 0, CONCAT(' (', GROUP_CONCAT(code SEPARATOR ', '), ')'), '')) name
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
-            WHERE {$whereClause}
+            WHERE {$pb->getWhereIntersect()}
             GROUP BY folder.id
         ";
         return new Audience\Segment\TranslateSql($sql, $pb->getParams());
@@ -489,11 +487,13 @@ class Folder extends SimpleStrategy
                 return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
             }, $filtered))
             ->equals('delivery', RoutePermission::MUTE);
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $query       = $this->folderMapper->getDatabase()->query(
-            "SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) folder_id, user_id FROM msg_reroute_override WHERE {$whereClause}",
-            $pb->getParams()
-        );
+
+        $sql   = "
+            SELECT SUBSTRING_INDEX(msg_route_key, '.', -1) folder_id, user_id
+            FROM msg_reroute_override
+            WHERE {$pb->getWhereIntersect()}
+        ";
+        $query = $this->folderMapper->getDatabase()->query($sql, $pb->getParams());
         while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
             $mutedUsersPerFolder[$folderId][] = $userId;
         }
@@ -597,13 +597,12 @@ class Folder extends SimpleStrategy
             }
         }
 
-        $groupWhere = implode(' AND ', $groupPb->getWhere());
         $queries    = [];
         $queries[]  = "
             SELECT ua.uid id
             FROM user u
             {$groupJoin} JOIN userAccess ua ON u.id = ua.uid
-            WHERE ({$groupWhere})
+            WHERE {$groupPb->getWhereIntersect()}
             AND u.deleted_at IS NULL
         ";
         $allParams  = [$groupPb->getParams()];
@@ -677,9 +676,8 @@ class Folder extends SimpleStrategy
         }
         $classPb->isNull("u.deleted_at");
 
-        $whereClause = implode(' AND ', $classPb->getWhere());
         return [
-            "SELECT u.id FROM user u JOIN `groups` g ON g.id = u.group_id WHERE {$whereClause}",
+            "SELECT u.id FROM user u JOIN `groups` g ON g.id = u.group_id WHERE {$classPb->getWhereIntersect()}",
             $classPb->getParams(),
         ];
     }
