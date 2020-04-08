@@ -564,21 +564,28 @@ abstract class Kernel
                      * @var External_UserInterface  $externalUser
                      * @var External_ClassInterface  $externalClass
                      * @var News\Audience\Segment\StrategyFactory $strategyFactory
+                     * @var MapperFactory $mapperFactory
                      */
                     $db              = $di->get('databaseInternal');
                     $externalUser    = $di->get('externalUser');
-                    $externalClass    = $di->get('externalClass');
-                    $mapperFactory   = $di->get('mapperFactory');
+                    $externalClass   = $di->get('externalClass');
                     $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
+                    $mapperFactory   = $di->get('mapperFactory');
+                    /** @var Folder\Mapper $folderMapper */
+                    $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $mapperFactory->get(UserMapper::class);
+                    /** @var UserAccessMapper $userAccessMapper */
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
                     return new News\Audience\UserResolver(
                         $db,
                         new News\Audience\RelationshipFilterer(
                             $db,
-                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $userMapper,
                             $externalUser,
-                            $mapperFactory->get(Folder\Mapper::class),
+                            $folderMapper,
                             $externalClass,
-                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                            $userAccessMapper
                         ),
                         $strategyFactory
                     );
