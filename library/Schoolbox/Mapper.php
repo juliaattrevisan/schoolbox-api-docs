@@ -15,6 +15,8 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use function array_key_exists;
+use function array_keys;
 use function array_map;
 use Aura\Di;
 use function count;
@@ -988,7 +990,7 @@ abstract class Mapper implements IMapper, Serializable
     public function getPropertyFromColumn($column)
     {
         foreach($this->map as $map) {
-            if($map['column'] == $column) {
+            if (array_key_exists('column', $map) && $map['column'] === $column) {
                 return $map['property'];
             }
         }
