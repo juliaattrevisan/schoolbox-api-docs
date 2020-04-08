@@ -23,6 +23,7 @@
         <tbody>
         {% for log in travelLogs %}
             {% set direction = log.direction|lower == 'in' ? 'Enter' : 'Exit' %}
+            {% set directionStyle =  log.direction|lower == 'in' ? 'reviewed' : 'submitted-late'%}
             {% set type = log.event_type|capitalize %}
             <tr>
                 <td>
@@ -32,6 +33,7 @@
                          style="width: 16px;" />
                 </td>
                 <td>
+                    <span class="{{ directionStyle}} label">{{ direction }}</span>
                     {{ log.location_tag }}
                 </td>
                 <td>{{ log.timestamp|date('h:i a') }}</td>
