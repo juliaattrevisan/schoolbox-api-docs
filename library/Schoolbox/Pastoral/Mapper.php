@@ -788,7 +788,7 @@ class Mapper extends BaseMapper
 
         if ($severity && $this->getConfigLoader()->get('pastoral_severity')) {
             $this->bindings[':severity'] = $severity->getId();
-            $this->filters[]             = '`sv`.`order` >= :severity';
+            $this->filters[]             = '`sv`.`sequence` >= :severity';
         }
 
         $this->addFilter($students, '`student_id`');
@@ -804,7 +804,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`s`.lastname, `s`.firstname";
                     break;
                 case 'severity':
-                    $orderParts[] = "`sv`.order";
+                    $orderParts[] = "`sv`.sequence";
                     break;
                 case 'date':
                     $orderParts[] = "`pastoral`.created_at desc";

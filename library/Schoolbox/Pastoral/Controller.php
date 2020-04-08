@@ -484,7 +484,7 @@ class Controller extends Base
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
         } else {
-            $severities = $this->pastoralSeverityMapper->findAll(['order' => ['order' => 'ASC']]);
+            $severities = $this->pastoralSeverityMapper->findAll();
         }
 
         // Check if user is a pastoral moderator
@@ -498,7 +498,7 @@ class Controller extends Base
         $roles = new Collection();
         $roleUsers = [];
 
-        $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
+        $rolesAll = $this->roleMapper->findAll();
 
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
