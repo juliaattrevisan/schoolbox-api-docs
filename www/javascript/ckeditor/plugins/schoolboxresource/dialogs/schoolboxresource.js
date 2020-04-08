@@ -556,7 +556,8 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     $.fn.schoolboxResource({
                                         allowedFilesystems: 'files',
                                         allowedFiles: 'image/*,audio/*,video/*',
-                                        previousModal: previousModal
+                                        previousModal: previousModal,
+                                        useFolder: false
                                     });
 
                                     $(window).unbind('message').on('message', function(event) {
