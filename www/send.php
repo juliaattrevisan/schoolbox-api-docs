@@ -15,7 +15,7 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Resource\Storage\S3\PreSignedUrl;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
@@ -66,13 +66,10 @@ if (is_numeric($_GET['id'])) {
         $config = $kernel->get('config');
 
         if ($config->get('otfs_s3_presigned_urls_enabled')) {
-            $signedUrlExpiration = Alaress_Date_Format::now()->addDays(1)->__toString();
+            $preSignedUrlService = new PreSignedUrlService($config);
 
-            $expires = Alaress_Date_Format::now()->addDays(1)->__toString();
-
-            $preSignedUrl = new PreSignedUrl(
-                $config,
-                $expires,
+            $preSignedUrlDataObject = $preSignedUrlService->generate(
+                Alaress_Date_Format::now()->addDays(1),
                 $attachmentType,
                 $contentType,
                 $file->getPath(),
@@ -80,7 +77,7 @@ if (is_numeric($_GET['id'])) {
                 $cacheControl
             );
 
-            $preSignedUrl->download($preSignedUrl->generate());
+            $preSignedUrlService->download($preSignedUrlDataObject);
         }
     }
 
