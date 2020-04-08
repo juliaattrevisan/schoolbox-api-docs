@@ -13,6 +13,7 @@ use League\Flysystem\Filesystem;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
 use Schoolbox\Video\Factory\Video as VideoFactory;
 use Schoolbox\Video\ResourceVideo;
@@ -89,7 +90,24 @@ if (isset($type) && isset($id)) {
 
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
-        $videoStream = S3Stream::open($video->getTranscodePath(), $config);
+        if ($config->get('otfs_s3_presigned_urls_enabled')) {
+            $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
+
+            $preSignedUrlService = new PreSignedUrlService($config);
+
+            $preSignedUrlDataObject = $preSignedUrlService->generate(
+                Alaress_Date_Format::now()->addDays(1),
+                $video->getStorage()->getMime(),
+                $video->getStorage()->getMime(),
+                $video->getTranscodePath(),
+                $video->getStorage()->getBasename(),
+                $cacheControl
+            );
+
+            $preSignedUrlService->download($preSignedUrlDataObject);
+        } else {
+            $videoStream = S3Stream::open($video->getTranscodePath(), $config);
+        }
     } elseif (($localFilename = getLocalFilesystemPath($video, $config)) !== false) {
         // Local Disk
         $videoStream = fopen($localFilename, "rb");
