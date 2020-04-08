@@ -81,7 +81,9 @@ class ArticleResolver implements IArticleResolver
         Database\Connector\IConnector $db,
         Folder\Mapper $folderMapper,
         RelationshipFilterer $relationshipFilter,
-        GenericCollection $simpleStrategies
+        GenericCollection $simpleStrategies,
+        Complex\Mapper $complexMapper,
+        News\Mapper $newsMapper
     ) {
         $this->validNullEntities  = $validNullEntities;
         $this->modifierEntityMap  = $modifierEntityMap;
@@ -89,8 +91,8 @@ class ArticleResolver implements IArticleResolver
         $this->folderMapper       = $folderMapper;
         $this->relationshipFilter = $relationshipFilter;
         $this->simpleStrategies   = $simpleStrategies;
-        $this->complexMapper      = Complex\Mapper::getInstance(); // TODO inject
-        $this->articleMapper      = News\Mapper::getInstance(); // TODO inject
+        $this->complexMapper      = $complexMapper;
+        $this->articleMapper      = $newsMapper;
     }
 
 

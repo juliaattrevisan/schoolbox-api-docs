@@ -527,6 +527,8 @@ abstract class Kernel
                      * @var UserAccessMapper                      $userAccessMapper
                      * @var Folder\Mapper                         $folderMapper
                      * @var UserMapper                            $userMapper
+                     * @var News\Audience\Complex\Mapper          $complexMapper
+                     * @var News\Mapper                           $newsMapper
                      */
                     $db               = $di->get('databaseInternal');
                     $externalUser     = $di->get('externalUser');
@@ -536,6 +538,8 @@ abstract class Kernel
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
                     $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
                     $userMapper       = $mapperFactory->get(UserMapper::class);
+                    $complexMapper    = $mapperFactory->get(News\Audience\Complex\Mapper::class);
+                    $newsMapper       = $mapperFactory->get(News\Mapper::class);
                     return new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
                         $strategyFactory->getValidRelationshipEntityMap(),
@@ -549,7 +553,9 @@ abstract class Kernel
                             $externalClass,
                             $userAccessMapper
                         ),
-                        $strategyFactory->makeAllSimpleStrategies()
+                        $strategyFactory->makeAllSimpleStrategies(),
+                        $complexMapper,
+                        $newsMapper
                     );
                 }
             )
