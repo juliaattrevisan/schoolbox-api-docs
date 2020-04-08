@@ -104,7 +104,7 @@ class Renderer
             });
         }
 
-        return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
+        return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs]) : '';
     }
 
 
