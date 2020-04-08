@@ -122,6 +122,10 @@ class UserResolver implements IUserResolver
                 }
             }
         }
+        // We will have no subQueries if we detected that all bricks could not resolve to any users.
+        if (!count($subQueries)) {
+            return [];
+        }
 
         $sql = implode("\nUNION\n", $subQueries);
 
