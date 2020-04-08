@@ -1,26 +1,35 @@
 <?php
 /**
- * FileFactory
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Editor;
 
+use InvalidArgumentException;
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Exception;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
+use UnexpectedValueException;
 
-class FileFactory {
+/**
+ * Class FileFactory
+ *
+ * Normalised info about the node you chose in the picker.
+ *
+ * @package Schoolbox\Editor
+ */
+class FileFactory
+{
 
     /**
      * A hash tuple e.g. browse:55
      *
      * @var string
      */
-    private $hash = '';
+    private $hash;
+
 
     /**
      * Constructor
@@ -31,40 +40,47 @@ class FileFactory {
 
         /* Ridiculous quick fix
          */
-        $this->setHash(str_replace('sbfs', 'browse', $hashTuple));
+        $this->hash = str_replace('sbfs', 'browse', $hashTuple);
     }
+
 
     /**
      * Produce json_encoded data
      *
      * @return string
+     * @throws InvalidArgumentException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function produce() {
+    public function produce(): string
+    {
         $folderMapper = false;
         $type = false;
 
         $data = [
+            'filesystem' => '',
             'type' => '',
             'hash' => '',
+            'name' => '',
             'id' => ''
         ];
 
-        if ($this->getHash()) {
+        if ($this->hash) {
 
             /* When identifying a storage file via browse:xxx which is
              * a string used internally in resource browser messages
              */
-            list($filesystem, $id) = explode(':', $this->getHash());
+            [$filesystem, $id] = explode(':', $this->hash);
 
             /* Folders treated uniquely
              * Regular folders and My Folder are also treated uniquely
              */
-            if (strstr($filesystem, '.folder')) {
-                if ($filesystem == 'browse.folder') {
+            if (strpos($filesystem, '.folder') !== false) {
+                if ($filesystem === 'browse.folder') {
                     $folderMapper = new FolderMapper();
                     $type = 'folder';
                 }
-                else if ($filesystem == 'myfile.folder') {
+                else if ($filesystem === 'myfile.folder') {
                     $folderMapper = new MyFolderMapper();
                     $type = 'myfolder';
                 }
@@ -81,22 +97,24 @@ class FileFactory {
                             'filesystem' => '',
                             'type'       => $type,
                             'hash'       => '',
+                            'name'       => $folder->getName(),
                             'id'         => $folder->getId()
                         ];
                     }
                     catch (\Exception $e) {
                     }
                 }
-            }
-            /* Other files
-             */
-            else {
-                $collector = (new CollectorFactory())->build([$this->getHash()])->getFirst();
+            } else {
+
+                /* Other files
+                 */
+                $collector = (new CollectorFactory())->build([$this->hash])->getFirst();
 
                 $data = [
                     'filesystem' => $filesystem,
                     'type'       => $collector->getMimetype()->getType(),
                     'hash'       => $collector->getHash(),
+                    'name'       => $collector->getFilename(),
 
                     /* Used for video/audio, sadly
                      */
@@ -106,28 +124,5 @@ class FileFactory {
         }
 
         return json_encode($data);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set hash
-     *
-     * @param string $hash
-     */
-    private function setHash($hash)
-    {
-        $this->hash = $hash;
-    }
-
-    /**
-     * Get hash
-     *
-     * @return string
-     */
-    private function getHash()
-    {
-        return $this->hash;
     }
 }

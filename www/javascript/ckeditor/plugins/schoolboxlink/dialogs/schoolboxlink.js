@@ -1,28 +1,31 @@
 CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
-    var config = {
-        url: {
-            /* Find information about a node/resource
-             */
-            nodeinfo: '/editor/nodeInfo.php',
+    var config = $.fn.schoolboxModalConfig({
 
-            /* Prefix for linking to Folders
-             */
-            folder: '/homepage/',
+        /**
+         * A callback which you use to deal with the url produced
+         * by interacting with the modal
+         *
+         * @param url     string  the url to which you linked
+         * @param name    string  user-facing name of the thing you linked
+         * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+         */
+        onSelect: function(url, name, dialog) {
 
-            /* Prefix for linking to MyFolders
+            /* Manufacture link url based on whether it was
+             * a file or a folder
+             *
+             * Assign link text to be same as url for now
+             * User can change it to whatever they want
              */
-            myfolder: '/my-files/',
+            var fields = dialogFields(dialog);
 
-            /* Prefix for link to Storage hash
-             */
-            storage: '/storage/fetch.php?hash=',
+            fields.url.setValue(url);
 
-            /* Prefix for linking to Files
-             */
-            file: '/send.php?id='
+            $('#participant-customise-modal').css('z-index', '10000');
         }
-    };
+    });
+
 
     /**
      * Inject link into editor panel with modifiers applied
@@ -70,6 +73,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
         return element;
     }
+
 
     /**
      * A macro to all the fields in the Dialog
@@ -127,8 +131,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();
-                                    var fields = dialogFields(dialog);
-
                                     var domId = $(this).attr('domId');
                                     var previousModal = $('#'+domId).closest('.cke_dialog');
                                     previousModal.addClass('hide');
@@ -136,73 +138,14 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
+                                        allowedFiles: null,
                                         allowedFilesystems: 'link',
                                         previousModal: previousModal
                                     });
 
-                                    $(window).unbind('message').on('message', function(event) {
-                                        var message;
-
-                                        try {
-                                            message = JSON.parse(event.originalEvent.data);
-                                        } catch (err) {
-                                            message = event.originalEvent.data;
-                                        }
-
-                                        /* Find out how to render this file
-                                         */
-                                        if (message.data != undefined) {
-                                            if (0 in message.data && 'hash' in message.data[0]) {
-                                                $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                                                    fields.id.setValue(responseText.id);
-                                                    fields.type.setValue(responseText.type);
-                                                    fields.filesystem.setValue(responseText.filesystem);
-
-                                                    /* Manufacture link url based on whether it was
-                                                     * a file or a folder
-                                                     *
-                                                     * Assign link text to be same as url for now
-                                                     * User can change it to whatever they want
-                                                     */
-                                                    if (fields.type.getValue() == 'folder') {
-                                                        fields.url.setValue(config.url.folder + fields.id.getValue());
-                                                    }
-                                                    else if (fields.type.getValue() == 'myfolder') {
-                                                        fields.url.setValue(config.url.myfolder + fields.id.getValue());
-                                                    }
-                                                    else if (fields.filesystem.getValue() == 'store') {
-                                                        fields.url.setValue(config.url.storage + fields.id.getValue());
-                                                    }
-                                                    else {
-                                                        fields.url.setValue(config.url.file + fields.id.getValue());
-                                                    }
-
-                                                    /* Shut modal, go back to Dialog
-                                                     */
-                                                    $('#file-picker').foundation('reveal', 'close');
-                                                    $('#participant-customise-modal').css('z-index', '10000');
-                                                });
-                                            } else if ('meetingUrl' in message.data) {
-
-                                                /* Microsoft Teams meetings url format
-                                                 */
-                                                fields.url.setValue(message.data.meetingUrl);
-
-                                                /* Shut modal, go back to Dialog
-                                                 */
-                                                $('#file-picker').foundation('reveal', 'close');
-                                            } else {
-
-                                                // The file was rejected, probably cause it was the wrong mimetype.
-                                                // Do nothing
-                                            }
-                                        }
-                                        else {
-
-                                            /* Connecting to your Google Drive
-                                             */
-                                        }
-                                    });
+                                    /* Send the message up and deal with the dialog, if one was specified
+                                     */
+                                    $.fn.schoolboxMessage(config, dialog);
                                 }
                             }
                         ]

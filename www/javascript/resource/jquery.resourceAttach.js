@@ -66,6 +66,7 @@ if(typeof window.location.origin == 'undefined') {
             // pass through to various implementations
             allowedFiles: null,
             multi: false,
+            useFolder: true,
 
             // callbacks
             onSelect: noop,
@@ -306,6 +307,10 @@ if(typeof window.location.origin == 'undefined') {
 
         if (this.options.allowedFiles) {
             qString += '&mime=' + this.options.allowedFiles;
+        }
+
+        if (this.options.useFolder) {
+            qString += '&f=1';
         }
 
         return qString;

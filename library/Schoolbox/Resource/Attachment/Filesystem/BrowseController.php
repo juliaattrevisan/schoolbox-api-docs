@@ -26,10 +26,11 @@ class BrowseController extends NavigatorController
      * @param string        $mimeFilter
      * @param IConfigLoader $conf
      * @param RosettaStone  $rosetta
+     * @param bool          $useFolder
      */
-    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null)
+    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null, $useFolder = true)
     {
-        parent::__construct($multi, $mimeFilter);
+        parent::__construct($multi, $mimeFilter, $conf, $rosetta, $useFolder);
         $this->rosetta = $rosetta;
     }
 

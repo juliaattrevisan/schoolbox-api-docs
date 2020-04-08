@@ -3,7 +3,18 @@
     value:         string
     required:      bool
 #}
+<script>
+    $(function() {
+        $('#modalLinkButton-{{ name }}').schoolboxLink({
+            allowedFiles: false,
+            allowedFilesystems: 'folder',
+            onSelect: function(url, name, dialog) {
+                $('#{{ name }}').val(url);
+            }
+        });
+    });
+</script>
 <div class="input-group">
     <input id="{{ name }}" {{  required ? 'required ' }} type="text" name="{{ name }}" value="{{ value }}" />
-    <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{{ name }}">Select Source</a>
+    <a id="modalLinkButton-{{ name }}" class="button icon-link">Browse</a>
 </div>

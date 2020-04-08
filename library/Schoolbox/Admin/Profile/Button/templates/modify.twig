@@ -11,7 +11,7 @@
     <input type="hidden" name="id" value="{{ item.id }}">
     <div class="row">
         <div class="small-12 island">
-            
+
             <h2 class="subheader">
                 {% if createForm %}
                     Create Profile Button
@@ -19,7 +19,7 @@
                     Modify Profile Button
                 {% endif %}
             </h2>
-            
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -55,9 +55,18 @@
                     <div class="small-12 columns">
                         <label for="profile-button-url" class="required">Destination URL</label>
                         <p class="meta">You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the URL, these will be replaced with details of the user being <b>viewed</b>.</p> <p class="meta">You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    onSelect: function(url, name, dialog) {
+                                        $('#profile-button-url').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
                             <input name="url" id="profile-button-url" type="text" value="{{ item.url }}">
-                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ locale.resource.properPlural }}</a>
+                            <a id="modalLinkButton" class="button icon-link">Browse</a>
                         </div>
                     </div>
                     <div class="small-12 columns">
@@ -182,19 +191,6 @@
                 'campusVisibility[]': {required: 'Please select at least one campus.'},
                 'roleVisibility[]': {required: 'Please select at least one role.'}
             }
-        });
-
-        // Resource browser
-        $('a[data-role="openResourceBrowser"]').click(function(e) {
-            e.preventDefault();
-            $('[data-role="resourceBrowser"]').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('#profile-button-url').val(url);
-                }
-            });
         });
 
         /*

@@ -1,211 +1,24 @@
-(function() {
-    var modalCache = {};
-    var singletonModal = null;
+(function($) {
 
     /**
-     * Spawns a Schoolbox Resource Browser which allows you
-     * to choose a file of some sort
-     *
-     * Shamelessly cannibalised from Dropzone Resource Browser
+     * Unified Editor interface
      *
      * @param options
      */
-    $.fn.schoolboxResource = function(options) {
+    $.fn.alaressEditor = function(options) {
         options = options || {};
 
-        var config = init(options, $(this));
+        var config = init(options);
 
-        cacheModal();
+        start();
 
         /**
          * Init
          *
          * @param options
-         * @param element
          * @returns {*}
          */
-        function init(options, element) {
-            var defaults = {
-                element: element,
-
-                /* Comma-separated list of extensions to filter
-                 */
-                allowedFiles: null,
-
-                /* Url to get node information
-                 */
-                source: '/resources/attachment',
-
-                /* Allowed Filesystems for choosing resources
-                 */
-                allowedFilesystems: false
-            };
-
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
-        }
-
-        /**
-         * Augment url with parameters
-         *
-         * @returns {string}
-         */
-        function getQueryString() {
-            var qString = 'multi=0';
-
-            if (config.allowedFiles) {
-                qString += '&mime=' + config.allowedFiles;
-            }
-
-            if (config.allowedFilesystems) {
-                qString += '&fs=' + config.allowedFilesystems;
-            }
-
-            return qString;
-        }
-
-        /**
-         * Unique identifier for modals
-         *
-         * @returns {string}
-         */
-        function getCacheKey() {
-            return config.source + '?' + getQueryString();
-        }
-
-        /**
-         * Respawn a modal from the cache if it already existed for
-         * a given url
-         */
-        function cacheModal() {
-            var key = getCacheKey();
-
-            if ('undefined' == typeof modalCache[key]) {
-                modalCache[key] = $.get(config.source, getQueryString()).promise();
-            }
-
-            modalCache[key].done(function(data) {
-                // ensure we retain ResourceAttache context
-                build(data);
-            });
-        }
-
-        /**
-         * Resize picker dimensions dynamically
-         */
-        function resizePicker() {
-            var pickerWidth = $(window).width() * 0.67;
-
-            $('.reveal-modal.file-picker.open').css({
-                width: pickerWidth + 'px',
-                left: Math.floor($(window).width()/2 - pickerWidth/2) + 'px'
-            });
-        }
-
-        /**
-         * Manufacture a modal
-         *
-         * @param data
-         */
-        function build(data) {
-            var body = $('body');
-
-            if (singletonModal) {
-                // you've got a modal; don't try to make another one
-                return;
-            }
-            else if($('#attachment-browser').length) {
-                singletonModal = $('#attachment-browser').parent();
-            }
-            else {
-                singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
-                    .data('content', data);
-
-                body.append(singletonModal);
-            }
-
-            singletonModal
-                .html(singletonModal.data('content'))
-                .foundation('reveal', 'open')
-                .off('closed.fndtn.reveal.attach');
-
-            /* If you're opening the modal in cke_maximised,
-             * you have to wrangle styles around so it doesn't
-             * appear in a stupid layout
-             *
-             * For some reason cke fights foundation and kills responsiveness
-             * so dynamically assign a pixel width upon initiation and
-             * also aupon resization
-             */
-            if ($('.cke_maximized').length) {
-                $(window).resize(function() {
-                    resizePicker();
-                });
-
-                $(document).on('opened.fndtn.reveal', '.file-picker', function() {
-                    resizePicker();
-                });
-            }
-
-            /* Hide cke overlay and adjust a z-index so the
-             * Schoolbox Resource Browser appears on top of the
-             * ckeditor dialog (enormous sigh)
-             */
-            $('.cke_dialog_background_cover').addClass('hide');
-
-            /* ckeditor dialog appears at z-index 10010 so our
-             * Resource Browser needs to be more
-             */
-            $('[data-reveal]').css({zIndex: 20000});
-
-            // reinit
-            $(document)
-                //.foundation('reveal', 'reflow')
-                .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal) {
-                        singletonModal.detach();
-                        singletonModal = null;
-                    }
-                    if(undefined !== config.previousModal) {
-                        config.previousModal.removeClass('hide');
-                    }
-
-                    // Show the cke dialog overlay again
-                    $('.cke_dialog_background_cover').removeClass('hide');
-                });
-
-            singletonModal.on('click', '.cancel[role=button]', function (e) {
-                e.preventDefault();
-                window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
-                singletonModal.foundation('reveal', 'close');
-            });
-        }
-    };
-}(jQuery));
-
-(function($) {
-
-	/**
-	 * Unified Editor interface
-	 *
-	 * @param options
-	 */
-	$.fn.alaressEditor = function(options) {
-		options = options || {};
-
-		var config = init(options);
-
-		start();
-
-		/**
-		 * Init
-		 *
-		 * @param options
-		 * @returns {*}
-		 */
-		function init(options) {
+        function init(options) {
 
             /* These are the default CKEDITOR.config values
              * You can find more at http://docs.ckeditor.com/#!/api/CKEDITOR.config
@@ -323,12 +136,12 @@
             };
 
             return $.extend(defaults, derived, options);
-		}
+        }
 
-		/**
-		 * Disturb the sleeping dragon
-		 */
-		function start() {
+        /**
+         * Disturb the sleeping dragon
+         */
+        function start() {
             config.load();
 
             $.each(config.targetElements, function(index, element) {
@@ -354,7 +167,7 @@
                     applyCallbacks(name, element);
                 }
             });
-		}
+        }
 
         /**
          * Apply setup, ckeditor spawn, and change events
@@ -393,7 +206,7 @@
                 }
             });
         }
-	};
+    };
 
     // Remove unsupported table options on table properties dialog open
     CKEDITOR.on('dialogDefinition', function(ev) {

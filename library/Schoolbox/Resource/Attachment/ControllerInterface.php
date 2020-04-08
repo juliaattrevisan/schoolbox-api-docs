@@ -21,8 +21,9 @@ interface ControllerInterface
     /**
      * @param bool   $multi
      * @param string $mimeFilter
+     * @param bool   $useFolder
      */
-    public function __construct($multi, $mimeFilter = null);
+    public function __construct($multi, $mimeFilter = null, $useFolder = true);
 
 
     /**

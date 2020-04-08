@@ -10926,11 +10926,6 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/AbstractController.php
 
 		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\BrowseController has an unused parameter \\$conf\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/BrowseController.php
-
-		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$conf\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/NavigatorController.php

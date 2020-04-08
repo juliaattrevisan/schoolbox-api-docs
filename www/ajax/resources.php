@@ -20,7 +20,18 @@ if (count($this->arg) < 3) {
 
 $source = $this->arg[1];
 $multi  = $this->arg[2] === 'multi';
-$mime   = $_GET['mime'];
+
+if (!isset($_GET['mime'])) {
+    $mimeFilter = null;
+} elseif ('' === $_GET['mime']) {
+    $mimeFilter = false;
+} else {
+    $mimeFilter = $_GET['mime'];
+}
+
+/* Whether there is a Use This Folder button
+ */
+$useFolder = isset($_GET['f']);
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
@@ -33,8 +44,9 @@ $configLoader = $this->getDi()->get('config');
 /* Parse individual template in the accordion
  */
 (new Schoolbox\Resource\Attachment\Factory())
-    ->setMimeFilter($mime)
+    ->setMimeFilter($mimeFilter)
     ->allowMulti($multi)
     ->setConfig($configLoader)
+    ->setUseFolder($useFolder)
     ->build($source)
     ->parse($this);

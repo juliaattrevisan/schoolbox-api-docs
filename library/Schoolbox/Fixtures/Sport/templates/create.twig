@@ -10,21 +10,6 @@
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
         });
-
-        /**
-         * Modal for URL homepage selection
-         */
-        $('[data-role="openResourceBrowser"]').click(function(e) {
-            e.preventDefault();
-            $('[data-role="resourceBrowser"]').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('input[name="url"]').val(url);
-                }
-            });
-        });
     });
 </script>
 
@@ -59,10 +44,19 @@
                         <input type="text" name="name" id="name" value="{{ sport.name }}" required />
 
                         <label for="url">Homepage URL</label>
+                        <script>
+                            $(function() {
+                                $('#modalLinkButton').schoolboxLink({
+                                    allowedFilesystems: 'folder',
+                                    onSelect: function(url, name, dialog) {
+                                        $('input[name="url"]').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <div class="input-group">
                             <input type="text" name="url" value="{{ sport.url }}" placeholder="http://" />
-                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
-                            <div data-role="resourceBrowser" class="hide"></div>
+                            <a id="modalLinkButton" class="button icon-link">Browse</a>
                         </div>
                     </div>
                 </fieldset>

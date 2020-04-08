@@ -21,11 +21,12 @@ class WebdavController extends NavigatorController
     /**
      * @param bool   $multi
      * @param string $mimeFilter
+     * @param bool   $useFolder
      * @throws OutOfRangeException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function __construct($multi, $mimeFilter = null)
+    public function __construct($multi, $mimeFilter = null, $useFolder = true)
     {
         try {
             \PortfolioWebDAV::factory();
@@ -34,7 +35,7 @@ class WebdavController extends NavigatorController
         }
 
         // disallow null: cast to '*/*'
-        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter);
+        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter, null, null, $useFolder);
     }
 
 

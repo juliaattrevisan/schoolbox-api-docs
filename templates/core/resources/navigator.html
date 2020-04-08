@@ -5,6 +5,7 @@
       modal: false,
       isolate: true,
       mimeFilter: {MIME_FILTER},
+      useFolder: {USE_FOLDER},
       submitCallback: function (url, filename, meta) {
         var i, hash, data;
 
@@ -21,7 +22,7 @@
         }
 
         data = [{
-          title:    $(filename).text(),
+          title:    filename,
           mimeType: meta.mime,
           filesize: meta.size,
           hash:     hash
