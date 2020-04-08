@@ -120,7 +120,7 @@ class Module extends BaseModule
         } else {
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
-                $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
+                $article->setAudience(News\Audience\Mapper::getInstance()->findForArticles([$article->getId()]));
             } catch (MapperException $e) {
                 throw new NotFound("No article found for 'articleId' {$params['articleId']}", 0, $e);
             }
@@ -149,15 +149,5 @@ class Module extends BaseModule
     private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
     {
         return $this->injector->get('commsNewsAudienceStrategyFactory');
-    }
-
-
-    /**
-     * @return \Schoolbox\Mapper|News\Audience\Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getAudienceMapper(): News\Audience\Mapper
-    {
-        return $this->getMapperFactory()->get(News\Audience\Mapper::class);
     }
 }
