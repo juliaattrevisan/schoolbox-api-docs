@@ -70,10 +70,30 @@
         function getQueryString() {
             var qString = 'multi=0';
 
-            if (config.allowedFiles) {
+            /* Didn't specify a mimetype for files; display folders and all files via the empty string
+             * Or, if you specified an allowedFiles string, use that as a filter
+             */
+            if (false === config.allowedFiles) {
+
+                /* Only show folders (disallow all files)
+                 * Specify an empty mime querystring param
+                 */
+                qString += '&mime=';
+            } else if (null === config.allowedFiles) {
+
+                /* Show both folders and any/all files
+                 * This is the default behaviour (noop)
+                 */
+
+            } else {
+
+                /* Filter to specific filetypes
+                 */
                 qString += '&mime=' + config.allowedFiles;
             }
 
+            /* Pick from the presets as to what controllers are available
+             */
             if (config.allowedFilesystems) {
                 qString += '&fs=' + config.allowedFilesystems;
             }
@@ -350,6 +370,7 @@
              */
             {
                 element: $(this),
+                allowedFiles: null,
                 allowedFilesystems: 'link',
             },
 
@@ -372,7 +393,8 @@
             /* Select something from the Resource Browser
              */
             $.fn.schoolboxResource({
-                allowedFilesystems: config.allowedFilesystems
+                allowedFiles: config.allowedFiles,
+                allowedFilesystems: config.allowedFilesystems,
             });
 
             /* Send the message up and deal with the dialog, if one was specified

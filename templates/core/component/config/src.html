@@ -2,6 +2,7 @@
 <script>
     $(function() {
         $('#modalLinkButton-src-{COMPONENT_HANDLE}').schoolboxLink({
+            allowedFiles: false,
             allowedFilesystems: 'folder',
             onSelect: function(url, name, dialog) {
                 const currentFolderId = parseInt('{ID}');

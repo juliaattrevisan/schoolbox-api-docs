@@ -31,7 +31,7 @@ class Factory
 
 
     /**
-     * @var string
+     * @var string|bool|null
      */
     protected $mime;
 
@@ -68,7 +68,7 @@ class Factory
 
 
     /**
-     * @param string $mime
+     * @param string|bool|null $mime
      * @return self
      */
     public function setMimeFilter($mime): self

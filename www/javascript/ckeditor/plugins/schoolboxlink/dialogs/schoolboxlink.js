@@ -138,6 +138,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
+                                        allowedFiles: null,
                                         allowedFilesystems: 'link',
                                         previousModal: previousModal
                                     });

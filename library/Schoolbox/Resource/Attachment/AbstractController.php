@@ -45,12 +45,25 @@ abstract class AbstractController implements ControllerInterface
      */
     public function getUrl()
     {
-        return sprintf(
-            '/ajax/resources/%s/%s?mime=%s',
-            $this->getSlug(),
-            $this->multi ? 'multi' : 'single',
-            urlencode($this->mimeFilter)
-        );
+        /* Finally I found this place
+         */
+        $prefix = sprintf('/ajax/resources/%s/%s', $this->getSlug(), $this->multi ? 'multi' : 'single');
+
+        /* mimeFilter not set; use default behaviour (folders and files)
+         */
+        if (null === $this->mimeFilter) {
+            return $prefix;
+        }
+
+        /* mimeFilter was false; just show folders
+         */
+        if (false === $this->mimeFilter) {
+            return "{$prefix}?mime=";
+        }
+
+        /* mimeFilter was set to some string so urlencode it then supply it
+         */
+        return "{$prefix}?mime=" . urlencode($this->mimeFilter);
     }
 
 

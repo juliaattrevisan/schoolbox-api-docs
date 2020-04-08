@@ -24,10 +24,10 @@ abstract class NavigatorController extends AbstractController
     protected $template;
 
     /**
-     * @param bool          $multi
-     * @param string        $mimeFilter
-     * @param IConfigLoader $conf
-     * @param RosettaStone  $rosetta
+     * @param bool             $multi
+     * @param string|bool|null $mimeFilter
+     * @param IConfigLoader    $conf
+     * @param RosettaStone     $rosetta
      */
     public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null)
     {
@@ -53,8 +53,8 @@ abstract class NavigatorController extends AbstractController
          * of folders-only, but alright, mr matt will have his mysteries
          */
         if (null === $this->mimeFilter) {
-            $mimeFilter = null;
-        } elseif (!$this->mimeFilter) {
+            $mimeFilter = 'null';
+        } elseif (false === $this->mimeFilter || '' === $this->mimeFilter) {
             $mimeFilter = 'false';
         } else {
             $mimeFilter = "'{$this->mimeFilter}'";

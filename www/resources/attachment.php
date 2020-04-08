@@ -22,9 +22,16 @@ $this->setAjax();
 $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
-$multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
-$mimeFilter       = empty($_GET['mime']) ? false : $_GET['mime'];
+$multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
+
+if (!isset($_GET['mime'])) {
+    $mimeFilter = null;
+} elseif ('' === $_GET['mime']) {
+    $mimeFilter = false;
+} else {
+    $mimeFilter = $_GET['mime'];
+}
 
 /* Figger out which filesystem options to show
  */

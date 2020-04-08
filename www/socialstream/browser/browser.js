@@ -148,7 +148,7 @@ try {
 
             if (config.mimeFilter === false) {
                 // if the filter is explicitly false, exclude all files
-                args.mimeFilter = '';
+                args.mimeFilter = false;
             }
             else if (config.mimeFilter) {
                 // if a filter is set, include it
