@@ -25,12 +25,13 @@
             {% set direction = log.direction|lower == 'in' ? 'Enter' : 'Exit' %}
             {% set type = log.event_type|capitalize %}
             <tr>
-                <td>{{ type }}</td>
                 <td>
                     <img src="/images/VIST/{{ log.icon }}"
                          title="{{ type }}, {{ direction }}"
                          alt="{{ type }}, {{ direction }}"
-                         style="width: 16px; margin-right: 10px;" />
+                         style="width: 16px;" />
+                </td>
+                <td>
                     {{ log.location_tag }}
                 </td>
                 <td>{{ log.timestamp|date('h:i a') }}</td>
