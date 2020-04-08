@@ -8186,16 +8186,6 @@ parameters:
 			path: library/Schoolbox/Column/Timestamp.php
 
 		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/ArticleResolver.php
-
-		-
-			message: "#^Variable \\$entityValue in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$type, \\$value$#"
-			count: 2
-			path: library/Schoolbox/Comms/News/Audience/ArticleResolver.php
-
-		-
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\StrategyFactory\\:\\:\\$knownUserSubjects has unknown class mixed as its type\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/StrategyFactory.php
@@ -8261,11 +8251,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Moderation/Module.php
 
 		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\StrategyFactory\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Moderation/Module.php
@@ -8292,11 +8277,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Module.php
 
@@ -8377,11 +8357,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\StrategyFactory\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Module.php
-
-		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Module.php
 
