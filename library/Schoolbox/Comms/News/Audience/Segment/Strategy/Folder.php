@@ -671,6 +671,7 @@ class Folder extends SimpleStrategy
                     ->equals("g.group_type", \Schoolbox\Role::STAFF)
             );
         }
+        $classPb = (new Builder($quoter, ''))->any($classPb);
         if (count($excludedUsers)) {
             $classPb->notIn('u.id', $excludedUsers);
         }
