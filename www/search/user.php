@@ -181,7 +181,7 @@ function renderStudent(
         if (is_array($externalUser['AlertMessage'])) {
             $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
         } else {
-            $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [$externalUser['AlertMessage']];
+            $externalUser['AlertMessages'] = empty(trim($externalUser['AlertMessage'])) ? [] : [$externalUser['AlertMessage']];
         }
         if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
             $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
