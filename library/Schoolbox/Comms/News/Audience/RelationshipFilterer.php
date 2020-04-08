@@ -134,7 +134,7 @@ class RelationshipFilterer
             AND u.deleted_at IS NULL
         ";
 
-        return $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN));
     }
 
 
@@ -246,7 +246,7 @@ class RelationshipFilterer
                                     ->any($innerPb)
                                     ->equals('g.group_type', Role::STAFF);
 
-        return $this->userMapper->findByPredicates($outerPb)->getPropertyValues('id');
+        return array_map('intval', $this->userMapper->findByPredicates($outerPb)->getPropertyValues('id'));
     }
 
 
