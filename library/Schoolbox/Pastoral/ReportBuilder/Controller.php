@@ -244,7 +244,7 @@ class Controller extends Base
             $severities = [];
         } else {
             $orders[]   = 'severity';
-            $severities = $this->pastoralSeverityMapper->findAll()->sortBy('order', 'asc');
+            $severities = $this->pastoralSeverityMapper->findAll()->sortBy('sequence', 'asc');
         }
 
         foreach ($orders as $orderCurrent) {

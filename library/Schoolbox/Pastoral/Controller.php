@@ -484,7 +484,7 @@ class Controller extends Base
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
         } else {
-            $severities = $this->pastoralSeverityMapper->findAll(['order' => ['order' => 'ASC']]);
+            $severities = $this->pastoralSeverityMapper->findAll(['order' => ['sequence' => 'ASC']]);
         }
 
         // Check if user is a pastoral moderator

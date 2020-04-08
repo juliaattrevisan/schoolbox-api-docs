@@ -46,24 +46,6 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @param int $order
-     *
-     * @return self
-     */
-    public function setOrder($order)
-    {
-        return $this->setSequence($order);
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrder()
-    {
-        return $this->getSequence();
-    }
-
-    /**
      * @param bool $dashboard
      *
      * @return self

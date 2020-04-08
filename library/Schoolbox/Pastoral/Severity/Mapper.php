@@ -21,7 +21,7 @@ class Mapper extends BaseMapper
         $this->hasTable('lu_pastoral_severity');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('order', self::TYPE_INTEGER);
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('dashboard', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -58,6 +58,6 @@ class Mapper extends BaseMapper
     /** @inheritDoc */
     protected function getDefaultOrderByParams(): array
     {
-        return ['order' => 'ASC'];
+        return ['sequence' => 'ASC'];
     }
 }

@@ -1044,14 +1044,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             try {
                 /** @var PastoralSeverity $severity */
-                $severity = $this->pastoralSeverityMapper->findOneByColumn("order", 0);
+                $severity = $this->pastoralSeverityMapper->findOneByColumn('sequence', 0);
             } catch (Exception $e) {
                 // Pastoral severity was not found, this should never happen as it is a mandatory field in Schoolbox.
                 // We will just create a default one called "Low" in case it every does happen
 
                 /** @var PastoralSeverity $severity */
                 $severity = $this->pastoralSeverityMapper->createModel();
-                $severity->setOrder(0);
+                $severity->setSequence(0);
                 $severity->setName("Low");
                 $this->pastoralSeverityMapper->save($severity);
             }
