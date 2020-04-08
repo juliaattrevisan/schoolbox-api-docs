@@ -28,10 +28,11 @@ abstract class NavigatorController extends AbstractController
      * @param string|bool|null $mimeFilter
      * @param IConfigLoader    $conf
      * @param RosettaStone     $rosetta
+     * @param bool             $useFolder
      */
-    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null)
+    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null, $useFolder = true)
     {
-        parent::__construct($multi, $mimeFilter);
+        parent::__construct($multi, $mimeFilter, $useFolder);
         $this->template = 'navigator';
     }
 
@@ -61,6 +62,7 @@ abstract class NavigatorController extends AbstractController
         }
 
         $page->setVar([
+            'USE_FOLDER' => $this->useFolder ? 'true' : 'false',
             'MIME_FILTER' => $mimeFilter,
             'SOURCE_SLUG' => substr($this->getSlug(), strpos($this->getSlug(), '/') + 1),
         ]);

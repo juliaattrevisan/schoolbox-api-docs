@@ -29,6 +29,10 @@ if (!isset($_GET['mime'])) {
     $mimeFilter = $_GET['mime'];
 }
 
+/* Whether there is a Use This Folder button
+ */
+$useFolder = isset($_GET['f']);
+
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
     'SITE_LOCATION' => $this->site,
@@ -43,5 +47,6 @@ $configLoader = $this->getDi()->get('config');
     ->setMimeFilter($mimeFilter)
     ->allowMulti($multi)
     ->setConfig($configLoader)
+    ->setUseFolder($useFolder)
     ->build($source)
     ->parse($this);

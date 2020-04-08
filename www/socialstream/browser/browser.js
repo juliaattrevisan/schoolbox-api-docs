@@ -85,6 +85,10 @@ try {
                  */
                 mimeFilter: null,
 
+                /* Present the Use This Folder button
+                 */
+                useFolder: true,
+
                 /* selectors */
                 browserSelector: '[data-socialstream-browser]',
                 breadcrumbSelector: '[data-breadcrumb]',
@@ -166,6 +170,10 @@ try {
             var container = config.element;
             if (modal.length) {
                 container = modal;
+            }
+
+            if (config.useFolder) {
+                args.useFolder = true;
             }
 
 			/* Load data into the node container

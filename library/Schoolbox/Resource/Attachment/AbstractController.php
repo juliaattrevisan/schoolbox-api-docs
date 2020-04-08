@@ -22,11 +22,19 @@ abstract class AbstractController implements ControllerInterface
     /** @var string */
     protected $slug;
 
+
+    /**
+     * @var bool
+     */
+    protected $useFolder = true;
+
+
     /**
      * @param bool   $multi
      * @param string $mimeFilter
+     * @param bool   $useFolder
      */
-    public function __construct($multi, $mimeFilter = null)
+    public function __construct($multi, $mimeFilter = null, $useFolder = true)
     {
         $regex = '`([A-Za-z0-9_]+\\\\[A-Za-z0-9_]+)Controller$`';
         $class = get_class($this);
@@ -37,6 +45,7 @@ abstract class AbstractController implements ControllerInterface
         $this->mimeFilter = $mimeFilter;
         $this->slug       = strtolower(str_replace('\\', '/', $matches[1]));
         $this->template   = $this->slug;
+        $this->useFolder  = $useFolder;
     }
 
 
@@ -49,21 +58,31 @@ abstract class AbstractController implements ControllerInterface
          */
         $prefix = sprintf('/ajax/resources/%s/%s', $this->getSlug(), $this->multi ? 'multi' : 'single');
 
+        $args = [];
+
         /* mimeFilter not set; use default behaviour (folders and files)
          */
         if (null === $this->mimeFilter) {
-            return $prefix;
+            // noop
+        } elseif (false === $this->mimeFilter) {
+
+            /* mimeFilter was false; just show folders
+             */
+            $args['mime'] = '';
+        } else {
+
+            /* mimeFilter was set to some string so urlencode it then supply it
+             */
+            $args['mime'] = urlencode($this->mimeFilter);
         }
 
-        /* mimeFilter was false; just show folders
+        /* If we should have a Use This Folder button
          */
-        if (false === $this->mimeFilter) {
-            return "{$prefix}?mime=";
+        if ($this->useFolder) {
+            $args['f'] = true;
         }
 
-        /* mimeFilter was set to some string so urlencode it then supply it
-         */
-        return "{$prefix}?mime=" . urlencode($this->mimeFilter);
+        return $prefix . '?' . http_build_query($args);
     }
 
 

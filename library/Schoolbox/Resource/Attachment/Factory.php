@@ -55,6 +55,12 @@ class Factory
 
 
     /**
+     * @var bool
+     */
+    protected $useFolder = true;
+
+
+    /**
      * @param array $classmap
      */
     public function __construct(array $classmap = [])
@@ -64,6 +70,17 @@ class Factory
         $this
              ->setMimeFilter(null)
              ->allowMulti(false);
+    }
+
+
+    /**
+     * @param bool $useFolder
+     * @return $this
+     */
+    public function setUseFolder(bool $useFolder): self
+    {
+        $this->useFolder = $useFolder;
+        return $this;
     }
 
 
@@ -124,7 +141,7 @@ class Factory
             throw new OutOfRangeException("No controller found: {$source}");
         }
 
-        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta);
+        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta, $this->useFolder);
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException('Controller does not implement ControllerInterface');

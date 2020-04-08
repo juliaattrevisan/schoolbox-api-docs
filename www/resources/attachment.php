@@ -33,6 +33,10 @@ if (!isset($_GET['mime'])) {
     $mimeFilter = $_GET['mime'];
 }
 
+/* Whether the Use This Folder button should be available
+ */
+$useFolder = isset($_GET['f']);
+
 /* Figger out which filesystem options to show
  */
 $context = new ResourceContextFactory($filesystemContext);
@@ -50,7 +54,8 @@ $rosettaStone = $this->getDi()->get('l10n');
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
         ->setConfig($configLoader)
-        ->setRosetta($rosettaStone);
+        ->setRosetta($rosettaStone)
+        ->setUseFolder($useFolder);
 
 foreach ($factory->getMappedControllers() as $controller) {
 

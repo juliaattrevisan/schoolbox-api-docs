@@ -37,7 +37,7 @@ $resourceId = isset($_REQUEST['relationID']) && is_numeric($_REQUEST['relationID
 
 /* For rendering "Use this folder" ability
  */
-$useFolders = true;
+$useFolder = isset($_REQUEST['useFolder']);
 
 if (!isset($_REQUEST['mimeFilter'])) {
     $mimeFilter = null;
@@ -64,8 +64,7 @@ try {
 
     // Render the stuff in this node
     $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
-    $renderer->render($useFolders);
-
+    $renderer->render($useFolder);
 } catch (Unauthorized $e) {
     $this->error(2);
 } catch (\Schoolbox\Resource\Exception $e) {

@@ -32,6 +32,7 @@
 
         cacheModal();
 
+
         /**
          * Init
          *
@@ -43,24 +44,26 @@
             var defaults = {
                 element: element,
 
-                /* Comma-separated list of extensions to filter
-                 */
-                allowedFiles: null,
-
                 /* Url to get node information
                  */
                 source: '/resources/attachment',
 
+                /* Comma-separated list of extensions to filter
+                 */
+                allowedFiles: null,
+
                 /* Allowed Filesystems for choosing resources
                  */
-                allowedFilesystems: false
+                allowedFilesystems: false,
+
+                /* Whether Use This Folder is available
+                 */
+                useFolder: true
             };
 
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
+            return $.extend(defaults, options);
         }
+
 
         /**
          * Augment url with parameters
@@ -96,6 +99,12 @@
              */
             if (config.allowedFilesystems) {
                 qString += '&fs=' + config.allowedFilesystems;
+            }
+
+            /* If the Use This Folder button is available
+             */
+            if (config.useFolder) {
+                qString += '&f';
             }
 
             return qString;
