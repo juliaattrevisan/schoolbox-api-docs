@@ -127,7 +127,7 @@ class Renderer
             unset($record);
         }
 
-        return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs]) : '';
+        return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs['data']]) : '';
     }
 
 

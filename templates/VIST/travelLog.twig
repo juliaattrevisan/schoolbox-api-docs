@@ -1,4 +1,4 @@
-{% if travelLogs.data is not empty %}
+{% if travelLogs is not empty %}
     <table>
         <thead>
         <tr>
@@ -8,7 +8,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for log in travelLogs.data %}
+        {% for log in travelLogs %}
             {% set direction = log.direction|lower == 'in' ? 'Enter' : 'Exit' %}
             {% set type = log.event_type|capitalize %}
             <tr>
