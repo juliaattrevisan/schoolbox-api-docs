@@ -27,7 +27,7 @@ class Renderer
      * Student's Travel Log should be requested and displayed only for verso school
      * Note that this is the school code, not the site location
      */
-    private const VERSO_SCHOOL_CODE = 'verso';
+    private const VERSO_SCHOOL_CODE = 'VIST';
 
 
     /**
