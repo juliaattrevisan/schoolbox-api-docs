@@ -115,9 +115,9 @@ class SchoolHouse extends SimpleStrategy
         $isValidNull = self::isValidNullEntityValue();
         foreach ($users as $user) {
             if ($user->getSchoolHouse() !== null) {
-                $values[$user->getSchoolHouse()->getId()] = $user->getSchoolHouse()->getId();
+                $values[] = $user->getSchoolHouse()->getId();
             } elseif ($isValidNull) {
-                $values[$user->getSchoolHouse()->getId()] = null;
+                $values[] = null;
             }
         }
         return array_unique($values);
