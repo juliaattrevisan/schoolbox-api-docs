@@ -221,4 +221,22 @@ interface IBuilder
      * @return static
      */
     public function putParam(string $param, $value): IBuilder;
+
+
+    /**
+     * Returns the where clause combined using INTERSECTION
+     *
+     * eg, ['id' => [1,2], 'colour' => [NULL]] => "(id IN (:id_1,:id_2) AND colour IS NULL)"
+     * @return string
+     */
+    public function getWhereIntersect(): string;
+
+
+    /**
+     * Returns the where clause combined using UNION
+     *
+     * eg, ['id' => [1,2], 'colour' => [NULL]] => "(id IN (:id_1,:id_2) OR colour IS NULL)"
+     * @return string
+     */
+    public function getWhereUnion(): string;
 }
