@@ -45,9 +45,9 @@ class External_Tass_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
-        $this->companyCode  = $this->database->smartQuote(Config::get('external_tass_company_code'));
-        $this->helper = new External_Tass_Helper();
+        $this->database    = MSSQL::getInstance();
+        $this->companyCode = Config::get('external_tass_company_code');
+        $this->helper      = new External_Tass_Helper();
     }
 
 
@@ -82,9 +82,10 @@ class External_Tass_User implements External_UserInterface
             WHERE
                   pa.e_mail IS NOT NULL AND
                   s.stud_code IN ($idList) AND
-                  pa.cmpy_code = {$this->companyCode} AND
+                  pa.cmpy_code = :companyCode AND
                   pa.add_num IN ($addnum)
         ";
+        $params = ['companyCode' => $this->companyCode];
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
@@ -97,9 +98,10 @@ class External_Tass_User implements External_UserInterface
                 FROM paraddress pa
                 INNER JOIN studcommrules scr ON pa.par_code=scr.par_code
                     AND pa.cmpy_code = scr.cmpy_code
-                    AND scr.cmpy_code = {$this->companyCode}
+                    AND scr.cmpy_code = :companyCodeComm
                     AND pa.add_num = scr.add_num
             ";
+            $params['companyCodeComm'] = $this->companyCode;
 
             $typecode = $this->helper->getTypeCode();
 
@@ -112,12 +114,11 @@ class External_Tass_User implements External_UserInterface
                 WHERE
                     pa.e_mail IS NOT NULL AND
                     s.stud_code IN ($idList) AND
-                    pa.cmpy_code = {$this->companyCode} AND
                     pa.add_num IN ($addnum)
             ";
         }
 
-        $statement = $this->database->query($query);
+        $statement = $this->database->query($query, $params);
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             if (false !== strpos($row['e_mail'], ';')) {
@@ -390,9 +391,9 @@ class External_Tass_User implements External_UserInterface
         $query = "
             SELECT curr_sem
             FROM ttparms
-            WHERE cmpy_code = {$this->companyCode}
+            WHERE cmpy_code = :companyCode
         ";
-        $currentSemester = $this->database->getOne($query);
+        $currentSemester = $this->database->getOne($query, ['companyCode' => $this->companyCode]);
         return $currentSemester === null ? null : (string)$currentSemester;
     }
 
@@ -405,9 +406,9 @@ class External_Tass_User implements External_UserInterface
         $query = "
             SELECT curr_year
             FROM ttparms
-            WHERE cmpy_code = {$this->companyCode}
+            WHERE cmpy_code = :companyCode
         ";
-        $currentYear = $this->database->getOne($query);
+        $currentYear = $this->database->getOne($query, ['companyCode' => $this->companyCode]);
         return $currentYear === null ? null : (string)$currentYear;
     }
 
@@ -514,6 +515,7 @@ class External_Tass_User implements External_UserInterface
                 WHERE sf.par_code = {$this->database->smartQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->database->smartQuote($parentNum)}
             ";
+            $params = [];
 
             if ($commrules) {
                 $query .= "
@@ -522,18 +524,18 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = {$this->companyCode}
+                    WHERE cmpy_code = :companyCode
                     AND par_code = {$this->database->smartQuote($parentCode)}
                     AND add_num IN({$addnum})
                 ";
-
+                $params['companyCode'] = $this->companyCode;
                 if (!empty($typecode)) {
                     $query .= "AND commtype_code IN ({$typecode}) ";
                 }
             }
 
             $return = array();
-            $result = $this->database->getAll($query);
+            $result = $this->database->getAll($query, $params);
 
             // parse the array, because this data is stored in a funky way
             if (count($result) && is_array($result)) {
@@ -556,6 +558,7 @@ class External_Tass_User implements External_UserInterface
                 WHERE s.par_code = {$this->database->smartQuote($id)}
                 AND (s.dol IS NULL OR s.dol >= getdate())
             ";
+            $params = [];
             if ($commrules) {
                 $query .= "
                     UNION
@@ -563,17 +566,18 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = {$this->companyCode}
+                    WHERE cmpy_code = :companyCode
                     AND par_code = {$this->database->smartQuote($id)}
                     AND add_num IN ({$addnum})
                 ";
+                $params['companyCode'] = $this->companyCode;
 
                 if (!empty($typecode)) {
                     $query .= "AND commtype_code IN ({$typecode}) ";
                 }
             }
 
-            $return = $this->database->getAll($query);
+            $return = $this->database->getAll($query, $params);
         }
 
         return $return;
@@ -626,7 +630,7 @@ class External_Tass_User implements External_UserInterface
     {
         // Exclude selected position text
 
-        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_text_exclude'));
+        $staffCategory = explode(',', Config::get('tass_staff_dir_position_text_exclude'));
 
         $wherePositionText = '';
 
@@ -650,7 +654,7 @@ class External_Tass_User implements External_UserInterface
 
         // Exclude selected position title
 
-        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_title_exclude'));
+        $staffCategory = explode(',', Config::get('tass_staff_dir_position_title_exclude'));
 
         $wherePositionTitle = '';
 
@@ -675,7 +679,7 @@ class External_Tass_User implements External_UserInterface
 
         // Exclude selected award codes
 
-        $staffAward = explode(',',\Config::get('tass_staff_dir_award_exclude'));
+        $staffAward = explode(',', Config::get('tass_staff_dir_award_exclude'));
 
         $whereAward = '';
 
@@ -699,7 +703,7 @@ class External_Tass_User implements External_UserInterface
 
         // Custom category code descriptions
 
-        $awardMappings = explode(',',\Config::get('tass_staff_dir_award_mappings'));
+        $awardMappings = explode(',', Config::get('tass_staff_dir_award_mappings'));
 
         if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0)
         {
@@ -739,7 +743,7 @@ class External_Tass_User implements External_UserInterface
             FROM dbo.tel_vw_telemf
             LEFT OUTER JOIN dbo.teacher ON dbo.tel_vw_telemf.emp_code = dbo.teacher.emp_code
             WHERE
-              (dbo.tel_vw_telemf.cust_code = {$this->companyCode}) AND
+              (dbo.tel_vw_telemf.cust_code = :companyCode) AND
               (dbo.tel_vw_telemf.term_date IS NULL)
               {$wherePositionText}
               {$wherePositionTitle}
@@ -747,7 +751,7 @@ class External_Tass_User implements External_UserInterface
             ORDER BY StaffSurname, StaffPreferredName
         ";
 
-        return $database->trimAll($database->getAll($query));
+        return $database->trimAll($database->getAll($query, ['companyCode' => $this->companyCode]));
     }
 
     /**

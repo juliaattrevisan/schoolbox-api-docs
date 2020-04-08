@@ -1,5 +1,8 @@
 <?php
 
+use Alaress\Database\Predicate\Bindings;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+
 class External_Tass_Helper
 {
 
@@ -85,6 +88,17 @@ class External_Tass_Helper
     }
 
     /**
+     * Bindings for address number block ids (paraddress.add_num)
+     * @param string $bind
+     * @return Bindings
+     */
+    public function getAddNumBindings(string $bind = 'addNum'): Bindings
+    {
+        $addNums = array_unique(explode(',', trim(Config::get('external_tass_addnum'))));
+        return PredicateBuilder::getBindings($addNums, $bind);
+    }
+
+    /**
      * @return string
      */
     public function getAddNumMother()
@@ -125,5 +139,16 @@ class External_Tass_Helper
         }
 
         return $typecode;
+    }
+
+    /**
+     * Bindings for typeCode
+     * @param string $bind
+     * @return Bindings
+     */
+    public function getTypeCodeBindings(string $bind = 'typeCode'): Bindings
+    {
+        $typeCodes = array_unique(explode(',', trim(Config::get('external_tass_commrules_typecode'))));
+        return PredicateBuilder::getBindings($typeCodes, $bind);
     }
 }
