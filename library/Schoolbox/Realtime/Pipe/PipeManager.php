@@ -254,7 +254,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $pipe      = $this->pipes->getPipeBySocketKey($socketKey);
 
         if (!$pipe) {
-            throw new ConnectionException("Unrecognised pipe: '$socketKey'");
+            throw new ErrorException("Unrecognised pipe: '$socketKey'");
         }
 
         $userId    = $pipe->getUserId();
