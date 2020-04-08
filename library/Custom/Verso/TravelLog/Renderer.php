@@ -96,6 +96,12 @@ class Renderer
 
         if ($this->isTravelLogAvailable($externalId)) {
             $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
+
+            /* Sort chronologically
+             */
+            usort($travelLogs['data'], function($a, $b) {
+                return (int)$a['event_id'] > (int)$b['event_id'];
+            });
         }
 
         return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
