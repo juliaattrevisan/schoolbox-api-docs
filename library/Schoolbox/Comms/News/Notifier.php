@@ -78,13 +78,11 @@ class Notifier extends AbstractModuleNotifier
         ]);
 
         $userResolver = $di->lazyNew(UserResolver::class, [
-            'validNullEntities'    => StrategyFactory::getValidNullEntities(),
             'db'                   => $di->lazyGet('databaseInternal'),
-            'externalClass'        => $di->lazyGet('externalClass'),
             'relationshipFilterer' => $relationshipFilterer,
-            'audienceMapper'       => $mf->getLazy(Audience\Mapper::class),
-            'folderMapper'         => $mf->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
+            'strategyFactory'      => $di->lazyGet('commsNewsAudienceStrategyFactory'),
         ]);
+
 
         $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
             'audienceMapper'   => $mf->getLazy(Audience\Mapper::class),
