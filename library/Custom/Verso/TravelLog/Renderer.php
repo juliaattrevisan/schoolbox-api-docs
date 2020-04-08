@@ -37,6 +37,21 @@ class Renderer
 
 
     /**
+     * Icons are mapped based on event_type ['security, 'transport'] and direction ['in', 'out']
+     */
+    private const ICON_MAPPING = [
+        'security' => [
+            'in' => 'enter.svg',
+            'out' => 'exit.svg'
+        ],
+        'transport' => [
+            'in' => 'enter-bus.svg',
+            'out' => 'exit-bus.svg'
+        ],
+    ];
+
+
+    /**
      * @var string
      */
     private $schoolCode;
@@ -103,10 +118,30 @@ class Renderer
                 return strtotime($a['timestamp']) > strtotime($b['timestamp']);
             });
 
-            new \Alaress_Probe($travelLogs['data']);
+            /* Augment the array with an icon
+             */
+            foreach ($travelLogs['data'] as &$record) {
+                $record['icon'] = $this->decideIcon($record['event_type'], $record['direction']);
+            }
+
+            unset($record);
         }
 
         return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs]) : '';
+    }
+
+
+    /**
+     * Decide an icon for this record
+     * event_type and direction are not case sensitive for the purposes of deciding icons
+     *
+     * @param string $eventType
+     * @param string $direction
+     * @return mixed
+     */
+    private function decideIcon(string $eventType, string $direction)
+    {
+        return self::ICON_MAPPING[strtolower($eventType)][strtolower($direction)];
     }
 
 

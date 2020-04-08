@@ -9,12 +9,14 @@
         </thead>
         <tbody>
         {% for log in travelLogs.data %}
+            {% set direction = log.direction|lower == 'in' ? 'Enter' : 'Exit' %}
+            {% set type = log.event_type|capitalize %}
             <tr>
-                <td>{{ log.event_type|capitalize }}</td>
+                <td>{{ type }}</td>
                 <td>
-                    <img src="/images/VIST/{{ log.direction|lower == 'in' ? 'enter' : 'exit' }}.svg"
-                         title="{{ log.direction|lower == 'in' ? 'enter' : 'exit' }}"
-                         alt="{{ log.direction|lower == 'in' ? 'enter' : 'exit' }}"
+                    <img src="/images/VIST/{{ log.icon }}"
+                         title="{{ type }}, {{ direction }}"
+                         alt="{{ type }}, {{ direction }}"
                          style="width: 16px; margin-right: 10px;" />
                     {{ log.location_tag }}
                 </td>
