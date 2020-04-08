@@ -106,7 +106,6 @@ class UserResolver implements IUserResolver
             return [];
         }
 
-
         $subQueries   = [];
         $allParams    = [];
         $uniquePrefix = 0;
@@ -322,7 +321,7 @@ class UserResolver implements IUserResolver
             ->setParamPrefix("_{$subQueryId}_x")
             ->in("{$userTableAlias}.id", $relatedUsers)
             ->isNull("{$userTableAlias}.deleted_at");
-        $sql = "SELECT {$userTableAlias}.id FROM user {$userTableAlias} WHERE {$pb->getWhereIntersect()}";
+        $sql = "SELECT {$userTableAlias}.id, 'self' relationship FROM user {$userTableAlias} WHERE {$pb->getWhereIntersect()}";
 
         return [$sql, $pb->getParams()];
 
@@ -369,7 +368,7 @@ class UserResolver implements IUserResolver
             $allRelatedUsers[] = array_diff($relatedUsers, $mutedFolders[$folderId] ?? []);
         }
 
-        return array_unique(array_merge($allRelatedUsers));
+        return array_unique(array_merge(...$allRelatedUsers));
     }
 
 
