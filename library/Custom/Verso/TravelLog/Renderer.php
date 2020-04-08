@@ -100,34 +100,50 @@ class Renderer
      *
      * @param Environment $twig
      * @param string|null $externalId
+     * @param bool        $showDate
      * @return string
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function render(Environment $twig, ?string $externalId): string
+    public function render(Environment $twig, ?string $externalId, bool $showDate = false): string
     {
         $travelLogs = [];
 
         if ($this->isTravelLogAvailable($externalId)) {
             $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
 
-            /* Sort chronologically
-             */
-            usort($travelLogs['data'], function($a, $b) {
-                return strtotime($a['timestamp']) > strtotime($b['timestamp']);
-            });
+            /* $travelLogs might be an array of error data when the externalId wasn't found
+             * in the third party system:
 
-            /* Augment the array with an icon
+               array (size=3)
+                  'status' => int 404
+                  'title' => string 'Not found' (length=9)
+                  'message' => string 'id "135" not found.' (length=19)
              */
-            foreach ($travelLogs['data'] as &$record) {
-                $record['icon'] = $this->decideIcon($record['event_type'], $record['direction']);
+            if (!isset($travelLogs['data'])) {
+                $travelLogs = [];
+            } else {
+                /* Sort chronologically
+                 */
+                usort($travelLogs['data'], function ($a, $b) {
+                    return strtotime($a['timestamp']) > strtotime($b['timestamp']);
+                });
+
+                /* Augment the array with an icon
+                 */
+                foreach ($travelLogs['data'] as &$record) {
+                    $record['icon'] = $this->decideIcon($record['event_type'], $record['direction']);
+                }
+
+                unset($record);
             }
-
-            unset($record);
         }
 
-        return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs['data']]) : '';
+        return !empty($travelLogs) ? $twig->render('travelLog.twig', [
+            'travelLogs' => $travelLogs['data'],
+            'date' => $showDate ? $travelLogs['data'][0]['timestamp'] : ''
+        ]) : '';
     }
 
 
