@@ -100,8 +100,10 @@ class Renderer
             /* Sort chronologically
              */
             usort($travelLogs['data'], function($a, $b) {
-                return (int)$a['event_id'] > (int)$b['event_id'];
+                return strtotime($a['timestamp']) > strtotime($b['timestamp']);
             });
+
+            new \Alaress_Probe($travelLogs['data']);
         }
 
         return !empty($travelLogs) ? $twig->render('travelLog.twig', ['travelLogs' => $travelLogs]) : '';
