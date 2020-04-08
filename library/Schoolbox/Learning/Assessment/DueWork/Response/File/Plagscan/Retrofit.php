@@ -77,12 +77,12 @@ class Retrofit
             FROM assessment a
             INNER JOIN submission_box sb ON a.id = sb.assessment_id
             INNER JOIN (
-                SELECT student_submission.box_id, student_submission.submitted_by, MAX(submitted_at) as maxdate
+                SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
                 FROM student_submission
-                GROUP BY box_id, submitted_by
+                GROUP BY box_id, owner
                 ) maxdates
              ON sb.id = maxdates.box_id
-            INNER JOIN student_submission ss ON maxdates.submitted_by = ss.submitted_by AND maxdate = ss.submitted_at
+            INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
             LEFT JOIN plagscan_document pd ON ssf.id = pd.student_submission_file_id
             WHERE a.id = :assessmentId
