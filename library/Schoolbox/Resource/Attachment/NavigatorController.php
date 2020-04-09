@@ -58,7 +58,7 @@ abstract class NavigatorController extends AbstractController
         } elseif (false === $this->mimeFilter || '' === $this->mimeFilter) {
             $mimeFilter = 'false';
         } else {
-            $mimeFilter = "'{$this->mimeFilter}'";
+            $mimeFilter = "'" . urldecode($this->mimeFilter) . "'";
         }
 
         $page->setVar([
