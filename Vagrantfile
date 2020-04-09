@@ -101,6 +101,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vf.vmx["memsize"] = memory
   end
 
+  config.vm.provision "shell", run: "always", path: "tools/vagrant-provision-pre-puppet.sh"
+
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
   config.vm.synced_folder "#{puppet_dir}/environments/staging/hieradata/node", "/etc/puppetlabs/code/hieradata/node"
