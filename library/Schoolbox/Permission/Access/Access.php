@@ -422,10 +422,14 @@ class Access
 
         // Find the NNIAN ancestors for the folder
         /** @var Folder\Model $nnian */
-        $folder         = $this->folderMapper->findCheaplyById($folderId);
-        $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
-        $nnian          = $nnianAncestors->last();
-        $nnianId        = $nnian->getId();
+        $folder = $this->folderMapper->findCheaplyById($folderId);
+        try {
+            $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
+        } catch (Mapper\Exception $e) {
+            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+        }
+        $nnian   = $nnianAncestors->last();
+        $nnianId = $nnian->getId();
 
         // 1. Superusers always have full access if folder exists
         $accessLevel = $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
@@ -490,10 +494,14 @@ class Access
 
         // Ensure we take role-permission from NNIAN
         /** @var Folder\Model $nnian */
-        $folder         = $this->folderMapper->findCheaplyById($folderId);
-        $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
-        $nnian          = $nnianAncestors->last();
-        $nnianId        = $nnian->getId();
+        $folder = $this->folderMapper->findCheaplyById($folderId);
+        try {
+            $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
+        } catch (Mapper\Exception $e) {
+            return UserAccess::ACCESS_DENY;
+        }
+        $nnian   = $nnianAncestors->last();
+        $nnianId = $nnian->getId();
 
         // Permission check #2 - Query the DB (unique constraints ensure 0:1 results)
         // (it is possible to have a folder that does not inherit that lacks role perms, eg 'Lost & Found' folder)
