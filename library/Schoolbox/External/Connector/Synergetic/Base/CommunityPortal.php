@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
 class CommunityPortal implements ICommunityPortal
@@ -41,12 +42,15 @@ class CommunityPortal implements ICommunityPortal
     private $allowCreateUser;
 
     /**
-     * @inheritdoc
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     * @param IConnector    $databaseExternal
      */
-    public function __construct($config, $databaseExternal)
+    public function __construct(IConfigLoader $config, IConnector $databaseExternal)
     {
-        $this->allowUpdate = (bool)$config['synergetic_password_reset'];
-        $this->allowCreateUser = (bool)$config['synergetic_portal_create_account'];
+        $this->allowUpdate      = (bool)$config->get('synergetic_password_reset');
+        $this->allowCreateUser  = (bool)$config->get('synergetic_portal_create_account');
         $this->databaseExternal = $databaseExternal;
     }
 
@@ -80,10 +84,10 @@ class CommunityPortal implements ICommunityPortal
 
         $query = $this->databaseExternal->executeQuery(
             "
-                SELECT    * 
-                FROM      dbo.communityLogins 
+                SELECT    *
+                FROM      dbo.communityLogins
                 WHERE     ID = :externalId
-            ", 
+            ",
             ['externalId' => $communityId]
         );
 
