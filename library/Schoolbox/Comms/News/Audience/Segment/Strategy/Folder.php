@@ -521,6 +521,9 @@ class Folder extends SimpleStrategy
                     return null;
                 }
                 foreach ($user->getChildren() as $child) {
+                    if ($child->getSubjectCollection() === null) {
+                        continue;
+                    }
                     if (count(array_intersect($this->parseSubjectIds($child), $entityValues))) {
                         return true;
                     }
