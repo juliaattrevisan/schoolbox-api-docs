@@ -409,10 +409,14 @@ class Access
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
-        // Special case for root folder
+        // 1. Superusers always have full access if folder exists
+        if ($user->isSuperuser()) {
+            return UserAccess::ACCESS_FULL;
+        }
+
+        // Special case for root folder: all users can read
         if ($folderId === Folder\Model::ROOT_ID) {
-            // Superusers have FULL access, other users have DENY
-            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_READ;
+            return UserAccess::ACCESS_READ;
         }
 
         // check cache before we proceed for shortcuts
@@ -426,13 +430,13 @@ class Access
         try {
             $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
         } catch (Mapper\Exception $e) {
-            return $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+            return UserAccess::ACCESS_DENY;
         }
         $nnian   = $nnianAncestors->last();
         $nnianId = $nnian->getId();
 
-        // 1. Superusers always have full access if folder exists
-        $accessLevel = $user->isSuperuser() ? UserAccess::ACCESS_FULL : UserAccess::ACCESS_DENY;
+        // Assume access is denied until proven otherwise
+        $accessLevel = UserAccess::ACCESS_DENY;
 
         // 2. Check `userAccess` table. (if not already full access)
         if ($accessLevel !== UserAccess::ACCESS_FULL) {
