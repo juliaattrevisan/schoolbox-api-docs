@@ -1,0 +1,44 @@
+{##
+ # Display the entry/exit events of students as they interact with transport to/from
+ # their school. Optionally show a date for context since the data is a big list
+ # of things that happened on a day.
+ #
+ # travelLogs  array  An array of events that a student experienced
+ # date        bool   The date of the first event on this page (empty to hide)
+ #}
+{% if travelLogs is not empty %}
+    <table>
+        <thead>
+        {% if date %}
+            <tr>
+                <th colspan="3">{{ date|date('jS M Y') }}</th>
+            </tr>
+        {% endif %}
+        <tr>
+            <th>TYPE</th>
+            <th>ACTION & LOCATION</th>
+            <th>TIME</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in travelLogs %}
+            {% set direction = log.direction|lower == 'in' ? 'Enter' : 'Exit' %}
+            {% set directionStyle =  log.direction|lower == 'in' ? 'reviewed' : 'submitted-late'%}
+            {% set type = log.event_type|capitalize %}
+            <tr>
+                <td>
+                    <img src="/images/VIST/{{ log.icon }}"
+                         title="{{ type }}, {{ direction }}"
+                         alt="{{ type }}, {{ direction }}"
+                         style="height: 24px;" />
+                </td>
+                <td>
+                    <span class="{{ directionStyle}} label">{{ direction }}</span>
+                    {{ log.location_tag }}
+                </td>
+                <td>{{ log.timestamp|date('h:i a') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

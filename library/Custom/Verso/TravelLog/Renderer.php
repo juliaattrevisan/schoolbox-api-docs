@@ -27,13 +27,28 @@ class Renderer
      * Student's Travel Log should be requested and displayed only for verso school
      * Note that this is the school code, not the site location
      */
-    private const VERSO_SCHOOL_CODE = 'verso';
+    private const VERSO_SCHOOL_CODE = 'VIST';
 
 
     /**
      * API times out after this many seconds elapse
      */
     private const DEFAULT_API_TIMEOUT = 300;
+
+
+    /**
+     * Icons are mapped based on event_type ['security, 'transport'] and direction ['in', 'out']
+     */
+    private const ICON_MAPPING = [
+        'security' => [
+            'in' => 'enter.svg',
+            'out' => 'exit.svg'
+        ],
+        'transport' => [
+            'in' => 'enter-bus.svg',
+            'out' => 'exit-bus.svg'
+        ],
+    ];
 
 
     /**
@@ -85,20 +100,64 @@ class Renderer
      *
      * @param Environment $twig
      * @param string|null $externalId
+     * @param bool        $showDate
      * @return string
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function render(Environment $twig, ?string $externalId): string
+    public function render(Environment $twig, ?string $externalId, bool $showDate = false): string
     {
         $travelLogs = [];
 
         if ($this->isTravelLogAvailable($externalId)) {
             $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
+
+            /* $travelLogs might be an array of error data when the externalId wasn't found
+             * in the third party system:
+
+               array (size=3)
+                  'status' => int 404
+                  'title' => string 'Not found' (length=9)
+                  'message' => string 'id "135" not found.' (length=19)
+             */
+            if (!isset($travelLogs['data'])) {
+                $travelLogs = [];
+            } else {
+                /* Sort chronologically
+                 */
+                usort($travelLogs['data'], function ($a, $b) {
+                    return strtotime($a['timestamp']) > strtotime($b['timestamp']);
+                });
+
+                /* Augment the array with an icon
+                 */
+                foreach ($travelLogs['data'] as &$record) {
+                    $record['icon'] = $this->decideIcon($record['event_type'], $record['direction']);
+                }
+
+                unset($record);
+            }
         }
 
-        return !empty($travelLogs) ? $twig->render('versoTravelLog.twig', ['travelLogs' => $travelLogs]) : '';
+        return !empty($travelLogs) ? $twig->render('travelLog.twig', [
+            'travelLogs' => $travelLogs['data'],
+            'date' => $showDate ? $travelLogs['data'][0]['timestamp'] : ''
+        ]) : '';
+    }
+
+
+    /**
+     * Decide an icon for this record
+     * event_type and direction are not case sensitive for the purposes of deciding icons
+     *
+     * @param string $eventType
+     * @param string $direction
+     * @return mixed
+     */
+    private function decideIcon(string $eventType, string $direction)
+    {
+        return self::ICON_MAPPING[strtolower($eventType)][strtolower($direction)];
     }
 
 

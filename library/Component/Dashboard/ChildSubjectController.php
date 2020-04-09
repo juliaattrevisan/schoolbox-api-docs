@@ -82,8 +82,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar("STUDENT_YEAR", $userChild->getYear());
 
             // Render the Verso school's Travel Log data
-            $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId()));
-
+            $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true));
 
 
             if ($this->getConfigLoader()->get('pastoral_enabled') &&

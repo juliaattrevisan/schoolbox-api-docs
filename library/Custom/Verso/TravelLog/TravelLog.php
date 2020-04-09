@@ -83,7 +83,7 @@ class TravelLog
      * @return false|string
      * @throws IdentityProviderException
      */
-    public function getForStudent($externalId)
+    public function getForStudent(string $externalId)
     {
         $request = $this->provider->getAuthenticatedRequest(
             'GET',
