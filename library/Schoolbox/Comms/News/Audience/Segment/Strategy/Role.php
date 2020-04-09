@@ -7,9 +7,19 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
+use function array_unique;
+use function count;
+use function implode;
+use function in_array;
 
 class Role extends SimpleStrategy
 {
@@ -70,15 +80,20 @@ class Role extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, groups.name AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN groups ON cna.entity_type = '{$entityType}' AND cna.entity_value = groups.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+
+        $pb = (new Builder(new Quoter(), 'groups'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, name name
+            FROM `groups`
+            WHERE {$pb->getWhereIntersect()}
         ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
     /**
@@ -98,8 +113,29 @@ class Role extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $values[$user->getRole()->getId()] = $user->getRole()->getId();
+            $values[] = $user->getRole()->getId();
         }
-        return $values;
+        return array_unique($values);
+    }
+
+
+    /**
+     * @inheritDoc
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        return new UserResolutionSql('', $this->newPb($paramPrefix)->in("$userTableAlias.group_id", $filtered));
     }
 }

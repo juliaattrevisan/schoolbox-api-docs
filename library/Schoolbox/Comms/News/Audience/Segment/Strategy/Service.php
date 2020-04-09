@@ -7,8 +7,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function count;
+use function in_array;
 
 class Service extends SimpleStrategy
 {
@@ -44,9 +49,9 @@ class Service extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
-        return ''; // TODO
+        return new TranslateSql('', []); // TODO
     }
 
     /**
@@ -69,5 +74,70 @@ class Service extends SimpleStrategy
             $values[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
         }
         return $values;
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $uaAlias = "ua_$paramPrefix";
+
+        $pb = $this->newPb($paramPrefix);
+        foreach ($filtered as $entityValue) {
+            [$service, $sid, $type] = \explode('.', $entityValue);
+            $innerPb = $this->newPb($paramPrefix);
+            if ('*' !== $service) {
+                $innerPb->equals("$uaAlias.service", $service);
+            }
+            if ('*' !== $sid) {
+                $innerPb->equals("$uaAlias.sid", $sid);
+            }
+            if ('*' !== $type) {
+                $innerPb->equals("$uaAlias.type", $type);
+            }
+            $pb->all($innerPb);
+        }
+        if ($targetNull) {
+            $pb->isNull("$uaAlias.uid");
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        $joinType = $targetNull ? "LEFT" : "";
+        $join     = "$joinType JOIN userAccess $uaAlias ON $userTableAlias.id = $uaAlias.uid";
+
+        return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                return null;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
+                return null;
+        }
+        return null;
     }
 }

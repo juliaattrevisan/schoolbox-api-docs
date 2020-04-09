@@ -91,7 +91,7 @@ class Codec
      * Converts a selectize value to a set of structured audience segments
      *
      * @param string $selectizeValues
-     * @return GenericCollection
+     * @return GenericCollection|Audience\Model[]
      * @throws DomainException
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws UnexpectedValueException

@@ -122,7 +122,8 @@ class Homepage
             Resource\File\Mapper::getInstance(),
             Schoolbox\Dropbox\Mapper::getInstance(),
             \SocialStream\PostMapper::getInstance(),
-            Schoolbox\Comms\News\Audience\Mapper::getInstance(),
+            Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance(),
+            Schoolbox\Comms\News\Audience\Complex\Mapper::getInstance(),
             Schoolbox\Blog\Homepage\Post\Mapper::getInstance(),
         ];
 

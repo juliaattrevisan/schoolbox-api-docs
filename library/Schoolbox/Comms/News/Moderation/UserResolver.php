@@ -8,12 +8,21 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Database;
+use DomainException;
+use InvalidArgumentException;
+use PDOException;
+use Schoolbox\Comms;
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
-use Schoolbox\Comms\News\Audience\Model as Audience;
+use Schoolbox\Resource\Folder;
 use PDO;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
+use UnderflowException;
+use function array_intersect;
+use function array_map;
+use function array_merge;
+use function array_unique;
 
 /**
  * Responsible for:
@@ -21,7 +30,7 @@ use Schoolbox\Comms\News\Audience\Segment\EntityType;
  */
 class UserResolver implements IUserResolver
 {
-    /** @var AudienceMapper */
+    /** @var Audience\Mapper */
     private $audienceMapper;
 
     /** @var UserAccessMapper */
@@ -30,78 +39,153 @@ class UserResolver implements IUserResolver
     /** @var Database\Connector\IConnector */
     private $db;
 
+
     /**
-     * @param AudienceMapper                $audienceMapper
+     * @param Audience\Mapper               $audienceMapper
      * @param UserAccessMapper              $userAccessMapper
+     * @param Database\Connector\IConnector $db
      */
     public function __construct(
-        AudienceMapper $audienceMapper,
+        Audience\Mapper $audienceMapper,
         UserAccessMapper $userAccessMapper,
         Database\Connector\IConnector $db
     ) {
-        $this->audienceMapper       = $audienceMapper;
-        $this->userAccessMapper     = $userAccessMapper;
-        $this->db                   = $db;
+        $this->audienceMapper   = $audienceMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->db               = $db;
     }
 
-    /**
-     * Returns the ids of users who are capable of moderating this article
-     *
-     * The business rules, as *intended* to be coded below, are:
-     *  - if an article is audienced ONLY to a single homepage, with no modifiers, users with WRITE+ access can moderate
-     *  - in all other cases, only superusers and comms officers can moderate (since sub-moderators don't yet exist)
-     *
-     * @param \Schoolbox\Comms\News\Model $article
-     * @param bool $includeFolderWriteUsers
-     * @throws \Schoolbox\Mapper\Exception
-     * @return int[]
-     * @todo Add logic to handle the case when an article has 0 audience segments. See SA-6839
-     */
-    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article, bool $includeFolderWriteUsers = true): array
+
+    /** @inheritDoc */
+    public function findModeratorsForArticle(Comms\News\Model $article): array
     {
-        // Default moderators (superusers and comms officers)
-        $superuserIds = $this->db->executeQuery(
-            'SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
-            ->fetchAll(PDO::FETCH_COLUMN);
+        return array_unique(array_merge(
+            $this->getSuperuserIds(),
+            $this->getGlobalNewsModerators(),
+            $this->getAudienceModerators($article)
+        ));
+    }
 
-        $superuserIds = array_map('intval', $superuserIds);
-        $moderators = array_unique(array_merge($superuserIds, $this->findModeratorIds()));
 
-        if (!$includeFolderWriteUsers) {
-            return $moderators;
+    /**
+     * @param Comms\News\Model $article
+     * @return array
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws DomainException
+     */
+    public function getAudienceModerators(Comms\News\Model $article): array
+    {
+        $rootSegments = $this->audienceMapper->findForArticles([$article->getId()]);
+
+        // Special case, no audience
+        if (!$rootSegments->count()) {
+            return [];
         }
 
-        $rootSegments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
-
-        if ($rootSegments->count() !== 1) {
-            // non-trivial case, more than one segment
-            return $moderators;
+        // To moderate an article due to its audience, users must be able to moderate all root segments
+        $audienceModerators = null;
+        foreach ($article->getAudience() as $rootSegment) {
+            $segmentModerators = $this->getSegmentModerators($rootSegment);
+            if ($audienceModerators === null) {
+                $audienceModerators = $segmentModerators;
+            } else {
+                $audienceModerators = array_intersect($audienceModerators, $segmentModerators);
+            }
+            if (!count($audienceModerators)) {
+                break;
+            }
         }
 
-        /** @var Audience $segment */
-        $segment = $rootSegments->first();
+        return $audienceModerators;
+    }
 
-        if ($segment->getEntityType() !== \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
-            // not a trivial folder segment; bounce this
-            return $moderators;
+
+    /**
+     * Returns the id of users who can moderate the specified audience segment
+     *
+     * @param Audience\Model $segment
+     * @return int[]
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws UnderflowException
+     * @throws Mapper\Exception\InsufficientHydrationException
+     */
+    private function getSegmentModerators(Audience\Model $segment): array
+    {
+        if ($segment->isSimple()) {
+            return $this->getLeafSegmentModerators($segment);
         }
 
-        $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($segment->getEntityValue());
+        // A user can moderator a composite segment if they can moderate any child segment
+        $childModerators = [];
+        foreach ($segment->getChildren() as $childSegment) {
+            $childModerators = array_merge($this->getSegmentModerators($childSegment));
+        }
+        return $childModerators;
+    }
+
+
+    /**
+     * Returns the id of users who can moderate the specified audience leaf segment
+     *
+     * @param Audience\Model $segment
+     * @return int[]
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws UnderflowException
+     */
+    private function getLeafSegmentModerators(Audience\Model $segment): array
+    {
+        if ($segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType()) {
+            return [];
+        }
+        if ($segment->getEntityValue() === null) {
+            return [];
+        }
+        if ($segment->getRelationship() !== Audience\Model::RELATIONSHIP_SELF) {
+            return [];
+        }
+
+        // Need to hydrate folder codes to ensure we get SIS teachers
+        $folder       = Folder\Mapper::getInstance()->findById($segment->getEntityValue());
         $writePlusIds = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_WRITE)->getPropertyValues('id');
-
-        return array_unique(array_merge($writePlusIds, $moderators));
+        return array_unique(array_map('intval', $writePlusIds));
     }
 
 
-    /**
-     * Returns the ids of users who have news moderate permission
-     *
-     * @throws \Schoolbox\Mapper\Exception
-     * @return int[]
-     */
-    private function findModeratorIds(): array
+    /** @inheritDoc */
+    public function getSuperuserIds(): array
     {
-        return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->getPropertyValues('id');
+        $superUserIds = $this->db
+            ->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
+            ->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $superUserIds);
     }
 
+
+    /** @inheritDoc */
+    public function getGlobalNewsModerators(): array
+    {
+        $sql          = "SELECT uid FROM userAccess WHERE service = :service AND type >= :type";
+        $moderatorIds = $this->db->executeQuery(
+            $sql,
+            ['service' => UserAccess::SERVICE_NEWS, 'type' => UserAccess::ACCESS_FULL]
+        )->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $moderatorIds);
+    }
 }

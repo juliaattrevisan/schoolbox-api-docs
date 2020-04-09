@@ -143,7 +143,7 @@ class Module extends BaseModule
         $args = $this->preloadNews($params);
         /** @var News\Model $article */
         $article = $args['article'];
-        $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
+        $article->setAudience(News\Audience\Mapper::getInstance()->findForArticles([$article->getId()]));
         return $args;
     }
 
@@ -205,15 +205,6 @@ class Module extends BaseModule
     private function getArticleMapper(): News\Mapper
     {
         return $this->getMapperFactory()->get(News\Mapper::class);
-    }
-
-    /**
-     * @return Mapper|News\Audience\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    private function getAudienceMapper(): News\Audience\Mapper
-    {
-        return $this->getMapperFactory()->get(News\Audience\Mapper::class);
     }
 
 

@@ -7,60 +7,55 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Moderation;
 
+use Schoolbox\Comms;
+use function array_merge;
+use function array_unique;
+
 class MockUserResolver implements IUserResolver
 {
-    /** @var int */
-    private $defaultSet;
-
-
-    /**
-     * @param int $defaultSet
-     */
-    public function __construct(int $defaultSet = 0)
-    {
-        $this->defaultSet = $defaultSet;
-    }
-
     public const ARTICLE_MODERATORS = [
-        0  => [13,19],
-        1  => [13,19],
-        2  => [13,19,151],
-        3  => [13,19,151],
-        4  => [13,19,151],
-        5  => [13,19,151],
-        6  => [13,19],
-        7  => [13,19],
-        8  => [13,19],
-        9  => [13,19],
-        10 => [13,19,247],
+        0  => [],
+        1  => [],
+        2  => [151],
+        3  => [151],
+        4  => [151],
+        5  => [151],
+        6  => [],
+        7  => [],
+        8  => [],
+        9  => [],
+        10 => [247],
     ];
 
-    /**
-     * Returns the ids of users who are capable of moderating this article
-     *
-     * @param \Schoolbox\Comms\News\Model $article
-     * @param bool $includeFolderWriteUsers
-     * @return int[]
-     */
-    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article, bool $includeFolderWriteUsers = true): array
+
+    /** @inheritDoc */
+    public function findModeratorsForArticle(Comms\News\Model $article): array
     {
-        return $this->findUsers($article->getId(), self::ARTICLE_MODERATORS);
+        return array_unique(array_merge(
+            $this->getSuperuserIds(),
+            $this->getGlobalNewsModerators(),
+            $this->getAudienceModerators($article)
+        ));
     }
 
 
-    /**
-     * @param int   $articleId
-     * @param array $dataset
-     * @return int[]
-     */
-    private function findUsers(int $articleId, array $dataset): array
+    /** @inheritDoc */
+    public function getGlobalNewsModerators(): array
     {
-        if (\array_key_exists($articleId, $dataset)) {
-            return $dataset[$articleId];
-        }
-        return $dataset[$this->defaultSet];
-
+        return [13];
     }
 
 
+    /** @inheritDoc */
+    public function getSuperuserIds(): array
+    {
+        return [19];
+    }
+
+
+    /** @inheritDoc */
+    public function getAudienceModerators(Comms\News\Model $article): array
+    {
+        return self::ARTICLE_MODERATORS[$article->getId()] ?? [];
+    }
 }

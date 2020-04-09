@@ -13,7 +13,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
-use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * @method static GenericCollection|self[] createCollection()
@@ -25,7 +24,8 @@ class Model
     public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
     public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
 
-    public const DEPTH_SEGMENT_TREE_MAX   = 1;
+    public const DEPTH_SEGMENT_TREE_MAX = 1;
+
 
     /**
      * Returns the set of valid relationship modifiers
@@ -41,8 +41,14 @@ class Model
         ];
     }
 
-    use Id;
+
     use CreateCollection;
+
+    /**
+     * @deprecated No longer used as of 20.0, but retained in codebase due to usage by 19.1.3 update script
+     * @var int
+     */
+    private $id;
 
     /** @var News\Model() */
     private $commsNewsArticle;
@@ -155,7 +161,29 @@ class Model
 
 
     /**
-      * @return null|News\Model
+     * @deprecated No longer used as of 20.0, but retained in codebase due to usage by 19.1.3 update script
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @deprecated No longer used as of 20.0, but retained in codebase due to usage by 19.1.3 update script
+     * @param int|null $id
+     * @return $this
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    /**
+     * @return null|News\Model
      */
     public function getCommsNewsArticle(): ?News\Model
     {

@@ -7,8 +7,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use function count;
+use function in_array;
 
 class RoleType extends SimpleStrategy
 {
@@ -41,9 +46,9 @@ class RoleType extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
-        return ''; // TODO
+        return new TranslateSql('', []); // TODO
     }
 
 
@@ -67,6 +72,51 @@ class RoleType extends SimpleStrategy
             $values[$user->getRole()->getType()] = $user->getRole()->getType();
         }
         return $values;
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $groupAlias = "g_$paramPrefix";
+        $join       = "JOIN groups $groupAlias ON $userTableAlias.group_id = $groupAlias.id";
+
+        $pb = $this->newPb($paramPrefix)->in("$groupAlias.group_type", $filtered);
+
+        return new UserResolutionSql($join, $pb);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    {
+        switch($relationship){
+            case Audience\Model::RELATIONSHIP_SELF:
+                return $user->getRole() ? in_array($user->getRole()->getType(), $entityValues, true) : null;
+            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if(!$user->getRole()->isParent()){
+                    return false;
+                }
+                return null;
+            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if(!$user->getRole()->isStaff()){
+                    return false;
+                }
+                return null;
+        }
+        return null;
     }
 }
 

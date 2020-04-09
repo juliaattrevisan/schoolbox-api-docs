@@ -517,7 +517,7 @@ abstract class Kernel
         $di->set(
             'commsNewsArticleResolver',
             $di->lazy(
-                function () use ($di) {
+                static function () use ($di) {
                     /**
                      * @var IConnector                            $db
                      * @var External_UserInterface                $externalUser
@@ -527,6 +527,8 @@ abstract class Kernel
                      * @var UserAccessMapper                      $userAccessMapper
                      * @var Folder\Mapper                         $folderMapper
                      * @var UserMapper                            $userMapper
+                     * @var News\Audience\Complex\Mapper          $complexMapper
+                     * @var News\Mapper                           $newsMapper
                      */
                     $db               = $di->get('databaseInternal');
                     $externalUser     = $di->get('externalUser');
@@ -536,7 +538,9 @@ abstract class Kernel
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
                     $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
                     $userMapper       = $mapperFactory->get(UserMapper::class);
-                    $articleResolver  = new News\Audience\ArticleResolver(
+                    $complexMapper    = $mapperFactory->get(News\Audience\Complex\Mapper::class);
+                    $newsMapper       = $mapperFactory->get(News\Mapper::class);
+                    return new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
                         $strategyFactory->getValidRelationshipEntityMap(),
                         $db,
@@ -549,10 +553,10 @@ abstract class Kernel
                             $externalClass,
                             $userAccessMapper
                         ),
-                        $strategyFactory->makeAllSimpleStrategies()
+                        $strategyFactory->makeAllSimpleStrategies(),
+                        $complexMapper,
+                        $newsMapper
                     );
-
-                    return $articleResolver;
                 }
             )
         );
@@ -560,34 +564,37 @@ abstract class Kernel
         $di->set(
             'commsNewsUserResolver',
             $di->lazy(
-                function() use ($di) {
+                static function() use ($di) {
                     /**
                      * @var IConnector              $db
                      * @var External_UserInterface  $externalUser
-                     * @var External_ClassInterface $externalClass
+                     * @var External_ClassInterface  $externalClass
+                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
+                     * @var MapperFactory $mapperFactory
                      */
                     $db              = $di->get('databaseInternal');
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
+                    $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
                     $mapperFactory   = $di->get('mapperFactory');
-                    $folderMapper    = $mapperFactory->get(Folder\Mapper::class);
-                    $userResolver = new News\Audience\UserResolver(
-                        StrategyFactory::getValidNullEntities(),
+                    /** @var Folder\Mapper $folderMapper */
+                    $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $mapperFactory->get(UserMapper::class);
+                    /** @var UserAccessMapper $userAccessMapper */
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+                    return new News\Audience\UserResolver(
                         $db,
-                        $externalClass,
                         new News\Audience\RelationshipFilterer(
                             $db,
-                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $userMapper,
                             $externalUser,
-                            $di->get('mapperFactory')->get(Folder\Mapper::class),
+                            $folderMapper,
                             $externalClass,
-                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                            $userAccessMapper
                         ),
-                        $di->get('mapperFactory')->get(News\Audience\Mapper::class),
-                        $folderMapper
+                        $strategyFactory
                     );
-
-                    return $userResolver;
                 }
             )
         );

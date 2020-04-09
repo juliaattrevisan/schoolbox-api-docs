@@ -120,6 +120,21 @@ class StrategyFactory
 
 
     /**
+     * Returns all valid simple entity_type values
+     *
+     * @return string[]
+     */
+    public static function getSimpleEntityTypes(): array
+    {
+        $entityTypes = [];
+        foreach (self::getAllSimpleStrategies() as $strategy) {
+            $entityTypes[] = $strategy::getEntityType();
+        }
+        return $entityTypes;
+    }
+
+
+    /**
      * Grouped by entity_type
      *
      * @return string[][]
@@ -166,7 +181,7 @@ class StrategyFactory
     /**
      * Returns all simple (ie non-composite) entity types
      *
-     * @return IStrategy[]
+     * @return string[]|IStrategy[]
      */
     private static function getAllSimpleStrategies(): array
     {

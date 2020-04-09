@@ -7,9 +7,19 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
+use function array_unique;
+use function count;
+use function implode;
+use function in_array;
 
 class SchoolHouse extends SimpleStrategy
 {
@@ -61,15 +71,20 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, house.house AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN house ON cna.entity_type = '{$entityType}' AND cna.entity_value = house.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+
+        $pb = (new Builder(new Quoter(), 'house'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, house name
+            FROM house
+            WHERE {$pb->getWhereIntersect()}
         ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
 
@@ -96,12 +111,45 @@ class SchoolHouse extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        $values = [];
+        $values      = [];
+        $isValidNull = self::isValidNullEntityValue();
         foreach ($users as $user) {
-            if($user->getSchoolHouse() !== null) {
-                $values[$user->getSchoolHouse()->getId()] = $user->getSchoolHouse()->getId();
+            if ($user->getSchoolHouse() !== null) {
+                $values[] = $user->getSchoolHouse()->getId();
+            } elseif ($isValidNull) {
+                $values[] = null;
             }
         }
-        return $values;
+        return array_unique($values);
+    }
+
+
+    /**
+     * @inheritDoc
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$userTableAlias.house");
+        }
+        if (count($filtered)) {
+            $pb->in("$userTableAlias.house", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql('', $pb);
     }
 }

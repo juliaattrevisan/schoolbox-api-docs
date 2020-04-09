@@ -7,9 +7,14 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
+use function implode;
 
 class User extends SimpleStrategy
 {
@@ -71,7 +76,7 @@ class User extends SimpleStrategy
                 TRIM(CONCAT(COALESCE(firstname, ''), ' ', COALESCE(lastname, ''), ' (', `groups`.name, ')')) AS name,
                 '{$entityType}' AS entity_type,
                 `groups`.group_type as entity_meta
-            FROM `user` 
+            FROM `user`
             INNER JOIN `groups` ON user.group_id = `groups`.id
             WHERE user.deleted_at IS NULL
             AND `groups`.name IS NOT NULL
@@ -83,15 +88,20 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, CONCAT(firstname, ' ', lastname) AS `name`
-            FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.id
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+
+        $pb = (new Builder(new Quoter(), 'user'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $sql = "
+            SELECT '{$entityType}' entity_type, id entity_value, CONCAT(firstname, ' ', lastname) name
+            FROM user
+            WHERE {$pb->getWhereIntersect()}
         ";
+        return new TranslateSql($sql, $pb->getParams());
     }
 
     /**
@@ -110,5 +120,19 @@ class User extends SimpleStrategy
     public function getValues(GenericCollection $users): array
     {
         return \array_unique($users->getPropertyValues('id'));
+    }
+
+
+    /** @inheritDoc */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        // no need for join or to filter out null values (all users have IDs)
+        $join = '';
+        $pb   = $this->newPb($paramPrefix)->in("{$userTableAlias}.id", $entityValues);
+        return new UserResolutionSql($join, $pb);
     }
 }

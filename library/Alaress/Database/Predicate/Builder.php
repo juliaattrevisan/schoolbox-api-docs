@@ -13,6 +13,7 @@ use Traversable;
 use Alaress_Date_Format;
 use UnderflowException;
 use TypeError;
+use function implode;
 
 class Builder implements IBuilder
 {
@@ -787,5 +788,34 @@ class Builder implements IBuilder
         }
         // Couldn't generate? Crash and burn
         return false;
+    }
+
+
+    /** @inheritDoc */
+    public function getWhereIntersect(): string
+    {
+        return $this->getWhereClause(self::OPERATOR_INTERSECT);
+    }
+
+
+    /** @inheritDoc */
+    public function getWhereUnion(): string
+    {
+        return $this->getWhereClause(self::OPERATOR_UNION);
+    }
+
+
+    /**
+     * Returns this builder's where params as a string, combined using the specified set operator.
+     *
+     * Returned clause is wrapped in parenthesis to ensure where clause is atomic when combined
+     * in a query with other clauses.
+     *
+     * @param string $setOperator
+     * @return string
+     */
+    private function getWhereClause(string $setOperator): string
+    {
+        return '(' . implode(" $setOperator ", $this->getWhere()) . ')';
     }
 }

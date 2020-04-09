@@ -7,9 +7,19 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
+use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use UnderflowException;
+use function array_filter;
+use function count;
+use function implode;
+use function in_array;
 
 class Year extends SimpleStrategy
 {
@@ -53,7 +63,7 @@ class Year extends SimpleStrategy
             SELECT DISTINCT
               year AS id,
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
-              '{$entityType}' AS entity_type, 
+              '{$entityType}' AS entity_type,
               null as entity_meta
             FROM `user`
             WHERE deleted_at IS NULL
@@ -66,15 +76,26 @@ class Year extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getTranslateSql(string $segmentIdsPlaceholder): string
+    public function getTranslateSql(array $entityValues): TranslateSql
     {
         $entityType = self::getEntityType();
-        return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name
-            FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.year
-            WHERE cna.id IN ($segmentIdsPlaceholder)
+
+        $pb = (new Builder(new Quoter(), 'user'))
+            ->setParamPrefix($entityType)
+            ->in('id', $entityValues);
+
+        $sql         = "
+            SELECT
+                '{$entityType}' entity_type,
+                id entity_value,
+                IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) name
+            FROM user WHERE {$pb->getWhereIntersect()}
         ";
+
+        return new TranslateSql(
+            $sql,
+            $pb->getParams()
+        );
     }
 
 
@@ -101,6 +122,42 @@ class Year extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        return \array_unique($users->getPropertyValues('year'));
+        $yearLevels = $users->getPropertyValues('year');
+        if (!self::isValidNullEntityValue()) {
+            $yearLevels = array_filter($yearLevels, static function (?string $yearLevel): bool {
+                return $yearLevel !== null;
+            });
+        }
+        return \array_unique($yearLevels);
+    }
+
+
+    /**
+     * @inheritDoc
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getUserResolutionSql(
+        string $userTableAlias,
+        string $paramPrefix,
+        array $entityValues,
+        bool $excludeMuted
+    ): UserResolutionSql {
+        $targetNull = self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $filtered   = $this->filterOutNullValues($entityValues);
+        if (!$targetNull && !count($filtered)) {
+            return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
+        }
+
+        $pb = $this->newPb($paramPrefix);
+        if ($targetNull) {
+            $pb->isNull("$userTableAlias.year");
+        }
+        if (count($filtered)) {
+            $pb->in("$userTableAlias.year", $filtered);
+        }
+        $pb = $this->newPb($paramPrefix)->any($pb);
+
+        return new UserResolutionSql('', $pb);
     }
 }

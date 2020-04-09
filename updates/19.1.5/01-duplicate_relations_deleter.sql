@@ -12,11 +12,10 @@ DELIMITER $$
 -- Create procedure
 CREATE PROCEDURE create_constraint_if_not_exists()
 BEGIN
+    -- Ensure `statistics` meta table is up to date.
+    ANALYZE TABLE `sis_user_profile_relation`;
     IF
-        (SELECT COUNT(*)
-        FROM information_schema.innodb_sys_indexes  i
-        JOIN information_schema.innodb_sys_tables t ON t.TABLE_ID = i.TABLE_ID
-        WHERE t.NAME LIKE '%sis_user_profile_relation' AND i.NAME = 'sis_unique_relation') = 0
+        (SELECT COUNT(*) FROM information_schema.statistics WHERE TABLE_NAME = 'sis_user_profile_relation' AND INDEX_NAME = 'sis_unique_relation') = 0
     THEN
         ALTER IGNORE TABLE `sis_user_profile_relation`
         ADD UNIQUE INDEX `sis_unique_relation` (`child_profile_id` ASC, `user_profile_id` ASC);

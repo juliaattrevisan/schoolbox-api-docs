@@ -8,111 +8,50 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
-use Schoolbox\Comms\News;
-use Alaress\Database\Predicate\Builder;
+use DomainException;
+use PDOException;
 use Schoolbox\GenericCollection;
-use InvalidArgumentException;
-use PDOStatement;
-use PDO;
-use Schoolbox\IHomepageCleanable;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use UnexpectedValueException;
 
-/**
- * @method Model createModel($idValue = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method GenericCollection|Model[] createCollection($contents = [])
- * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
- */
-class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
+class Mapper
 {
-    // Table definition
-    public const TABLE_NAME                  = 'comms_news_audience';
+    // Need to retain this as it now exists only in domain level
+    public const FIELD_PARENT_ID = 'parent_id';
 
-    public const FIELD_ID                    = 'id';
-    public const FIELD_COMMS_NEWS_ARTICLE_ID = 'comms_news_article_id';
-    public const FIELD_PARENT_ID             = 'parent_id';
-    public const FIELD_ENTITY_TYPE           = 'entity_type';
-    public const FIELD_ENTITY_VALUE          = 'entity_value';
-    public const FIELD_RELATIONSHIP          = 'relationship';
+    /** @var Simple\Mapper */
+    private $simpleMapper;
 
+    /** @var Complex\Mapper */
+    private $complexMapper;
 
-    /**
-     * @inheritdoc
-     * @throws InvalidArgumentException
-     */
-    protected function mapping(): void
-    {
-        $this->hasTable(self::TABLE_NAME);
-        $this->hasModel(Model::class);
+    /** @var self */
+    private static $instance;
 
-        $this->uses(self::FIELD_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID, News\Mapper::class, 'id', null, null, 'commsNewsArticle', 'commsNewsArticle');
-        $this->joins(self::FIELD_PARENT_ID, self::class, 'id', null, null, 'parent', 'parent');
-        $this->joinsReverseMulti(self::FIELD_PARENT_ID, self::class, 'children', 'children');
-        $this->uses(self::FIELD_ENTITY_TYPE, self::TYPE_STRING);
-        $this->uses(self::FIELD_ENTITY_VALUE, self::TYPE_STRING);
-        $this->uses(self::FIELD_RELATIONSHIP, self::TYPE_STRING);
-    }
 
     /**
-     * Attempt to join to both parent and children
-     *
-     * @return string
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * Implemented for backwards compatibility for when this used to be a real mapper.
+     * @return static
      */
-    protected function getSelectString(): string
+    public static function getInstance(): self
     {
-        return "
-            SELECT    {$this->getColumnString()},
-                      {$this->getJoinColumnString('parent', 'parent')},
-                      {$this->getJoinColumnString('children', 'child')}
-            FROM      {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('parent', '', 'parent')}
-            LEFT JOIN {$this->getJoinSql('children', '', 'child')}
-        ";
-    }
-    /**
-     * Returns a structured collection of segments.
-     *
-     * ie, composite segments will be linked to their child components, which are linked back to the parent composite segment.
-     *
-     * Parent and children are always hydrated.
-     *
-     * @param PDOStatement $statement
-     * @return Model[]|GenericCollection
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        $idColumn       = $this->getIdentifierColumn();
-        $parentIdColumn = "parent.{$this->getIdentifierColumn()}";
-        $childIdColumn  = "child.{$this->getIdentifierColumn()}";
-        $segments = $this->createCollection();
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            // Hydrate Segment
-            $id = $row[$idColumn];
-            if (!$segments->offsetExists($id)) {
-                $segments[$id] = $this->hydrate($row);
-            }
-            $segment = $segments[$id];
-            // Link parent back to child if this is a child of a composite.
-            $parentId = $row[$parentIdColumn];
-            if ($parentId) {
-                $parent = $this->hydrate($row, 'parent');
-                $segment->setParent($parent);
-                /** @noinspection NullPointerExceptionInspection */
-                $parent->getChildren()[$id] = $segment;
-            }
-            // Optionally hydrate children
-            $childId = $row[$childIdColumn];
-            if ($childId) {
-                $child = $this->hydrate($row, 'child');
-                /** @noinspection NullPointerExceptionInspection */
-                $child->setParent($segments[$id]);
-                $segments[$id]->getChildren()[$childId] = $child;
-            }
+        if (!self::$instance) {
+            self::$instance = new self(Simple\Mapper::getInstance(), Complex\Mapper::getInstance());
         }
-        return $segments;
+        return self::$instance;
+    }
+
+
+    /**
+     * Private to enforce singleton
+     *
+     * @param Simple\Mapper  $simpleMapper
+     * @param Complex\Mapper $complexMapper
+     */
+    private function __construct(Simple\Mapper $simpleMapper, Complex\Mapper $complexMapper)
+    {
+        $this->simpleMapper  = $simpleMapper;
+        $this->complexMapper = $complexMapper;
     }
 
 
@@ -122,10 +61,18 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
      * @param int[] $articleIds
      * @param array $options
      * @return GenericCollection|Model[]
+     * @throws DomainException
      */
     public function findForArticles(array $articleIds, array $options = []): GenericCollection
     {
-        return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleIds, $options);
+        $collection = Model::createCollection();
+        foreach ($this->simpleMapper->findByColumn($this->simpleMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleIds, $options) as $simple) {
+            $collection->add($this->translateSimpleDataToDomain($simple));
+        }
+        foreach ($this->complexMapper->findByColumn($this->complexMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleIds, $options) as $complex) {
+            $collection->add($this->translateComplexDataToDomain($complex));
+        }
+        return $collection;
     }
 
 
@@ -137,75 +84,117 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
      * @param Model $segment
      * @return bool
      * @throws \Schoolbox\Mapper\Exception
+     * @throws InsufficientHydrationException
      */
     public function deleteSegment(Model $segment): bool
     {
-        $deletedChildren = false;
-        foreach ($segment->getChildren() as $child) {
-            if ($this->deleteSegment($child)) {
-                $deletedChildren = true;
-            }
+        if ($segment->isSimple()) {
+            return $this->simpleMapper->delete($this->translateSimpleDomainToData($segment));
         }
-        $deleted = $this->delete($segment);
-        return $deletedChildren || $deleted;
+        return $this->complexMapper->delete($this->translateComplexDomainToData($segment));
     }
+
 
     /**
      * Saves a segment and its children using root-first strategy
      *
-     * Returns whether any records were deleted.
+     * Returns whether any records were saved.
      *
      * @param Model $segment
      * @return bool|int[]
+     * @throws InsufficientHydrationException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
     public function saveSegment(Model $segment)
     {
-        $affectedIds = [];
-        $id = $this->save($segment);
-        if(false === $id){
-            return false;
+        if ($segment->isSimple()) {
+            return $this->simpleMapper->save($this->translateSimpleDomainToData($segment));
         }
-        $affectedIds[] = $id;
-
-        foreach ($segment->getChildren() as $child) {
-            $child->setParent($segment);
-            $childId = $this->saveSegment($child);
-            if(false === $childId){
-                $affectedIds[] = $childId;
-            }
-        }
-        return $affectedIds;
+        return $this->complexMapper->save($this->translateComplexDomainToData($segment));
     }
 
+
     /**
-     * Deletes related news article audience by folder id
+     * Translates a simple audience from domain to data representation
      *
-     * @param int $cid
-     * @return void
+     * @param Model $domainModel
+     * @return Simple\Model
      */
-    public function homepageClean($cid) :void
+    private function translateSimpleDomainToData(Model $domainModel): Simple\Model
     {
-        $entityType = Segment\Strategy\Folder::getEntityType();
+        return (new Simple\Model())
+            ->setCommsNewsArticle($domainModel->getCommsNewsArticle())
+            ->setEntityType($domainModel->getEntityType())
+            ->setEntityValue($domainModel->getEntityValue())
+            ->setRelationship($domainModel->getRelationship());
+    }
 
-        // Query for composite folders
-        $query = $this->getSelectString() . 'WHERE `child`.'. self::FIELD_ENTITY_VALUE .' = :folderId 
-        AND `child`.'. self::FIELD_ENTITY_TYPE .' = :entityType';
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':folderId', $cid);
-        $statement->bindParam(':entityType', $entityType);
-        $statement->execute();
+    /**
+     * Translates a simple audience from data to domain representation
+     * @param Simple\Model $dataModel
+     * @return Model
+     */
+    private function translateSimpleDataToDomain(Simple\Model $dataModel): Model
+    {
+        return (new Model())
+            ->setCommsNewsArticle($dataModel->getCommsNewsArticle())
+            ->setEntityType($dataModel->getEntityType())
+            ->setEntityValue($dataModel->getEntityValue())
+            ->setRelationship($dataModel->getRelationship());
+    }
 
-        // Delete respective composite folder audiences if any
-        foreach ($statement->fetchAll() as $key => $segment) {
-            $this->deleteSegment($this->findById($segment['id']));
-        }
 
-        // Delete non-composite folder audiences as well if any
-        $this->deleteByColumnList([
-            self::FIELD_ENTITY_VALUE   => $cid,
-            self::FIELD_ENTITY_TYPE    => $entityType
-        ]);
+    /**
+     * Translates a complex domain representation to data representation
+     *
+     * @param Model $domainModel
+     * @return Complex\Model
+     */
+    private function translateComplexDomainToData(Model $domainModel): Complex\Model
+    {
+        /**
+         * @var Simple\Model $child1
+         * @var Simple\Model $child2
+         */
+        [$child1, $child2] = array_values($domainModel->getChildren()->getAll());
+        return (new Complex\Model())
+            ->setCommsNewsArticle($domainModel->getCommsNewsArticle())
+            ->setEntityType1($child1->getEntityType())
+            ->setEntityValue1($child1->getEntityValue())
+            ->setEntityType2($child2->getEntityType())
+            ->setEntityValue2($child2->getEntityValue());
+    }
+
+
+    /**
+     * Translates a complex data representation to domain representation
+     *
+     * @param Complex\Model $dataModel
+     * @return Model
+     * @throws DomainException
+     */
+    private function translateComplexDataToDomain(Complex\Model $dataModel): Model
+    {
+        $rootSegment = (new Model())
+            ->setCommsNewsArticle($dataModel->getCommsNewsArticle())
+            ->setEntityType(Segment\Strategy\Composite::getEntityType())
+            ->setRelationship(Model::RELATIONSHIP_SELF);
+
+        $child1 = (new Model())
+            ->setParent($rootSegment)
+            ->setEntityType($dataModel->getEntityType1())
+            ->setEntityValue($dataModel->getEntityValue1())
+            ->setRelationship(Model::RELATIONSHIP_SELF);
+
+        $child2 = (new Model())
+            ->setParent($rootSegment)
+            ->setEntityType($dataModel->getEntityType2())
+            ->setEntityValue($dataModel->getEntityValue2())
+            ->setRelationship(Model::RELATIONSHIP_SELF);
+
+        return $rootSegment->setChildren(Model::createCollection()->add($child1)->add($child2));
     }
 }

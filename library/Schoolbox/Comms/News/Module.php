@@ -300,7 +300,7 @@ class Module extends BaseModule
         $args = $this->preloadArticle($params);
         /** @var Model $article */
         $article = $args['article'];
-        $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
+        $article->setAudience(Audience\Mapper::getInstance()->findForArticles([$article->getId()]));
         return $args;
     }
 
@@ -312,16 +312,6 @@ class Module extends BaseModule
     private function getArticleMapper(): Mapper
     {
         return $this->getMapperFactory()->get(Mapper::class);
-    }
-
-
-    /**
-     * @return \Schoolbox\Mapper|Audience\Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getAudienceMapper(): Audience\Mapper
-    {
-        return $this->getMapperFactory()->get(Audience\Mapper::class);
     }
 
 

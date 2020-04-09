@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
@@ -19,6 +20,16 @@ use Alaress\Database\Predicate;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 use InvalidArgumentException;
 use Schoolbox\Comms\News;
+use UnderflowException;
+use UnexpectedValueException;
+use function array_filter;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_unique;
+use function count;
+use function implode;
+use function in_array;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -49,6 +60,12 @@ class ArticleResolver implements IArticleResolver
     /** @var GenericCollection|News\Audience\Segment\ISimpleStrategy[] */
     private $simpleStrategies;
 
+    /** @var Complex\Mapper */
+    private $complexMapper;
+
+    /** @var News\Mapper */
+    private $articleMapper;
+
 
     /**
      * @param bool[]                        $validNullEntities
@@ -64,7 +81,9 @@ class ArticleResolver implements IArticleResolver
         Database\Connector\IConnector $db,
         Folder\Mapper $folderMapper,
         RelationshipFilterer $relationshipFilter,
-        GenericCollection $simpleStrategies
+        GenericCollection $simpleStrategies,
+        Complex\Mapper $complexMapper,
+        News\Mapper $newsMapper
     ) {
         $this->validNullEntities  = $validNullEntities;
         $this->modifierEntityMap  = $modifierEntityMap;
@@ -72,6 +91,8 @@ class ArticleResolver implements IArticleResolver
         $this->folderMapper       = $folderMapper;
         $this->relationshipFilter = $relationshipFilter;
         $this->simpleStrategies   = $simpleStrategies;
+        $this->complexMapper      = $complexMapper;
+        $this->articleMapper      = $newsMapper;
     }
 
 
@@ -80,172 +101,302 @@ class ArticleResolver implements IArticleResolver
      *
      * @param User $user
      * @return int[]
-     * @throws \UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws UnderflowException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     * @throws Database\Exception
      */
     public function findArticlesForUser(User $user): array
     {
         /* Business Rules + Algorithm:
          * * An articles is targeted to 0:N audience segments.
-         * * An audience segment may be simple or composite.
+         * * An audience segment may be simple or complex.
          * * Simple segments are targeted to a entity type and value.
-         * * Composite segments are composed of 2 simple segments.
-         * * Audience segments may be root segments or child segments.
-         * * There is a maximum of one level of nesting (ie no children of child segments).
-         * * Hence, child segments are always simple.
-         * * A composite segment matches a user if all its child segments match the user (ie AND)
+         * * Complex segments are composed of two entity type/value pairs
+         * * A complex segment matches a user if both type/value pairs match the user (ie AND)
          * * A article matches a user if any root segment matches the user (ie OR)
-         * * Segments have a relationship modifier
+         * * Simple segments have a relationship modifier
          * * * self        => user must match segment
          * * * parents_of  => user's child must match segment
          * * * teachers_of => user's students must match segment
-         * * Composite segments do not have modifiers on either the parent or children
-         * * For users with role type 'student' or 'guest', they can only match:
+         * * For users with role type 'student' or 'guest', the user can only match:
          * * 1. segments targeted to 'self'
-         * * For users with role type 'parent', they can match:
+         * * For users with role type 'parent', the user can match:
          * * 1. segments targeted to 'self' if the segment matches themselves, or
-         * * 2. segments targeted to 'parents_of' if the segment matches one of their children
-         * * For users with role type 'teacher', they can match:
+         * * 2. segments targeted to 'parents_of' if the segment matches one of the user's children
+         * * For users with role type 'staff', the user can match:
          * * 1. segments targeted to 'self' if the segment matches themselves, or
          * * 2. segments targeted to 'teachers_of' if the segment matches one of their taught students
          * * Hence there are 2 independent methods for matching an article to a user:
          * * 1. Simple root segment targeted to user, or children/students of user
-         * * 2. Composite root segment targeted to user, composed of child segments that target user
+         * * 2. Complex root segment targeted to user
          *
          * Hence we can build 2 queries, both using the 'self' predicates, the simple segments also
          * checking 'related' user attributes, then UNION ALL them together.
          */
 
-        /**
-         * @var Collection|string[]|null[] $selfAttributes     Indexed by [entityType]
-         * @var Collection|string[]|null[] $relatedAttributes  Indexed by [entityType]
-         * @var Collection|mixed[]         $whereParams
-         */
-        $selfAttributes    = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
-        $relatedAttributes = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
-        $whereParams       = new Collection();
+        $selfAttributes    = $this->buildSelfAttributes($user);
+        $relatedAttributes = $this->buildRelatedAttributes($user);
 
         // Fetch all the data we need for our query from
         // * the user, and
         // * any relevant related users (eg students/children) if relevant (ie staff/parent)
-
-        // Build query for user themself.
-        $validSelfEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
-        if (\count($validSelfEntities)) {
-            foreach ($this->simpleStrategies as $strategy) {
-                if (\in_array($strategy::getEntityType(), $validSelfEntities, true)) {
-                    $selfAttributes[$strategy::getEntityType()] = $strategy->getValues(new GenericCollection(User::class, [$user]));
-                }
-            }
-        }
-        $selfWhereClauses = $this->buildWhereClauses($selfAttributes, Model::RELATIONSHIP_SELF, $whereParams);
-
-        // Build query for related users?
-        $role       = $user->getRole();
-        $hasRelated = $role->isParent() || $role->isStaff();
-        if ($hasRelated) {
-            $relationship         = $role->isParent() ? Model::RELATIONSHIP_PARENTS_OF : Model::RELATIONSHIP_TEACHERS_OF;
-            $validRelatedEntities = $this->modifierEntityMap[$relationship];
-
-            if (\count($validRelatedEntities)) {
-                // Don't bother fetching these if there's no valid relationships currently configured
-                $relatedUsers = $this->getRelatedUsers($user);
-
-                if (\count($relatedUsers)) {
-                    foreach ($this->simpleStrategies as $strategy) {
-                        if (\in_array($strategy::getEntityType(), $validRelatedEntities, true)) {
-                            $relatedAttributes[$strategy::getEntityType()] = $strategy->getValues($relatedUsers);
-                        }
-                    }
-                }
-            }
-            $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
-        } else {
-            $relatedWhereClauses = [];
-        }
 
         // Check for the unlikely case where the system is configured to not permit targeting to any segment types
         if (!$selfAttributes->count() && !$relatedAttributes->count()) {
             return [];
         }
 
-        // Simple segments permit related modifiers, composites do not
-        $simpleClause  = "\n" . \implode(" OR \n", \array_merge($selfWhereClauses, $relatedWhereClauses));
-        $complexClause = "\n" . \implode(" OR \n", $selfWhereClauses);
+        // We will generate a UNION of two sub-queries, the first targets simple 'self' and 'related' segments, the
+        // second targets complex 'self' segments. Therefore, if only 'related' attributes are populated, we do not
+        // require the second subquery.
+        /** @var string[] */
+        $subQueries = [];
 
-        $parameters = $whereParams->getAll();
+        // We always need the simple subquery
+        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user);
+        $subQueries[] = $sqlSimple;
 
-        $query = "
-            SELECT comms_news_article_id
-            FROM comms_news_audience
-            WHERE parent_id IS NULL AND ({$simpleClause})
+        // We can avoid the sub-query in the unlikely case the system is configured to not permit targeting
+        // to 'self', as that is the implicit relationship modifier of all complex audiences segments.
+        if ($selfAttributes->count()) {
+            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes);
+            $subQueries[] = $sqlComplex;
+            $params       = array_merge($params, $paramsComplex);
+        }
 
-            UNION 
+        $query = implode("\nUNION\n", $subQueries);
 
-            SELECT parent.comms_news_article_id
-            FROM comms_news_audience comms_news_audience
-            JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
-            WHERE ({$complexClause})
-            GROUP BY comms_news_audience.parent_id
-            HAVING COUNT(comms_news_audience.parent_id) = 2;
-        ";
-        $hydrator = News\Audience\Mapper::getInstance()->getColumnScalarHydrator('comms_news_article_id');
-        return array_map([$hydrator, 'hydrate'], $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN));
+        $hydrator = $this->articleMapper->getColumnScalarHydrator($this->articleMapper->getIdentifierColumn());
+        return array_unique(array_map(
+            [$hydrator, 'hydrate'],
+            $this->db->executeQuery($query, $params)->fetchAll(PDO::FETCH_COLUMN)
+        ));
     }
 
 
     /**
-     * Accepts a set of user attributes and a relationship modifier, and converts to a set of WHERE clauses.
+     * Builds attributes for the user themself, suitable for converting to predicates
      *
-     * Inserts any bound parameters values into $whereParams
-     *
-     * @param Collection $attributes
-     * @param string     $relationship
-     * @param Collection $whereParams
-     * @return string[]
+     * @param User $user
+     * @return Collection|string[]|null[] Indexed by [entityType]
+     * @throws UnexpectedValueException
      */
-    private function buildWhereClauses(Collection $attributes, string $relationship, Collection $whereParams): array
+    private function buildSelfAttributes(User $user): Collection
     {
-        $table           = Mapper::TABLE_NAME;
-        $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
-        $colRelationship = Mapper::FIELD_RELATIONSHIP;
-        $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
-
-        $whereClauses = [];
-        foreach ($attributes as $entityType => $values) {
-            $matchNull = $this->simpleStrategies[$entityType]::isValidNullEntityValue() && \in_array(null, $values, true);
-            $filtered  = \array_filter($values, function ($value) {
-                return null !== $value;
-            });
-            $parts     = [];
-            if (\count($filtered)) {
-                $prefix   = "{$entityType}_{$relationship[0]}";
-                $bindings = Predicate\Builder::getBindings($filtered, $prefix);
-                $parts[]  = "$table.$colEntityValue IN ({$bindings->getPlaceholder()})";
-                foreach ($bindings->getParams() as $placeholder => $val) {
-                    $whereParams[$placeholder] = $val;
+        $selfAttributes    = new Collection();
+        $validSelfEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
+        if (!count($validSelfEntities)) {
+            return $selfAttributes;
+        }
+        foreach ($this->simpleStrategies as $strategy) {
+            if (in_array($strategy::getEntityType(), $validSelfEntities, true)) {
+                $selfValues = $strategy->getValues(new GenericCollection(User::class, [$user]));
+                if (count($selfValues)) {
+                    $selfAttributes[$strategy::getEntityType()] = $selfValues;
                 }
             }
-            if ($matchNull) {
-                $parts[] = "$table.$colEntityValue IS NULL";
-            }
-            if (\count($parts)) {
-                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND (" . \implode(' OR ', $parts) . "))";
-            }
         }
-        return $whereClauses;
+        return $selfAttributes;
     }
 
 
+    /**
+     * Builds attributes for the user's related users, suitable for converting to predicates
+     *
+     * @param User $user
+     * @return Collection|string[]|null[] Indexed by [entityType]
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws UnderflowException
+     */
+    private function buildRelatedAttributes(User $user): Collection
+    {
+        $relatedAttributes = new Collection();
+        $relationship      = $this->getRelationshipModifier($user);
+        if (!$relationship) {
+            return $relatedAttributes;
+        }
+        $validRelatedEntities = $this->modifierEntityMap[$relationship];
+
+        // Don't bother fetching related users if there's no valid relationships currently configured
+        if (!count($validRelatedEntities)) {
+            return $relatedAttributes;
+        }
+        $relatedUsers = $this->getRelatedUsers($user);
+
+        // Short circuit if user has no related users
+        if (!count($relatedUsers)) {
+            return $relatedAttributes;
+        }
+
+        // Generate values suitable for insertion in query
+        foreach ($this->simpleStrategies as $strategy) {
+            if (in_array($strategy::getEntityType(), $validRelatedEntities, true)) {
+                $values = $strategy->getValues($relatedUsers);
+                if (count($values)) {
+                    $relatedAttributes[$strategy::getEntityType()] = $values;
+                }
+            }
+        }
+        return $relatedAttributes;
+    }
+
 
     /**
+     * Returns a relationship modifier if one is appropriate for this user's role type
+     *
+     * @param User $user
+     * @return string|null
+     */
+    private function getRelationshipModifier(User $user): ?string
+    {
+        $role = $user->getRole();
+        if ($role->isStaff()) {
+            return Model::RELATIONSHIP_TEACHERS_OF;
+        }
+        if ($role->isParent()) {
+            return Model::RELATIONSHIP_PARENTS_OF;
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns a query suitable for matching simple audience segments
+     *
+     * @param Collection|string[][]|null[][] $selfAttributes
+     * @param Collection|string[][]|null[][] $relatedAttributes
+     * @param User                           $user
+     * @return array
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function generateSimpleSubquery(
+        Collection $selfAttributes,
+        Collection $relatedAttributes,
+        User $user
+    ): array {
+        $pb = new Predicate\Builder($this->db, '');
+        foreach ($selfAttributes as $entityType => $entityValues) {
+            $pb->all($this->buildPredicate('simple', Model::RELATIONSHIP_SELF, $entityType, $entityValues));
+        }
+        $relationship = $this->getRelationshipModifier($user);
+        foreach ($relatedAttributes as $entityType => $entityValues) {
+            // If we had $relatedAttributes, we can assume here that $relationship is non-null
+            $pb->all($this->buildPredicate('simple', $relationship, $entityType, $entityValues));
+        }
+
+        $sql = "
+            SELECT comms_news_article_id
+            FROM comms_news_audience simple
+            WHERE {$pb->getWhereUnion()}
+        ";
+        return [$sql, $pb->getParams()];
+    }
+
+
+    /**
+     * Returns a query suitable for matching complex audience segments
+     *
+     * @param Collection|string[][]|null[][] $selfAttributes
+     * @return array
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function generateComplexSubquery(Collection $selfAttributes): array
+    {
+        $tableAlias = 'complex';
+        $pb1        = new Predicate\Builder($this->db, '');
+        $pb2        = new Predicate\Builder($this->db, '');
+        foreach ($selfAttributes as $entityType => $entityValues) {
+            $pb1->all($this->buildPredicate(
+                $tableAlias,
+                null,
+                $entityType,
+                $entityValues,
+                Complex\Mapper::FIELD_ENTITY_TYPE_1,
+                Complex\Mapper::FIELD_ENTITY_VALUE_1
+            ));
+            $pb2->all($this->buildPredicate(
+                $tableAlias,
+                null,
+                $entityType,
+                $entityValues,
+                Complex\Mapper::FIELD_ENTITY_TYPE_2,
+                Complex\Mapper::FIELD_ENTITY_VALUE_2
+            ));
+        }
+
+        $pb = (new Predicate\Builder($this->db, ''))
+            ->any($pb1)
+            ->any($pb2);
+
+
+        $sql = "
+            SELECT comms_news_article_id
+            FROM comms_news_audience_complex {$tableAlias}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        return [$sql, $pb->getParams()];
+    }
+
+
+    /**
+     * Builds a predicate suitable for inclusion in a larger predicate
+     *
+     * @param string          $tableAlias
+     * @param null|string     $relationship   If NULL, don't filter to this relationship
+     * @param string          $entityType
+     * @param string[]|null[] $entityValues
+     * @param string          $colEntityType  Name of the 'entity_type' column
+     * @param string          $colEntityValue Name of the 'entity_value' column
+     * @return Predicate\Builder
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    private function buildPredicate(
+        string $tableAlias,
+        ?string $relationship,
+        string $entityType,
+        array $entityValues,
+        string $colEntityType = Simple\Mapper::FIELD_ENTITY_TYPE,
+        string $colEntityValue = Simple\Mapper::FIELD_ENTITY_VALUE
+    ): Predicate\Builder {
+        $outerPb = (new Predicate\Builder($this->db, $tableAlias))
+            ->setParamPrefix($tableAlias)
+            ->equals($colEntityType, $entityType);
+        if ($relationship) {
+            $outerPb->equals(Simple\Mapper::FIELD_RELATIONSHIP, $relationship);
+        }
+
+        $innerPb = (new Predicate\Builder($this->db, $tableAlias))->setParamPrefix($tableAlias);
+
+        // Need an inner PB to account for nulls, eg 'entity_value IN (:nonNull) OR entity_value IS NULL'
+        $matchNull = $this->simpleStrategies[$entityType]::isValidNullEntityValue() && in_array(null, $entityValues, true);
+        $nonNulls  = array_filter($entityValues, static function ($value) {
+            return null !== $value;
+        });
+        if (count($nonNulls)) {
+            $innerPb->in($colEntityValue, $nonNulls);
+        }
+        if ($matchNull) {
+            $innerPb->isNull($colEntityValue);
+        }
+        return $outerPb->any($innerPb);
+    }
+
+
+    /**
+     * Returns a set of user's related (children/students) to the specified user.
+     *
      * @param User $user
      * @return GenericCollection|User[]
-     * @throws Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     private function getRelatedUsers(User $user): GenericCollection
     {
@@ -266,169 +417,165 @@ class ArticleResolver implements IArticleResolver
 
 
     /**
-     * Helper function to build a predicate.
-     *
-     * Empty collections will be converted to 'IS NULL' predicates.
-     *
-     * If entity value is NULL or empty, checks current business rules to determine if that is a valid value
-     *
-     * @param Collection|string[]   $whereClauses
-     * @param Collection|mixed[]    $whereParams
-     * @param int                   $paramSuffix So we can distinguish bound args for self and related users.
-     * @param string                $entityType
-     * @param null|array|string|int $entityValue
-     * @param string                $relationship
+     * @inheritdoc
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws Database\Exception
      */
-    private function buildClause(
-        Collection $whereClauses,
-        Collection $whereParams,
-        int $paramSuffix,
+    public function findArticlesForAudience(
         string $entityType,
         $entityValue,
-        string $relationship
-    ): void {
-        // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
-        if (!$this->validNullEntities[$entityType] && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
-            return;
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
+        // Simple equality case
+        if (Strategy\Composite::getEntityType() !== $entityType) {
+            return $this->findArticlesForSimpleAudience($entityType, $entityValue, $relationship, $publishedOnly, $orderBy, $limit);
         }
 
-        $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
-        $colRelationship = Mapper::FIELD_RELATIONSHIP;
-        $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
-
-        if (null === $entityValue) {
-            $predicate = 'IS NULL';
-        } else {
-            // Convert even single items to sets of 1 for consistent treatment
-            if (!\is_iterable($entityValue)) {
-                $entityValue = [$entityValue];
-            }
-            if (!\count($entityValue)) {
-                $predicate = 'IS NULL';
-            } else {
-                $prefix       = "{$entityType}_{$paramSuffix}";
-                $params       = Predicate\Builder::getArrayParameters($entityValue, $prefix);
-                $placeholders = Predicate\Builder::getArrayPlaceholders($entityValue, $prefix);
-                $predicate    = "IN {$placeholders}";
-                foreach ($params as $placeholder => $val) {
-                    $whereParams[$placeholder] = $val;
-                }
-            }
+        // Complex intersect case
+        if (!\is_array($entityValue) || count($entityValue) !== 2) {
+            throw new InvalidArgumentException('If performing a complex search, $entityValue must be an array of two type:value pairs');
         }
+        [$entityType1, $entityType2] = array_keys($entityValue);
 
-        $table = Mapper::TABLE_NAME;
-        $whereClauses->add("($table.$colEntityType = '$entityType' AND $table.$colRelationship = '$relationship' AND $table.$colEntityValue {$predicate})");
+        return $this->findArticlesForComplexAudience(
+            $entityType1,
+            $entityValue[$entityType1],
+            $entityType2,
+            $entityValue[$entityType2],
+            $publishedOnly,
+            $orderBy,
+            $limit
+        );
     }
 
 
     /**
-     * @inheritdoc
-     * @throws InvalidArgumentException
-     * @throws Predicate\InvalidColumnException
-     * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
-     * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
+     * Returns article ids matching specified simple audience
+     *
+     * @param string      $entityType
+     * @param string|null $entityValue
+     * @param string|null $relationship NULL means don't filter by
+     * @param bool        $publishedOnly
+     * @param array       $orderBy
+     * @param int|null    $limit
+     * @return int[]
+     * @throws Database\Exception
+     * @throws InvalidColumnException
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, bool $publishedOnly = true, array $orderBy = [], int $limit = null): array
-    {
-        // Simple equality case
-        if (Strategy\Composite::getEntityType() !== $entityType) {
-            $pb = $this->db
-                ->buildPredicateBuilder(Mapper::TABLE_NAME)
-                ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
-                ->isNull(Mapper::FIELD_PARENT_ID)
-                ->isNull('comms_news_article.deleted_at');
+    private function findArticlesForSimpleAudience(
+        string $entityType,
+        ?string $entityValue,
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
 
-            if (null === $entityValue) {
-                $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
-            } else {
-                $pb->equals(Mapper::FIELD_ENTITY_VALUE, $entityValue);
-            }
-
-            if (null !== $relationship) {
-                $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
-            }
-
-            if ($publishedOnly) {
-                // TODO inject mapper dependency
-                $publishedPb = News\Mapper::getInstance()->getPredicatePublished();
-                $pb          = $pb->all($publishedPb);
-            }
-
-            $whereClause = \implode(' AND ', $pb->getWhere());
-
-            $sql = "
-                SELECT DISTINCT comms_news_article_id
-                FROM comms_news_audience
-                INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
-                WHERE {$whereClause}";
-
-            if (\count($orderBy)) {
-                $sql .= "
-                    {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
-            }
-
-            if (null !== $limit) {
-                $sql .= "
-                    LIMIT :limit";
-                $pb->putParam('limit', $limit);
-            }
-
-            return $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
-        }
-
-        // Complex intersect case
-        if (!\is_array($entityValue)) {
-            throw new InvalidArgumentException('If performing a complex search, $entityValue must be an array of type:value pairs');
-        }
-
-        if (!\count($entityValue)) {
+        // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
+        if (null === $entityValue && !$this->validNullEntities[$entityType]) {
             return [];
         }
 
-        /* Must match all elements/children of composite rule.
-         * eg A1 = [folder:x ∩ role:y ∩ year:z]
-         * findArticlesForAudience([folder:x ∩ role:y]) should not return A1,  as there may be users
-         * in that audience who have year != z and hence should not see article.
-         */
-        $whereClauses = new Collection();
-        $whereParams  = new Collection();
+        $pb = $this->db
+            ->buildPredicateBuilder(Simple\Mapper::TABLE_NAME)
+            ->equals(Simple\Mapper::FIELD_ENTITY_TYPE, $entityType)
+            ->isNull('comms_news_article.deleted_at');
 
-        /** @var array $entityValue */
-        foreach ($entityValue as $type => $value) {
-            $this->buildClause($whereClauses, $whereParams, 0, $type, $value, Model::RELATIONSHIP_SELF);
+        if (null === $entityValue) {
+            $pb->isNull(Simple\Mapper::FIELD_ENTITY_VALUE);
+        } else {
+            $pb->equals(Simple\Mapper::FIELD_ENTITY_VALUE, $entityValue);
         }
 
-        $whereClause = \implode(' OR ', $whereClauses->getAll());
+        if (null !== $relationship) {
+            $pb->equals(Simple\Mapper::FIELD_RELATIONSHIP, $relationship);
+        }
 
-        // TODO investigate re-writing this to perform matchCount == availableCount before joining to parent composite rule to get article ids
+        if ($publishedOnly) {
+            $publishedPb = $this->articleMapper->getPredicatePublished();
+            $pb->all($publishedPb);
+        }
+
+        // If we are not filtering by relationship, we may be duplicates, which we'll need to filter out.
+        // If we are specifying the relationship, we can avoid the DISTINCT, and hence avoid a temp table.
+        $distinct = null === $relationship ? 'DISTINCT' : '';
+
         $sql = "
-            SELECT t1.comms_news_article_id
-            FROM comms_news_audience t1
-            JOIN (
-              -- Get child segments that match the target audience
-              SELECT parent_id, count(*) AS child_count
-              FROM comms_news_audience
-              WHERE {$whereClause}
-              AND parent_id IS NOT NULL
-              GROUP BY parent_id
-            ) t2 ON t1.id = t2.parent_id
-            JOIN (
-              -- Group all child segments by parent to get count of parents' children.
-              -- If count-matching children == count-available children, then composite segment is a match
-              SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
-            ) t3 ON t1.id = t3.parent_id AND t2.child_count = t3.child_count
+            SELECT {$distinct} comms_news_article_id
+            FROM comms_news_audience
+            INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
+            WHERE {$pb->getWhereIntersect()}";
+
+        if (count($orderBy)) {
+            $sql .= "
+                {$this->folderMapper::buildOrderByClause(Simple\Mapper::TABLE_NAME, $orderBy, $this->db)}";
+        }
+
+        if (null !== $limit) {
+            $sql .= "
+                LIMIT :limit";
+            $pb->putParam('limit', $limit);
+        }
+
+        $hydrator = $this->articleMapper->getColumnScalarHydrator($this->articleMapper->getIdentifierColumn());
+        return array_map([
+            $hydrator,
+            'hydrate',
+        ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /**
+     * @param string      $entityType1
+     * @param string|null $entityValue1
+     * @param string      $entityType2
+     * @param string|null $entityValue2
+     * @param bool        $publishedOnly
+     * @param array       $orderBy
+     * @param int|null    $limit
+     * @return int[]
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     */
+    private function findArticlesForComplexAudience(
+        string $entityType1,
+        ?string $entityValue1,
+        string $entityType2,
+        ?string $entityValue2,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
+        $pb = $this->complexMapper->getCombinationMatchPredicate($entityType1, $entityValue1, $entityType2, $entityValue2);
+
+        if ($publishedOnly) {
+            $pb->all($this->articleMapper->getPredicatePublished());
+        }
+
+        $sql = "
+            SELECT comms_news_article.id
+            FROM comms_news_article
+            JOIN comms_news_audience_complex ON comms_news_audience_complex.comms_news_article_id = comms_news_article.id
+            WHERE {$pb->getWhereIntersect()}
         ";
 
-        // Check the exact intersect
-        $articleIds = $this->db->executeQuery($sql, $whereParams->getAll())->fetchAll(PDO::FETCH_COLUMN);
-
-        // Check more generally-audienced articles
-        /** @var array $entityValue */
-        foreach ($entityValue as $type => $value) {
-            // Note we don't pass ORDER BY or LIMIT recursively
-            /** @noinspection SlowArrayOperationsInLoopInspection */
-            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship, $publishedOnly, $orderBy, $limit));
+        if (count($orderBy)) {
+            $sql .= "\n" . Complex\Mapper::buildOrderByClause(Complex\Mapper::TABLE_NAME, $orderBy, $this->db);
         }
-        return \array_unique($articleIds);
+
+        if (null !== $limit) {
+            $sql .= "
+                LIMIT :limit";
+            $pb->putParam('limit', $limit);
+        }
+        $hydrator = $this->articleMapper->getColumnScalarHydrator($this->articleMapper->getIdentifierColumn());
+        return array_map([
+            $hydrator,
+            'hydrate',
+        ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
     }
 }

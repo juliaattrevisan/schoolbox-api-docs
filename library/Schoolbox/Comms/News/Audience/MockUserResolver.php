@@ -8,6 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
+use Schoolbox\Comms\News;
+use Schoolbox\User;
+use function in_array;
+
 class MockUserResolver implements IUserResolver
 {
     /** @var int */
@@ -50,7 +54,7 @@ class MockUserResolver implements IUserResolver
     /**
      * @inheritdoc
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false, bool $includeAuthor = false): array
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false): array
     {
         return $this->findUsers($article->getId(), self::ARTICLE_AUDIENCES);
     }
@@ -69,4 +73,10 @@ class MockUserResolver implements IUserResolver
 
     }
 
+
+    /** @inheritDoc */
+    public function isUserInAudience(User $user, News\Model $article): bool
+    {
+        return in_array($user->getId(), self::ARTICLE_AUDIENCES[$article->getId()] ?? [], false);
+    }
 }
