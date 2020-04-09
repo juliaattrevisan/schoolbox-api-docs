@@ -26,7 +26,7 @@ if (!isset($_GET['mime'])) {
 } elseif ('' === $_GET['mime']) {
     $mimeFilter = false;
 } else {
-    $mimeFilter = $_GET['mime'];
+    $mimeFilter = urldecode($_GET['mime']);
 }
 
 /* Whether there is a Use This Folder button
