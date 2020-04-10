@@ -91,7 +91,7 @@ class UserResolver implements IUserResolver
 
         // To moderate an article due to its audience, users must be able to moderate all root segments
         $audienceModerators = null;
-        foreach ($article->getAudience() as $rootSegment) {
+        foreach ($rootSegments as $rootSegment) {
             $segmentModerators = $this->getSegmentModerators($rootSegment);
             if ($audienceModerators === null) {
                 $audienceModerators = $segmentModerators;
