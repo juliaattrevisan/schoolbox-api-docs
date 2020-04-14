@@ -12,6 +12,7 @@ use Calendar_Api_Cache;
 use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
 use DateTimeZone;
+use InvalidArgumentException;
 use Predis\Client as RedisClient;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Reader;
@@ -97,7 +98,14 @@ class Vcal
         // Don't actually store the file in cache.
         // (Use the cache class because it contains logic for handling proxy
         //  servers, failures, relative URLs and probably other stuff.)
-        $cache->init($config->getUrl(), $headers);
+        try {
+            $cache->init($config->getUrl(), $headers);
+        } catch (InvalidArgumentException $e) {
+            // The cached calendar wasn't able to be loaded.
+            // Maybe the config's URL was invalid or empty?
+            return null;
+        }
+
         $source = $cache->getStreamContents();
         $cache->invalidateCache();
         return $source;

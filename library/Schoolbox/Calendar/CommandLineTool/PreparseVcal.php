@@ -69,6 +69,15 @@ class PreparseVcal extends CliTool\App
             return;
         }
 
+        if (!$decodedConfig->getUrl()) {
+            $this->getLogger()->info(
+                sprintf(
+                    'Calendar configuration #%d has no URL: skipping',
+                    $config->getId()
+                )
+            );
+            return;
+        }
         $this->getLogger()->info(
             sprintf(
                 'Retrieving and caching raw vCal source for config #%d (%s)',
