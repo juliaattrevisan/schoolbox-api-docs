@@ -458,7 +458,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     'CheckAttendancesExistFlag' => 1,
                     'IncludeSparesFlag'         => 0,
                     'IncludeRecessFlag'         => 0,
-                    'WhereIsFlag'               => 1,
                 ]
             );
 
