@@ -15,7 +15,7 @@ CREATE TABLE comms_news_audience_complex(
 
 -- Migrate records
 INSERT INTO comms_news_audience_complex(comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, entity_value_2)
-    SELECT cna.comms_news_article_id, cna1.entity_type, cna1.entity_value, cna2.entity_type, cna2.entity_value
+    SELECT DISTINCT cna.comms_news_article_id, cna1.entity_type, cna1.entity_value, cna2.entity_type, cna2.entity_value
     FROM comms_news_audience cna
     JOIN comms_news_audience cna1 ON cna1.parent_id = cna.id
     JOIN comms_news_audience cna2 ON cna2.parent_id = cna.id AND cna1.id < cna2.id;
