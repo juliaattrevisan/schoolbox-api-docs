@@ -15,6 +15,8 @@ use DateTimeZone;
 use InvalidArgumentException;
 use Predis\Client as RedisClient;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\ParseException;
 use Sabre\VObject\Reader;
 
 /**
@@ -50,6 +52,9 @@ class Vcal
      * Stores this calendar's events in cache.
      *
      * @param CalendarConfig $config
+     * @throws InvalidArgumentException if the config has no URL
+     * @throws InvalidDataException     if the URL contains bad data
+     * @throws ParseException           if the URL contains bad data
      */
     public function write(CalendarConfig $config): void
     {
@@ -86,6 +91,7 @@ class Vcal
      *
      * @param CalendarConfig $config
      * @return string|null
+     * @throws InvalidArgumentException if the config has no URL
      */
     private function retrieveSource(CalendarConfig $config): ?string
     {
@@ -117,7 +123,8 @@ class Vcal
      *
      * @param string $source
      * @return VCalendar
-     * @noinspection PhpDocMissingThrowsInspection
+     * @throws InvalidDataException apparently. What it actually throws is a ParseException: see below
+     * @throws ParseException       if the document can't be parsed
      */
     private function convertSourceToEvents(string $source): VCalendar
     {
@@ -130,7 +137,6 @@ class Vcal
 
         // Expand 1 year in both directions
         $timezone = new DateTimeZone('UTC');
-        /** @noinspection PhpUnhandledExceptionInspection */
         $document = Reader::read($source, Reader::OPTION_FORGIVING);
         if ($document instanceof VCalendar) {
             $document->expand(
