@@ -452,7 +452,9 @@ class Notifier extends AbstractModuleNotifier
     private function hasAuthorMutedAllAudienceSegments(News\Model $article): bool
     {
         // Article needs its entire audience loaded before this will work
-        $article->setAudience(AudienceMapper::getInstance()->findForArticles([$article->getId()]));
+        if (!$article->getAudience()) {
+            $article->setAudience(AudienceMapper::getInstance()->findForArticles([$article->getId()]));
+        }
 
         // If article has no audience, then treat this as the author not muting all audiences.
         if (!$article->getAudience()->count()) {
