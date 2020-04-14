@@ -11,6 +11,9 @@ namespace Schoolbox\Calendar\CommandLineTool;
 use Calendar_Api_Config_Connector_Vcal;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
+use InvalidArgumentException;
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\ParseException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Calendar\Cache\Vcal as VcalCache;
 
@@ -85,6 +88,18 @@ class PreparseVcal extends CliTool\App
                 $decodedConfig->getUrl()
             )
         );
-        $this->cache->write($decodedConfig);
+        try {
+            $this->cache->write($decodedConfig);
+        } catch (InvalidArgumentException|ParseException|InvalidDataException $e) {
+            // There was a failure when writing the cache,
+            // or reading from the URL in the config.
+            // Whatever the case, log and continue.
+            $this->getLogger()->warning(
+                sprintf(
+                    'Could not cache source: %s',
+                    $e->getMessage()
+                )
+            );
+        }
     }
 }

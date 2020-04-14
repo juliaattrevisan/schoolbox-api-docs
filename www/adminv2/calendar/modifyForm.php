@@ -1,5 +1,7 @@
 <?php
 
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\ParseException;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Collection;
@@ -125,10 +127,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl()) {
                 try {
                     $cache->write($decodedConfig);
-                } catch (InvalidArgumentException $e) {
+                } catch (InvalidArgumentException|ParseException|InvalidDataException $e) {
                     // There was a failure when writing the cache,
-                    // probably because no URL was set or it's inaccessible.
-                    // Continue
+                    // or reading from the URL in the config.
+                    // Whatever the case, continue
                 }
             }
         }
