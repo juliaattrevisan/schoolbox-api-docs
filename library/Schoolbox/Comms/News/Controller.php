@@ -1650,6 +1650,6 @@ class Controller extends Base
      */
     private function isNewsModerator(): bool
     {
-        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) > UserAccess::ACCESS_READ);
+        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) === UserAccess::ACCESS_FULL);
     }
 }
