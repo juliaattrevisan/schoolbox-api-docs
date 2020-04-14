@@ -12,58 +12,51 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Database\Predicate;
 use Aura\Di\ContainerInterface;
-use Facebook\WebDriver\Exception\NullPointerException;
 use InvalidArgumentException;
 use Monolog\Logger;
 use PDO;
-use Schoolbox\Comms\News\Audience\IUserResolver;
-use Schoolbox\Comms\News\Audience\RelationshipFilterer;
-use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
+use Schoolbox\Comms\News\Mapper as ArticleMapper;
+use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Discussion\Comment\Model as Comment;
+use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Discussion\Comment\Model as Comment;
-use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
-use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Mapper as ArticleMapper;
-use Schoolbox\Comms\News\Model as Article;
-use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_map;
 use function array_unique;
-use function implode;
 use function in_array;
 use function sprintf;
 
 class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_COMMENTED = 'commented';
-    public const TRIGGER_FOLLOWED = 'followed';
+    public const TRIGGER_FOLLOWED  = 'followed';
 
     private const PATTERN_COMMENTED_TITLE = ':user commented on your article :title';
-    private const PATTERN_ARTICLE_HREF = '/news/%d';
+    private const PATTERN_ARTICLE_HREF    = '/news/%d';
 
     private const PATTERN_FOLLOWED_TITLE = ':user commented on the article :title';
 
@@ -95,18 +88,18 @@ class Notifier extends AbstractModuleNotifier
         $userResolver = $di->lazyGet('commsNewsUserResolver');
 
         $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
-            'audienceMapper'       => $mf->getLazy(AudienceMapper::class),
-            'userAccessMapper'     => $mf->getLazy(UserAccessMapper::class),
-            'db'                   => $di->lazyGet('databaseInternal')
+            'audienceMapper'   => $mf->getLazy(AudienceMapper::class),
+            'userAccessMapper' => $mf->getLazy(UserAccessMapper::class),
+            'db'               => $di->lazyGet('databaseInternal'),
         ]);
 
         return [
-            'setMapper' => $mf->getLazy(CommentMapper::class),
-            'setUserMapper' => $mf->getLazy(UserMapper::class),
-            'setThreadMapper' => $mf->getLazy(ThreadMapper::class),
-            'setArticleMapper' => $mf->getLazy(ArticleMapper::class),
+            'setMapper'            => $mf->getLazy(CommentMapper::class),
+            'setUserMapper'        => $mf->getLazy(UserMapper::class),
+            'setThreadMapper'      => $mf->getLazy(ThreadMapper::class),
+            'setArticleMapper'     => $mf->getLazy(ArticleMapper::class),
             'setAudienceResolver'  => $userResolver,
-            'setModeratorResolver' => $moderatorResolver
+            'setModeratorResolver' => $moderatorResolver,
         ];
     }
 
@@ -224,8 +217,8 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * Notifies staff that someone has commented on his article
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -237,8 +230,8 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * Notifies student that someone has commented on his article
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -250,8 +243,8 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * Notifies parent that someone has commented on his article
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -282,7 +275,7 @@ class Notifier extends AbstractModuleNotifier
     private function notifyCommented(string $roleType, Comment $comment, User $effector): Envelope
     {
         // get the item that the comment has created on
-        $thread = $comment->getThread();
+        $thread        = $comment->getThread();
         $threadLocator = new ThreadLocator($this->threadMapper, $this->articleMapper);
 
         /** @var GenericCollection $articles */
@@ -299,11 +292,11 @@ class Notifier extends AbstractModuleNotifier
         // Has user muted all audience segments, and they are not a SU or news moderator?
         /** @var User $author */
         $author = $article->getAuthor();
-        if(
+        if (
             !$author->isSuperuser() &&
             $this->hasAuthorMutedAllAudienceSegments($article) &&
             !in_array($author->getId(), $this->moderatorResolver->getGlobalNewsModerators(), false)
-        ){
+        ) {
             return $envelope;
         }
 
@@ -316,7 +309,7 @@ class Notifier extends AbstractModuleNotifier
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
-                'user' => new UserParam($effector, Param::STACKING_APPEND),
+                'user'  => new UserParam($effector, Param::STACKING_APPEND),
                 'title' => new Param(
                     $article->getTitle(),
                     sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
@@ -331,8 +324,8 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -343,8 +336,8 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -355,8 +348,8 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param Comment $comment
-     * @param User $effector
+     * @param Comment    $comment
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
@@ -368,14 +361,14 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * Notifies users who have made comments on the same article
-     * @param string $roleType
+     * @param string  $roleType
      * @param Comment $comment
-     * @param User $effector
+     * @param User    $effector
      * @return Envelope
      */
     private function notifyFollowed(string $roleType, Comment $comment, User $effector): Envelope
     {
-        $envelope = new Envelope();
+        $envelope      = new Envelope();
         $threadLocator = new ThreadLocator($this->threadMapper, $this->articleMapper);
 
         // get the item that the comment has created on
@@ -388,9 +381,9 @@ class Notifier extends AbstractModuleNotifier
         }
 
         /** @var Article $article */
-        $article = $articles->first();
+        $article        = $articles->first();
         $commentAuthors = $this->mapper->findByColumn('discussion_thread_id', $thread->getId())->getPropertyValues('author');
-        $recipientIds = [];
+        $recipientIds   = [];
         /** @var User $commentAuthor */
         // send to users who have ever made comments and are not the author of the article
         foreach ($commentAuthors as $commentAuthor) {
@@ -422,7 +415,7 @@ class Notifier extends AbstractModuleNotifier
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
-                'user' => new UserParam($effector, Param::STACKING_APPEND),
+                'user'  => new UserParam($effector, Param::STACKING_APPEND),
                 'title' => new Param(
                     $article->getTitle(),
                     sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
