@@ -16,7 +16,6 @@ use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Zend\Uri\Exception\InvalidArgumentException;
@@ -131,21 +130,6 @@ class Internal extends Base
 
 
     /**
-     * Checks whether this SBFS file is viewable by the current user.
-     * (Cribbed from /send.php)
-     *
-     * It's viewable if the current user has at least read access to the folder.
-     *
-     * @param  FileModel $file
-     * @param  User      $user
-     * @return bool
-     */
-    private function checkSendPermissions(FileModel $file, User $user)
-    {
-        return true;
-    }
-
-    /**
      * Get the id from a submission URL
      *
      * @param  Uri $url
@@ -166,27 +150,6 @@ class Internal extends Base
 
 
     /**
-     * Checks whether this submission is viewable by the current user.
-     * (Cribbed from /submission/send.php)
-     *
-     * It's viewable if any of the following are true:
-     * * The current user is the owner of the submission
-     * * The current user has write level access to the page of the submission
-     * * The submission has been showcased
-     *
-     * @param  SubmissionBox\ReturnedWork $file
-     * @param  User                       $user
-     * @return bool
-     */
-    private function checkSubmissionPermissions(SubmissionBox\ReturnedWork $file, User $user)
-    {
-        if ($file->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Get the id from a return URL
      *
      * @param  Uri $url
@@ -205,26 +168,6 @@ class Internal extends Base
         return null;
     }
 
-    /**
-     * Checks whether this return is viewable by the current user.
-     * (Cribbed from /submission/send.php)
-     *
-     * It's viewable if any of the following are true:
-     * * The current user is the owner of the return
-     * * The current user is a parent of the owner
-     * * The current user is a staff member
-     *
-     * @param  SubmissionBox\Submission\Submission $file
-     * @param  User                          $user
-     * @return bool
-     */
-    private function checkReturnPermissions(SubmissionBox\Submission\Submission $file, User $user)
-    {
-        if ($file->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Process Storage file analysis
