@@ -1,19 +1,15 @@
 <?php
 /**
- * Chain
- *
- * Seeks preview from an External (non-local) url
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Preview\Chain;
 
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
@@ -25,13 +21,22 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Zend\Uri\Uri;
 
-class Internal extends Base {
+/**
+ * Class Internal
+ *
+ * Seeks preview from an Internal (local) url
+ *
+ * @package Schoolbox\Preview\Chain
+ */
+class Internal extends Base
+{
 
     /**
      * Constructor
      *
      * @param string $url
      * @param User   $user The user to check permissions against
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
      */
     public function __construct($url, User $user) {
 
@@ -39,52 +44,52 @@ class Internal extends Base {
          * how to display it (or redirect, if it can't be displayed)
          */
         $uriObject = new Uri($url);
+
         if ($hash = $this->isStorage($uriObject)) {
             try {
                 $item = StorageMapper::getInstance()->findByHash($hash);
                 $this->processStorage($url, $item);
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isSend($uriObject)) {
             try {
                 $item = FileMapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isSubmission($uriObject)) {
             try {
                 $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
                 $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
+
                 if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                } else {
-                    // throw some error
                 }
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isReturn($uriObject)) {
             try {
                 $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
+
                 if ($item->hasPermission($user)) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                } else {
-                    // error
                 }
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
-        }
-        /* Just redirect straight there
-         */
-        else {
+        } else {
+
+            /* Just redirect straight there
+             */
             $this->start([
                 new Redirect($url, null),
             ]);
         }
     }
+
 
     /**
      * Get the hash out of a storage url
@@ -92,14 +97,19 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isStorage(Uri $url)
+    private function isStorage(Uri $url): ?string
     {
-        if ($url->getPath() == '/storage/fetch.php' || $url->getPath() == '/storage/image.php') {
+        $path = $url->getPath();
+
+        if ($path === '/storage/fetch.php' || $path === '/storage/image.php') {
             $query = $url->getQueryAsArray();
+
             return $query['hash'];
         }
+
         return null;
     }
+
 
     /**
      * Get the id from a send URL
@@ -107,14 +117,17 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isSend(Uri $url)
+    private function isSend(Uri $url): ?string
     {
-        if ($url->getPath() == '/send.php') {
+        if ($url->getPath() === '/send.php') {
             $query = $url->getQueryAsArray();
+
             return $query['id'];
         }
+
         return null;
     }
+
 
     /**
      * Checks whether this SBFS file is viewable by the current user.
@@ -137,16 +150,19 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isSubmission(Uri $url)
+    private function isSubmission(Uri $url): ?string
     {
-        if ($url->getPath() == '/submission/send.php') {
+        if ($url->getPath() === '/submission/send.php') {
             $query = $url->getQueryAsArray();
+
             if (empty($query['save']) && empty($query['return'])) {
                 return $query['id'];
             }
         }
+
         return null;
     }
+
 
     /**
      * Checks whether this submission is viewable by the current user.
@@ -175,14 +191,16 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isReturn(Uri $url)
+    private function isReturn(Uri $url): ?string
     {
-        if ($url->getPath() == '/submission/send.php') {
+        if ($url->getPath() === '/submission/send.php') {
             $query = $url->getQueryAsArray();
+
             if (empty($query['save']) && !empty($query['return'])) {
                 return $query['id'];
             }
         }
+
         return null;
     }
 
@@ -213,7 +231,8 @@ class Internal extends Base {
      * @param $url
      * @param $item
      */
-    private function processStorage($url, $item) {
+    private function processStorage($url, $item): void
+    {
         $this->start([
             new Image($url, $item),
             new Media($url, $item),
