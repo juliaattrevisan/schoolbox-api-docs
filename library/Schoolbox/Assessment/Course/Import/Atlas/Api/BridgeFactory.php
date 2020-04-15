@@ -87,7 +87,7 @@ class BridgeFactory
         return new Bridge(
             new HttpClient([
                 'handler'  => $stack,
-                'base_uri' => 'https://api.rubicon.com/api/',
+                'base_uri' => 'https://api.onatlas.com/api/',
                 'headers'  => [
                     'Authorization' => 'Bearer ' . $this->token,
                     'Accept'        => 'application/json',
