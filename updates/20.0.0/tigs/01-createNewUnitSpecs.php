@@ -65,7 +65,15 @@ $app = new class extends CliTool\App {
                 (cid, template)
             VALUES
                 (:folderId, :template)
+        ");
 
+
+        $createFolderPermissionsQuery = $db->prepareQuery("
+            INSERT INTO perms
+                (cid, gid, type)
+            SELECT role_id, :folderId, permission
+            FROM course_builder_config
+            WHERE page = 'unit'
         ");
 
 
@@ -101,7 +109,10 @@ $app = new class extends CliTool\App {
                     'folderId' => $newFolderId,
                     'template' => $this->getConfig()->get('course_builder_default_unit_page_template'),
                 ]);
-                // TODO figure out where default role perms come from
+
+                $createFolderPermissionsQuery->execute([
+                    'folderId' => $newFolderId,
+                ]);
 
                 $now = Alaress_Date_Format::now();
                 $createUnitSpecQuery->execute([
