@@ -182,8 +182,17 @@ $app = new class extends CliTool\App {
                 $implAssessmentId = (int)$implRow['assessment_id'];
 
                 if (!isset($unitImplIds[$courseImplId])) {
-
+                    $unitImplIds[$courseImplId] = $this->createUnitImplementation(
+                        $courseImplId,
+                        $unitSpecIds[$courseSpecId]
+                    );
                 }
+
+                // And move the assessment
+                $this->moveImplAssessmentQuery->execute([
+                    'newUnitImplId' => $unitImplIds[$courseImplId],
+                    'assessmentId'  => $implAssessmentId,
+                ]);
             }
         }
 
@@ -294,16 +303,15 @@ $app = new class extends CliTool\App {
                 cui.id
             FROM       course_implementation      ci
             INNER JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
-            WHERE ci.id                            =  :courseImplId
-            AND   cui.course_unit_specification_id != :newUnitSpecId
+            WHERE ci.id                            = :courseImplId
+            AND   cui.course_unit_specification_id = :newUnitSpecId
         ");
 
         // When should the new impl start and end?
         $this->findUnitImplDatesQuery = $db->prepareQuery("
             SELECT
-                ci.id,
-                MIN(cui.open_date),
-                MAX(cui.due_date)
+                MIN(cui.open_date) AS open_date,
+                MAX(cui.due_date)  AS due_date
             FROM       course_implementation      ci
             INNER JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
             WHERE ci.id = :courseImplId
@@ -390,7 +398,38 @@ $app = new class extends CliTool\App {
 
         // otherwise the unit spec already exists
         $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
-        return (int)$this->findUnitSpecQuery->fetch();
+        return (int)$this->findUnitSpecQuery->fetchColumn();
+    }
+
+
+    private function createUnitImplementation(int $courseImplId, int $unitSpecId): int
+    {
+        $this->findUnitImplQuery->execute([
+            'courseImplId'  => $courseImplId,
+            'newUnitSpecId' => $unitSpecId,
+        ]);
+
+        if ($this->findUnitImplQuery->rowCount() === 0) {
+            // create new impl
+            $this->findUnitImplDatesQuery->execute([
+                'courseImplId'  => $courseImplId,
+            ]);
+            $dates = $this->findUnitImplDatesQuery->fetch();
+            $now   = Alaress_Date_Format::now();
+            $this->createUnitImplQuery->execute([
+                'courseImplId'  => $courseImplId,
+                'newUnitSpecId' => $unitSpecId,
+                'unitName'      => self::UNIT_NAME,
+                'openDate'      => $dates['open_date'],
+                'dueDate'       => $dates['due_date'],
+                'createdAt'     => $now->getDatabase(),
+                'updatedAt'     => $now->getDatabase(),
+            ]);
+            return (int)$this->getDatabaseInternal()->lastInsertId();
+        }
+
+        // return existing impl
+        return (int)$this->findUnitImplQuery->fetchColumn();
     }
 };
 
