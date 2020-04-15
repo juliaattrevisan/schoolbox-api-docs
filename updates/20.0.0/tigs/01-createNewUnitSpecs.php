@@ -156,7 +156,6 @@ $app = new class extends CliTool\App {
             $courseFolderId   = (int)$specRow['folder_id'];
             $specAssessmentId = (int)$specRow['assessment_id'];
 
-            $this->getLogger()->info(sprintf('Preparing to move assessment #%d to new unit spec', $specAssessmentId));
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
                     $courseSpecId,
@@ -166,6 +165,7 @@ $app = new class extends CliTool\App {
             }
 
             // Move spec assessments from one place to the other
+            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
             $this->moveSpecAssessmentQuery->execute([
                 'newUnitSpecId' => $unitSpecIds[$courseSpecId],
                 'assessmentId'  => $specAssessmentId,
@@ -189,6 +189,7 @@ $app = new class extends CliTool\App {
                 }
 
                 // And move the assessment
+                $this->getLogger()->info(sprintf('Moving impl assessment #%d to new unit impl', $implAssessmentId));
                 $this->moveImplAssessmentQuery->execute([
                     'newUnitImplId' => $unitImplIds[$courseImplId],
                     'assessmentId'  => $implAssessmentId,
@@ -362,7 +363,7 @@ $app = new class extends CliTool\App {
             'folderName'   => self::UNIT_NAME,
         ]);
         if ($this->findUnitSpecQuery->rowCount() === 0) {
-            $this->getLogger()->info(sprintf('Creating folder for spec #%d', $courseSpecId));
+            $this->getLogger()->info(sprintf('Creating new unit spec for course spec #%d', $courseSpecId));
             $this->createFolderQuery->execute([
                 'folderName' => self::UNIT_NAME,
                 'parent'     => $courseFolderId,
@@ -397,11 +398,19 @@ $app = new class extends CliTool\App {
         }
 
         // otherwise the unit spec already exists
-        $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
+        $this->getLogger()->info(sprintf('Unit spec for course spec #%d already exists: skipping', $courseSpecId));
         return (int)$this->findUnitSpecQuery->fetchColumn();
     }
 
 
+    /**
+     * Creates the unit implementation for the given course impl and unit spec,
+     * if it doesn't already exist.
+     *
+     * @param int $courseImplId
+     * @param int $unitSpecId
+     * @return int the unit implementation's ID, whether it exists or not
+     */
     private function createUnitImplementation(int $courseImplId, int $unitSpecId): int
     {
         $this->findUnitImplQuery->execute([
@@ -411,6 +420,7 @@ $app = new class extends CliTool\App {
 
         if ($this->findUnitImplQuery->rowCount() === 0) {
             // create new impl
+            $this->getLogger()->info(sprintf('Creating new unit impl for course impl #%d', $courseImplId));
             $this->findUnitImplDatesQuery->execute([
                 'courseImplId'  => $courseImplId,
             ]);
@@ -429,6 +439,7 @@ $app = new class extends CliTool\App {
         }
 
         // return existing impl
+        $this->getLogger()->info(sprintf('Unit impl for course impl #%d already exists: skipping', $courseImplId));
         return (int)$this->findUnitImplQuery->fetchColumn();
     }
 };
