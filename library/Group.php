@@ -659,7 +659,7 @@ class Group extends DeprecatedModel
             return $allFolders;
         }
 
-        $folderMapper = new FolderMapper();
+        $folderMapper = FolderMapper::getInstance();
 
         if ($user->getExternalId()) {
             $externalUser = new External_User;

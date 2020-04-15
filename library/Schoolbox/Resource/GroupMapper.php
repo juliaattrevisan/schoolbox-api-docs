@@ -115,39 +115,4 @@ class GroupMapper extends Mapper {
 
         return $allFolders;
     }
-
-    /**
-     * Find all folders that a user hasn't joined yet
-     *
-     * @param User $user
-     * @return \Schoolbox\Collection
-     */
-    public function findUnjoinedFolders(User $user) {
-        $allFolders = $this->getJoinMapper('folder')->createCollection();
-        $folderMapper = new FolderMapper();
-
-        $query = "
-            SELECT
-                {$this->getColumnString('ug')},
-                {$this->getJoinColumnString('folder', 'f')},
-                userAccess.*
-            FROM `{$this->getTable()}` ug
-            LEFT JOIN {$this->getJoinSql('folder', 'ug', 'f')}
-            LEFT JOIN `userAccess`
-            ON (userAccess.service = " . UserAccess::SERVICE_HOMEPAGE . " AND ug.cid = userAccess.sid AND userAccess.uid = :userId)
-            WHERE f.id IS NOT NULL
-            AND userAccess.uid IS NULL
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'userId' => $user->getId()
-        ]);
-
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $allFolders->add($folderMapper->hydrate($row, 'f'));
-        }
-
-        return $allFolders;
-    }
 }

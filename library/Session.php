@@ -461,7 +461,7 @@ class Session
     private function setSynergyInfo(UserMapper $userMapper, User $user)
     {
         $synUser = new External_User;
-        $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
         $synergy_id = $_SESSION['sid'];
 
