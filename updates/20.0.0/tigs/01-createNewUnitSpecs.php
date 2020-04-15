@@ -26,6 +26,8 @@ $app = new class extends CliTool\App {
      *
      * Any spec or impl assessment (that isn't in a project) with one of these
      * work types will be moved to the new assessment type.
+     *
+     * TODO this list works with the TIGS data set, but I'm not sure it's right for their actual data
      */
     private const WORK_TYPE_IDS = [5, 4, 7, 1];
 
