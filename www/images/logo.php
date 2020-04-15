@@ -11,7 +11,11 @@ use Alaress\Image\Cache;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -63,13 +67,34 @@ if (!(array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[
 try {
     /* Choose a caching method to use
      */
-    $key   = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
-    $store = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+    $key            = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
+    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+    $fileSystem     = $resource->getFilesystem();
+
+    if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+
+        if ($config->get('otfs_s3_presigned_urls_enabled')) {
+            $preSignedUrlService = new PreSignedUrlService($config);
+
+            $preSignedUrlDataObject = $preSignedUrlService->generate(
+                Alaress_Date_Format::now()->addDays(1),
+                (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '',
+                ($resource->getMime()) ?: 'application/octet-stream',
+                $resource->getPath(),
+                $resource->getBasename(),
+                ($_GET['cache'] ?? '0') ? 'private' : 'no-store'
+            );
+
+            $preSignedUrlService->download($preSignedUrlDataObject);
+        }
+    }
 
     /* Process and stream image
      */
     $imageProcessor = new Freeform(
-        new Cache\Storage($store, $key),
+        new Cache\Storage($resource, $key),
         new Transformation\MyImage($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
