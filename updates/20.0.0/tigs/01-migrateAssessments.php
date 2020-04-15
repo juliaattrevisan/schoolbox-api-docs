@@ -213,7 +213,6 @@ $app = new class extends CliTool\App {
             $specAssessmentId = (int)$specRow['assessment_id'];
 
 
-            // Create unit specs if required
             $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
@@ -222,51 +221,25 @@ $app = new class extends CliTool\App {
                     $courseBuilderConfigs
                 );
             }
+            $this->moveAssessmentSpecification($unitSpecIds[$courseSpecId], $specAssessmentId);
 
 
-            // Move spec assessments from one place to the other
-            $this->moveSpecAssessmentQuery->execute([
-                'newUnitSpecId' => $unitSpecIds[$courseSpecId],
-                'assessmentId'  => $specAssessmentId,
-            ]);
-            if ($this->moveSpecAssessmentQuery->rowCount() > 0) {
-                $this->movedSpecAssessments[$specAssessmentId] = $specAssessmentId;
-            }
+            $implAssessments = $this->findAssessmentImplementations($specAssessmentId);
+            $this->getLogger()->info(sprintf('.. %d impl assessments for this spec found', count($implAssessments)));
 
-
-            // Find all implementations of the spec assessment
-            $this->findImplAssessmentsQuery->execute([
-                'specAssessmentId' => $specAssessmentId,
-            ]);
-            $this->getLogger()->info(
-                sprintf(
-                    '.. %d impl assessments for this spec found',
-                    $this->findImplAssessmentsQuery->rowCount()
-                )
-            );
-            foreach ($this->findImplAssessmentsQuery->fetchAll() as $implRow) {
+            foreach ($implAssessments as $implRow) {
                 $courseImplId     = (int)$implRow['course_implementation_id'];
                 $implAssessmentId = (int)$implRow['assessment_id'];
 
 
-                // Create unit implementations for the new unit spec if required
+                $this->getLogger()->info(sprintf('.... Moving impl assessment #%d to new unit impl', $implAssessmentId));
                 if (!isset($unitImplIds[$courseImplId])) {
                     $unitImplIds[$courseImplId] = $this->createUnitImplementation(
                         $courseImplId,
                         $unitSpecIds[$courseSpecId]
                     );
                 }
-
-
-                // And move the implementation assessment into the new unit implementation
-                $this->getLogger()->info(sprintf('.... Moving impl assessment #%d to new unit impl', $implAssessmentId));
-                $this->moveImplAssessmentQuery->execute([
-                    'newUnitImplId' => $unitImplIds[$courseImplId],
-                    'assessmentId'  => $implAssessmentId,
-                ]);
-                if ($this->moveImplAssessmentQuery->rowCount() > 0) {
-                    $this->movedImplAssessments[$implAssessmentId] = $implAssessmentId;
-                }
+                $this->moveAssessmentImplementation($unitImplIds[$courseImplId], $implAssessmentId);
             }
         }
 
@@ -542,6 +515,60 @@ $app = new class extends CliTool\App {
 
         // return existing impl
         return (int)$this->findUnitImplQuery->fetchColumn();
+    }
+
+
+    /**
+     * Move the spec assessment into the newly created unit spec.
+     *
+     * @param int $unitSpecId
+     * @param int $specAssessmentId
+     */
+    private function moveAssessmentSpecification(int $unitSpecId, int $specAssessmentId): void
+    {
+        $this->moveSpecAssessmentQuery->execute([
+            'newUnitSpecId' => $unitSpecId,
+            'assessmentId'  => $specAssessmentId,
+        ]);
+        if ($this->moveSpecAssessmentQuery->rowCount() > 0) {
+            $this->movedSpecAssessments[$specAssessmentId] = $specAssessmentId;
+        }
+    }
+
+
+    /**
+     * Find all implementations of the given spec assessment.
+     *
+     * These will be moved to a new unit implementation.
+     *
+     * @param int $specAssessmentId
+     * @return array
+     */
+    private function findAssessmentImplementations(int $specAssessmentId): array
+    {
+        $this->findImplAssessmentsQuery->execute([
+            'specAssessmentId' => $specAssessmentId,
+        ]);
+        return $this->findImplAssessmentsQuery->fetchAll();
+    }
+
+
+    /**
+     * Move the implementation assessment into the newly created unit
+     * implementation.
+     *
+     * @param int $unitImplId
+     * @param int $implAssessmentId
+     */
+    private function moveAssessmentImplementation($unitImplId, int $implAssessmentId): void
+    {
+        $this->moveImplAssessmentQuery->execute([
+            'newUnitImplId' => $unitImplId,
+            'assessmentId'  => $implAssessmentId,
+        ]);
+        if ($this->moveImplAssessmentQuery->rowCount() > 0) {
+            $this->movedImplAssessments[$implAssessmentId] = $implAssessmentId;
+        }
     }
 };
 
