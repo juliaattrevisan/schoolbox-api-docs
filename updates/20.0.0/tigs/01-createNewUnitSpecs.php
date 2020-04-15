@@ -77,6 +77,14 @@ $app = new class extends CliTool\App {
 
 
     /**
+     * Query for moving a spec assessment.
+     *
+     * @var IQuery
+     */
+    private $moveSpecAssessmentQuery;
+
+
+    /**
      * @inheritDoc
      */
     public function run(): void
@@ -97,11 +105,13 @@ $app = new class extends CliTool\App {
         $db->beginTransaction();
 
         $unitSpecIds = [];
+        $unitImplIds = [];
         foreach ($this->findSpecAssessmentsQuery->getIterator() as $row) {
-            $courseSpecId   = (int)$row['course_specification_id'];
-            $courseFolderId = (int)$row['folder_id'];
-            $assessmentId   = (int)$row['assessment_id'];
+            $courseSpecId     = (int)$row['course_specification_id'];
+            $courseFolderId   = (int)$row['folder_id'];
+            $specAssessmentId = (int)$row['assessment_id'];
 
+            $this->getLogger()->info(sprintf('Preparing to move assessment #%d to new unit spec', $specAssessmentId));
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
                     $courseSpecId,
@@ -111,6 +121,12 @@ $app = new class extends CliTool\App {
             }
 
             // Move spec assessments from one place to the other
+            $this->moveSpecAssessmentQuery->execute([
+                'newUnitSpecId' => $unitSpecIds[$courseSpecId],
+                'assessmentId'  => $specAssessmentId,
+            ]);
+
+
             // Create unit implementations
             // Move impl assessments from one place to the other
         }
@@ -144,7 +160,7 @@ $app = new class extends CliTool\App {
             WHERE lwt.id IN {$placeholders}
             AND   var.course_specification_id  IS NOT NULL
             AND   var.course_implementation_id IS NULL
-            AND   var.project_id               IS NULL
+            AND   var.project_assessment_id    IS NULL
         ");
 
         $this->findCourseBuilderConfigQuery = $db->prepareQuery("
@@ -192,18 +208,10 @@ $app = new class extends CliTool\App {
 
 
         // Queries for moving assessments from one spec to another.
-        $findSpecAssessmentsQuery = $db->prepareQuery("
-            SELECT assessment_course_unit_specification acus
-            SET    acus.course_unit_specification_id = :newCourseSpecId
-            WHERE  acus.course_unit_specification_id = :oldCourseSpecId
-            AND    acus.assessment_id                = :assessmentId
-        ");
-
-        $moveSpecAssessmentQuery = $db->prepareQuery("
+        $this->moveSpecAssessmentQuery = $db->prepareQuery("
             UPDATE assessment_course_unit_specification acus
-            SET    acus.course_unit_specification_id = :newCourseSpecId
-            WHERE  acus.course_unit_specification_id = :oldCourseSpecId
-            AND    acus.assessment_id                = :assessmentId
+            SET    acus.course_unit_specification_id = :newUnitSpecId
+            WHERE  acus.assessment_id                = :assessmentId
         ");
     }
 
