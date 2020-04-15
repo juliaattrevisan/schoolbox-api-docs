@@ -82,19 +82,14 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $eventType = 1;
         }
 
-        // Find for student currently hacks together a term
-        $term = (new Schoolbox\Assessment\Term\Model())
-            ->setStart(new Alaress_Date_Format($startTimestamp, Alaress_Date_Format::TIMESTAMP))
-            ->setActualFinish(new Alaress_Date_Format($endTimestamp, Alaress_Date_Format::TIMESTAMP));
+        $assessables = $this->assessmentDataSource->findAllBetweenDates(
+            Alaress_Date_Format::newFromTimestamp($startTimestamp),
+            Alaress_Date_Format::newFromTimestamp($endTimestamp),
+            $this->getUser()
+        );
 
-        // Get a timeline of events
-        // Use the assessment data source to get everything for this user
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessables, $this->getUser(), true);
 
-        if ($this->getUser()->getRole()->isStudent()) {
-            $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), true, $term);
-        } else {
-            $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
-        }
 
         foreach ($assessables as $assessment) {
             // Permission check to see the assessment
