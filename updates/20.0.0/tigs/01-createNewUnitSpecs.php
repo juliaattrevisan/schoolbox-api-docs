@@ -25,7 +25,7 @@ $app = new class extends CliTool\App {
      *
      * @var IQuery
      */
-    private $findCourseSpecsQuery;
+    private $findSpecAssessmentsQuery;
 
 
     /**
@@ -41,7 +41,7 @@ $app = new class extends CliTool\App {
      *
      * @var IQuery
      */
-    private $hasUnitSpecQuery;
+    private $findUnitSpecQuery;
 
 
     /**
@@ -88,22 +88,36 @@ $app = new class extends CliTool\App {
         $courseBuilderConfigs = $this->findCourseBuilderConfigQuery->fetchAll();
 
 
-        $this->findCourseSpecsQuery->execute(
+        $this->findSpecAssessmentsQuery->execute(
             Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId')
         );
 
 
         $db = $this->getDatabaseInternal();
         $db->beginTransaction();
-        foreach ($this->findCourseSpecsQuery->getIterator() as $row) {
+
+        $unitSpecIds = [];
+        foreach ($this->findSpecAssessmentsQuery->getIterator() as $row) {
             $courseSpecId   = (int)$row['course_specification_id'];
             $courseFolderId = (int)$row['folder_id'];
-            $this->createUnitSpecification($courseSpecId, $courseFolderId, $courseBuilderConfigs);
+            $assessmentId   = (int)$row['assessment_id'];
+
+            if (!isset($unitSpecIds[$courseSpecId])) {
+                $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
+                    $courseSpecId,
+                    $courseFolderId,
+                    $courseBuilderConfigs
+                );
+            }
 
             // Move spec assessments from one place to the other
             // Create unit implementations
             // Move impl assessments from one place to the other
         }
+
+
+
+
         $db->commit();
     }
 
@@ -118,8 +132,9 @@ $app = new class extends CliTool\App {
 
         // Queries for creating a new unit spec.
         $placeholders = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
-        $this->findCourseSpecsQuery = $db->prepareQuery("
+        $this->findSpecAssessmentsQuery = $db->prepareQuery("
             SELECT DISTINCT
+                var.assessment_id,
                 var.course_specification_id,
                 cs.folder_id
             FROM v_assessment_relation var
@@ -138,8 +153,8 @@ $app = new class extends CliTool\App {
             WHERE page = 'unit'
         ");
 
-        $this->hasUnitSpecQuery = $db->prepareQuery("
-            SELECT f.id
+        $this->findUnitSpecQuery = $db->prepareQuery("
+            SELECT cus.id
             FROM       course_specification      cs
             INNER JOIN course_unit_specification cus ON cs.id         = cus.course_specification_id
             INNER JOIN folder                    f   ON cus.folder_id = f.id
@@ -199,15 +214,15 @@ $app = new class extends CliTool\App {
      * @param int   $courseSpecId
      * @param int   $courseFolderId
      * @param array $courseBuilderConfigs
+     * @return int the unit specification's ID, whether it exists or not
      */
-    private function createUnitSpecification(int $courseSpecId, int $courseFolderId, array $courseBuilderConfigs): void
+    private function createUnitSpecification(int $courseSpecId, int $courseFolderId, array $courseBuilderConfigs): int
     {
-        $db = $this->getDatabaseInternal();
-        $this->hasUnitSpecQuery->execute([
+        $this->findUnitSpecQuery->execute([
             'courseSpecId' => $courseSpecId,
             'folderName'   => self::UNIT_NAME,
         ]);
-        if ($this->hasUnitSpecQuery->rowCount() === 0) {
+        if ($this->findUnitSpecQuery->rowCount() === 0) {
             $this->getLogger()->info(sprintf('Creating folder for spec #%d', $courseSpecId));
             $this->createFolderQuery->execute([
                 'folderName' => self::UNIT_NAME,
@@ -215,7 +230,7 @@ $app = new class extends CliTool\App {
                 'inherit'    => $this->getConfig()->get('course_builder_default_unit_page_inherit'),
             ]);
 
-            $newFolderId = $db->lastInsertId();
+            $newFolderId = $this->getDatabaseInternal()->lastInsertId();
 
             $this->createHomepageQuery->execute([
                 'folderId' => $newFolderId,
@@ -237,10 +252,14 @@ $app = new class extends CliTool\App {
                 'createdAt'    => $now->getDatabase(),
                 'updatedAt'    => $now->getDatabase(),
             ]);
-        } else {
-            // already exists
-            $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
+
+            return (int)$this->getDatabaseInternal()->lastInsertId();
+
         }
+
+        // otherwise the unit spec already exists
+        $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
+        return (int)$this->findUnitSpecQuery->fetch();
     }
 };
 
