@@ -11,8 +11,8 @@ use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
-use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Uri;
 
@@ -25,6 +25,18 @@ use Zend\Uri\Uri;
  */
 class Internal extends Base
 {
+
+    /**
+     * Storage urls
+     */
+    private const URL_STORAGE = ['/storage/fetch.php', '/storage/image.php'];
+
+
+    /**
+     * Send url
+     */
+    private const URL_SEND = '/send.php';
+
 
     /**
      * Constructor
@@ -45,14 +57,14 @@ class Internal extends Base
          */
         if ($hash = $this->isStorage($uriObject)) {
             try {
-                $item = StorageMapper::getInstance()->findByHash($hash);
+                $item = Storage\Mapper::getInstance()->findByHash($hash);
                 $this->processStorage($url, $item);
             } catch (Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isSend($uriObject)) {
             try {
-                $item = FileMapper::getInstance()->findById($id);
+                $item = File\Mapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
             } catch (Exception $e ) {
                 //noop
@@ -76,9 +88,7 @@ class Internal extends Base
      */
     private function isStorage(Uri $url): ?string
     {
-        $path = $url->getPath();
-
-        if ($path === '/storage/fetch.php' || $path === '/storage/image.php') {
+        if (\in_array($url->getPath(), self::URL_STORAGE, true)) {
             $query = $url->getQueryAsArray();
 
             return $query['hash'];
@@ -96,7 +106,7 @@ class Internal extends Base
      */
     private function isSend(Uri $url): ?string
     {
-        if ($url->getPath() === '/send.php') {
+        if ($url->getPath() === self::URL_SEND) {
             $query = $url->getQueryAsArray();
 
             return $query['id'];
@@ -110,7 +120,7 @@ class Internal extends Base
      * Process Storage file analysis
      *
      * @param string $url
-     * @param \Schoolbox\Resource\Storage\Model|\Schoolbox\Resource\File\Model $item
+     * @param Storage\Model|File\Model $item
      */
     private function processStorage(string $url, $item): void
     {
