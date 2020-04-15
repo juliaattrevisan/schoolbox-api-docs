@@ -6,18 +6,13 @@
  */
 namespace Schoolbox\Preview\Chain;
 
-use Eportfolio\ShowcaseMapper;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Uri;
 
@@ -35,21 +30,18 @@ class Internal extends Base
      * Constructor
      *
      * @param string $url
-     * @param User   $user The user to check permissions against
      * @throws InvalidArgumentException
      */
-    public function __construct(string $url, User $user) {
+    public function __construct(string $url) {
 
         /* Storage item: find the hash, and analyse it to find out
          * how to display it (or redirect, if it can't be displayed)
          */
         $uriObject = new Uri($url);
 
-        /* $item can be one of
+        /* $item can be one of:
          * Schoolbox\Resource\Storage\Model
          * Schoolbox\Resource\File\Model
-         * Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission
-         * Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
          */
         if ($hash = $this->isStorage($uriObject)) {
             try {
@@ -62,31 +54,6 @@ class Internal extends Base
             try {
                 $item = FileMapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
-            } catch (Exception $e ) {
-                //noop
-            }
-        } elseif ($id = $this->isSubmission($uriObject)) {
-            try {
-                $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
-                $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
-
-                /* TODO But submissions (Responses) have multiple files now - this is probably impossible
-                 */
-                if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
-                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                }
-            } catch (Exception $e ) {
-                //noop
-            }
-        } elseif ($id = $this->isReturn($uriObject)) {
-            try {
-                $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
-
-                /* TODO But returns (Feedbacks) have multiple files now - this is probably impossible
-                 */
-                if ($item->hasPermission($user)) {
-                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                }
             } catch (Exception $e ) {
                 //noop
             }
@@ -140,50 +107,10 @@ class Internal extends Base
 
 
     /**
-     * Get the id from a submission URL
-     *
-     * @param  Uri $url
-     * @return string
-     */
-    private function isSubmission(Uri $url): ?string
-    {
-        if ($url->getPath() === '/submission/send.php') {
-            $query = $url->getQueryAsArray();
-
-            if (empty($query['save']) && empty($query['return'])) {
-                return $query['id'];
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Get the id from a return URL
-     *
-     * @param  Uri $url
-     * @return string
-     */
-    private function isReturn(Uri $url): ?string
-    {
-        if ($url->getPath() === '/submission/send.php') {
-            $query = $url->getQueryAsArray();
-
-            if (empty($query['save']) && !empty($query['return'])) {
-                return $query['id'];
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
      * Process Storage file analysis
      *
      * @param string $url
-     * @param $item
+     * @param \Schoolbox\Resource\Storage\Model|\Schoolbox\Resource\File\Model $item
      */
     private function processStorage(string $url, $item): void
     {

@@ -1,18 +1,22 @@
 <?php
 /**
- *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
-
 namespace Schoolbox\Preview;
 
+use DomainException;
+use InvalidArgumentException;
 use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
-use Schoolbox\User;
 
+/**
+ * Class Factory
+ *
+ * @package Schoolbox\Preview
+ */
 class Factory
 {
 
@@ -20,6 +24,7 @@ class Factory
      * @var Translator
      */
     private $translator;
+
 
     /**
      * @param Translator $translator
@@ -35,12 +40,11 @@ class Factory
      * This exists separately now so that it can be used in the task screen for displaying URLs inline
      *
      * @param string $encodedUrl
-     * @param User   $user
      * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException if $url is not a string
+     * @throws DomainException
+     * @throws InvalidArgumentException if $url is not a string
      */
-    public function urlFragment($encodedUrl, User $user)
+    public function urlFragment($encodedUrl): array
     {
         /* Distill a url from an encapsulating structure, if necessary
          */
@@ -62,35 +66,31 @@ class Factory
          */
         $url = new \Url($testUrl);
 
-        /* Local Chain
-         */
         if ($url->isLocalUrl()) {
-            if (!$user instanceof User) {
-                $user = new User();
-            }
-            $chain  = new Internal($url->getUrl(), $user);
-            $result = $chain->getResult();
-        } /* External Chain
-         */
-        else {
-            $chain  = new External($url->getUrl());
-            $result = $chain->getResult();
+
+            /* Internal Chain
+             */
+            $result = (new Internal($url->getUrl()))->getResult();
+        } else {
+
+            /* External Chain
+             */
+            $result = (new External($url->getUrl()))->getResult();
             $result['src'] = $this->translator->translate($result['src']);
         }
 
         /* Set up html fragment
          */
         $fragment = null;
+
         if ($result['type'] !== 'inline') {
             $fragment = $result['src'];
         }
 
-        $previewResponse = [
+        return [
             'type'     => $result['type'],
             'twig'     => $result['twig'],
             'fragment' => $fragment,
         ];
-
-        return $previewResponse;
     }
 }
