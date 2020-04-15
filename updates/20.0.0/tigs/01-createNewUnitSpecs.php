@@ -138,7 +138,7 @@ $app = new class extends CliTool\App {
                 $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
             }
         }
-        $db->rollBack();
+        $db->commit();
     }
 };
 
