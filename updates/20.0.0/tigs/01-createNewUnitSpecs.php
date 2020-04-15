@@ -71,10 +71,18 @@ $app = new class extends CliTool\App {
         $createFolderPermissionsQuery = $db->prepareQuery("
             INSERT INTO perms
                 (cid, gid, type)
-            SELECT role_id, :folderId, permission
+            VALUES
+                (:folderId, :roleId, :permission)
+        ");
+
+
+        $findCourseBuilderConfigQuery = $db->prepareQuery("
+            SELECT role_id, permission
             FROM course_builder_config
             WHERE page = 'unit'
         ");
+        $findCourseBuilderConfigQuery->execute();
+        $courseBuilderConfigs = $findCourseBuilderConfigQuery->fetchAll();
 
 
         $createUnitSpecQuery = $db->prepareQuery("
@@ -110,9 +118,13 @@ $app = new class extends CliTool\App {
                     'template' => $this->getConfig()->get('course_builder_default_unit_page_template'),
                 ]);
 
-                $createFolderPermissionsQuery->execute([
-                    'folderId' => $newFolderId,
-                ]);
+                foreach ($courseBuilderConfigs as $courseBuilderConfig) {
+                    $createFolderPermissionsQuery->execute([
+                        'folderId'   => $newFolderId,
+                        'roleId'     => $courseBuilderConfig['role_id'],
+                        'permission' => $courseBuilderConfig['permission'],
+                    ]);
+                }
 
                 $now = Alaress_Date_Format::now();
                 $createUnitSpecQuery->execute([
