@@ -84,8 +84,10 @@ class Javascript extends Base
             'end'       => "$end",
 
             /* Whether you can edit this event or not
+             * EOTC events can't be moved on the calendar yet, but they do have
+             * a modify button.
              */
-            'editable'  => $editable,
+            'editable'  => false,
 
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
