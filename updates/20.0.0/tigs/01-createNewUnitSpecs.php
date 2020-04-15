@@ -31,6 +31,38 @@ $app = new class extends CliTool\App {
 
 
     /**
+     * Unit specs that have been created by this script.
+     *
+     * @var array
+     */
+    private $createdUnitSpecs = [];
+
+
+    /**
+     * Spec assessments that have been moved by this script.
+     *
+     * @var array
+     */
+    private $movedSpecAssessments = [];
+
+
+    /**
+     * Unit implementations that have been created by this script.
+     *
+     * @var array
+     */
+    private $createdUnitImpls = [];
+
+
+    /**
+     * Implementation assessments that have been moved by this script.
+     *
+     * @var array
+     */
+    private $movedImplAssessments = [];
+
+
+    /**
      * Query for finding course specs which need a "Report Grades" unit spec.
      *
      * @var IQuery
@@ -146,6 +178,7 @@ $app = new class extends CliTool\App {
     {
         // This script is TIGS only
         if ($this->getConfig()->get('site_location') !== 'tigs') {
+            $this->getLogger()->notice('This update is not intended for this environment');
             return;
         }
 
@@ -193,14 +226,22 @@ $app = new class extends CliTool\App {
                 'newUnitSpecId' => $unitSpecIds[$courseSpecId],
                 'assessmentId'  => $specAssessmentId,
             ]);
+            if ($this->moveSpecAssessmentQuery->rowCount() > 0) {
+                $this->movedSpecAssessments[$specAssessmentId] = $specAssessmentId;
+            }
 
 
             // Create unit implementations
             // Move impl assessments from one place to the other
-            $this->getLogger()->info('.. Finding impl assessments to move');
             $this->findImplAssessmentsQuery->execute([
                 'specAssessmentId' => $specAssessmentId,
             ]);
+            $this->getLogger()->info(
+                sprintf(
+                    '.. %d impl assessments for this spec found',
+                    $this->findImplAssessmentsQuery->rowCount()
+                )
+            );
             foreach ($this->findImplAssessmentsQuery->fetchAll() as $implRow) {
                 $courseImplId     = (int)$implRow['course_implementation_id'];
                 $implAssessmentId = (int)$implRow['assessment_id'];
@@ -218,9 +259,18 @@ $app = new class extends CliTool\App {
                     'newUnitImplId' => $unitImplIds[$courseImplId],
                     'assessmentId'  => $implAssessmentId,
                 ]);
+                if ($this->moveImplAssessmentQuery->rowCount() > 0) {
+                    $this->movedImplAssessments[$implAssessmentId] = $implAssessmentId;
+                }
             }
         }
 
+
+        // Some sort of summary of what happened
+        $this->getLogger()->notice(sprintf('%d unit specs created', count($this->createdUnitSpecs)));
+        $this->getLogger()->notice(sprintf('%d spec assessments moved', count($this->movedSpecAssessments)));
+        $this->getLogger()->notice(sprintf('%d unit impls created', count($this->createdUnitImpls)));
+        $this->getLogger()->notice(sprintf('%d impl assessments moved', count($this->movedImplAssessments)));
 
         $db->commit();
     }
@@ -418,8 +468,9 @@ $app = new class extends CliTool\App {
                 'updatedAt'    => $now->getDatabase(),
             ]);
 
-            return (int)$this->getDatabaseInternal()->lastInsertId();
-
+            $newUnitSpecId = (int)$this->getDatabaseInternal()->lastInsertId();
+            $this->createdUnitSpecs[$newUnitSpecId] = $newUnitSpecId;
+            return $newUnitSpecId;
         }
 
         // otherwise the unit spec already exists
@@ -459,7 +510,10 @@ $app = new class extends CliTool\App {
                 'createdAt'     => $now->getDatabase(),
                 'updatedAt'     => $now->getDatabase(),
             ]);
-            return (int)$this->getDatabaseInternal()->lastInsertId();
+
+            $newUnitImplId = (int)$this->getDatabaseInternal()->lastInsertId();
+            $this->createdUnitImpls[$newUnitImplId] = $newUnitImplId;
+            return $newUnitImplId;
         }
 
         // return existing impl
@@ -468,5 +522,5 @@ $app = new class extends CliTool\App {
 };
 
 
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::NOTICE, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 (new CliTool\Kernel($app, $options))->runApp();
