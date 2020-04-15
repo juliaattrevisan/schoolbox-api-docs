@@ -8,6 +8,8 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\IModel;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
@@ -16,9 +18,10 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Assessment\Term
  */
-class Model implements \IComparable
+class Model implements \IComparable, IModel
 {
     use Id;
+    use CreateCollection;
 
     /**
      * The human-readable title of this term.

@@ -13,6 +13,7 @@ use RangeException;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
 /**
@@ -87,23 +88,15 @@ class Mapper extends BaseMapper
      */
     public function findForDate(Alaress_Date_Format $date): Model
     {
-        $query = "
-            SELECT   {$this->getColumnString()}
-            FROM     {$this->getTable()}
-            WHERE    `start` <= :date
-            ORDER BY `start` DESC
-            LIMIT 1
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(['date' => $date->getDatabaseDate(),]);
-        $result = $statement->fetch();
-
-        // Nothing? Either throw exception or return an empty item
-
-        /** @var Model $model */
-        $model = $result ? $this->hydrate($result) : $this->createModel();
-
-        return $model;
+        $pb = $this->getPredicateBuilder();
+        try {
+            return $this->findOneByPredicates($pb->lessThanOrEqualTo('start', $date->getDatabaseDate()), [
+                'order' => ['start' => 'DESC'],
+                'limit' => 1
+            ]);
+        } catch (Exception $e) {
+            return $this->createModel();
+        }
     }
 
 
