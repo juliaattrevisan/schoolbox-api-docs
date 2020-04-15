@@ -21,8 +21,8 @@ class TidewaysCollector extends DataCollector implements Renderable {
      * Constructor: enables XHProf profiling
      */
     public function __construct() {
-        if (extension_loaded('tideways')) {
-            tideways_enable(TIDEWAYS_FLAGS_CPU + TIDEWAYS_FLAGS_MEMORY);
+        if (extension_loaded('tideways_xhprof')) {
+            tideways_xhprof_enable(TIDEWAYS_XHPROF_FLAGS_MEMORY | TIDEWAYS_XHPROF_FLAGS_CPU);
         }
     }
 
@@ -30,9 +30,9 @@ class TidewaysCollector extends DataCollector implements Renderable {
      * {@inheritDoc}
      */
     public function collect() {
-        if (extension_loaded('tideways')) {
+        if (extension_loaded('tideways_xhprof')) {
             $profiler_namespace = 'schoolbox';
-            $xhprof_data = tideways_disable();
+            $xhprof_data = tideways_xhprof_disable();
 
             $xhprof_runs = new XHProfRuns_Default();
             $run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
