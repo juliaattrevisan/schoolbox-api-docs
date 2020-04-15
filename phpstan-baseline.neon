@@ -8228,6 +8228,11 @@ parameters:
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
+			path: library/Schoolbox/Comms/News/Feed/Module.php
+
+		-
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			count: 1
 			path: library/Schoolbox/Comms/News/Moderation/Module.php
 
 		-
