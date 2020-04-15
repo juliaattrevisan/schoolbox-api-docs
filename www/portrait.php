@@ -12,8 +12,11 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -42,15 +45,40 @@ try {
 }
 
 try {
+    $portrait = new Image\Cache\Portrait(
+        $user,
+        $_GET['size'],
+        $_SESSION['user'],
+        (bool)$config->get('photo_sis_import'),
+        (bool)$config->get('protect_student_photo'),
+        (int)$config->get('protect_teacher_photo')
+    );
+
+    $fileSystem = $portrait->load()->getFilesystem();
+
+    if ($fileSystem instanceof Filesystem &&
+        $fileSystem->getAdapter() instanceof AwsS3Adapter &&
+        $config->get('otfs_s3_presigned_urls_enabled')
+    ) {
+
+        $preSignedUrlService = new PreSignedUrlService($config);
+        $resource = $portrait->load();
+
+        $preSignedUrlDataObject = $preSignedUrlService->generate(
+            Alaress_Date_Format::now()->addDays(1),
+            (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '',
+            ($resource->getMime()) ?: 'application/octet-stream',
+            $resource->getPath(),
+            $resource->getBasename(),
+            ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
+            $key
+        );
+
+        $preSignedUrlService->download($preSignedUrlDataObject);
+    }
+
     $image = new Image\Processor\Standard(
-        new Image\Cache\Portrait(
-            $user,
-            $_GET['size'],
-            $_SESSION['user'],
-            (bool)$config->get('photo_sis_import'),
-            (bool)$config->get('protect_student_photo'),
-            (int)$config->get('protect_teacher_photo')
-        ),
+        $portrait,
         new Image\Transformation\Portrait(),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
