@@ -19,6 +19,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Uri;
 
 /**
@@ -36,9 +37,9 @@ class Internal extends Base
      *
      * @param string $url
      * @param User   $user The user to check permissions against
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct($url, User $user) {
+    public function __construct(string $url, User $user) {
 
         /* Storage item: find the hash, and analyse it to find out
          * how to display it (or redirect, if it can't be displayed)
@@ -228,10 +229,10 @@ class Internal extends Base
     /**
      * Process Storage file analysis
      *
-     * @param $url
+     * @param string $url
      * @param $item
      */
-    private function processStorage($url, $item): void
+    private function processStorage(string $url, $item): void
     {
         $this->start([
             new Image($url, $item),
