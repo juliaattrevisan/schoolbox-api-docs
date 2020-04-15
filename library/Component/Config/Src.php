@@ -42,8 +42,8 @@ class Component_Config_Src extends Component_Config_Abstract
         );
         if ($configValue) {
             try {
-                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-                $folder       = $folderMapper->findCheaplyById($configValue);
+                $folderMapper = $page->getDi()->get('mapperFactory')->get(\Schoolbox\Resource\Folder\Mapper::class);
+                $folder       = $folderMapper->findCheaplyById((int)$configValue);
                 $vars         = array(
                     'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),
                     'COMPONENT_CONFIG_SRC_NAME' => Scrub::text($folder->getName()),
