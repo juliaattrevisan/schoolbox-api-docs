@@ -10676,21 +10676,6 @@ parameters:
 			path: library/Schoolbox/Preview/Chain/Base.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\Submission\\\\Submission\\:\\:getStorage\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Internal.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\ReturnedWork\\:\\:getStorage\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Internal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Internal.php
-
-		-
 			message: "#^Cannot call method test\\(\\) on bool\\.$#"
 			count: 1
 			path: library/Schoolbox/Preview/Chain/Strategy/Base.php
