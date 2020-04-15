@@ -168,12 +168,27 @@ $app = new class extends CliTool\App {
                 (:folderId, :roleId, :permission)
         ");
 
-
         $this->createUnitSpecQuery = $db->prepareQuery("
             INSERT INTO course_unit_specification
                 (folder_id, course_specification_id, created_at, updated_at)
             VALUES
                 (:folderId, :courseSpecId, :createdAt, :updatedAt)
+        ");
+
+
+        // Queries for moving assessments from one spec to another.
+        $findSpecAssessmentsQuery = $db->prepareQuery("
+            SELECT assessment_course_unit_specification acus
+            SET    acus.course_unit_specification_id = :newCourseSpecId
+            WHERE  acus.course_unit_specification_id = :oldCourseSpecId
+            AND    acus.assessment_id                = :assessmentId
+        ");
+
+        $moveSpecAssessmentQuery = $db->prepareQuery("
+            UPDATE assessment_course_unit_specification acus
+            SET    acus.course_unit_specification_id = :newCourseSpecId
+            WHERE  acus.course_unit_specification_id = :oldCourseSpecId
+            AND    acus.assessment_id                = :assessmentId
         ");
     }
 
