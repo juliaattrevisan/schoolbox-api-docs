@@ -16,17 +16,17 @@ $app = new class extends CliTool\App {
 
     private const UNIT_NAME = 'Report Grades';
 
+    private const WORK_TYPE_IDS = [5, 4, 7, 1];
+
     /**
      * @inheritDoc
      */
     public function run(): void
     {
-        $workTypeIds  = [5, 4, 7, 1];
-        $params       = Builder::getArrayParameters($workTypeIds, 'workTypeId');
-        $placeholders = Builder::getArrayPlaceholders($workTypeIds, 'workTypeId');
+        $params       = Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId');
+        $placeholders = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
+        $db           = $this->getDatabaseInternal();
 
-
-        $db = $this->getDatabaseInternal();
 
         $findCourseSpecsQuery = $db->prepareQuery("
             SELECT DISTINCT
@@ -42,7 +42,7 @@ $app = new class extends CliTool\App {
         ");
 
 
-        $hasUnitSpecQuery  = $db->prepareQuery("
+        $hasUnitSpecQuery = $db->prepareQuery("
             SELECT f.id
             FROM       course_specification      cs
             INNER JOIN course_unit_specification cus ON cs.id         = cus.course_specification_id
