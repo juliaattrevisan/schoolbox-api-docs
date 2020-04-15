@@ -36,7 +36,8 @@ try {
                     ($resource->getMime()) ?: 'application/octet-stream',
                     $resource->getPath(),
                     $resource->getBasename(),
-                    ($_GET['cache'] ?? '0') ? 'private' : 'no-store'
+                    ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
+                    $size
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);

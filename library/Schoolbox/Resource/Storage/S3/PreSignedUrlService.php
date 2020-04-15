@@ -43,12 +43,13 @@ class PreSignedUrlService
     }
 
     /**
-     * @param AlaressDateFormat        $expireAt
-     * @param string                   $attachmentType
-     * @param string                   $contentType
-     * @param string                   $resourcePath
-     * @param string                   $resourceBaseName
-     * @param string                   $cacheControl
+     * @param AlaressDateFormat $expireAt
+     * @param string            $attachmentType
+     * @param string            $contentType
+     * @param string            $resourcePath
+     * @param string            $resourceBaseName
+     * @param string            $cacheControl
+     * @param string            $size
      *
      * @return PreSignedUrlDataObject
      */
@@ -57,10 +58,12 @@ class PreSignedUrlService
                              string $contentType,
                              string $resourcePath,
                              string $resourceBaseName,
-                             string $cacheControl): PreSignedUrlDataObject
+                             string $cacheControl,
+                             string $size = null): PreSignedUrlDataObject
     {
         $expires       = $expireAt->__toString(); // whatever formatting most appropriate
-        $commandObject = $this->getObject($resourcePath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
+        $itemPath      = ($size || $size === 'maxsize') ? $resourcePath . '-' . $size : $resourcePath;
+        $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
         $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
         return new PreSignedUrlDataObject($url, $cacheControl, $expires);
