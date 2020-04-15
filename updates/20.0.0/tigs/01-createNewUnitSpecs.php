@@ -15,8 +15,18 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
 
+    /**
+     * The name of the new unit to be created.
+     */
     private const UNIT_NAME = 'Report Grades';
 
+
+    /**
+     * The list of work type IDs to migrate to the new unit.
+     *
+     * Any spec or impl assessment (that isn't in a project) with one of these
+     * work types will be moved to the new assessment type.
+     */
     private const WORK_TYPE_IDS = [5, 4, 7, 1];
 
 
@@ -134,6 +144,12 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        // This script is TIGS only
+        if ($this->getConfig()->get('site_location') !== 'tigs') {
+            return;
+        }
+
+
         $this->prepareQueries();
 
 
@@ -198,8 +214,6 @@ $app = new class extends CliTool\App {
         }
 
 
-
-
         $db->commit();
     }
 
@@ -213,7 +227,7 @@ $app = new class extends CliTool\App {
 
 
         // Queries for creating a new unit spec.
-        $placeholders = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
+        $placeholders                   = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
         $this->findSpecAssessmentsQuery = $db->prepareQuery("
             SELECT DISTINCT
                 var.assessment_id,
@@ -422,7 +436,7 @@ $app = new class extends CliTool\App {
             // create new impl
             $this->getLogger()->info(sprintf('Creating new unit impl for course impl #%d', $courseImplId));
             $this->findUnitImplDatesQuery->execute([
-                'courseImplId'  => $courseImplId,
+                'courseImplId' => $courseImplId,
             ]);
             $dates = $this->findUnitImplDatesQuery->fetch();
             $now   = Alaress_Date_Format::now();
