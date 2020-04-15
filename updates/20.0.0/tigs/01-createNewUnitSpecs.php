@@ -113,8 +113,11 @@ $app = new class extends CliTool\App {
      */
     private function prepareQueries(): void
     {
+        $db = $this->getDatabaseInternal();
+
+
+        // Queries for creating a new unit spec.
         $placeholders = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
-        $db           = $this->getDatabaseInternal();
         $this->findCourseSpecsQuery = $db->prepareQuery("
             SELECT DISTINCT
                 var.course_specification_id,
@@ -126,15 +129,14 @@ $app = new class extends CliTool\App {
             WHERE lwt.id IN {$placeholders}
             AND   var.course_specification_id  IS NOT NULL
             AND   var.course_implementation_id IS NULL
+            AND   var.project_id               IS NULL
         ");
-
 
         $this->findCourseBuilderConfigQuery = $db->prepareQuery("
             SELECT role_id, permission
             FROM course_builder_config
             WHERE page = 'unit'
         ");
-
 
         $this->hasUnitSpecQuery = $db->prepareQuery("
             SELECT f.id
@@ -145,7 +147,6 @@ $app = new class extends CliTool\App {
             AND   f.name = :folderName
         ");
 
-
         $this->createFolderQuery = $db->prepareQuery("
             INSERT INTO folder
                 (name, parent, inherit)
@@ -153,14 +154,12 @@ $app = new class extends CliTool\App {
                 (:folderName, :parent, :inherit)
         ");
 
-
         $this->createHomepageQuery = $db->prepareQuery("
             INSERT INTO homepage_config
                 (cid, template)
             VALUES
                 (:folderId, :template)
         ");
-
 
         $this->createFolderPermissionsQuery = $db->prepareQuery("
             INSERT INTO perms
