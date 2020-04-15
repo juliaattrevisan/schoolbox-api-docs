@@ -45,6 +45,12 @@ class Internal extends Base
          */
         $uriObject = new Uri($url);
 
+        /* $item can be one of
+         * Schoolbox\Resource\Storage\Model
+         * Schoolbox\Resource\File\Model
+         * Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission
+         * Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+         */
         if ($hash = $this->isStorage($uriObject)) {
             try {
                 $item = StorageMapper::getInstance()->findByHash($hash);
@@ -64,6 +70,8 @@ class Internal extends Base
                 $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
                 $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
 
+                /* TODO But submissions (Responses) have multiple files now - this is probably impossible
+                 */
                 if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
                 }
@@ -74,6 +82,8 @@ class Internal extends Base
             try {
                 $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
 
+                /* TODO But returns (Feedbacks) have multiple files now - this is probably impossible
+                 */
                 if ($item->hasPermission($user)) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
                 }
