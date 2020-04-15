@@ -62,7 +62,7 @@ class PreSignedUrlService
                              string $size = null): PreSignedUrlDataObject
     {
         $expires       = $expireAt->__toString(); // whatever formatting most appropriate
-        $itemPath      = ($size || $size === 'maxsize') ? $resourcePath . '-' . $size : $resourcePath;
+        $itemPath      = ($size && $size !== 'maxsize') ? $resourcePath . '-' . $size : $resourcePath;
         $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
         $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
