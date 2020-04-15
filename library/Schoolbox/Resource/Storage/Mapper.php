@@ -148,11 +148,19 @@ class Mapper extends BaseMapper implements Receiver
      *
      * @return bool
      * @throws FileException
+     * @throws FileNotFoundException
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        if ($previous) {
-            // Not the first time we've seen this file? no copying to take place
+        // Is this file already in the storage table and (config flag OFF or (previous exists and size appears correct))?
+        if (
+            $previous &&
+            (
+                !$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE) ||
+                ($previous->exists() && $storage->getSize() === $previous->getFilesystem()->getSize($previous->getPath()))
+            )
+        ) {
+            // no copying to take place
             return true;
         }
 
