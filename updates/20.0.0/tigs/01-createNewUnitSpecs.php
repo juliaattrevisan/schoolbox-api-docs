@@ -255,14 +255,14 @@ $app = new class extends CliTool\App {
             INNER JOIN course_unit_specification cus ON cs.id         = cus.course_specification_id
             INNER JOIN folder                    f   ON cus.folder_id = f.id
             WHERE cs.id  = :courseSpecId
-            AND   f.name = :folderName
+            AND   f.name = :unitName
         ");
 
         $this->createFolderQuery = $db->prepareQuery("
             INSERT INTO folder
                 (name, parent, inherit)
             VALUES
-                (:folderName, :parent, :inherit)
+                (:unitName, :parent, :inherit)
         ");
 
         $this->createHomepageQuery = $db->prepareQuery("
@@ -374,14 +374,14 @@ $app = new class extends CliTool\App {
     {
         $this->findUnitSpecQuery->execute([
             'courseSpecId' => $courseSpecId,
-            'folderName'   => self::UNIT_NAME,
+            'unitName'     => self::UNIT_NAME,
         ]);
         if ($this->findUnitSpecQuery->rowCount() === 0) {
             $this->getLogger()->info(sprintf('Creating new unit spec for course spec #%d', $courseSpecId));
             $this->createFolderQuery->execute([
-                'folderName' => self::UNIT_NAME,
-                'parent'     => $courseFolderId,
-                'inherit'    => $this->getConfig()->get('course_builder_default_unit_page_inherit'),
+                'unitName' => self::UNIT_NAME,
+                'parent'   => $courseFolderId,
+                'inherit'  => $this->getConfig()->get('course_builder_default_unit_page_inherit'),
             ]);
 
             $newFolderId = $this->getDatabaseInternal()->lastInsertId();
