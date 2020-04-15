@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Comms\News\Feed;
 
 use Alaress\Authorizer\Rule;
@@ -25,21 +24,29 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Comms\News\Feed
+ */
 class Module extends BaseModule
 {
+
     /**
      * @inheritdoc
      */
     protected $basename = 'commsNewsFeed';
+
 
     /**
      * Hook method for setting up routes via self::register()
      */
     protected function registerRoutes(): void
     {
-        $preloadUser          = function ($params) {
+        $preloadUser = function ($params) {
             return $this->preloadUser($params);
         };
+
         $preloadFolderAndUser = function ($params) {
             return array_merge(
                 $this->preloadUser($params),
@@ -52,15 +59,19 @@ class Module extends BaseModule
             return new Rule\Callback(static function (array $params): bool {
                 /** @var User $user */
                 $user = $params['user'];
+
                 if ($user->isSuperuser()) {
                     return true;
                 }
+
                 if (Access::getInstance()->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_READ) {
                     return true;
                 }
+
                 if (Access::getInstance()->getFolderAccess($user, (int)$params['folderId']) >= UserAccess::ACCESS_READ) {
                     return true;
                 }
+
                 throw new Unauthorized("User with key '{$user->getKey()}' does not have access to news RSS for folder {$params['folderId']}");
             });
         });
@@ -86,6 +97,7 @@ class Module extends BaseModule
         if ($params['user'] instanceof User) {
             return ['user' => $params['user']];
         }
+
         try {
             return ['user' => $this->getUserMapper()->findOneByColumn('key', $params['key'])];
         } catch (MapperException $e) {
@@ -107,12 +119,14 @@ class Module extends BaseModule
         if ($params['folder'] instanceof Folder\Model) {
             return ['folder' => $params['folder']];
         }
+
         try {
             return ['folder' => $this->getFolderMapper()->findOneByColumn('id', $params['folderId'])];
         } catch (MapperException $e) {
             throw new Unauthorized("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
         }
     }
+
 
     /**
      * @inheritdoc
@@ -122,6 +136,7 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -129,6 +144,7 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * Override with any steps required for a controller and its routes
@@ -144,9 +160,9 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
-            'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
-            'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
+            'newsMapper'      => $this->getMapperFactory()->getLazy(News\Mapper::class),
+            'topicMapper'     => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
+            'articleResolver' => $injector->lazyGet('commsNewsArticleResolver'),
         ];
     }
 
@@ -163,7 +179,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @throws InvalidArgumentException If cannot find mapper class
      */
     private function getUserMapper()
     {
