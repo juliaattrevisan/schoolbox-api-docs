@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Statement\Query\IQuery;
+use Custom\Tigs\Summative\Config as TigsConfig;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -19,17 +20,6 @@ $app = new class extends CliTool\App {
      * The name of the new unit to be created.
      */
     private const UNIT_NAME = 'Report Grades';
-
-
-    /**
-     * The list of work type IDs to migrate to the new unit.
-     *
-     * Any spec or impl assessment (that isn't in a project) with one of these
-     * work types will be moved to the new assessment type.
-     *
-     * TODO this list works with the TIGS data set, but I'm not sure it's right for their actual data
-     */
-    private const WORK_TYPE_IDS = [5, 4, 7, 1];
 
 
     /**
@@ -185,14 +175,22 @@ $app = new class extends CliTool\App {
         }
 
 
-        $this->prepareQueries();
+        // Figure out which work types this applies to, and build queries
+        $workTypeIds = $this->retrieveWorkTypeIds();
+        if (empty($workTypeIds)) {
+            $this->getLogger()->warning('No work types have been configured: no assessments can be moved');
+            return;
+        }
+        $this->prepareQueries($workTypeIds);
 
 
+        // Load course builder configuration
         $this->findCourseBuilderConfigQuery->execute();
         $courseBuilderConfigs = $this->findCourseBuilderConfigQuery->fetchAll();
 
 
-        $params = Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId');
+        // Load spec assessments to migrate
+        $params = Builder::getArrayParameters($workTypeIds, 'workTypeId');
         $params['unitName'] = self::UNIT_NAME;
         $this->findSpecAssessmentsQuery->execute($params);
         $this->getLogger()->notice(
@@ -206,6 +204,7 @@ $app = new class extends CliTool\App {
         $db = $this->getDatabaseInternal();
         $db->beginTransaction();
 
+        // Start migrating
         $unitSpecIds = [];
         $unitImplIds = [];
         foreach ($this->findSpecAssessmentsQuery->fetchAll() as $specRow) {
@@ -213,8 +212,9 @@ $app = new class extends CliTool\App {
             $courseFolderId   = (int)$specRow['folder_id'];
             $specAssessmentId = (int)$specRow['assessment_id'];
 
-            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
 
+            // Create unit specs if required
+            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
                     $courseSpecId,
@@ -222,6 +222,7 @@ $app = new class extends CliTool\App {
                     $courseBuilderConfigs
                 );
             }
+
 
             // Move spec assessments from one place to the other
             $this->moveSpecAssessmentQuery->execute([
@@ -233,8 +234,7 @@ $app = new class extends CliTool\App {
             }
 
 
-            // Create unit implementations
-            // Move impl assessments from one place to the other
+            // Find all implementations of the spec assessment
             $this->findImplAssessmentsQuery->execute([
                 'specAssessmentId' => $specAssessmentId,
             ]);
@@ -248,6 +248,8 @@ $app = new class extends CliTool\App {
                 $courseImplId     = (int)$implRow['course_implementation_id'];
                 $implAssessmentId = (int)$implRow['assessment_id'];
 
+
+                // Create unit implementations for the new unit spec if required
                 if (!isset($unitImplIds[$courseImplId])) {
                     $unitImplIds[$courseImplId] = $this->createUnitImplementation(
                         $courseImplId,
@@ -255,7 +257,8 @@ $app = new class extends CliTool\App {
                     );
                 }
 
-                // And move the assessment
+
+                // And move the implementation assessment into the new unit implementation
                 $this->getLogger()->info(sprintf('.... Moving impl assessment #%d to new unit impl', $implAssessmentId));
                 $this->moveImplAssessmentQuery->execute([
                     'newUnitImplId' => $unitImplIds[$courseImplId],
@@ -280,14 +283,16 @@ $app = new class extends CliTool\App {
 
     /**
      * Prepare queries that this script requires.
+     *
+     * @param array $workTypeIds The work types whose assessments will be moved
      */
-    private function prepareQueries(): void
+    private function prepareQueries(array $workTypeIds): void
     {
         $db = $this->getDatabaseInternal();
 
 
         // Queries for creating a new unit spec.
-        $placeholders                   = Builder::getArrayPlaceholders(self::WORK_TYPE_IDS, 'workTypeId');
+        $placeholders                   = Builder::getArrayPlaceholders($workTypeIds, 'workTypeId');
         $this->findSpecAssessmentsQuery = $db->prepareQuery("
             SELECT DISTINCT
                 var.assessment_id,
@@ -422,6 +427,23 @@ $app = new class extends CliTool\App {
             SET    acui.course_unit_implementation_id = :newUnitImplId
             WHERE  acui.assessment_id                 = :assessmentId
         ");
+    }
+
+
+    /**
+     * Retrieve the list of work types whose assessments are to be moved to the
+     * new unit.
+     *
+     * @return array
+     */
+    private function retrieveWorkTypeIds(): array
+    {
+        return array_filter([
+            (int)$this->getConfig()->get(TigsConfig::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS),
+            (int)$this->getConfig()->get(TigsConfig::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE),
+            (int)$this->getConfig()->get(TigsConfig::_TIGS_WORK_TYPE_HSC_ASSESSMENT_RANK),
+            (int)$this->getConfig()->get(TigsConfig::_TIGS_WORK_TYPE_NESA_SCORE),
+        ]);
     }
 
 
