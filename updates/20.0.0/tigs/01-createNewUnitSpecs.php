@@ -157,8 +157,14 @@ $app = new class extends CliTool\App {
         $courseBuilderConfigs = $this->findCourseBuilderConfigQuery->fetchAll();
 
 
-        $this->findSpecAssessmentsQuery->execute(
-            Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId')
+        $params = Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId');
+        $params['unitName'] = self::UNIT_NAME;
+        $this->findSpecAssessmentsQuery->execute($params);
+        $this->getLogger()->notice(
+            sprintf(
+                '%d spec assessments in specified work types found',
+                $this->findSpecAssessmentsQuery->rowCount()
+            )
         );
 
 
@@ -172,6 +178,8 @@ $app = new class extends CliTool\App {
             $courseFolderId   = (int)$specRow['folder_id'];
             $specAssessmentId = (int)$specRow['assessment_id'];
 
+            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
+
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
                     $courseSpecId,
@@ -181,7 +189,6 @@ $app = new class extends CliTool\App {
             }
 
             // Move spec assessments from one place to the other
-            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
             $this->moveSpecAssessmentQuery->execute([
                 'newUnitSpecId' => $unitSpecIds[$courseSpecId],
                 'assessmentId'  => $specAssessmentId,
@@ -190,6 +197,7 @@ $app = new class extends CliTool\App {
 
             // Create unit implementations
             // Move impl assessments from one place to the other
+            $this->getLogger()->info('.. Finding impl assessments to move');
             $this->findImplAssessmentsQuery->execute([
                 'specAssessmentId' => $specAssessmentId,
             ]);
@@ -205,7 +213,7 @@ $app = new class extends CliTool\App {
                 }
 
                 // And move the assessment
-                $this->getLogger()->info(sprintf('Moving impl assessment #%d to new unit impl', $implAssessmentId));
+                $this->getLogger()->info(sprintf('.... Moving impl assessment #%d to new unit impl', $implAssessmentId));
                 $this->moveImplAssessmentQuery->execute([
                     'newUnitImplId' => $unitImplIds[$courseImplId],
                     'assessmentId'  => $implAssessmentId,
@@ -234,13 +242,16 @@ $app = new class extends CliTool\App {
                 var.course_specification_id,
                 cs.folder_id
             FROM v_assessment_relation var
-            INNER JOIN course_specification cs  ON var.course_specification_id = cs.id
-            INNER JOIN assessment           a   ON var.assessment_id           = a.id
-            INNER JOIN lu_work_type         lwt ON a.work_type_id              = lwt.id
+            INNER JOIN course_specification      cs  ON var.course_specification_id      = cs.id
+            INNER JOIN course_unit_specification cus ON var.course_unit_specification_id = cus.id
+            INNER JOIN folder                    f   ON cus.folder_id                    = f.id
+            INNER JOIN assessment                a   ON var.assessment_id                = a.id
+            INNER JOIN lu_work_type              lwt ON a.work_type_id                   = lwt.id
             WHERE lwt.id IN {$placeholders}
             AND   var.course_specification_id  IS NOT NULL
             AND   var.course_implementation_id IS NULL
             AND   var.project_assessment_id    IS NULL
+            AND   f.name                       != :unitName
         ");
 
         $this->findCourseBuilderConfigQuery = $db->prepareQuery("
@@ -377,7 +388,7 @@ $app = new class extends CliTool\App {
             'unitName'     => self::UNIT_NAME,
         ]);
         if ($this->findUnitSpecQuery->rowCount() === 0) {
-            $this->getLogger()->info(sprintf('Creating new unit spec for course spec #%d', $courseSpecId));
+            $this->getLogger()->info(sprintf('.. Creating new unit spec for course spec #%d', $courseSpecId));
             $this->createFolderQuery->execute([
                 'unitName' => self::UNIT_NAME,
                 'parent'   => $courseFolderId,
@@ -412,7 +423,6 @@ $app = new class extends CliTool\App {
         }
 
         // otherwise the unit spec already exists
-        $this->getLogger()->info(sprintf('Unit spec for course spec #%d already exists: skipping', $courseSpecId));
         return (int)$this->findUnitSpecQuery->fetchColumn();
     }
 
@@ -434,7 +444,7 @@ $app = new class extends CliTool\App {
 
         if ($this->findUnitImplQuery->rowCount() === 0) {
             // create new impl
-            $this->getLogger()->info(sprintf('Creating new unit impl for course impl #%d', $courseImplId));
+            $this->getLogger()->info(sprintf('.... Creating new unit impl for course impl #%d', $courseImplId));
             $this->findUnitImplDatesQuery->execute([
                 'courseImplId' => $courseImplId,
             ]);
@@ -453,7 +463,6 @@ $app = new class extends CliTool\App {
         }
 
         // return existing impl
-        $this->getLogger()->info(sprintf('Unit impl for course impl #%d already exists: skipping', $courseImplId));
         return (int)$this->findUnitImplQuery->fetchColumn();
     }
 };
