@@ -29,6 +29,14 @@ $app = new class extends CliTool\App {
 
 
     /**
+     * Query for finding the default permissions for course builder units.
+     *
+     * @var IQuery
+     */
+    private $findCourseBuilderConfigQuery;
+
+
+    /**
      * Query for finding out if a course spec has a "Report Grades" unit spec.
      *
      * @var IQuery
@@ -76,62 +84,25 @@ $app = new class extends CliTool\App {
         $this->prepareQueries();
 
 
-        $db = $this->getDatabaseInternal();
-        $findCourseBuilderConfigQuery = $db->prepareQuery("
-            SELECT role_id, permission
-            FROM course_builder_config
-            WHERE page = 'unit'
-        ");
-        $findCourseBuilderConfigQuery->execute();
-        $courseBuilderConfigs = $findCourseBuilderConfigQuery->fetchAll();
+        $this->findCourseBuilderConfigQuery->execute();
+        $courseBuilderConfigs = $this->findCourseBuilderConfigQuery->fetchAll();
 
 
         $this->findCourseSpecsQuery->execute(
             Builder::getArrayParameters(self::WORK_TYPE_IDS, 'workTypeId')
         );
 
+
+        $db = $this->getDatabaseInternal();
         $db->beginTransaction();
         foreach ($this->findCourseSpecsQuery->getIterator() as $row) {
-            $courseSpecId   = $row['course_specification_id'];
-            $courseFolderId = $row['folder_id'];
-            $this->hasUnitSpecQuery->execute([
-                'courseSpecId' => $courseSpecId,
-                'folderName'   => self::UNIT_NAME,
-            ]);
-            if ($this->hasUnitSpecQuery->rowCount() === 0) {
-                $this->getLogger()->info(sprintf('Creating folder for spec #%d', $courseSpecId));
-                $this->createFolderQuery->execute([
-                    'folderName' => self::UNIT_NAME,
-                    'parent'     => $courseFolderId,
-                    'inherit'    => $this->getConfig()->get('course_builder_default_unit_page_inherit'),
-                ]);
+            $courseSpecId   = (int)$row['course_specification_id'];
+            $courseFolderId = (int)$row['folder_id'];
+            $this->createUnitSpecification($courseSpecId, $courseFolderId, $courseBuilderConfigs);
 
-                $newFolderId = $db->lastInsertId();
-
-                $this->createHomepageQuery->execute([
-                    'folderId' => $newFolderId,
-                    'template' => $this->getConfig()->get('course_builder_default_unit_page_template'),
-                ]);
-
-                foreach ($courseBuilderConfigs as $courseBuilderConfig) {
-                    $this->createFolderPermissionsQuery->execute([
-                        'folderId'   => $newFolderId,
-                        'roleId'     => $courseBuilderConfig['role_id'],
-                        'permission' => $courseBuilderConfig['permission'],
-                    ]);
-                }
-
-                $now = Alaress_Date_Format::now();
-                $this->createUnitSpecQuery->execute([
-                    'courseSpecId' => $courseSpecId,
-                    'folderId'     => $newFolderId,
-                    'createdAt'    => $now->getDatabase(),
-                    'updatedAt'    => $now->getDatabase(),
-                ]);
-            } else {
-                // already exists
-                $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
-            }
+            // Move spec assessments from one place to the other
+            // Create unit implementations
+            // Move impl assessments from one place to the other
         }
         $db->commit();
     }
@@ -155,6 +126,13 @@ $app = new class extends CliTool\App {
             WHERE lwt.id IN {$placeholders}
             AND   var.course_specification_id  IS NOT NULL
             AND   var.course_implementation_id IS NULL
+        ");
+
+
+        $this->findCourseBuilderConfigQuery = $db->prepareQuery("
+            SELECT role_id, permission
+            FROM course_builder_config
+            WHERE page = 'unit'
         ");
 
 
@@ -198,6 +176,57 @@ $app = new class extends CliTool\App {
             VALUES
                 (:folderId, :courseSpecId, :createdAt, :updatedAt)
         ");
+    }
+
+
+    /**
+     * Creates the unit specification for the given spec and folder.
+     *
+     * @param int   $courseSpecId
+     * @param int   $courseFolderId
+     * @param array $courseBuilderConfigs
+     */
+    private function createUnitSpecification(int $courseSpecId, int $courseFolderId, array $courseBuilderConfigs): void
+    {
+        $db = $this->getDatabaseInternal();
+        $this->hasUnitSpecQuery->execute([
+            'courseSpecId' => $courseSpecId,
+            'folderName'   => self::UNIT_NAME,
+        ]);
+        if ($this->hasUnitSpecQuery->rowCount() === 0) {
+            $this->getLogger()->info(sprintf('Creating folder for spec #%d', $courseSpecId));
+            $this->createFolderQuery->execute([
+                'folderName' => self::UNIT_NAME,
+                'parent'     => $courseFolderId,
+                'inherit'    => $this->getConfig()->get('course_builder_default_unit_page_inherit'),
+            ]);
+
+            $newFolderId = $db->lastInsertId();
+
+            $this->createHomepageQuery->execute([
+                'folderId' => $newFolderId,
+                'template' => $this->getConfig()->get('course_builder_default_unit_page_template'),
+            ]);
+
+            foreach ($courseBuilderConfigs as $courseBuilderConfig) {
+                $this->createFolderPermissionsQuery->execute([
+                    'folderId'   => $newFolderId,
+                    'roleId'     => $courseBuilderConfig['role_id'],
+                    'permission' => $courseBuilderConfig['permission'],
+                ]);
+            }
+
+            $now = Alaress_Date_Format::now();
+            $this->createUnitSpecQuery->execute([
+                'courseSpecId' => $courseSpecId,
+                'folderId'     => $newFolderId,
+                'createdAt'    => $now->getDatabase(),
+                'updatedAt'    => $now->getDatabase(),
+            ]);
+        } else {
+            // already exists
+            $this->getLogger()->info(sprintf('Folder already exists for spec #%d: skipping', $courseSpecId));
+        }
     }
 };
 
