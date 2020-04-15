@@ -85,6 +85,51 @@ $app = new class extends CliTool\App {
 
 
     /**
+     * Query for finding implementation assessments.
+     *
+     * @var IQuery
+     */
+    private $findImplAssessmentsQuery;
+
+
+    /**
+     * Query for finding unit implementations for a given spec assessment.
+     *
+     * @var IQuery
+     */
+    private $findUnitImplQuery;
+
+
+    /**
+     * Query for finding the earliest start and latest end date for all unit
+     * implementations within a course implementation.
+     *
+     * These dates are used as the start/end for the new unit implementation.
+     *
+     * @var IQuery
+     */
+    private $findUnitImplDatesQuery;
+
+
+    /**
+     * Query for creating a unit implementation for the new course
+     * implementation.
+     *
+     * @var IQuery
+     */
+    private $createUnitImplQuery;
+
+
+    /**
+     * Query for moving assessments from their existing unit implementation into
+     * the new one.
+     *
+     * @var IQuery
+     */
+    private $moveImplAssessmentQuery;
+
+
+    /**
      * @inheritDoc
      */
     public function run(): void
@@ -106,10 +151,10 @@ $app = new class extends CliTool\App {
 
         $unitSpecIds = [];
         $unitImplIds = [];
-        foreach ($this->findSpecAssessmentsQuery->getIterator() as $row) {
-            $courseSpecId     = (int)$row['course_specification_id'];
-            $courseFolderId   = (int)$row['folder_id'];
-            $specAssessmentId = (int)$row['assessment_id'];
+        foreach ($this->findSpecAssessmentsQuery->fetchAll() as $specRow) {
+            $courseSpecId     = (int)$specRow['course_specification_id'];
+            $courseFolderId   = (int)$specRow['folder_id'];
+            $specAssessmentId = (int)$specRow['assessment_id'];
 
             $this->getLogger()->info(sprintf('Preparing to move assessment #%d to new unit spec', $specAssessmentId));
             if (!isset($unitSpecIds[$courseSpecId])) {
@@ -129,6 +174,17 @@ $app = new class extends CliTool\App {
 
             // Create unit implementations
             // Move impl assessments from one place to the other
+            $this->findImplAssessmentsQuery->execute([
+                'specAssessmentId' => $specAssessmentId,
+            ]);
+            foreach ($this->findImplAssessmentsQuery->fetchAll() as $implRow) {
+                $courseImplId     = (int)$implRow['course_implementation_id'];
+                $implAssessmentId = (int)$implRow['assessment_id'];
+
+                if (!isset($unitImplIds[$courseImplId])) {
+
+                }
+            }
         }
 
 
@@ -212,6 +268,73 @@ $app = new class extends CliTool\App {
             UPDATE assessment_course_unit_specification acus
             SET    acus.course_unit_specification_id = :newUnitSpecId
             WHERE  acus.assessment_id                = :assessmentId
+        ");
+
+
+        // Queries for finding unit implementations for a course spec.
+
+        // Find all impl assessments for the spec assessment
+        $this->findImplAssessmentsQuery = $db->prepareQuery("
+            SELECT DISTINCT
+                var.assessment_id,
+                var.course_implementation_id
+            FROM v_assessment_relation var
+            INNER JOIN assessment           a   ON var.assessment_id           = a.id
+            INNER JOIN lu_work_type         lwt ON a.work_type_id              = lwt.id
+            INNER JOIN assessment_specification_implementation asi ON var.assessment_id = asi.implementation_assessment_id
+            WHERE asi.specification_assessment_id = :specAssessmentId
+            AND   var.course_specification_id     IS NULL
+            AND   var.course_implementation_id    IS NOT NULL
+            AND   var.project_assessment_id       IS NULL
+        ");
+
+        // Does the unit implementation already exist?
+        $this->findUnitImplQuery = $db->prepareQuery("
+            SELECT
+                cui.id
+            FROM       course_implementation      ci
+            INNER JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
+            WHERE ci.id                            =  :courseImplId
+            AND   cui.course_unit_specification_id != :newUnitSpecId
+        ");
+
+        // When should the new impl start and end?
+        $this->findUnitImplDatesQuery = $db->prepareQuery("
+            SELECT
+                ci.id,
+                MIN(cui.open_date),
+                MAX(cui.due_date)
+            FROM       course_implementation      ci
+            INNER JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
+            WHERE ci.id = :courseImplId
+        ");
+
+        // Create the unit implementation if it doesn't
+        $this->createUnitImplQuery = $db->prepareQuery("
+            INSERT INTO course_unit_implementation (
+                course_implementation_id,
+                course_unit_specification_id,
+                title,
+                open_date,
+                due_date,
+                created_at,
+                updated_at
+            ) VALUES (
+                :courseImplId,
+                :newUnitSpecId,
+                :unitName,
+                :openDate,
+                :dueDate,
+                :createdAt,
+                :updatedAt
+            )
+        ");
+
+        // Move existing unit implementations
+        $this->moveImplAssessmentQuery = $db->prepareQuery("
+            UPDATE assessment_course_unit_implementation acui
+            SET    acui.course_unit_implementation_id = :newUnitImplId
+            WHERE  acui.assessment_id                 = :assessmentId
         ");
     }
 
