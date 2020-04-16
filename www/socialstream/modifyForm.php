@@ -1,12 +1,9 @@
 <?php
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream;
 
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -29,6 +26,7 @@ if (!($currentUser instanceof User)) {
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
+
     /* Softdelete the post and the entire thread
      */
     $postMapper = new PostMapper();
@@ -51,10 +49,11 @@ if (is_numeric($_GET['delete'])) {
          */
         if ($post->getRootId() === 0) {
             $allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
-        } /* For any threaded stuff that isn't a top-level post
-         * delete by parent_id
-         */
-        else {
+        } else {
+
+            /* For any threaded stuff that isn't a top-level post
+             * delete by parent_id
+             */
             $allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
         }
 
@@ -66,15 +65,18 @@ if (is_numeric($_GET['delete'])) {
     } else {
         error(19);
     }
-} /* Otherwise create a post
- */
-else {
-    /* Compile some misc data
+} else {
+    /* Otherwise create a post
+     *
+     * Compile some misc data
      */
     $data = array_merge($_POST, array(
         'ownerId'     => $currentUser->getId(),
         'requestTime' => \Alaress_Date_Format::now(),
     ));
+
+    /* M3 picker means I can do away with most of this weird unique shenanigans
+     */
 
     /* Check that you have a message, and one of Attachment or URL
      * to prevent you from submitting wholly empty data
