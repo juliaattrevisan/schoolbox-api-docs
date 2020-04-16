@@ -23,7 +23,7 @@ try {
         $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $fileSystem = $resource->getFilesystem();
 
-        if ($fileSystem instanceof  Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
+        if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 
