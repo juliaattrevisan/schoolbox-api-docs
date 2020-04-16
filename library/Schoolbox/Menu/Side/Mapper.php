@@ -102,6 +102,7 @@ class Mapper extends BaseMapper
             LEFT JOIN `msg_reroute_override` ON `ua`.uid = msg_reroute_override.user_id AND msg_route_key = CONCAT('service.1.',f.id)
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
             AND `ua`.`type` != " . UserAccess::ACCESS_AWAITING_AUTHORISATION . "
+            AND (msg_route_key is null OR `msg_reroute_override`.delivery != 'MU')
             ORDER BY `f`.`name`
         ";
 
@@ -113,16 +114,10 @@ class Mapper extends BaseMapper
         $statement->execute($params);
 
         $groups = $statement->fetchAll();
-        $filteredGroups = [];
-        foreach($groups as $group) {
-            if ($group['delivery'] != 'MU') {
-                array_push($filteredGroups, $group);
-            }
-        }
-        usort($filteredGroups, function ($a, $b) {
+        usort($groups, function ($a, $b) {
             return strnatcasecmp($a['name'], $b['name']);
         });
 
-        return $filteredGroups;
+        return $groups;
     }
 }
