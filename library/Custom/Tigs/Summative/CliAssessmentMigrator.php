@@ -179,10 +179,8 @@ class CliAssessmentMigrator extends App
      */
     public function run(): void
     {
-        // This script is TIGS only
-        if ($this->getConfig()->get('site_location') !== 'tigs') {
-            $this->getLogger()->notice('This update is not intended for this environment');
-            return;
+        if (!$this->perform()) {
+            $this->getLogger()->notice('Executing in dry run mode. Provide --perform or -p to migrate assessments.');
         }
 
 
@@ -261,7 +259,11 @@ class CliAssessmentMigrator extends App
         $this->getLogger()->notice(sprintf('%d unit impls created', count($this->createdUnitImpls)));
         $this->getLogger()->notice(sprintf('%d impl assessments moved', count($this->movedImplAssessments)));
 
-        $db->commit();
+        if ($this->perform()) {
+            $db->commit();
+        } else {
+            $db->rollBack();
+        }
     }
 
 
