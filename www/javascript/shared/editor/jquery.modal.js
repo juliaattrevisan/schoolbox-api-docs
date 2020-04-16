@@ -243,7 +243,16 @@
              * selector applies to all modals, not just the picker one. Maybe that's the next change.
              */
             if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
-                // you've got a modal; don't try to make another one
+
+                /* Forcibly reopen it anyway. You can enter this code path by opening a socialstream reply
+                 * M3 picker, then cancel it, then try to open a socialstream post M3 where
+                 * restoreModal is empty and singletonModal existed, but was shut (so reopen it)
+                 */
+                singletonModal
+                    .html(singletonModal.data('content'))
+                    .foundation('reveal', 'open')
+                    .off('closed.fndtn.reveal.attach');
+
                 return;
             } else if($('#attachment-browser').length) {
                 singletonModal = $('#attachment-browser').parent();
