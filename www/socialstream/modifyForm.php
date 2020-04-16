@@ -23,13 +23,14 @@ if (!($currentUser instanceof User)) {
     $currentUser = new User();
 }
 
+$postMapper = PostMapper::getInstance();
+
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
 
     /* Softdelete the post and the entire thread
      */
-    $postMapper = new PostMapper();
     try {
         $post = $postMapper->findById($_GET['delete']);
     }
@@ -70,48 +71,25 @@ if (is_numeric($_GET['delete'])) {
      *
      * Compile some misc data
      */
-    $data = array_merge($_POST, array(
+    $data = array_merge($_POST, [
         'ownerId'     => $currentUser->getId(),
         'requestTime' => \Alaress_Date_Format::now(),
-    ));
+    ]);
 
-    /* M3 picker means I can do away with most of this weird unique shenanigans
+    /* Check that you have contents to prevent you from submitting wholly empty data
      */
-
-    /* Check that you have a message, and one of Attachment or URL
-     * to prevent you from submitting wholly empty data
-     */
-    if (!strlen(trim($data['body']))) {
-        if (!count($data['attachment']) && !strlen(trim($data['url']))) {
-            error(2);
-        }
-    }
-
-    $url = '';
-
-    if (!empty($_POST['url'])) {
-        // give precedence to URL
-        $url = $_POST['url'];
-
-    } else {
-        // if the attachment points to a folder, use that for the URL
-        $str = NodeFactory::SBFS . '.folder:';
-        if (strpos($data['attachment'][0], $str) === 0) {
-            $url = '/homepage/' . substr($data['attachment'][0], strlen($str));
-            unset($data['attachment']);
-        }
+    if ('' === trim($data['url']) && '' === trim($data['body'])) {
+        error(2);
     }
 
     /* Create new SocialStream Post
      */
-    $factory = new Post\Factory\Creational($url);
-    $newPost = $factory->produce($data);
+    $newPost = (new Post\Factory\Creational($data['url']))->produce($data);
 
     /* Set up authentication
      * Put your permissions and stuff in here, just like ePortfolio v2
      */
-    $instanceMapper = \Component_InstanceMapper::getInstance();
-    $instance = $instanceMapper->findByInstanceId($_POST['instanceId']);
+    $instance = (\Component_InstanceMapper::getInstance())->findByInstanceId($data['instanceId']);
 
     /* Authenticate!
      */
@@ -120,8 +98,7 @@ if (is_numeric($_GET['delete'])) {
     /* Find out if you can collaborate on this
     */
     if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
-        $mapper = new PostMapper();
-        $mapper->save($newPost);
+        $postMapper->save($newPost);
 
         $page->backToTheFuture(1);
     } else {
