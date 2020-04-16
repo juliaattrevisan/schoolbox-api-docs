@@ -3,7 +3,7 @@
 
 <script type='text/javascript'>
     $(function() {
-        var sigPadElement = $('[data-signature]');
+        var sigPadElement = $('[data-signature="{RESPONSE_ID}"]');
         var canvas        = sigPadElement.find('canvas[data-role="signatureCanvas"]');
         var context       = canvas.get(0).getContext('2d');
         var sigPad        = sigPadElement.signaturePad({
@@ -48,9 +48,9 @@
 <tr class="row content">
     <td>
         <h4>Answer Given</h4>
-        <div id='sigPad{ID}' class="sigPad readonly" data-signature>
+        <div id='sigPad{ID}' class="sigPad readonly" data-signature="{RESPONSE_ID}">
             <div class="sigPadWrapper">
-                <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
+                <canvas class="pad" data-role="signatureCanvas" height="142 "></canvas>
             </div>
         </div>
     </td>
