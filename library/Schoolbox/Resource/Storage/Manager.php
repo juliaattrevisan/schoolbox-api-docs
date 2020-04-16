@@ -8,6 +8,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
+use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
@@ -139,10 +140,17 @@ class Manager
      */
     protected function copy($tmpFilePath, Model $storage)
     {
-        return $this->mountManager->copy(
-            self::FS_TEMP . "://$tmpFilePath",
-            self::FS_STORAGE . '://' . $storage->getPath()
-        );
+        try {
+            return $this->mountManager->copy(
+                self::FS_TEMP . "://$tmpFilePath",
+                self::FS_STORAGE . '://' . $storage->getPath()
+            );
+        } catch (FileExistsException $e) {
+            // The file already exists in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+            return true;
+        }
     }
 
     /**
