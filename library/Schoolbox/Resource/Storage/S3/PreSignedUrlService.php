@@ -66,7 +66,29 @@ class PreSignedUrlService
         $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
         $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
-        return new PreSignedUrlDataObject($url, $cacheControl, $expires);
+        return new PreSignedUrlDataObject($url, $cacheControl, $expires, $itemPath, $size);
+    }
+
+    /**
+     * @param PreSignedUrlDataObject $dataObject
+     *
+     * @return bool
+     */
+    private function fileExists(PreSignedUrlDataObject $dataObject): bool
+    {
+        $size = $dataObject->getSize();
+
+        /**
+         * Add some shortcut, if size isn't provided as most likely if everything was migrated successfully
+         * the original file should exists in bucket
+         */
+        if (($size === 'maxsize' || is_null($size)) ||
+            $this->s3Client->doesObjectExist($this->bucket, $dataObject->getItemPath())
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -74,14 +96,16 @@ class PreSignedUrlService
      */
     public function download(PreSignedUrlDataObject $dataObject): void
     {
-        // Instruct browser to cache redirect to presigned URL.
-        // Browser will request a new presigned URL when old one expires.
-        header('HTTP/1.1 301 Moved Permanently');
-        header('Location: ' . $dataObject->getUrl(), true, 301);
-        header('Cache-Control: ' . $dataObject->getCacheControl());
-        header('Expires: ' . $dataObject->getExpires());
-        header_remove('pragma');
-        exit;
+        if ($this->fileExists($dataObject)) {
+            // Instruct browser to cache redirect to presigned URL.
+            // Browser will request a new presigned URL when old one expires.
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: ' . $dataObject->getUrl(), true, 301);
+            header('Cache-Control: ' . $dataObject->getCacheControl());
+            header('Expires: ' . $dataObject->getExpires());
+            header_remove('pragma');
+            exit;
+        }
     }
 
     /**
