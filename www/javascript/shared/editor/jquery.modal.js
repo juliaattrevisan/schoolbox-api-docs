@@ -1,3 +1,5 @@
+
+
 /**
  * Mr Matt's Modal
  *
@@ -16,6 +18,37 @@
 (function() {
     var modalCache = {};
     var singletonModal = null;
+
+
+    /**
+     * Attempt to restore the previous modal with the identifier $id
+     * Reopens its ui and reanimates its overlay
+     *
+     * @param id
+     */
+    $.fn.schoolboxRestorePreviousModal = function(id)
+    {
+        if (null === id) {
+            return;
+        }
+
+        /* Select it, in case it was provided as just an id string
+         */
+        $(id).foundation('reveal', 'open');
+
+        /* M3 picker shut this overlay so I have to manually restore it after
+         * foundation finishes its animation
+         */
+        setTimeout(function() {
+            $('.reveal-modal-bg')
+                .css('opacity', 0)
+                .css('display', 'block')
+                .animate({
+                    opacity: 1
+                }, 250);
+        }, 275);
+    }
+
 
     /**
      * Spawns a Schoolbox Resource Browser which allows you
@@ -78,6 +111,8 @@
                 defaultFolderSelector: 0,
 =======
                 /* If specified, try to restore the modal designated by this identifier
+                 * You only need to do this if the M3 picker starts from within another modal
+                 * There were only two places at the time of writing: My Links and Socialstream
                  */
                 restoreModal: null,
 >>>>>>> 51d54403abb... Add a special restoreModal config [SA-10216]
@@ -190,7 +225,20 @@
         function build(data) {
             var body = $('body');
 
-            if (singletonModal && config.allowDetachment) {
+            /* null !== config.restoreModal was previously known as allowDetachment
+             *
+             * Whether the singleton modal should allow detachment
+             * (meaning, allow modal to destroy itself when any modal shuts)
+             *
+             * Set this when the picker is spawned from within some other modal
+             * because that modal will shut, causing a reinit and this singleton detachment.
+             *
+             * That causes your file picker modal to inexplicably vanish, as it destroys itself
+             * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
+             * could only exist once, and in a modal; any time it shut, it must reinit - but the
+             * selector applies to all modals, not just the picker one. Maybe that's the next change.
+             */
+            if (singletonModal && null === config.restoreModal) {
                 // you've got a modal; don't try to make another one
                 return;
             } else if($('#attachment-browser').length) {
@@ -240,7 +288,7 @@
             $(document)
                 //.foundation('reveal', 'reflow')
                 .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal && config.allowDetachment) {
+                    if (singletonModal && null === config.restoreModal) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
@@ -264,39 +312,6 @@
             });
         }
     };
-
-
-    /**
-     * Attempt to restore the previous modal with the identifier $id
-     * Reopens its ui and reanimates its overlay
-     *
-     * @param id
-     */
-    $.fn.schoolboxRestorePreviousModal = function(id)
-    {
-
-        /* Not specified? Do nothing
-         */
-        if (null === id) {
-            return;
-        }
-
-        /* Select it, in case it was provided as just an id string
-         */
-        $(id).foundation('reveal', 'open');
-
-        /* M3 picker shut this overlay so I have to manually restore it after
-         * foundation finishes its animation
-         */
-        setTimeout(function() {
-            $('.reveal-modal-bg')
-                .css('opacity', 0)
-                .css('display', 'block')
-                .animate({
-                    opacity: 1
-                }, 250);
-        }, 275);
-    }
 
 
     /**
@@ -421,18 +436,11 @@
                  */
                 meetingUrl: '',
 
-                /* Whether the singleton modal should allow detachment
-                 * (meaning, allow modal to destroy itself when any modal shuts)
+                /* restoreModal specifies whether there's a modal that should be restored once the M3 shuts
+                 * This is in the form of an id string for the modal but you can use a jquery selector too
                  *
-                 * Set to false when the picker is spawned from within some other modal
-                 * because that modal will shut, causing a reinit and this singleton detachment.
-                 *
-                 * That causes your file picker modal to inexplicably vanish, as it destroys itself
-                 * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
-                 * could only exist once, and in a modal; any time it shut, it must reinit - but the
-                 * selector applies to all modals, not just the picker one. Maybe that's the next change.
                  */
-                allowDetachment: true
+                restoreModal: null
             },
 
             /**
@@ -502,7 +510,6 @@
             /* Select something from the Resource Browser
              */
             $.fn.schoolboxResource({
-                allowDetachment: config.allowDetachment,
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
 <<<<<<< HEAD
