@@ -71,8 +71,18 @@
                         </label>
                         <div class="row post-attachment attach">
                             <div class="small-12 columns">
+                                <script>
+                                    $(function() {
+                                        $('#modalLink-newpostbtn-{COMPONENT_INSTANCE_ID}').schoolboxLink({
+                                            onSelect: function(url, name, dialog) {
+                                                $('#modalLinkTarget-newpost-{COMPONENT_INSTANCE_ID}').val(url);
+                                            }
+                                        });
+                                    });
+                                </script>
                                 <div class="input-group">
-                                    {ATTACH_ZONE}
+                                    <input id="modalLinkTarget-newpost-{COMPONENT_INSTANCE_ID}" type="text" name="attachment" />
+                                    <a id='modalLink-newpostbtn-{COMPONENT_INSTANCE_ID}' class="button icon-link">Browse</a>
                                     <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
                                 </div>
                             </div>
@@ -112,8 +122,18 @@
                         </label>
 
                         <div class="row post-attachment attach">
+                            <script>
+                                $(function() {
+                                    $('#modalLink-replybtn-{COMPONENT_INSTANCE_ID}').schoolboxLink({
+                                        onSelect: function(url, name, dialog) {
+                                            $('#modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}').val(url);
+                                        }
+                                    });
+                                });
+                            </script>
                             <div class="input-group">
-                                {ATTACH_ZONE}
+                                <input id="modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}" type="text" name="attachment" />
+                                <a id="modalLink-replybtn-{COMPONENT_INSTANCE_ID}" class="button icon-link">Browse</a>
                                 <a class='button icon-link sstream-attachment' data-value='url'>Link</a>
                             </div>
                         </div>
