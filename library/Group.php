@@ -651,7 +651,7 @@ class Group extends DeprecatedModel
         //Fetch subject list
         $allFolders = array();
 
-        $userMapper = new UserMapper();
+        $userMapper = UserMapper::getInstance();
         try {
             $user = $userMapper->findById($userID);
         } catch (MapperException $e)  {

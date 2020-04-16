@@ -46,7 +46,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         // Get collection of members
-        $userMapper = new UserMapper();
+        $userMapper = UserMapper::getInstance();
 
         if($this->getContext()->getInherit()) {
             // Find nearest nian folder
