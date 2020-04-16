@@ -35,6 +35,15 @@ security:
 paths:
 
   /user:
+    get:
+      operationId: searchUser
+      summary: Returns all users
+      responses:
+        '200':
+          $ref: '#/components/responses/userList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
     post:
       operationId: createUser
       summary: Creates a user
@@ -144,6 +153,19 @@ components:
       required:
         - id
 
+    userList:
+      title: User list
+      description: A list of users
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
+
     userProfile:
       title: User Profile
       description: Common fields for user profiles
@@ -224,7 +246,10 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/user'
-        text/html:
+
+    userList:
+      description: A list of users
+      content:
+        application/json:
           schema:
-            type: string
-            description: The user, rendered into HTML on the server.
+            $ref: '#/components/schemas/userList'

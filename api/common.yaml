@@ -49,6 +49,30 @@ components:
         points to the next page of the result set.
       type: string
 
+    item:
+      title: Item
+      description: An example of a schema for a single item.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+
+    itemList:
+      title: Item list
+      description: |
+        An example of a schema for a list of items.
+
+        Contains metadata for the list of items, as well as the list itself.
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/item'
+        metadata:
+          $ref: '#/components/schemas/listMetadata'
+
     listMetadata:
       title: List metadata
       description: Metadata for lists of items retrieved
@@ -189,23 +213,28 @@ components:
   responses:
 
     item:
-      description: A single item
-      content:
-        application/json:
-          schema: {}
+      description: |
+        A response for a single item.
 
-    itemList:
-      description: A list of items
+        Currently this serves only as an example of how a response for a single
+        item should look: OpenAPI doesn't currently allow a response to
+        reference another response, and also define its own schema.
       content:
         application/json:
           schema:
-            readOnly: true
-            type: object
-            properties:
-              data:
-                type: array
-              metadata:
-                $ref: '#/components/schemas/listMetadata'
+            $ref: '#/components/schemas/item'
+
+    itemList:
+      description: |
+        A list of items.
+
+        Currently this serves only as an example of how a response for a single
+        item should look: OpenAPI doesn't currently allow a response to
+        reference another response, and also define its own schema.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/itemList'
 
     problem:
       description: RFC 7807 Problem Details
