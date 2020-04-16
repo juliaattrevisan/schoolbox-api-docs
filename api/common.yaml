@@ -187,6 +187,26 @@ components:
 
 
   responses:
+
+    item:
+      description: A single item
+      content:
+        application/json:
+          schema: {}
+
+    itemList:
+      description: A list of items
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            type: object
+            properties:
+              data:
+                type: array
+              metadata:
+                $ref: '#/components/schemas/listMetadata'
+
     problem:
       description: RFC 7807 Problem Details
       content:
