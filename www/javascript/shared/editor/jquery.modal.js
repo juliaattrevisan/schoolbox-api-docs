@@ -28,7 +28,7 @@
      */
     $.fn.schoolboxRestorePreviousModal = function(id)
     {
-        if (null === id) {
+        if (null === id || undefined === id) {
             return;
         }
 
@@ -238,7 +238,7 @@
              * could only exist once, and in a modal; any time it shut, it must reinit - but the
              * selector applies to all modals, not just the picker one. Maybe that's the next change.
              */
-            if (singletonModal && null === config.restoreModal) {
+            if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
                 // you've got a modal; don't try to make another one
                 return;
             } else if($('#attachment-browser').length) {
@@ -288,7 +288,7 @@
             $(document)
                 //.foundation('reveal', 'reflow')
                 .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal && null === config.restoreModal) {
+                    if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
