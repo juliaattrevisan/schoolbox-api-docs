@@ -351,14 +351,16 @@ class Factory
     protected function getStudentInvolvement(Folder $folder, User $student, bool $publishedOnly)
     {
         // Is $student a member of $folder (by class code?)
-        foreach ($student->getSubjectCollection() as $subject) {
-            foreach ($folder->getCodes() as $code) {
-                if ($code->getCode() == $subject['code']) {
-                    // Student is involved, even if they have no grades.
-                    // Try to get them anyway.
-                    return [
-                        'grades' => $this->getGrades($folder, $student, $publishedOnly),
-                    ];
+        if ($folder->getCodes()) {
+            foreach ($student->getSubjectCollection() as $subject) {
+                foreach ($folder->getCodes() as $code) {
+                    if ($code->getCode() === $subject['code']) {
+                        // Student is involved, even if they have no grades.
+                        // Try to get them anyway.
+                        return [
+                            'grades' => $this->getGrades($folder, $student, $publishedOnly),
+                        ];
+                    }
                 }
             }
         }
