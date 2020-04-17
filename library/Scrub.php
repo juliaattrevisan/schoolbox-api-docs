@@ -107,6 +107,14 @@ class Scrub
     {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
 
+            $serializerPath = Config::get('xml_dir') . '/../purifier/';
+            if (!is_dir($serializerPath)) {
+                // Don't need to care if this failed,
+                // because HTMLPurifier will fail later if it did.
+                /** @noinspection MkdirRaceConditionInspection */
+                mkdir($serializerPath, 0775, true);
+            }
+
             $config = HTMLPurifier_Config::createDefault();
 
             /* http://htmlpurifier.org/phorum/read.php?3,6724
@@ -116,7 +124,7 @@ class Scrub
             // position, top/left/right/bottom, z-index
             $config->set('CSS.Trusted', true);
 
-            $config->set('Cache.SerializerPath', Config::get('xml_dir') . '/../purifier/');
+            $config->set('Cache.SerializerPath', $serializerPath);
             $config->set('AutoFormat.Linkify', true);
 
             // Allow Iframe
