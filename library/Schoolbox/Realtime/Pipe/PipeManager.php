@@ -160,7 +160,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (SessionException $e) {
             // user not found, not logged in: signal authentication required
-            $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception'=>$e ]);
+            $this->log->notice('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
@@ -365,7 +365,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (preg_match('`^msg:.*:(\d+):(.*)$`', $msg->getChannel(), $matches)) {
             $userId = $matches[1];
 
-            $this->log->info("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
+            $this->log->debug("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
             $instance  = Instance::jsonUnserialize($msg->getPayload());
@@ -450,7 +450,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 function ($data) use ($pipe, $userId) {
 
                     // the timer contains the data to be processed
-                    $this->log->info("Pushing cached messages to user $userId", [ 'char' => '<' ]);
+                    $this->log->debug("Pushing cached messages to user $userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
@@ -614,7 +614,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $data  = is_string($data) ? $data : json_encode($data);
         $bytes = strlen($data);
 
-        $this->log->info("Sending $bytes bytes to {$pipe->getSocketKey()}", [ 'char' => '<' ]);
+        $this->log->debug("Sending $bytes bytes to {$pipe->getSocketKey()}", [ 'char' => '<' ]);
         $pipe->send($data);
     }
 
