@@ -8671,6 +8671,41 @@ parameters:
 			path: library/Schoolbox/File/ExtensionMapper.php
 
 		-
+			message: "#^Variable \\$pageFilters in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$pageFilter$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForPageAndEntity\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForEntity\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$contents with type array\\<Schoolbox\\\\Filter\\\\IDefinition\\>\\|null is not subtype of native type array\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$contents with type array\\<Schoolbox\\\\Filter\\\\IKeyConverter\\>\\|null is not subtype of native type array\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$contents with type array\\<Schoolbox\\\\Filter\\\\IComponent\\>\\|null is not subtype of native type array\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/AbstractIdFinder.php
+
+		-
 			message: "#^Variable \\$filterSelectionArray in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$isSelected$#"
 			count: 1
 			path: library/Schoolbox/Filter/Codec.php
