@@ -455,12 +455,12 @@ class Access
         // 4. Folder role permission. (if not already full access)
         if ($accessLevel !== UserAccess::ACCESS_FULL) {
             // Technically this should never increase the permission, as the UI does not support FULL role perms.
-            $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $folderId, $cache));
+            $accessLevel = max($accessLevel, $this->getFolderAccessForRole($user->getRole()->getId(), $nnianId, $cache));
         }
 
         // 5. Sis Class enrollment access. (If not already full access)
         if ($accessLevel !== UserAccess::ACCESS_FULL) {
-            $accessLevel = max($accessLevel, $this->getSisAccessLevel($user, $folderId));
+            $accessLevel = max($accessLevel, $this->getSisAccessLevel($user, $nnianId));
         }
 
         foreach ($nnianAncestors as $ancestor) {
