@@ -253,12 +253,12 @@ class DataSource
             }
             else {
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
-                foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
+                foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
                     // Is this user already an explicit participant? (Either an inclusion or exclusion)
-                    if ($explicitParticipants->keyExists($user->getId())) {
+                    if ($explicitParticipants->keyExists($student->getId())) {
                         continue;
                     }
-                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+                    $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan);
                 }
             }
         }
