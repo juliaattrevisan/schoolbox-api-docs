@@ -562,7 +562,7 @@ class Access
             'service' => $service,
         ];
         // Check sid only when required.
-        if (!in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
+        if (in_array($service, UserAccess::requiresServiceIdentifier(), true)) {
             $columns['sid'] = $serviceIdentifier;
         }
         $userAccess  = $this->userAccessMapper->findByColumnList($columns)->first();

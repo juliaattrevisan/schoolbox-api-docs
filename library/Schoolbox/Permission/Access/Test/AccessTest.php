@@ -1245,7 +1245,7 @@ class AccessTest extends TestCase
                          ->willReturnCallback(static function (array $columnList) use ($allUserAccess): GenericCollection {
                              $userId      = $columnList['uid'];
                              $serviceType = $columnList['service'];
-                             $serviceId   = $columnList['sid'];
+                             $serviceId   = isset($columnList['sid']) ? $columnList['sid'] : UserAccess::SID_NONE;
                              return new GenericCollection(
                                  UserAccess::class,
                                  $allUserAccess[$userId][$serviceType][$serviceId] ?? []
