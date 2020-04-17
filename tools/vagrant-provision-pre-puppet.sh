@@ -5,3 +5,6 @@
 if [[ ! -f /etc/schoolbox/conf.php ]]; then
     ln -s /vagrant/www/conf/conf.php /etc/schoolbox/conf.php;
 fi;
+if [[ ! -f /etc/schoolboxdev/conf.php ]]; then
+    ln -s /vagrant/www/conf/conf.php /etc/schoolboxdev/conf.php;
+fi;
