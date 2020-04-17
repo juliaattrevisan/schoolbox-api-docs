@@ -34,6 +34,6 @@ class ValidTopic extends Leaf
         if ($candidate === null || $candidate === '' || strtolower($candidate) === Mapper::TOPIC_ALL_SLUG) {
             return true;
         }
-        return (bool)$this->topicMapper->countByColumn('name', $candidate);
+        return (bool)$this->topicMapper->findTopicIdBySlug($candidate);
     }
 }

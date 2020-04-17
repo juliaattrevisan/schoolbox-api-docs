@@ -84,9 +84,12 @@ class Archive extends Base
             ? $this->newsMapper->findYearsAndMonthsWithArticles($articleIdFilter, Model::STATE_PUBLIC)
             : null;
 
+        $slag = $params->getSlug() ?: News\Mapper::TOPIC_ALL_SLUG;
+        $topicId = $this->topicMapper->findTopicIdBySlug($slag);
+
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdFilter,
-            $params->getSlug(),
+            $topicId,
             null,
             null,
             $year,

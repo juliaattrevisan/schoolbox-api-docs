@@ -4222,7 +4222,7 @@ abstract class Mapper implements IMapper, Serializable
         //   But unlikely we have a valid chain this long.
         if ($depth > 1000) {
             // This will intentionally throw a TypeError
-            return null;
+            throw new TypeError('Depth exceeded 1000: ' . $depth);
         }
 
         /** @var IColumnType $hydrator */

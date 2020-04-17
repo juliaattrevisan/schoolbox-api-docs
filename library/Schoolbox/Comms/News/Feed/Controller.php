@@ -128,11 +128,11 @@ class Controller extends Base
      */
     private function renderArticlesAsXml(array $articleIdFilter, ?string $topicSlug, Folder\Model $folder = null): void
     {
-        $this->assertValidTopic($topicSlug);
+        $topicId = $this->topicMapper->findTopicIdBySlug($topicSlug);
 
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdFilter,
-            $topicSlug,
+            $topicId,
             null,
             null,
             null,
@@ -153,19 +153,5 @@ class Controller extends Base
             'url'        => $this->getRequest()->url->get(),
             'articles'   => $articles,
         ]));
-    }
-
-
-    /**
-     * Asserts that a topic is valid, throws 404 if not found
-     *
-     * @param string|null $topic
-     * @throws NotFound
-     */
-    private function assertValidTopic(?string $topic): void
-    {
-        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
-            throw new NotFound("No topic found with name '$topic'");
-        }
     }
 }

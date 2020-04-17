@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
+use Schoolbox\Comms\News\Mapper as NewsMapper;
+
 class Mapper extends \Schoolbox\Mapper {
 
 	protected function mapping() {
@@ -18,7 +20,7 @@ class Mapper extends \Schoolbox\Mapper {
 			'column' => 'newsTopicID',
 			'property' => 'id',
 			'type' => Mapper::TYPE_INTEGER,
-			'identifier' => true
+			'identifier' => true,
 		));
 
 		$this->hasMap(array(
@@ -40,8 +42,33 @@ class Mapper extends \Schoolbox\Mapper {
 
 	}
 
+    /**
+     * @inheritDoc
+     */
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Finds the topic whose slug matches the url param
+     *
+     * @param null|string $slug
+     * @return null|int
+     */
+    public function findTopicIdBySlug(?string $slug): ?int
+    {
+        if ($slug === NewsMapper::TOPIC_ALL_SLUG) {
+            return NewsMapper::TOPIC_ALL_ID;
+        }
+        $topics = $this->findAll();
+
+        /** @var Model $topic */
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+        return null;
     }
 }

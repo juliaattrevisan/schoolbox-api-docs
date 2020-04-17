@@ -485,7 +485,7 @@ class Builder implements IBuilder
      * @param Alaress_Date_Format  $from If null, this value is excluded.
      * @param Alaress_Date_Format  $to   If null, this value is excluded.
      * @param string               $compareFormat
-     * @return $this
+     * @return null|$this
      * @throws InvalidColumnException If unable to parse column name
      */
     public function betweenDates(
@@ -493,7 +493,7 @@ class Builder implements IBuilder
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null,
         $compareFormat = Alaress_Date_Format::DATABASE_FORMAT
-    ): self {
+    ): ?self {
         $fromString = $toString = null;
         if (isset($from) && !$from->isNull()) {
             $fromString = $from->getUsingFormat($compareFormat);
