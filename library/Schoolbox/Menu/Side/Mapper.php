@@ -11,6 +11,7 @@ namespace Schoolbox\Menu\Side;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\User;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper as RerouteOverrideMapper;
 
@@ -101,14 +102,17 @@ class Mapper extends BaseMapper
             JOIN `homepage_config` ON `f`.id = `homepage_config`.cid
             LEFT JOIN `msg_reroute_override` ON `ua`.uid = msg_reroute_override.user_id AND msg_route_key = CONCAT('service.1.',f.id)
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
-            AND `ua`.`type` != " . UserAccess::ACCESS_AWAITING_AUTHORISATION . "
-            AND (msg_route_key is null OR `msg_reroute_override`.delivery != 'MU')
+            AND `ua`.`type` != :userAccess
+            AND (msg_route_key is null OR `msg_reroute_override`.delivery != :muted )
             ORDER BY `f`.`name`
         ";
 
-        $params = [];
-        $params['userId'] = $user->getId();
-        $params['service'] = UserAccess::SERVICE_HOMEPAGE;
+        $params = [
+            'userId' => $user->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'userAccess' => UserAccess::ACCESS_AWAITING_AUTHORISATION,
+            'muted' => RoutePermission::MUTE,
+        ];
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
