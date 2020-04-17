@@ -82,7 +82,7 @@ class External_Tass_V52_User extends External_Tass_User
         $statement = $this->database->query($query, $params);
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $currentEmailList = array_filter(array_map('trim', explode(';', $row['e_mail'])));
+            $currentEmailList = array_filter(array_map('trim', explode(';', $row['e_mail'] ?? '')));
             if ($row['e_mail2'] && !empty(trim($row['e_mail2']))) {
                 $currentEmailList[] = trim($row['e_mail2']);
             }
