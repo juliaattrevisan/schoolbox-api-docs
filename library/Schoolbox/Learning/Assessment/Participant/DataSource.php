@@ -272,7 +272,7 @@ class DataSource
 
 
     /**
-     * @param GenericCollection $assessables
+     * @param IAssessable[]|GenericCollection $assessables
      * @param Collection        $allResponses
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -296,28 +296,25 @@ class DataSource
                     continue;
                 }
 
-                try {
-                    $participantUser = $assessable->getParticipant($responseUser);
+                $participantUser = $assessable->getParticipantIfExtant($responseUser);
 
-                    // Don't load interactions for excluded participants.
-                    if (!$participantUser->isExcluded()) {
-                        $participantUser->getAllResponses()[$response->getId()] = $response;
-                    }
-                } catch (UnexpectedValueException $e) {
-
-                    /* participant not found
-                     * noop
-                     *
-                     * Why this should result in a critical failure of this page, I don't understand
-                     *
-                     * Their participations should be attributed to an unknown user, at worst;
-                     * so that we remember the data that was put here, even if nobody can own it at the moment
-                     * We don't know the reasons why a participant may no longer exist here
-                     * but allow the system to continue as best it can instead of just dying entirely
-                     *
-                     * Otherwise you could disregard their involvement
-                     */
+                // Don't load interactions for excluded participants.
+                if ($participantUser && !$participantUser->isExcluded()) {
+                    $participantUser->getAllResponses()[$response->getId()] = $response;
                 }
+
+                /* else: participant not found
+                 * noop
+                 *
+                 * Why this should result in a critical failure of this page, I don't understand
+                 *
+                 * Their participations should be attributed to an unknown user, at worst;
+                 * so that we remember the data that was put here, even if nobody can own it at the moment
+                 * We don't know the reasons why a participant may no longer exist here
+                 * but allow the system to continue as best it can instead of just dying entirely
+                 *
+                 * Otherwise you could disregard their involvement
+                 */
             }
         }
     }
