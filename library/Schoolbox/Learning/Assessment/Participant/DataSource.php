@@ -273,33 +273,48 @@ class DataSource
 
     /**
      * @param IAssessable[]|GenericCollection $assessables
-     * @param IResponse[][]|Collection        $allResponses
-     * @throws DomainException If a response is encountered for a user who is not an assessment participant
+     * @param Collection        $allResponses
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function loadResponses(GenericCollection $assessables, Collection $allResponses): void
     {
         // Load into each assessment
         foreach ($assessables as $assessable) {
             $assessmentResponses = $allResponses[$assessable->getId()];
+
             if (!$assessmentResponses) {
                 continue;
             }
+
             foreach ($assessmentResponses as $response) {
+
                 //Ensure response user is fully hydrated
                 $responseUser = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
+
                 // participants for assessment are no longer hydrated for deleted user.
                 if ($responseUser->isDeleted()) {
                     continue;
                 }
-                try {
-                    $participantUser = $assessable->getParticipant($responseUser);
-                } catch (UnexpectedValueException $e) {
-                    throw new DomainException($e);
-                }
-                if (!$participantUser->isExcluded()) {
-                    // Don't load interactions for excluded participants.
+
+                $participantUser = $assessable->getParticipantIfExtant($responseUser);
+
+                // Don't load interactions for excluded participants.
+                if ($participantUser && !$participantUser->isExcluded()) {
                     $participantUser->getAllResponses()[$response->getId()] = $response;
                 }
+
+                /* else: participant not found
+                 * noop
+                 *
+                 * Why this should result in a critical failure of this page, I don't understand
+                 *
+                 * Their participations should be attributed to an unknown user, at worst;
+                 * so that we remember the data that was put here, even if nobody can own it at the moment
+                 * We don't know the reasons why a participant may no longer exist here
+                 * but allow the system to continue as best it can instead of just dying entirely
+                 *
+                 * Otherwise you could disregard their involvement
+                 */
             }
         }
     }
