@@ -557,11 +557,15 @@ class Access
 
         // Check UserAccess table (there will be 0:1 results due to unique constraint)
         /** @var null|UserAccess $userAccess */
-        $userAccess  = $this->userAccessMapper->findByColumnList([
+        $columns = [
             'uid'     => $user->getId(),
             'service' => $service,
-            'sid'     => $serviceIdentifier,
-        ])->first();
+        ];
+        // Check sid only when required.
+        if (!in_array($service, UserAccess::doesNotRequireServiceIdentifier(), true)) {
+            $columns['sid'] = $serviceIdentifier;
+        }
+        $userAccess  = $this->userAccessMapper->findByColumnList($columns)->first();
         $accessLevel = $userAccess ? $userAccess->getAccessLevel() : UserAccess::ACCESS_DENY;
 
         $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier] = $accessLevel;
