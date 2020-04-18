@@ -20,7 +20,7 @@ trait SerializeTrait
 {
 
     /**
-     * @param IDecorator[] $decorators
+     * @param IDecorator ...$decorators
      * @return array
      */
     public function jsonSerialize(IDecorator... $decorators)
