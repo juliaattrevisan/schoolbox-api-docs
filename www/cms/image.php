@@ -68,7 +68,8 @@ try {
             ($resource->getMime()) ?: 'application/octet-stream',
             $resource->getPath(),
             $resource->getBasename(),
-            'private'
+            'private',
+            $key
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
