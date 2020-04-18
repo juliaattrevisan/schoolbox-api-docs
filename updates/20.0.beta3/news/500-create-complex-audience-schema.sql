@@ -29,5 +29,9 @@ ALTER TABLE comms_news_audience DROP FOREIGN KEY fk_comms_news_audience_parent_i
 ALTER TABLE comms_news_audience DROP INDEX idx_comms_news_audience_parent_type_value_relationship;
 ALTER TABLE comms_news_audience DROP COLUMN id;
 ALTER TABLE comms_news_audience DROP COLUMN parent_id;
-ALTER IGNORE TABLE comms_news_audience ADD UNIQUE INDEX idx_comms_news_audience_article_type_value_relationship (comms_news_article_id, entity_type, entity_value, relationship);
+
+-- We should be able to just do an 'ALTER IGNORE' to remove duplicates, but there is a bug in some version of 10.2.
+-- This affects cloud which is running 10.2.21. It appears this is fixed in later versions, eg 10.2.31.
+-- https://jira.mariadb.org/browse/MDEV-12968
+ALTER IGNORE TABLE comms_news_audience ADD UNIQUE INDEX idx_comms_news_audience_article_type_value_relationship (comms_news_article_id, entity_type, entity_value, relationship), ALGORITHM=COPY;
 
