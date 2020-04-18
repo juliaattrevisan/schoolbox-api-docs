@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
