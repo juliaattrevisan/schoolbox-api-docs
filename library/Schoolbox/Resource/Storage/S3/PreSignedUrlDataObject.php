@@ -25,17 +25,31 @@ class PreSignedUrlDataObject
     private $cacheControl;
 
     /**
+     * @var string
+     */
+    private $itemPath;
+
+    /**
+     * @var string|null
+     */
+    private $size;
+
+    /**
      * PreSignedUrlDataObject constructor.
      *
-     * @param string $url
-     * @param string $cacheControl
-     * @param string $expires
+     * @param string      $url
+     * @param string      $cacheControl
+     * @param string      $expires
+     * @param string      $itemPath
+     * @param string|null $size
      */
-    public function __construct(string $url, string $cacheControl, string $expires)
+    public function __construct(string $url, string $cacheControl, string $expires, string $itemPath, string $size = null)
     {
         $this->url          = $url;
         $this->expires      = $expires;
         $this->cacheControl = $cacheControl;
+        $this->itemPath     = $itemPath;
+        $this->size         = $size;
     }
 
     /**
@@ -60,5 +74,21 @@ class PreSignedUrlDataObject
     public function getExpires(): string
     {
         return $this->expires;
+    }
+
+    /**
+     * @return string
+     */
+    public function getItemPath(): string
+    {
+        return $this->itemPath;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSize(): ?string
+    {
+        return $this->size;
     }
 }
