@@ -62,7 +62,7 @@ class PreSignedUrlService
                              string $size = null): PreSignedUrlDataObject
     {
         $expires       = $expireAt->__toString(); // whatever formatting most appropriate
-        $itemPath      = ($size && $size !== 'maxsize') ? $resourcePath . '-' . $size : $resourcePath;
+        $itemPath      = ($size) ? $resourcePath . '-' . $size : $resourcePath;
         $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
         $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
@@ -82,9 +82,7 @@ class PreSignedUrlService
          * Add some shortcut, if size isn't provided as most likely if everything was migrated successfully
          * the original file should exists in bucket
          */
-        if (($size === 'maxsize' || is_null($size)) ||
-            $this->s3Client->doesObjectExist($this->bucket, $dataObject->getItemPath())
-        ) {
+        if (is_null($size) || $this->s3Client->doesObjectExist($this->bucket, $dataObject->getItemPath())) {
             return true;
         }
 
