@@ -15,7 +15,7 @@ class SubjectMatcherBase implements ISubjectMatcher
     /** @inheritDoc */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool
     {
-        return $sbFolderCode === $this->generateFolderCode($sisCampus, $sisClass);
+        return $sbFolderCode === $sisClass || $sbFolderCode === $this->generateFolderCode($sisCampus, $sisClass);
     }
 
     /** @inheritDoc */
