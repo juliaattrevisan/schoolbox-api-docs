@@ -475,13 +475,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * $limit applies to the number of articles, rather than number of rows due to *:N joins.
      *
-     * @param array|null $availableArticleIds If provided, do not return results outside this set
-     * @param int|null   $topicId             If provided, filter to articles that include this topic. 'all' => no filter
-     * @param int|null   $offset              If provided, offset results by this many
-     * @param int|null   $limit               If provided, limit to this many article ids
-     * @param int|null   $publishYear         If provided, filter to articles published in this year
-     * @param int|null   $publishMonth        If provided, filter to articles published in this month
-     * @param int|null   $temporalState       The article's state. A bit-mask of discrete/atomic states
+     * @param array|null  $availableArticleIds If provided, do not return results outside this set
+     * @param string|null $topicSlug           If provided, filter to articles that include this topic. 'all' => no filter
+     * @param int|null    $offset              If provided, offset results by this many
+     * @param int|null    $limit               If provided, limit to this many article ids
+     * @param int|null    $publishYear         If provided, filter to articles published in this year
+     * @param int|null    $publishMonth        If provided, filter to articles published in this month
+     * @param int|null    $temporalState       The article's state. A bit-mask of discrete/atomic states
      * @return int[]
      * @throws InvalidArgumentException
      * @throws InvalidColumnException
@@ -491,7 +491,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findArticleIdsByFilters(
         ?array $availableArticleIds,
-        ?int $topicId,
+        ?string $topicSlug,
         ?int $offset,
         ?int $limit,
         ?int $publishYear,
@@ -500,7 +500,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     ): array {
 
         // Short-circuit if searching for an empty set
-        if (null === $topicId || (is_array($availableArticleIds) && !count($availableArticleIds))) {
+        if (null === $topicSlug || (is_array($availableArticleIds) && !count($availableArticleIds))) {
             return [];
         }
 
@@ -538,9 +538,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var bool $distinct Required if performing any *:N joins */
         $distinct = false;
 
-        if ($topicId !== Mapper::TOPIC_ALL_ID) {
+        if ($topicSlug !== Mapper::TOPIC_ALL_SLUG) {
             $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
-            $pb->equals('v_newsTopic.topic_id', $topicId);
+            $pb->equals('newsTopic.slug', $topicSlug);
             $distinct = true;
         }
 

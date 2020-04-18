@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News;
 
 use Alaress\Specification\Leaf;
+use Schoolbox\Mapper\Exception;
 use function strtolower;
 
 class ValidTopic extends Leaf
@@ -34,6 +35,11 @@ class ValidTopic extends Leaf
         if ($candidate === null || $candidate === '' || strtolower($candidate) === Mapper::TOPIC_ALL_SLUG) {
             return true;
         }
-        return (bool)$this->topicMapper->findTopicIdBySlug($candidate);
+        try {
+            return (bool)$this->topicMapper->findOneByColumn('slug', $candidate);
+        } catch (Exception $e) {
+            // noop
+        }
+        return false;
     }
 }

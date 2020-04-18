@@ -8,39 +8,50 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
-use Schoolbox\Comms\News\Mapper as NewsMapper;
+class Mapper extends \Schoolbox\Mapper
+{
 
-class Mapper extends \Schoolbox\Mapper {
+    /**
+     * @inheritDoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('newsTopic');
+        $this->hasModel(Model::class);
 
-	protected function mapping() {
-		$this->hasTable('newsTopic');
-		$this->hasModel(Model::class);
+        $this->hasMap([
+            'column'     => 'newsTopicID',
+            'property'   => 'id',
+            'type'       => Mapper::TYPE_INTEGER,
+            'identifier' => true,
+        ]);
 
-		$this->hasMap(array(
-			'column' => 'newsTopicID',
-			'property' => 'id',
-			'type' => Mapper::TYPE_INTEGER,
-			'identifier' => true,
-		));
+        $this->hasMap([
+            'column'   => 'name',
+            'property' => 'name',
+            'type'     => Mapper::TYPE_STRING,
+        ]);
 
-		$this->hasMap(array(
-			'column' => 'name',
-			'property' => 'name',
-			'type' => Mapper::TYPE_STRING,
-		));
+        $this->hasMap([
+            'column'   => 'slug',
+            'property' => 'slug',
+            'type'     => Mapper::TYPE_STRING,
+        ]);
 
-        $this->hasMap(array(
-                'column' => 'sequence',
-                'property' => 'sequence',
-                'type' => Mapper::TYPE_STRING,
-            ));
+        $this->hasMap([
+            'column'   => 'sequence',
+            'property' => 'sequence',
+            'type'     => Mapper::TYPE_STRING,
+        ]);
 
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-	}
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateSlug']);
+    }
+
 
     /**
      * @inheritDoc
@@ -51,24 +62,16 @@ class Mapper extends \Schoolbox\Mapper {
     }
 
     /**
-     * Finds the topic whose slug matches the url param
-     *
-     * @param null|string $slug
-     * @return null|int
+     * @param Model $topic
+     * @return bool
      */
-    public function findTopicIdBySlug(?string $slug): ?int
+    public function updateSlug(Model $topic): bool
     {
-        if ($slug === NewsMapper::TOPIC_ALL_SLUG) {
-            return NewsMapper::TOPIC_ALL_ID;
+        $url = new \Url($topic->getName());
+        if ($url->getSlug() === $topic->getSlug()) {
+            return true;
         }
-        $topics = $this->findAll();
-
-        /** @var Model $topic */
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                return $topic->getId();
-            }
-        }
-        return null;
+        $topic->setSlug($url->getSlug());
+        return true;
     }
 }

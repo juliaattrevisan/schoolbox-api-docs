@@ -33,39 +33,31 @@ class Model implements Serializable, Sequential, ISoftDeletable
     private $slug;
 
     /**
-     * @param $name
+     * @param string $name
      * @return Model
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function setName($name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
-
-        // This should not happen. Just to make sure that this will not break admin news page.
-        // Slugs cannot be derived from an empty name value, throwing an InvalidArgumentException
-        if (!empty($name)) {
-            $url = new \Url($name);
-            $this->setSlug($url->getSlug());
-        }
-
         return $this;
     }
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * @param string $slug
-     * @return $this
+     * @return Model $this
      */
-    public function setSlug($slug): self
+    public function setSlug(string $slug): self
     {
         $this->slug = $slug;
         return $this;
@@ -75,7 +67,7 @@ class Model implements Serializable, Sequential, ISoftDeletable
      * Returns the slug version of the name
      * @return string
      */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
@@ -91,5 +83,4 @@ class Model implements Serializable, Sequential, ISoftDeletable
             'sequence',
         ];
     }
-
 }

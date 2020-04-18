@@ -85,11 +85,10 @@ class Archive extends Base
             : null;
 
         $slag = $params->getSlug() ?: News\Mapper::TOPIC_ALL_SLUG;
-        $topicId = $this->topicMapper->findTopicIdBySlug($slag);
 
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdFilter,
-            $topicId,
+            $slag,
             null,
             null,
             $year,
