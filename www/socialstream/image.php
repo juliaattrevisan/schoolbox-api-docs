@@ -67,7 +67,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            (!$storage->getMimetype()->getInline()) ? 'attachment;' : '',
+            '',
             ($storage->getMime()) ?: 'application/octet-stream',
             $storage->getPath(),
             $storage->getBasename(),
