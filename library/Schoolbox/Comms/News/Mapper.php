@@ -31,7 +31,6 @@ use UnderflowException;
 use UnexpectedValueException;
 use function implode;
 use function is_array;
-use function strtolower;
 
 /**
  * Class Mapper
@@ -239,7 +238,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateDraft(): IBuilder
     {
         return $this->getPredicateBuilder()
-            ->isNull('submitted_at');
+                    ->isNull('submitted_at');
     }
 
 
@@ -253,8 +252,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateRejected(): IBuilder
     {
         return $this->getPredicateBuilder()
-            ->notNull('submitted_at')
-            ->notNull('rejected_at');
+                    ->notNull('submitted_at')
+                    ->notNull('rejected_at');
     }
 
 
@@ -268,9 +267,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateAwaitingModeration(): IBuilder
     {
         return $this->getPredicateBuilder()
-            ->notNull('submitted_at')
-            ->isNull('rejected_at')
-            ->isNull('accepted_at');
+                    ->notNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->isNull('accepted_at');
     }
 
 
@@ -305,7 +304,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateApproved(): IBuilder
     {
         return $this->getPredicateBuilder()
-            ->notNull('accepted_at');
+                    ->notNull('accepted_at');
     }
 
 
@@ -321,11 +320,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-            ->notNull('submitted_at')
-            ->isNull('rejected_at')
-            ->notNull('accepted_at')
-            ->lessThanOrEqualTo('publish_at', $nowDatabase)
-            ->greaterThan('expires_at', $nowDatabase);
+                    ->notNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->notNull('accepted_at')
+                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
+                    ->greaterThan('expires_at', $nowDatabase);
     }
 
 
@@ -341,11 +340,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-            ->notNull('submitted_at')
-            ->isNull('rejected_at')
-            ->notNull('accepted_at')
-            ->lessThanOrEqualTo('publish_at', $nowDatabase)
-            ->lessThan('expires_at', $nowDatabase);
+                    ->notNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->notNull('accepted_at')
+                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
+                    ->lessThan('expires_at', $nowDatabase);
     }
 
 
@@ -360,7 +359,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function getPredicateForState(int $state): Builder
     {
-        if($state === Model::STATE_NONE){
+        if ($state === Model::STATE_NONE) {
             // We could generate a predicate that matches no articles (eg id=0) but that  would
             // cause a wasted round trip to DB, better to force caller to test and short-circuit in code.
             throw new UnderflowException("No articles can ever match an article with no state");
@@ -377,22 +376,22 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $pb = $this->getPredicateBuilder();
 
-        if($state & Model::STATE_DRAFT){
+        if ($state & Model::STATE_DRAFT) {
             $pb->all($this->getPredicateDraft());
         }
-        if($state & Model::STATE_AWAITING_MODERATION){
+        if ($state & Model::STATE_AWAITING_MODERATION) {
             $pb->all($this->getPredicateAwaitingModeration());
         }
-        if($state & Model::STATE_AWAITING_PUBLICATION){
+        if ($state & Model::STATE_AWAITING_PUBLICATION) {
             $pb->all($this->getPredicateAwaitingPublication());
         }
-        if($state & Model::STATE_REJECTED){
+        if ($state & Model::STATE_REJECTED) {
             $pb->all($this->getPredicateRejected());
         }
-        if($state & Model::STATE_PUBLISHED){
+        if ($state & Model::STATE_PUBLISHED) {
             $pb->all($this->getPredicatePublished());
         }
-        if($state & Model::STATE_EXPIRED){
+        if ($state & Model::STATE_EXPIRED) {
             $pb->all($this->getPredicateExpired());
         }
         return $this->getPredicateBuilder()->any($pb);
@@ -501,7 +500,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     ): array {
 
         // Short-circuit if searching for an empty set
-        if (is_array($availableArticleIds) && !count($availableArticleIds)) {
+        if (null === $topicSlug || (is_array($availableArticleIds) && !count($availableArticleIds))) {
             return [];
         }
 
@@ -516,7 +515,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder()
                    ->isNull('deleted_at');
 
-        if($temporalState !== null && $temporalState !== Model::STATE_ALL){
+        if ($temporalState !== null && $temporalState !== Model::STATE_ALL) {
             $pb->all($this->getPredicateForState($temporalState));
         }
 
@@ -539,9 +538,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /** @var bool $distinct Required if performing any *:N joins */
         $distinct = false;
 
-        if (($topicSlug ?? '') !== '' && strtolower($topicSlug) !== self::TOPIC_ALL_SLUG) {
+        if ($topicSlug !== Mapper::TOPIC_ALL_SLUG) {
             $joins[] = "INNER JOIN {$this->getJoinSql('comms_news_article_topic')}";
-            $pb->equals('newsTopic.name', $topicSlug);
+            $pb->equals('newsTopic.slug', $topicSlug);
             $distinct = true;
         }
 
@@ -614,13 +613,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function checkArchiveForHomepage(int $folderId): bool
     {
-        $now = \Alaress_Date_Format::now()->getDatabase();
+        $now = Alaress_Date_Format::now()->getDatabase();
 
         $pb = $this->getPredicateBuilder()
-            ->lessThan('expires_at', $now)
-            ->lessThan('publish_at', $now)
-            ->notNull('accepted_at')
-            ->isNull('deleted_at');
+                   ->lessThan('expires_at', $now)
+                   ->lessThan('publish_at', $now)
+                   ->notNull('accepted_at')
+                   ->isNull('deleted_at');
 
         $where = implode("\nAND ", $pb->getWhere());
 

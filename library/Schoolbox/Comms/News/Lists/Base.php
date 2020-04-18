@@ -253,32 +253,4 @@ abstract class Base
 
         return $articles;
     }
-
-
-    /**
-     * From a slug, figure out what topic matches it
-     *
-     * By default, select the All tab...
-     * but try to find the topic whose slug matches the url param
-     *
-     * @param Collection|Topic\Model[]  $topics
-     * @param null|string         $slug
-     * @return int
-     */
-    protected function determineSelectedTopicId(Collection $topics, ?string $slug): int
-    {
-        $selectedTopicId = Mapper::TOPIC_ALL_ID;
-
-        if ($slug === null || trim($slug) === '') {
-            return $selectedTopicId;
-        }
-
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                return $topic->getId();
-            }
-        }
-
-        return $selectedTopicId;
-    }
 }

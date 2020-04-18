@@ -506,11 +506,6 @@ parameters:
 			path: library/Alaress/Date/Format.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 2
 			path: library/Alaress/Date/Interval.php
@@ -634,56 +629,6 @@ parameters:
 			message: "#^Call to an undefined method Alaress\\\\Json\\\\Serializable\\:\\:getPrimitive\\(\\)\\.$#"
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Model.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Comment/Model.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Comment/ModelDecorator/BaseDecorator.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/Model.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/ModelDecorator/BaseDecorator.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
 
 		-
 			message: "#^Variable \\$uaMapper in PHPDoc tag @var does not exist\\.$#"

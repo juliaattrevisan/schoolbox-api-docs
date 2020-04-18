@@ -165,7 +165,7 @@ class Controller extends Base
     private function assertValidTopic(?string $topic): void
     {
         if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
-            throw new NotFound("No topic found with name '$topic'");
+            throw new NotFound("No topic found with slug '$topic'");
         }
     }
 }
