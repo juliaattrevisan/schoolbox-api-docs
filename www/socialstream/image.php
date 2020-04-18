@@ -66,12 +66,12 @@ try {
         $preSignedUrlService = new PreSignedUrlService($config);
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
-            Alaress_Date_Format::now()->addDays(1),
-            (!$storage->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '',
+            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+            (!$storage->getMimetype()->getInline()) ? 'attachment;' : '',
             ($storage->getMime()) ?: 'application/octet-stream',
             $storage->getPath(),
             $storage->getBasename(),
-            ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
+            'private',
             $size
         );
 

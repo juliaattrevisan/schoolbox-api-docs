@@ -65,12 +65,12 @@ try {
         $resource = $portrait->load();
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
-            Alaress_Date_Format::now()->addDays(1),
-            (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '',
+            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+            (!$resource->getMimetype()->getInline()) ? 'attachment;' : '',
             ($resource->getMime()) ?: 'application/octet-stream',
             $resource->getPath(),
             $resource->getBasename(),
-            ($_GET['cache'] ?? '0') ? 'private' : 'no-store',
+            'private',
             $key
         );
 
