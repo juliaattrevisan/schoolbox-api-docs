@@ -171,7 +171,7 @@ class WeatherstackClient
                  * But why would I get multiple of these? I just chose the first one anyway
                  */
                 'weatherSummary' => $responseData['current']['weather_descriptions'][0],
-                'weatherIcon'    => $responseData['current']['weather_icons'][0],
+                'weatherIcon'    => str_replace('http:', '', $responseData['current']['weather_icons'][0]),
 
                 /* Basic facts
                  */
@@ -204,7 +204,7 @@ class WeatherstackClient
                  * and the usual first in the stack for description/icon
                  */
                 'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
-                'weatherIcon'    => $data['hourly'][4]['weather_icons'][0],
+                'weatherIcon'    => str_replace('http:', '', $data['hourly'][4]['weather_icons'][0]),
 
                 /* Basic facts
                  */
