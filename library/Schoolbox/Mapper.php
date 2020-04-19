@@ -3450,8 +3450,8 @@ abstract class Mapper implements IMapper, Serializable
 
     /**
      * Provides the key string used to store values in the cache
-     * @param $mapper
-     * @param $key
+     * @param object $mapper
+     * @param string|int $key
      * @return string
      */
     protected function getLocalKeyString($mapper, $key): string {
