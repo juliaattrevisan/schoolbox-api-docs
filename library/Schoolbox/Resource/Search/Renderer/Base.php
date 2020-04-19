@@ -176,7 +176,7 @@ abstract class Base
      */
     protected function spawnBreadcrumbs(FolderModel $folder)
     {
-        $categoryMapper = new FolderMapper();
+        $categoryMapper = FolderMapper::getInstance();
         $allCrumbs = $categoryMapper->breadcrumb($folder);
 
         $html = array();

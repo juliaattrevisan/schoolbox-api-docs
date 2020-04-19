@@ -39,7 +39,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->userMapper = new UserMapper();
+        $this->userMapper = UserMapper::getInstance();
     }
 
     /**

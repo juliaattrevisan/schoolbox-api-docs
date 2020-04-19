@@ -47,7 +47,7 @@ class Renderer extends Handler
      */
     public function render()
     {
-        $folderMapper = new FolderMapper();
+        $folderMapper = FolderMapper::getInstance();
         $userHandler = new \User();
 
         $result = $this->getResult($this->getType());

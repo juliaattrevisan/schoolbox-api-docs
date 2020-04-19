@@ -338,7 +338,7 @@ class Creational extends AbstractFactory
         // Owner ID is probably passed as an int value, convert to actual user
         $owner = $data['ownerId'];
         if (!$owner instanceof User) {
-            $userMapper = new UserMapper();
+            $userMapper = UserMapper::getInstance();
             try {
                 $owner = $userMapper->findById($owner);
             } catch (\Schoolbox\Mapper\Exception $e) {

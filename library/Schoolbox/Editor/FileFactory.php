@@ -77,11 +77,11 @@ class FileFactory
              */
             if (strpos($filesystem, '.folder') !== false) {
                 if ($filesystem === 'browse.folder') {
-                    $folderMapper = new FolderMapper();
+                    $folderMapper = FolderMapper::getInstance();
                     $type = 'folder';
                 }
                 else if ($filesystem === 'myfile.folder') {
-                    $folderMapper = new MyFolderMapper();
+                    $folderMapper = MyFolderMapper::getInstance();
                     $type = 'myfolder';
                 }
 

@@ -3445,9 +3445,18 @@ abstract class Mapper implements IMapper, Serializable
 
         }
 
-        return get_class($mapper).".$key";
+        return $this->getLocalKeyString($mapper, $key);
     }
 
+    /**
+     * Provides the key string used to store values in the cache
+     * @param object $mapper
+     * @param string|int $key
+     * @return string
+     */
+    protected function getLocalKeyString($mapper, $key): string {
+        return get_class($mapper).".$key";
+    }
 
     /**
      * Helper method for hydrating a collection of stub model objects.

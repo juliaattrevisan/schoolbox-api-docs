@@ -651,7 +651,7 @@ class Group extends DeprecatedModel
         //Fetch subject list
         $allFolders = array();
 
-        $userMapper = new UserMapper();
+        $userMapper = UserMapper::getInstance();
         try {
             $user = $userMapper->findById($userID);
         } catch (MapperException $e)  {
@@ -659,7 +659,7 @@ class Group extends DeprecatedModel
             return $allFolders;
         }
 
-        $folderMapper = new FolderMapper();
+        $folderMapper = FolderMapper::getInstance();
 
         if ($user->getExternalId()) {
             $externalUser = new External_User;

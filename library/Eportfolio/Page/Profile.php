@@ -353,7 +353,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function renderGroups()
     {
         $groupHandler = new Group();
-        $folderMapper = new FolderMapper();
+        $folderMapper = FolderMapper::getInstance();
         /** @var Schoolbox\Collection $allGroups */
         $allGroups = $folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
         $allGroups->sortByCallback(function (Folder $f1, Folder $f2) {
