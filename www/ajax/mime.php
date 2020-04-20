@@ -8,7 +8,6 @@
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-define('DEFAULT_ICON_SIZE', 128);
 define('MAX_AGE', 2419200);
 
 /* Enforce sitepage context
@@ -30,10 +29,6 @@ try {
     if (\count($this->arg) !== 2) {
         throw new Schoolbox\Mapper\Exception('No mime specified');
     }
-
-    /* Enforce dimensions
-     */
-    $size = empty($_GET['size']) ? DEFAULT_ICON_SIZE : (int)$_GET['size'];
 
     $root = __DIR__ . '/../images/mime';
     $base = "{$root}/";
