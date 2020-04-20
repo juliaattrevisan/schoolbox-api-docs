@@ -37,12 +37,19 @@ paths:
   /user:
     get:
       operationId: searchUser
-      summary: Returns all users
+      summary: Returns users which match a search term
       responses:
         '200':
           $ref: '#/components/responses/userList'
         default:
           $ref: 'common.yaml#/components/responses/problem'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/cursor'
+      - name:        q
+        in:          query
+        required:    true
+        description: A search term
 
     post:
       operationId: createUser
