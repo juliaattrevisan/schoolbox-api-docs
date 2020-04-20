@@ -9,7 +9,11 @@
 
 namespace Etherpad;
 
+use Schoolbox\GenericCollection;
 
+/**
+ * @method GenericCollection|Pad[] findByColumn($columnName, $columnValue, $options = [])
+ */
 class PadMapper extends \Schoolbox\Mapper {
 
 	/**
