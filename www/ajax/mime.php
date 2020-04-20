@@ -8,6 +8,9 @@
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
+define('MIME_URL_PREFIX', __DIR__ . '/../images/mime');
+define('DEFAULT_FOLDER_ICON', MIME_URL_PREFIX . '/application-document.svg');
+define('DEFAULT_NONE_ICON', MIME_URL_PREFIX . '/none.svg');
 define('MAX_AGE', 2419200);
 
 /* Enforce sitepage context
@@ -24,48 +27,48 @@ $filenames = [];
 
 try {
 
-    /* Always need two args for the mime
+    /* Folders have a specific icon
      */
-    if (\count($this->arg) !== 2) {
-        throw new Schoolbox\Mapper\Exception('No mime specified');
-    }
-
-    $root = __DIR__ . '/../images/mime';
-    $base = "{$root}/";
-
-    // special case -_-
     if ($this->arg === ['folder']) {
-        $filenames[] = __DIR__ . '/../images/icons/128x128/folder.png';
+        $filenames[] = DEFAULT_FOLDER_ICON;
     } else {
-        $filenames[] = "{$root}/128x128/mime.png";
-        $filenames[] = "{$base}/mime.png";
+
+        /* Always need two args for the mime
+         */
+        if (\count($this->arg) !== 2) {
+            throw new Schoolbox\Mapper\Exception('No mime specified');
+        }
+
+        /* Fall back to something that was specified in Allowed Files
+         */
+        /** @var Mimetype $mime */
+        $mime = MimetypeMapper::getInstance()->findOneByColumnList([
+            'mime' => strtolower(implode('/', $this->arg)),
+            'enable' => 'true'
+        ]);
+
+        $filenames[] = MIME_URL_PREFIX . '/' . $mime->getIconFile();
     }
-
-    /** @var Mimetype $mime */
-    $mime = MimetypeMapper::getInstance()->findOneByColumnList([
-        'mime' => strtolower(implode('/', $this->arg)),
-        'enable' => 'true'
-    ]);
-
-    $icon = $mime->getIconFile();
-
-    $filenames[] = "{$base}/{$icon}";
 } catch (Schoolbox\Mapper\Exception $e) {
-    // Show an empty icon
-    $filenames[] = "{$base}/none.svg";
+
+    /* Something died in MimetypeMapper, probably
+     * noop
+     */
 }
+
+/* A default icon, in case none were found elsewhere
+ * Hopefully this always exists
+ */
+$filenames[] = DEFAULT_NONE_ICON;
 
 /* Check each of the possible filenames for what we chose
  *
  * Start with the one associated by MimetypeMapper which is synonymous for Allowed Files configuration
  * then gradually fall back to other files
- *
- * ...though why you hardcoded them in the backwards order then array_reverse() here is going to
- * remain a mystery to me but ok
  */
-foreach (array_reverse($filenames) as $filename) {
+foreach ($filenames as $filename) {
 
-    /* Progressively degrade icon choice
+    /* Progressively degrade icon choice until we find the first available
      */
     if (!file_exists($filename)) {
         continue;
