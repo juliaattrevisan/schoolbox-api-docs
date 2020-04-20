@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
+use PDOException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -21,9 +23,9 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
-
 
 /**
  * Class Classes
@@ -208,7 +210,7 @@ class Classes implements IStrategy
     /**
      * Import data from xml into local schema
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws InvalidUriPartException
      * @throws InvalidArgumentException
      * @throws Exception
@@ -311,25 +313,38 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class
      *
-     * @param array $class
+     * @param array $subject
      * @return ClassEntry
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    private function createTimetableClass(array $class): ClassEntry
+    private function createTimetableClass(array $subject): ClassEntry
     {
-        /** @var ClassEntry $timetableClass */
-        $timetableClass = $this->classEntryMapper->createModel()
-            ->setCode($class['class']['code'])
-            ->setName($class['class']['name'])
-            ->setDescription($class['class']['name']);
+        /* See if one exists already; if so, reuse it
+         */
+        try {
+            $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
-        $this->log->info(sprintf(
-            'Creating new class %s %s',
-            $timetableClass->getName(),
-            $timetableClass->getCode()
-        ));
+            $this->log->info(sprintf(
+                'Reusing previously-saved class %s %s with id %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                $timetableClass->getId()
+            ));
+        } catch (Exception $e) {
+            /** @var ClassEntry $timetableClass */
+            $timetableClass = $this->classEntryMapper->createModel()
+                ->setCode($subject['class']['code'])
+                ->setName($subject['class']['name'])
+                ->setDescription($subject['class']['name']);
+
+            $this->log->info(sprintf(
+                'Creating new class %s %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
+        }
 
         if ($this->perform) {
             $this->classEntryMapper->save($timetableClass);
@@ -349,8 +364,8 @@ class Classes implements IStrategy
      * @param ClassEntry      $timetableClass
      * @return ClassPeriod
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
@@ -383,19 +398,21 @@ class Classes implements IStrategy
         $timetableClassPeriod->setTeacher($class['teachers']['username']);
 
         $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
+            'Creating class period relation for teacher %s %s in room %s on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
-            $class['period']['room']['name']
-        ));
-
-        $this->log->info(sprintf(
-            'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
+            $class['period']['room']['name'],
             $class['period']['day'],
             $class['period']['sequence'],
             $class['period']['start'],
             $class['period']['end'],
             $ext
+        ));
+
+        $this->log->debug(sprintf(
+            'Using timetableClass id %s, timetableClassPeriod id %s',
+            $timetableClassPeriod->getClass()->getId(),
+            $timetableClassPeriod->getPeriod()->getId()
         ));
 
         if ($this->perform) {
@@ -413,8 +430,8 @@ class Classes implements IStrategy
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
     {
