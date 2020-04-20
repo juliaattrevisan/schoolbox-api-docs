@@ -69,10 +69,7 @@ class FolderFetcher
             ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
             ->setActualFinish($attributes->getCurriculumSemesterFinish());
 
-        $idProperty    = $this->folderMapper->getIdentifierProperty();
-        $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
-        $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
-        $folders       = $withResponses->mergeUnique($withFeedback, $idProperty);
+        $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($student, $term);
 
         // Only retain folders that are either current or rolled-over classes
         $folders = $folders->filter(static function (Folder\Model $folder) {
@@ -81,7 +78,10 @@ class FolderFetcher
 
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
-            $folders = $folders->mergeUnique($this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)), $idProperty);
+            $folders = $folders->mergeUnique(
+                $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)),
+                $this->folderMapper->getIdentifierProperty()
+            );
         }
 
         $exclusions = array_filter(array_map('\trim', explode(',', $excludedClassCodes ?? '')));

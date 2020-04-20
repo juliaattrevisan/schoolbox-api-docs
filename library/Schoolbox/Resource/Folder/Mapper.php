@@ -1865,7 +1865,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Return a list of folders that the student has submitted work to in a given term
+     * Return a list of folders that the student has submitted work to in a
+     * given term.
      *
      * Folder is hydrated with:
      *  * folder codes
@@ -1875,7 +1876,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Collection|Model[]
      * @throws DefinitionException
      */
-    public function findFoldersWithResponses(User $student, Term $term = null)
+    public function findFoldersWithResponsesByStudent(User $student, Term $term = null)
     {
         $whereClause = "(`tkc`.`student_id` = :userId OR `dws`.`owner` = :userId OR `qza`.`user_id` = :userId)";
         $whereParams = [
@@ -1892,7 +1893,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Return a set of folders where the student has received feedback
+     * Return a set of folders where the student has received feedback.
      *
      * Hydrated joins:
      * * folder code

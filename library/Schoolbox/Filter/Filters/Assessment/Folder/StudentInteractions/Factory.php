@@ -72,7 +72,7 @@ class Factory extends FolderFilter\Factory
         }
 
         if ($options->keyExists(Definition::KEY_RESPONSE) && $options[Definition::KEY_RESPONSE]->getAvailable()) {
-            $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id');
+            $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponsesByStudent($viewee), 'id');
         }
         if ($options->keyExists(Definition::KEY_FEEDBACK) && $options[Definition::KEY_FEEDBACK]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');

@@ -591,8 +591,7 @@ class Controller extends Base
     {
         /** @var GenericCollection|Folder\Model[] $involvedFolders */
         $involvedFolders = $this->folderMapper->createCollection()
-                                              ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($student, $term), 'id')
-                                              ->mergeUnique($this->folderMapper->findFoldersWithResponses($student, $term), 'id')
+                                              ->mergeUnique($this->folderMapper->findFoldersWithInteractionsForStudent($student, $term), 'id')
                                               ->indexBy('id')
                                               ->sortByCallback(function (Folder\Model $a, Folder\Model $b) {
                                                   return strnatcasecmp($a->getName(), $b->getName());
