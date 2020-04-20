@@ -2033,7 +2033,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (!$folderCache[$folderId] instanceof Model) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
                 $folderCache[$folderId]->setCodes($codeMapper->createCollection());
-                $folders->add($folderCache[$folderId]);
+                $folders[$folderId] = $folderCache[$folderId];
             }
 
             $folder = $folderCache[$folderId];
