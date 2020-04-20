@@ -167,7 +167,7 @@ class Controller extends Base
         }
 
         // Add folders with response or feedback
-        $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
+        $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
@@ -369,7 +369,7 @@ class Controller extends Base
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Get folders for drop-down.
-        $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
+        $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
@@ -576,28 +576,6 @@ class Controller extends Base
             ])->getAsString(),
         ]));
 
-    }
-
-
-    /**
-     * Fetch the set of folders where the specified user has submitted responses or received feedback.
-     *
-     * @param User       $student
-     * @param Term\Model $term
-     * @return GenericCollection|Folder\Model[] Sorted by name, indexed by ID
-     * @throws DefinitionException If specified mapper join is not defined
-     */
-    private function findFoldersWithStudentInteractions(User $student, Term\Model $term)
-    {
-        /** @var GenericCollection|Folder\Model[] $involvedFolders */
-        $involvedFolders = $this->folderMapper->createCollection()
-                                              ->mergeUnique($this->folderMapper->findFoldersWithInteractionsForStudent($student, $term), 'id')
-                                              ->indexBy('id')
-                                              ->sortByCallback(function (Folder\Model $a, Folder\Model $b) {
-                                                  return strnatcasecmp($a->getName(), $b->getName());
-                                              });
-
-        return $involvedFolders;
     }
 
 
