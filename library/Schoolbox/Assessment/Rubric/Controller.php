@@ -283,10 +283,6 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         try {
-            if ($file->getMime(true) != 'text/plain') {
-                throw new \Schoolbox\Resource\Exception("Not a plaintext CSV file, cannot parse");
-            }
-
             if ($assessmentId = (int)$post->get('assessmentId')) {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
             } elseif ($folderId = $post->get('folderId')) {
@@ -312,6 +308,7 @@ class Controller extends BaseController
             return;
         }
 
+        /** @var DueWork $assessment */
         $context = [
             'formField'              => $post->get('formField', 'rb'),
             'rubricGrid'             => $assessment->getRubricGrid(),

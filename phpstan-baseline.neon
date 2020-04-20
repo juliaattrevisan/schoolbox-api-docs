@@ -7576,21 +7576,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getRubricGrid\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getMarkPerCapability\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseMarkRange\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Controller.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
