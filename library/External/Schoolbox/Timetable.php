@@ -264,6 +264,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     protected function getClassUsers(string $externalId): array
     {
+
         // Get classes for which this user is involved, or is a teacher.
 
         /* A left join includes all the classes even if you're not in it
@@ -271,39 +272,57 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
          *
          * Therefore surgically extract teachers via teacehr_external_id usage separately
          * from the regular participants in sis_class_user
+         *
+         * Note that we still need to always join onto user to get the actual class teacher, even if
+         * $externalId isn't that class teacher; otherwise they won't display on the fulltimetable grid
          */
         $query = '
             (
-                -- Class Teacher First
-                SELECT c.*, cp.period_id AS periodId
+                -- Where externalId is a class teacher
+                SELECT
+                    c.*,
+                    cp.period_id AS periodId,
+                    u.synergy_id,
+                    u.title,
+                    u.firstname,
+                    u.lastname
                 FROM        sis_class c
                 INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
                 LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
             )
             UNION
             (
-                -- Then regular class involvements
-                SELECT c.*, cp.period_id AS periodId
+                -- Regular class involvements
+                SELECT
+                    c.*,
+                    cp.period_id AS periodId,
+                    u.synergy_id,
+                    u.title,
+                    u.firstname,
+                    u.lastname
                 FROM        sis_class c
                 INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
                 INNER JOIN  sis_class_period cp ON cp.class_id = c.id
+                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
             )
         ';
 
         $statement = $this->internalDatabase->prepareQuery($query);
         $statement->execute([
             'userId'  => $externalId,
-            'userId2' => $externalId,
+            'userId2' => $externalId
         ]);
 
         $stack = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($stack[$row['periodId']])) {
-                $stack[$row['periodId']] = [];
+            $index = $row['periodId'];
+
+            if (!isset($stack[$index])) {
+                $stack[$index] = [];
             }
 
-            $stack[$row['periodId']][] = $row;
+            $stack[$index][] = $row;
         }
 
         return $stack;
