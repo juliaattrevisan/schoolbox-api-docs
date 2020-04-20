@@ -1876,73 +1876,17 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithResponses(User $student, Term $term = null)
     {
-        /** @var Code\Mapper $codeMapper */
-        $codeMapper           = $this->getJoinMapper('codes');
-
+        $whereClause = "(`tkc`.`student_id` = :userId OR `dws`.`owner` = :userId OR `qza`.`user_id` = :userId)";
         $whereParams = [
-            ':studentId' => $student->getId(),
+            ':userId' => $student->getId(),
         ];
 
-        // Are we limiting assessments to those due in some term ?
-        $termWhere = '';
         if ($term instanceof Term) {
+            $whereClause .= $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
-            $termWhere = $this->buildWherePartForTerm($term);
         }
 
-
-        $query = "
-            SELECT
-                {$this->getColumnString('f')},
-                {$codeMapper->getColumnString('fc')}
-            FROM {$this->getTable()} f
-            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-
-            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
-            INNER JOIN assessment            a     ON var.assessment_id = a.id
-
-            LEFT  JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id AND `tk`.deleted_at IS NULL
-            LEFT  JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
-            LEFT  JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
-
-            LEFT  JOIN `task_completion`     `tkc` ON `tkc`.`task_id`   = `tk`.`id`        AND `tkc`.deleted_at IS NULL
-            LEFT  JOIN `assess_attempt`      `qza` ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
-            LEFT  JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
-
-
-            WHERE f.deleted_at IS NULL
-            AND   a.deleted_at IS NULL
-            AND   (`tkc`.`student_id` = :studentId OR `dwr`.`owner` = :studentId OR `qza`.`user_id` = :studentId)
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($whereParams);
-
-        /** @var GenericCollection|Model[] $folders Indexed by id */
-        $folders = $this->createCollection();
-
-        while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $folderId = $row["f.{$this->getIdentifierColumn()}"];
-
-            if ($folders[$folderId] == null) {
-                $folder = $this->hydrate($row, 'f');
-                $folders[$folderId] = $folder;
-                $folder->setCodes($codeMapper->createCollection());
-            } else {
-                $folder = $folders[$folderId];
-            }
-
-            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
-            $codeCollection = $folder->getCodes();
-            $code = $row['fc.code'];
-            if($code && !$codeCollection->offsetExists($code)){
-                /** @var FolderCode\Model $folderCode */
-                $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
-                $codeCollection->setOffset($code, $folderCode);
-                $folderCode->setFolder($folder);
-            }
-        }
-        return $folders;
+        return $this->findFoldersWithInteractions($whereClause, $whereParams);
     }
 
 
@@ -1957,8 +1901,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return GenericCollection
      * @throws DefinitionException
      */
-    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null) {
-
+    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null)
+    {
         $whereClause = "(`tkc`.`student_id` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
         $whereParams = [
             ':userId' => $student->getId(),
@@ -1969,7 +1913,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions($whereClause, $whereParams);
     }
 
     /**
@@ -1990,7 +1934,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithFeedbacksFromTeacher(User $teacher, Term $term = null)
     {
-
         $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
         $whereParams = [
             ':userId' => $teacher->getId(),
@@ -2001,7 +1944,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions($whereClause, $whereParams);
     }
 
 
@@ -2016,7 +1959,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return GenericCollection
      * @throws DefinitionException
      */
-    private function findFoldersWithFeedbacks($whereClause, $whereParams)
+    private function findFoldersWithInteractions($whereClause, $whereParams)
     {
         $codeMapper = $this->getJoinMapper('codes');
 
@@ -2036,6 +1979,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT  JOIN `task_completion`     `tkc` ON `tkc`.`task_id`   = `tk`.`id`        AND `tkc`.deleted_at IS NULL
             LEFT  JOIN `assess_attempt`      `qza` ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
             LEFT  JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
+            LEFT  JOIN `student_submission`  `dws` ON `dws`.`box_id`    = `dw`.id          AND `dws`.deleted_at IS NULL
 
             WHERE f.deleted_at IS NULL
             AND   a.deleted_at IS NULL
