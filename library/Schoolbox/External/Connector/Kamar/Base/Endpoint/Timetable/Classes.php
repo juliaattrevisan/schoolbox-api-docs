@@ -381,11 +381,7 @@ class Classes implements IStrategy
         /* See if one exists already; if so, reuse it
          */
         try {
-            $timetableClass = $this->classEntryMapper->findOneByColumnList([
-                'code'        => $subject['class']['code'],
-                'name'        => $subject['class']['name'],
-                'description' => $subject['class']['name']
-            ]);
+            $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
             $this->log->info(sprintf(
                 'Reusing previously-saved class %s %s with id %s',

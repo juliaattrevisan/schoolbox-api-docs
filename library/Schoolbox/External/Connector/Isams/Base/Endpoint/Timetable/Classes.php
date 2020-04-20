@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use PDOException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
@@ -25,7 +26,6 @@ use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
-
 
 /**
  * Class Classes
@@ -210,7 +210,7 @@ class Classes implements IStrategy
     /**
      * Import data from xml into local schema
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws InvalidUriPartException
      * @throws InvalidArgumentException
      * @throws Exception
@@ -324,11 +324,7 @@ class Classes implements IStrategy
         /* See if one exists already; if so, reuse it
          */
         try {
-            $timetableClass = $this->classEntryMapper->findOneByColumnList([
-                'code'        => $subject['class']['code'],
-                'name'        => $subject['class']['name'],
-                'description' => $subject['class']['name']
-            ]);
+            $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
             $this->log->info(sprintf(
                 'Reusing previously-saved class %s %s with id %s',
