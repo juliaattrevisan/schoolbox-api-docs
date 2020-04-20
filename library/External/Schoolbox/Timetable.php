@@ -236,8 +236,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             $dayNumber = $period['day'];
 
-            foreach ($classList as $i => $class) {
-                if ($class['period_id'] == $period['id']) {
+            if (isset($classList[$period['id']])) {
+                foreach ($classList[$period['id']] as $class) {
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
@@ -247,7 +247,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         'staffFirstname' => $class['firstname'],
                         'staffSurname'   => $class['lastname'],
                     ];
-                    unset($classList[$i]);
                 }
             }
         }
@@ -276,7 +275,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $query = '
             (
                 -- Class Teacher First
-                SELECT c.*, cp.id AS periodId
+                SELECT c.*, cp.period_id AS periodId
                 FROM        sis_class c
                 INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
                 LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
@@ -284,17 +283,30 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             UNION
             (
                 -- Then regular class involvements
-                SELECT c.*, cp.id AS periodId
+                SELECT c.*, cp.period_id AS periodId
                 FROM        sis_class c
                 INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
                 INNER JOIN  sis_class_period cp ON cp.class_id = c.id
             )
         ';
 
-        return $this->internalDatabase->executeQuery($query, [
+        $statement = $this->internalDatabase->prepareQuery($query);
+        $statement->execute([
             'userId'  => $externalId,
             'userId2' => $externalId,
-        ])->fetchAll();
+        ]);
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($stack[$row['periodId']])) {
+                $stack[$row['periodId']] = [];
+            }
+
+            $stack[$row['periodId']][] = $row;
+        }
+
+        return $stack;
     }
 
 
