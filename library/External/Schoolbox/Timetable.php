@@ -266,23 +266,29 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     protected function getClassUsers(string $externalId): array
     {
         // Get classes for which this user is involved, or is a teacher.
+
+        /* A left join includes all the classes even if you're not in it
+         * That returns a huge data set
+         *
+         * Therefore surgically extract teachers via teacehr_external_id usage separately
+         * from the regular participants in sis_class_user
+         */
         $query = '
-            SELECT      c.name,
-                        c.code,
-                        c.description,
-                        cp.period_id,
-                        cp.room,
-                        cp.teacher_external_id,
-                        u.synergy_id,
-                        u.title,
-                        u.firstname,
-                        u.lastname
-            FROM        sis_class c
-            LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
-            LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
-            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            WHERE       cp.teacher_external_id = :userId OR
-                        cl.external_id = :userId2
+            (
+                -- Class Teacher First
+                SELECT c.*, cp.id AS periodId
+                FROM        sis_class c
+                INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
+                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
+            )
+            UNION
+            (
+                -- Then regular class involvements
+                SELECT c.*, cp.id AS periodId
+                FROM        sis_class c
+                INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
+                INNER JOIN  sis_class_period cp ON cp.class_id = c.id
+            )
         ';
 
         return $this->internalDatabase->executeQuery($query, [
