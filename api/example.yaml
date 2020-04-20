@@ -7,6 +7,9 @@ info:
 
     This may be used as an example for how to define RESTful APIs for your own
     resources.
+  # This API ID should be regenerated for each new API document.
+  # See https://opensource.zalando.com/restful-api-guidelines/#215 for the
+  # inspiration behind this.
   x-api-id:    45db1eda-7945-4bf8-8210-49d8adfd1ca0
   x-audience:  external-partner
   version:     1.0.0
