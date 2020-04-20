@@ -11,7 +11,7 @@ use Schoolbox\File\MimetypeMapper;
 define('MIME_URL_PREFIX', __DIR__ . '/../images/mime');
 define('DEFAULT_FOLDER_ICON', MIME_URL_PREFIX . '/application-document.svg');
 define('DEFAULT_NONE_ICON', MIME_URL_PREFIX . '/none.svg');
-define('MAX_AGE', 2419200);
+define('MAX_AGE', 2419200); // 28 days
 
 /* Enforce sitepage context
  */
@@ -76,14 +76,12 @@ foreach ($filenames as $filename) {
 
     $fp = fopen($filename, 'rb');
 
-    $maxAge = MAX_AGE; // 28 days
-
     // send the right headers
     header('Content-Type: image/svg+xml');
     header('Content-Length: ' . filesize($filename));
     header('Pragma: public');
-    header("Cache-Control: public, max-age={$maxAge}");
-    header('Expires: ' . date('r', $_SERVER['REQUEST_TIME'] + $maxAge));
+    header('Cache-Control: public, max-age=' . MAX_AGE);
+    header('Expires: ' . date('r', $_SERVER['REQUEST_TIME'] + MAX_AGE));
 
     // dump the picture and stop the script
     fpassthru($fp);
