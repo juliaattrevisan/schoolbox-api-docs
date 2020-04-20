@@ -12,6 +12,7 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
+use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -285,6 +286,9 @@ class Controller extends BaseController
         try {
             if ($assessmentId = (int)$post->get('assessmentId')) {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
+                if (!$assessment instanceof DueWork) {
+                    throw new UnexpectedValueException('Assessment is not due work: ' . $assessmentId);
+                }
             } elseif ($folderId = $post->get('folderId')) {
                 $assessment = (new DueWork())
                     ->setId(0)
@@ -308,7 +312,6 @@ class Controller extends BaseController
             return;
         }
 
-        /** @var DueWork $assessment */
         $context = [
             'formField'              => $post->get('formField', 'rb'),
             'rubricGrid'             => $assessment->getRubricGrid(),
