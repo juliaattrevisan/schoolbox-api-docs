@@ -1863,6 +1863,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $folderMapper->save($movedFolder->setParent($parentFolder));
     }
 
+
     /**
      * Return a list of folders that the student has submitted work to in a given term
      *
@@ -1916,8 +1917,38 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $this->findFoldersWithInteractions($whereClause, $whereParams);
     }
 
+
     /**
-     * Return a set of folders where the teacher has provided feedback in the specified term
+     * Return a set of folders where the student has either submitted a response
+     * or received feedback.
+     *
+     * Hydrated joins:
+     *  * folder codes
+     *
+     * @param User $student
+     * @param Term|null $term
+     * @return GenericCollection|Model[]
+     */
+    public function findFoldersWithInteractionsForStudent(User $student, Term $term = null)
+    {
+        $whereClause = "(`tkc`.`student_id` = :userId OR `dws`.`owner` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $whereParams = [
+            ':userId' => $student->getId(),
+        ];
+
+        if ($term instanceof Term) {
+            $whereClause .= $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
+        }
+
+        return $this->findFoldersWithInteractions($whereClause, $whereParams);
+    }
+
+
+
+    /**
+     * Return a set of folders where the teacher has interacted in the specified
+     * term. (Interaction being that the teacher has provided a mark.)
      *
      * Hydrated joins:
      *  * folder codes
@@ -1932,7 +1963,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Term|null $term
      * @return GenericCollection|Model[]
      */
-    public function findFoldersWithFeedbacksFromTeacher(User $teacher, Term $term = null)
+    public function findFoldersWithInteractionsForTeacher(User $teacher, Term $term = null)
     {
         $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
         $whereParams = [
@@ -1949,7 +1980,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Hydrates folders with feedbacks based on a where clause provided
+     * Hydrates folders with interaction based on a where clause provided
      *
      * Hydrated joins:
      *  * folder code
