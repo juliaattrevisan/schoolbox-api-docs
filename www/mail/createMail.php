@@ -8,7 +8,7 @@
 
 use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
-
+use Schoolbox\UserMapper;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -16,6 +16,8 @@ $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());
 
 $groupHandler = new Group;
+$externalHandler = new External_User();
+$userMapper = UserMapper::getInstance();
 
 if (Config::get('mail_enable') == 1) {
 
@@ -28,6 +30,27 @@ if (Config::get('mail_enable') == 1) {
         'bcc' => []
     ];
 
+    // Only students' externalIds are passed in. Building emails from there.
+    $buildEmailFromId = isset($_POST['selectedIds']) && !empty($_POST['selectedIds']);
+    if ($buildEmailFromId) {
+        $studentExternalIds = explode(',', $_POST['selectedIds']);
+        $selectedGroups     = isset($_POST['selectedGroups']) ? explode(',', $_POST['selectedGroups']) : [];
+        /* Now get the parents of the students
+         */
+        if (in_array('parents', $selectedGroups)) {
+            $addressLists['bcc'] = array_merge($addressLists['bcc'], array_values($externalHandler->getParentEmails($studentExternalIds)));
+        }
+        if (in_array('students', $selectedGroups)) {
+            $users = $userMapper->findByColumn('synergy_id', $studentExternalIds);
+            foreach ($users as $user) {
+                $addressLists['bcc'][] = $user->getFormattedEmailDisplay();
+            }
+        }
+        if (in_array('housemasters', $selectedGroups)) {
+            $addressLists['bcc'] = array_merge($addressLists['bcc'], $externalHandler->getHousemasterEmails($studentExternalIds));
+        }
+    }
+
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
@@ -36,7 +59,7 @@ if (Config::get('mail_enable') == 1) {
                     $addressLists[$type][] = Mailer::buildAddress($email, $name);
                 }
             }
-        } elseif (null === $_REQUEST[$type] && $type === 'bcc') {
+        } elseif (!$buildEmailFromId && null === $_REQUEST[$type] && $type === 'bcc') {
             $addressLists[$type][] = Mailer::buildAddress(
                 $_SESSION['user']->getEmail(),
                 $_SESSION['user']->getFullName()
