@@ -1885,7 +1885,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Are we limiting assessments to those due in some term ?
         $termWhere = '';
-        if($term instanceof Term){
+        if ($term instanceof Term) {
             $whereParams += $this->buildWhereParamsForTerm($term);
             $termWhere = $this->buildWherePartForTerm($term);
         }
@@ -1897,26 +1897,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$codeMapper->getColumnString('fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            WHERE f.deleted_at IS NULL AND f.id IN
-            (
-              SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`) AS `folder_id`
-              FROM `assessment` AS `a`
-              LEFT JOIN `assessment_folder`                     AS `af`   ON `a`.`id`        = `af`.`assessment_id`
-              LEFT JOIN `assessment_course_unit_implementation` AS `acui` ON `a`.`id`        = `acui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `cui`  ON `cui`.`id`      = `acui`.`course_unit_implementation_id`  AND `cui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id` AND `ci`.deleted_at IS NULL
-              LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id` AND `t`.deleted_at IS NULL
-              LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id` AND `q`.deleted_at IS NULL
-              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id`
-              LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id` AND `tc`.deleted_at IS NULL
-              LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id` AND `qa`.deleted_at IS NULL
-              LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id AND `ss`.deleted_at IS NULL
-              WHERE
-                (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
-                {$termWhere}
-                AND `a`.deleted_at IS NULL
-            )
-            ORDER BY f.name
+
+            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN assessment            a     ON var.assessment_id = a.id
+
+            LEFT  JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id AND `tk`.deleted_at IS NULL
+            LEFT  JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
+            LEFT  JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+
+            LEFT  JOIN `task_completion`     `tkc` ON `tkc`.`task_id`   = `tk`.`id`        AND `tkc`.deleted_at IS NULL
+            LEFT  JOIN `assess_attempt`      `qza` ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
+            LEFT  JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
+
+
+            WHERE f.deleted_at IS NULL
+            AND   a.deleted_at IS NULL
+            AND   (`tkc`.`student_id` = :studentId OR `dwr`.`owner` = :studentId OR `qza`.`user_id` = :studentId)
         ";
 
         $statement = $this->database->prepare($query);
