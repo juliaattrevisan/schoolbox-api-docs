@@ -235,22 +235,6 @@
             },
 
             /**
-             * Build the map of classes to render for a resource booking button.
-             *
-             * @param action
-             * @return {Object}
-             */
-            buildBookingButtonClasses(action) {
-                let base = {
-                    button: true
-                };
-                if (action.class) {
-                    base[action.class] = true;
-                }
-                return base;
-            },
-
-            /**
              * Handle the clicking of a booking button.
              *
              * @param $event
@@ -621,7 +605,7 @@
                         </span>
                         <!-- Booking buttons: handle random events -->
                         <span v-for="action in eventExtendedProps.booking.actions">
-                            <a :class="buildBookingButtonClasses(action)"
+                            <a class="button"
                                :data-booking-action="String(action.action)"
                                @click="clickBookingButton($event)"
                                :href="action.href || '#'">{{ action.label }}</a>
