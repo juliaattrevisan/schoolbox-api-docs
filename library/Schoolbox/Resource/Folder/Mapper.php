@@ -2030,39 +2030,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$codeMapper->getColumnString('fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            WHERE f.deleted_at IS NULL AND f.id IN
-            (
-              SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`, `apf`.`folder_id`, `pci`.`folder_id`) AS `folder_id`
-              FROM      `assessment`                            AS `a`
+            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN assessment            a     ON var.assessment_id = a.id
 
-              LEFT JOIN `assessment_folder`                     AS `af`   ON `af`.`assessment_id` = `a`.`id`
+            LEFT  JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id AND `tk`.deleted_at IS NULL
+            LEFT  JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
+            LEFT  JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
 
-              LEFT JOIN `assessment_course_unit_implementation` AS `aui`  ON `a`.`id` = `aui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `ui`   ON `ui`.`id` = `aui`.`course_unit_implementation_id` AND `ui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id` = `ui`.`course_implementation_id` AND `ci`.deleted_at IS NULL
+            LEFT  JOIN `task_completion`     `tkc` ON `tkc`.`task_id`   = `tk`.`id`        AND `tkc`.deleted_at IS NULL
+            LEFT  JOIN `assess_attempt`      `qza` ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
+            LEFT  JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
 
-              LEFT JOIN `project_assessment`                    AS `pa`   ON `pa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `p`    ON `p`.`id` = `pa`.`project_id` AND `p`.deleted_at IS NULL
-              LEFT JOIN `assessment`                            AS `ap`   ON `ap`.`id` = `p`.`assessment_id` AND `ap`.deleted_at IS NULL
-              LEFT JOIN `assessment_folder`                     AS `apf`  ON `apf`.`assessment_id` = `ap`.`id`
-
-              LEFT JOIN `project_assessment`                    AS `uipa` ON `uipa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `uip`  ON `uip`.`id` = `uipa`.`project_id` AND `uip`.deleted_at IS NULL
-              LEFT JOIN `assessment`                            AS `uiap` ON `uiap`.`id` = `uip`.`assessment_id` AND `uiap`.deleted_at IS NULL
-              LEFT JOIN `assessment_course_unit_implementation` AS `paui` ON `paui`.`assessment_id` = `uiap`.`id`
-              LEFT JOIN `course_unit_implementation`            AS `pui`  ON `pui`.`id` = `paui`.`course_unit_implementation_id` AND `pui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `pci`  ON `pci`.`id` = `pui`.`course_implementation_id` AND `pci`.deleted_at IS NULL
-
-              LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id` AND `tk`.deleted_at IS NULL
-              LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id` AND `qz`.deleted_at IS NULL
-              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
-
-              LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id` AND `tkc`.deleted_at IS NULL
-              LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
-              LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id AND `dwr`.deleted_at IS NULL
-              WHERE $whereClause AND `a`.deleted_At IS NULL
-            )
-            ORDER BY f.name
+            WHERE f.deleted_at IS NULL
+            AND   a.deleted_at IS NULL
+            AND   $whereClause
         ";
 
         $statement = $this->database->prepare($query);
@@ -2095,7 +2076,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $folderCode->setFolder($folder);
             }
         }
-        return $folders;
+        return $folders->sortByCallback(static function (Model $a, Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
     }
 
 
