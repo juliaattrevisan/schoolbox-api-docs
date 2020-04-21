@@ -1,12 +1,30 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <script type="text/javascript" src="//az523909.vo.msecnd.net/cv-events-api/1.0.0/cv-events-api.min.js"></script>
+    <script type="text/javascript" src="//az523909.vo.msecnd.net/cv-events-api/1.0.1/cv-events-api.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            var dialog = $('#plugin{COMPONENT_INSTANCE_ID}');
-            dialog.on('opened.fndtn.reveal', function() {
+            $('#plugin{COMPONENT_INSTANCE_ID}').on('opened.fndtn.reveal', function() {
+                let clickviewModalUrl = '//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&schoolId={CLICKVIEW_SCHOOL_ID}';
+                let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
+                let clickviewFrame = $('#' + clickviewFrameId);
+                let self = $(this);
+
+                /* Update loader and frame
+                 */
+                $('#plugin-loader{COMPONENT_INSTANCE_ID}').show();
+
+                $(clickviewFrame).css({
+                    'display': 'none',
+                    'height': 0
+                });
+
+                /* Load iframe src on demand, but only do it once
+                 */
+                if (clickviewFrame.attr('src') === '' || clickviewFrame.attr('src') === undefined) {
+                    clickviewFrame.attr('src', clickviewModalUrl);
+                }
 
                 // Use the ClickView Events API to catch the cv-lms-addvideo event
-                var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
+                let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
                 eventsApi.on("cv-lms-addvideo", function (event, args) {
                     $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
                     $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
@@ -24,13 +42,40 @@
 
                     $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
 
-                    dialog.foundation('reveal', 'close');
-                    //The plugin should be reinitialised to be used again, to do this simply reload the iframe.
-                    $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src', $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src'));
-
-                    // We are done with this listener
-                    eventsApi.off("cv-lms-addvideo");
+                    self.foundation('reveal', 'close');
                 });
+            });
+
+            $('#plugin-frame{COMPONENT_INSTANCE_ID}').on('load', function() {
+                let clickviewFrameHeight = 401;
+
+                /* Update loader and frame
+                 */
+                $('#plugin-loader{COMPONENT_INSTANCE_ID}').hide();
+
+                $(this).css({
+                    'display': 'block',
+                    'height': clickviewFrameHeight
+                });
+            });
+
+            $('#plugin{COMPONENT_INSTANCE_ID}').on('closed.fndtn.reveal', function() {
+                let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
+                let clickviewFrame = $('#' + clickviewFrameId);
+
+                /* Update loader and frame
+                 */
+                $('#plugin-loader{COMPONENT_INSTANCE_ID}').show();
+
+                $(clickviewFrame).css({
+                    'display': 'none',
+                    'height': 0
+                });
+
+                /* Clear all handlers for this
+                 */
+                let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
+                eventsApi.off('cv-lms-addvideo');
             });
         })
     </script>
@@ -55,8 +100,6 @@
                 <!-- BEGIN empty_invalid -->
                 <p>We couldn't find a ClickView video with the URL provided. Try <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">checking your URL is correct</a> or <a href="#" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">selecting the video</a> again.</p>
                 <!-- END empty_invalid -->
-
-
             </div>
             <!-- END empty_state -->
 
@@ -75,12 +118,11 @@
                     <!-- END iframe_clickview -->
                 </div>
             </section>
-
-
         </div>
     </div>
 
     <div id="plugin{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&amp;schoolId={CLICKVIEW_SCHOOL_ID}" width="100%" height="401" style="border: 0;"></iframe>
+        <section class="content" id="plugin-loader{COMPONENT_INSTANCE_ID}"><div class="loader"></div></section>
+        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" width="100%" style="border: 0; display:none"></iframe>
     </div>
 </div>
