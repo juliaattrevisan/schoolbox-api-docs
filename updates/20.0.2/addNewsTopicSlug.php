@@ -54,7 +54,7 @@ $app = new class extends CliTool\App {
         $original = $slug;
         while (in_array($slug, $this->slugs)) {
             $i++;
-            $slug = "{$original}{$i}";
+            $slug = "{$original}-{$i}";
         }
 
         $this->slugs[] = $slug;
