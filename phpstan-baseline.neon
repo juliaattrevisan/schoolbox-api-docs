@@ -10996,16 +10996,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$whereClause\\)\\: Unexpected token \"\\$whereClause\", expected type at offset 149$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$whereParams\\)\\: Unexpected token \"\\$whereParams\", expected type at offset 176$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Mapper.php
-
-		-
 			message: "#^Call to an undefined method iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\:\\:assertCollectionOf\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Model.php

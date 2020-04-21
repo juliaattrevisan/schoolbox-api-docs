@@ -1986,8 +1986,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Hydrated joins:
      *  * folder code
      *
-     * @param $whereClause
-     * @param $whereParams
+     * @param string $whereClause
+     * @param array  $whereParams
      * @return GenericCollection
      * @throws DefinitionException
      */
