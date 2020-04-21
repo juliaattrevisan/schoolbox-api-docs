@@ -3,7 +3,6 @@
     <script type="text/javascript">
         $(function() {
             $('#plugin{COMPONENT_INSTANCE_ID}').on('opened.fndtn.reveal', function() {
-                console.log('opened {COMPONENT_INSTANCE_ID}');
                 let clickviewModalUrl = '//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&schoolId={CLICKVIEW_SCHOOL_ID}';
                 let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
                 let clickviewFrame = $('#' + clickviewFrameId);
@@ -21,7 +20,6 @@
                 /* Load iframe src on demand, but only do it once
                  */
                 if (clickviewFrame.attr('src') === '' || clickviewFrame.attr('src') === undefined) {
-                    console.log('setting iframe src {COMPONENT_INSTANCE_ID}');
                     clickviewFrame.attr('src', clickviewModalUrl);
                 }
 
@@ -53,11 +51,7 @@
             });
 
             $('#plugin-frame{COMPONENT_INSTANCE_ID}').on('load', function() {
-                let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
-                let clickviewFrame = $('#' + clickviewFrameId);
                 let clickviewFrameHeight = 401;
-
-                console.log('loaded {COMPONENT_INSTANCE_ID} ' + clickviewFrame.attr('src'));
 
                 /* Update loader and frame
                  */
@@ -70,10 +64,8 @@
             });
 
             $('#plugin{COMPONENT_INSTANCE_ID}').on('closed.fndtn.reveal', function() {
-                console.log('closed {COMPONENT_INSTANCE_ID}');
-
                 let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
-                let clickviewFrame = $('#plugin-frame{COMPONENT_INSTANCE_ID}');
+                let clickviewFrame = $('#' + clickviewFrameId);
 
                 /* Update loader and frame
                  */
