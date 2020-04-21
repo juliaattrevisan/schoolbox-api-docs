@@ -11,9 +11,11 @@
                 var clickviewFrameHeight = 401;
                 var loader = $('#plugin-loader{COMPONENT_INSTANCE_ID}');
 
-                /* Load iframe src on demand
+                /* Load iframe src on demand, but only do it once
                  */
-                clickviewFrame.attr('src', clickviewModalUrl);
+                if (clickviewFrame.attr('src') === '' || clickviewFrame.attr('src') === undefined) {
+                    clickviewFrame.attr('src', clickviewModalUrl);
+                }
 
                 clickviewFrame.on('load', function() {
                     loader.hide();
