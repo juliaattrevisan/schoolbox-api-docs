@@ -54,10 +54,10 @@ class Model implements Serializable, Sequential, ISoftDeletable
     }
 
     /**
-     * @param string $slug
+     * @param null|string $slug
      * @return Model $this
      */
-    public function setSlug(string $slug): self
+    public function setSlug(?string $slug): self
     {
         $this->slug = $slug;
         return $this;

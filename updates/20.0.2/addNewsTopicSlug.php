@@ -19,7 +19,7 @@ $app = new class extends CliTool\App {
     {
         $this->getDatabaseInternal()->executeQuery("
                 ALTER TABLE newsTopic ADD COLUMN slug VARCHAR(150) AFTER `name`,
-                ADD INDEX idx_newsTopic_slug (slug)"
+                ADD UNIQUE INDEX idx_newsTopic_slug (slug)"
         );
 
         $topics = $this->getDatabaseInternal()->executeQuery(
@@ -40,13 +40,13 @@ $app = new class extends CliTool\App {
 
     /**
      * @param string|null $name
-     * @return string
+     * @return string|null
      */
-    private function generateSlug(?string $name): string
+    private function generateSlug(?string $name): ?string
     {
         // It won't appear in the UI
         if (empty($name)) {
-            return '';
+            return null;
         }
         $url      = new \Url($name);
         $slug     = $url->getSlug();

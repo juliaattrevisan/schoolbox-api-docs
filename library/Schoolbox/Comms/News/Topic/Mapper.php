@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
+use Schoolbox\Mapper\Exception as MapperException;
+
 class Mapper extends \Schoolbox\Mapper
 {
 
@@ -50,6 +52,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateSlug']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeSlug']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSlug']);
     }
 
 
@@ -62,14 +66,14 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param Model      $topic
+     * @param Model $topic
      * @return bool
      */
     public function updateSlug(Model $topic): bool
     {
         // It won't appear in the UI
-        if (empty($topic->getName())) {
-            $topic->setSlug('');
+        if (empty($topic->getName()) || $topic->getDeletedAt()) {
+            $topic->setSlug(null);
             return true;
         }
 
@@ -94,6 +98,21 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         $topic->setSlug($newSlug);
+        return true;
+    }
+
+
+    /**
+     * @param Model $topic
+     * @return bool
+     */
+    public function removeSlug(Model $topic): bool
+    {
+        $sql  = "UPDATE {$this->getTable()}
+                   SET slug = NULL
+                   WHERE newsTopicID = :topicId";
+        $stmt = $this->database->prepare($sql);
+        $stmt->execute(['topicId' => $topic->getId()]);
         return true;
     }
 }
