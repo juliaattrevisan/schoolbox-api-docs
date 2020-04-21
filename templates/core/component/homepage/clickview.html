@@ -7,6 +7,7 @@
                 let clickviewModalUrl = '//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&schoolId={CLICKVIEW_SCHOOL_ID}';
                 let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
                 let clickviewFrame = $('#' + clickviewFrameId);
+                let self = $(this);
 
                 /* Update loader and frame
                  */
@@ -22,6 +23,36 @@
                 if (clickviewFrame.attr('src') === '' || clickviewFrame.attr('src') === undefined) {
                     console.log('setting iframe src {COMPONENT_INSTANCE_ID}');
                     clickviewFrame.attr('src', clickviewModalUrl);
+
+                    // Use the ClickView Events API to catch the cv-lms-addvideo event
+                    let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
+
+                    eventsApi.on("cv-lms-addvideo", function (event, args) {
+                        $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
+                        $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
+                        $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
+
+                        $.ajax({
+                            url: '/homepage/configForm.php',
+                            type: 'GET',
+                            data: { cid: '{ID}',
+                                type: 'config',
+                                component: '{COMPONENT_INSTANCE_ID}',
+                                url: args.embedLink
+                            }
+                        });
+
+                        $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
+
+                        self.foundation('reveal', 'close');
+
+                        /* Reinit the plugin, I guess
+                         */
+                        clickviewFrame.attr('src', clickviewFrame.attr('src'));
+
+                        // We are done with this listener
+                        eventsApi.off("cv-lms-addvideo");
+                    });
                 }
             });
 
@@ -29,7 +60,6 @@
                 let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
                 let clickviewFrame = $('#' + clickviewFrameId);
                 let clickviewFrameHeight = 401;
-                let self = $(this);
 
                 console.log('loaded {COMPONENT_INSTANCE_ID} ' + clickviewFrame.attr('src'));
 
@@ -40,32 +70,6 @@
                 $(this).css({
                     'display': 'block',
                     'height': clickviewFrameHeight
-                });
-
-                // Use the ClickView Events API to catch the cv-lms-addvideo event
-                let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
-
-                eventsApi.on("cv-lms-addvideo", function (event, args) {
-                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
-                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
-                    $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
-
-                    $.ajax({
-                        url: '/homepage/configForm.php',
-                        type: 'GET',
-                        data: { cid: '{ID}',
-                            type: 'config',
-                            component: '{COMPONENT_INSTANCE_ID}',
-                            url: args.embedLink
-                        }
-                    });
-
-                    $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
-
-                    self.foundation('reveal', 'close');
-
-                    // We are done with this listener
-                    eventsApi.off("cv-lms-addvideo");
                 });
             });
 
