@@ -518,9 +518,6 @@ abstract class Base {
      *
      * Returns whether exception was able to be reported.
      *
-     * Method signature is intentionally vague to abstract away exception reporting implementation
-     * in the event we want to switch it out in the future.
-     *
      * @param \Throwable $e The exception you wish to report
      * @return bool
      */
