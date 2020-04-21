@@ -5,40 +5,51 @@
             var dialog = $('#plugin{COMPONENT_INSTANCE_ID}');
 
             dialog.on('opened.fndtn.reveal', function() {
-                var clickviewModalurl = '//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&schoolId={CLICKVIEW_SCHOOL_ID}';
-                var clickviewModal = '#plugin-frame{COMPONENT_INSTANCE_ID}';
+                var clickviewModalUrl = '//{CLICKVIEW_URL}/v3/plugins/base?consumerKey=79fph239f0b7&sizeSelector=false&schoolId={CLICKVIEW_SCHOOL_ID}';
+                var clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
+                var clickviewFrame = $('#' + clickviewFrameId);
+                var clickviewFrameHeight = 401;
+                var loader = $('#plugin-loader{COMPONENT_INSTANCE_ID}');
 
                 /* Load iframe src on demand
                  */
-                $(clickviewModal).attr('src', clickviewModalurl);
+                clickviewFrame.attr('src', clickviewModalUrl);
 
-                // Use the ClickView Events API to catch the cv-lms-addvideo event
-                var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
+                clickviewFrame.on('load', function() {
+                    loader.hide();
 
-                eventsApi.on("cv-lms-addvideo", function (event, args) {
-                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
-                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
-                    $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
-
-                    $.ajax({
-                        url: '/homepage/configForm.php',
-                        type: 'GET',
-                        data: { cid: '{ID}',
-                            type: 'config',
-                            component: '{COMPONENT_INSTANCE_ID}',
-                            url: args.embedLink
-                        }
+                    $(this).css({
+                        'display': 'block',
+                        'height': clickviewFrameHeight
                     });
 
-                    $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
+                    // Use the ClickView Events API to catch the cv-lms-addvideo event
+                    var eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
 
-                    dialog.foundation('reveal', 'close');
+                    eventsApi.on("cv-lms-addvideo", function (event, args) {
+                        $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
+                        $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
+                        $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
 
-                    //The plugin should be reinitialised to be used again, to do this simply reload the iframe.
-                    $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src', $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src'));
+                        loader.css('display', 'block');
 
-                    // We are done with this listener
-                    eventsApi.off("cv-lms-addvideo");
+                        $.ajax({
+                            url: '/homepage/configForm.php',
+                            type: 'GET',
+                            data: { cid: '{ID}',
+                                type: 'config',
+                                component: '{COMPONENT_INSTANCE_ID}',
+                                url: args.embedLink
+                            }
+                        });
+
+                        $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
+
+                        dialog.foundation('reveal', 'close');
+
+                        // We are done with this listener
+                        eventsApi.off("cv-lms-addvideo");
+                    });
                 });
             });
         })
@@ -86,6 +97,7 @@
     </div>
 
     <div id="plugin{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" width="100%" height="401" style="border: 0;"></iframe>
+        <section class="content" id="plugin-loader{COMPONENT_INSTANCE_ID}"><div class="loader"></div></section>
+        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" width="100%" style="border: 0; display:none"></iframe>
     </div>
 </div>
