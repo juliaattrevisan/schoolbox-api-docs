@@ -52,6 +52,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 class Controller extends Assessment\Controller
 {
@@ -734,7 +735,9 @@ class Controller extends Assessment\Controller
 
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
-                    $this->getDi()->get('sentry')->captureException($e);
+                    /** @var HubInterface $sentry */
+                    $sentry = $this->getDi()->get('sentry');
+                    $sentry->captureException($e);
                 }
 
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
