@@ -1,5 +1,5 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <script type="text/javascript" src="//az523909.vo.msecnd.net/cv-events-api/1.0.0/cv-events-api.min.js"></script>
+    <script type="text/javascript" src="//az523909.vo.msecnd.net/cv-events-api/1.0.1/cv-events-api.min.js"></script>
     <script type="text/javascript">
         $(function() {
             $('#plugin{COMPONENT_INSTANCE_ID}').on('opened.fndtn.reveal', function() {
@@ -23,37 +23,33 @@
                 if (clickviewFrame.attr('src') === '' || clickviewFrame.attr('src') === undefined) {
                     console.log('setting iframe src {COMPONENT_INSTANCE_ID}');
                     clickviewFrame.attr('src', clickviewModalUrl);
-
-                    // Use the ClickView Events API to catch the cv-lms-addvideo event
-                    let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
-
-                    eventsApi.on("cv-lms-addvideo", function (event, args) {
-                        $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
-                        $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
-                        $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
-
-                        $.ajax({
-                            url: '/homepage/configForm.php',
-                            type: 'GET',
-                            data: { cid: '{ID}',
-                                type: 'config',
-                                component: '{COMPONENT_INSTANCE_ID}',
-                                url: args.embedLink
-                            }
-                        });
-
-                        $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
-
-                        self.foundation('reveal', 'close');
-
-                        /* Reinit the plugin, I guess
-                         */
-                        clickviewFrame.attr('src', clickviewFrame.attr('src'));
-
-                        // We are done with this listener
-                        eventsApi.off("cv-lms-addvideo");
-                    });
                 }
+
+                // Use the ClickView Events API to catch the cv-lms-addvideo event
+                let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
+                eventsApi.on("cv-lms-addvideo", function (event, args) {
+                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>').removeClass('hide');
+                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
+                    $('#clickview-empty-state-{COMPONENT_INSTANCE_ID}').addClass('hide');
+
+                    $.ajax({
+                        url: '/homepage/configForm.php',
+                        type: 'GET',
+                        data: { cid: '{ID}',
+                            type: 'config',
+                            component: '{COMPONENT_INSTANCE_ID}',
+                            url: args.embedLink
+                        }
+                    });
+
+                    $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
+
+                    self.foundation('reveal', 'close');
+
+                    /* Reinit the plugin, I guess
+                     */
+                    clickviewFrame.attr('src', clickviewFrame.attr('src'));
+                });
             });
 
             $('#plugin-frame{COMPONENT_INSTANCE_ID}').on('load', function() {
@@ -75,6 +71,8 @@
 
             $('#plugin{COMPONENT_INSTANCE_ID}').on('closed.fndtn.reveal', function() {
                 console.log('closed {COMPONENT_INSTANCE_ID}');
+
+                let clickviewFrameId = 'plugin-frame{COMPONENT_INSTANCE_ID}';
                 let clickviewFrame = $('#plugin-frame{COMPONENT_INSTANCE_ID}');
 
                 /* Update loader and frame
@@ -85,6 +83,11 @@
                     'display': 'none',
                     'height': 0
                 });
+
+                /* Clear all handlers for this
+                 */
+                let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
+                eventsApi.off('cv-lms-addvideo');
             });
         })
     </script>
