@@ -1932,7 +1932,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithInteractionsForStudent(User $student, Term $term = null)
     {
-        $whereClause = "(`tkc`.`student_id` = :userId OR `dws`.`owner` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $whereClause = "p.user_id = :userId";
         $whereParams = [
             ':userId' => $student->getId(),
         ];
@@ -1942,7 +1942,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClause, $whereParams);
+        return $this->findFoldersWithParticipations($whereClause, $whereParams);
     }
 
 
@@ -1977,6 +1977,44 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return $this->findFoldersWithInteractions($whereClause, $whereParams);
+    }
+
+
+    /**
+     * Hydrates folders with participation based on a where clause provided
+     *
+     * Hydrated joins:
+     *  * folder code
+     *
+     * @param string $whereClause
+     * @param array  $whereParams
+     * @return GenericCollection
+     * @throws DefinitionException
+     */
+    private function findFoldersWithParticipations($whereClause, $whereParams)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('f')},
+                {$this->getJoinColumnString('codes', 'fc')}
+            FROM {$this->getTable()} f
+            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
+            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN assessment            a     ON var.assessment_id = a.id
+            INNER JOIN participant_plan      pp    ON a.id              = pp.assessment_id
+            INNER JOIN participant           p     ON pp.id             = p.participant_plan_id
+
+            WHERE f.deleted_at  IS NULL
+            AND   a.deleted_at  IS NULL
+            AND   p.excluded_at IS NULL
+            AND   $whereClause
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($whereParams);
+        return $this->hydrateForInteractionQuery($statement)->sortByCallback(static function (Model $a, Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
     }
 
 
