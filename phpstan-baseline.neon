@@ -511,22 +511,22 @@ parameters:
 			path: library/Alaress/Date/Interval.php
 
 		-
-			message: "#^Constant TIDEWAYS_FLAGS_CPU not found\\.$#"
+			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_CPU not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^Constant TIDEWAYS_FLAGS_MEMORY not found\\.$#"
+			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_MEMORY not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^Function tideways_enable not found\\.$#"
+			message: "#^Function tideways_xhprof_enable not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^Function tideways_disable not found\\.$#"
+			message: "#^Function tideways_xhprof_disable not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
