@@ -282,6 +282,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 SELECT
                     c.*,
                     cp.period_id AS periodId,
+                    cp.room,
                     u.synergy_id,
                     u.title,
                     u.firstname,
@@ -296,6 +297,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 SELECT
                     c.*,
                     cp.period_id AS periodId,
+                    cp.room,
                     u.synergy_id,
                     u.title,
                     u.firstname,
