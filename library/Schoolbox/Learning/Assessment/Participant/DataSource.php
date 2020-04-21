@@ -237,6 +237,7 @@ class DataSource
      * to the assessment's folder and do not have an explicit participation record.
      *
      * @param PlanObject[]|GenericCollection $dynamicPlans
+     * @param User|null                      $user If provided, load only this user's participation
      * @throws UnexpectedValueException If unable to merge student collections
      */
     private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans, User $user = null): void
@@ -246,12 +247,11 @@ class DataSource
             $assessment = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
 
-            if($user instanceof User) {
+            if ($user instanceof User) {
                 if (!$explicitParticipants->keyExists($user->getId())) {
                     $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
                 }
-            }
-            else {
+            } else {
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
                 foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
                     // Is this user already an explicit participant? (Either an inclusion or exclusion)
