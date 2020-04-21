@@ -11,28 +11,54 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 
 $app = new class extends CliTool\App {
+    /* @var array */
+    private $slugs = [];
+
     /** Hands off execution over to the App */
     public function run(): void
     {
         $this->getDatabaseInternal()->executeQuery("
                 ALTER TABLE newsTopic ADD COLUMN slug VARCHAR(150) AFTER `name`,
-                ADD UNIQUE INDEX idx_newsTopic_slug (slug)"
+                ADD INDEX idx_newsTopic_slug (slug)"
         );
 
         $topics = $this->getDatabaseInternal()->executeQuery(
-            'SELECT `name`, `newsTopicID` FROM newsTopic'
+            'SELECT `name`, `newsTopicID` FROM newsTopic WHERE deleted_at IS NULL'
         )->fetchAll();
 
         foreach ($topics as $topic) {
-            $url = new \Url($topic['name']);
             try {
+                $slug = $this->generateSlug($topic['name']);
                 $this->getDatabaseInternal()->executeQuery(
                     'UPDATE newsTopic SET slug = :slug WHERE newsTopicID = :topicId'
-                    , ['slug' => $url->getSlug(), 'topicId' => $topic['newsTopicID']]);
+                    , ['slug' => $slug, 'topicId' => $topic['newsTopicID']]);
             } catch (Exception $e) {
                 $this->getLogger()->warning("Could not set slug for new topic: {$topic['newsTopicID']}: " . $e->getMessage());
             }
         }
+    }
+
+    /**
+     * @param string|null $name
+     * @return string
+     */
+    private function generateSlug(?string $name): string
+    {
+        // It won't appear in the UI
+        if (empty($name)) {
+            return '';
+        }
+        $url      = new \Url($name);
+        $slug     = $url->getSlug();
+        $i        = 0;
+        $original = $slug;
+        while (in_array($slug, $this->slugs)) {
+            $i++;
+            $slug = "{$original}{$i}";
+        }
+
+        $this->slugs[] = $slug;
+        return $slug;
     }
 };
 /** @noinspection PhpUnhandledExceptionInspection */

@@ -62,16 +62,40 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param Model $topic
+     * @param Model      $topic
+     * @param Model|null $previous
      * @return bool
      */
-    public function updateSlug(Model $topic): bool
+    public function updateSlug(Model $topic, ?Model $previous = null): bool
     {
-        $url = new \Url($topic->getName());
-        if ($url->getSlug() === $topic->getSlug()) {
+        // If name is not changed, don't worry
+        if ($previous && $previous->getName() === $topic->getName()) {
             return true;
         }
-        $topic->setSlug($url->getSlug());
+
+        // It won't appear in the UI
+        if (empty($topic->getName())) {
+            $topic->setSlug('');
+            return true;
+        }
+
+        $sql  = "SELECT slug FROM {$this->getTable()}
+                 WHERE deleted_at IS NULL
+                 AND newsTopicID != :topicId";
+        $stmt = $this->database->prepare($sql);
+        $stmt->execute(['topicId' => $topic->getId()]);
+        $slugs = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        $url      = new \Url($topic->getName());
+        $newSlug  = $url->getSlug();
+        $original = $newSlug;
+        $i        = 0;
+        while (in_array($newSlug, $slugs)) {
+            $i++;
+            $newSlug = "{$original}{$i}";
+        }
+
+        $topic->setSlug($newSlug);
         return true;
     }
 }
