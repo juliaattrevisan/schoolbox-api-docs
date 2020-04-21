@@ -1993,12 +1993,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     private function findFoldersWithInteractions($whereClause, $whereParams)
     {
-        $codeMapper = $this->getJoinMapper('codes');
-
         $query = "
             SELECT
                 {$this->getColumnString('f')},
-                {$codeMapper->getColumnString('fc')}
+                {$this->getJoinColumnString('codes', 'fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
             INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
@@ -2020,35 +2018,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $statement = $this->database->prepare($query);
         $statement->execute($whereParams);
-
-        // Maintain separate cache so we can preserve query result ordering
-        /** @var Model[] $folderCache - Indexed by folder.id */
-        $folderCache = [];
-        $folders     = $this->createCollection();
-
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            $folderId = $row["f.{$this->getIdentifierColumn()}"];
-
-            if (!$folderCache[$folderId] instanceof Model) {
-                $folderCache[$folderId] = $this->hydrate($row, 'f');
-                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
-                $folders[$folderId] = $folderCache[$folderId];
-            }
-
-            $folder = $folderCache[$folderId];
-
-            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
-            $codeCollection = $folder->getCodes();
-            $code           = $row['fc.code'];
-            if ($code && !$codeCollection->offsetExists($code)) {
-                /** @var FolderCode\Model $folderCode */
-                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
-                $codeCollection[$code] = $folderCode;
-                $folderCode->setFolder($folder);
-            }
-        }
-        return $folders->sortByCallback(static function (Model $a, Model $b) {
+        return $this->hydrateForInteractionQuery($statement)->sortByCallback(static function (Model $a, Model $b) {
             return strnatcasecmp($a->getName(), $b->getName());
         });
     }
@@ -2128,5 +2098,46 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return false;
+    }
+
+
+    /**
+     * Special hydrator for hydrating the queries for retrieving interactions.
+     *
+     * @param PDOStatement      $statement
+     * @return GenericCollection|Model[]
+     * @throws Exception
+     */
+    private function hydrateForInteractionQuery(PDOStatement $statement): GenericCollection
+    {
+        // Maintain separate cache so we can preserve query result ordering
+        /** @var Model[] $folderCache - Indexed by folder.id */
+        $folderCache = [];
+        $folders     = $this->createCollection();
+        $codeMapper  = $this->getJoinMapper('codes');
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            $folderId = $row["f.{$this->getIdentifierColumn()}"];
+
+            if (!$folderCache[$folderId] instanceof Model) {
+                $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
+                $folders[$folderId] = $folderCache[$folderId];
+            }
+
+            $folder = $folderCache[$folderId];
+
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $folder->getCodes();
+            $code           = $row['fc.code'];
+            if ($code && !$codeCollection->offsetExists($code)) {
+                /** @var FolderCode\Model $folderCode */
+                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
+                $codeCollection[$code] = $folderCode;
+                $folderCode->setFolder($folder);
+            }
+        }
+        return $folders;
     }
 }
