@@ -248,6 +248,9 @@ class DataSource
             $explicitParticipants = $assessment->getAllParticipants();
 
             if ($user instanceof User) {
+                // For efficiency reasons:
+                // bypass findAllStudentsForAssessment and assume that $user is
+                // a participant of this plan
                 if (!$explicitParticipants->keyExists($user->getId())) {
                     $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
                 }
