@@ -382,8 +382,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 'class'          => [],
             ];
 
-            foreach ($classList as $i => $class) {
-                if ($class['period_id'] == $period['id']) {
+            if (isset($classList[$period['id']])) {
+                foreach ($classList[$period['id']] as $class) {
                     $periodAdaption['class'][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
@@ -393,8 +393,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         'staffFirstname' => $class['firstname'],
                         'staffLastname'  => $class['lastname'],
                     ];
-
-                    unset($classList[$i]);
                 }
             }
 
