@@ -769,7 +769,7 @@ class MapperProxy
     /**
      * Finds all assessables for a staff member.
      *
-     * This method does not loads participation.
+     * This method does not load participation.
      *
      * @param User $staff
      * @param Term $term Restrict results to this term
@@ -781,6 +781,27 @@ class MapperProxy
      */
     public function findAllByStaff(User $staff, Term $term)
     {
+        return $this->findAllByStaffBetweenDates($staff, $term->getStart(), $term->getActualFinish());
+    }
+
+
+    /**
+     * Finds all assessables for a staff member, between the given dates.
+     *
+     * This method does not load participation.
+     *
+     * @param User                $staff
+     * @param Alaress_Date_Format $from    If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format $to      If provided, fetch only assessables due on or before this date
+     * @param array               $options Any other query options
+     * @return GenericCollection|IAssessable[]
+     */
+    public function findAllByStaffBetweenDates(
+        User $staff,
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null,
+        array $options = []
+    ): GenericCollection {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
@@ -790,13 +811,15 @@ class MapperProxy
             true,
             UserAccess::ACCESS_WRITE,
             false
-        )->getColumnValues('id');
+        )->getPropertyValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $predicate = $this->convertOptionsToPredicateBuilder(['term' => $term,], false);
+        $options['due_after']  = $from;
+        $options['due_before'] = $to;
+        $builder               = $this->convertOptionsToPredicateBuilder($options, false);
 
         return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId($classFolderIds, $predicate)
+            $this->baseMapper->findAllForFolderId($classFolderIds, $builder)
         );
     }
 
