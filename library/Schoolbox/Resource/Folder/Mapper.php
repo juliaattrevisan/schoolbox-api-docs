@@ -1878,17 +1878,27 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithResponsesByStudent(User $student, Term $term = null)
     {
-        $whereClause = "(`tkc`.`student_id` = :userId OR `dws`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $whereClauses = [
+            "`tkc`.`student_id` = :userId",
+            "`qza`.`user_id` = :userId",
+            '1 = 0',
+            "`dws`.`owner` = :userId",
+        ];
         $whereParams = [
             ':userId' => $student->getId(),
         ];
 
         if ($term instanceof Term) {
-            $whereClause .= $this->buildWherePartForTerm($term);
+            foreach ($whereClauses as &$clause) {
+                if (isset($clause)) {
+                    $clause .= $this->buildWherePartForTerm($term);
+                }
+            }
+            unset($clause);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
     }
 
 
@@ -1905,17 +1915,27 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithFeedbackToStudent(User $student, Term $term = null)
     {
-        $whereClause = "(`tkc`.`student_id` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $whereClauses = [
+            "`tkc`.`student_id` = :userId",
+            "`qza`.`user_id` = :userId",
+            "`dwr`.`owner` = :userId",
+            '1 = 0'
+        ];
         $whereParams = [
             ':userId' => $student->getId(),
         ];
 
         if ($term instanceof Term) {
-            $whereClause .= $this->buildWherePartForTerm($term);
+            foreach ($whereClauses as &$clause) {
+                if (isset($clause)) {
+                    $clause .= $this->buildWherePartForTerm($term);
+                }
+            }
+            unset($clause);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
     }
 
 
@@ -1966,17 +1986,27 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithInteractionsForTeacher(User $teacher, Term $term = null)
     {
-        $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
+        $whereClauses = [
+            "`tkc`.`marking_user_id` = :userId",
+            "`qza`.`reviewer_id` = :userId",
+            "`dwr`.`marker` = :userId",
+            '1 = 0'
+        ];
         $whereParams = [
             ':userId' => $teacher->getId(),
         ];
 
         if ($term instanceof Term) {
-            $whereClause .= $this->buildWherePartForTerm($term);
+            foreach ($whereClauses as &$clause) {
+                if (isset($clause)) {
+                    $clause .= $this->buildWherePartForTerm($term);
+                }
+            }
+            unset($clause);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
     }
 
 
@@ -2024,14 +2054,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Hydrated joins:
      *  * folder code
      *
-     * @param string $whereClause
-     * @param array  $whereParams
+     * @param array $whereClauses
+     * @param array $whereParams
      * @return GenericCollection
      * @throws DefinitionException
      */
-    private function findFoldersWithInteractions($whereClause, $whereParams)
+    private function findFoldersWithInteractions($whereClauses, $whereParams)
     {
-        $query = "
+        [$taskClause, $quizClause, $dueWorkResponseClause, $dueWorkFeedbackClause] = $whereClauses;
+        $baseQuery = "
             SELECT
                 {$this->getColumnString('f')},
                 {$this->getJoinColumnString('codes', 'fc')}
@@ -2039,19 +2070,49 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
             INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
             INNER JOIN assessment            a     ON var.assessment_id = a.id
+        ";
+        $query = "
+            (
+                $baseQuery
+                INNER JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id      AND `tk`.deleted_at IS NULL
+                INNER JOIN `task_completion`     `tkc` ON `tkc`.`task_id`      = `tk`.`id` AND `tkc`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $taskClause
+            )
 
-            LEFT  JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id AND `tk`.deleted_at IS NULL
-            LEFT  JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
-            LEFT  JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+            UNION
 
-            LEFT  JOIN `task_completion`     `tkc` ON `tkc`.`task_id`   = `tk`.`id`        AND `tkc`.deleted_at IS NULL
-            LEFT  JOIN `assess_attempt`      `qza` ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
-            LEFT  JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
-            LEFT  JOIN `student_submission`  `dws` ON `dws`.`box_id`    = `dw`.id          AND `dws`.deleted_at IS NULL
+            (
+                $baseQuery
+                INNER JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
+                INNER JOIN `assess_attempt`      `qza` ON `qza`.`assess_id`    = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $quizClause
+            )
 
-            WHERE f.deleted_at IS NULL
-            AND   a.deleted_at IS NULL
-            AND   $whereClause
+            UNION
+
+            (
+                $baseQuery
+                INNER JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+                INNER JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $dueWorkResponseClause
+            )
+
+            UNION
+
+            (
+                $baseQuery
+                INNER JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+                INNER JOIN `student_submission`  `dws` ON `dws`.`box_id`    = `dw`.id          AND `dws`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $dueWorkFeedbackClause
+            )
         ";
 
         $statement = $this->database->prepare($query);
