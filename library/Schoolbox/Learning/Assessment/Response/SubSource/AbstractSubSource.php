@@ -74,7 +74,7 @@ abstract class AbstractSubSource implements IResponseDataSource
     public function findForAssessmentCollection(Collection $assessments, User $student = null)
     {
         // Find responses which belong to any assessments this recognizes
-        $recognizedIds = $assessments->getPropertyValues('id');
+        $recognizedIds = $assessments->filter([$this, 'recognizes'])->getPropertyValues('id');
 
         if (!\count($recognizedIds)) {
             return new Collection();
