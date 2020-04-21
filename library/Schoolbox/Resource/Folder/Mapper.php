@@ -1863,8 +1863,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $folderMapper->save($movedFolder->setParent($parentFolder));
     }
 
+
     /**
-     * Return a list of folders that the student has submitted work to in a given term
+     * Return a list of folders that the student has submitted work to in a
+     * given term.
      *
      * Folder is hydrated with:
      *  * folder codes
@@ -1874,84 +1876,30 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Collection|Model[]
      * @throws DefinitionException
      */
-    public function findFoldersWithResponses(User $student, Term $term = null)
+    public function findFoldersWithResponsesByStudent(User $student, Term $term = null)
     {
-        /** @var Code\Mapper $codeMapper */
-        $codeMapper           = $this->getJoinMapper('codes');
-
         $whereParams = [
-            ':studentId' => $student->getId(),
+            ':userId' => $student->getId(),
         ];
 
-        // Are we limiting assessments to those due in some term ?
-        $termWhere = '';
-        if($term instanceof Term){
+        $termClause = '';
+        if ($term instanceof Term) {
+            $termClause = $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
-            $termWhere = $this->buildWherePartForTerm($term);
         }
 
-
-        $query = "
-            SELECT
-                {$this->getColumnString('f')},
-                {$codeMapper->getColumnString('fc')}
-            FROM {$this->getTable()} f
-            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            WHERE f.deleted_at IS NULL AND f.id IN
-            (
-              SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`) AS `folder_id`
-              FROM `assessment` AS `a`
-              LEFT JOIN `assessment_folder`                     AS `af`   ON `a`.`id`        = `af`.`assessment_id`
-              LEFT JOIN `assessment_course_unit_implementation` AS `acui` ON `a`.`id`        = `acui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `cui`  ON `cui`.`id`      = `acui`.`course_unit_implementation_id`  AND `cui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id` AND `ci`.deleted_at IS NULL
-              LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id` AND `t`.deleted_at IS NULL
-              LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id` AND `q`.deleted_at IS NULL
-              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id`
-              LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id` AND `tc`.deleted_at IS NULL
-              LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id` AND `qa`.deleted_at IS NULL
-              LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id AND `ss`.deleted_at IS NULL
-              WHERE
-                (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
-                {$termWhere}
-                AND `a`.deleted_at IS NULL
-            )
-            ORDER BY f.name
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($whereParams);
-
-        /** @var GenericCollection|Model[] $folders Indexed by id */
-        $folders = $this->createCollection();
-
-        while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $folderId = $row["f.{$this->getIdentifierColumn()}"];
-
-            if ($folders[$folderId] == null) {
-                $folder = $this->hydrate($row, 'f');
-                $folders[$folderId] = $folder;
-                $folder->setCodes($codeMapper->createCollection());
-            } else {
-                $folder = $folders[$folderId];
-            }
-
-            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
-            $codeCollection = $folder->getCodes();
-            $code = $row['fc.code'];
-            if($code && !$codeCollection->offsetExists($code)){
-                /** @var FolderCode\Model $folderCode */
-                $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
-                $codeCollection->setOffset($code, $folderCode);
-                $folderCode->setFolder($folder);
-            }
-        }
-        return $folders;
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`student_id` = :userId {$termClause}",
+            "`qza`.`user_id` = :userId {$termClause}",
+            "`dws`.`owner` = :userId {$termClause}",
+            '1 = 0',
+            $whereParams
+        );
     }
 
 
     /**
-     * Return a set of folders where the student has received feedback
+     * Return a set of folders where the student has received feedback.
      *
      * Hydrated joins:
      * * folder code
@@ -1961,9 +1909,42 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return GenericCollection
      * @throws DefinitionException
      */
-    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null) {
+    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null)
+    {
+        $whereParams = [
+            ':userId' => $student->getId(),
+        ];
 
-        $whereClause = "(`tkc`.`student_id` = :userId OR `dwr`.`owner` = :userId OR `qza`.`user_id` = :userId)";
+        $termClause = '';
+        if ($term instanceof Term) {
+            $termClause = $this->buildWherePartForTerm($term);
+            $whereParams += $this->buildWhereParamsForTerm($term);
+        }
+
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`student_id` = :userId {$termClause}",
+            "`qza`.`user_id` = :userId {$termClause}",
+            '1 = 0',
+            "`dwr`.`owner` = :userId {$termClause}",
+            $whereParams
+        );
+    }
+
+
+    /**
+     * Return a set of folders where the student has either submitted a response
+     * or received feedback.
+     *
+     * Hydrated joins:
+     *  * folder codes
+     *
+     * @param User $student
+     * @param Term|null $term
+     * @return GenericCollection|Model[]
+     */
+    public function findFoldersWithInteractionsForStudent(User $student, Term $term = null)
+    {
+        $whereClause = "p.user_id = :userId";
         $whereParams = [
             ':userId' => $student->getId(),
         ];
@@ -1973,11 +1954,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+        return $this->findFoldersWithParticipations($whereClause, $whereParams);
     }
 
+
+
     /**
-     * Return a set of folders where the teacher has provided feedback in the specified term
+     * Return a set of folders where the teacher has interacted in the specified
+     * term. (Interaction being that the teacher has provided a mark.)
      *
      * Hydrated joins:
      *  * folder codes
@@ -1992,110 +1976,145 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Term|null $term
      * @return GenericCollection|Model[]
      */
-    public function findFoldersWithFeedbacksFromTeacher(User $teacher, Term $term = null)
+    public function findFoldersWithInteractionsForTeacher(User $teacher, Term $term = null)
     {
-
-        $whereClause = "(`tkc`.`marking_user_id` = :userId OR `dwr`.`marker` = :userId OR `qza`.`reviewer_id` = :userId)";
         $whereParams = [
             ':userId' => $teacher->getId(),
         ];
 
+        $termClause = '';
         if ($term instanceof Term) {
-            $whereClause .= $this->buildWherePartForTerm($term);
+            $termClause = $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithFeedbacks($whereClause, $whereParams);
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`marking_user_id` = :userId {$termClause}",
+            "`qza`.`reviewer_id` = :userId {$termClause}",
+            '1 = 0',
+            "`dwr`.`marker` = :userId {$termClause}",
+            $whereParams
+        );
     }
 
 
     /**
-     * Hydrates folders with feedbacks based on a where clause provided
+     * Hydrates folders with participation based on a where clause provided
      *
      * Hydrated joins:
      *  * folder code
      *
-     * @param $whereClause
-     * @param $whereParams
+     * @param string $whereClause
+     * @param array  $whereParams
      * @return GenericCollection
      * @throws DefinitionException
      */
-    private function findFoldersWithFeedbacks($whereClause, $whereParams)
+    private function findFoldersWithParticipations($whereClause, $whereParams)
     {
-        $codeMapper = $this->getJoinMapper('codes');
-
         $query = "
             SELECT
                 {$this->getColumnString('f')},
-                {$codeMapper->getColumnString('fc')}
+                {$this->getJoinColumnString('codes', 'fc')}
             FROM {$this->getTable()} f
             LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
-            WHERE f.deleted_at IS NULL AND f.id IN
-            (
-              SELECT DISTINCT COALESCE(`af`.`folder_id`, `ci`.`folder_id`, `apf`.`folder_id`, `pci`.`folder_id`) AS `folder_id`
-              FROM      `assessment`                            AS `a`
+            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN assessment            a     ON var.assessment_id = a.id
+            INNER JOIN participant_plan      pp    ON a.id              = pp.assessment_id
+            INNER JOIN participant           p     ON pp.id             = p.participant_plan_id
 
-              LEFT JOIN `assessment_folder`                     AS `af`   ON `af`.`assessment_id` = `a`.`id`
-
-              LEFT JOIN `assessment_course_unit_implementation` AS `aui`  ON `a`.`id` = `aui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `ui`   ON `ui`.`id` = `aui`.`course_unit_implementation_id` AND `ui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id` = `ui`.`course_implementation_id` AND `ci`.deleted_at IS NULL
-
-              LEFT JOIN `project_assessment`                    AS `pa`   ON `pa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `p`    ON `p`.`id` = `pa`.`project_id` AND `p`.deleted_at IS NULL
-              LEFT JOIN `assessment`                            AS `ap`   ON `ap`.`id` = `p`.`assessment_id` AND `ap`.deleted_at IS NULL
-              LEFT JOIN `assessment_folder`                     AS `apf`  ON `apf`.`assessment_id` = `ap`.`id`
-
-              LEFT JOIN `project_assessment`                    AS `uipa` ON `uipa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `uip`  ON `uip`.`id` = `uipa`.`project_id` AND `uip`.deleted_at IS NULL
-              LEFT JOIN `assessment`                            AS `uiap` ON `uiap`.`id` = `uip`.`assessment_id` AND `uiap`.deleted_at IS NULL
-              LEFT JOIN `assessment_course_unit_implementation` AS `paui` ON `paui`.`assessment_id` = `uiap`.`id`
-              LEFT JOIN `course_unit_implementation`            AS `pui`  ON `pui`.`id` = `paui`.`course_unit_implementation_id` AND `pui`.deleted_at IS NULL
-              LEFT JOIN `course_implementation`                 AS `pci`  ON `pci`.`id` = `pui`.`course_implementation_id` AND `pci`.deleted_at IS NULL
-
-              LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id` AND `tk`.deleted_at IS NULL
-              LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id` AND `qz`.deleted_at IS NULL
-              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
-
-              LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id` AND `tkc`.deleted_at IS NULL
-              LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
-              LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id AND `dwr`.deleted_at IS NULL
-              WHERE $whereClause AND `a`.deleted_At IS NULL
-            )
-            ORDER BY f.name
+            WHERE f.deleted_at  IS NULL
+            AND   a.deleted_at  IS NULL
+            AND   p.excluded_at IS NULL
+            AND   $whereClause
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute($whereParams);
+        return $this->hydrateForInteractionQuery($statement)->sortByCallback(static function (Model $a, Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
+    }
 
-        // Maintain separate cache so we can preserve query result ordering
-        /** @var Model[] $folderCache - Indexed by folder.id */
-        $folderCache = [];
-        $folders     = $this->createCollection();
 
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+    /**
+     * Hydrates folders with interaction based on a where clause provided
+     *
+     * Hydrated joins:
+     *  * folder code
+     *
+     * @param string $taskClause
+     * @param string $quizClause
+     * @param string $dueWorkResponseClause
+     * @param string $dueWorkFeedbackClause
+     * @param array  $whereParams
+     * @return GenericCollection
+     * @throws Exception
+     */
+    private function findFoldersWithInteractions(
+        $taskClause,
+        $quizClause,
+        $dueWorkResponseClause,
+        $dueWorkFeedbackClause,
+        $whereParams
+    ) {
+        $baseQuery = "
+            SELECT
+                {$this->getColumnString('f')},
+                {$this->getJoinColumnString('codes', 'fc')}
+            FROM {$this->getTable()} f
+            LEFT JOIN {$this->getJoinSql('codes', 'f', 'fc')}
+            INNER JOIN v_assessment_relation var   ON var.folder_id     = f.id
+            INNER JOIN assessment            a     ON var.assessment_id = a.id
+        ";
+        $query = "
+            (
+                $baseQuery
+                INNER JOIN `task`                `tk`  ON `tk`.`assessment_id` = a.id      AND `tk`.deleted_at IS NULL
+                INNER JOIN `task_completion`     `tkc` ON `tkc`.`task_id`      = `tk`.`id` AND `tkc`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $taskClause
+            )
 
-            $folderId = $row["f.{$this->getIdentifierColumn()}"];
+            UNION
 
-            if (!$folderCache[$folderId] instanceof Model) {
-                $folderCache[$folderId] = $this->hydrate($row, 'f');
-                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
-                $folders->add($folderCache[$folderId]);
-            }
+            (
+                $baseQuery
+                INNER JOIN `assess`              `qz`  ON `qz`.`assessment_id` = a.id AND `qz`.deleted_at IS NULL
+                INNER JOIN `assess_attempt`      `qza` ON `qza`.`assess_id`    = `qz`.`assess_id` AND `qza`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $quizClause
+            )
 
-            $folder = $folderCache[$folderId];
+            UNION
 
-            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
-            $codeCollection = $folder->getCodes();
-            $code           = $row['fc.code'];
-            if ($code && !$codeCollection->offsetExists($code)) {
-                /** @var FolderCode\Model $folderCode */
-                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
-                $codeCollection[$code] = $folderCode;
-                $folderCode->setFolder($folder);
-            }
-        }
-        return $folders;
+            (
+                $baseQuery
+                INNER JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+                INNER JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $dueWorkFeedbackClause
+            )
+
+            UNION
+
+            (
+                $baseQuery
+                INNER JOIN `submission_box`      `dw`  ON `dw`.`assessment_id` = a.id
+                INNER JOIN `student_submission`  `dws` ON `dws`.`box_id`    = `dw`.id          AND `dws`.deleted_at IS NULL
+                WHERE f.deleted_at IS NULL
+                AND   a.deleted_at IS NULL
+                AND   $dueWorkResponseClause
+            )
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($whereParams);
+        return $this->hydrateForInteractionQuery($statement)->sortByCallback(static function (Model $a, Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
     }
 
 
@@ -2173,5 +2192,46 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return false;
+    }
+
+
+    /**
+     * Special hydrator for hydrating the queries for retrieving interactions.
+     *
+     * @param PDOStatement      $statement
+     * @return GenericCollection|Model[]
+     * @throws Exception
+     */
+    private function hydrateForInteractionQuery(PDOStatement $statement): GenericCollection
+    {
+        // Maintain separate cache so we can preserve query result ordering
+        /** @var Model[] $folderCache - Indexed by folder.id */
+        $folderCache = [];
+        $folders     = $this->createCollection();
+        $codeMapper  = $this->getJoinMapper('codes');
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            $folderId = $row["f.{$this->getIdentifierColumn()}"];
+
+            if (!$folderCache[$folderId] instanceof Model) {
+                $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
+                $folders[$folderId] = $folderCache[$folderId];
+            }
+
+            $folder = $folderCache[$folderId];
+
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $folder->getCodes();
+            $code           = $row['fc.code'];
+            if ($code && !$codeCollection->offsetExists($code)) {
+                /** @var FolderCode\Model $folderCode */
+                $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
+                $codeCollection[$code] = $folderCode;
+                $folderCode->setFolder($folder);
+            }
+        }
+        return $folders;
     }
 }
