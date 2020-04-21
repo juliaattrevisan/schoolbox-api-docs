@@ -236,8 +236,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             $dayNumber = $period['day'];
 
-            foreach ($classList as $i => $class) {
-                if ($class['period_id'] == $period['id']) {
+            if (isset($classList[$period['id']])) {
+                foreach ($classList[$period['id']] as $class) {
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
@@ -247,7 +247,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         'staffFirstname' => $class['firstname'],
                         'staffSurname'   => $class['lastname'],
                     ];
-                    unset($classList[$i]);
                 }
             }
         }
@@ -265,30 +264,70 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     protected function getClassUsers(string $externalId): array
     {
+
         // Get classes for which this user is involved, or is a teacher.
+
+        /* A left join includes all the classes even if you're not in it
+         * That returns a huge data set
+         *
+         * Therefore surgically extract teachers via teacehr_external_id usage separately
+         * from the regular participants in sis_class_user
+         *
+         * Note that we still need to always join onto user to get the actual class teacher, even if
+         * $externalId isn't that class teacher; otherwise they won't display on the fulltimetable grid
+         */
         $query = '
-            SELECT      c.name,
-                        c.code,
-                        c.description,
-                        cp.period_id,
-                        cp.room,
-                        cp.teacher_external_id,
-                        u.synergy_id,
-                        u.title,
-                        u.firstname,
-                        u.lastname
-            FROM        sis_class c
-            LEFT JOIN   sis_class_user cl ON c.id = cl.class_id
-            LEFT JOIN   sis_class_period cp ON c.id = cp.class_id
-            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            WHERE       cp.teacher_external_id = :userId OR
-                        cl.external_id = :userId2
+            (
+                -- Where externalId is a class teacher
+                SELECT
+                    c.*,
+                    cp.period_id AS periodId,
+                    cp.room,
+                    u.synergy_id,
+                    u.title,
+                    u.firstname,
+                    u.lastname
+                FROM        sis_class c
+                INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
+                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
+            )
+            UNION
+            (
+                -- Regular class involvements
+                SELECT
+                    c.*,
+                    cp.period_id AS periodId,
+                    cp.room,
+                    u.synergy_id,
+                    u.title,
+                    u.firstname,
+                    u.lastname
+                FROM        sis_class c
+                INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
+                INNER JOIN  sis_class_period cp ON cp.class_id = c.id
+                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
+            )
         ';
 
-        return $this->internalDatabase->executeQuery($query, [
+        $statement = $this->internalDatabase->prepareQuery($query);
+        $statement->execute([
             'userId'  => $externalId,
-            'userId2' => $externalId,
-        ])->fetchAll();
+            'userId2' => $externalId
+        ]);
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $index = $row['periodId'];
+
+            if (!isset($stack[$index])) {
+                $stack[$index] = [];
+            }
+
+            $stack[$index][] = $row;
+        }
+
+        return $stack;
     }
 
 
@@ -343,8 +382,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 'class'          => [],
             ];
 
-            foreach ($classList as $i => $class) {
-                if ($class['period_id'] == $period['id']) {
+            if (isset($classList[$period['id']])) {
+                foreach ($classList[$period['id']] as $class) {
                     $periodAdaption['class'][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
@@ -354,8 +393,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                         'staffFirstname' => $class['firstname'],
                         'staffLastname'  => $class['lastname'],
                     ];
-
-                    unset($classList[$i]);
                 }
             }
 
