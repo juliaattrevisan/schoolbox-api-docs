@@ -71,6 +71,8 @@ class Factory extends FolderFilter\Factory
             $folders = $this->getFolderMapper()->createCollection();
         }
 
+        // TODO figure out if these are ever used
+        // If they never are: they and the findFolders methods can be removed
         if ($options->keyExists(Definition::KEY_RESPONSE) && $options[Definition::KEY_RESPONSE]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponsesByStudent($viewee), 'id');
         }
