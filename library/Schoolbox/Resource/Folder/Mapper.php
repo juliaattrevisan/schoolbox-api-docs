@@ -1878,27 +1878,23 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithResponsesByStudent(User $student, Term $term = null)
     {
-        $whereClauses = [
-            "`tkc`.`student_id` = :userId",
-            "`qza`.`user_id` = :userId",
-            '1 = 0',
-            "`dws`.`owner` = :userId",
-        ];
         $whereParams = [
             ':userId' => $student->getId(),
         ];
 
+        $termClause = '';
         if ($term instanceof Term) {
-            foreach ($whereClauses as &$clause) {
-                if (isset($clause)) {
-                    $clause .= $this->buildWherePartForTerm($term);
-                }
-            }
-            unset($clause);
+            $termClause = $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`student_id` = :userId {$termClause}",
+            "`qza`.`user_id` = :userId {$termClause}",
+            "`dws`.`owner` = :userId {$termClause}",
+            '1 = 0',
+            $whereParams
+        );
     }
 
 
@@ -1915,27 +1911,23 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithFeedbackToStudent(User $student, Term $term = null)
     {
-        $whereClauses = [
-            "`tkc`.`student_id` = :userId",
-            "`qza`.`user_id` = :userId",
-            "`dwr`.`owner` = :userId",
-            '1 = 0'
-        ];
         $whereParams = [
             ':userId' => $student->getId(),
         ];
 
+        $termClause = '';
         if ($term instanceof Term) {
-            foreach ($whereClauses as &$clause) {
-                if (isset($clause)) {
-                    $clause .= $this->buildWherePartForTerm($term);
-                }
-            }
-            unset($clause);
+            $termClause = $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`student_id` = :userId {$termClause}",
+            "`qza`.`user_id` = :userId {$termClause}",
+            '1 = 0',
+            "`dwr`.`owner` = :userId {$termClause}",
+            $whereParams
+        );
     }
 
 
@@ -1986,27 +1978,23 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithInteractionsForTeacher(User $teacher, Term $term = null)
     {
-        $whereClauses = [
-            "`tkc`.`marking_user_id` = :userId",
-            "`qza`.`reviewer_id` = :userId",
-            "`dwr`.`marker` = :userId",
-            '1 = 0'
-        ];
         $whereParams = [
             ':userId' => $teacher->getId(),
         ];
 
+        $termClause = '';
         if ($term instanceof Term) {
-            foreach ($whereClauses as &$clause) {
-                if (isset($clause)) {
-                    $clause .= $this->buildWherePartForTerm($term);
-                }
-            }
-            unset($clause);
+            $termClause = $this->buildWherePartForTerm($term);
             $whereParams += $this->buildWhereParamsForTerm($term);
         }
 
-        return $this->findFoldersWithInteractions($whereClauses, $whereParams);
+        return $this->findFoldersWithInteractions(
+            "`tkc`.`marking_user_id` = :userId {$termClause}",
+            "`qza`.`reviewer_id` = :userId {$termClause}",
+            '1 = 0',
+            "`dwr`.`marker` = :userId {$termClause}",
+            $whereParams
+        );
     }
 
 
@@ -2054,14 +2042,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Hydrated joins:
      *  * folder code
      *
-     * @param array $whereClauses
-     * @param array $whereParams
+     * @param string $taskClause
+     * @param string $quizClause
+     * @param string $dueWorkResponseClause
+     * @param string $dueWorkFeedbackClause
+     * @param array  $whereParams
      * @return GenericCollection
-     * @throws DefinitionException
+     * @throws Exception
      */
-    private function findFoldersWithInteractions($whereClauses, $whereParams)
-    {
-        [$taskClause, $quizClause, $dueWorkResponseClause, $dueWorkFeedbackClause] = $whereClauses;
+    private function findFoldersWithInteractions(
+        $taskClause,
+        $quizClause,
+        $dueWorkResponseClause,
+        $dueWorkFeedbackClause,
+        $whereParams
+    ) {
         $baseQuery = "
             SELECT
                 {$this->getColumnString('f')},
@@ -2100,7 +2095,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 INNER JOIN `submission_return`   `dwr` ON `dwr`.`box_id`    = `dw`.id          AND `dwr`.deleted_at IS NULL
                 WHERE f.deleted_at IS NULL
                 AND   a.deleted_at IS NULL
-                AND   $dueWorkResponseClause
+                AND   $dueWorkFeedbackClause
             )
 
             UNION
@@ -2111,7 +2106,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 INNER JOIN `student_submission`  `dws` ON `dws`.`box_id`    = `dw`.id          AND `dws`.deleted_at IS NULL
                 WHERE f.deleted_at IS NULL
                 AND   a.deleted_at IS NULL
-                AND   $dueWorkFeedbackClause
+                AND   $dueWorkResponseClause
             )
         ";
 
