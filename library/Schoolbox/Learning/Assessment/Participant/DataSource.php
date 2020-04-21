@@ -212,7 +212,7 @@ class DataSource
 
         // We do need excluded participants to be present to determine whether to whether to
         // insert students as dynamic participants.
-        $this->loadDynamicPlanParticipants($dynamicPlans);
+        $this->loadDynamicPlanParticipants($dynamicPlans, $user);
 
         // Add Responses
         $this->loadResponses(
@@ -237,22 +237,32 @@ class DataSource
      * to the assessment's folder and do not have an explicit participation record.
      *
      * @param PlanObject[]|GenericCollection $dynamicPlans
+     * @param User|null                      $user If provided, load only this user's participation
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans): void
+    private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans, User $user = null): void
     {
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
             $assessment = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
 
-            // It's acceptable to findAllStudents in a loop for now, because the list is cached
-            foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
-                // Is this user already an explicit participant? (Either an inclusion or exclusion)
-                if ($explicitParticipants->keyExists($user->getId())) {
-                    continue;
+            if ($user instanceof User) {
+                // For efficiency reasons:
+                // bypass findAllStudentsForAssessment and assume that $user is
+                // a participant of this plan
+                if (!$explicitParticipants->keyExists($user->getId())) {
+                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
                 }
-                $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+            } else {
+                // It's acceptable to findAllStudents in a loop for now, because the list is cached
+                foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
+                    // Is this user already an explicit participant? (Either an inclusion or exclusion)
+                    if ($explicitParticipants->keyExists($student->getId())) {
+                        continue;
+                    }
+                    $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan);
+                }
             }
         }
     }
