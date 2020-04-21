@@ -1365,7 +1365,6 @@ $selector-width: 2.25rem;
 // Threaded / Social Stream
 .social-stream,
 .threaded {
-
     .reply,
     .child {
         background-color: $snow;
@@ -1396,7 +1395,8 @@ $selector-width: 2.25rem;
             li:first-child{
                 border-top: 0;
             }
-            li{
+
+            li {
                 border-top: 1px solid $base;
             }
             .card {
@@ -1404,11 +1404,20 @@ $selector-width: 2.25rem;
             }
         }
     }
+
     .reply ~ .reply,
     .child ~ .child {
         border-top: 1px solid $body-bg;
     }
 }
+
+
+.socialstream-preview {
+  background-color: $snow;
+  font-size: $paragraph-font-size;
+  padding: 1rem;
+}
+
 
 // Tables
 .table-actions{
