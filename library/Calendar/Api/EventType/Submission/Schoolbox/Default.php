@@ -82,15 +82,20 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $eventType = 1;
         }
 
-        $assessables = $this->assessmentDataSource->findAllByStudentBetweenDates(
-            $this->getUser(),
-            true,
-            Alaress_Date_Format::newFromTimestamp($startTimestamp),
-            Alaress_Date_Format::newFromTimestamp($endTimestamp)
-        );
-
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessables, $this->getUser(), true);
-
+        // Get a timeline of events
+        // Use the assessment data source to get everything for this user
+        $from = Alaress_Date_Format::newFromTimestamp($startTimestamp);
+        $to   = Alaress_Date_Format::newFromTimestamp($endTimestamp);
+        if ($this->getUser()->getRole()->isStudent()) {
+            $assessables = $this->assessmentDataSource->findAllByStudentBetweenDates(
+                $this->getUser(),
+                true,
+                $from,
+                $to
+            );
+        } else {
+            $assessables = $this->assessmentDataSource->findAllByStaffBetweenDates($this->getUser(), $from, $to);
+        }
 
         foreach ($assessables as $assessment) {
             // Permission check to see the assessment
