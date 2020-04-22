@@ -251,7 +251,14 @@ class CliAssessmentMigrator extends App
                 $implAssessmentId = (int)$implRow['assessment_id'];
 
 
-                $this->getLogger()->info(sprintf('.... Moving impl assessment #%d to new unit impl', $implAssessmentId));
+                $this->getLogger()->info(
+                    sprintf(
+                        '.... Moving impl assessment #%d in class #%d (%s) to new unit impl',
+                        $implAssessmentId,
+                        $implRow['class_folder_id'],
+                        $implRow['class_folder_name']
+                    )
+                );
                 if (!isset($unitImplIds[$courseImplId])) {
                     $unitImplIds[$courseImplId] = $this->createUnitImplementation(
                         $courseImplId,
@@ -370,10 +377,13 @@ class CliAssessmentMigrator extends App
         $this->findImplAssessmentsQuery = $db->prepareQuery("
             SELECT DISTINCT
                 var.assessment_id,
-                var.course_implementation_id
+                var.course_implementation_id,
+                f.id   AS class_folder_id,
+                f.name AS class_folder_name
             FROM v_assessment_relation var
-            INNER JOIN assessment           a   ON var.assessment_id           = a.id
-            INNER JOIN lu_work_type         lwt ON a.work_type_id              = lwt.id
+            INNER JOIN folder                                  f   ON var.folder_id     = f.id
+            INNER JOIN assessment                              a   ON var.assessment_id = a.id
+            INNER JOIN lu_work_type                            lwt ON a.work_type_id    = lwt.id
             INNER JOIN assessment_specification_implementation asi ON var.assessment_id = asi.implementation_assessment_id
             WHERE asi.specification_assessment_id = :specAssessmentId
             AND   var.course_specification_id     IS NULL
