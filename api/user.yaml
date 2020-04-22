@@ -121,6 +121,14 @@ components:
   schemas:
     externalId:
       type: string
+      description: |
+        This user's ID in the school's School Information System (SIS).
+
+        This value is used to query the SIS for data that is stored in the SIS,
+        in particular:
+        * relationships with other users
+        * class enrolments
+        * timetabled classes
 
     user:
       title: User
@@ -137,16 +145,16 @@ components:
           type: string
         lastName:
           type: string
-        parents:
-          type: array
-          items:
-            $ref: '#/components/schemas/userProfile'
-          nullable: true
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/userProfile'
-          nullable: true
+#        parents:
+#          type: array
+#          items:
+#            $ref: '#/components/schemas/userProfile'
+#          nullable: true
+#        children:
+#          type: array
+#          items:
+#            $ref: '#/components/schemas/userProfile'
+#          nullable: true
         _links:
           type: object
           properties:
