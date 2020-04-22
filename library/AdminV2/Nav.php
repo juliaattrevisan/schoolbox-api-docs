@@ -46,7 +46,7 @@ class AdminV2_Nav
             'messages'                 => ['name' => 'Notifications',               'visible' => true],
             'lists'                    => ['name' => 'Lists',                       'visible' => true],
             'lti'                      => ['name' => 'LTI Providers',               'visible' => true],
-            'usage'                    => ['name' => 'Usage',                       'visible' => true],
+            'usage/all'                => ['name' => 'Usage',                       'visible' => true],
             'engagement'               => ['name' => 'Engagement',                  'visible' => true],
             'ups'                      => ['name' => 'User Provisioning System',    'visible' => true],
             'shaps/provisioning'       => ['name' => 'Schoolbox Help Provisioning', 'visible' => true],
