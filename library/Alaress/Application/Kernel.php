@@ -1358,30 +1358,8 @@ abstract class Kernel
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
                 /** @var \Schoolbox\Instance $sb */
-                $sb = $di->get('instance');
-                \Sentry\init([
-                    'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
-                    'environment' => $sb->getType(),
-                ]);
-                \Sentry\configureScope(static function (\Sentry\State\Scope $scope) use ($sb): void {
-                    // fall back to site_location if site_school_code not set
-                    $scope->setTags([
-                        'php_version'      => PHP_VERSION,
-                        'site_version'     => $sb->getVersion(),
-                        'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
-                    ]);
-                });
-                $sentryClient = \Sentry\SentrySdk::getCurrentHub();
-
-                // The equivalent of the old client's install method
-                $errorListener = new \Sentry\Integration\ErrorListenerIntegration();
-                $errorListener->setupOnce();
-
-                $exceptionListener = new \Sentry\Integration\ExceptionListenerIntegration();
-                $exceptionListener->setupOnce();
-
-                $fatalErrorListener = new \Sentry\Integration\FatalErrorListenerIntegration();
-                $fatalErrorListener->setupOnce();
+                $sb           = $di->get('instance');
+                $sentryClient = (new \Alaress\Sentry\Factory())->build($sb, $sentryToken, $sentryProject);
             } catch (Di\Exception\ServiceNotFound $e) {
                 // do nothing; sentry is not installed
             }
