@@ -8,8 +8,6 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
-use Schoolbox\Mapper\Exception as MapperException;
-
 class Mapper extends \Schoolbox\Mapper
 {
 
@@ -53,7 +51,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateSlug']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeSlug']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSlug']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'updateSlug']);
     }
 
 
