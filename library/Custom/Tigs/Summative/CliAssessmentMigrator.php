@@ -218,11 +218,19 @@ class CliAssessmentMigrator extends App
         $unitImplIds = [];
         foreach ($this->findSpecAssessmentsQuery->fetchAll() as $specRow) {
             $courseSpecId     = (int)$specRow['course_specification_id'];
-            $courseFolderId   = (int)$specRow['folder_id'];
+            $courseFolderId   = (int)$specRow['course_folder_id'];
             $specAssessmentId = (int)$specRow['assessment_id'];
 
 
-            $this->getLogger()->info(sprintf('Moving spec assessment #%d to new unit spec', $specAssessmentId));
+            $this->getLogger()->info(
+                sprintf(
+                    'Moving spec assessment #%d (%s/%s/%s) to new unit spec',
+                    $specAssessmentId,
+                    $specRow['course_name'],
+                    $specRow['unit_name'],
+                    $specRow['assessment_name']
+                )
+            );
             if (!isset($unitSpecIds[$courseSpecId])) {
                 $unitSpecIds[$courseSpecId] = $this->createUnitSpecification(
                     $courseSpecId,
@@ -283,18 +291,22 @@ class CliAssessmentMigrator extends App
             SELECT DISTINCT
                 var.assessment_id,
                 var.course_specification_id,
-                cs.folder_id
+                cf.name      AS course_name,
+                cuf.name     AS unit_name,
+                a.title      AS assessment_name,
+                cs.folder_id AS course_folder_id
             FROM v_assessment_relation var
             INNER JOIN course_specification      cs  ON var.course_specification_id      = cs.id
+            INNER JOIN folder                    cf  ON cs.folder_id                     = cf.id
             INNER JOIN course_unit_specification cus ON var.course_unit_specification_id = cus.id
-            INNER JOIN folder                    f   ON cus.folder_id                    = f.id
+            INNER JOIN folder                    cuf ON cus.folder_id                    = cuf.id
             INNER JOIN assessment                a   ON var.assessment_id                = a.id
             INNER JOIN lu_work_type              lwt ON a.work_type_id                   = lwt.id
             WHERE lwt.id IN {$placeholders}
             AND   var.course_specification_id  IS NOT NULL
             AND   var.course_implementation_id IS NULL
             AND   var.project_assessment_id    IS NULL
-            AND   f.name                       != :unitName
+            AND   cuf.name                     != :unitName
         ");
 
         $this->findCourseBuilderConfigQuery = $db->prepareQuery("
