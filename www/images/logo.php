@@ -75,7 +75,7 @@ try {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 
-        if ($config->get('otfs_logo_s3_presigned_urls_enabled')) {
+        if ($config->get('otfs_image_s3_presigned_urls_enabled')) {
             $preSignedUrlService = new PreSignedUrlService($config);
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
