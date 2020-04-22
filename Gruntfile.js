@@ -19,7 +19,6 @@ var jsSrc = {
 
         // jQuery Validation
         'www/javascript/components/jquery-validation/dist/jquery.validate.js',
-        'www/javascript/shared/jquery.validate.extensions.js',
         'www/javascript/jquery.alaressValidate.js',
 
         // jQuery UI
