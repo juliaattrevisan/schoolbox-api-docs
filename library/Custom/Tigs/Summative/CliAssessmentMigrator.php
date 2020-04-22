@@ -224,11 +224,13 @@ class CliAssessmentMigrator extends App
 
             $this->getLogger()->info(
                 sprintf(
-                    'Moving spec assessment #%d (%s/%s/%s) to new unit spec',
+                    'Moving course #%d / unit #%d / spec assessment #%d (%s/%s/%s)',
+                    $courseSpecId,
+                    $specRow['course_unit_specification_id'],
                     $specAssessmentId,
+                    $specRow['assessment_name'],
                     $specRow['course_name'],
-                    $specRow['unit_name'],
-                    $specRow['assessment_name']
+                    $specRow['unit_name']
                 )
             );
             if (!isset($unitSpecIds[$courseSpecId])) {
@@ -291,6 +293,7 @@ class CliAssessmentMigrator extends App
             SELECT DISTINCT
                 var.assessment_id,
                 var.course_specification_id,
+                var.course_unit_specification_id,
                 cf.name      AS course_name,
                 cuf.name     AS unit_name,
                 a.title      AS assessment_name,
