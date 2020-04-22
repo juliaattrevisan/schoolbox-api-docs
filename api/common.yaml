@@ -39,6 +39,7 @@ components:
       type: integer
       format: int32
       minimum: 1
+      required: true
 
     cursor:
       title: Cursor
