@@ -10,6 +10,8 @@ namespace Schoolbox;
 
 class Instance
 {
+    public const APPLICATION_NAME = 'schoolbox';
+
     /**
      * @var string
      */

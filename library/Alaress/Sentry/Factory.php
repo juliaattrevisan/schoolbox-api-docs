@@ -22,17 +22,22 @@ class Factory
      * Also installs the error, exception and fatal error handler integrations.
      *
      * @param Instance $instance
+     * @param string   $applicationName
      * @param string   $sentryToken
      * @param string   $sentryProject
      * @return Sentry\State\HubInterface|null
      */
-    public function build(Instance $instance, string $sentryToken, string $sentryProject): ?Sentry\State\HubInterface
-    {
+    public function build(
+        Instance $instance,
+        string $applicationName,
+        string $sentryToken,
+        string $sentryProject
+    ): ?Sentry\State\HubInterface {
         if ($sentryToken !== '' && $sentryProject !== '') {
             Sentry\init([
                 'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
                 'environment' => $instance->getType(),
-                'release'     => 'schoolbox@' . $instance->getVersion(),
+                'release'     => $applicationName . '@' . $instance->getVersion(),
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set

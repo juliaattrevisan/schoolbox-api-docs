@@ -215,9 +215,14 @@ class Kernel extends WebKernelAbstract
         $sentryClient  = null;
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
-                /** @var \Schoolbox\Instance $sb */
+                /** @var Instance $sb */
                 $sb           = $di->get('instance');
-                $sentryClient = (new \Alaress\Sentry\Factory())->build($sb, $sentryToken, $sentryProject);
+                $sentryClient = (new \Alaress\Sentry\Factory())->build(
+                    $sb,
+                    Instance::APPLICATION_NAME,
+                    $sentryToken,
+                    $sentryProject
+                );
             } catch (Di\Exception\ServiceNotFound $e) {
                 // do nothing; sentry is not installed
             }
