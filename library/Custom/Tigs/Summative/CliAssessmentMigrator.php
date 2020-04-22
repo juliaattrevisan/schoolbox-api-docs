@@ -228,9 +228,9 @@ class CliAssessmentMigrator extends App
                     $courseSpecId,
                     $specRow['course_unit_specification_id'],
                     $specAssessmentId,
-                    $specRow['assessment_name'],
                     $specRow['course_name'],
-                    $specRow['unit_name']
+                    $specRow['unit_name'],
+                    $specRow['assessment_name']
                 )
             );
             if (!isset($unitSpecIds[$courseSpecId])) {
