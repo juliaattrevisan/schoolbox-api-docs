@@ -1,7 +1,7 @@
 (function() {
 
     /**
-     /* Every sortable is connected to every other sortable
+     * Every sortable is connected to every other sortable
      * This enables you to drag:
      *     within a sortable;
      *     between division and team sortables;
