@@ -118,14 +118,14 @@ do
     fi;
 done
 
-start=`grep -n "$firstUpdate" $versionlist | cut -d':' -f1`;
+start=`grep -n "^${firstUpdate}$" $versionlist | cut -d':' -f1`;
 if [ -z $start ];
 then
     echo "Error: SQL version not supported for update, no changes made";
     exit;
 fi
 
-end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
+end=`grep -n "^${newver}$" $versionlist | cut -d':' -f1`;
 if [ -z $end ];
 then
     echo "Error: SQL version greater than update, no changes made";
