@@ -230,6 +230,16 @@ class Kernel extends WebKernelAbstract
                     ]);
                 });
                 $sentryClient = \Sentry\SentrySdk::getCurrentHub();
+
+                // The equivalent of the old client's install method
+                $errorListener = new \Sentry\Integration\ErrorListenerIntegration();
+                $errorListener->setupOnce();
+
+                $exceptionListener = new \Sentry\Integration\ExceptionListenerIntegration();
+                $exceptionListener->setupOnce();
+
+                $fatalErrorListener = new \Sentry\Integration\FatalErrorListenerIntegration();
+                $fatalErrorListener->setupOnce();
             } catch (Di\Exception\ServiceNotFound $e) {
                 // do nothing; sentry is not installed
             }
