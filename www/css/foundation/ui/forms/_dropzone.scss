@@ -17,6 +17,13 @@ $attachzone-error-color: $alert-color;
 $attachzone-overlay-duration: 800ms;
 $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
+// Center the icon in Mr Matt's Modal file uploader
+#filesystem-upload {
+  .dz-image {
+    text-align: center;
+  }
+}
+
 .dragging {
     .dropzone.overlay {
         opacity: 1;
