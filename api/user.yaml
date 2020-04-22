@@ -173,71 +173,7 @@ components:
         metadata:
           $ref: 'common.yaml#/components/schemas/listMetadata'
 
-    userProfile:
-      title: User Profile
-      description: Common fields for user profiles
-      type: object
-      allOf:
-        - type: object
-          properties:
-            id:
-              $ref: 'common.yaml#/components/schemas/id'
-            externalId:
-              $ref: '#/components/schemas/externalId'
-        - oneOf:
-          - $ref: '#/components/schemas/userProfileGuardian'
-          - $ref: '#/components/schemas/userProfileStaff'
-          - $ref: '#/components/schemas/userProfileStudent'
-          discriminator:
-            propertyName: type
-            mapping:
-              guardian: '#/components/schemas/userProfileGuardian'
-              staff:    '#/components/schemas/userProfileStaff'
-              student:  '#/components/schemas/userProfileStudent'
-
-    userProfileStaff:
-      title: User Profile Staff fields
-      description: Fields for user profiles (staff only)
-      type: object
-      properties:
-        category:
-          type: string
-        positionDescription:
-          type: string
-        department:
-          type: string
-        extension:
-          type: string
-        room:
-          type: string
-
-    userProfileStudent:
-      title: User Profile Student fields
-      description: Fields for user profiles (students only)
-      type: object
-      properties:
-        dateOfBirth:
-          $ref: 'common.yaml#/components/schemas/dateTime'
-        medicalAlert:
-          type: string
-        specialNeeds:
-          type: string
-        internationalBaccalaureate:
-          type: boolean
-        englishSecondLanguage:
-          type: boolean
-
-    userProfileGuardian:
-      title: User Profile Guardian fields
-      description: Fields for user profiles (guardians only)
-      type: object
-      properties:
-        phoneMobile:
-          type: string
-        phoneHome:
-          type: string
-        phoneWork:
-          type: string
+    # TODO create schemas for SIS user profiles
 
   securitySchemes:
     bearerAuth:
