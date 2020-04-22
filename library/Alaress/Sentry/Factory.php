@@ -42,17 +42,25 @@ class Factory
                 ]);
             });
 
+            $hub = Sentry\SentrySdk::getCurrentHub();
+
             // The equivalent of the old Raven_ErrorHandler's register methods
-            $errorListener = new Sentry\Integration\ErrorListenerIntegration();
-            $errorListener->setupOnce();
+            $errorListener = $hub->getIntegration(Sentry\Integration\ErrorListenerIntegration::class);
+            if ($errorListener) {
+                $errorListener->setupOnce();
+            }
 
-            $exceptionListener = new Sentry\Integration\ExceptionListenerIntegration();
-            $exceptionListener->setupOnce();
+            $exceptionListener = $hub->getIntegration(Sentry\Integration\ExceptionListenerIntegration::class);
+            if ($exceptionListener) {
+                $exceptionListener->setupOnce();
+            }
 
-            $fatalErrorListener = new Sentry\Integration\FatalErrorListenerIntegration();
-            $fatalErrorListener->setupOnce();
+            $fatalErrorListener = $hub->getIntegration(Sentry\Integration\FatalErrorListenerIntegration::class);
+            if ($fatalErrorListener) {
+                $fatalErrorListener->setupOnce();
+            }
 
-            return Sentry\SentrySdk::getCurrentHub();
+            return $hub;
         }
         return null;
     }
