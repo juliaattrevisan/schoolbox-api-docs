@@ -117,10 +117,11 @@ class Sync extends BaseSync implements ISync
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentJoin}
                 INNER JOIN family f
-                    ON f.entity_code = p.par_code AND f.entity_gender = '{$gender[$i]}'
+                    ON f.entity_code = p.par_code
+                    AND f.entity_gender = '{$gender[$i]}'
+                    AND (f.entity_type = 'P' OR f.entity_type = 'E')
                 INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
-                    AND pd.added_flg = 'U'
                     AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$placeHolders[$i]}
                 AND   p.f_name IS NOT NULL
