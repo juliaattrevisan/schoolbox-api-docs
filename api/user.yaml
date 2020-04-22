@@ -137,14 +137,147 @@ components:
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
+
         externalId:
           $ref: '#/components/schemas/externalId'
+
+        username:
+          type: string
+          description: |
+            The user's username. This will be used as the user's identification
+            when they attempt to log into the Schoolbox instance.
+
+        role:
+          $ref: '#/components/schemas/role'
+
+        superuser:
+          type: boolean
+          description: |
+            Does this user have superuser permissions over the Schoolbox
+            instance?
+          default: false
+
+        enabled:
+          type: boolean
+          description: Is this user able to log in to the Schoolbox instance?
+          default: true
+
+        campus:
+          type: array
+          items:
+            $ref: '#/components/schemas/campus'
+
         title:
           type: string
+          description: The user's title (Mr., Ms., etc.).
+
         firstName:
           type: string
+          description: |
+            The user's first name.
+
+            Schoolbox doesn't distinguish between a person's actual first name
+            and any other names, and in any case is not the definitive source of
+            naming information; therefore in practice this will usually be the
+            user's given name.
+
         lastName:
           type: string
+          description: The user's surname.
+
+        email:
+          type: string
+          format: email
+          readOnly: true
+          description: |
+            The user's email address for receiving communication from this
+            Schoolbox instance, or its users.
+
+            This may be derived from the user's username and the instance's
+            hostname (see isEmailDerived); if not, it may be set via the
+            altEmail field.
+
+        isEmailDerived:
+          type: boolean
+          description: |
+            Is this user's email address derived directly from their username
+            and the host name of the Schoolbox instance?
+
+        altEmail:
+          type: string
+          format: email
+          nullable: true
+          description: |
+            The user's email address, if it is not derived from their username
+            and hostname.
+
+        positionTitle:
+          type: string
+          description: |
+            The user's job or position title within the school which owns the
+            Schoolbox instance.
+          nullable: true
+
+        yearLevel:
+          type: string
+          description: |
+            The user's year level. May be provided as a number, or as a textual
+            description of their year level.
+
+        schoolHouse:
+          $ref: '#/components/schemas/schoolHouse'
+
+        isBoarder:
+          type: boolean
+          description: Is this user a boarder?
+
+        residentialHouse:
+          $ref: '#/components/schemas/residentialHouse'
+
+        flags:
+          type: object
+          description: |
+            A set of flags which control the behavior of a user's Schoolbox
+            session.
+          properties:
+            showWebmailTab:
+              type: boolean
+              description: Does the Webmail tab display for this user?
+            showContacts:
+              type: boolean
+              description: Does this user's contacts get shown to other users?
+            enableTimetable:
+              type: boolean
+              description: Does this user get to see their timetabled classes?
+            showSideNav:
+              type: boolean
+              description: Does the side navigation show for this user?
+            showNotificationsPanel:
+              type: boolean
+              description: Does the notifications panel show for this user?
+            showGradeGraph:
+              type: boolean
+              description: Does the grade graph show for this user?
+            enableEportfolio:
+              type: boolean
+              description: Is this user able to create ePortfolio content?
+            useInternalMail:
+              type: boolean
+              description: |
+                Does this user use Schoolbox's internal mail system to send
+                email?
+
+                If false, they use webmail instead.
+            calendarView:
+              type: string
+              description: Which calendar view will the user default to?
+              enum:
+                - month
+                - agendaWeek
+                - agendaDay
+                - list
+
+
 #        parents:
 #          type: array
 #          items:
@@ -155,6 +288,11 @@ components:
 #          items:
 #            $ref: '#/components/schemas/userProfile'
 #          nullable: true
+#        linkedUsers:
+#          type: array
+#          items:
+#            $ref: '#/components/schemas/user'
+
         _links:
           type: object
           properties:
@@ -182,6 +320,102 @@ components:
           $ref: 'common.yaml#/components/schemas/listMetadata'
 
     # TODO create schemas for SIS user profiles
+
+    schoolHouse:
+      title: School House
+      description: |
+        A school house which a student may belong to.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the school house.
+
+    residentialHouse:
+      title: Residential House
+      description: |
+        A residential house at which a student may board.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the residential house.
+
+    role:
+      title: Role
+      description: |
+        A type of user account at the school. Roles are generally used to group
+        users by the type of position that they have at the school.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the role.
+          required: true
+        type:
+          type: string
+          description: |
+            The type of this role. Different role types have different levels of
+            access to different parts of Schoolbox.
+          enum:
+            - staff
+            - student
+            - parent
+            - guest
+          required: true
+      example:
+        - id:   3
+          name: Parents
+          type: parent
+        - id:   4
+          name: Senior Students
+          type: student
+        - id:   5
+          name: Teaching Staff
+          type: staff
+        - id:   6
+          name: Non-teaching Staff
+          type: staff
+        - id:   7
+          name: Alumni
+          type: student
+        - id:   8
+          name: Guests
+          type: guest
+
+    campus:
+      title: Campus
+      description: |
+        A sub-division within the school.
+
+        All users within the school belong to one or more campuses:
+        * a teacher may have classes across multiple campuses
+        * a student will generally only attend one campus
+        * a parent may have children who belong to different campuses
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the campus.
+          required: true
+        code:
+          type: string
+          description: |
+            The identifying code for the campus in the school's SIS.
+          required: true
+        days:
+          type: integer
+          minimum: 5
+          maximum: 10
+          description: The number of days in a cycle for this campus' timetable.
 
   securitySchemes:
     bearerAuth:
