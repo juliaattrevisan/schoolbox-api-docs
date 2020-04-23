@@ -2912,10 +2912,10 @@ abstract class Mapper implements IMapper, Serializable
                     // Does this have an ID? Update, otherwise insert
                     if ($this->getModelProperty($model, $id_property)) {
                         $result         = $updateStatement->execute($this->dehydrate($model));
-                        $pdoMethods[$i] = self::METHOD_CREATE;
+                        $pdoMethods[$i] = self::METHOD_UPDATE;
                     } else {
                         $result         = $insertStatement->execute($this->dehydrate($model));
-                        $pdoMethods[$i] = self::METHOD_UPDATE;
+                        $pdoMethods[$i] = self::METHOD_CREATE;
                     }
                 } else {
                     $result = $replaceStatement->execute($this->dehydrate($model));
