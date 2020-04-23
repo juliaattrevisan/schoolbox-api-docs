@@ -2881,7 +2881,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (isset($id_column)) {
             $insertStatement = $this->database->prepare($insertQuery);
-            $updateStatement = $this->database->prepare($updateQuery);
+            $updateStatement = $this->database->prepare("{$updateQuery} WHERE `{$tbl}`.`{$id_column}` = :{$id_column}");
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
             $collectionIds = array_filter(
