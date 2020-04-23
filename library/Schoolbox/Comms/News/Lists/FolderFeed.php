@@ -35,17 +35,19 @@ class FolderFeed
      *
      * Optionally filters by topic and state
      *
-     * @param int         $folderId
+     * @param int  $folderId
+     * @param bool $publishedOnly
      * @return array
      * @throws InvalidColumnException
      * @throws InvalidArgumentException
      */
-    public function find(int $folderId): array
+    public function find(int $folderId, $publishedOnly = true): array
     {
         return $this->articleResolver->findArticlesForAudience(
             Strategy\Folder::getEntityType(),
             (string)$folderId,
-            News\Audience\Model::RELATIONSHIP_SELF
+            News\Audience\Model::RELATIONSHIP_SELF,
+            $publishedOnly
         );
     }
 }
