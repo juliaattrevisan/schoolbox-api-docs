@@ -2873,7 +2873,8 @@ abstract class Mapper implements IMapper, Serializable
         // Is this an INSERT or UPDATE,
         // or can we not tell because there's no identifier column?
         $insertQuery      = "INSERT INTO `{$tbl}` ({$colString}) VALUES ({$plcString})";
-        $updateQuery      = "UPDATE {$updString}";
+        $updateQuery      = "UPDATE `{$tbl}` SET {$updString} WHERE `{$tbl}`.`{$id_column}` = :{$id_column}";
+        $replaceQuery     = "{$insertQuery} ON DUPLICATE KEY UPDATE {$updString}";
         $insertStatement  = null;
         $updateStatement  = null;
         $replaceStatement = null;
@@ -2881,7 +2882,7 @@ abstract class Mapper implements IMapper, Serializable
 
         if (isset($id_column)) {
             $insertStatement = $this->database->prepare($insertQuery);
-            $updateStatement = $this->database->prepare("{$updateQuery} WHERE `{$tbl}`.`{$id_column}` = :{$id_column}");
+            $updateStatement = $this->database->prepare($updateQuery);
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
             $collectionIds = array_filter(
@@ -2899,7 +2900,7 @@ abstract class Mapper implements IMapper, Serializable
                 }
             }
         } else {
-            $replaceStatement = $this->database->prepare("{$insertQuery} ON DUPLICATE KEY {$updateQuery}");
+            $replaceStatement = $this->database->prepare($replaceQuery);
         }
 
         $this->database->beginTransaction();
