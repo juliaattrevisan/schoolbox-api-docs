@@ -62,19 +62,19 @@ $f-dropdown-icon-align: 0.25rem;
     @media #{$small-only} {
         width: 99% !important;
     }
-    @media screen and (min-width: 770px) {
-        max-width: rem-calc(700);
+    @media screen and (min-width: 767px) {
+        max-width: rem-calc(688);
     }
     .container {
         display: flex;
-        @media screen and (max-width: 769px) {
+        @media screen and (max-width: 766px) {
             flex-wrap: wrap;
         }
     }
     .category {
         flex: 1 auto;
 
-        @media screen and (max-width: 774px) {
+        @media screen and (max-width: 766px) {
             flex: 1 100%;
         }
         &:last-child ul {
