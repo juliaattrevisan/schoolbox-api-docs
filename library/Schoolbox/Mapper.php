@@ -2851,13 +2851,6 @@ abstract class Mapper implements IMapper, Serializable
         $collection  = $this->populateUuids($this->populateSaveTimestamps($collection));
         $plcString   = $this->getPlaceholderString();
         $updString   = $this->getUpdateString();
-        $statement   = $this->database->prepare(
-            "
-			INSERT INTO `$tbl` ($colString)
-			VALUES ($plcString)
-			ON DUPLICATE KEY UPDATE $updString;
-		"
-        );
         $affectedIDs = array();
         $pdoMethods  = array();
         //
@@ -2874,12 +2867,21 @@ abstract class Mapper implements IMapper, Serializable
         }
 
 
-        $id_property     = $this->getIdentifierProperty();
-        $id_column       = $this->getIdentifierColumn();
+        $id_property      = $this->getIdentifierProperty();
+        $id_column        = $this->getIdentifierColumn();
 
-        $existingObjects = array();
+        // Is this an INSERT or UPDATE,
+        // or can we not tell because there's no identifier column?
+        $insertQuery      = "INSERT INTO `{$tbl}` ({$colString}) VALUES ({$plcString})";
+        $updateQuery      = "UPDATE {$updString}";
+        $insertStatement  = null;
+        $updateStatement  = null;
+        $replaceStatement = null;
+        $existingObjects  = [];
 
         if (isset($id_column)) {
+            $insertStatement = $this->database->prepare($insertQuery);
+            $updateStatement = $this->database->prepare($updateQuery);
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
             $collectionIds = array_filter(
@@ -2896,16 +2898,29 @@ abstract class Mapper implements IMapper, Serializable
                     $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
                 }
             }
+        } else {
+            $replaceStatement = $this->database->prepare("{$insertQuery} ON DUPLICATE KEY {$updateQuery}");
         }
 
         $this->database->beginTransaction();
 
         try {
             foreach ($collection as $i => $model) {
-                if ($statement->execute($this->dehydrate($model))) {
+
+                // Use the insert/update if they exist: otherwise the replace
+                if (isset($insertStatement, $updateStatement)) {
+                    // Does this have an ID? Update, otherwise insert
+                    if ($this->getModelProperty($model, $id_property)) {
+                        $result         = $updateStatement->execute($this->dehydrate($model));
+                        $pdoMethods[$i] = self::METHOD_CREATE;
+                    } else {
+                        $result         = $insertStatement->execute($this->dehydrate($model));
+                        $pdoMethods[$i] = self::METHOD_UPDATE;
+                    }
+                } else {
+                    $result = $replaceStatement->execute($this->dehydrate($model));
                     // take note of whether this was an insert or update
-                    $m = $statement->rowCount();
-                    switch ($m) {
+                    switch ($replaceStatement->rowCount()) {
                         case self::PDO_RESULT_INSERT:
                             $pdoMethods[$i] = self::METHOD_CREATE;
                             break;
@@ -2917,6 +2932,9 @@ abstract class Mapper implements IMapper, Serializable
                             $pdoMethods[$i] = null;
                             break;
                     }
+                }
+
+                if ($result) {
                     if ($id_property) {
                         if (!$this->getModelProperty($model, $id_property)) {
                             $new_id = $this->database->lastInsertId();
