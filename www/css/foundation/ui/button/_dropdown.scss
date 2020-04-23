@@ -59,13 +59,15 @@ $f-dropdown-icon-align: 0.25rem;
 }
 
 #tab-control {
-    @media screen and (min-width: 775px) {
+    @media #{$small-only} {
+        width: 99% !important;
+    }
+    @media screen and (min-width: 770px) {
         max-width: rem-calc(700);
     }
-
     .container {
         display: flex;
-        @media screen and (max-width: 774px) {
+        @media screen and (max-width: 769px) {
             flex-wrap: wrap;
         }
     }
