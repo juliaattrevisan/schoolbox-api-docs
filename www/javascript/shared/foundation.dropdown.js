@@ -276,7 +276,8 @@
         //get the actual width of the page and store it
         var actualBodyWidth;
         var windowWidth = window.innerWidth;
-        
+
+        // This to prevent core foundation js finding the first row in the dom and grabbing the width of that element and calculating numbers.
         if (document.getElementsByClassName('inner-wrap')[0]) {
           actualBodyWidth = document.getElementsByClassName('inner-wrap')[0].clientWidth;
         } else {
@@ -289,7 +290,7 @@
         if (!this.hasClass('mega') && !s.ignore_repositioning) {
           var outerWidth = this.outerWidth();
           var o_left = t.offset().left;
-		  
+
           //miss top
           if (t.offset().top <= this.outerHeight()) {
             p.missTop = true;
