@@ -59,20 +59,20 @@ $f-dropdown-icon-align: 0.25rem;
 }
 
 #tab-control {
-    @media #{$large-up} {
+    @media screen and (min-width: 775px) {
         max-width: rem-calc(700);
     }
 
     .container {
         display: flex;
-        @media #{$medium-down} {
+        @media screen and (max-width: 774px) {
             flex-wrap: wrap;
         }
     }
     .category {
         flex: 1 auto;
 
-        @media #{$medium-down} {
+        @media screen and (max-width: 774px) {
             flex: 1 100%;
         }
         &:last-child ul {
