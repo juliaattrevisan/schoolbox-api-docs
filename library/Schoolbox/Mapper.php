@@ -2911,7 +2911,11 @@ abstract class Mapper implements IMapper, Serializable
                 if (isset($insertStatement, $updateStatement)) {
                     // Does this have an ID? Update, otherwise insert
                     if ($this->getModelProperty($model, $id_property)) {
-                        $result         = $updateStatement->execute($this->dehydrate($model));
+                        $params = $this->dehydrate($model);
+                        if (isset($this->createdMap['column'])) {
+                            unset($params[$this->createdMap['column']]);
+                        }
+                        $result         = $updateStatement->execute($params);
                         $pdoMethods[$i] = self::METHOD_UPDATE;
                     } else {
                         $result         = $insertStatement->execute($this->dehydrate($model));
