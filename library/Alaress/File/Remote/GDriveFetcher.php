@@ -48,22 +48,22 @@ class GDriveFetcher implements FetcherInterface
          */
         'application/vnd.google-apps.presentation' => [
             self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            self::CONTEXT_EXTENSION => 'pptx',
+            self::CONTEXT_EXTENSION   => 'pptx',
         ],
 
         /* Word doc
          */
-        'application/vnd.google-apps.document' => [
+        'application/vnd.google-apps.document'     => [
             self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            self::CONTEXT_EXTENSION => 'docx',
+            self::CONTEXT_EXTENSION   => 'docx',
         ],
 
         /* Spreadsheets
          */
-        'application/vnd.google-apps.spreadsheet' => [
+        'application/vnd.google-apps.spreadsheet'  => [
             self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            self::CONTEXT_EXTENSION => 'xlsx'
-        ]
+            self::CONTEXT_EXTENSION   => 'xlsx',
+        ],
     ];
 
     /**
@@ -110,13 +110,13 @@ class GDriveFetcher implements FetcherInterface
         bool $allowPdfExport = true
     ) {
         $this->extensionMapper = $extensionMapper;
-        $this->dir = $storageDir;
-        $this->ch  = $curl ?: curl_init();
+        $this->dir             = $storageDir;
+        $this->ch              = $curl ?: curl_init();
 
         if ($httpAuth) {
-            curl_setopt($this->ch, CURLOPT_HTTPHEADER, array(
-                'Authorization: ' . $httpAuth
-            ));
+            curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
+                'Authorization: ' . $httpAuth,
+            ]);
         }
 
         $this->allowPdfExport = $allowPdfExport;
@@ -152,10 +152,10 @@ class GDriveFetcher implements FetcherInterface
     public function fetchMetaData($fileId, $refresh = false): array
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
-            $ch = $this->curlPrepare(array(
+            $ch = $this->curlPrepare([
                 CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
                 CURLOPT_RETURNTRANSFER => 1,
-            ));
+            ]);
 
             $this->metaCache[$fileId] = json_decode(curl_exec($ch), true);
             curl_close($ch);
@@ -248,10 +248,11 @@ class GDriveFetcher implements FetcherInterface
             throw new OutOfBoundsException('Could not open target');
         }
 
-        $ch = $this->curlPrepare(array(
-            CURLOPT_URL  => $url,
-            CURLOPT_FILE => $fp,
-        ));
+        $ch = $this->curlPrepare([
+            CURLOPT_URL            => $url,
+            CURLOPT_FILE           => $fp,
+            CURLOPT_FOLLOWLOCATION => true,
+        ]);
 
         curl_exec($ch);
         curl_close($ch);
