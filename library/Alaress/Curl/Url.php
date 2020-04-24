@@ -26,19 +26,20 @@ class Alaress_Curl_Url {
 	/**
 	 * Constructor
 	 *
-	 * @param $url
+	 * @param string $url
 	 */
-	public function __construct($url) {
-		$this->setUrl($url);
+	public function __construct(string $url) {
+	    $this->url = $url;
 	}
 
 	/**
 	 * Add implementation-specific options
 	 *
-	 * @param $newOptions
-	 * @return \Alaress_Curl_Url
+	 * @param array $newOptions
+     *
+	 * @return $this
 	 */
-	public function addOptions($newOptions) {
+	public function addOptions(array $newOptions) {
 
 		/* Use array union operator to glue these two arrays together
 		 * and preserve indexes. array_merge() loses numerical indexes
@@ -53,7 +54,7 @@ class Alaress_Curl_Url {
 	/**
 	 * Execute curl request and store result
 	 *
-	 * @return \Alaress_Curl_Url
+	 * @return $this
 	 */
 	public function exec() {
 
@@ -73,10 +74,10 @@ class Alaress_Curl_Url {
 	/**
 	 * Add errors
 	 *
-	 * @param $error
+	 * @param string $error
 	 */
-	private function addErrors($error) {
-		if (strlen($error)) {
+	private function addErrors(string $error) {
+		if ($error !== '') {
 			$this->errors[] = $error;
 		}
 	}
