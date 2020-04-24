@@ -20,7 +20,7 @@ class Create extends Payload\Request
         $this->setAllowedRole('1', true);
         $this->setAllowedRole('2', true);
         $this->setResourceCat('1');
-        $moderationType=\Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_OPEN;
+        $moderationType=\Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_MODERATED;
         $this->setModerationTypeId($moderationType);
     }
     
