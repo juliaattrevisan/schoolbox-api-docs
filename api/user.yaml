@@ -36,7 +36,7 @@ paths:
 
   /user:
     get:
-      operationId: searchUser
+      operationId: userSearch
       summary: Returns users which match a search term and set of filters.
       responses:
         '200':
@@ -50,7 +50,7 @@ paths:
       - $ref: 'common.yaml#/components/parameters/filter'
 
     post:
-      operationId: createUser
+      operationId: userPost
       summary: Creates a user
       responses:
         '201':
@@ -68,7 +68,7 @@ paths:
 
   /user/{id}:
     put:
-      operationId: putUser
+      operationId: userPut
       summary: Updates a user
       responses:
         '200':
@@ -82,7 +82,7 @@ paths:
               $ref: '#/components/schemas/user'
 
     delete:
-      operationId: deleteUser
+      operationId: userDelete
       summary: Deletes a user
       responses:
         '204':
@@ -91,7 +91,7 @@ paths:
           $ref: 'common.yaml#/components/responses/problem'
 
     get:
-      operationId: getUser
+      operationId: userGet
       summary: Returns a user
       responses:
         '200':
