@@ -284,8 +284,8 @@ components:
         maximum: 100
         default: 20
 
-    q:
-      name:        q
+    search:
+      name:        search
       in:          query
       description: |
         A search term.
