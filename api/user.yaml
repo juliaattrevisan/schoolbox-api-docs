@@ -313,7 +313,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/user'
+            allOf:
+              - $ref: '#/components/schemas/user'
+              - $ref: 'common.yaml#/components/schemas/itemSearchRelevance'
         metadata:
           $ref: 'common.yaml#/components/schemas/listMetadata'
 

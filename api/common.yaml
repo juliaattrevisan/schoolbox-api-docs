@@ -50,6 +50,22 @@ components:
         points to the next page of the result set.
       type: string
 
+    itemSearchRelevance:
+      title: Item search relevance metadata
+      description: |
+        If this item is retrieved as part of a search, this field may contain
+        the item's relevance to the search term.
+      type: object
+      properties:
+        _relevance:
+          type: number
+          minimum: 0
+          maximum: 1
+          required: false
+          description: |
+            A floating-point number between 0 and 1: the higher the number, the
+            more relevant to the search this item is.
+
     item:
       title: Item
       description: An example of a schema for a single item.
@@ -70,7 +86,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/item'
+            allOf:
+              - $ref: '#/components/schemas/item'
+              - $ref: '#/components/schemas/itemSearchRelevance'
         metadata:
           $ref: '#/components/schemas/listMetadata'
 
@@ -353,7 +371,6 @@ components:
                 in: [staff, parent]
           id:
             lessThan: 17
-
 
     cursor:
       name:        cursor
