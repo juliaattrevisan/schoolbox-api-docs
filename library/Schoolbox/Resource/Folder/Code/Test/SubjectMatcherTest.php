@@ -85,6 +85,29 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has /' => ['D/Y/ABC', 'D/Y', 'ABC', true],
             'folder code w/ / and campus: sisClass matches, sisCampus redundant'      => ['D/Y/ABC', 'D', 'D/Y/ABC', true],
             'folder code w/ / and campus: sisClass matches, sisCampus incomplete'     => ['D/Y/ABC', 'D', 'ABC', false],
+
+            // Case insensitive
+            // No campus in folder code
+            'folder code w/o campus: sisClass matches, sisCampus null (case insensitive)'                => ['Abc', null, 'ABC', true],
+            'folder code w/o campus: sisClass matches, sisCampus empty (case insensitive)'               => ['ABC', '', 'Abc', true],
+            'folder code w/o campus: sisClass has campus, sisCampus not empty (case insensitive)'        => ['ABC', 'D', 'd/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus empty (case insensitive)'            => ['ABC', '', 'D/Abc', false],
+            'folder code w/o campus: sisClass has campus, sisCampus null (case insensitive)'             => ['Abc', null, 'D/ABC', false],
+
+            // Campus in folder code
+            'folder code w/ campus: sisClass matches, sisCampus null (case insensitive)'                 => ['D/Abc', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus empty (case insensitive)'                => ['D/ABC', '', 'd/ABC', true],
+            'folder code w/ campus: sisClass has other campus, sisCampus empty (case insensitive)'       => ['D/ABC', '', 'E/Abc', false],
+            'folder code w/ campus: sisCampus/sisClass matches (case insensitive)'                       => ['D/ABC', 'D', 'Abc', true],
+            'folder code w/ campus: sisClass matches, sisCampus redundant (case insensitive)'            => ['D/Abc', 'D', 'D/ABC', true],
+
+            // Campus in folder code, multiple separators
+            'folder code w/ / and campus: sisClass matches, sisCampus null (case insensitive)'           => ['D/Y/Abc', null, 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus empty (case insensitive)'          => ['D/Y/ABC', '', 'D/Y/Abc', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches (case insensitive)'                 => ['D/Y/Abc', 'D', 'Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has / (case insensitive)' => ['D/Y/ABC', 'D/Y', 'Abc', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus redundant (case insensitive)'      => ['d/y/ABC', 'D', 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus incomplete (case insensitive)'     => ['D/Y/Abc', 'D', 'ABC', false],
         ];
     }
 
@@ -114,6 +137,29 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has /' => ['D/Y/ABC', 'D/Y', 'ABC', true],
             'folder code w/ / and campus: sisClass matches, sisCampus redundant'      => ['D/Y/ABC', 'D', 'D/Y/ABC', true],  // fuzzy
             'folder code w/ / and campus: sisClass matches, sisCampus incomplete'     => ['D/Y/ABC', 'D', 'ABC', false],
+
+            // Case insensitive
+            // No campus in folder code
+            'folder code w/o campus: sisClass matches, sisCampus null (case insensitive)'                => ['Abc', null, 'ABC', true],
+            'folder code w/o campus: sisClass matches, sisCampus empty (case insensitive)'               => ['ABC', '', 'Abc', true],
+            'folder code w/o campus: sisClass has campus, sisCampus not empty (case insensitive)'        => ['ABC', 'D', 'd/ABC', false],
+            'folder code w/o campus: sisClass has campus, sisCampus empty (case insensitive)'            => ['ABC', '', 'D/Abc', false],
+            'folder code w/o campus: sisClass has campus, sisCampus null (case insensitive)'             => ['Abc', null, 'D/ABC', false],
+
+            // Campus in folder code
+            'folder code w/ campus: sisClass matches, sisCampus null (case insensitive)'                 => ['D/Abc', null, 'D/ABC', true],
+            'folder code w/ campus: sisClass matches, sisCampus empty (case insensitive)'                => ['D/ABC', '', 'd/ABC', true],
+            'folder code w/ campus: sisClass has other campus, sisCampus empty (case insensitive)'       => ['D/ABC', '', 'E/Abc', false],
+            'folder code w/ campus: sisCampus/sisClass matches (case insensitive)'                       => ['D/ABC', 'D', 'Abc', true],
+            'folder code w/ campus: sisClass matches, sisCampus redundant (case insensitive)'            => ['d/Abc', 'D', 'D/ABC', true],  // fuzzy
+
+            // Campus in folder code, multiple separators
+            'folder code w/ / and campus: sisClass matches, sisCampus null (case insensitive)'           => ['D/Y/Abc', null, 'D/Y/ABC', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus empty (case insensitive)'          => ['D/Y/ABC', '', 'D/Y/Abc', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches (case insensitive)'                 => ['D/Y/Abc', 'd', 'Y/ABC', true],
+            'folder code w/ / and campus: sisCampus/sisClass matches, sisClass has / (case insensitive)' => ['D/Y/ABC', 'D/y', 'Abc', true],
+            'folder code w/ / and campus: sisClass matches, sisCampus redundant (case insensitive)'      => ['D/Y/ABC', 'D', 'D/Y/Abc', true],  // fuzzy
+            'folder code w/ / and campus: sisClass matches, sisCampus incomplete (case insensitive)'     => ['D/Y/Abc', 'd', 'ABC', false],
         ];
     }
 }
