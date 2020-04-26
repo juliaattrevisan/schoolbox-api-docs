@@ -48,6 +48,6 @@ class SubjectMatcher extends SubjectMatcherBase
     private function isFuzzyMatch(string $sbFolderCode, string $sisCampus, string $sisClass): bool
     {
         // Fuzzy match if campus code present and matches on class code only
-        return $sisCampus !== '' && $sbFolderCode === $sisClass;
+        return $sisCampus !== '' && strcasecmp($sbFolderCode, $sisClass) === 0;
     }
 }
