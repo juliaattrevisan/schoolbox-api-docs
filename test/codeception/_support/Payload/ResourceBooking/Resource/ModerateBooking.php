@@ -1,10 +1,10 @@
 <?php
+
 namespace Payload\ResourceBooking\Resource;
 
 use Payload;
 
 use Payload\PostTrait;
-
 
 class ModerateBooking extends Payload\Request
 {

@@ -15,8 +15,15 @@ use Payload;
 
 /**
  * Tests:
- * * 
- * * 
+ * * Approve a booking time slot request for a bookable resource.
+ * * Cacnel an approved booking request.
+ * * Create a booking request to be moderated.
+ * * Create a category of booking resources.
+ * * Create a booking resource
+ * * Reject a booking request.
+ * * Update the title and description of a booking request.
+ * * Update the title of a category
+ * * Update the title and description of a resource.
  *
  * @noinspection PhpUnused
  */
@@ -32,6 +39,11 @@ class ResourceBookingCest
         $i->stopFollowingRedirects();
     }
     
+    /**
+     * Hit /resource-booking/category url with POST to create a category.
+     *
+     * @param IntegrationTester $i
+     */
     public function createCategory(IntegrationTester $i, Payload\ResourceBooking\Category\Create $category): void
     {
         #GIVEN
@@ -47,6 +59,12 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/resource-booking/category");
     }
     
+    /**
+     * Hit /resource-booking/category/<id>/update with POST to edit the category title.
+     * The test first creates the category using a post request, then updates it.
+     *
+     * @param IntegrationTester $i
+     */
     public function updateCategory(IntegrationTester $i, Payload\ResourceBooking\Category\Create $category): void
     {
         #GIVEN
@@ -69,6 +87,11 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/resource-booking/category");
     }
     
+    /**
+     * Hit /resource-booking/item with POST to add a booking resource item.
+     *
+     * @param IntegrationTester $i
+     */
     public function createResource(IntegrationTester $i, Payload\ResourceBooking\Resource\Create $resource): void
     {
         #GIVEN
@@ -87,6 +110,14 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
     }
     
+    
+    /**
+     * Hit /resource-booking/item/<id>/edit with POST to edit a booking resource item. 
+     * This test just changes the title and description.
+     * The test creates a new booking resource item to edit, then tests the edit request.
+     *
+     * @param IntegrationTester $i
+     */
     public function updateResource(IntegrationTester $i, Payload\ResourceBooking\Resource\Create $resource): void
     {
         #GIVEN
@@ -111,6 +142,12 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
     }
     
+    /**
+     * Hit /resource-booking/booking/bookItem/<ID> with POST to create a new booking request.
+     * The test creates a new booking resource item to send a booking request to then we test the booking request.
+     *
+     * @param IntegrationTester $i
+     */
     public function createBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
