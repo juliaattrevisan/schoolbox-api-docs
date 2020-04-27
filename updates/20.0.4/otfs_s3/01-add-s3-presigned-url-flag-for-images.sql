@@ -12,8 +12,8 @@ INSERT INTO config (
 ) VALUES (
     'otfs_image_s3_presigned_urls_enabled',
     '0',
-    'Enable AWS S3 PreSigned URLs for image.php',
-    'If enabled, files stored in S3 will be served directly from S3 to clients for all images, without streaming via Schoolbox',
+    'Enable AWS S3 PreSigned URLs Images',
+    'If enabled, files stored in S3 will be served directly from S3 to clients for all images, without downl via Schoolbox',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
     'false',
