@@ -1,90 +1,84 @@
 <?php
 /**
- * Chain
- *
- * Seeks preview from an External (non-local) url
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Preview\Chain;
 
-use Eportfolio\ShowcaseMapper;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
-use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\File\Model as FileModel;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
+use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Uri;
 
-class Internal extends Base {
+/**
+ * Class Internal
+ *
+ * Seeks preview from an Internal (local) url
+ *
+ * @package Schoolbox\Preview\Chain
+ */
+class Internal extends Base
+{
+
+    /**
+     * Storage urls
+     */
+    private const URL_STORAGE = ['/storage/fetch.php', '/storage/image.php'];
+
+
+    /**
+     * Send url
+     */
+    private const URL_SEND = '/send.php';
+
 
     /**
      * Constructor
      *
      * @param string $url
-     * @param User   $user The user to check permissions against
+     * @throws InvalidArgumentException
      */
-    public function __construct($url, User $user) {
+    public function __construct(string $url) {
 
         /* Storage item: find the hash, and analyse it to find out
          * how to display it (or redirect, if it can't be displayed)
          */
         $uriObject = new Uri($url);
+
+        /* $item can be one of:
+         * Schoolbox\Resource\Storage\Model
+         * Schoolbox\Resource\File\Model
+         */
         if ($hash = $this->isStorage($uriObject)) {
             try {
-                $item = StorageMapper::getInstance()->findByHash($hash);
+                $item = Storage\Mapper::getInstance()->findByHash($hash);
                 $this->processStorage($url, $item);
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isSend($uriObject)) {
             try {
-                $item = FileMapper::getInstance()->findById($id);
+                $item = File\Mapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
-            } catch (\Schoolbox\Mapper\Exception $e ) {
+            } catch (Exception $e ) {
                 //noop
             }
-        } elseif ($id = $this->isSubmission($uriObject)) {
-            try {
-                $item = SubmissionBox\Submission\SubmissionMapper::getInstance()->findById($id);
-                $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
-                if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
-                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                } else {
-                    // throw some error
-                }
-            } catch (\Schoolbox\Mapper\Exception $e ) {
-                //noop
-            }
-        } elseif ($id = $this->isReturn($uriObject)) {
-            try {
-                $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
-                if ($item->hasPermission($user)) {
-                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
-                } else {
-                    // error
-                }
-            } catch (\Schoolbox\Mapper\Exception $e ) {
-                //noop
-            }
-        }
-        /* Just redirect straight there
-         */
-        else {
+        } else {
+
+            /* Just redirect straight there
+             */
             $this->start([
                 new Redirect($url, null),
             ]);
         }
     }
+
 
     /**
      * Get the hash out of a storage url
@@ -92,14 +86,17 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isStorage(Uri $url)
+    private function isStorage(Uri $url): ?string
     {
-        if ($url->getPath() == '/storage/fetch.php' || $url->getPath() == '/storage/image.php') {
+        if (\in_array($url->getPath(), self::URL_STORAGE, true)) {
             $query = $url->getQueryAsArray();
+
             return $query['hash'];
         }
+
         return null;
     }
+
 
     /**
      * Get the id from a send URL
@@ -107,113 +104,26 @@ class Internal extends Base {
      * @param  Uri $url
      * @return string
      */
-    private function isSend(Uri $url)
+    private function isSend(Uri $url): ?string
     {
-        if ($url->getPath() == '/send.php') {
+        if ($url->getPath() === self::URL_SEND) {
             $query = $url->getQueryAsArray();
+
             return $query['id'];
         }
+
         return null;
     }
 
-    /**
-     * Checks whether this SBFS file is viewable by the current user.
-     * (Cribbed from /send.php)
-     *
-     * It's viewable if the current user has at least read access to the folder.
-     *
-     * @param  FileModel $file
-     * @param  User      $user
-     * @return bool
-     */
-    private function checkSendPermissions(FileModel $file, User $user)
-    {
-        return true;
-    }
-
-    /**
-     * Get the id from a submission URL
-     *
-     * @param  Uri $url
-     * @return string
-     */
-    private function isSubmission(Uri $url)
-    {
-        if ($url->getPath() == '/submission/send.php') {
-            $query = $url->getQueryAsArray();
-            if (empty($query['save']) && empty($query['return'])) {
-                return $query['id'];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Checks whether this submission is viewable by the current user.
-     * (Cribbed from /submission/send.php)
-     *
-     * It's viewable if any of the following are true:
-     * * The current user is the owner of the submission
-     * * The current user has write level access to the page of the submission
-     * * The submission has been showcased
-     *
-     * @param  SubmissionBox\ReturnedWork $file
-     * @param  User                       $user
-     * @return bool
-     */
-    private function checkSubmissionPermissions(SubmissionBox\ReturnedWork $file, User $user)
-    {
-        if ($file->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get the id from a return URL
-     *
-     * @param  Uri $url
-     * @return string
-     */
-    private function isReturn(Uri $url)
-    {
-        if ($url->getPath() == '/submission/send.php') {
-            $query = $url->getQueryAsArray();
-            if (empty($query['save']) && !empty($query['return'])) {
-                return $query['id'];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Checks whether this return is viewable by the current user.
-     * (Cribbed from /submission/send.php)
-     *
-     * It's viewable if any of the following are true:
-     * * The current user is the owner of the return
-     * * The current user is a parent of the owner
-     * * The current user is a staff member
-     *
-     * @param  SubmissionBox\Submission\Submission $file
-     * @param  User                          $user
-     * @return bool
-     */
-    private function checkReturnPermissions(SubmissionBox\Submission\Submission $file, User $user)
-    {
-        if ($file->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Process Storage file analysis
      *
-     * @param $url
-     * @param $item
+     * @param string $url
+     * @param Storage\Model|File\Model $item
      */
-    private function processStorage($url, $item) {
+    private function processStorage(string $url, $item): void
+    {
         $this->start([
             new Image($url, $item),
             new Media($url, $item),

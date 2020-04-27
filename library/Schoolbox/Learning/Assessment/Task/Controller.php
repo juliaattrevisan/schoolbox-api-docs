@@ -134,7 +134,7 @@ class Controller extends Assessment\Controller
                 $this->getConfigLoader()->get('cyberhound_api_shared_key')
             );
 
-            $previewFragment = (new PreviewFactory($translator))->urlFragment($assessment->getUrl(), $this->getUser());
+            $previewFragment = (new PreviewFactory($translator))->urlFragment($assessment->getUrl());
 
             if (($previewFragment['type'] == 'redirect' || $previewFragment['type'] == 'iframe')
                 && !$assessment->getDescription()) {

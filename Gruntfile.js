@@ -19,7 +19,6 @@ var jsSrc = {
 
         // jQuery Validation
         'www/javascript/components/jquery-validation/dist/jquery.validate.js',
-        'www/javascript/shared/jquery.validate.extensions.js',
         'www/javascript/jquery.alaressValidate.js',
 
         // jQuery UI
@@ -107,13 +106,13 @@ var jsSrc = {
         'www/javascript/shared/course/jquery.course-selector.js',
 
         // Date syncing
-        'www/javascript/shared/datetime/jquery.sync-dates.js',
+        'www/javascript/shared/alaress-datetime-picker/jquery.sync-dates.js',
 
         // Flatpickr date selector
         'node_modules/flatpickr/dist/flatpickr.js',
 
         // Loads Flatpickr into a modal
-        'www/javascript/shared/datetime/attacher.datepicker.js',
+        'www/javascript/shared/alaress-datetime-picker/attacher.datepicker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
         'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
 

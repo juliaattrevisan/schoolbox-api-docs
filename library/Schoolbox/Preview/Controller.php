@@ -89,7 +89,7 @@ class Controller extends Base
             $this->getConfigLoader()->get('cyberhound_api_shared_key')
         );
 
-        $previewFragment = (new Factory($translator))->urlFragment($params['encodedUrl'], $this->getUser());
+        $previewFragment = (new Factory($translator))->urlFragment($params['encodedUrl']);
 
         if ($previewFragment['type'] === 'inline') {
             $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])
