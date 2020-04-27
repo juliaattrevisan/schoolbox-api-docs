@@ -58,7 +58,7 @@ try {
 
     if ($fileSystem instanceof Filesystem &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
-        $config->get('otfs_s3_presigned_urls_enabled')
+        $config->get('otfs_image_s3_presigned_urls_enabled')
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
