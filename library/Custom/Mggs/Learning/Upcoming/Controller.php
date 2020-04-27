@@ -18,6 +18,11 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Custom\Mggs\Learning\Personalised;
 
+/**
+ * Controller for the MGGS custom upcoming due work page.
+ *
+ * @deprecated As of SA-10363 this is no longer being used
+ */
 class Controller extends \Schoolbox\Learning\Upcoming\Controller
 {
 

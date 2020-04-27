@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
  * Overload the existing module as-is, and just change our templates directory
  *
  * @package Custom\Mggs\Learning\Upcoming
+ * @deprecated As of SA-10363 this is no longer being used
  */
 class Module extends \Schoolbox\Learning\Upcoming\Module
 {
