@@ -203,19 +203,23 @@ class RoleCloner
             ['src'  => $source->getId(), 'dest' => $destination->getId(),]
         );
 
-
-        // Composite permissions
-        $this->clonePerms("
+        // Composite permissions cleanup
+        $this->db->query("
                 DELETE FROM comms_news_audience_complex
-                WHERE ( entity_type_1  = 'role'
-                AND   entity_value = ? )
-                OR (entity_type_2 = 'role' AND entity_value = ? )
-        ",
+                WHERE
+                ( entity_type_1  = 'role' AND entity_value_1 = ? )
+                OR
+                (entity_type_2 = 'role' AND entity_value_2 = ? )",
+                [$destination->getId(), $destination->getId()]
+        );
+
+        // Copy first set of complex audiences
+        $this->db->query(
             "
                 INSERT INTO comms_news_audience_complex
-                    (comms_news_article_id, entity_type_1, entity_value_1)
-                SELECT comms_news_article_id, entity_type_1, :dest, relationship
-                FROM   comms_news_audience
+                    (comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, entity_value_2)
+                SELECT comms_news_article_id, entity_type_1, :dest, entity_type_2, entity_value_2
+                FROM   comms_news_audience_complex
                 WHERE  entity_type_1  = 'role'
                 AND    entity_value_1 = :src
             ",
@@ -225,11 +229,11 @@ class RoleCloner
         //And second set of composite permissions
         $this->db->query(
             "INSERT INTO comms_news_audience_complex
-            (comms_news_article_id, entity_type_2, entity_value_2)
-            SELECT comms_news_article_id, entity_type_2, :dest, relationship
-            FROM   comms_news_audience
+            (comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, entity_value_2)
+            SELECT comms_news_article_id, entity_type_1, entity_value_1, entity_type_2, :dest
+            FROM   comms_news_audience_complex
             WHERE  entity_type_2  = 'role'
-            AND    entity_value_1 = :src",
+            AND    entity_value_2 = :src",
             ['src'  => $source->getId(), 'dest' => $destination->getId(),]
         );
     }
