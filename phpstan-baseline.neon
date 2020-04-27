@@ -186,36 +186,6 @@ parameters:
 			path: library/Alaress/Codec/Integer/Base64.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$newOptions\\)\\: Unexpected token \"\\$newOptions\", expected type at offset 59$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$error\\)\\: Unexpected token \"\\$error\", expected type at offset 34$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$result\\)\\: Unexpected token \"\\$result\", expected type at offset 39$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 31$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$options\\)\\: Unexpected token \"\\$options\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Curl/Url.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 97$#"
 			count: 1
 			path: library/Alaress/DataStructures/ObjectTree.php
