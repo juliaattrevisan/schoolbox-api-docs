@@ -185,11 +185,11 @@ if ($_GET) {
 
         case "storybox":
             $form                              = "SchoolLoginForm_schoolsLoginForm";
-            $action                            = "https://storyboxlibrary.com.au/schools/schoolsLoginForm";
+            $action                            = "https://storyboxlibrary.com.au/login";
             $method                            = "POST";
             $formArray['AuthenticationMethod'] = 'SchoolAuthenticator';
             $formArray['Username']             = 'Morris Hall';
-            $formArray['ViewerPassword']       = 'mohalllibrary';
+            $formArray['ViewerPassword']       = 'SBLmorris20';
             break;
 
         default:
