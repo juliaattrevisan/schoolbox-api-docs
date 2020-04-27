@@ -201,7 +201,6 @@
                                                data-progress-tick-status="teacherAssessed"></div>
                                         {% endif %}
                                     {% endif %}
-                                    <span class="indicator indicator-{{ decorator.taskIndicator(participant) }}" title="{{ decorator.taskNotchTitle(participant) }}"></span>
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(true) %}
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
