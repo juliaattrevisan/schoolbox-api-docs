@@ -123,11 +123,13 @@ class PreSignedUrlService
                                string $contentType,
                                string $expires): CommandInterface
     {
+        $basename = utf8_encode($resourceBaseName);
+
         return $this->s3Client->getCommand('GetObject', [
             'Bucket'                     => $this->bucket,
             'Key'                        => $resourcePath,
             'ResponseCacheControl'       => $cacheControl,
-            'ResponseContentDisposition' => "$attachmentType filename=\"{$resourceBaseName}\"",
+            'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
             'ResponseContentType'        => $contentType,
             'ResponseExpires'            => $expires,
         ]);
