@@ -41,9 +41,10 @@ class PersonalisedLearning implements ModuleConfigInterface
             $adminModule = new AdminModule($di);
             $adminModule->init('/adminv2/pbl');
 
-            // override the default upcoming module
-            $upcomingModule = new UpcomingModule($di);
-            $upcomingModule->initOverride('/learning/due');
+            // As of SA-10363 the upcoming work module is no longer overridden
+//            // override the default upcoming module
+//            $upcomingModule = new UpcomingModule($di);
+//            $upcomingModule->initOverride('/learning/due');
         }
     }
 }
