@@ -266,7 +266,6 @@ class External_Liss_Server
             $this->log()->info("publishClassMemberships: processing request");
             $classInvolvementMapper = new ClassInvolvementMapper();
             $classEntryMapper = new ClassEntryMapper();
-            $userMapper = new UserMapper();
 
             $classInvolvementMapper->truncate();
 
@@ -277,17 +276,9 @@ class External_Liss_Server
             $queryItems = array();
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
-
-                try {
-
-                    /* TODO: Specify roletype here?
-                     */
-                    $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
-                    $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
-                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getExternalId()."')";
-                } catch (MapperException $e) {
-                    $this->log()->warning(sprintf('publishClassMemberships: Failed to put student %s in %s: %s', trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
-                }
+                $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
+                $external_id = trim((string)$struct['StudentId']->me['string']);
+                $queryItems[] = "(NULL, '".$class->getId()."', '".$external_id."')";
             }
 
             if (count($queryItems) > 0) {
@@ -521,16 +512,11 @@ class External_Liss_Server
 
             $timetablePeriodMapper = new TimetablePeriodMapper();
             $classEntryMapper = new ClassEntryMapper();
-            $userMapper = new UserMapper();
 
             /* Truncate everything before re-adding
              */
             $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
-
-            /* TODO: Default user for testing
-             */
-            $defaultUser = $userMapper->findById(1); // changed to alaress user for testing
 
             $allData = $message->params[1]->me['array'];
 
@@ -548,25 +534,15 @@ class External_Liss_Server
                  */
                 $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
-                /* Find the Teacher
-                 */
-                $allTeachers = $userMapper->findByColumn('synergy_id', trim($struct['TeacherCode']->me['string']));
-
-                /* TODO: Ram in a duff account for testing
-                 */
-                if (!$allTeachers->count()) {
-                    $allTeachers->add($defaultUser);
-                }
-
                 /* Check that all three are provided
                  * Save it!
                  */
-                if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
+                if ($allPeriods->count() && $allClasses->count()) {
                     $classPeriod = $classPeriodMapper->createModel();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
-                    $classPeriod->setTeacher($allTeachers->first()->getId());
-                    $classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
+                    $classPeriod->setTeacher(trim((string)$struct['TeacherCode']->me['string']));
+                    $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
                     $classPeriodMapper->save($classPeriod);
                 } else {
 
@@ -577,10 +553,6 @@ class External_Liss_Server
 
                     if ($allClasses->count() === 0) {
                         $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
-                    }
-
-                    if ($allTeachers->count() === 0) {
-                        $this->log()->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
                     }
                 }
             }
