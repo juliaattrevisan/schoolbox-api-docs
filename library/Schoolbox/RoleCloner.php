@@ -191,90 +191,47 @@ class RoleCloner
                 DELETE FROM comms_news_audience
                 WHERE entity_type  = 'role'
                 AND   entity_value = ?
-                AND   parent_id IS NULL
             ",
             "
                 INSERT INTO comms_news_audience
-                    (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-                SELECT comms_news_article_id, parent_id, entity_type, :dest, relationship
+                    (comms_news_article_id, entity_type, entity_value, relationship)
+                SELECT comms_news_article_id, entity_type, :dest, relationship
                 FROM   comms_news_audience
                 WHERE  entity_type  = 'role'
                 AND    entity_value = :src
-                AND    parent_id IS NULL
             ",
             ['src'  => $source->getId(), 'dest' => $destination->getId(),]
         );
 
 
-        // Composite permissions: more complicated
-        // Step 1: delete all composite rules which contain the destination role
-        // Step 2: copy all composite rules which contain the source role into
-        //         the destination role
-        $findParentIdQuery = $this->db->prepare("
-            SELECT parent_id
+        // Composite permissions
+        $this->clonePerms("
+                DELETE FROM comms_news_audience_complex
+                WHERE ( entity_type_1  = 'role'
+                AND   entity_value = ? )
+                OR (entity_type_2 = 'role' AND entity_value = ? )
+        ",
+            "
+                INSERT INTO comms_news_audience_complex
+                    (comms_news_article_id, entity_type_1, entity_value_1)
+                SELECT comms_news_article_id, entity_type_1, :dest, relationship
+                FROM   comms_news_audience
+                WHERE  entity_type_1  = 'role'
+                AND    entity_value_1 = :src
+            ",
+            ['src'  => $source->getId(), 'dest' => $destination->getId(),]
+        );
+
+        //And second set of composite permissions
+        $this->db->query(
+            "INSERT INTO comms_news_audience_complex
+            (comms_news_article_id, entity_type_2, entity_value_2)
+            SELECT comms_news_article_id, entity_type_2, :dest, relationship
             FROM   comms_news_audience
-            WHERE  entity_type  = 'role'
-            AND    entity_value = ?
-            AND    parent_id IS NOT NULL
-        ");
-
-
-        // Delete all composite rules which contain the destination role.
-        // Need to find all sub-rules which contain the destination role, then
-        // delete them, their sibling sub-rules and their parents.
-        $findParentIdQuery->execute([$destination->getId()]);
-        $destParentIds         = $findParentIdQuery->fetchAll(PDO::FETCH_COLUMN);
-        $deleteChildRulesQuery = $this->db->prepare("DELETE FROM comms_news_audience WHERE parent_id = ?");
-        $deleteParentRuleQuery = $this->db->prepare("DELETE FROM comms_news_audience WHERE id = ?");
-        foreach ($destParentIds as $destParentId) {
-            $deleteChildRulesQuery->execute([$destParentId]);
-            $deleteParentRuleQuery->execute([$destParentId]);
-        }
-
-
-        // Clone all rules which contain the source into the new role.
-        // Need to find all sub-rules which contain the source role, then:
-        // * copy their parent rule
-        // * copy any sub-rules which aren't for the role
-        // * create a new role sub-rule for the destination
-        $findParentIdQuery->execute([$source->getId()]);
-        $srcParentIds         = $findParentIdQuery->fetchAll(PDO::FETCH_COLUMN);
-        $cloneParentRuleQuery = $this->db->prepare("
-            INSERT INTO comms_news_audience
-                (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-            SELECT comms_news_article_id, parent_id, entity_type, entity_value, relationship
-            FROM  comms_news_audience
-            WHERE id = ?
-        ");
-        $cloneNonRoleChildRulesQuery = $this->db->prepare("
-            INSERT INTO comms_news_audience
-                (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-            SELECT comms_news_article_id, :destParentId, entity_type, entity_value, relationship
-            FROM  comms_news_audience
-            WHERE parent_id = :srcParentId
-            AND   entity_type != 'role'
-        ");
-        $cloneRoleChildRulesQuery = $this->db->prepare("
-            INSERT INTO comms_news_audience
-                (comms_news_article_id, parent_id, entity_type, entity_value, relationship)
-            SELECT comms_news_article_id, :destParentId, entity_type, :destRole, relationship
-            FROM  comms_news_audience
-            WHERE parent_id = :srcParentId
-            AND   entity_type = 'role'
-        ");
-        foreach ($srcParentIds as $srcParentId) {
-            $cloneParentRuleQuery->execute([$srcParentId]);
-            $destParentId = $this->db->lastInsertId();
-            $cloneNonRoleChildRulesQuery->execute([
-                'srcParentId'  => $srcParentId,
-                'destParentId' => $destParentId,
-            ]);
-            $cloneRoleChildRulesQuery->execute([
-                'srcParentId'  => $srcParentId,
-                'destParentId' => $destParentId,
-                'destRole'     => $destination->getId(),
-            ]);
-        }
+            WHERE  entity_type_2  = 'role'
+            AND    entity_value_1 = :src",
+            ['src'  => $source->getId(), 'dest' => $destination->getId(),]
+        );
     }
 
     /**
