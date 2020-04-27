@@ -18,7 +18,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $this->getDatabaseInternal()->executeQuery("
-                ALTER TABLE newsTopic ADD COLUMN slug VARCHAR(150) AFTER `name`,
+                ALTER TABLE newsTopic ADD COLUMN slug VARCHAR(150) DEFAULT NULL AFTER `name`,
                 ADD UNIQUE INDEX idx_newsTopic_slug (slug)"
         );
 
