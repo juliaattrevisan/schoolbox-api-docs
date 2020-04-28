@@ -246,16 +246,6 @@ parameters:
 			path: library/Alaress/Rss/Strategy/Rss20.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(Alaress_Rss_Strategy_Interface\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 156$#"
-			count: 1
-			path: library/Alaress/Rss/Stream.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 53$#"
-			count: 1
-			path: library/Alaress/Rss/Stream.php
-
-		-
 			message: "#^Variable \\$timer in PHPDoc tag @var does not match assigned variable \\$interval\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/AbstractScheduler.php
