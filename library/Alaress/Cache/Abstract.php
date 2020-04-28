@@ -113,9 +113,8 @@ abstract class Alaress_Cache_Abstract
     /**
      * Setup method
      *
-     * @param string     $url
+     * @param string    $url
      * @param string[]  $headers
-     * @return self
      * @return self
      * @throws InvalidArgumentException if `$url` is empty
      */
@@ -268,7 +267,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * Remove the cached file
      *
-     * @param $file
+     * @param string $file
      * @return Alaress_Cache_Abstract
      */
     private function remove($file): \Alaress_Cache_Abstract
@@ -283,8 +282,8 @@ abstract class Alaress_Cache_Abstract
     /**
      * Determine if the cached file has expired
      *
-     * @param $file
-     * @param $duration
+     * @param string $file
+     * @param int    $duration
      * @return bool
      */
     public function isExpired($file, $duration): bool
@@ -334,7 +333,7 @@ abstract class Alaress_Cache_Abstract
      * Hashing method. By default it uses md5, but subclasses can use whatever
      * hashing method they want such as sha1
      *
-     * @param $data
+     * @param string $data
      * @return string
      */
     protected function encode($data): string
@@ -345,7 +344,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * Add an observer
      *
-     * @param $observer
+     * @param string $observer
      * @return Alaress_Cache_Abstract
      */
     private function registerObserver($observer): Alaress_Cache_Abstract
@@ -356,7 +355,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * Remove an observer
      *
-     * @param $observer
+     * @param string $observer
      * @return void
      */
     private function unregisterObserver($observer): void
@@ -367,7 +366,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * All observers - do something with data
      *
-     * @param $text
+     * @param string $text
      * @return void
      */
     protected function notifyObservers($text): void

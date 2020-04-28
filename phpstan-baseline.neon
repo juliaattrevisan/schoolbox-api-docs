@@ -56,42 +56,7 @@ parameters:
 			path: library/Alaress/Cache/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 55$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$duration\\)\\: Unexpected token \"\\$duration\", expected type at offset 93$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 73$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 149$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$observer\\)\\: Unexpected token \"\\$observer\", expected type at offset 48$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
 			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$observer\\)\\: Unexpected token \"\\$observer\", expected type at offset 51$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 71$#"
 			count: 1
 			path: library/Alaress/Cache/Abstract.php
 
