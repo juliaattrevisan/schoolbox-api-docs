@@ -166,21 +166,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$prefix\\)\\: Unexpected token \"\\$prefix\", expected type at offset 52$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 58$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$dataStructure\\)\\: Unexpected token \"\\$dataStructure\", expected type at offset 35$#"
 			count: 1
 			path: library/Alaress/Log/Probe.php
