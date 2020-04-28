@@ -191,11 +191,6 @@ parameters:
 			path: library/Alaress/Mail/AbstractMailer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(resource file stream \\$storageStream\\)\\: Unexpected token \"file\", expected variable at offset 71$#"
-			count: 1
-			path: library/Alaress/Mail/AttachmentStream.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 80$#"
 			count: 4
 			path: library/Alaress/Mail/Test/CodecTest.php
