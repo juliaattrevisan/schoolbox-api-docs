@@ -1,0 +1,25 @@
+{% extends '@twitter/component.twig' %}
+
+{% block markup %}
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="https://twitter.com/{{ username }}/lists/{{ listSlug }}"
+    >Tweets from https://twitter.com/{{ username }}/lists/{{ listSlug }}</a>
+{% endblock markup %}
+
+{% block install %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            ($(function () {
+                twttr.widgets.createTimeline(
+                    {
+                        sourceType:      "list",
+                        ownerScreenName: "{{ username }}",
+                        slug:            "{{ listSlug }}"
+                    },
+                    document.getElementById("twitter-view-{{ id }}")
+                );
+            }));
+        </script>
+    {% endautoescape %}
+{% endblock install %}

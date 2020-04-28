@@ -1,0 +1,24 @@
+{% extends '@twitter/component.twig' %}
+
+{% block markup %}
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="https://twitter.com/{{ username }}/timelines/{{ collectionId }}"
+    >Tweet Collection by @{{ username }}</a>
+{% endblock markup %}
+
+{% block install %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            ($(function () {
+                twttr.widgets.createTimeline(
+                    {
+                        sourceType: "collection",
+                        id:         "{{ collectionId }}"
+                    },
+                    document.getElementById("twitter-view-{{ id }}")
+                );
+            }));
+        </script>
+    {% endautoescape %}
+{% endblock install %}
