@@ -22,17 +22,14 @@
 
                 return t;
             }(document, "script", "twitter-wjs"));
+
+            // Wait for Twitter API to become available, then load the widget.
+            // (This is only required when reloading the component's content)
+            twttr.ready(
+                function (twttr) {
+                    twttr.widgets.load(document.getElementById("twitter-view-{{ id }}"));
+                }
+            );
         </script>
     {% endautoescape %}
 {% endblock js %}
-
-{% block install %}
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            ($(function () {
-                // Wait for Twitter API to become available, then load widgets
-                twttr.widgets.load(document.getElementById("twitter-view-{{ id }}"));
-            }));
-        </script>
-    {% endautoescape %}
-{% endblock install %}
