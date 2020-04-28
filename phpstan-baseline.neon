@@ -51,11 +51,6 @@ parameters:
 			path: library/Alaress/Authorizer/Rule/IsTrue.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 64$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
 			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Cache/Abstract.php
