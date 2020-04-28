@@ -485,7 +485,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
 
     /**
-     * @param $year
+     * @param int $year
      * @return $this
      */
     public function setYear($year)
@@ -495,7 +495,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $month
+     * @param int $month
      * @return $this
      */
     public function setMonth($month)
@@ -505,7 +505,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $day
+     * @param int $day
      * @return $this
      */
     public function setDay($day)
@@ -588,7 +588,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $hour
+     * @param int $hour
      * @return $this
      */
     public function setHour($hour)
@@ -598,7 +598,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $minute
+     * @param int $minute
      * @return $this
      */
     public function setMinute($minute)
@@ -608,7 +608,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $second
+     * @param int $second
      * @return $this
      */
     public function setSecond($second)
@@ -629,12 +629,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $year
-     * @param $month
-     * @param $day
-     * @param $hour
-     * @param $min
-     * @param $sec
+     * @param int $year
+     * @param int $month
+     * @param int $day
+     * @param int $hour
+     * @param int $min
+     * @param int $sec
      * @return $this
      */
     public function setDateTime($year, $month, $day, $hour, $min, $sec)
@@ -691,7 +691,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $timestamp
+     * @param int $timestamp
      * @return $this
      */
     public function setTimestamp($timestamp)
@@ -703,7 +703,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Add/subtract seconds and reinitialise
      *
-     * @param $val
+     * @param int $val
      * @return $this
      */
     public function addSeconds($val)
@@ -715,7 +715,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Add/subtract minutes and reinitialise
      *
-     * @param $val
+     * @param int $val
      * @return \Alaress_Date_Format
      */
     public function addMinutes($val)
@@ -727,7 +727,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Add/subtract hours and reinitialise
      *
-     * @param $val
+     * @param int $val
      * @return \Alaress_Date_Format
      */
     public function addHours($val)
@@ -739,7 +739,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Add/subtract days and reinitialise
      *
-     * @param  $val
+     * @param  int $val
      * @return \Alaress_Date_Format
      */
     public function addDays($val)
@@ -751,7 +751,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Add/subtract weekdays and reinitialise
      *
-     * @param  $val
+     * @param  int $val
      * @return \Alaress_Date_Format
      */
     public function addWeekdays($val)
@@ -761,7 +761,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $val
+     * @param int $val
      * @return $this
      */
     public function addMonths($val)
@@ -771,7 +771,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $val
+     * @param int $val
      * @return $this
      */
     public function addYears($val)
@@ -781,7 +781,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $val
+     * @param int $val
      * @return $this
      */
     public function addWeeks($val)
@@ -1435,7 +1435,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Delegation method to get the datetime in an arbitrary format
      *
-     * @param  $format
+     * @param  string $format
      * @return string
      */
     public function getUsingFormat($format)
