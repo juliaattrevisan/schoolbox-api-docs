@@ -66,16 +66,6 @@ parameters:
 			path: library/Alaress/Database/Broker/Mysql/Broker.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(IStatement &\\$statement\\)\\: Unexpected token \"&\", expected variable at offset 104$#"
-			count: 1
-			path: library/Alaress/Database/Iterator/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(PDOStatement &\\$pdoStatement\\)\\: Unexpected token \"&\", expected variable at offset 143$#"
-			count: 1
-			path: library/Alaress/Database/Iterator/Base.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Database/Predicate/Builder.php
