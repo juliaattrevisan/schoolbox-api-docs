@@ -19,10 +19,12 @@ abstract class Composite implements IAuthorizationRule {
     protected $subRuleList = array();
 
     /**
-     * @param  IAuthorizationRule ...   An unlimited number of authorization rules.
      * @throws InvalidArgumentException if any param is not a IAuthorizationRule
      */
     public function __construct() {
+
+        /* An unlimited number of authorization rules.
+         */
         foreach (func_get_args() as $subRule) {
             if (!($subRule instanceof IAuthorizationRule)) {
                 throw new InvalidArgumentException(
