@@ -191,26 +191,6 @@ parameters:
 			path: library/Alaress/Mail/AbstractMailer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 80$#"
-			count: 4
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 59$#"
-			count: 4
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 81$#"
-			count: 2
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 2
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 15$#"
 			count: 1
 			path: library/Alaress/Mail/TwigMailer.php
