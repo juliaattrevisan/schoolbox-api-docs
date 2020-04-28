@@ -16,7 +16,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * The url of the stream you just got
      *
-     * @var
+     * @var string
      */
     protected $url = '';
 
