@@ -176,11 +176,6 @@ parameters:
 			path: library/Alaress/Lumberjack/Logger.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$level\\)\\: Unexpected token \"\\$level\", expected type at offset 54$#"
-			count: 1
-			path: library/Alaress/Lumberjack/TtyFormatter.php
-
-		-
 			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$host\\.$#"
 			count: 1
 			path: library/Alaress/Mail/AbstractMailer.php
