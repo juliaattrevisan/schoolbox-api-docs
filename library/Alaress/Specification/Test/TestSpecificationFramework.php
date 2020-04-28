@@ -76,7 +76,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_andValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
