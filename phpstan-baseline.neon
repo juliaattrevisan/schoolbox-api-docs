@@ -21,21 +21,6 @@ parameters:
 			path: library/Alaress/Application/Kernel.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 85$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 90$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 70$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(int\\?   \\$ttl\\)\\: Unexpected token \"\\?\", expected variable at offset 150$#"
 			count: 1
 			path: library/Alaress/Async/Broker/IBroker.php
