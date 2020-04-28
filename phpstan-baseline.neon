@@ -51,11 +51,6 @@ parameters:
 			path: library/Alaress/Cache/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$verbosity\\)\\: Unexpected token \"\\$verbosity\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
-
-		-
 			message: "#^Constructor of class Alaress_CleanProbe has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/CleanProbe.php
