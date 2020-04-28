@@ -210,7 +210,6 @@
                                         class="no-text progress-tick {{ progressClass }}"
                                         title="Incomplete"
                                         data-progress-tick-status="incomplete"></div>
-                                    <span class="indicator indicator-{{ decorator.taskIndicator(participant) }}" title="{{ decorator.taskNotchTitle(participant) }}"></span>
                                 {% else %}
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
