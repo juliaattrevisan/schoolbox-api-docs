@@ -121,11 +121,6 @@ parameters:
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$loadedFromCache\\)\\: Unexpected token \"\\$loadedFromCache\", expected type at offset 77$#"
-			count: 1
-			path: library/Alaress/Image/Cache/Flysystem.php
-
-		-
 			message: "#^Variable \\$userList in PHPDoc tag @var does not match assigned variable \\$users\\.$#"
 			count: 1
 			path: library/Alaress/Image/Cache/Portrait.php
