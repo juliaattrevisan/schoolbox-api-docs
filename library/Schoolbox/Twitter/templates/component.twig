@@ -27,4 +27,12 @@
 {% endblock js %}
 
 {% block install %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            ($(function () {
+                // Wait for Twitter API to become available, then load widgets
+                twttr.widgets.load(document.getElementById("twitter-view-{{ id }}"));
+            }));
+        </script>
+    {% endautoescape %}
 {% endblock install %}

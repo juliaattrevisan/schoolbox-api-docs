@@ -4,21 +4,6 @@
     <a id="twitter-view-{{ id }}"
        class="twitter-timeline"
        href="https://twitter.com/{{ username }}"
+       data-dnt="true"
     >Tweets by @{{ username }}</a>
 {% endblock markup %}
-
-{% block install %}
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            ($(function () {
-                twttr.widgets.createTimeline(
-                    {
-                        sourceType: "profile",
-                        screenName: "{{ username }}"
-                    },
-                    document.getElementById("twitter-view-{{ id }}")
-                );
-            }));
-        </script>
-    {% endautoescape %}
-{% endblock install %}
