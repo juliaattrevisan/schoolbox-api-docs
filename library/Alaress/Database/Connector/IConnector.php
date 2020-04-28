@@ -24,10 +24,10 @@ interface IConnector extends IQuoter
     /**
      * Connect to database
      *
-     * @param $hostname
-     * @param $database
-     * @param $username
-     * @param $password
+     * @param string $hostname
+     * @param string $database
+     * @param string $username
+     * @param string $password
      * @param array $options
      * @return bool
      */
@@ -108,9 +108,9 @@ interface IConnector extends IQuoter
      * Prepare database function call
      *
      * @param string $function Name of the function to execute
-     * @param null|array &$inputs
-     * @param null|array &$outputs
-     * @param null|array &$return
+     * @param null|array $inputs
+     * @param null|array $outputs
+     * @param null|array $return
      * @return IStoredProcedure
      */
     public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
@@ -119,9 +119,9 @@ interface IConnector extends IQuoter
      * Convenience method to prepare and execute a function call with the supplied parameters
      *
      * @param string $function
-     * @param null|array &$inputs
-     * @param null|array &$outputs
-     * @param null|array &$return
+     * @param null|array $inputs
+     * @param null|array $outputs
+     * @param null|array $return
      * @return IFunctionCall
      */
     public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null);
@@ -130,9 +130,9 @@ interface IConnector extends IQuoter
      * Prepare database stored procedure
      *
      * @param string $procedure Name of the stored procedure to execute
-     * @param null|array &$inputs
-     * @param null|array &$outputs
-     * @param null|array &$return
+     * @param null|array $inputs
+     * @param null|array $outputs
+     * @param null|array $return
      * @return IStoredProcedure
      */
     public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
@@ -141,9 +141,9 @@ interface IConnector extends IQuoter
      * Convenience method to prepare and execute a stored procedure with the supplied parameters
      *
      * @param string $procedure
-     * @param null|array &$inputs
-     * @param null|array &$outputs
-     * @param null|array &$return
+     * @param null|array $inputs
+     * @param null|array $outputs
+     * @param null|array $return
      * @return IStoredProcedure
      */
     public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
@@ -152,9 +152,9 @@ interface IConnector extends IQuoter
      * Retrieve an iterator for a stored procedure
      *
      * @param string $procedure
-     * @param null|array &$inputs
-     * @param null|array &$outputs
-     * @param null|array &$return
+     * @param null|array $inputs
+     * @param null|array $outputs
+     * @param null|array $return
      * @return IIterator
      */
     public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
@@ -304,7 +304,7 @@ interface IConnector extends IQuoter
      * Create an array with SQL and matching bindings for an IN query
      * TODO: Investigate that predicate builder thing
      *
-     * @param $externalIds
+     * @param string|array $externalIds
      * @param string $prefix
      * @return mixed
      */
