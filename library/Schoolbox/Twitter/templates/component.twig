@@ -1,12 +1,5 @@
-{% block emptyState %}
-<div class="empty-state">
-    <span class="icon-twitter"></span>
-    <p>
-        <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
-        to show a feed of tweets.
-    </p>
-</div>
-{% endblock emptyState %}
+{% block markup %}
+{% endblock markup %}
 
 {% block js %}
     {% autoescape 'js' %}
@@ -34,31 +27,4 @@
 {% endblock js %}
 
 {% block install %}
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            ($(function () {
-                twttr.widgets.createTimeline(
-                    {
-                        sourceType: "profile",
-                        screenName: "{{ username }}"
-                    },
-                    document.getElementById("twitter-view-{{ id }}")
-                );
-            }));
-        </script>
-    {% endautoescape %}
 {% endblock install %}
-
-{% block markup %}
-    <a id="twitter-view-{{ id }}"
-       class="twitter-timeline"
-       href="https://twitter.com/{{ username }}"
-    >Tweets by @{{ username }}</a>
-{% endblock markup %}
-
-{# Things to support:
- # Hashtag: show a deprecation message
- # Show tweets by an author
- # Show tweets from a collection
- # Show tweets from a timeline
- #}

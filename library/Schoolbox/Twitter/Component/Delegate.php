@@ -15,10 +15,10 @@ use Component_ControllerAbstract;
  */
 class Delegate
 {
-    private const TEMPLATE_EMPTY               = '@twitter/component/empty.twig';
-    private const TEMPLATE_PROFILE_TIMELINE    = '@twitter/component/timeline/profile.twig';
-    private const TEMPLATE_LIST_TIMELINE       = '@twitter/component/timeline/list.twig';
-    private const TEMPLATE_COLLECTION_TIMELINE = '@twitter/component/timeline/collection.twig';
+    private const TEMPLATE_EMPTY               = '@twitter/empty.twig';
+    private const TEMPLATE_PROFILE_TIMELINE    = '@twitter/timeline/profile.twig';
+    private const TEMPLATE_LIST_TIMELINE       = '@twitter/timeline/list.twig';
+    private const TEMPLATE_COLLECTION_TIMELINE = '@twitter/timeline/collection.twig';
 
 
     /**
@@ -39,12 +39,12 @@ class Delegate
         }
 
         $listSlug = $component->getConfig('listSlug') ?? '';
-        if ($listSlug !== '') {
+        if ((string)$listSlug !== '') {
             return self::TEMPLATE_LIST_TIMELINE;
         }
 
         $collectionId = $component->getConfig('collectionId') ?? '';
-        if ($collectionId !== '') {
+        if ((string)$collectionId !== '') {
             return self::TEMPLATE_COLLECTION_TIMELINE;
         }
 
