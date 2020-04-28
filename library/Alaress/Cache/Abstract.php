@@ -191,7 +191,7 @@ abstract class Alaress_Cache_Abstract
     /**
      * Sam's new cache update :P
      *
-     * @return self
+     * @return $this
      * @throws InvalidArgumentException
      */
     protected function newCacheUpdate(): \Alaress_Cache_Abstract
@@ -268,7 +268,7 @@ abstract class Alaress_Cache_Abstract
      * Remove the cached file
      *
      * @param string $file
-     * @return self
+     * @return $this
      */
     private function remove($file): \Alaress_Cache_Abstract
     {
