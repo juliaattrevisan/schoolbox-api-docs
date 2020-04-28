@@ -67,7 +67,7 @@ abstract class AbstractMailer implements IMailer
     /**
      * Construct the basics of a new Mailer
      *
-     * @param        $template
+     * @param string $template
      * @param string $subject
      * @param string $to
      * @param string $host
@@ -442,7 +442,7 @@ abstract class AbstractMailer implements IMailer
     /**
      * Parse valid email addresses from a string
      *
-     * @param $emails
+     * @param array $emails
      * @return array
      */
     private static function parseValidEmailAddresses($emails): array
@@ -488,7 +488,7 @@ abstract class AbstractMailer implements IMailer
 
     /**
      * Update email separator from comma with EMAIL_SEPARATOR_CODE
-     * @param $string
+     * @param string $string
      * @return mixed
      */
     public static function standardiseEmailSeparator($string)
