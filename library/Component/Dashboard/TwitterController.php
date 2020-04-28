@@ -11,6 +11,8 @@ use \Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Component_Dashboard_TwitterController
+ *
+ * @deprecated replaced by \Schoolbox\Twitter\Component\Dashboard\Controller
  */
 class Component_Dashboard_TwitterController extends Component_Dashboard_ControllerAbstract {
 

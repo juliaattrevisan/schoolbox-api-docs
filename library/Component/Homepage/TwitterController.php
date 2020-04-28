@@ -11,6 +11,8 @@ use \Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Component_Homepage_TwitterController
+ *
+ * @deprecated replaced by \Schoolbox\Twitter\Component\Homepage\Controller
  */
 class Component_Homepage_TwitterController extends Component_Homepage_ControllerAbstract
 {
