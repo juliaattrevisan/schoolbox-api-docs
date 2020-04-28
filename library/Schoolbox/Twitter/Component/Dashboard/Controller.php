@@ -31,9 +31,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $templateHandle,
             '@twitter/component.twig',
             [
-                'componentId' => $this->getInstance()->getId(),
-                'username'    => $this->getConfig('username'),
-                'keywords'    => $this->getConfig('keywords'),
+                'componentId'  => $this->getInstance()->getId(),
+                'username'     => $this->getConfig('username'),
+                'keywords'     => $this->getConfig('keywords'),
+                'listSlug'     => $this->getConfig('listSlug'),
+                'collectionId' => $this->getConfig('collectionId'),
+                'limit'        => $this->getConfig('limit'),
             ]
         );
     }

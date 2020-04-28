@@ -1,12 +1,14 @@
-{% if username is empty %}
-    <div class="empty-state">
-        <span class="icon-twitter"></span>
-        <p>
-            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
-            to show a feed of tweets.
-        </p>
-    </div>
-{% else %}
+{% block emptyState %}
+<div class="empty-state">
+    <span class="icon-twitter"></span>
+    <p>
+        <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
+        to show a feed of tweets.
+    </p>
+</div>
+{% endblock emptyState %}
+
+{% block js %}
     {% autoescape 'js' %}
         <script type="text/javascript">
             // Include Twitter's JS API
@@ -27,7 +29,13 @@
 
                 return t;
             }(document, "script", "twitter-wjs"));
+        </script>
+    {% endautoescape %}
+{% endblock js %}
 
+{% block install %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
             ($(function () {
                 twttr.widgets.createTimeline(
                     {
@@ -39,13 +47,14 @@
             }));
         </script>
     {% endautoescape %}
+{% endblock install %}
+
+{% block markup %}
     <a id="twitter-view-{{ id }}"
        class="twitter-timeline"
-       href="https://twitter.com/{{ username }}">
-        Tweets by @{{ username }}
-    </a>
-
-{% endif %}
+       href="https://twitter.com/{{ username }}"
+    >Tweets by @{{ username }}</a>
+{% endblock markup %}
 
 {# Things to support:
  # Hashtag: show a deprecation message
