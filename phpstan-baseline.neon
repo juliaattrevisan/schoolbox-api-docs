@@ -461,16 +461,6 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 104$#"
-			count: 1
-			path: library/Alaress/Web/Controller/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 80$#"
-			count: 1
-			path: library/Alaress/Web/Controller/Base.php
-
-		-
 			message: "#^Variable \\$data in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Web/Output/Base.php
