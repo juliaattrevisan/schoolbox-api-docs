@@ -166,11 +166,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$level\\)\\: Unexpected token \"\\$level\", expected type at offset 47$#"
-			count: 1
-			path: library/Alaress/Lumberjack/CliFormatter.php
-
-		-
 			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: library/Alaress/Lumberjack/CliFormatter.php
