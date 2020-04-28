@@ -63,7 +63,7 @@ class RelativeUrlTest extends TestCase
 
     /**
      * @dataProvider provider_validSiteHost
-     * @param $siteHost
+     * @param string|null $siteHost
      */
     public function test_constructor_validSiteHost($siteHost)
     {
@@ -161,8 +161,8 @@ class RelativeUrlTest extends TestCase
 
     /**
      * @dataProvider provider_parsableHostnames
-     * @param $url
-     * @param $expected
+     * @param string $url
+     * @param string $expected
      */
     public function testCanGetHostname($url, $expected)
     {
