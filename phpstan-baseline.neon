@@ -66,16 +66,6 @@ parameters:
 			path: library/Alaress/Cache/Log.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 41$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
-
-		-
-			message: "#^Return typehint of method Alaress_Cache_Log\\:\\:setVerbose\\(\\) has invalid type Alaress_Cache_Locker_Abstract\\.$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
-
-		-
 			message: "#^Constructor of class Alaress_CleanProbe has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/CleanProbe.php

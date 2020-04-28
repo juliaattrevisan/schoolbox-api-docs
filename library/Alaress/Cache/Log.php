@@ -27,7 +27,7 @@ class Alaress_Cache_Log {
 	/**
 	 * Logging mechanism
 	 *
-	 * @param $text
+	 * @param string $text
 	 */
 	public function report($text) {
 		if ($this->getVerbose()) {
@@ -42,7 +42,7 @@ class Alaress_Cache_Log {
 	 * Set verbose
 	 *
 	 * @param boolean $verbose
-	 * @return \Alaress_Cache_Locker_Abstract
+	 * @return self
 	 */
 	private function setVerbose($verbose) {
 		$this->verbose = $verbose;
