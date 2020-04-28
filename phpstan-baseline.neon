@@ -301,21 +301,6 @@ parameters:
 			path: library/Alaress/Session/SegmentFactory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\\\Aura\\\\Session\\\\CsrfTokenFactory A CSRF token factory\\.\\)\\: Unexpected token \"A\", expected variable at offset 176$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(int Request time, to compare the session time against\\)\\: Unexpected token \"Request\", expected variable at offset 386$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$lifetime\\)\\: Unexpected token \"\\$lifetime\", expected type at offset 86$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
 			message: "#^Call to an undefined method Aura\\\\Session\\\\Phpfunc\\:\\:setcookie\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Session/Session.php
