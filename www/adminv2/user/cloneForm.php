@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -32,6 +32,8 @@ if ($clone['dest'] == 0) {
     // new role
     $dest = new Role();
     $dest->setName($clone['new']);
+    $dest->setSequence($src->getSequence());
+    $dest->setUpdatedBy($_SESSION['user']->getId());
 } else {
     $dest = RoleMapper::getInstance()->findById($clone['dest']);
 }
