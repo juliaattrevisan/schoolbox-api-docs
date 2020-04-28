@@ -177,6 +177,9 @@
                                             <p>{{ recentVisitor.user.fullName }}</p>
                                         </a>
                                         <p class="meta">{{ recentVisitor.user.preferredTitle }}</p>
+                                        <p class="meta">Last visited
+                                            <time title="{{ recentVisitor.lastAccessTime.long }}">{{ recentVisitor.lastAccessTime.relativeTime }}</time>
+                                        </p>
                                     </div>
                                 </li>
                             {% endfor %}
