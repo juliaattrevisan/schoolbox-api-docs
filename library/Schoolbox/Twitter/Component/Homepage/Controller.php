@@ -7,11 +7,6 @@
 namespace Schoolbox\Twitter\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
-use RuntimeException;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use UnexpectedValueException;
 
 /**
  * Homepage component for Twitter feeds
@@ -19,20 +14,16 @@ use UnexpectedValueException;
 class Controller extends Component_Homepage_ControllerAbstract
 {
     /**
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
+     * @inheritDoc
      */
     public function execute()
     {
+        return true;
     }
 
 
     /**
-     * @param String $templateHandle
-     * @return bool
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * @inheritDoc
      */
     public function renderTemplate($templateHandle)
     {

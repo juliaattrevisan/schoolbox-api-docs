@@ -7,11 +7,6 @@
 namespace Schoolbox\Twitter\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
-use RuntimeException;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use UnexpectedValueException;
 
 /**
  * Dashboard component for Twitter feeds
@@ -19,20 +14,16 @@ use UnexpectedValueException;
 class Controller extends Component_Dashboard_ControllerAbstract
 {
     /**
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
+     * @inheritDoc
      */
     public function execute()
     {
+        return true;
     }
 
 
     /**
-     * @param String $templateHandle
-     * @return bool
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * @inheritDoc
      */
     public function renderTemplate($templateHandle)
     {
