@@ -187,8 +187,8 @@ class Builder implements BuilderInterface
 
 
 	/**
-	 * @param $name
-	 * @param $value
+	 * @param string $name
+	 * @param string $value
 	 * @return self
 	 */
 	public function putMeta($name, $value) {
