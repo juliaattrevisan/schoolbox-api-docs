@@ -49,7 +49,7 @@ class FlatRouter implements IRouter
      * Get the data stored at the end of this path. The return value is an array of key-value pairs as
      * stored by static::add(), or throws an InvalidArgument exception if there is no data (ie. path not declared)
      *
-     * @param $path
+     * @param string $path
      * @throws InvalidArgumentException
      * @return array
      */
