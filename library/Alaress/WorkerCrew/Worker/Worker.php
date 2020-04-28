@@ -211,7 +211,7 @@ class Worker extends PipeWriter
 
 
     /**
-     * @param $data
+     * @param string $data
      * @return self
      */
     public function appendData($data)
