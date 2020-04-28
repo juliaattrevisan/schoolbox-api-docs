@@ -66,16 +66,6 @@ parameters:
 			path: library/Alaress/Database/Broker/Mysql/Broker.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\*/\", expected variable at offset 17$#"
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\*/\", expected variable at offset 18$#"
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 76$#"
 			count: 1
 			path: library/Alaress/Database/Connector/IConnector.php
