@@ -71,11 +71,6 @@ parameters:
 			path: library/Alaress/Database/Predicate/Builder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(&array \\$param\\)\\: Unexpected token \"&\", expected type at offset 91$#"
-			count: 1
-			path: library/Alaress/Database/Statement/StoredProcedure/Base.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(&array \\$param\\)\\: Unexpected token \"&\", expected type at offset 313$#"
 			count: 1
 			path: library/Alaress/Database/Statement/StoredProcedure/Dblib/StoredProcedure.php
