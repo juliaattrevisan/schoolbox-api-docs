@@ -39,9 +39,9 @@ class SortUsersByName implements IUserComparator
     public function getCallable(): callable
     {
         return function (User $left, User $right) {
-            $cmp = \strcasecmp($left->getLastname(), $right->getLastname());
+            $cmp = \strcasecmp($left->getLastname() ?? '', $right->getLastname() ?? '');
             if ($cmp === 0) {
-                $cmp = \strcasecmp($left->getFirstname(), $right->getFirstname());
+                $cmp = \strcasecmp($left->getFirstname() ?? '', $right->getFirstname() ?? '');
             }
             return $cmp;
         };
