@@ -6,11 +6,6 @@ parameters:
 			path: conf/modules/SportsFixtures.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 2
-			path: library/Activity.php
-
-		-
 			message: "#^Variable \\$inst in PHPDoc tag @var does not match assigned variable \\$instance\\.$#"
 			count: 1
 			path: library/AjaxChat.php

@@ -29,7 +29,7 @@ class Activity
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed|string
      */
     public function lastCatVisit($id)
@@ -47,7 +47,7 @@ class Activity
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     public function newCategory($id)
