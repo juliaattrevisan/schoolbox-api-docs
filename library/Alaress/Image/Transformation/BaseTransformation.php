@@ -24,7 +24,7 @@ class BaseTransformation implements Transformation
     /**
     * Get all transformations for a particular key
     *
-    * @param  $key
+    * @param  string $key
     * @throws \OutOfBoundsException if transformation isn't found
     * @return array
     */
