@@ -311,16 +311,6 @@ parameters:
 			path: library/Alaress/Session/Session.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$candidate\\)\\: Unexpected token \"\\$candidate\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Specification/Test/TestSpecificationFramework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$components\\)\\: Unexpected token \"\\$components\", expected type at offset 18$#"
-			count: 6
-			path: library/Alaress/Specification/Test/TestSpecificationFramework.php
-
-		-
 			message: "#^Constructor of class Alaress_Submarine has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/Submarine.php
