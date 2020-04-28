@@ -256,11 +256,6 @@ parameters:
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 94$#"
-			count: 1
-			path: library/Alaress/Scheduler/CronScheduler.php
-
-		-
 			message: "#^Property Alaress\\\\Scheduler\\\\Interactive\\\\Interactor\\:\\:\\$scheduler has unknown class Alaress\\\\Scheduler\\\\StompScheduler as its type\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Interactive/Interactor.php
