@@ -136,11 +136,6 @@ parameters:
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$strategy\\)\\: Unexpected token \"\\$strategy\", expected type at offset 212$#"
-			count: 1
-			path: library/Alaress/Image/Processor/Standard.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 75$#"
 			count: 1
 			path: library/Alaress/Image/Transformation/BaseTransformation.php
