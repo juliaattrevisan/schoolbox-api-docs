@@ -644,9 +644,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * @param $year
-     * @param $month
-     * @param $day
+     * @param int $year
+     * @param int $month
+     * @param int $day
      * @return $this
      */
     public function setDate($year, $month, $day)
