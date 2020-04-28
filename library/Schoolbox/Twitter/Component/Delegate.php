@@ -38,12 +38,12 @@ class Delegate
             return self::TEMPLATE_EMPTY;
         }
 
-        $listSlug = $component->getConfig('listSlug') ?? '';
+        $listSlug = $component->getConfig('twitterListSlug') ?? '';
         if ((string)$listSlug !== '') {
             return self::TEMPLATE_LIST_TIMELINE;
         }
 
-        $collectionId = $component->getConfig('collectionId') ?? '';
+        $collectionId = $component->getConfig('twitterCollectionId') ?? '';
         if ((string)$collectionId !== '') {
             return self::TEMPLATE_COLLECTION_TIMELINE;
         }
@@ -64,8 +64,8 @@ class Delegate
             'componentId'  => $component->getInstance()->getId(),
             'username'     => $component->getConfig('username'),
             'keywords'     => $component->getConfig('keywords'),
-            'listSlug'     => $component->getConfig('listSlug'),
-            'collectionId' => $component->getConfig('collectionId'),
+            'listSlug'     => $component->getConfig('twitterListSlug'),
+            'collectionId' => $component->getConfig('twitterCollectionId'),
             'limit'        => $component->getConfig('limit'),
         ];
     }
