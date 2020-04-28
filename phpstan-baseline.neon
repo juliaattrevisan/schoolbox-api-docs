@@ -81,16 +81,6 @@ parameters:
 			path: library/Alaress/Database/Wrapper/Db2/PDO.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$statement\\)\\: Unexpected token \"\\$statement\", expected type at offset 115$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connection\\)\\: Unexpected token \"\\$connection\", expected type at offset 116$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 9
 			path: library/Alaress/Date/Format.php

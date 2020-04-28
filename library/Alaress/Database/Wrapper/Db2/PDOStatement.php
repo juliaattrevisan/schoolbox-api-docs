@@ -315,7 +315,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * Set underlying DB2 statement resource. You should not need to use this externally.
      *
-     * @param $statement
+     * @param resource $statement
      * @return self
      */
     public function setStatement($statement)
@@ -337,7 +337,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * Set underlying DB2 connection resource. You should not need to use this externally.
      *
-     * @param $connection
+     * @param resource $connection
      * @return self
      */
     public function setConnection($connection)
