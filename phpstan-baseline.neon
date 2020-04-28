@@ -243,16 +243,6 @@ parameters:
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
 			count: 1
-			path: library/Alaress/Rss/Strategy/Atom.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Atom.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
-			count: 1
 			path: library/Alaress/Rss/Strategy/Interface.php
 
 		-
