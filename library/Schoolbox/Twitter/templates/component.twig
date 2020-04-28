@@ -1,4 +1,55 @@
-<div class="empty-state">
-    <span class="icon-twitter"></span>
-    <p><a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a hashtag and/or author</a> to show a feed of tweets from the last 6 to 9 days.</p>
-</div>
+{% if username is empty %}
+    <div class="empty-state">
+        <span class="icon-twitter"></span>
+        <p>
+            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
+            to show a feed of tweets.
+        </p>
+    </div>
+{% else %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            // Include Twitter's JS API
+            window.twttr = (function (d, s, id) {
+                let js,
+                    fjs = d.getElementsByTagName(s)[0],
+                    t = window.twttr || {};
+                if (d.getElementById(id)) return t;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "https://platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+
+                t._e = [];
+                t.ready = function (f) {
+                    t._e.push(f);
+                };
+
+                return t;
+            }(document, "script", "twitter-wjs"));
+
+            ($(function () {
+                twttr.widgets.createTimeline(
+                    {
+                        sourceType: "profile",
+                        screenName: "{{ username }}"
+                    },
+                    document.getElementById("twitter-view-{{ id }}")
+                );
+            }));
+        </script>
+    {% endautoescape %}
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="https://twitter.com/{{ username }}">
+        Tweets by @{{ username }}
+    </a>
+
+{% endif %}
+
+{# Things to support:
+ # Hashtag: show a deprecation message
+ # Show tweets by an author
+ # Show tweets from a collection
+ # Show tweets from a timeline
+ #}

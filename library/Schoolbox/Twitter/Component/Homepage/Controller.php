@@ -29,7 +29,12 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@twitter/component.twig'
+            '@twitter/component.twig',
+            [
+                'componentId' => $this->getInstance()->getId(),
+                'username'    => $this->getConfig('username'),
+                'keywords'    => $this->getConfig('keywords'),
+            ]
         );
     }
 }
