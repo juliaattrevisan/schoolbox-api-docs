@@ -61,11 +61,6 @@ parameters:
 			path: library/Alaress/Codec/Integer/Base64.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 97$#"
-			count: 1
-			path: library/Alaress/DataStructures/ObjectTree.php
-
-		-
 			message: "#^PHPDoc tag @throws with type Alaress\\\\Database\\\\Broker\\\\Mysql\\\\PDOException is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Database/Broker/Mysql/Broker.php
