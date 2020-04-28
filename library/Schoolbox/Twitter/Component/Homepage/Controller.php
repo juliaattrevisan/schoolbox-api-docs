@@ -7,6 +7,7 @@
 namespace Schoolbox\Twitter\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Schoolbox\Twitter\Component\Delegate;
 
 /**
  * Homepage component for Twitter feeds
@@ -27,18 +28,11 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Which type of view are we using?
+        $delegate = new Delegate();
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@twitter/component.twig',
-            [
-                'componentId'  => $this->getInstance()->getId(),
-                'username'     => $this->getConfig('username'),
-                'keywords'     => $this->getConfig('keywords'),
-                'listSlug'     => $this->getConfig('listSlug'),
-                'collectionId' => $this->getConfig('collectionId'),
-                'limit'        => $this->getConfig('limit'),
-            ]
+            $delegate->determineTemplate($this),
+            $delegate->buildTemplateParams($this)
         );
     }
 }
