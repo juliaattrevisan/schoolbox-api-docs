@@ -5,7 +5,7 @@
        class="twitter-timeline"
        href="https://twitter.com/{{ username }}/timelines/{{ collectionId }}"
        data-dnt="true"
-       data-height="600"
+       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
        data-chrome="noheader nofooter noborders transparent noscrollbar"
     >Tweet Collection by @{{ username }}</a>
 {% endblock markup %}
