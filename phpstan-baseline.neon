@@ -246,16 +246,6 @@ parameters:
 			path: library/Alaress/Rss/Strategy/Rss20.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(Alaress_Rss_Strategy_Interface\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 156$#"
 			count: 1
 			path: library/Alaress/Rss/Stream.php
