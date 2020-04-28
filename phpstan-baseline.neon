@@ -126,11 +126,6 @@ parameters:
 			path: library/Alaress/Image/Cache/Portrait.php
 
 		-
-			message: "#^Binary operation \"\\-\" between array and array results in an error\\.$#"
-			count: 2
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Crop.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Image\\\\Filetype\\\\FiletypeInterface\\:\\:getImageManager\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
