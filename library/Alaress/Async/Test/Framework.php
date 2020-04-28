@@ -451,10 +451,10 @@ class Framework
 
     /**
      * @param Subscription $subscription
-     * @param              $name
-     * @param              $line
-     * @param              $record
-     * @param              $testClass
+     * @param string       $name
+     * @param string       $line
+     * @param string       $record
+     * @param string       $testClass
      * @return bool
      */
     protected function testSubscription(Subscription $subscription, $name, $line, $record, $testClass)

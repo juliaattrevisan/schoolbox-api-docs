@@ -41,26 +41,6 @@ parameters:
 			path: library/Alaress/Async/Queue/RedisQueue.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$line\\)\\: Unexpected token \"\\$line\", expected type at offset 105$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 72$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$record\\)\\: Unexpected token \"\\$record\", expected type at offset 138$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$testClass\\)\\: Unexpected token \"\\$testClass\", expected type at offset 173$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
