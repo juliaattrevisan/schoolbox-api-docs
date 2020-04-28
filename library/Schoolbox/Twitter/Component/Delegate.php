@@ -66,7 +66,7 @@ class Delegate
             'keywords'     => $component->getConfig('keywords'),
             'listSlug'     => $component->getConfig('twitterListSlug'),
             'collectionId' => $component->getConfig('twitterCollectionId'),
-            'limit'        => $component->getConfig('limit'),
+            'limit'        => $component->getConfig('size'),
         ];
     }
 }
