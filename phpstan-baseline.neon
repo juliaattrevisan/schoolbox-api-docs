@@ -226,11 +226,6 @@ parameters:
 			path: library/Alaress/Redis/Cache.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(array  &\\$dictionary\\)\\: Unexpected token \"&\", expected variable at offset 112$#"
-			count: 1
-			path: library/Alaress/Routing/Dictionary/SubscriptionDictionary.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 243$#"
 			count: 1
 			path: library/Alaress/Routing/FlatRouter.php

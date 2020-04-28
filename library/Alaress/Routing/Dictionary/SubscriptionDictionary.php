@@ -99,7 +99,7 @@ class SubscriptionDictionary implements IDictionary
      * Helper method for the two translate methods
      *
      * @param string $string
-     * @param array  &$dictionary
+     * @param array  $dictionary
      * @return string
      */
     private function translate($string, array &$dictionary)
