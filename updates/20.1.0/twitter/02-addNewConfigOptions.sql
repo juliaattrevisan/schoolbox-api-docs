@@ -16,6 +16,6 @@ INSERT IGNORE INTO component_config_definition (
     label,
     description
 )
-SELECT cd.id, 'Collection ID', '', 'Collection ID', 'The ID of the collection (if any) to show in this component'
+SELECT cd.id, 'collectionId', '', 'Collection ID', 'The ID of the collection (if any) to show in this component'
 FROM component_definition cd
 WHERE cd.class IN ('Schoolbox\\Twitter\\Component\\Homepage\\Controller', 'Schoolbox\\Twitter\\Component\\Dashboard\\Controller');
