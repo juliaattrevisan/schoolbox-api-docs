@@ -46,11 +46,6 @@ parameters:
 			path: library/Alaress/Async/Test/Subscription.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$paramsKey$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/IsTrue.php
-
-		-
 			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Cache/Abstract.php
