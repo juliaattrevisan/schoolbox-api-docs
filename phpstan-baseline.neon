@@ -126,16 +126,6 @@ parameters:
 			path: library/Alaress/Image/Cache/Portrait.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$canvasHeight\\)\\: Unexpected token \"\\$canvasHeight\", expected type at offset 47$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/BaseStrategy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$canvasWidth\\)\\: Unexpected token \"\\$canvasWidth\", expected type at offset 46$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/BaseStrategy.php
-
-		-
 			message: "#^Binary operation \"\\-\" between array and array results in an error\\.$#"
 			count: 2
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Crop.php
