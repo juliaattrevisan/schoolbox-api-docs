@@ -1,9 +1,9 @@
 <?php
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @deprecated Twitter hashtags are no longer supported: use list slugs or collection IDs instead
+ * @author     Matt Day <matt.day@alaress.com.au>
+ * @copyright  Copyright 2019, Schoolbox Pty Ltd
+ * @link       https://schoolbox.com.au/
  */
 class Component_Config_Keywords extends Component_Config_Abstract
 {

@@ -4,11 +4,16 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Twitter;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 
+/**
+ * Module for the Twitter component
+ */
 class Module extends BaseModule
 {
     /**

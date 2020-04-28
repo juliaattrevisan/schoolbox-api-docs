@@ -4,6 +4,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Twitter\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
