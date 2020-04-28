@@ -755,7 +755,7 @@ class Builder implements IBuilder
     /**
      * Set a parameter prefix, because multiple predicate builders in a single query are a thing
      *
-     * @param $string
+     * @param string $string
      * @return self|$this
      */
     public function setParamPrefix($string): self

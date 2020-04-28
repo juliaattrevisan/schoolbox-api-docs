@@ -71,11 +71,6 @@ parameters:
 			path: library/Alaress/Database/Predicate/Builder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 122$#"
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$values\\)\\: Unexpected token \"\\$values\", expected type at offset 92$#"
 			count: 1
 			path: library/Alaress/Database/Statement/Base.php
