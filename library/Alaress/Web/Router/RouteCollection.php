@@ -10,7 +10,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Alaress\Web\Router;
 
 class RouteCollection extends \Aura\Router\RouteCollection {
@@ -23,8 +23,8 @@ class RouteCollection extends \Aura\Router\RouteCollection {
      * * replace:post
      * * delete:post
      *
-     * @param $name
-     * @param $path
+     * @param string $name
+     * @param string $path
      */
     public function attachResourcePostAlias($name, $path) {
         $this->attach(
