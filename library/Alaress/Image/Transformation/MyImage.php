@@ -19,8 +19,8 @@ class MyImage extends BaseTransformation
     /**
      * Accept arguments in transformation list
      *
-     * @param $width
-     * @param $height
+     * @param int $width
+     * @param int $height
      */
     public function __construct($width, $height)
     {
@@ -40,7 +40,7 @@ class MyImage extends BaseTransformation
     /**
      * Dynamically construct a transformation list
      *
-     * @param $allTransformations
+     * @param array $allTransformations
      */
     private function setAllTransformations($allTransformations)
     {

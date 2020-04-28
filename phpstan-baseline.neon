@@ -136,21 +136,6 @@ parameters:
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$height\\)\\: Unexpected token \"\\$height\", expected type at offset 93$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$width\\)\\: Unexpected token \"\\$width\", expected type at offset 72$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allTransformations\\)\\: Unexpected token \"\\$allTransformations\", expected type at offset 76$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
 			count: 1
 			path: library/Alaress/Json/Decorator/PropertyDecorator.php
