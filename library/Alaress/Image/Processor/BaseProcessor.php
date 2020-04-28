@@ -183,7 +183,7 @@ class BaseProcessor
     /**
      * Set image resource being manipulated
      *
-     * @param $image
+     * @param mixed $image
      * @return static
      */
     protected function setImage($image)
