@@ -65,14 +65,7 @@ paths:
           $ref: 'common.yaml#/components/responses/problem'
       parameters:
         - $ref: 'common.yaml#/components/parameters/cursor'
-        - name:        q
-          in:          query
-          required:    true
-          description: |
-            A search term.
-
-            (Different resources may have different search support, thus they
-            may have different search parameters.)
+        - $ref: 'common.yaml#/components/parameters/search'
 
     post:
       operationId: resourcePost
@@ -210,6 +203,8 @@ paths:
           (In practice, actions will be split into different paths so that they
           can be documented separately; but for example purposes the action is
           provided as a path parameter.)
+        schema:
+          type: string
 
 
   /resource/{id}/{subresource}:
@@ -249,6 +244,8 @@ paths:
           (In practice, each sub-resource will have its own path so multiple
           different types of sub-resource may be defined; but for example
           purposes the subresource is provided as a path parameter.)
+        schema:
+          type: string
 
 
 # Reusable references to definitions go here.
