@@ -1006,11 +1006,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$invalidYear\\)\\: Unexpected token \"\\$invalidYear\", expected type at offset 149$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/Test/StudentAttributesTest.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 39$#"
 			count: 1
 			path: library/DAV/Error.php
