@@ -631,27 +631,7 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Property Calendar_Api_EventType_Timetable_ExternalConstrained_Default\\:\\:\\$configLoader has unknown class Config\\\\Loader as its type\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
 			message: "#^Call to method get\\(\\) on an unknown class Config\\\\Loader\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
 
