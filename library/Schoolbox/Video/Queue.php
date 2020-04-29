@@ -204,16 +204,16 @@ class Queue extends ResourceVideo
 
         $transcodeString =
             "nice {$commandTranscode}" .
-            " -y" .
+            ' -y' .
             ' -nostats' .
             " -i {$filenameSourceEscaped}" .
-            " -map 0:a" .
-            " -c:a libmp3lame" .
-            " -b {$audioBitrateEscaped}k" .
-            " -ar:a 44100" .
+            ' -map 0:a' .
+            " -b {$audioBitrateEscaped}" .
+            ' -ar:a 44100' .  //44Khz sampling
+            ' -ac 2' .   //Stereo audio
             " -timelimit {$processTimeoutEscaped}" .
             " {$filenameTranscodeAudioEscaped}" .
-            " 2>&1";
+            ' 2>&1';
 
         $this->log("Transcoding audio");
 
@@ -278,7 +278,7 @@ class Queue extends ResourceVideo
         $infoCommandline =
             "{$commandMediaInformation} " .
             " -show_streams {$filenameSourceEscaped} " .
-            " 2>&1";
+            ' 2>&1';
 
         $infoMessage   = $this->executeCommand($infoCommandline);
         $videoMetadata = $this->getVideoMetadata($infoMessage);
@@ -289,21 +289,25 @@ class Queue extends ResourceVideo
 
         $transcodeCommandline =
             "nice {$commandTranscode}" .
-            " -y" .
+            ' -y' .
             ' -nostats' .
             " -i {$filenameSourceEscaped}" .
-            ' -max_muxing_queue_size 1024'.
+            ' -max_muxing_queue_size 1024'.  //Set queue size larger to work around bug in some videos
             " -c:v libx264 {$videoMetadata["videoScale"]}" .
-            " -preset slow" .
+            ' -preset slow' .
             " -b:v {$videoBitrateEscaped}" .
-            " -pix_fmt yuv420p " .
+            ' -pix_fmt yuv420p ' . //Colour depth yuv420p for compat
+            ' -movflags faststart ' . //Move meta data to start of file for streaming
+            ' -profile:v high ' . //High profile, not compatible with iPhone 3 but that is ancient
+            ' -r 30' . // 30 fps
+            ' -c:a aac' . // AAC encoding
             " -b:a {$audioBitrateEscaped}" .
-            " -r 24" .
-            " -ar:a 44100" .
+            ' -ar:a 44100' . //44Khz audio
+            ' -ac 2' .   //Stereo audio
             " -timelimit {$processTimeoutEscaped}" .
             " {$strictMode}" .
-            " -ac 2 {$filenameTranscodeVideoEscaped}" .
-            " 2>&1";
+            " {$filenameTranscodeVideoEscaped}" .
+            ' 2>&1';
 
         $this->log("Transcoding video");
 
@@ -334,12 +338,12 @@ class Queue extends ResourceVideo
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024'.
-                " -f image2 " .
+                ' -f image2 ' .
                 " -ss {$thumbnailSecondsEscaped}" .
                 " -vf {$videoMetadata["thumbScale"]}crop=64:64" .
-                " -frames:v 1" .
+                ' -frames:v 1' .
                 " {$filenameTranscodeThumbnailEscaped}" .
-                " 2>&1";
+                ' 2>&1';
 
             $this->executeCommand($thumbnailCommandline);
             $this->log("Video thumbnail generated");
@@ -353,15 +357,15 @@ class Queue extends ResourceVideo
 
             $posterCommandline =
                 "nice {$commandTranscode} " .
-                " -y" .
+                ' -y' .
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024'.
-                " -f image2 " .
+                ' -f image2 ' .
                 " -ss {$thumbnailSecondsEscaped}" .
-                " -frames:v 1" .
+                ' -frames:v 1' .
                 " {$filenameTranscodePosterEscaped}" .
-                " 2>&1";
+                ' 2>&1';
 
             $this->executeCommand($posterCommandline);
             $this->log("Video poster generated");
