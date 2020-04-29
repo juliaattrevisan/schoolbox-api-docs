@@ -831,11 +831,6 @@ parameters:
 			path: library/Component/Instance.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 104$#"
-			count: 1
-			path: library/Component/Instance.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$definitionId\\)\\: Unexpected token \"\\$definitionId\", expected type at offset 141$#"
 			count: 1
 			path: library/Component/InstanceMapper.php
