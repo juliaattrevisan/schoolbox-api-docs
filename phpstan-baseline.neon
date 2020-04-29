@@ -1181,11 +1181,6 @@ parameters:
 			path: library/EOTC/Authenticator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 79$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
-
-		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:setAuthor\\(\\)\\.$#"
 			count: 1
 			path: library/EOTC/EventConnector.php
@@ -1243,16 +1238,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:getMetadata\\(\\)\\.$#"
 			count: 3
-			path: library/EOTC/EventConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 103$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 73$#"
-			count: 1
 			path: library/EOTC/EventConnector.php
 
 		-
