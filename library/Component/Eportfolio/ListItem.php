@@ -13,35 +13,35 @@ abstract class ListItem {
 	/**
 	 * Primary key
 	 *
-	 * @var
+	 * @var int
 	 */
 	public $id;
 
 	/**
 	 * List to which this list item belongs
 	 *
-	 * @var
+	 * @var int
 	 */
 	public $component_instance_id;
 
 	/**
 	 * List item contents
 	 *
-	 * @var
+	 * @var string
 	 */
 	public $content;
 
 	/**
 	 * Order of the list item
 	 *
-	 * @var
+	 * @var int
 	 */
 	public $sequence;
 
 	/**
 	 * Set component instance id
 	 *
-	 * @param  $component_instance_id
+	 * @param int $component_instance_id
 	 */
 	public function setComponentInstanceId($component_instance_id) {
 		$this->component_instance_id = $component_instance_id;
@@ -50,7 +50,7 @@ abstract class ListItem {
 	/**
 	 * Get component instance id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getComponentInstanceId() {
 		return $this->component_instance_id;
@@ -59,7 +59,7 @@ abstract class ListItem {
 	/**
 	 * Set content
 	 *
-	 * @param  $content
+	 * @param string $content
 	 */
 	public function setContent($content) {
 		$this->content = $content;
@@ -68,7 +68,7 @@ abstract class ListItem {
 	/**
 	 * Get content
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function getContent() {
 		return $this->content;
@@ -77,7 +77,7 @@ abstract class ListItem {
 	/**
 	 * Set list item id
 	 *
-	 * @param  $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -86,7 +86,7 @@ abstract class ListItem {
 	/**
 	 * Get list item id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -95,7 +95,7 @@ abstract class ListItem {
 	/**
 	 * Set sequence
 	 *
-	 * @param  $sequence
+	 * @param int $sequence
 	 */
 	public function setSequence($sequence) {
 		$this->sequence = $sequence;
@@ -104,7 +104,7 @@ abstract class ListItem {
 	/**
 	 * Get sequence
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getSequence() {
 		return $this->sequence;
