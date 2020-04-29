@@ -12,29 +12,21 @@ namespace Calendar\Event\Collection;
 
 use Aura\Di\ContainerInterface;
 use Calendar\Event\Collection;
+use Calendar_Api_EventType_Interface;
 use Schoolbox\User;
 
 class Lister extends Renderer
 {
+
     /**
      * Constructor
      *
-     * @param $api
-     * @param $startTimestamp
-     * @param $endTimestamp
-     * @param User $user            Who the Calendar is about
-     * @param \SitePage $page
-     * @param User $viewer          Who is viewing the Calendar
-     */
-    /**
-     * Constructor
-     *
-     * @param                    $api
-     * @param                    $startTimestamp
-     * @param                    $endTimestamp
-     * @param User               $user           Who the Calendar is about
-     * @param ContainerInterface $di
-     * @param User               $viewer         Who is viewing the Calendar
+     * @param Calendar_Api_EventType_Interface  $api
+     * @param int                               $startTimestamp
+     * @param int                               $endTimestamp
+     * @param User                              $user           Who the Calendar is about
+     * @param ContainerInterface                $di
+     * @param User                              $viewer         Who is viewing the Calendar
      */
     public function __construct($api, $startTimestamp, $endTimestamp, User $user, ContainerInterface $di, User $viewer)
     {
