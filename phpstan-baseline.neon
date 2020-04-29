@@ -706,16 +706,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$calendar\\)\\: Unexpected token \"\\$calendar\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/Dashboard/CalendarController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$group\\)\\: Unexpected token \"\\$group\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/Dashboard/CalendarController.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$period\\)\\: Unexpected token \"\\$period\", expected type at offset 73$#"
 			count: 1
 			path: library/Component/Dashboard/JuniorTimetableController.php
