@@ -10,6 +10,7 @@ namespace Alaress\Mail;
 
 
 use Alaress\Html\ToText as Html2Text;
+use Scrub;
 use Twig\TwigFilter;
 use Twig_Environment;
 
@@ -53,15 +54,15 @@ class TwigMailer extends AbstractMailer {
         $this->twig->addFilter(
             new TwigFilter(
                 'purify',
-                array('Scrub', 'html'),
-                array('is_safe' => array('html'))
+                [Scrub::class, 'html'],
+                ['is_safe' => ['html']]
             )
         );
         $this->twig->addFilter(
             new TwigFilter(
                 'purifyAbsoluteUri',
-                array('Scrub', 'htmlAbsoluteUri'),
-                array('is_safe' => array('html'))
+                [Scrub::class, 'htmlAbsoluteUri'],
+                ['is_safe' => ['html']]
             )
         );
 
@@ -69,7 +70,7 @@ class TwigMailer extends AbstractMailer {
         $this->twig->addFilter(
             new TwigFilter(
                 'linkify',
-                [\Scrub::class, 'linkifyText'],
+                [Scrub::class, 'linkifyText'],
                 ['is_safe' => ['html']]
             )
         );
@@ -78,7 +79,7 @@ class TwigMailer extends AbstractMailer {
         $this->twig->addFilter(
             new TwigFilter(
                 'html2text',
-                array('Scrub', 'html2text')
+                [Scrub::class, 'html2text']
             )
         );
 
@@ -86,14 +87,14 @@ class TwigMailer extends AbstractMailer {
         $this->twig->addFilter(
             new TwigFilter(
                 'cutSentence',
-                array('TextFormatter', 'cutSentence')
+                ['TextFormatter', 'cutSentence']
             )
         );
-	}
+    }
 
-	/**
-	 * @param array $context
-	 * @return self
+    /**
+     * @param array $context
+     * @return self
 	 */
 	public function setContext($context) {
 		if($context) {
