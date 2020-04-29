@@ -364,7 +364,7 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * {@inheritDoc}
      *
-     * @param $object
+     * @param mixed $object
      * @return bool|int[]
      */
     public function save($object)

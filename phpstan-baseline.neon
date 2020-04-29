@@ -836,11 +836,6 @@ parameters:
 			path: library/Component/InstanceMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 46$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
 			message: "#^Return typehint of method Component_InstanceMapper\\:\\:save\\(\\) has invalid type int\\.$#"
 			count: 1
 			path: library/Component/InstanceMapper.php
