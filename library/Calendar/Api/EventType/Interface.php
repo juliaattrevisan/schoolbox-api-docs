@@ -24,7 +24,7 @@ interface Calendar_Api_EventType_Interface
 
 
     /**
-     * @param $eventId
+     * @param int $eventId
      * @todo What does this return?
      */
     public function getEvent($eventId);

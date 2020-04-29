@@ -611,11 +611,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 18$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Interface.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 153$#"
 			count: 1
 			path: library/Calendar/Api/EventType/ResourceBooking/Base.php
