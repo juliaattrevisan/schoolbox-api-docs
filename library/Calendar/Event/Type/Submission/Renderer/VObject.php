@@ -12,7 +12,9 @@ namespace Calendar\Event\Type\Submission\Renderer;
 use Calendar\Event\Render\VObjectTrait;
 
 /**
- * @method
+ * Class VObject
+ *
+ * @package Calendar\Event\Type\Submission\Renderer
  */
 class VObject extends Base
 {
