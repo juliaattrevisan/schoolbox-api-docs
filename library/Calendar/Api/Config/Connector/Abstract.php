@@ -104,17 +104,6 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     }
 
 
-    /**
-     * Find out if the current user's settings of $userCampus and $userGroup
-     * are in the selections for this config
-     *
-     * @param $userCampus
-     * @param $userGroup
-     *
-     * @return bool
-     */
-
-
     /* Getters/Setters
 	 */
 

@@ -14,8 +14,8 @@ interface Calendar_Api_Config_Connector_Interface {
 	 * $userCampus is an array of campus ids
 	 * $userGroup is an int
 	 *
-	 * @param $userCampus
-	 * @param $userGroup
+	 * @param array $userCampus
+	 * @param int $userGroup
 	 * @return mixed
 	 */
 	public function hasPermissions($userCampus, $userGroup);
