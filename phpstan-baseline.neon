@@ -921,26 +921,6 @@ parameters:
 			path: library/Custom/Meriden/Pastoral/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 72$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 90$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 83$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 86$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Mggs/Learning/Personalised/Admin/Module.php

@@ -262,7 +262,7 @@ class Gateway
     /**
      * Gets awards for the given student.
      *
-     * @param      $year
+     * @param int  $year
      * @param User $student
      *
      * @return array
@@ -275,7 +275,7 @@ class Gateway
     /**
      * Gets co-curricular activities for the given student.
      *
-     * @param      $year
+     * @param int  $year
      * @param User $student
      *
      * @return array
@@ -288,7 +288,7 @@ class Gateway
     /**
      * Gets community service for the given student.
      *
-     * @param      $year
+     * @param int  $year
      * @param User $student
      *
      * @return array
@@ -301,7 +301,7 @@ class Gateway
     /**
      * Gets positions of offices for the given student.
      *
-     * @param      $year
+     * @param int  $year
      * @param User $student
      *
      * @return array
