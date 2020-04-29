@@ -75,7 +75,7 @@ class ValidQualification
     /**
      * $mark is equivalent to 100.00%
      *
-     * @param $mark
+     * @param string $mark
      * @return bool
      */
     private function isFullmarks($mark): bool

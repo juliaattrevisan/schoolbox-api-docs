@@ -901,11 +901,6 @@ parameters:
 			path: library/Custom/Help/Hero/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mark\\)\\: Unexpected token \"\\$mark\", expected type at offset 63$#"
-			count: 1
-			path: library/Custom/Help/Hero/ValidQualification.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Help/Nesa/Module.php
