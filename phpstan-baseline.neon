@@ -476,21 +476,6 @@ parameters:
 			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 124$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$extension\\)\\: Unexpected token \"\\$extension\", expected type at offset 78$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\<type\\> \\$errorArray\\)\\: Unexpected token \"\\<\", expected type at offset 154$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
 			message: "#^Variable \\$files might not be defined\\.$#"
 			count: 1
 			path: library/AllowedFile.php
