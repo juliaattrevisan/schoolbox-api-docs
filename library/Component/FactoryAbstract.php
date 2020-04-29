@@ -41,7 +41,7 @@ abstract class Component_FactoryAbstract
     }
 
     /**
-     * @param $identifier
+     * @param int $identifier
      * @return Collection|Component_ControllerAbstract[]
      */
     public function buildComponentList($identifier)
