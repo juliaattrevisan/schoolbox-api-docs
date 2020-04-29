@@ -1,8 +1,5 @@
 <?php
-
 /**
- * Calendar_Api_EventType_Event_Vcal_Default
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +10,9 @@ use Sabre\VObject\Component\VCalendar;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
 
+/**
+ * Class Calendar_Api_EventType_Event_Vcal_Default
+ */
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
 
