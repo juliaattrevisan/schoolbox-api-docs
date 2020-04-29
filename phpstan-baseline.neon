@@ -731,11 +731,6 @@ parameters:
 			path: library/Component/Eportfolio/LinkListMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 97$#"
-			count: 1
-			path: library/Component/Homepage/EtherpadController.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForFolders\\(\\)\\.$#"
 			count: 1
 			path: library/Component/Homepage/ImageController.php
