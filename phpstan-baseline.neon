@@ -561,36 +561,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connectorClass\\)\\: Unexpected token \"\\$connectorClass\", expected type at offset 163$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventType\\)\\: Unexpected token \"\\$eventType\", expected type at offset 138$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentConnector\\)\\: Unexpected token \"\\$currentConnector\", expected type at offset 152$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentEventType\\)\\: Unexpected token \"\\$currentEventType\", expected type at offset 120$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connectorClass\\)\\: Unexpected token \"\\$connectorClass\", expected type at offset 89$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventType\\)\\: Unexpected token \"\\$eventType\", expected type at offset 64$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Custom/EOTC/Default.php
