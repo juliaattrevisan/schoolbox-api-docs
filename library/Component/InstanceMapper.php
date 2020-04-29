@@ -510,8 +510,8 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * Forcibly resequence a set of components, optionally protecting one
      *
-     * @param $module
-     * @param $identifier
+     * @param string $module
+     * @param int $identifier
      * @param int $protect - the component that has had its sequence changed, and so should be preserved
      * @param string $position
      * @return bool
@@ -540,10 +540,10 @@ class Component_InstanceMapper extends BaseMapper
     }
 
     /**
-     * @param $module
-     * @param $identifier
-     * @param $protect
-     * @param $position
+     * @param string $module
+     * @param int $identifier
+     * @param int $protect
+     * @param int $position
      * @return bool
      */
     private function resequenceColumn($module, $identifier, $protect, $position)
