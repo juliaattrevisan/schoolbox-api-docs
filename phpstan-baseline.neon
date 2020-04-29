@@ -561,21 +561,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 65$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 88$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 114$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 81$#"
 			count: 1
 			path: library/Calendar/Api/Config/Connector/EventExternal.php
