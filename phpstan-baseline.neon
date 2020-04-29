@@ -561,11 +561,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Custom/EOTC/Default.php
-
-		-
 			message: "#^Call to an undefined method Calendar\\:\\:getExternalEvents\\(\\)\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Event/External/Default.php

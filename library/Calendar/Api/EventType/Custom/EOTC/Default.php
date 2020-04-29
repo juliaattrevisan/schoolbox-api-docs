@@ -57,7 +57,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
     /**
      * Find a particular event from this source
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return \Calendar\Event\Collection
      */
