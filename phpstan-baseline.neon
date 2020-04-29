@@ -841,11 +841,6 @@ parameters:
 			path: library/Component/InstanceMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$configName\\)\\: Unexpected token \"\\$configName\", expected type at offset 318$#"
-			count: 1
-			path: library/Config.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 128$#"
 			count: 1
 			path: library/Custom/Diocesan/AchievementReport/Base.php
