@@ -64,7 +64,7 @@ abstract class Base
     /**
      * The year for which to obtain data
      *
-     * @var string
+     * @var string|null
      */
     protected $year = 0;
 
@@ -109,10 +109,10 @@ abstract class Base
     /**
      * Constructor
      *
-     * @param User  $user
-     * @param array $externalUser
-     * @param MSSQL $db
-     * @param $year
+     * @param User        $user
+     * @param array       $externalUser
+     * @param MSSQL       $db
+     * @param string|null $year
      */
     public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
         $this->user = $user;
@@ -166,7 +166,7 @@ abstract class Base
      * Determine if this result is progressive
      * (has square brackets around Result value)
      *
-     * @param $result
+     * @param string $result
      * @return bool
      */
     protected function isProgressive($result): bool

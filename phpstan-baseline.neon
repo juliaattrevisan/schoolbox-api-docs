@@ -841,16 +841,6 @@ parameters:
 			path: library/Component/InstanceMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 128$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$result\\)\\: Unexpected token \"\\$result\", expected type at offset 121$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findByExternalId\\(\\)\\.$#"
 			count: 1
 			path: library/Custom/Diocesan/AchievementReport/Module.php
