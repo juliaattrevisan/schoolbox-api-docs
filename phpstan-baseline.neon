@@ -516,37 +516,7 @@ parameters:
 			path: library/Bulk/Folder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 120$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$status\\)\\: Unexpected token \"\\$status\", expected type at offset 143$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 72$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 2
-			path: library/Calendar.php
-
-		-
 			message: "#^Variable \\$campusList might not be defined\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 78$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventID\\)\\: Unexpected token \"\\$eventID\", expected type at offset 55$#"
 			count: 1
 			path: library/Calendar.php
 
