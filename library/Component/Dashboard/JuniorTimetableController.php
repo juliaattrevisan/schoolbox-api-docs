@@ -85,7 +85,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     /**
      * Decide on a period code, for event stack
      *
-     * @param $period
+     * @param array $period
      * @return string
      */
     private function getCode($period)
@@ -105,7 +105,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     /**
      * Condense adjacent timetable periods
      *
-     * @param $timetable
+     * @param array $timetable
      * @return array
      */
     private function condense($timetable)

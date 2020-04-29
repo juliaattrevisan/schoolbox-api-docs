@@ -706,16 +706,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$period\\)\\: Unexpected token \"\\$period\", expected type at offset 73$#"
-			count: 1
-			path: library/Component/Dashboard/JuniorTimetableController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timetable\\)\\: Unexpected token \"\\$timetable\", expected type at offset 68$#"
-			count: 1
-			path: library/Component/Dashboard/JuniorTimetableController.php
-
-		-
 			message: "#^Variable \\$assessables in PHPDoc tag @var does not match assigned variable \\$allAssessments\\.$#"
 			count: 1
 			path: library/Component/Dashboard/RecentSubmissionsController.php
