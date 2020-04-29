@@ -37,7 +37,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
     /**
      * Associate a colour scheme with this event stream
      *
-     * @param $id
+     * @param int $id
      *
      * @return array
      */
@@ -55,8 +55,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
     /**
      * Get day events from this data source
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      *
      * @internal param $currentDay
      * @return Collection

@@ -566,21 +566,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/External/Default.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 81$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$DTSTART\\.$#"
 			count: 3
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
