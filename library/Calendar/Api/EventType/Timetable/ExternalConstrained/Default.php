@@ -22,7 +22,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     private $externalTimetable;
 
-    /** @var Config\Loader */
+    /** @var IConfigLoader */
     private $configLoader;
 
 

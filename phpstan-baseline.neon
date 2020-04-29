@@ -631,11 +631,6 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Call to method get\\(\\) on an unknown class Config\\\\Loader\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
 			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:getFirst\\(\\) should return Calendar\\\\Event\\\\Type\\\\EventBase but return statement is missing\\.$#"
 			count: 1
 			path: library/Calendar/Event/Collection.php
