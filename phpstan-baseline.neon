@@ -481,11 +481,6 @@ parameters:
 			path: library/AllowedFile.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 149$#"
-			count: 1
-			path: library/Assess/Answer/Exact.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 157$#"
 			count: 1
 			path: library/Assess/Answer/Fillgap.php
