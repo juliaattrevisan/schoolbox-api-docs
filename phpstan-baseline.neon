@@ -851,16 +851,6 @@ parameters:
 			path: library/Custom/Diocesan/AchievementReport/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 115$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/SchoolGrades/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 285$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/SchoolGrades/Base.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
 			count: 1
 			path: library/Custom/Help/CourseParticipation/Controller.php

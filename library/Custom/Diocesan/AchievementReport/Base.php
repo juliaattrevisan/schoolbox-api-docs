@@ -155,7 +155,7 @@ abstract class Base
     /**
      * Get the primary key out of $externalUser array
      *
-     * @return mixed
+     * @return string
      */
     protected function getExternalUserId() {
         return $this->externalUser['StudentID'];
