@@ -486,16 +486,6 @@ parameters:
 			path: library/Assess/Answer/Fillgap.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessId\\)\\: Unexpected token \"\\$assessId\", expected type at offset 122$#"
-			count: 1
-			path: library/Assess/Attempt.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionId\\)\\: Unexpected token \"\\$questionId\", expected type at offset 146$#"
-			count: 1
-			path: library/Assess/Attempt.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 153$#"
 			count: 1
 			path: library/Assess/IAutomarkable.php

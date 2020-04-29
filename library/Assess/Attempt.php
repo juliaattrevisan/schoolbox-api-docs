@@ -16,8 +16,8 @@ class Assess_Attempt extends Evaluation_Attempt {
      * Get all the attempts for a particular question
      * This is used for horizontal marking
      *
-     * @param $assessId
-     * @param $questionId
+     * @param int $assessId
+     * @param int $questionId
      * @return array|bool
      */
     public function getAllAttemptsForQuestion($assessId, $questionId)
