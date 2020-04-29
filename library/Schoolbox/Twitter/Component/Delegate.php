@@ -61,6 +61,7 @@ class Delegate
     public function buildTemplateParams(): array
     {
         return [
+            'id'          => $this->component->getInstance()->getId(),
             'href'        => $this->buildHref(),
             'componentId' => $this->component->getInstance()->getId(),
             'limit'       => $this->component->getConfig('size'),
