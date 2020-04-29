@@ -71,7 +71,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * This implementation of getEvent is actually used
 	 * (by /www/calendar/ajax/create.php, to display a new event)
 	 *
-	 * @param $eventId
+	 * @param int $eventId
 	 * @return \Calendar\Event\Collection
 	 */
 	public function getEvent($eventId) {
