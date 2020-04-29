@@ -35,8 +35,8 @@ class Assess_Question extends Evaluation_Question {
 	/**
 	 * Get the next question in the sequence
 	 *
-	 * @param $assessId
-	 * @param $questionId
+	 * @param int $assessId
+	 * @param int $questionId
 	 * @return array|bool
 	 */
 	public function getNextQuestion($assessId, $questionId) {
@@ -67,8 +67,8 @@ class Assess_Question extends Evaluation_Question {
 	/**
 	 * Get the previous question in the sequence
 	 *
-	 * @param $assessId
-	 * @param $questionId
+	 * @param int $assessId
+	 * @param int $questionId
 	 * @return array|bool
 	 */
 	public function getPreviousQuestion($assessId, $questionId) {
