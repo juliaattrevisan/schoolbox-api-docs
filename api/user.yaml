@@ -371,7 +371,6 @@ components:
         name:
           type: string
           description: The name of the role.
-          required: true
         type:
           type: string
           description: |
@@ -382,7 +381,9 @@ components:
             - student
             - parent
             - guest
-          required: true
+      required:
+        - id
+        - type
       example:
         - id:   3
           name: Parents
@@ -419,17 +420,18 @@ components:
         name:
           type: string
           description: The name of the campus.
-          required: true
         code:
           type: string
           description: |
             The identifying code for the campus in the school's SIS.
-          required: true
         days:
           type: integer
           minimum: 5
           maximum: 10
           description: The number of days in a cycle for this campus' timetable.
+      required:
+        - id
+        - code
 
   securitySchemes:
     bearerAuth:
