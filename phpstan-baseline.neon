@@ -1006,11 +1006,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 39$#"
-			count: 1
-			path: library/DAV/Error.php
-
-		-
 			message: "#^Method DailyQuote\\\\ConfigMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/DailyQuote/ConfigMapper.php

@@ -56,7 +56,7 @@ class DAV_Error {
 	/**
 	 * Get the meaning
 	 *
-	 * @param $message
+	 * @param string $message
 	 *
 	 * @internal param $code
 	 * @return mixed
