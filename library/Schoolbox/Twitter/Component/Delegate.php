@@ -15,45 +15,14 @@ use Component_ControllerAbstract;
  */
 class Delegate
 {
-    private const TEMPLATE_EMPTY               = '@twitter/empty.twig';
-    private const TEMPLATE_PROFILE_TIMELINE    = '@twitter/timeline/profile.twig';
-    private const TEMPLATE_LIST_TIMELINE       = '@twitter/timeline/list.twig';
-    private const TEMPLATE_COLLECTION_TIMELINE = '@twitter/timeline/collection.twig';
+    public const TEMPLATE                  = '@twitter/component.twig';
+    private const HREF_PROFILE_TIMELINE    = 'https://twitter.com/%s';
+    private const HREF_LIST_TIMELINE       = 'https://twitter.com/%s/lists/%s';
+    private const HREF_COLLECTION_TIMELINE = 'https://twitter.com/%s/timelines/%d';
 
 
     /**
-     * Which template should the component render?
-     * * No username: render the empty state
-     * * Username only: render the profile timeline
-     * * Username + list slug: render the list timeline
-     * * Username + collection ID: render the collection timeline
-     *
-     * @param Component_ControllerAbstract $component
-     * @return string
-     */
-    public function determineTemplate(Component_ControllerAbstract $component): string
-    {
-        $username = $component->getConfig('username') ?? '';
-        if ($username === '') {
-            return self::TEMPLATE_EMPTY;
-        }
-
-        $listSlug = $component->getConfig('twitterListSlug') ?? '';
-        if ((string)$listSlug !== '') {
-            return self::TEMPLATE_LIST_TIMELINE;
-        }
-
-        $collectionId = $component->getConfig('twitterCollectionId') ?? '';
-        if ((string)$collectionId !== '') {
-            return self::TEMPLATE_COLLECTION_TIMELINE;
-        }
-
-        return self::TEMPLATE_PROFILE_TIMELINE;
-    }
-
-
-    /**
-     * Which params should be sent to the template?
+     * Build the params to send to the template.
      *
      * @param Component_ControllerAbstract $component
      * @return array
@@ -61,12 +30,37 @@ class Delegate
     public function buildTemplateParams(Component_ControllerAbstract $component): array
     {
         return [
+            'href'         => $this->buildHref($component),
             'componentId'  => $component->getInstance()->getId(),
-            'username'     => $component->getConfig('username'),
-            'keywords'     => $component->getConfig('keywords'),
-            'listSlug'     => $component->getConfig('twitterListSlug'),
-            'collectionId' => $component->getConfig('twitterCollectionId'),
             'limit'        => $component->getConfig('size'),
         ];
+    }
+
+
+    /**
+     * Build the href of the Twitter widget. This governs the content that is
+     * loaded in the widget.
+     *
+     * @param Component_ControllerAbstract $component
+     * @return string|null
+     */
+    private function buildHref(Component_ControllerAbstract $component): ?string
+    {
+        $username = $component->getConfig('username') ?? '';
+        if ($username === '') {
+            return null;
+        }
+
+        $listSlug = $component->getConfig('twitterListSlug') ?? '';
+        if ((string)$listSlug !== '') {
+            return sprintf(self::HREF_LIST_TIMELINE, $username, $listSlug);
+        }
+
+        $collectionId = $component->getConfig('twitterCollectionId') ?? '';
+        if ((string)$collectionId !== '') {
+            return sprintf(self::HREF_COLLECTION_TIMELINE, $username, $collectionId);
+        }
+
+        return sprintf(self::HREF_PROFILE_TIMELINE, $username);
     }
 }

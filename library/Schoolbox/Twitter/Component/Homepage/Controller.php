@@ -33,7 +33,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $delegate = new Delegate();
         return $this->renderTwigTemplate(
             $templateHandle,
-            $delegate->determineTemplate($this),
+            Delegate::TEMPLATE,
             $delegate->buildTemplateParams($this)
         );
     }

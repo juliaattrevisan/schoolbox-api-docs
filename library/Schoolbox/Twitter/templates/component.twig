@@ -1,4 +1,11 @@
 {% block markup %}
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="{{ href }}"
+       data-dnt="true"
+       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
+       data-chrome="noheader nofooter noborders transparent noscrollbar"
+    >Loading tweets...</a>
 {% endblock markup %}
 
 {% block js %}
@@ -26,8 +33,8 @@
             // Wait for Twitter API to become available, then load the widget.
             // (This is only required when reloading the component's content)
             twttr.ready(
-                function (twttr) {
-                    twttr.widgets.load(document.getElementById("twitter-view-{{ id }}"));
+                function (t) {
+                    t.widgets.load(document.getElementById("twitter-view-{{ id }}"));
                 }
             );
         </script>
