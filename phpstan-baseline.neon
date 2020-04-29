@@ -1011,21 +1011,6 @@ parameters:
 			path: library/DailyQuote/ConfigMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$createdAt\\)\\: Unexpected token \"\\$createdAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$deletedAt\\)\\: Unexpected token \"\\$deletedAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$updatedAt\\)\\: Unexpected token \"\\$updatedAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
-
-		-
 			message: "#^Method DailyQuote\\\\QuoteMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/DailyQuote/QuoteMapper.php
