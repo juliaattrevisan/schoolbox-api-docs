@@ -295,7 +295,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set author
      *
-     * @param $authorName
+     * @param string $authorName
      */
     public function setAuthorName($authorName)
     {
@@ -315,7 +315,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set author id
      *
-     * @param $authorId
+     * @param int $authorId
      */
     public function setAuthorId($authorId)
     {
@@ -325,7 +325,7 @@ abstract class EventBase implements EventInterface
     /**
      * Get author id
      *
-     * @return null
+     * @return int
      */
     public function getAuthorId()
     {
@@ -335,7 +335,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set colour
      *
-     * @param $colour
+     * @param string $colour
      */
     public function setColour($colour)
     {
@@ -345,7 +345,7 @@ abstract class EventBase implements EventInterface
     /**
      * Get colour
      *
-     * @return null
+     * @return string
      */
     public function getColour()
     {
@@ -355,7 +355,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set detail
      *
-     * @param $detail
+     * @param string $detail
      */
     public function setDetail($detail)
     {
@@ -365,7 +365,7 @@ abstract class EventBase implements EventInterface
     /**
      * Get detail
      *
-     * @return null
+     * @return string
      */
     public function getDetail()
     {
@@ -416,7 +416,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set title
      *
-     * @param $title
+     * @param string $title
      */
     public function setTitle($title)
     {
@@ -426,7 +426,7 @@ abstract class EventBase implements EventInterface
     /**
      * Get title
      *
-     * @return null
+     * @return string
      */
     public function getTitle()
     {

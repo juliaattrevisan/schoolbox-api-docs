@@ -646,31 +646,6 @@ parameters:
 			path: library/Calendar/Event/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$authorName\\)\\: Unexpected token \"\\$authorName\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$authorId\\)\\: Unexpected token \"\\$authorId\", expected type at offset 46$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$colour\\)\\: Unexpected token \"\\$colour\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$detail\\)\\: Unexpected token \"\\$detail\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$title\\)\\: Unexpected token \"\\$title\", expected type at offset 42$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$colour\\)\\: Unexpected token \"\\$colour\", expected type at offset 43$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventInterface.php
