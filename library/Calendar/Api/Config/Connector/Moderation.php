@@ -49,8 +49,8 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
     /**
      * Check if current user has permissions to see this event
      *
-     * @param  $userCampus
-     * @param  $userGroup
+     * @param array $userCampus
+     * @param int $userGroup
      *
      * @return bool
      */
