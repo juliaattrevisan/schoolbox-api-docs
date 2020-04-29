@@ -706,21 +706,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateHandle\\)\\: Unexpected token \"\\$templateHandle\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$targetHandle\\)\\: Unexpected token \"\\$targetHandle\", expected type at offset 102$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$componentName\\)\\: Unexpected token \"\\$componentName\", expected type at offset 62$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$calendar\\)\\: Unexpected token \"\\$calendar\", expected type at offset 18$#"
 			count: 1
 			path: library/Component/Dashboard/CalendarController.php

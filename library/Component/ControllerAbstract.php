@@ -191,7 +191,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param $templateHandle
+     * @param string $templateHandle
      * @param string $templateName
      * @param string $templatePath
      * @return bool
@@ -422,7 +422,7 @@ abstract class Component_ControllerAbstract
      * Set up statue of phpliberty
      * Ingredient of parseConfig() facade
      *
-     * @param $targetHandle
+     * @param string $targetHandle
      */
     protected function setupConfigRendering($targetHandle)
     {
@@ -1129,7 +1129,7 @@ abstract class Component_ControllerAbstract
     /**
      * Assign component name default
      *
-     * @param $componentName
+     * @param string $componentName
      * @return string
      * @return static
      */
