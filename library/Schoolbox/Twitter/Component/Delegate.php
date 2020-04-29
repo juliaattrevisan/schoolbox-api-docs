@@ -40,6 +40,20 @@ class Delegate
 
 
     /**
+     * Will this component render as an empty state?
+     *
+     * This controls whether the component will even show in some contexts.
+     *
+     * @return bool
+     */
+    public function isEmptyState(): bool
+    {
+        $username = $this->component->getConfig('username') ?? '';
+        return $username === '';
+    }
+
+
+    /**
      * Build the params to send to the template.
      *
      * @return array

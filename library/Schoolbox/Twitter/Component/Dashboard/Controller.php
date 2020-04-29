@@ -31,6 +31,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $delegate = new Delegate($this);
+
+        // Don't show component at all if it's empty
+        if ($delegate->isEmptyState()) {
+            return false;
+        }
+
         return $this->renderTwigTemplate(
             $templateHandle,
             Delegate::TEMPLATE,
