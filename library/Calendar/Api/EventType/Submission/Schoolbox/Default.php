@@ -157,7 +157,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /**
      * Find a particular event from this source
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return Collection
      */
