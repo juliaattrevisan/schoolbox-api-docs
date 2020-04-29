@@ -23,7 +23,7 @@ interface Calendar_Api_Config_Connector_Interface {
 	/**
 	 * Render this connector config
 	 *
-	 * @param $page
+	 * @param SitePage $page
 	 * @return mixed
 	 */
 	public function render($page);
