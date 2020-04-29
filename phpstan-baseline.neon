@@ -561,26 +561,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 77$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 47$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 104$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$api\\)\\: Unexpected token \"\\$api\", expected type at offset 56$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 117$#"
 			count: 1
 			path: library/Calendar/Api/Config/Connector/Abstract.php
