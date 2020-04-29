@@ -58,7 +58,7 @@ class Urgent extends Base {
 		/* N days before the event starts causes an event to be
 		 * put into Urgent subcategory
 		 */
-		if ($timeDifference < 60 * 60 * 24 * $config->getValue()) {
+		if ($timeDifference < 60 * 60 * 24 * (int)$config->getValue()) {
 			return true;
 		}
 
