@@ -851,31 +851,6 @@ parameters:
 			path: library/Custom/Diocesan/AchievementReport/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 139$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 85$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 76$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 78$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 69$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 115$#"
 			count: 1
 			path: library/Custom/Diocesan/AchievementReport/SchoolGrades/Base.php
