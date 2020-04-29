@@ -1266,11 +1266,6 @@ parameters:
 			path: library/EOTC/ListGroup/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 62$#"
-			count: 1
-			path: library/EOTC/ListGroup/Mapping.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$listGroupIndex\\)\\: Unexpected token \"\\$listGroupIndex\", expected type at offset 58$#"
 			count: 1
 			path: library/EOTC/ListGroup/Response.php
