@@ -711,11 +711,6 @@ parameters:
 			path: library/Component/Dashboard/RecentSubmissionsController.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$component\\)\\: Unexpected token \"\\$component\", expected type at offset 926$#"
-			count: 1
-			path: library/Component/DefinitionMapper.php
-
-		-
 			message: "#^Method Component\\\\Eportfolio\\\\AdvancedListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Component/Eportfolio/AdvancedListMapper.php

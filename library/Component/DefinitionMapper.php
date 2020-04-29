@@ -89,13 +89,13 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
     protected function getSelectString()
     {
         return "
-            SELECT    {$this->getColumnString()}, 
-                      `hcc`.`homepageComponentCategoryID` `hcc.id`, 
+            SELECT    {$this->getColumnString()},
+                      `hcc`.`homepageComponentCategoryID` `hcc.id`,
                       `hcc`.`name` `hcc.name`,
                       {$this->getJoinColumnString('namespace', 'ns')},
                       `component_definition`.`class` as `cd.class`
             FROM      {$this->getTable()}
-            LEFT JOIN `homepageComponentCategory` `hcc` ON 
+            LEFT JOIN `homepageComponentCategory` `hcc` ON
                       `component_definition`.`component_category` = `hcc`.`homepageComponentCategoryID`
             LEFT JOIN {$this->getJoinSql('namespace', '', 'ns')}
         ";
@@ -200,7 +200,6 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
      * ]
      *
      * @param array $component
-     * @param $component
      * @return int[]
      */
     public function create($component)
@@ -220,7 +219,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $colString = implode('`, `', array_keys($component));
 
         $sql = "
-            INSERT INTO   `component_definition` (`$colString`) 
+            INSERT INTO   `component_definition` (`$colString`)
             VALUES        ($pdoString)
         ";
 
@@ -230,14 +229,14 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
 
                 $stmt = $this->database->prepare("
 					INSERT INTO `component_config_definition` (
-					    `component_definition_id`, 
-					    `key`, 
-					    `default_value`, 
+					    `component_definition_id`,
+					    `key`,
+					    `default_value`,
 					    `label`
                     ) VALUES (
-                        :ccid, 
-                        :key, 
-                        :default_value, 
+                        :ccid,
+                        :key,
+                        :default_value,
                         :label
                     )
 					ON DUPLICATE KEY UPDATE `default_value` = :default_value, `label` = :label
