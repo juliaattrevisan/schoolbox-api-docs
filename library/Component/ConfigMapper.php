@@ -69,8 +69,8 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
     /**
      * Find the value of a particular component instance's config instance
      *
-     * @param $key
-     * @param $instanceId
+     * @param string $key
+     * @param int $instanceId
      * @return mixed
      */
     public function findValue($key, $instanceId)

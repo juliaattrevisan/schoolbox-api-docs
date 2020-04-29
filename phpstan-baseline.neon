@@ -696,16 +696,6 @@ parameters:
 			path: library/Component/Config/TextboxSearch.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$instanceId\\)\\: Unexpected token \"\\$instanceId\", expected type at offset 119$#"
-			count: 1
-			path: library/Component/ConfigMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 100$#"
-			count: 1
-			path: library/Component/ConfigMapper.php
-
-		-
 			message: "#^Variable \\$to in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Component/ConfigNotifier.php
