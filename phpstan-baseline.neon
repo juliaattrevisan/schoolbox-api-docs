@@ -511,11 +511,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageConfig\\)\\: Unexpected token \"\\$homepageConfig\", expected type at offset 58$#"
-			count: 1
-			path: library/Bulk/Folder.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$columnIndexes with type mixed is not subtype of native type array\\<int, array\\>\\.$#"
 			count: 1
 			path: library/Bulk/Folder.php

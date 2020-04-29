@@ -329,7 +329,7 @@ class Bulk_Folder
     /**
      * Saves the homepage config
      *
-     * @param $homepageConfig
+     * @param HomepageConfig $homepageConfig
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
