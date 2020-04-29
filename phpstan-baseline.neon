@@ -646,11 +646,6 @@ parameters:
 			path: library/Calendar/Event/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$array\\)\\: Unexpected token \"\\$array\", expected type at offset 133$#"
-			count: 1
-			path: library/Calendar/Import/Vcal.php
-
-		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$DTSTART\\.$#"
 			count: 2
 			path: library/Calendar/Import/Vcal.php
