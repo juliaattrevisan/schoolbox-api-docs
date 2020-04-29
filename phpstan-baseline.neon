@@ -511,16 +511,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 35$#"
-			count: 1
-			path: library/Bulk/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 32$#"
-			count: 1
-			path: library/Bulk/Abstract.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 160$#"
 			count: 1
 			path: library/Bulk/Calendar.php

@@ -12,7 +12,7 @@ abstract class Bulk_Abstract {
 	/**
 	 * Constructor
 	 *
-	 * @param $file
+	 * @param string $file
 	 */
 	public function __construct($file) {
 		$this->setFile($file);
@@ -25,7 +25,7 @@ abstract class Bulk_Abstract {
 	/**
 	 * Set file
 	 *
-	 * @param $file
+	 * @param string $file
 	 */
 	protected function setFile($file) {
 		$this->file = $file;
@@ -34,8 +34,8 @@ abstract class Bulk_Abstract {
 	/**
 	 * Get file
 	 *
-	 * @return null
-	 */
+	 * @return string
+     */
 	protected function getFile() {
 		return $this->file;
 	}
