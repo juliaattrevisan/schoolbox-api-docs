@@ -29,7 +29,7 @@ class Registry {
 	/**
 	 * Delegation method
 	 *
-	 * @param $item
+	 * @param Log $item
 	 */
 	public function add($item) {
 		$this->getRegistry()->add($item);
