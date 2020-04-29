@@ -1266,16 +1266,6 @@ parameters:
 			path: library/EOTC/ListGroup/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timeDifference\\)\\: Unexpected token \"\\$timeDifference\", expected type at offset 105$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Urgent.php
-
-		-
-			message: "#^Binary operation \"\\*\" between 86400 and string results in an error\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Urgent.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 264$#"
 			count: 1
 			path: library/Email.php

@@ -18,7 +18,7 @@ class Urgent extends Base {
 	/**
 	 * Determine where to go next
 	 *
-	 * @return $this|mixed
+	 * @return Response
 	 */
 	public function determine() {
 		$difference = $this->getEvent()->getStartDateTime()->getUnixTimeStamp() - $_SERVER['REQUEST_TIME'];
@@ -48,7 +48,7 @@ class Urgent extends Base {
 	 * Determine whether you're within a certain threshold of
 	 * a particular timestamp
 	 *
-	 * @param $timeDifference
+	 * @param int $timeDifference
 	 * @return bool
 	 */
 	private function isWithinThreshold($timeDifference) {
