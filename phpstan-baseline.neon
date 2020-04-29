@@ -646,11 +646,6 @@ parameters:
 			path: library/Calendar/Event/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attendance\\)\\: Unexpected token \"\\$attendance\", expected type at offset 47$#"
-			count: 1
-			path: library/Calendar/Event/Type/EOTC/Event.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$authorName\\)\\: Unexpected token \"\\$authorName\", expected type at offset 43$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php
