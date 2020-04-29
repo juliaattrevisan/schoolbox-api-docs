@@ -96,7 +96,7 @@ class FileListMapper extends Schoolbox\Mapper
 	/**
 	 * Find all published image files on a particular page
 	 *
-	 * @param $pageId
+	 * @param int $pageId
 	 * @return Collection
 	 */
 	public function findAllImagesByPage($pageId) {
@@ -108,8 +108,8 @@ class FileListMapper extends Schoolbox\Mapper
 	/**
 	 * Retrieves a list of recently-published images
 	 *
-	 * @param $uid
-	 * @param $limit
+	 * @param int $uid
+	 * @param int $limit
 	 * @return Collection
 	 */
 	public function findRecent($uid, $limit)
