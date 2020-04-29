@@ -116,7 +116,7 @@ class TtyFormatter extends CliFormatter
 
     /**
      * @param string $string
-     * @param        $level
+     * @param int    $level
      * @return string
      */
     protected function prependSeverity($string, $level)

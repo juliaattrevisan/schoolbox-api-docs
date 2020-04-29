@@ -26,10 +26,10 @@ class Base implements Serializable, IConnector
     /** @var ITransactor */
     protected $transactor;
 
-    /** @param array */
+    /** @var array */
     protected $options;
 
-    /** @param string */
+    /** @var string */
     protected $dsn;
 
     /** @var string */

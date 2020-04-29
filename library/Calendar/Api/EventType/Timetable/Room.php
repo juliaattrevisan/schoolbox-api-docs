@@ -58,8 +58,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * Get day events from this data source
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
@@ -192,7 +192,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * Find a particular event from this source
      *
-     * @param $eventId
+     * @param int $eventId
      * @return Collection
      */
     public function getEvent($eventId)

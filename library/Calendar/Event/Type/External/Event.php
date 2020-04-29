@@ -24,7 +24,7 @@ class Event extends EventBase
     /**
      * Set location
      *
-     * @param $location
+     * @param string $location
      */
     public function setLocation($location)
     {
@@ -34,7 +34,7 @@ class Event extends EventBase
     /**
      * Get location
      *
-     * @return null
+     * @return string
      */
     public function getLocation()
     {

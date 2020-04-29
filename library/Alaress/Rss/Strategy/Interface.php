@@ -16,16 +16,16 @@ interface Alaress_Rss_Strategy_Interface
      * Output should consist of an array containing
      * title, link, description, publish date
      *
-     * @param  \Xml $source
-     * @param  int  $limit
+     * @param Xml $source
+     * @param int $limit
      * @return array
      */
-    public function get(\Xml $source, $limit);
+    public function get(Xml $source, $limit);
 
     /**
      * Get the title of the stream
      *
-     * @param  $input
+     * @param Xml $input
      * @return string
      */
     public function getTitle($input);
@@ -33,7 +33,7 @@ interface Alaress_Rss_Strategy_Interface
     /**
      * Get the link of the stream
      *
-     * @param  $input
+     * @param Xml $input
      * @return string
      */
     public function getLink($input);

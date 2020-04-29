@@ -18,11 +18,11 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
      * Output should consist of an array containing
      * title, link, description, publish date
      *
-     * @param  \Xml $input
-     * @param  int  $limit
+     * @param Xml  $input
+     * @param int $limit
      * @return array
      */
-    public function get(\Xml $input, $limit)
+    public function get(Xml $input, $limit)
     {
         $data = array();
 
@@ -62,7 +62,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
     /**
      * Get the title of the stream
      *
-     * @param  $input
+     * @param Xml $input
      * @return string
      */
     public function getTitle($input)
@@ -73,7 +73,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
     /**
      * Get the link of the stream
      *
-     * @param  $input
+     * @param  Xml $input
      * @return string
      */
     public function getLink($input)

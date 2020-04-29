@@ -29,7 +29,7 @@ class TwigMailer extends AbstractMailer {
 	protected $rendercache = '';
 
 	/**
-	 * @param $template
+	 * @param string $template
 	 * @param string $subject
 	 * @param string $to
 	 * @param string $host

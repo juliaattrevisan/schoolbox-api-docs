@@ -30,19 +30,18 @@ class Session extends BaseSession {
      */
     protected $requestTime;
 
+
     /**
-     * Constructor sets up config dependencies
-     * @param SegmentFactory $segment_factory A session segment factory.
+     * Session constructor.
      *
-     * @param \Aura\Session\CsrfTokenFactory A CSRF token factory.
+     * Sets up config dependencies
      *
-     * @param array $cookies An arry of cookies from the client, typically a
-     * copy of $_COOKIE.
-     *
-     * @param \Schoolbox\IConfigLoader $config
-     *
-     * @param int Request time, to compare the session time against
-     *
+     * @param SegmentFactory                 $segment_factory     A session segment factory.
+     * @param \Aura\Session\CsrfTokenFactory $csrf_token_factory  A CSRF token factory.
+     * @param \Aura\Session\Phpfunc          $phpfunc
+     * @param array                          $cookies             An array of cookies from the client, typically a copy of $_COOKIE.
+     * @param IConfigLoader                  $config
+     * @param int                            $requestTime         Request time, to compare the session time against
      */
     public function __construct(
         SegmentFactory   $segment_factory,
@@ -97,7 +96,7 @@ class Session extends BaseSession {
 
     /**
      * Set the expiry time on an session cookie that already exists
-     * @param $lifetime
+     * @param int $lifetime
      */
     public function setCookieExpiry($lifetime) {
         $cookieParams  = $this->getCookieParams();
@@ -154,7 +153,7 @@ class Session extends BaseSession {
         else {
             // Don't save history if this is the same as the most recent item in
             // history.
-            list($mostRecent) = $history;
+            [$mostRecent] = $history;
             if ($value != $mostRecent) {
                 array_unshift($history, $value);
             }

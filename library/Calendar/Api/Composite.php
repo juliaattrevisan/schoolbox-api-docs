@@ -20,15 +20,15 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     /**
      * A list of all the api classes which produce Collections to combine
      *
-     * @var Calendar_Api_EventType_Interface[] $api
+     * @var Calendar_Api_EventType_Interface[]
      */
     private $api = [];
 
     /**
      * Get day events
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      * @internal param $currentDay
      * @return Collection
      */
@@ -48,7 +48,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     /**
      * Find a particular event matching an eventId from all registered sources
      *
-     * @param $eventId
+     * @param int $eventId
      * @return EventInterface
      */
     public function getEvent($eventId)
@@ -65,7 +65,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     /**
      * Add an api to the stack
      *
-     * @param $api
+     * @param Calendar_Api_EventType_Interface $api
      */
     public function add($api)
     {

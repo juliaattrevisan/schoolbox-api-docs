@@ -27,7 +27,7 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
     /**
      * Render configs into admin screen
      *
-     * @param $page
+     * @param SitePage $page
      *
      * @return mixed|void
      */
@@ -52,8 +52,8 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
     /**
      * Check if current user has permissions to see this event
      *
-     * @param $userCampus
-     * @param $userGroup
+     * @param array $userCampus
+     * @param int $userGroup
      *
      * @return bool
      */

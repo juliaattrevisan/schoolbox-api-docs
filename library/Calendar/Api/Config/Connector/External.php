@@ -18,7 +18,6 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
     protected $connectorClass = 'External';
 
 
-
     /**
      * {@inheritdoc}
      */
@@ -48,8 +47,8 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
     /**
      * Currently all users have access to these events.
      *
-     * @param $userCampus
-     * @param $userGroup
+     * @param array $userCampus
+     * @param int $userGroup
      * @return bool
      */
     public function hasPermissions($userCampus, $userGroup)

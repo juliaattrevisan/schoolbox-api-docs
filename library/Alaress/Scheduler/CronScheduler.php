@@ -150,7 +150,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
     /**
 	 * Report in an appropriate way, based on the data returned by the worker
 	 *
-	 * @param $data
+	 * @param array $data
 	 * @return mixed
 	 */
 	protected abstract function report($data);

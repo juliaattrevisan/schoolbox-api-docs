@@ -28,7 +28,7 @@ class Vcal extends Base
      * Find an event type from an array of possibilities
      * The array contains the "type" (name) values
      *
-     * @param $array
+     * @param array $array
      * @return mixed
      */
     private function findEventTypeFromArray($array)

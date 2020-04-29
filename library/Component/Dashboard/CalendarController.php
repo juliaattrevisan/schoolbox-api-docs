@@ -166,7 +166,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     }
 
     /**
-     * @param $calendar
+     * @param Calendar $calendar
      */
     public function setCalendar($calendar)
     {
@@ -182,7 +182,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     }
 
     /**
-     * @param $group
+     * @param Group $group
      */
     public function setGroup($group)
     {

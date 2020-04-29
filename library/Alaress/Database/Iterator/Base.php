@@ -45,8 +45,8 @@ class Base implements IIterator
      * Database statement constructor
      *
      * @param IBroker $broker
-     * @param IStatement &$statement
-     * @param PDOStatement &$pdoStatement
+     * @param IStatement $statement
+     * @param PDOStatement $pdoStatement
      */
     public function __construct($broker, $statement, $pdoStatement)
     {

@@ -347,8 +347,8 @@ abstract class Base {
     /**
      * Factory method for loading an xml output object
      *
-     * @param $template
-     * @param $data
+     * @param string $template
+     * @param string|array $data
      * @return mixed
      * @throws ServiceNotFound
      */

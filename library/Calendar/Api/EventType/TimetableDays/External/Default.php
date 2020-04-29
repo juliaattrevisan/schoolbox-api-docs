@@ -41,8 +41,8 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
     /**
      * Get day events from this data source
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      *
      * @return Collection
      */
@@ -86,7 +86,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             //Combine titles of campuses with the same code (if any)
 
             $campusMerged = Array();
-            
+
             //Now build the stack
             foreach ($userCampuses as $campus) {
 
@@ -133,7 +133,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
     /**
      * Find a particular event from this source
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return Collection
      */

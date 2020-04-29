@@ -45,14 +45,14 @@ interface EventInterface
     /**
      * Set colour
      *
-     * @param $colour
+     * @param string $colour
      */
     public function setColour($colour);
 
     /**
      * Get colour
      *
-     * @return
+     * @return string
      */
     public function getColour();
 
@@ -102,14 +102,14 @@ interface EventInterface
     /**
      * Set type
      *
-     * @param $type
+     * @param string $type
      */
     public function setType($type);
 
     /**
      * Get type
      *
-     * @return null
+     * @return string
      */
     public function getType();
 
@@ -224,7 +224,7 @@ interface EventInterface
     /**
      * Get location
      *
-     * @return mixed
+     * @return string
      */
     public function getLocation();
 }

@@ -28,7 +28,7 @@ class TestSpecificationFramework extends TestCase
 {
 
     /**
-     * @param $candidate
+     * @param ISpecification $candidate
      * @dataProvider provider_candidate
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -76,7 +76,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_andValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -88,7 +88,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_andInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -100,7 +100,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_orValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -112,7 +112,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_orInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -124,7 +124,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_xorValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
@@ -136,7 +136,7 @@ class TestSpecificationFramework extends TestCase
 
 
     /**
-     * @param $components
+     * @param ISpecification[] $components
      * @dataProvider provider_xorInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */

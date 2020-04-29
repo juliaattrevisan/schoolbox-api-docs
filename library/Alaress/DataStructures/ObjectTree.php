@@ -124,7 +124,7 @@ class ObjectTree
     /**
      * Returns the element specified by the hash, or null if none found
      *
-     * @param $hash
+     * @param string $hash
      * @return object|null
      */
     public function getElementByHash($hash)

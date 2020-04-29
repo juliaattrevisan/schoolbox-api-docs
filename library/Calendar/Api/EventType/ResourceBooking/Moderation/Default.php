@@ -114,7 +114,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
     /**
      * Find a particular event from this source
      *
-     * @param $eventId
+     * @param int $eventId
      * @return Collection
      */
     public function getEvent($eventId)

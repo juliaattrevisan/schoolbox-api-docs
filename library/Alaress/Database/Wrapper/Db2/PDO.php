@@ -226,7 +226,7 @@ class PDO extends BasePDO
     /**
      * Set underlying DB2 connection resource. You should not need to use this externally.
      *
-     * @param $connection
+     * @param resource $connection
      * @return self
      */
     public function setConnection($connection)

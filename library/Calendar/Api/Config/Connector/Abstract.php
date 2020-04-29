@@ -70,8 +70,8 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      * Render event type lookup selector with the currently chosen
      * value preselected
      *
-     * @param $page
-     * @param $preselected
+     * @param SitePage $page
+     * @param int $preselected
      */
     protected function renderEventType($page, $preselected)
     {
@@ -102,17 +102,6 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
             $page->setVar('luEventType_block', '');
         }
     }
-
-
-    /**
-     * Find out if the current user's settings of $userCampus and $userGroup
-     * are in the selections for this config
-     *
-     * @param $userCampus
-     * @param $userGroup
-     *
-     * @return bool
-     */
 
 
     /* Getters/Setters

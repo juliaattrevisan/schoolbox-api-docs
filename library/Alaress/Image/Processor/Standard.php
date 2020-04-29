@@ -176,8 +176,8 @@ class Standard extends BaseProcessor
      * methods in an easy-to-ready set of statements
      * Supports chained methods
      *
-     * @param      $strategy
-     * @param null $args
+     * @param string $strategy
+     * @param null   $args
      *
      * @return static
      */

@@ -22,7 +22,7 @@ class AttachmentStream implements \Swift_OutputByteStream{
     /**
      * AttachmentStream constructor.
      *
-     * @param resource file stream $storageStream
+     * @param resource $storageStream
      */
     public function __construct($storageStream){
         $this->storageStream = $storageStream;
@@ -49,7 +49,7 @@ class AttachmentStream implements \Swift_OutputByteStream{
         if(false === $string){
             throw new Swift_IoException('Unable to read from stream');
         }
-        
+
         return (0 === strlen($string)) ? false : $string;
     }
 

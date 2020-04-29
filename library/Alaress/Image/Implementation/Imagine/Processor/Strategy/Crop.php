@@ -61,7 +61,7 @@ class Crop extends BaseStrategy
     /**
     * Set coordinates
     *
-    * @param $coordinates
+    * @param array $coordinates
     */
     private function setCoordinates($coordinates)
     {
@@ -78,8 +78,8 @@ class Crop extends BaseStrategy
     /**
     * Get coordinates
     *
-    * @param $key
-    * @return array
+    * @param string $key
+    * @return float
     */
     private function getCoordinates($key)
     {

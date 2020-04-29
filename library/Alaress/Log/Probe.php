@@ -11,7 +11,7 @@ class Alaress_Log_Probe {
 	/**
 	 * Constructor
 	 *
-	 * @param $dataStructure
+	 * @param mixed $dataStructure
 	 */
 	public function __construct($dataStructure) {
 		echo "<pre>";

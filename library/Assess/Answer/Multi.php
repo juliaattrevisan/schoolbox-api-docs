@@ -17,7 +17,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *
-     * @param  $currentResponse
+     * @param  array $currentResponse
      * @return void
      */
     public function mark($currentResponse): void
@@ -92,8 +92,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param  SitePage $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param  int $attemptId
+     * @param  int $question_id
      * @return void
      */
     public function reviewResponse(SitePage $page, $attemptId, $question_id)

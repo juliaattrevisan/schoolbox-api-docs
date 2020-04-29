@@ -95,7 +95,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      *
      * Not implemented - at least not yet - for resource booking items.
      *
-     * @param $eventId
+     * @param int $eventId
      * @return Collection
      */
     public function getEvent($eventId)

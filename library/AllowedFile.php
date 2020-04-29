@@ -38,7 +38,7 @@ class AllowedFile extends DeprecatedModel
      * Determine the file extension for a given filename/path
      * TODO: Refactor into FileType
      *
-     * @param  $filename
+     * @param  string $filename
      * @return string
      */
     public function getExtension($filename)
@@ -85,7 +85,7 @@ class AllowedFile extends DeprecatedModel
     /**
      * Get mime type for a particular file extension
      *
-     * @param $extension
+     * @param string $extension
      * @return mixed
      */
     public function getMime($extension)
@@ -135,7 +135,7 @@ class AllowedFile extends DeprecatedModel
      * Decouple error handling from error checking methods, so we can reuse the
      * error checking methods in another context
      *
-     * @param <type> $errorArray
+     * @param array $errorArray
      */
     public function handleError($errorArray)
     {
@@ -181,5 +181,3 @@ class AllowedFile extends DeprecatedModel
         return $files;
     }
 }
-
-?>

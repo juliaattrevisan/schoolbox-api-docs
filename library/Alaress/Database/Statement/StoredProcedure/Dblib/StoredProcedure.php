@@ -170,7 +170,7 @@ class StoredProcedure extends Base
      * added to a select statement, and retrieved from the final rowset.
      *
      * @param string $name
-     * @param &array $param
+     * @param array $param
      */
     protected function internalBindOutputParam($name, &$param)
     {

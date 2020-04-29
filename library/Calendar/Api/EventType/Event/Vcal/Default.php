@@ -1,8 +1,5 @@
 <?php
-
 /**
- * Calendar_Api_EventType_Event_Vcal_Default
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +10,9 @@ use Sabre\VObject\Component\VCalendar;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
 
+/**
+ * Class Calendar_Api_EventType_Event_Vcal_Default
+ */
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
 
@@ -37,7 +37,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
     /**
      * Associate a colour scheme with this event stream
      *
-     * @param $id
+     * @param int $id
      *
      * @return array
      */
@@ -55,8 +55,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
     /**
      * Get day events from this data source
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      *
      * @internal param $currentDay
      * @return Collection

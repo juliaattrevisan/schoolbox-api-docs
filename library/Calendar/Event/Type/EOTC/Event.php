@@ -9,11 +9,6 @@
 namespace Calendar\Event\Type\EOTC;
 
 use Calendar\Event\Type\Day;
-use Calendar\Event\Type\EventInterface;
-use EOTC\EventMetadata;
-use Schoolbox\Calendar\EventType;
-use Schoolbox\Collection;
-use Schoolbox\User;
 
 
 class Event extends Day\Event
@@ -103,7 +98,7 @@ class Event extends Day\Event
     /**
      * Set attendance
      *
-     * @param $attendance
+     * @param string $attendance
      */
     public function setAttendance($attendance) {
         $this->attendance = $attendance;

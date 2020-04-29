@@ -136,7 +136,7 @@ abstract class BaseStrategy implements StrategyInterface
     /**
     * Set canvas height
     *
-    * @param $canvasHeight
+    * @param int $canvasHeight
     */
     protected function setCanvasHeight($canvasHeight)
     {
@@ -156,7 +156,7 @@ abstract class BaseStrategy implements StrategyInterface
     /**
     * Set canvas width
     *
-    * @param $canvasWidth
+    * @param int $canvasWidth
     */
     protected function setCanvasWidth($canvasWidth)
     {

@@ -25,7 +25,7 @@ class IsTrue implements IAuthorizationRule
     /**
      * Constructor (obviously)
      *
-     * @param string $paramsKey
+     * @param string $value
      */
     public function __construct($value)
     {

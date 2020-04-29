@@ -168,7 +168,7 @@ abstract Class Base implements IStatement
     /**
      * Prepare a statement for execution and bind input parameters
      *
-     * @param $values
+     * @param array|null $values
      * @return bool
      * @throws Exception if preparing execution failed for some reason
      */

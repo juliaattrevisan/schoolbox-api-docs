@@ -18,7 +18,7 @@ class Alaress_Cache_Log {
 	/**
 	 * Constructor
 	 *
-	 * @param $verbosity
+	 * @param bool $verbosity
 	 */
 	public function __construct($verbosity) {
 		$this->setVerbose($verbosity);
@@ -27,7 +27,7 @@ class Alaress_Cache_Log {
 	/**
 	 * Logging mechanism
 	 *
-	 * @param $text
+	 * @param string $text
 	 */
 	public function report($text) {
 		if ($this->getVerbose()) {
@@ -41,8 +41,8 @@ class Alaress_Cache_Log {
 	/**
 	 * Set verbose
 	 *
-	 * @param boolean $verbose
-	 * @return \Alaress_Cache_Locker_Abstract
+	 * @param bool $verbose
+	 * @return self
 	 */
 	private function setVerbose($verbose) {
 		$this->verbose = $verbose;
@@ -53,7 +53,7 @@ class Alaress_Cache_Log {
 	/**
 	 * Get verbose
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function getVerbose() {
 		return $this->verbose;

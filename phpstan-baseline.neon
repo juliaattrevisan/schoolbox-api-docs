@@ -6,11 +6,6 @@ parameters:
 			path: conf/modules/SportsFixtures.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 2
-			path: library/Activity.php
-
-		-
 			message: "#^Variable \\$inst in PHPDoc tag @var does not match assigned variable \\$instance\\.$#"
 			count: 1
 			path: library/AjaxChat.php
@@ -26,26 +21,6 @@ parameters:
 			path: library/Alaress/Application/Kernel.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 85$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 90$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 70$#"
-			count: 1
-			path: library/Alaress/Async/AMQP/AMQPInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(int\\?   \\$ttl\\)\\: Unexpected token \"\\?\", expected variable at offset 150$#"
-			count: 1
-			path: library/Alaress/Async/Broker/IBroker.php
-
-		-
 			message: "#^Method Alaress\\\\Async\\\\Notification\\\\Cloud\\\\Google\\\\GCM\\:\\:propagate\\(\\) should return bool but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
@@ -54,16 +29,6 @@ parameters:
 			message: "#^Comparison operation \"\\=\\=\" between \\(array\\|float\\|int\\) and 0 results in an error\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 15$#"
-			count: 1
-			path: library/Alaress/Async/Notification/Instance/Builder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 32$#"
-			count: 1
-			path: library/Alaress/Async/Notification/Instance/Builder.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -76,104 +41,14 @@ parameters:
 			path: library/Alaress/Async/Queue/RedisQueue.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$line\\)\\: Unexpected token \"\\$line\", expected type at offset 105$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 72$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$record\\)\\: Unexpected token \"\\$record\", expected type at offset 138$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$testClass\\)\\: Unexpected token \"\\$testClass\", expected type at offset 173$#"
-			count: 1
-			path: library/Alaress/Async/Test/Framework.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(IAuthorizationRule \\.\\.\\.   An unlimited number of authorization rules\\.\\)\\: Unexpected token \"An\", expected variable at offset 44$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$paramsValue\\)\\: Unexpected token \"\\$paramsValue\", expected type at offset 109$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/IsConfigSetTo.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$paramsKey$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/IsTrue.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 64$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 55$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$duration\\)\\: Unexpected token \"\\$duration\", expected type at offset 93$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 73$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 149$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$observer\\)\\: Unexpected token \"\\$observer\", expected type at offset 48$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
 			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$observer\\)\\: Unexpected token \"\\$observer\", expected type at offset 51$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 71$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$verbosity\\)\\: Unexpected token \"\\$verbosity\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 41$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
-
-		-
-			message: "#^Return typehint of method Alaress_Cache_Log\\:\\:setVerbose\\(\\) has invalid type Alaress_Cache_Locker_Abstract\\.$#"
-			count: 1
-			path: library/Alaress/Cache/Log.php
 
 		-
 			message: "#^Constructor of class Alaress_CleanProbe has an unused parameter \\$_\\.$#"
@@ -186,169 +61,14 @@ parameters:
 			path: library/Alaress/Codec/Integer/Base64.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 97$#"
-			count: 1
-			path: library/Alaress/DataStructures/ObjectTree.php
-
-		-
 			message: "#^PHPDoc tag @throws with type Alaress\\\\Database\\\\Broker\\\\Mysql\\\\PDOException is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Database/Broker/Mysql/Broker.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\*/\", expected variable at offset 17$#"
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\*/\", expected variable at offset 18$#"
-			count: 1
-			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 76$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hostname\\)\\: Unexpected token \"\\$hostname\", expected type at offset 52$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$password\\)\\: Unexpected token \"\\$password\", expected type at offset 124$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$username\\)\\: Unexpected token \"\\$username\", expected type at offset 100$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$inputs\\)\\: Unexpected token \"&\", expected variable at offset 137$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$outputs\\)\\: Unexpected token \"&\", expected variable at offset 171$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$return\\)\\: Unexpected token \"&\", expected variable at offset 206$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$inputs\\)\\: Unexpected token \"&\", expected variable at offset 161$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$outputs\\)\\: Unexpected token \"&\", expected variable at offset 195$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$return\\)\\: Unexpected token \"&\", expected variable at offset 230$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$inputs\\)\\: Unexpected token \"&\", expected variable at offset 149$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$outputs\\)\\: Unexpected token \"&\", expected variable at offset 183$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$return\\)\\: Unexpected token \"&\", expected variable at offset 218$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$inputs\\)\\: Unexpected token \"&\", expected variable at offset 165$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$outputs\\)\\: Unexpected token \"&\", expected variable at offset 199$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$return\\)\\: Unexpected token \"&\", expected variable at offset 234$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$inputs\\)\\: Unexpected token \"&\", expected variable at offset 119$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$outputs\\)\\: Unexpected token \"&\", expected variable at offset 153$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(null\\|array &\\$return\\)\\: Unexpected token \"&\", expected variable at offset 188$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalIds\\)\\: Unexpected token \"\\$externalIds\", expected type at offset 149$#"
-			count: 1
-			path: library/Alaress/Database/Connector/IConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(IStatement &\\$statement\\)\\: Unexpected token \"&\", expected variable at offset 104$#"
-			count: 1
-			path: library/Alaress/Database/Iterator/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(PDOStatement &\\$pdoStatement\\)\\: Unexpected token \"&\", expected variable at offset 143$#"
-			count: 1
-			path: library/Alaress/Database/Iterator/Base.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 122$#"
-			count: 1
-			path: library/Alaress/Database/Predicate/Builder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$values\\)\\: Unexpected token \"\\$values\", expected type at offset 92$#"
-			count: 1
-			path: library/Alaress/Database/Statement/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(mixed &\\$parameter Return value parameter\\)\\: Unexpected token \"&\", expected variable at offset 133$#"
-			count: 1
-			path: library/Alaress/Database/Statement/FunctionCall/IFunctionCall.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(&array \\$param\\)\\: Unexpected token \"&\", expected type at offset 91$#"
-			count: 1
-			path: library/Alaress/Database/Statement/StoredProcedure/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(&array \\$param\\)\\: Unexpected token \"&\", expected type at offset 313$#"
-			count: 1
-			path: library/Alaress/Database/Statement/StoredProcedure/Dblib/StoredProcedure.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(mixed &\\$parameter Return value parameter\\)\\: Unexpected token \"&\", expected variable at offset 133$#"
-			count: 1
-			path: library/Alaress/Database/Statement/StoredProcedure/IStoredProcedure.php
 
 		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Transactor\\\\Base\\:\\:implicitCommit\\(\\)\\.$#"
@@ -359,21 +79,6 @@ parameters:
 			message: "#^Class Alaress\\\\Database\\\\Wrapper\\\\Db2\\\\PDOStatement constructor invoked with 4 parameters, 2\\-3 required\\.$#"
 			count: 1
 			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connection\\)\\: Unexpected token \"\\$connection\", expected type at offset 116$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$statement\\)\\: Unexpected token \"\\$statement\", expected type at offset 115$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connection\\)\\: Unexpected token \"\\$connection\", expected type at offset 116$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -387,91 +92,6 @@ parameters:
 
 		-
 			message: "#^Variable \\$inputDateFormat in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 18$#"
-			count: 3
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$month\\)\\: Unexpected token \"\\$month\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$day\\)\\: Unexpected token \"\\$day\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hour\\)\\: Unexpected token \"\\$hour\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$minute\\)\\: Unexpected token \"\\$minute\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$second\\)\\: Unexpected token \"\\$second\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$day\\)\\: Unexpected token \"\\$day\", expected type at offset 59$#"
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hour\\)\\: Unexpected token \"\\$hour\", expected type at offset 78$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$min\\)\\: Unexpected token \"\\$min\", expected type at offset 98$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$month\\)\\: Unexpected token \"\\$month\", expected type at offset 38$#"
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sec\\)\\: Unexpected token \"\\$sec\", expected type at offset 117$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timestamp\\)\\: Unexpected token \"\\$timestamp\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 70$#"
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 68$#"
-			count: 2
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 72$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 18$#"
-			count: 3
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$format\\)\\: Unexpected token \"\\$format\", expected type at offset 94$#"
 			count: 1
 			path: library/Alaress/Date/Format.php
 
@@ -501,79 +121,14 @@ parameters:
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$loadedFromCache\\)\\: Unexpected token \"\\$loadedFromCache\", expected type at offset 77$#"
-			count: 1
-			path: library/Alaress/Image/Cache/Flysystem.php
-
-		-
 			message: "#^Variable \\$userList in PHPDoc tag @var does not match assigned variable \\$users\\.$#"
 			count: 1
 			path: library/Alaress/Image/Cache/Portrait.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$canvasHeight\\)\\: Unexpected token \"\\$canvasHeight\", expected type at offset 47$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/BaseStrategy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$canvasWidth\\)\\: Unexpected token \"\\$canvasWidth\", expected type at offset 46$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/BaseStrategy.php
-
-		-
-			message: "#^Binary operation \"\\-\" between array and array results in an error\\.$#"
-			count: 2
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Crop.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$coordinates\\)\\: Unexpected token \"\\$coordinates\", expected type at offset 45$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Crop.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 45$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Crop.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Image\\\\Filetype\\\\FiletypeInterface\\:\\:getImageManager\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$position\\)\\: Unexpected token \"\\$position\", expected type at offset 42$#"
-			count: 1
-			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Placement.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$image\\)\\: Unexpected token \"\\$image\", expected type at offset 69$#"
-			count: 1
-			path: library/Alaress/Image/Processor/BaseProcessor.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$strategy\\)\\: Unexpected token \"\\$strategy\", expected type at offset 212$#"
-			count: 1
-			path: library/Alaress/Image/Processor/Standard.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 75$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/BaseTransformation.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$height\\)\\: Unexpected token \"\\$height\", expected type at offset 93$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$width\\)\\: Unexpected token \"\\$width\", expected type at offset 72$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allTransformations\\)\\: Unexpected token \"\\$allTransformations\", expected type at offset 76$#"
-			count: 1
-			path: library/Alaress/Image/Transformation/MyImage.php
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
@@ -606,31 +161,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$prefix\\)\\: Unexpected token \"\\$prefix\", expected type at offset 52$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 58$#"
-			count: 1
-			path: library/Alaress/Log/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dataStructure\\)\\: Unexpected token \"\\$dataStructure\", expected type at offset 35$#"
-			count: 1
-			path: library/Alaress/Log/Probe.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$level\\)\\: Unexpected token \"\\$level\", expected type at offset 47$#"
-			count: 1
-			path: library/Alaress/Lumberjack/CliFormatter.php
-
-		-
 			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: library/Alaress/Lumberjack/CliFormatter.php
@@ -639,11 +169,6 @@ parameters:
 			message: "#^Default value of the parameter \\#1 \\$outStream \\(mixed\\) of method Alaress\\\\Lumberjack\\\\Logger\\:\\:__construct\\(\\) is incompatible with type resource\\.$#"
 			count: 1
 			path: library/Alaress/Lumberjack/Logger.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$level\\)\\: Unexpected token \"\\$level\", expected type at offset 54$#"
-			count: 1
-			path: library/Alaress/Lumberjack/TtyFormatter.php
 
 		-
 			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$host\\.$#"
@@ -656,54 +181,9 @@ parameters:
 			path: library/Alaress/Mail/AbstractMailer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 76$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$emails\\)\\: Unexpected token \"\\$emails\", expected type at offset 74$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
 			message: "#^Variable \\$emailAddresses might not be defined\\.$#"
 			count: 1
 			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 85$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(resource file stream \\$storageStream\\)\\: Unexpected token \"file\", expected variable at offset 71$#"
-			count: 1
-			path: library/Alaress/Mail/AttachmentStream.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 80$#"
-			count: 4
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 59$#"
-			count: 4
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 81$#"
-			count: 2
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 2
-			path: library/Alaress/Mail/Test/CodecTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 15$#"
-			count: 1
-			path: library/Alaress/Mail/TwigMailer.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$basename\\)\\: Unexpected token \"\\$basename\", expected type at offset 18$#"
@@ -741,16 +221,6 @@ parameters:
 			path: library/Alaress/Redis/Cache.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(array  &\\$dictionary\\)\\: Unexpected token \"&\", expected variable at offset 112$#"
-			count: 1
-			path: library/Alaress/Routing/Dictionary/SubscriptionDictionary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 243$#"
-			count: 1
-			path: library/Alaress/Routing/FlatRouter.php
-
-		-
 			message: "#^PHPDoc tag @throws with type InvalidArgumentException\\|PHPUnit_Framework_Exception is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Routing/Test/RouterTest.php
@@ -766,49 +236,9 @@ parameters:
 			path: library/Alaress/Routing/Trie.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Atom.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Atom.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Interface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Interface.php
-
-		-
 			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
 			count: 1
 			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 61$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$input\\)\\: Unexpected token \"\\$input\", expected type at offset 60$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(Alaress_Rss_Strategy_Interface\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 156$#"
-			count: 1
-			path: library/Alaress/Rss/Stream.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 53$#"
-			count: 1
-			path: library/Alaress/Rss/Stream.php
 
 		-
 			message: "#^Variable \\$timer in PHPDoc tag @var does not match assigned variable \\$interval\\.$#"
@@ -819,11 +249,6 @@ parameters:
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 94$#"
-			count: 1
-			path: library/Alaress/Scheduler/CronScheduler.php
 
 		-
 			message: "#^Property Alaress\\\\Scheduler\\\\Interactive\\\\Interactor\\:\\:\\$scheduler has unknown class Alaress\\\\Scheduler\\\\StompScheduler as its type\\.$#"
@@ -871,21 +296,6 @@ parameters:
 			path: library/Alaress/Session/SegmentFactory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\\\Aura\\\\Session\\\\CsrfTokenFactory A CSRF token factory\\.\\)\\: Unexpected token \"A\", expected variable at offset 176$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(int Request time, to compare the session time against\\)\\: Unexpected token \"Request\", expected variable at offset 386$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$lifetime\\)\\: Unexpected token \"\\$lifetime\", expected type at offset 86$#"
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
 			message: "#^Call to an undefined method Aura\\\\Session\\\\Phpfunc\\:\\:setcookie\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Session/Session.php
@@ -896,16 +306,6 @@ parameters:
 			path: library/Alaress/Session/Session.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$candidate\\)\\: Unexpected token \"\\$candidate\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Specification/Test/TestSpecificationFramework.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$components\\)\\: Unexpected token \"\\$components\", expected type at offset 18$#"
-			count: 6
-			path: library/Alaress/Specification/Test/TestSpecificationFramework.php
-
-		-
 			message: "#^Constructor of class Alaress_Submarine has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/Submarine.php
@@ -914,21 +314,6 @@ parameters:
 			message: "#^Call to an undefined method DebugBar\\\\DataCollector\\\\DataCollectorInterface\\:\\:addMessage\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Submarine.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$siteHost\\)\\: Unexpected token \"\\$siteHost\", expected type at offset 62$#"
-			count: 1
-			path: library/Alaress/Test/RelativeUrlTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 85$#"
-			count: 1
-			path: library/Alaress/Test/RelativeUrlTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 66$#"
-			count: 1
-			path: library/Alaress/Test/RelativeUrlTest.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 71$#"
@@ -1071,29 +456,9 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 104$#"
-			count: 1
-			path: library/Alaress/Web/Controller/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 80$#"
-			count: 1
-			path: library/Alaress/Web/Controller/Base.php
-
-		-
 			message: "#^Variable \\$data in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Web/Output/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 215$#"
-			count: 1
-			path: library/Alaress/Web/Router/RouteCollection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 235$#"
-			count: 1
-			path: library/Alaress/Web/Router/RouteCollection.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Router\\\\Router\\:\\:setTokens\\(\\)\\.$#"
@@ -1111,89 +476,14 @@ parameters:
 			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/Worker.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 124$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$extension\\)\\: Unexpected token \"\\$extension\", expected type at offset 78$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\<type\\> \\$errorArray\\)\\: Unexpected token \"\\<\", expected type at offset 154$#"
-			count: 1
-			path: library/AllowedFile.php
-
-		-
 			message: "#^Variable \\$files might not be defined\\.$#"
 			count: 1
 			path: library/AllowedFile.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 149$#"
-			count: 1
-			path: library/Assess/Answer/Exact.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 157$#"
-			count: 1
-			path: library/Assess/Answer/Fillgap.php
-
-		-
 			message: "#^Variable \\$totalMarks might not be defined\\.$#"
 			count: 1
 			path: library/Assess/Answer/Fillgap.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 157$#"
-			count: 1
-			path: library/Assess/Answer/Match.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 153$#"
-			count: 1
-			path: library/Assess/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attemptId\\)\\: Unexpected token \"\\$attemptId\", expected type at offset 205$#"
-			count: 1
-			path: library/Assess/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 231$#"
-			count: 1
-			path: library/Assess/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 145$#"
-			count: 1
-			path: library/Assess/Answer/Numeric.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 153$#"
-			count: 1
-			path: library/Assess/Answer/Radio.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessId\\)\\: Unexpected token \"\\$assessId\", expected type at offset 122$#"
-			count: 1
-			path: library/Assess/Attempt.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionId\\)\\: Unexpected token \"\\$questionId\", expected type at offset 146$#"
-			count: 1
-			path: library/Assess/Attempt.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentResponse\\)\\: Unexpected token \"\\$currentResponse\", expected type at offset 153$#"
-			count: 1
-			path: library/Assess/IAutomarkable.php
 
 		-
 			message: "#^Call to an undefined method Evaluation\\\\Import\\\\Parser\\\\IParser\\:\\:getWorkType\\(\\)\\.$#"
@@ -1221,127 +511,12 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 71$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 45$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 79$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessId\\)\\: Unexpected token \"\\$assessId\", expected type at offset 61$#"
-			count: 1
-			path: library/Assess/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionId\\)\\: Unexpected token \"\\$questionId\", expected type at offset 82$#"
-			count: 1
-			path: library/Assess/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessId\\)\\: Unexpected token \"\\$assessId\", expected type at offset 65$#"
-			count: 1
-			path: library/Assess/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionId\\)\\: Unexpected token \"\\$questionId\", expected type at offset 86$#"
-			count: 1
-			path: library/Assess/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 32$#"
-			count: 1
-			path: library/Blog.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 35$#"
-			count: 1
-			path: library/Bulk/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 32$#"
-			count: 1
-			path: library/Bulk/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 160$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryList\\)\\: Unexpected token \"\\$categoryList\", expected type at offset 107$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 44$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$groupList\\)\\: Unexpected token \"\\$groupList\", expected type at offset 135$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$owner\\)\\: Unexpected token \"\\$owner\", expected type at offset 86$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$source\\)\\: Unexpected token \"\\$source\", expected type at offset 64$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageConfig\\)\\: Unexpected token \"\\$homepageConfig\", expected type at offset 58$#"
-			count: 1
-			path: library/Bulk/Folder.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$columnIndexes with type mixed is not subtype of native type array\\<int, array\\>\\.$#"
 			count: 1
 			path: library/Bulk/Folder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 120$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$status\\)\\: Unexpected token \"\\$status\", expected type at offset 143$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 72$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 2
-			path: library/Calendar.php
-
-		-
 			message: "#^Variable \\$campusList might not be defined\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 78$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventID\\)\\: Unexpected token \"\\$eventID\", expected type at offset 55$#"
 			count: 1
 			path: library/Calendar.php
 
@@ -1386,204 +561,9 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 126$#"
-			count: 1
-			path: library/Calendar/Api/Cache.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 77$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 47$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 104$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$api\\)\\: Unexpected token \"\\$api\", expected type at offset 56$#"
-			count: 1
-			path: library/Calendar/Api/Composite.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 117$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$preselected\\)\\: Unexpected token \"\\$preselected\", expected type at offset 137$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 89$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Booking.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 116$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Booking.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 65$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 88$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 114$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EOTC.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 81$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EventExternal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 107$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/EventExternal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 81$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/External.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 107$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/External.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 81$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/ExternalConstrained.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 107$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/ExternalConstrained.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 140$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Interface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 163$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Interface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 52$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Interface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 89$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Moderation.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 116$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Moderation.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 65$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Schoolbox.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 88$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Schoolbox.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 114$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Schoolbox.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userCampus\\)\\: Unexpected token \"\\$userCampus\", expected type at offset 88$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Vcal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userGroup\\)\\: Unexpected token \"\\$userGroup\", expected type at offset 114$#"
-			count: 1
-			path: library/Calendar/Api/Config/Connector/Vcal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connectorClass\\)\\: Unexpected token \"\\$connectorClass\", expected type at offset 163$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventType\\)\\: Unexpected token \"\\$eventType\", expected type at offset 138$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentConnector\\)\\: Unexpected token \"\\$currentConnector\", expected type at offset 152$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentEventType\\)\\: Unexpected token \"\\$currentEventType\", expected type at offset 120$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$connectorClass\\)\\: Unexpected token \"\\$connectorClass\", expected type at offset 89$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventType\\)\\: Unexpected token \"\\$eventType\", expected type at offset 64$#"
-			count: 1
-			path: library/Calendar/Api/Config/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Custom/EOTC/Default.php
-
-		-
 			message: "#^Call to an undefined method Calendar\\:\\:getExternalEvents\\(\\)\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Event/External/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 180$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Schoolbox/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 81$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$DTSTART\\.$#"
@@ -1631,16 +611,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 18$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Interface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 153$#"
-			count: 1
-			path: library/Calendar/Api/EventType/ResourceBooking/Base.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForModerator\\(\\)\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
@@ -1656,74 +626,9 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
 			message: "#^Method Calendar_Api_EventType_ResourceBooking_Moderation_Default\\:\\:getEvent\\(\\) should return Calendar\\\\Event\\\\Collection but return statement is missing\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Submission/Schoolbox/Default.php
-
-		-
-			message: "#^Property Calendar_Api_EventType_Timetable_ExternalConstrained_Default\\:\\:\\$configLoader has unknown class Config\\\\Loader as its type\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^Call to method get\\(\\) on an unknown class Config\\\\Loader\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
-			path: library/Calendar/Api/EventType/TimetableDays/External/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/TimetableDays/External/Default.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/TimetableDays/External/Default.php
 
 		-
 			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:getFirst\\(\\) should return Calendar\\\\Event\\\\Type\\\\EventBase but return statement is missing\\.$#"
@@ -1734,106 +639,6 @@ parameters:
 			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:setStack\\(\\) should return array but return statement is missing\\.$#"
 			count: 1
 			path: library/Calendar/Event/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$api\\)\\: Unexpected token \"\\$api\", expected type at offset 63$#"
-			count: 1
-			path: library/Calendar/Event/Collection/Lister.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 150$#"
-			count: 1
-			path: library/Calendar/Event/Collection/Lister.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 101$#"
-			count: 1
-			path: library/Calendar/Event/Collection/Lister.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$location\\)\\: Unexpected token \"\\$location\", expected type at offset 45$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$access\\)\\: Unexpected token \"\\$access\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 48$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryId\\)\\: Unexpected token \"\\$categoryId\", expected type at offset 48$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryName\\)\\: Unexpected token \"\\$categoryName\", expected type at offset 50$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attendance\\)\\: Unexpected token \"\\$attendance\", expected type at offset 47$#"
-			count: 1
-			path: library/Calendar/Event/Type/EOTC/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$authorName\\)\\: Unexpected token \"\\$authorName\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$authorId\\)\\: Unexpected token \"\\$authorId\", expected type at offset 46$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$colour\\)\\: Unexpected token \"\\$colour\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$detail\\)\\: Unexpected token \"\\$detail\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$title\\)\\: Unexpected token \"\\$title\", expected type at offset 42$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$colour\\)\\: Unexpected token \"\\$colour\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventInterface.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 41$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$location\\)\\: Unexpected token \"\\$location\", expected type at offset 45$#"
-			count: 1
-			path: library/Calendar/Event/Type/External/Event.php
-
-		-
-			message: "#^PHPDoc tag @method has invalid value \\(\\)\\: Unexpected token \"\\\\n \", expected type at offset 14$#"
-			count: 1
-			path: library/Calendar/Event/Type/Submission/Renderer/VObject.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$array\\)\\: Unexpected token \"\\$array\", expected type at offset 133$#"
-			count: 1
-			path: library/Calendar/Import/Vcal.php
 
 		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$DTSTART\\.$#"
@@ -1866,11 +671,6 @@ parameters:
 			path: library/Calendar/Import/Vcal.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$date\\)\\: Unexpected token \"\\$date\", expected type at offset 147$#"
-			count: 1
-			path: library/Calendar/Layout/Full/Abstract.php
-
-		-
 			message: "#^Binary operation \"\\-\" between string and string results in an error\\.$#"
 			count: 1
 			path: library/Calendar/Layout/Full/Abstract.php
@@ -1891,64 +691,9 @@ parameters:
 			path: library/Calendar/Layout/Full/Javascript.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 46$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$body\\)\\: Unexpected token \"\\$body\", expected type at offset 157$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 93$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user_id\\)\\: Unexpected token \"\\$user_id\", expected type at offset 127$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 18$#"
-			count: 3
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user_id\\)\\: Unexpected token \"\\$user_id\", expected type at offset 45$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$cid\\)\\: Unexpected token \"\\$cid\", expected type at offset 78$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 18$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 22$#"
-			count: 1
-			path: library/Chat.php
-
-		-
 			message: "#^Variable \\$textbox might not be defined\\.$#"
 			count: 3
 			path: library/Component/Config/TextboxSearch.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$instanceId\\)\\: Unexpected token \"\\$instanceId\", expected type at offset 119$#"
-			count: 1
-			path: library/Component/ConfigMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 100$#"
-			count: 1
-			path: library/Component/ConfigMapper.php
 
 		-
 			message: "#^Variable \\$to in isset\\(\\) always exists and is not nullable\\.$#"
@@ -1959,31 +704,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Alaress\\\\Authorizer\\\\Authorizer\\.$#"
 			count: 1
 			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateHandle\\)\\: Unexpected token \"\\$templateHandle\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$targetHandle\\)\\: Unexpected token \"\\$targetHandle\", expected type at offset 102$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$componentName\\)\\: Unexpected token \"\\$componentName\", expected type at offset 62$#"
-			count: 1
-			path: library/Component/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$calendar\\)\\: Unexpected token \"\\$calendar\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/Dashboard/CalendarController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$group\\)\\: Unexpected token \"\\$group\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/Dashboard/CalendarController.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$period\\)\\: Unexpected token \"\\$period\", expected type at offset 73$#"

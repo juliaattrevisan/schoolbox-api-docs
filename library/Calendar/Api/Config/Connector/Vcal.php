@@ -101,8 +101,8 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     /**
      * Check if current user has permissions to see this event
      *
-     * @param $userCampus
-     * @param $userGroup
+     * @param array $userCampus
+     * @param int $userGroup
      *
      * @return bool
      */

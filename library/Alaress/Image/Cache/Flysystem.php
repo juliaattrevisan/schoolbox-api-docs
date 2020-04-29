@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -88,7 +88,7 @@ class Flysystem implements CacheInterface
      * Set loaded from cache
      * Enforce boolean
      *
-     * @param $loadedFromCache
+     * @param bool $loadedFromCache
      */
     protected function setLoadedFromCache($loadedFromCache)
     {

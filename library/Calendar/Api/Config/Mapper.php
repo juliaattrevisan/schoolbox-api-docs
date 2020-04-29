@@ -78,8 +78,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * The provided eventType and connectorClass combination is an active source
      * in Calendar subscription
      *
-     * @param $eventType
-     * @param $connectorClass
+     * @param string $eventType
+     * @param string $connectorClass
      * @return bool
      * @throws MapperException
      */
@@ -142,8 +142,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     /**
      * Return a set of decoded config objects for the specified event_type and connector_class
      *
-     * @param $currentEventType
-     * @param $currentConnector
+     * @param string $currentEventType
+     * @param string $currentConnector
      * @param ModuleChecker $moduleChecker
      * @return Calendar_Api_Config_Connector_Interface[]
      * @throws MapperException
@@ -193,8 +193,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     /**
      * Activate a particular connector
      *
-     * @param $eventType
-     * @param $connectorClass
+     * @param string $eventType
+     * @param string $connectorClass
      *
      * @return \Calendar_Api_Config_Mapper
      */

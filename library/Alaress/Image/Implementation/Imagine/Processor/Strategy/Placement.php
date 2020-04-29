@@ -97,7 +97,7 @@ class Placement extends BaseStrategy
     /**
     * Set position
     *
-    * @param $position
+    * @param string $position
     */
     private function setPosition($position)
     {

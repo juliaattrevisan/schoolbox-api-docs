@@ -63,8 +63,8 @@ class Calendar extends DeprecatedModel
      * Get a list of people who are attending/pending for a particular
      * event attendance
      *
-     * @param $eventId
-     * @param $status
+     * @param int $eventId
+     * @param int $status
      *
      * @return mixed
      */
@@ -89,7 +89,7 @@ class Calendar extends DeprecatedModel
     /**
      * Get all the people pending for an event
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return mixed
      */
@@ -101,7 +101,7 @@ class Calendar extends DeprecatedModel
     /**
      * Get all the people approved for an event
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return mixed
      */
@@ -113,7 +113,7 @@ class Calendar extends DeprecatedModel
     /**
      * Get all the people approved for an event
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return mixed
      */
@@ -276,7 +276,7 @@ class Calendar extends DeprecatedModel
     /**
      * Used on the Calendar screens to filter events
      *
-     * @param $userId
+     * @param int $userId
      *
      * @return array
      */
@@ -316,7 +316,7 @@ class Calendar extends DeprecatedModel
     /**
      * Get an event by its id
      *
-     * @param $eventID
+     * @param int $eventID
      *
      * @return array|bool
      */

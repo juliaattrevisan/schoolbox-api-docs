@@ -36,7 +36,7 @@ class Alaress_Rss_Stream
     /** This can be dynamically chosen based on structure
      * of input data. Choose strategy in the setup
      *
-     * @param Alaress_Rss_Strategy_Interface
+     * @var Alaress_Rss_Strategy_Interface
      */
     private $rssStrategy;
 
@@ -163,7 +163,7 @@ class Alaress_Rss_Stream
     /**
      * Set output contents
      *
-     * @param  $val
+     * @param array $val
      */
     private function setOutput($val)
     {

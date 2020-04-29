@@ -17,7 +17,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *
-     * @param  $currentResponse
+     * @param  array $currentResponse
      * @return void
      */
     public function mark($currentResponse): void

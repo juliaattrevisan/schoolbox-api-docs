@@ -42,7 +42,7 @@ class IsConfigSetTo implements IAuthorizationRule
      * Constructor (obviously)
      *
      * @param string        $paramsKey
-     * @param               $paramsValue
+     * @param string        $paramsValue
      * @param IConfigLoader $configLoader
      */
     public function __construct($paramsKey, $paramsValue, IConfigLoader $configLoader)

@@ -25,8 +25,8 @@ class Alaress_Log_File {
 	/**
 	 * Constructor
 	 *
-	 * @param $path
-	 * @param $prefix
+	 * @param string $path
+	 * @param string $prefix
 	 */
 	public function __construct($path, $prefix) {
 		$this->setPath($path);
@@ -36,7 +36,7 @@ class Alaress_Log_File {
 	/**
 	 * Save $data to $path with a $prefix
 	 *
-	 * @param $data
+	 * @param mixed $data
 	 */
 	public function log($data) {
 		$filepointer = fopen($this->getPath(), 'a+');

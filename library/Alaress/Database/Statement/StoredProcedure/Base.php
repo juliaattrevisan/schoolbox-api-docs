@@ -92,7 +92,7 @@ class Base extends BaseQuery implements IStoredProcedure
      * Bind a single output parameter.
      *
      * @param string $name
-     * @param &array $param
+     * @param array  $param
      */
     protected function internalBindOutputParam($name, &$param)
     {

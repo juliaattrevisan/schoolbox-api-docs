@@ -12,7 +12,7 @@ class Calendar_Api_Cache extends Alaress_Cache_Abstract {
      * The url of the stream you just got
      * You can hardcode a url in here, or pass it into init()
      *
-     * @var
+     * @var string
      */
     protected $url = '';
 

@@ -1,6 +1,6 @@
 <?php
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -11,6 +11,7 @@ namespace Alaress\Async\AMQP;
 
 
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Message\AMQPMessage;
 
 interface AMQPInterface {
 
@@ -91,7 +92,7 @@ interface AMQPInterface {
 	/**
 	 * Mark the message identified by the given delivery tag as ACK.
 	 *
-	 * @param $message
+	 * @param AMQPMessage $message
 	 * @param string $channelId
 	 * @return self
 	 */
@@ -122,7 +123,7 @@ interface AMQPInterface {
 	/**
 	 * Mark the message identified by the given delivery tag as rejected.
 	 *
-	 * @param $message
+	 * @param AMQPMessage $message
 	 * @param bool $requeue
 	 * @param string $channelId
 	 * @return self
@@ -144,7 +145,7 @@ interface AMQPInterface {
 	/**
 	 * Publish a message to a particular routing key.
 	 *
-	 * @param $message
+	 * @param AMQPMessage|string $message
 	 * @param string $routingKey
      * @param array  $properties
 	 * @param string $channelId

@@ -50,7 +50,7 @@ class Assess_Main extends Evaluation_Main {
 	/**
 	 * A list of assessments available for a category
 	 *
-	 * @param  $category_id
+	 * @param int|array $category_id
 	 * @param bool $limit
 	 * @return array|bool
 	 */
@@ -83,7 +83,7 @@ class Assess_Main extends Evaluation_Main {
 	/**
 	 * Soft-deletes content
 	 *
-	 * @param  $category_id
+	 * @param  int $category_id
 	 * @return void
 	 */
 	public function homepageClean($category_id) {
@@ -166,7 +166,7 @@ class Assess_Main extends Evaluation_Main {
     /**
      * Find out whether this assessment has expired.
      *
-     * @param  $assess_id
+     * @param  int $assess_id
      *
      * @return bool
      */

@@ -14,8 +14,8 @@ class CodecTest extends TestCase
 {
     /**
      * @dataProvider provider_testEncode
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      */
     public function testEncode($input, $expected)
     {
@@ -24,8 +24,8 @@ class CodecTest extends TestCase
 
     /**
      * @dataProvider provider_testDecode
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      */
     public function testDecode($input, $expected)
     {
@@ -34,8 +34,8 @@ class CodecTest extends TestCase
 
     /**
      * @dataProvider provider_dataIsNull
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      *
      * @expectedException \TypeError
      */
@@ -46,8 +46,8 @@ class CodecTest extends TestCase
 
     /**
      * @dataProvider provider_dataIsNull
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      *
      * @expectedException \TypeError
      */
@@ -164,8 +164,8 @@ class CodecTest extends TestCase
 
     /**
      * @dataProvider  provider_testDecode
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      */
     public function testLosslessDecoded($input, $expected)
     {
@@ -174,8 +174,8 @@ class CodecTest extends TestCase
 
     /**
      * @dataProvider  provider_testEncode
-     * @param $input
-     * @param $expected
+     * @param string $input
+     * @param string $expected
      */
     public function testLosslessEncoded($input, $expected)
     {
