@@ -638,21 +638,6 @@ parameters:
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
 			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 69$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 73$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 99$#"
-			count: 1
 			path: library/Calendar/Api/EventType/TimetableDays/External/Default.php
 
 		-
