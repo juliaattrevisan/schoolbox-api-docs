@@ -30,11 +30,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $delegate = new Delegate();
+        $delegate = new Delegate($this);
         return $this->renderTwigTemplate(
             $templateHandle,
             Delegate::TEMPLATE,
-            $delegate->buildTemplateParams($this)
+            $delegate->buildTemplateParams()
         );
     }
 }
