@@ -88,7 +88,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	/**
 	 * Find the next status for an event
 	 *
-	 * @param $event
+	 * @param Event $event
 	 * @return int
 	 */
 	public function findNextStatus($event) {
@@ -109,7 +109,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 * configuration - there should on be the current status,
 	 * the next status, and Rejected
 	 *
-	 * @param $event
+	 * @param Event $event
 	 * @return \Schoolbox\Collection
 	 */
 	public function findAvailableStatuses($event) {
