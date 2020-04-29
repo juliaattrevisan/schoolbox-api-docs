@@ -1251,11 +1251,6 @@ parameters:
 			path: library/EOTC/EventMetadataNotifier.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(User\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 22$#"
-			count: 1
-			path: library/EOTC/EventPermission.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$event\\)\\: Unexpected token \"\\$event\", expected type at offset 57$#"
 			count: 1
 			path: library/EOTC/EventStatusMapper.php

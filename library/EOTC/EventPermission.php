@@ -130,7 +130,7 @@ class EventPermission
     }
 
     /**
-     * @param User
+     * @param User $user
      * @return $this
      */
     public function setUser($user)
