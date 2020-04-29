@@ -1,4 +1,12 @@
-{% block markup %}
+{% if href is null %}
+    <div class="empty-state">
+        <span class="icon-twitter"></span>
+        <p>
+            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
+            to show a feed of tweets.
+        </p>
+    </div>
+{% else %}
     <a id="twitter-view-{{ id }}"
        class="twitter-timeline"
        href="{{ href }}"
@@ -6,9 +14,7 @@
        {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
        data-chrome="noheader nofooter noborders transparent noscrollbar"
     >Loading tweets...</a>
-{% endblock markup %}
 
-{% block js %}
     {% autoescape 'js' %}
         <script type="text/javascript">
             // Include Twitter's JS API
@@ -39,4 +45,4 @@
             );
         </script>
     {% endautoescape %}
-{% endblock js %}
+{% endif %}
