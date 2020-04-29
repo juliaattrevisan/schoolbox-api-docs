@@ -511,21 +511,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 71$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 45$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 79$#"
-			count: 1
-			path: library/Assess/Main.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$assessId\\)\\: Unexpected token \"\\$assessId\", expected type at offset 61$#"
 			count: 1
 			path: library/Assess/Question.php
