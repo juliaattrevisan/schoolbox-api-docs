@@ -39,7 +39,6 @@ components:
       type: integer
       format: int32
       minimum: 1
-      required: true
 
     cursor:
       title: Cursor
@@ -61,7 +60,6 @@ components:
           type: number
           minimum: 0
           maximum: 1
-          required: false
           description: |
             A floating-point number between 0 and 1: the higher the number, the
             more relevant to the search this item is.
