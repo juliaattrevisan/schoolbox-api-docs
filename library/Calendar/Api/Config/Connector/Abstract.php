@@ -70,8 +70,8 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      * Render event type lookup selector with the currently chosen
      * value preselected
      *
-     * @param $page
-     * @param $preselected
+     * @param SitePage $page
+     * @param int $preselected
      */
     protected function renderEventType($page, $preselected)
     {
