@@ -40,7 +40,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @param SitePage             $page
      * @param User                 $user
-     * @param                      $date
+     * @param string               $date
      * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
