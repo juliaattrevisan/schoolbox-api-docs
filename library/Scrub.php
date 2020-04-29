@@ -338,6 +338,35 @@ class Scrub
 
 
     /**
+     * A HTMLPurifier that can do nothing but add anchor tags to things tha
+     * look like links.
+     *
+     * @return HTMLPurifier
+     */
+    private static function getLinkifyingHtmlPurifierInstance(): HTMLPurifier
+    {
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('HTML.Allowed', 'a[href]');
+        $config->set('AutoFormat.Linkify', true);
+        return new HTMLPurifier($config);
+    }
+
+
+    /**
+     * Escapes and then linkifies (adds anchor tags to text that looks like a
+     * link) to text.
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function linkifyText(string $text): string
+    {
+        return self::getLinkifyingHtmlPurifierInstance()->purify(self::text($text));
+    }
+
+
+
+    /**
      * Mangles HTML-purified DOM - this is needed for things that HTMLPurifier
      * can't do, such as adding new nodes.
      *

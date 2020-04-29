@@ -336,7 +336,7 @@ class Threads
                 array(
                     'COMPONENT_INSTANCE_ID'              => Scrub::text($this->instance->getId()),
                     'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
-                    'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::text($currentPost->getBody())),
+                    'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::linkifyText($currentPost->getBody())),
                     'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
                     'SOCIALSTREAM_POST_CREATED_AT_LONG'  => Scrub::text($currentPost->getCreatedAt()->getLong()),
                     'SOCIALSTREAM_POST_USER_ID'          => Scrub::text($currentPost->getOwner()->getId()),
@@ -410,7 +410,7 @@ class Threads
                     array(
                         'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->instance->getId()),
                         'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
-                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::text($currentComment->getBody())),
+                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::linkifyText($currentComment->getBody())),
                         'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
                         'SOCIALSTREAM_COMMENT_CREATED_AT_LONG'  => Scrub::text($currentComment->getCreatedAt()->getLong()),
                         'SOCIALSTREAM_COMMENT_USER_ID'          => Scrub::text($currentComment->getOwner()->getId()),
@@ -483,7 +483,7 @@ class Threads
                         array(
                             'COMPONENT_INSTANCE_ID'               => Scrub::text($this->instance->getId()),
                             'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
-                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::text($currentReply->getBody())),
+                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::linkifyText($currentReply->getBody())),
                             'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
                             'SOCIALSTREAM_REPLY_CREATED_AT_LONG'  => Scrub::text($currentReply->getCreatedAt()->getLong()),
                             'SOCIALSTREAM_REPLY_USER_ID'          => Scrub::text($currentReply->getOwner()->getId()),

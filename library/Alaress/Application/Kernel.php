@@ -856,6 +856,15 @@ abstract class Kernel
                         )
                     );
 
+                    // Linkify filter
+                    $twig->addFilter(
+                        new TwigFilter(
+                            'linkify',
+                            [\Scrub::class, 'linkifyText'],
+                            ['is_safe' => ['html']]
+                        )
+                    );
+
                     // Cut sentence filter
                     $twig->addFilter(
                         new TwigFilter(
