@@ -511,36 +511,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 160$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryList\\)\\: Unexpected token \"\\$categoryList\", expected type at offset 107$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 44$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$groupList\\)\\: Unexpected token \"\\$groupList\", expected type at offset 135$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$owner\\)\\: Unexpected token \"\\$owner\", expected type at offset 86$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$source\\)\\: Unexpected token \"\\$source\", expected type at offset 64$#"
-			count: 1
-			path: library/Bulk/Calendar.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageConfig\\)\\: Unexpected token \"\\$homepageConfig\", expected type at offset 58$#"
 			count: 1
 			path: library/Bulk/Folder.php

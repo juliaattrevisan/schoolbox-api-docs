@@ -10,22 +10,45 @@
 class Bulk_Calendar extends Bulk_Abstract
 {
 
+    /**
+     * @var string|null
+     */
     private $source;
+
+
+    /**
+     * @var int|null
+     */
     private $owner;
+
+
+    /**
+     * @var array
+     */
     private $categoryList;
+
+
+    /**
+     * @var array
+     */
     private $groupList;
+
+
+    /**
+     * @var array
+     */
     private $campusList;
 
 
     /**
      * Constructor
      *
-     * @param $file
-     * @param $source
-     * @param $owner
-     * @param $categoryList
-     * @param $groupList
-     * @param $campusList
+     * @param string      $file
+     * @param string|null $source
+     * @param int|null    $owner
+     * @param array       $categoryList
+     * @param array       $groupList
+     * @param array       $campusList
      */
     public function __construct($file, $source, $owner, $categoryList, $groupList, $campusList)
     {
