@@ -16,7 +16,7 @@ class Blog extends DeprecatedModel
 
     /**
      *
-     * @param        $keyword
+     * @param string $keyword
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
