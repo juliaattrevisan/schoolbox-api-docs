@@ -192,7 +192,7 @@ class Event extends EventBase
     /**
      * Set location
      *
-     * @param $location
+     * @param string $location
      */
     public function setLocation($location)
     {
@@ -202,7 +202,7 @@ class Event extends EventBase
     /**
      * Get location
      *
-     * @return null
+     * @return string|null
      */
     public function getLocation()
     {
@@ -212,7 +212,7 @@ class Event extends EventBase
     /**
      * Set access
      *
-     * @param $access
+     * @param int $access
      */
     public function setAccess($access)
     {
@@ -230,9 +230,9 @@ class Event extends EventBase
     }
 
     /**
-     * Set campus list
+     * Set campus list, comma separated
      *
-     * @param $campusList
+     * @param string $campusList
      */
     public function setCampusList($campusList)
     {
@@ -240,9 +240,9 @@ class Event extends EventBase
     }
 
     /**
-     * Get campus list
+     * Get campus list, comma separated
      *
-     * @return null
+     * @return string
      */
     public function getCampusList()
     {
@@ -252,7 +252,7 @@ class Event extends EventBase
     /**
      * Set category id
      *
-     * @param $categoryId
+     * @param int $categoryId
      */
     public function setCategoryId($categoryId)
     {
@@ -272,7 +272,7 @@ class Event extends EventBase
     /**
      * Set category name
      *
-     * @param $categoryName
+     * @param string $categoryName
      */
     public function setCategoryName($categoryName)
     {

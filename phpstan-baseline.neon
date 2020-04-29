@@ -646,31 +646,6 @@ parameters:
 			path: library/Calendar/Event/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$location\\)\\: Unexpected token \"\\$location\", expected type at offset 45$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$access\\)\\: Unexpected token \"\\$access\", expected type at offset 43$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 48$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryId\\)\\: Unexpected token \"\\$categoryId\", expected type at offset 48$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryName\\)\\: Unexpected token \"\\$categoryName\", expected type at offset 50$#"
-			count: 1
-			path: library/Calendar/Event/Type/Day/Event.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$attendance\\)\\: Unexpected token \"\\$attendance\", expected type at offset 47$#"
 			count: 1
 			path: library/Calendar/Event/Type/EOTC/Event.php
