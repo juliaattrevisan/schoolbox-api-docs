@@ -30,7 +30,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Get logs
      *
-     * @param      $category_id
+     * @param int  $category_id
      * @param null $last_poll
      * @param int  $not_user_id
      * @return array|bool
@@ -80,9 +80,9 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Create a log entry which remembers what people typed.
      *
-     * @param        $category_id
-     * @param        $user_id
-     * @param        $body
+     * @param int    $category_id
+     * @param int    $user_id
+     * @param string $body
      * @param string $type
      * @return int
      * @throws InvalidArgumentException
@@ -102,8 +102,8 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param $category_id
-     * @param $user_id
+     * @param int $category_id
+     * @param int $user_id
      * @return bool|PDOStatement
      */
     public function update_poll($category_id, $user_id)
@@ -124,7 +124,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param $category_id
+     * @param int $category_id
      * @return array|bool
      */
     public function get_users($category_id)
@@ -156,7 +156,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param $category_id
+     * @param int $category_id
      * @return PDOStatement
      * @throws Exception
      */
@@ -176,7 +176,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      *
      * TODO: Refactor
      *
-     * @param  $cid
+     * @param  int $cid
      * @return void
      */
     public function homepageClean($cid)
@@ -191,7 +191,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     }
 
     /**
-     * @param $categoryID
+     * @param int $categoryID
      * @return array|null
      * @throws InvalidArgumentException
      */
@@ -242,7 +242,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param     $categoryID
+     * @param int $categoryID
      * @param int $year
      * @param int $month
      * @param int $index

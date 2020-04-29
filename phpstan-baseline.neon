@@ -691,51 +691,6 @@ parameters:
 			path: library/Calendar/Layout/Full/Javascript.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 46$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$body\\)\\: Unexpected token \"\\$body\", expected type at offset 157$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 93$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user_id\\)\\: Unexpected token \"\\$user_id\", expected type at offset 127$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 18$#"
-			count: 3
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user_id\\)\\: Unexpected token \"\\$user_id\", expected type at offset 45$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$cid\\)\\: Unexpected token \"\\$cid\", expected type at offset 78$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 18$#"
-			count: 1
-			path: library/Chat.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 22$#"
-			count: 1
-			path: library/Chat.php
-
-		-
 			message: "#^Variable \\$textbox might not be defined\\.$#"
 			count: 3
 			path: library/Component/Config/TextboxSearch.php
