@@ -646,11 +646,6 @@ parameters:
 			path: library/Calendar/Event/Collection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$location\\)\\: Unexpected token \"\\$location\", expected type at offset 45$#"
-			count: 1
-			path: library/Calendar/Event/Type/External/Event.php
-
-		-
 			message: "#^PHPDoc tag @method has invalid value \\(\\)\\: Unexpected token \"\\\\n \", expected type at offset 14$#"
 			count: 1
 			path: library/Calendar/Event/Type/Submission/Renderer/VObject.php
