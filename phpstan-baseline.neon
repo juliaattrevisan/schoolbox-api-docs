@@ -5121,11 +5121,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/SaveForLater/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 107$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Search/Renderer.php
-
-		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Statistics\\\\Cumulative\\\\Mapper\\:\\:findByColumn\\(\\) invoked with 3 parameters, 1 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
