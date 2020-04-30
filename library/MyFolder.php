@@ -50,7 +50,7 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     public function getParent($id)
@@ -134,7 +134,7 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $folderID
+     * @param int $folderID
      * @return mixed
      */
     public function hasChildren($folderID)
@@ -149,8 +149,8 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $folderID
-     * @param $action
+     * @param int $folderID
+     * @param string $action
      */
     public function logAction($folderID, $action)
     {
@@ -167,7 +167,7 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $data
+     * @param array $data
      * @return int|string
      */
     public function create($data)
@@ -182,7 +182,7 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $data
+     * @param array $data
      * @return bool
      */
     public function update($data)
@@ -193,7 +193,7 @@ class MyFolder extends DeprecatedModel
 
 
     /**
-     * @param $folderID
+     * @param int $folderID
      * @return bool
      */
     public function delete($folderID)

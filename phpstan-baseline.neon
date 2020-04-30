@@ -4331,26 +4331,6 @@ parameters:
 			path: library/MSSQL.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 1
-			path: library/MyFolder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderID\\)\\: Unexpected token \"\\$folderID\", expected type at offset 18$#"
-			count: 3
-			path: library/MyFolder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$action\\)\\: Unexpected token \"\\$action\", expected type at offset 42$#"
-			count: 1
-			path: library/MyFolder.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 18$#"
-			count: 2
-			path: library/MyFolder.php
-
-		-
 			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
 			count: 1
 			path: library/Page.php
