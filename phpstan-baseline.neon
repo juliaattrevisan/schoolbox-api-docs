@@ -4306,16 +4306,6 @@ parameters:
 			path: library/Leave/Controller.php
 
 		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 3
-			path: library/Leave/Core/Notice/Admin/Submitted.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/Admin/Submitted.php
-
-		-
 			message: "#^Cannot call method getStudentContactList\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Core/Notice/Parent/Abstract.php
@@ -4324,36 +4314,6 @@ parameters:
 			message: "#^Cannot call method send\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Core/Notice/User/Abstract.php
-
-		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 3
-			path: library/Leave/Core/Notice/User/Authorised.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/User/Authorised.php
-
-		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 3
-			path: library/Leave/Core/Notice/User/Rejected.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/User/Rejected.php
-
-		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 3
-			path: library/Leave/Core/Notice/User/Submitted.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/User/Submitted.php
 
 		-
 			message: "#^Variable \\$currentPerson in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$j, \\$period$#"
@@ -4384,26 +4344,6 @@ parameters:
 			message: "#^Cannot call method setAjax\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Report/Catering/CSV.php
-
-		-
-			message: "#^Cannot call method setFile\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Report/Catering/Web.php
-
-		-
-			message: "#^Cannot call method setBlock\\(\\) on null\\.$#"
-			count: 5
-			path: library/Leave/Report/Catering/Web.php
-
-		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 7
-			path: library/Leave/Report/Catering/Web.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 5
-			path: library/Leave/Report/Catering/Web.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$houseMapper\\)\\: Unexpected token \"\\$houseMapper\", expected type at offset 40$#"
