@@ -5166,11 +5166,6 @@ parameters:
 			path: library/Schoolbox/Curriculum/Import/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessmentId\\)\\: Unexpected token \"\\$assessmentId\", expected type at offset 126$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Node/Mapper.php
-
-		-
 			message: "#^Call to method resetParameters\\(\\) on an unknown class Zend_Http_Client\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/SparqlClient.php
