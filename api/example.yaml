@@ -219,16 +219,16 @@ paths:
         you would have the ability to fetch children as a sub-path of the user's
         path set.
 
-        Any of the paths defined above may be defined as sub-resources of
-        another resource:
-        * GET  /user/1/children/ gets all children of a user
-        * POST /user/1/children/ adds a child to a user
-        * GET  /user/1/children/2 gets the user's membership of a group
-        * PUT  /user/1/children/2/actions/change-password changes the child's
-               password
-        * GET  /user/1/children/2/children gets the children of user 2
-               (I recommend against going more than one sub-resource level deep
-               though)
+        Generally, sub-resources will be related via a join model, which
+        contains metadata about the relation between the resource and
+        sub-resource: this metadata will be modifiable directly.
+
+        Any of the paths defined above may be available on sub-resources:
+        * GET    /user/1/children/  gets all children of a user
+        * POST   /user/1/children/  adds a parent/child relation
+        * PUT    /user/1/children/2 replaces the parent/child relation
+        * PATCH  /user/1/children/2 patches the parent/child relation
+        * DELETE /user/1/children/2 removes the parent/child relation
       responses:
         '200':
           # This will generally not be the same type as the base resource.
