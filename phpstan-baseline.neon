@@ -4326,11 +4326,6 @@ parameters:
 			path: library/Leave/Core/Notice/User/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$email\\)\\: Unexpected token \"\\$email\", expected type at offset 42$#"
-			count: 1
-			path: library/Leave/Core/Notice/User/Abstract.php
-
-		-
 			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
 			count: 3
 			path: library/Leave/Core/Notice/User/Authorised.php
