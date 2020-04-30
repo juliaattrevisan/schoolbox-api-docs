@@ -355,7 +355,7 @@ class External_Schooledge_User implements External_UserInterface
      * StaffVoiceMail,
      * StaffHouseDescription
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     public function getStaff(string $externalUserId): array
