@@ -4301,11 +4301,6 @@ parameters:
 			path: library/Homepage.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$other\\)\\: Unexpected token \"\\$other\", expected type at offset 71$#"
-			count: 1
-			path: library/IComparable.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$request\\)\\: Unexpected token \"\\$request\", expected type at offset 58$#"
 			count: 1
 			path: library/Leave/Controller.php
