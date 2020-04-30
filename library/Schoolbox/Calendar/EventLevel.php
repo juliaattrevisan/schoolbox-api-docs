@@ -17,7 +17,7 @@ class EventLevel {
 	/**
 	 * Id of the event level
 	 *
-	 * @var string
+	 * @var int
 	 */
 	private $id = '';
 
@@ -31,8 +31,8 @@ class EventLevel {
 	/**
 	 * Constructor
 	 *
-	 * @param $id
-	 * @param $name
+	 * @param int $id
+	 * @param string $name
 	 */
 	public function __construct($id, $name) {
 		$this->setId($id);
@@ -42,7 +42,7 @@ class EventLevel {
 	/**
 	 * Set id
 	 *
-	 * @param string $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -51,7 +51,7 @@ class EventLevel {
 	/**
 	 * Get id
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;

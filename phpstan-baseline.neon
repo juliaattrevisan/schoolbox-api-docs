@@ -4846,16 +4846,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 35$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventLevel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 50$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventLevel.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$campusList\\)\\: Unexpected token \"\\$campusList\", expected type at offset 75$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventLevelCollection.php
