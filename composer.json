@@ -40,7 +40,6 @@
         "league/flysystem": "~1.0.16",
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "~2.7.0",
-        "sentry/sentry": "1.7.*",
         "mtdowling/cron-expression": "~2.0.0",
         "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "~4.1.0",
@@ -76,7 +75,8 @@
         "react/socket": "^1.2.1",
         "react/promise": "^2.7",
         "react/event-loop": "^1.1.0",
-        "laravie/predis-async": "^0.3.0"
+        "laravie/predis-async": "^0.3.0",
+        "sentry/sdk": "^2.1.0"
 
     },
     "require-dev": {

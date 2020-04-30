@@ -1352,26 +1352,19 @@ abstract class Kernel
 
 
         // install sentry
-        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-        $sentryClient = null;
+        $sentryClient  = null;
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
-                /** @var \Schoolbox\Instance $sb */
-                $sb = $di->get('instance');
-                // fall back to site_location if site_school_code not set
-                $options = [
-                    'environment' => $sb->getType(),
-                    'tags' => [
-                        'php_version' => PHP_VERSION,
-                        'site_version' => $sb->getVersion(),
-                        'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
-                    ]
-                ];
-                $sentryClient = new \Raven_Client("https://{$sentryToken}@sentry.io/{$sentryProject}", $options);
-                $sentryClient->install();
-            } catch (\Raven_Exception $e) {
-                // do nothing; sentry is not installed
+                /** @var Instance $sb */
+                $sb           = $di->get('instance');
+                $sentryClient = (new \Alaress\Sentry\Factory())->build(
+                    $sb,
+                    Instance::APPLICATION_NAME,
+                    $sentryToken,
+                    $sentryProject
+                );
             } catch (Di\Exception\ServiceNotFound $e) {
                 // do nothing; sentry is not installed
             }

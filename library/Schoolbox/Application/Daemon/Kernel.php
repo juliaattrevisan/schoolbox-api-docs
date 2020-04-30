@@ -348,7 +348,7 @@ EOL;
         $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->opts);
         $logger    = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
-        $this->addRavenHandler($logger);
+        $this->addSentryHandler($logger);
 
         return $logger;
     }

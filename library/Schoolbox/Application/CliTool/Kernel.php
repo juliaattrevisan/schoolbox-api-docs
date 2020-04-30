@@ -160,7 +160,7 @@ class Kernel extends CliKernelAbstract
 
         $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->kernelOpts);
         $logger    = new Lumberjack\Logger($outStream, null, $level, $fields, $porcelain);
-        $this->addRavenHandler($logger);
+        $this->addSentryHandler($logger);
 
         return $logger;
     }

@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Aura\Di\Exception\ServiceNotFound;
 use PDOStatement;
-use Raven_Client;
 use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
@@ -24,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+use Sentry\State\HubInterface;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
@@ -77,7 +77,7 @@ class Mapper extends \Schoolbox\Mapper
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('storage', 's')},
                         {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
-            FROM        {$this->getTable()} 
+            FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('storage', '', 's', true)}
             LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
         ";
@@ -382,7 +382,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $query = '
             SELECT student_submission.`id`, `owner`, `box_id`
-            FROM student_submission_file 
+            FROM student_submission_file
             INNER JOIN student_submission ON student_submission_file.`student_submission_id` = student_submission.`id`
             WHERE student_submission_file.`id` = :studentSubmissionFileId
         ';
@@ -485,7 +485,7 @@ class Mapper extends \Schoolbox\Mapper
     private function logConnectorException(\Exception $ce) : void
     {
         try {
-            /** @var Raven_Client $sentry */
+            /** @var HubInterface $sentry */
             $sentry = self::getDi()->get('sentry');
         } catch (ServiceNotFound $e) {
             return;

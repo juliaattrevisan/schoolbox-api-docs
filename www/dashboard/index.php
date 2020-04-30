@@ -5,6 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Sentry\State\HubInterface;
+
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 $this->setTab('main');
@@ -49,7 +51,7 @@ foreach ($componentCollection as $component) {
         }
 
         if ($this->getDi()->has('sentry')) {
-            /** @var Raven_Client $sentry */
+            /** @var HubInterface $sentry */
             $sentry = $this->getDi()->get('sentry');
             $sentry->captureException($e);
         }

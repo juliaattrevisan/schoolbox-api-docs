@@ -13,7 +13,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use Schoolbox\Learning\DueWork\StateMapper;
-use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
@@ -53,6 +52,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 class Controller extends Assessment\Controller
 {
@@ -734,9 +734,10 @@ class Controller extends Assessment\Controller
             } catch (\DomainException $e) {
 
                 // Report errors in this thing
-                /** @var Raven_Client|null $sentry */
                 if ($this->getDi()->has('sentry')) {
-                    $this->getDi()->get('sentry')->captureException($e);
+                    /** @var HubInterface $sentry */
+                    $sentry = $this->getDi()->get('sentry');
+                    $sentry->captureException($e);
                 }
 
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
