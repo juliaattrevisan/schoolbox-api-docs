@@ -382,7 +382,7 @@ class Connector
     /**
      * Returns full timetable for all timetables, or for a specified timetable.
      *
-     * @param int|null $timeTableId Fetches all timetables if no id specified
+     * @param int $timeTableId Fetches all timetables if no id specified
      * @return Models\TimetableDefinitions
      * @throws Unauthorised If credentials are incorrect
      * @throws InvalidArg If method args are invalid

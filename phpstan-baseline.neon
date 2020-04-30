@@ -4231,11 +4231,6 @@ parameters:
 			path: library/External/Synergetic/User.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$timeTableId with type int\\|null is not subtype of native type int\\.$#"
-			count: 1
-			path: library/External/Tass/Api/Connector.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$date with type Alaress_Date_Format\\|null is not subtype of native type Alaress_Date_Format\\.$#"
 			count: 1
 			path: library/External/Tass/Api/Connector.php
