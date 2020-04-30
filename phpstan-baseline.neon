@@ -4816,11 +4816,6 @@ parameters:
 			path: library/Schoolbox/Assessment/StudentReportCard/CommentMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 74$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Widgets.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Eportfolio/Image/Mapper.php
