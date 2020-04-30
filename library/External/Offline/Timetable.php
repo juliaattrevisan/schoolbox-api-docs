@@ -19,7 +19,7 @@ class External_Offline_Timetable implements External_TimetableInterface, IOfflin
 
     public function getDayNumber(Campus $campus, $date = 0)
     {
-        // Noop
+        return 0;
     }
 
     public function getDayName($dayNumber): string
