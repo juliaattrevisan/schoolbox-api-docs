@@ -4836,16 +4836,6 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$comments\\)\\: Unexpected token \"\\$comments\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$images\\)\\: Unexpected token \"\\$images\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Model.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$date\\)\\: Unexpected token \"\\$date\", expected type at offset 156$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
