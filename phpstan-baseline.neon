@@ -4701,11 +4701,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Destinations.php
-
-		-
 			message: "#^Cannot call method setOffset\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Project\\>\\.$#"
 			count: 4
 			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
