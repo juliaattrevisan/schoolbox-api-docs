@@ -4426,16 +4426,6 @@ parameters:
 			path: library/Schoolbox/Admin/Lists/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 133$#"
-			count: 1
-			path: library/Schoolbox/Admin/Menu/Top/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mapper\\)\\: Unexpected token \"\\$mapper\", expected type at offset 18$#"
-			count: 6
-			path: library/Schoolbox/Admin/Menu/Top/Controller.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$pageCurrent\\)\\: Unexpected token \"\\$pageCurrent\", expected type at offset 74$#"
 			count: 1
 			path: library/Schoolbox/Admin/Navigation/Renderer.php
