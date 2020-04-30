@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
 use Alaress\Cache;
@@ -29,7 +29,7 @@ class Factory implements IFactory
 
 
     /**
-    * @param $type
+    * @param string $type
     *
     * @return IColumnType
     */

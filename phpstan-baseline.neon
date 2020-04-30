@@ -4931,11 +4931,6 @@ parameters:
 			path: library/Schoolbox/Column/Datetime.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 17$#"
-			count: 1
-			path: library/Schoolbox/Column/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 15$#"
 			count: 1
 			path: library/Schoolbox/Column/IFactory.php
