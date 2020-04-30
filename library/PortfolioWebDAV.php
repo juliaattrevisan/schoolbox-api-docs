@@ -312,7 +312,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return mixed
      */
     public function getFileList($path)
@@ -544,7 +544,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
     public function isRoot($id)
@@ -553,7 +553,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @param bool $file
      * @return bool
      */
