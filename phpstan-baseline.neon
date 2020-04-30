@@ -4171,11 +4171,6 @@ parameters:
 			path: library/External/Edumate/Class.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value string\\)\\: Unexpected token \"\\$value\", expected type at offset 55$#"
-			count: 1
-			path: library/External/Edumate/Connection.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$campus with type int\\|Schoolbox\\\\Campus is not subtype of native type Schoolbox\\\\Campus\\.$#"
 			count: 1
 			path: library/External/Edumate/Timetable.php
