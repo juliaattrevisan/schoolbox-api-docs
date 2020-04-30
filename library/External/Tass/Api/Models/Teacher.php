@@ -46,7 +46,7 @@ class Teacher
 
 
     /**
-     * @param null|string $class
+     * @param string      $class
      * @param int         $companyCode
      * @param int         $employeeCode
      * @param string      $email

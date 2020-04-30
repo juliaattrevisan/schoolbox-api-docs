@@ -4246,11 +4246,6 @@ parameters:
 			path: library/External/Tass/Api/ModelFactory.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$class with type string\\|null is not subtype of native type string\\.$#"
-			count: 1
-			path: library/External/Tass/Api/Models/Teacher.php
-
-		-
 			message: "#^Variable \\$longestDay might not be defined\\.$#"
 			count: 1
 			path: library/External/Tass/Timetable.php
