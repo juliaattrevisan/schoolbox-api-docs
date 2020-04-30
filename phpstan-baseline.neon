@@ -4886,42 +4886,7 @@ parameters:
 			path: library/Schoolbox/Calendar/SidMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 71$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 77$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$stack\\)\\: Unexpected token \"\\$stack\", expected type at offset 42$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 143$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 102$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 84$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
 
