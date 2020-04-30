@@ -515,11 +515,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Determines if a student has already been marked or not, used to determining if to use insert or update
      *
-     * @param $fileType
-     * @param $classCampus
-     * @param $classCode
-     * @param $assessmentID
-     * @param $studentID
+     * @param string $fileType
+     * @param string $classCampus
+     * @param string $classCode
+     * @param int $assessmentID
+     * @param string $studentID
      * @return bool
      */
     private function doesMarkExist($fileType, $classCampus, $classCode, $assessmentID, $studentID): bool
@@ -643,8 +643,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param array           $assessmentRemote
      * @param User            $student
-     * @param                 $markValue
-     * @param                 $comment
+     * @param int|float       $markValue
+     * @param string          $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      */

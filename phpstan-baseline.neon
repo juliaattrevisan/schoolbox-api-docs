@@ -4226,41 +4226,6 @@ parameters:
 			path: library/External/Schooledge/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessmentID\\)\\: Unexpected token \"\\$assessmentID\", expected type at offset 211$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classCampus\\)\\: Unexpected token \"\\$classCampus\", expected type at offset 159$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classCode\\)\\: Unexpected token \"\\$classCode\", expected type at offset 186$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fileType\\)\\: Unexpected token \"\\$fileType\", expected type at offset 135$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$studentID\\)\\: Unexpected token \"\\$studentID\", expected type at offset 239$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$comment\\)\\: Unexpected token \"\\$comment\", expected type at offset 231$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markValue\\)\\: Unexpected token \"\\$markValue\", expected type at offset 190$#"
-			count: 1
-			path: library/External/Synergetic/Markbook.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
 			count: 1
 			path: library/External/Synergetic/User.php
