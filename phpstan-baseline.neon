@@ -4215,17 +4215,6 @@ parameters:
 			count: 1
 			path: library/External/Liss/Server.php
 
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classCode\\)\\: Unexpected token \"\\$classCode\", expected type at offset 117$#"
-			count: 1
-			path: library/External/Maze/Helper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$schoolboxClassCode\\)\\: Unexpected token \"\\$schoolboxClassCode\", expected type at offset 99$#"
-			count: 1
-			path: library/External/Maze/Helper.php
-
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$i\\)\\: Unexpected token \"\\$i\", expected type at offset 59$#"
 			count: 1
