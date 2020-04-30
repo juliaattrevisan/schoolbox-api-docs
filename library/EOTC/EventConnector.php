@@ -30,7 +30,7 @@ class EventConnector extends EventMapper
     /**
      * Get details of a single event (used in Mobile)
      *
-     * @param $eventId
+     * @param int $eventId
      *
      * @return Collection
      * @throws DefinitionException
@@ -154,8 +154,8 @@ class EventConnector extends EventMapper
     /**
      * Get events within a particular time span
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      * @return Collection
      * @throws MapperException
      * @throws DefinitionException

@@ -111,7 +111,7 @@ class StudentAttributesTest extends TestCase
      * Test that an exception is thrown if we supply invalid year level input
      *
      * @dataProvider providerInvalidYearLevel
-     * @param $invalidYear
+     * @param string $invalidYear
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @expectedException InvalidArgumentException

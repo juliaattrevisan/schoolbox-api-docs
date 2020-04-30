@@ -94,7 +94,7 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * Mark this series id as having been processed
 	 *
-	 * @param $seriesId
+	 * @param int $seriesId
 	 */
 	private function finish($seriesId) {
 		$this->processedSeriesIds[] = $seriesId;

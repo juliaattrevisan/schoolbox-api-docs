@@ -137,7 +137,7 @@ class Component_Instance
     /**
      * Converts new keys to old keys to preserve integrity with old components
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
     protected function compatMap($key)

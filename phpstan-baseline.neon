@@ -706,24 +706,9 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$period\\)\\: Unexpected token \"\\$period\", expected type at offset 73$#"
-			count: 1
-			path: library/Component/Dashboard/JuniorTimetableController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timetable\\)\\: Unexpected token \"\\$timetable\", expected type at offset 68$#"
-			count: 1
-			path: library/Component/Dashboard/JuniorTimetableController.php
-
-		-
 			message: "#^Variable \\$assessables in PHPDoc tag @var does not match assigned variable \\$allAssessments\\.$#"
 			count: 1
 			path: library/Component/Dashboard/RecentSubmissionsController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$component\\)\\: Unexpected token \"\\$component\", expected type at offset 926$#"
-			count: 1
-			path: library/Component/DefinitionMapper.php
 
 		-
 			message: "#^Method Component\\\\Eportfolio\\\\AdvancedListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
@@ -736,42 +721,7 @@ parameters:
 			path: library/Component/Eportfolio/BasicListMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$conf\\)\\: Unexpected token \"\\$conf\", expected type at offset 117$#"
-			count: 1
-			path: library/Component/Eportfolio/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 137$#"
-			count: 1
-			path: library/Component/Eportfolio/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 156$#"
-			count: 1
-			path: library/Component/Eportfolio/ControllerAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 176$#"
-			count: 1
-			path: library/Component/Eportfolio/ControllerAbstract.php
-
-		-
 			message: "#^Method Component\\\\Eportfolio\\\\FileListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 75$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 85$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$uid\\)\\: Unexpected token \"\\$uid\", expected type at offset 69$#"
 			count: 1
 			path: library/Component/Eportfolio/FileListMapper.php
 
@@ -779,81 +729,6 @@ parameters:
 			message: "#^Method Component\\\\Eportfolio\\\\LinkListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Component/Eportfolio/LinkListMapper.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 32$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 57$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 39$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 43$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$component_instance_id\\)\\: Unexpected token \"\\$component_instance_id\", expected type at offset 50$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 49$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$content\\)\\: Unexpected token \"\\$content\", expected type at offset 36$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 35$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 41$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 40$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sequence\\)\\: Unexpected token \"\\$sequence\", expected type at offset 37$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 36$#"
-			count: 1
-			path: library/Component/Eportfolio/ListItem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 18$#"
-			count: 2
-			path: library/Component/FactoryAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$instanceId\\)\\: Unexpected token \"\\$instanceId\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/FactoryAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 97$#"
-			count: 1
-			path: library/Component/Homepage/EtherpadController.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForFolders\\(\\)\\.$#"
@@ -956,47 +831,7 @@ parameters:
 			path: library/Component/Instance.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 104$#"
-			count: 1
-			path: library/Component/Instance.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$definitionId\\)\\: Unexpected token \"\\$definitionId\", expected type at offset 141$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$module\\)\\: Unexpected token \"\\$module\", expected type at offset 119$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$module\\)\\: Unexpected token \"\\$module\", expected type at offset 94$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fields\\)\\: Unexpected token \"\\$fields\", expected type at offset 37$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sql\\)\\: Unexpected token \"\\$sql\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
 			message: "#^Variable \\$configDef in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 46$#"
 			count: 1
 			path: library/Component/InstanceMapper.php
 
@@ -1004,51 +839,6 @@ parameters:
 			message: "#^Return typehint of method Component_InstanceMapper\\:\\:save\\(\\) has invalid type int\\.$#"
 			count: 1
 			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 121$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$module\\)\\: Unexpected token \"\\$module\", expected type at offset 99$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 40$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$module\\)\\: Unexpected token \"\\$module\", expected type at offset 18$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$position\\)\\: Unexpected token \"\\$position\", expected type at offset 89$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$protect\\)\\: Unexpected token \"\\$protect\", expected type at offset 66$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$configName\\)\\: Unexpected token \"\\$configName\", expected type at offset 318$#"
-			count: 1
-			path: library/Config.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 128$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$result\\)\\: Unexpected token \"\\$result\", expected type at offset 121$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findByExternalId\\(\\)\\.$#"
@@ -1059,41 +849,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Diocesan/AchievementReport/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 139$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 85$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 76$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 78$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allResults\\)\\: Unexpected token \"\\$allResults\", expected type at offset 69$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/NCEA/CreditSummary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 115$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/SchoolGrades/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 285$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/SchoolGrades/Base.php
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
@@ -1146,11 +901,6 @@ parameters:
 			path: library/Custom/Help/Hero/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mark\\)\\: Unexpected token \"\\$mark\", expected type at offset 63$#"
-			count: 1
-			path: library/Custom/Help/Hero/ValidQualification.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Help/Nesa/Module.php
@@ -1169,26 +919,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Meriden/Pastoral/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 72$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 90$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 83$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$year\\)\\: Unexpected token \"\\$year\", expected type at offset 86$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Gateway.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -1276,34 +1006,9 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$invalidYear\\)\\: Unexpected token \"\\$invalidYear\", expected type at offset 149$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/Test/StudentAttributesTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 39$#"
-			count: 1
-			path: library/DAV/Error.php
-
-		-
 			message: "#^Method DailyQuote\\\\ConfigMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/DailyQuote/ConfigMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$createdAt\\)\\: Unexpected token \"\\$createdAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$deletedAt\\)\\: Unexpected token \"\\$deletedAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$updatedAt\\)\\: Unexpected token \"\\$updatedAt\", expected type at offset 38$#"
-			count: 1
-			path: library/DailyQuote/Quote.php
 
 		-
 			message: "#^Method DailyQuote\\\\QuoteMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
@@ -1471,19 +1176,9 @@ parameters:
 			path: library/DeprecatedModel.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 41$#"
-			count: 1
-			path: library/EOTC/ActivityLog/Registry.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/EOTC/Authenticator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 79$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
 
 		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:setAuthor\\(\\)\\.$#"
@@ -1546,16 +1241,6 @@ parameters:
 			path: library/EOTC/EventConnector.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endTimestamp\\)\\: Unexpected token \"\\$endTimestamp\", expected type at offset 103$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startTimestamp\\)\\: Unexpected token \"\\$startTimestamp\", expected type at offset 73$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/EOTC/EventConnector.php
@@ -1564,21 +1249,6 @@ parameters:
 			message: "#^Binary operation \"\\*\" between \\-1 and string results in an error\\.$#"
 			count: 2
 			path: library/EOTC/EventMetadataNotifier.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(User\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 22$#"
-			count: 1
-			path: library/EOTC/EventPermission.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$event\\)\\: Unexpected token \"\\$event\", expected type at offset 57$#"
-			count: 1
-			path: library/EOTC/EventStatusMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$event\\)\\: Unexpected token \"\\$event\", expected type at offset 170$#"
-			count: 1
-			path: library/EOTC/EventStatusMapper.php
 
 		-
 			message: "#^Class EOTC\\\\ListGroup\\\\Type\\\\None does not have a constructor and must be instantiated without any parameters\\.$#"
@@ -1594,51 +1264,6 @@ parameters:
 			message: "#^Cannot call method getListGroupIndex\\(\\) on string\\.$#"
 			count: 2
 			path: library/EOTC/ListGroup/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$seriesId\\)\\: Unexpected token \"\\$seriesId\", expected type at offset 68$#"
-			count: 1
-			path: library/EOTC/ListGroup/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 62$#"
-			count: 1
-			path: library/EOTC/ListGroup/Mapping.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$listGroupIndex\\)\\: Unexpected token \"\\$listGroupIndex\", expected type at offset 58$#"
-			count: 1
-			path: library/EOTC/ListGroup/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$nextStatus\\)\\: Unexpected token \"\\$nextStatus\", expected type at offset 35$#"
-			count: 1
-			path: library/EOTC/ListGroup/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timeDifference\\)\\: Unexpected token \"\\$timeDifference\", expected type at offset 105$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Urgent.php
-
-		-
-			message: "#^Binary operation \"\\*\" between 86400 and string results in an error\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Urgent.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 264$#"
-			count: 1
-			path: library/Email.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 43$#"
-			count: 1
-			path: library/Email.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 42$#"
-			count: 1
-			path: library/Email.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 66$#"

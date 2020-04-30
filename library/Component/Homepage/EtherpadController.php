@@ -30,7 +30,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
     /**
      * Get sort key to be used in query, translated from human-friendly
      *
-     * @param $key
+     * @param string $key
      * @return string
      */
     private function getSortKey($key)

@@ -69,7 +69,7 @@ class Email
      * This creates local_email versions if specified, otherwise returns the
      * alt_email field
      *
-     * @param $user
+     * @param array $user
      * @return bool|string
      */
     public function formatEmailFromArray($user)
@@ -88,7 +88,7 @@ class Email
     /**
      * Set email
      *
-     * @param  $val
+     * @param  string $val
      * @return void
      */
     private function setEmail($val)
@@ -99,7 +99,7 @@ class Email
     /**
      * Get email
      *
-     * @return
+     * @return string
      */
     public function getEmail()
     {

@@ -14,7 +14,7 @@ class Config
      *             need into wherever they are needed instead of calling this
      *             and instantiating a DB connection from unknown places
      *
-     * @param $configName
+     * @param string $configName
      * @return mixed
      */
     public static function get($configName)

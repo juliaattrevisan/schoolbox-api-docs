@@ -122,13 +122,13 @@ class Component_InstanceMapper extends BaseMapper
                         {$componentDefinitionColumns},
                         {$componentConfigDefinitionColumns},
                         {$componentConfigColumns}
-            FROM        {$componentInstanceTable} 
-			INNER JOIN  `component_definition` `cd` ON 
+            FROM        {$componentInstanceTable}
+			INNER JOIN  `component_definition` `cd` ON
 			            {$componentInstanceTable}.`component_definition_id` = `cd`.`id`
-			LEFT JOIN   `component_config_definition` `ccd` ON 
+			LEFT JOIN   `component_config_definition` `ccd` ON
 			            `cd`.`id` = `ccd`.`component_definition_id`
-			LEFT JOIN   `component_config_instance` `cci` ON 
-			            `ccd`.`id` = `cci`.`component_config_definition_id` AND 
+			LEFT JOIN   `component_config_instance` `cci` ON
+			            `ccd`.`id` = `cci`.`component_config_definition_id` AND
 			            `cci`.`component_instance_id` = {$componentInstanceTable}.`id`
         ";
 
@@ -138,8 +138,8 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * Find all the known instances of a particular kind of component within a module context
      *
-     * @param $module
-     * @param $definitionId
+     * @param string $module
+     * @param int $definitionId
      * @return Component_Instance[]|GenericCollection
      */
     public function findByDefinition($module, $definitionId)
@@ -149,8 +149,8 @@ class Component_InstanceMapper extends BaseMapper
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
 			            {$componentInstanceTable}.`component_definition_id` = :definitionId
-			ORDER BY    {$componentInstanceTable}.`identifier` ASC, 
-			            {$componentInstanceTable}.`position` ASC, 
+			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
 		";
 
@@ -163,7 +163,7 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * Find component records by a module, but without an identifier
      *
-     * @param $module
+     * @param string $module
      * @return Component_Instance[]|GenericCollection
      */
     public function findByModule($module)
@@ -172,8 +172,8 @@ class Component_InstanceMapper extends BaseMapper
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module
-			ORDER BY    {$componentInstanceTable}.`identifier` ASC, 
-			            {$componentInstanceTable}.`position` ASC, 
+			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
 		";
 
@@ -195,8 +195,8 @@ class Component_InstanceMapper extends BaseMapper
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
                         {$componentInstanceTable}.`identifier` = :identifier
-			ORDER BY    {$componentInstanceTable}.`identifier` ASC, 
-			            {$componentInstanceTable}.`position` ASC, 
+			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
 		";
 
@@ -243,8 +243,8 @@ class Component_InstanceMapper extends BaseMapper
             WHERE       {$componentInstanceTable}.`module` = :module AND
                         {$componentInstanceTable}.`identifier` = :identifier AND
                         `cd`.`class` = :class
-            ORDER BY    {$componentInstanceTable}.`identifier` ASC, 
-                        {$componentInstanceTable}.`position` ASC, 
+            ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+                        {$componentInstanceTable}.`position` ASC,
                         {$componentInstanceTable}.`sequence` ASC
         ";
 
@@ -256,7 +256,7 @@ class Component_InstanceMapper extends BaseMapper
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return Component_Instance|null
      */
     public function findByInstanceId($id)
@@ -265,8 +265,8 @@ class Component_InstanceMapper extends BaseMapper
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
-			ORDER BY    {$componentInstanceTable}.`identifier` ASC, 
-			            {$componentInstanceTable}.`position` ASC, 
+			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
 		";
 
@@ -276,8 +276,8 @@ class Component_InstanceMapper extends BaseMapper
     }
 
     /**
-     * @param $sql
-     * @param $fields
+     * @param string $sql
+     * @param array $fields
      * @return Component_Instance[]|GenericCollection
      */
     protected function findByFields($sql, $fields)
@@ -364,7 +364,7 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * {@inheritDoc}
      *
-     * @param $object
+     * @param mixed $object
      * @return bool|int[]
      */
     public function save($object)
@@ -497,7 +497,7 @@ class Component_InstanceMapper extends BaseMapper
             $deleteIDs = implode(',', $instanceIDs);
 
             $this->database->query("
-                DELETE FROM     `component_config_instance` 
+                DELETE FROM     `component_config_instance`
                 WHERE           `component_instance_id` IN ({$deleteIDs});
             ");
 
@@ -510,8 +510,8 @@ class Component_InstanceMapper extends BaseMapper
     /**
      * Forcibly resequence a set of components, optionally protecting one
      *
-     * @param $module
-     * @param $identifier
+     * @param string $module
+     * @param int $identifier
      * @param int $protect - the component that has had its sequence changed, and so should be preserved
      * @param string $position
      * @return bool
@@ -540,10 +540,10 @@ class Component_InstanceMapper extends BaseMapper
     }
 
     /**
-     * @param $module
-     * @param $identifier
-     * @param $protect
-     * @param $position
+     * @param string $module
+     * @param int $identifier
+     * @param int $protect
+     * @param int $position
      * @return bool
      */
     private function resequenceColumn($module, $identifier, $protect, $position)
@@ -553,13 +553,13 @@ class Component_InstanceMapper extends BaseMapper
         // Extract the current listing
 
         $stmt = $this->database->prepare("
-			SELECT    * 
+			SELECT    *
 			FROM      {$componentInstanceTable}
 			WHERE     {$componentInstanceTable}.`module` = :mod
 			AND       {$componentInstanceTable}.`identifier` = :id
 			AND       {$componentInstanceTable}.`position` = :pos
-			ORDER BY  {$componentInstanceTable}.`identifier` ASC, 
-			          {$componentInstanceTable}.`position` ASC, 
+			ORDER BY  {$componentInstanceTable}.`identifier` ASC,
+			          {$componentInstanceTable}.`position` ASC,
 			          {$componentInstanceTable}.`sequence` ASC
 		");
 
@@ -628,7 +628,7 @@ class Component_InstanceMapper extends BaseMapper
         $stmt = $this->database->prepare("
 			UPDATE    {$componentInstanceTable}
 			SET       {$componentInstanceTable}.`sequence` = {$componentInstanceTable}.sequence + 1
-			WHERE     {$componentInstanceTable}.`position` = :pos AND 
+			WHERE     {$componentInstanceTable}.`position` = :pos AND
 			          {$componentInstanceTable}.`module` = :mod AND
 			          {$componentInstanceTable}.`identifier` = :id
 		");
@@ -653,7 +653,7 @@ class Component_InstanceMapper extends BaseMapper
         $stmt = $this->database->prepare("
 			SELECT    `component_instance_id`
 			FROM      `component_config_instance`
-			WHERE     `value` = :value AND 
+			WHERE     `value` = :value AND
 			          `component_config_definition_id` IN
                       (
                           SELECT    `id`

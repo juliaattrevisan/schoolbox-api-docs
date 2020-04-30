@@ -112,7 +112,7 @@ class Quote {
 	/**
 	 * Set created at
 	 *
-	 * @param $createdAt
+	 * @param string $createdAt
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
@@ -130,7 +130,7 @@ class Quote {
 	/**
 	 * Set deleted at
 	 *
-	 * @param $deletedAt
+	 * @param string $deletedAt
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
@@ -148,7 +148,7 @@ class Quote {
 	/**
 	 * Set updated at
 	 *
-	 * @param $updatedAt
+	 * @param string $updatedAt
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;

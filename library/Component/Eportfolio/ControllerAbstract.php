@@ -92,10 +92,10 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     /**
      * Split this out so in ePortfolio you can determine which config elements get rendered
      *
-     * @param $conf
-     * @param $key
-     * @param $page
-     * @param $params
+     * @param Component_Config_Abstract $conf
+     * @param string $key
+     * @param SitePage $page
+     * @param array $params
      */
     protected function parseConfigInstance($conf, $key, $page, $params)
     {

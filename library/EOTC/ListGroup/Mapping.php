@@ -40,7 +40,7 @@ class Mapping {
 	/**
 	 * The human-readable version of the name
 	 *
-	 * @param $index
+	 * @param string $index
 	 * @return mixed
 	 */
 	public function getName($index) {

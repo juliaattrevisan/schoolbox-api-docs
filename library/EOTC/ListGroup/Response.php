@@ -31,8 +31,8 @@ class Response {
 	/**
 	 * Constructor
 	 *
-	 * @param $nextStatus
-	 * @param $listGroupIndex
+	 * @param int $nextStatus
+	 * @param int $listGroupIndex
 	 */
 	public function __construct($nextStatus, $listGroupIndex) {
 		$this->setNextStatus($nextStatus);

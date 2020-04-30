@@ -96,7 +96,7 @@ class CreditSummary extends Base
      * Find values to populate the Credit Summary - All Years table
      * Rearrange everything into a nice order
      *
-     * @param $allResults
+     * @param array $allResults
      * @return array
      */
     private function findTable($allResults): array
@@ -178,7 +178,7 @@ class CreditSummary extends Base
     /**
      * Find values to populate Total Achieved Credits graph
      *
-     * @param $allResults
+     * @param array $allResults
      * @return array
      */
     private function findTotalAchievedCredits($allResults): array
@@ -239,7 +239,7 @@ class CreditSummary extends Base
     /**
      * Find values to populate Standard Type graph
      *
-     * @param $allResults
+     * @param array $allResults
      * @return array
      */
     private function findStandardType($allResults): array
@@ -305,7 +305,7 @@ class CreditSummary extends Base
     /**
      * Find values to populate Assessment Type graph
      *
-     * @param $allResults
+     * @param array $allResults
      * @return array
      */
     private function findAssessmentType($allResults): array
@@ -364,7 +364,7 @@ class CreditSummary extends Base
     /**
      * Find values to populate Result graph
      *
-     * @param $allResults
+     * @param array $allResults
      * @return array
      */
     private function findResult($allResults): array

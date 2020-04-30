@@ -92,7 +92,7 @@ abstract class Base extends AchievementReportBase
      * Get counts for Entered Grades for the current year
      * for a particular student
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     private function findEnteredGradesCurrentYear($externalUserId): array
@@ -144,7 +144,7 @@ abstract class Base extends AchievementReportBase
      * whatever, I'm just going to follow the spreadsheet word for
      * word because who knows
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
     private function findEnteredGradesPreviousYear($externalUserId): array

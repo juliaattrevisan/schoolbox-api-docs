@@ -41,7 +41,7 @@ abstract class Component_FactoryAbstract
     }
 
     /**
-     * @param $identifier
+     * @param int $identifier
      * @return Collection|Component_ControllerAbstract[]
      */
     public function buildComponentList($identifier)
@@ -68,7 +68,7 @@ abstract class Component_FactoryAbstract
      * Builds a component from a component instance or ID
      *
      * @param Component_Instance|Integer $instance
-     * @return Component_ControllerAbstract|Bool
+     * @return Component_ControllerAbstract|bool
      */
     public function buildComponent($instance)
     {
@@ -105,7 +105,7 @@ abstract class Component_FactoryAbstract
     }
 
     /**
-     * @param $identifier
+     * @param int $identifier
      * @return Component_Instance[]|GenericCollection
      */
     public function getInstanceList($identifier)
@@ -125,7 +125,7 @@ abstract class Component_FactoryAbstract
     }
 
     /**
-     * @param $instanceId
+     * @param int $instanceId
      * @return Component_Instance
      */
     public function getInstance($instanceId)

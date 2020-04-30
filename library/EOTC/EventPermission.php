@@ -77,7 +77,7 @@ class EventPermission
 
     /**
      * @param Campus $campus
-     * @return self $this
+     * @return $this
      */
     public function setCampus($campus)
     {
@@ -95,7 +95,7 @@ class EventPermission
 
     /**
      * @param int $id
-     * @return self $this
+     * @return $this
      */
     public function setId($id)
     {
@@ -113,7 +113,7 @@ class EventPermission
 
     /**
      * @param EventStatus $status
-     * @return self $this
+     * @return $this
      */
     public function setStatus($status)
     {
@@ -130,8 +130,8 @@ class EventPermission
     }
 
     /**
-     * @param User
-     * @return self $this
+     * @param User $user
+     * @return $this
      */
     public function setUser($user)
     {
@@ -149,7 +149,7 @@ class EventPermission
 
     /**
      * @param Alaress_Date_Format $createdAt
-     * @return self $this
+     * @return $this
      */
     public function setCreatedAt($createdAt)
     {
@@ -167,7 +167,7 @@ class EventPermission
 
     /**
      * @param Alaress_Date_Format $deletedAt
-     * @return self $this
+     * @return $this
      */
     public function setDeletedAt($deletedAt)
     {
@@ -185,7 +185,7 @@ class EventPermission
 
     /**
      * @param Alaress_Date_Format $updatedAt
-     * @return self $this
+     * @return $this
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -202,7 +202,7 @@ class EventPermission
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getAllowed()
     {
@@ -210,7 +210,7 @@ class EventPermission
     }
 
     /**
-     * @param  boolean $allowed
+     * @param  bool $allowed
      * @return $this
      */
     public function setAllowed($allowed)
@@ -220,7 +220,7 @@ class EventPermission
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getSubscribed()
     {
@@ -228,7 +228,7 @@ class EventPermission
     }
 
     /**
-     * @param  boolean $subscribed
+     * @param  bool $subscribed
      * @return $this
      */
     public function setSubscribed($subscribed)
