@@ -219,9 +219,10 @@ paths:
         you would have the ability to fetch children as a sub-path of the user's
         path set.
 
-        Generally, sub-resources will be related via a join model, which
-        contains metadata about the relation between the resource and
-        sub-resource: this metadata will be modifiable directly.
+        A sub-resource will generally be a join model, which contains metadata
+        about the relation between the resource and sub-resource: this metadata
+        will be modifiable directly, whereas the sub-resource itself will not be
+        modifiable by this path.
 
         Any of the paths defined above may be available on sub-resources:
         * GET    /user/1/children/  gets all children of a user
