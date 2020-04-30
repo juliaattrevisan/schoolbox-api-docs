@@ -4311,16 +4311,6 @@ parameters:
 			path: library/Leave/Core/Report/House/CSV.php
 
 		-
-			message: "#^Cannot call method getHouse\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Report/House/HTML.php
-
-		-
-			message: "#^Cannot call method getId\\(\\) on null\\.$#"
-			count: 2
-			path: library/Leave/Core/Report/House/HTML.php
-
-		-
 			message: "#^Variable \\$totals might not be defined\\.$#"
 			count: 2
 			path: library/Leave/Core/Report/House/HTML.php
