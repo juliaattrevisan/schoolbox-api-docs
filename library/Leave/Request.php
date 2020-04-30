@@ -93,7 +93,7 @@ class Leave_Request
      */
 
     /**
-     * @param $created
+     * @param string $created
      */
     public function setCreated($created)
     {
@@ -117,7 +117,7 @@ class Leave_Request
     /**
      * Set description
      *
-     * @param $description
+     * @param string $description
      */
     public function setDescription($description)
     {
@@ -127,7 +127,7 @@ class Leave_Request
     /**
      * Get description
      *
-     * @return mixed
+     * @return string
      */
     public function getDescription()
     {
@@ -137,7 +137,7 @@ class Leave_Request
     /**
      * Set finish
      *
-     * @param $finish
+     * @param Alaress_Date_Format $finish
      */
     public function setFinish($finish)
     {
@@ -157,7 +157,7 @@ class Leave_Request
     /**
      * Set host name
      *
-     * @param $hostName
+     * @param string $hostName
      */
     public function setHostName($hostName)
     {
@@ -167,7 +167,7 @@ class Leave_Request
     /**
      * Get host name
      *
-     * @return mixed
+     * @return string
      */
     public function getHostName()
     {
@@ -177,7 +177,7 @@ class Leave_Request
     /**
      * Set host phone
      *
-     * @param $hostPhone
+     * @param string $hostPhone
      */
     public function setHostPhone($hostPhone)
     {
@@ -187,7 +187,7 @@ class Leave_Request
     /**
      * Get host phone
      *
-     * @return mixed
+     * @return string
      */
     public function getHostPhone()
     {
@@ -218,7 +218,7 @@ class Leave_Request
     /**
      * Set id
      *
-     * @param $id
+     * @param int $id
      */
     public function setId($id)
     {
@@ -228,7 +228,7 @@ class Leave_Request
     /**
      * Get id
      *
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -238,7 +238,7 @@ class Leave_Request
     /**
      * Set start
      *
-     * @param $start
+     * @param Alaress_Date_Format $start
      */
     public function setStart($start)
     {
@@ -258,7 +258,7 @@ class Leave_Request
     /**
      * Set status
      *
-     * @param $status
+     * @param int $status
      */
     public function setStatus($status)
     {
@@ -360,7 +360,7 @@ class Leave_Request
     /**
      * Set user phone
      *
-     * @param $userPhone
+     * @param string $userPhone
      */
     public function setUserPhone($userPhone)
     {
@@ -370,7 +370,7 @@ class Leave_Request
     /**
      * Get user phone
      *
-     * @return mixed
+     * @return string
      */
     public function getUserPhone()
     {
@@ -402,7 +402,7 @@ class Leave_Request
     /**
      * Set authorisation date
      *
-     * @param $authorisationDatetime
+     * @param string $authorisationDatetime
      */
     public function setAuthorisationDatetime($authorisationDatetime)
     {
@@ -458,7 +458,7 @@ class Leave_Request
     /**
      * Set notes
      *
-     * @param $notes
+     * @param string $notes
      */
     public function setNotes($notes)
     {
@@ -468,7 +468,7 @@ class Leave_Request
     /**
      * Get notes
      *
-     * @return mixed
+     * @return string
      */
     public function getNotes()
     {
@@ -478,7 +478,7 @@ class Leave_Request
     /**
      * Get confirmed by
      *
-     * @return mixed
+     * @return int
      */
     public function getConfirmedBy()
     {
@@ -488,7 +488,7 @@ class Leave_Request
     /**
      * Set confirmed by
      *
-     * @param $confirmedBy
+     * @param int $confirmedBy
      */
     public function setConfirmedBy($confirmedBy)
     {
@@ -508,9 +508,9 @@ class Leave_Request
     /**
      * Get confirmed by label for a type id
      *
-     * @param $index
+     * @param int $index
      *
-     * @return array
+     * @return string
      */
     public function getConfirmedByMapIndex($index)
     {
