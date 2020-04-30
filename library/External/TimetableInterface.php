@@ -42,7 +42,7 @@ interface External_TimetableInterface extends External\IConnector
     /**
      * Returns the name of the current day
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return string
      */
     public function getDayName($dayNumber): string;
@@ -82,10 +82,10 @@ interface External_TimetableInterface extends External\IConnector
      * Array[]['class'][]['staffID']
      *
      *
-     * @param                   $externalUserId
-     * @param                   $userId
+     * @param string $externalUserId
+     * @param int    $userId
      * @param Campus $campus
-     * @param                   $dayNumber
+     * @param int    $dayNumber
      * @return array
      */
     public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array;
@@ -173,8 +173,8 @@ interface External_TimetableInterface extends External\IConnector
      *     staffTitle
      * )
      *
-     * @param $externalUserId
-     * @param $userId
+     * @param string $externalUserId
+     * @param int $userId
      * @param Schoolbox\Campus $campus
      * @return array
      */

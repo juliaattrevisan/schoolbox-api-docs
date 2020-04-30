@@ -4251,36 +4251,6 @@ parameters:
 			path: library/External/Tass/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 68$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 746$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 629$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 677$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 1496$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 1526$#"
-			count: 1
-			path: library/External/TimetableInterface.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 70$#"
 			count: 1
 			path: library/Feed.php
