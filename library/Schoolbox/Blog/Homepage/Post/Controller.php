@@ -33,6 +33,52 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var BlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var BlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var FileMapper;
+     */
+    protected $fileMapper;
+
+    /**
+     * @var FolderMapper;
+     */
+    protected $folderMapper;
+
+    /**
+     * @var BlogImageMapper
+     */
+    protected $blogImageMapper;
+
     /**
      * Controller constructor.
      */
@@ -335,7 +381,7 @@ class Controller extends Base
         // This creates an array of unique year/months for the date selector
 
         /** @var BlogModel $blog */
-        foreach ($blogs as $blog) 
+        foreach ($blogs as $blog)
         {
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
             $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
@@ -380,50 +426,7 @@ class Controller extends Base
      * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
      */
 
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
 
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * @var BlogMapper;
-     */
-    protected $blogMapper;
-
-    /**
-     * @var BlogCommentMapper;
-     */
-    protected $blogCommentMapper;
-
-    /**
-     * @var FileMapper;
-     */
-    protected $fileMapper;
-
-    /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
-     * @var BlogImageMapper
-     */
-    protected $blogImageMapper;
 
     /**
      * @param $userAccessMapper
