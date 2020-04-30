@@ -132,7 +132,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     }
 
     /**
-     * @param $externalUser
+     * @param External_User $externalUser
      */
     private function setExternalUser($externalUser)
     {
@@ -140,7 +140,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     }
 
     /**
-     * @return null
+     * @return External_User
      */
     private function getExternalUser()
     {

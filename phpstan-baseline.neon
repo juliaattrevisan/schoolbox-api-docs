@@ -4321,11 +4321,6 @@ parameters:
 			path: library/Leave/Core/Notice/Parent/Abstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUser\\)\\: Unexpected token \"\\$externalUser\", expected type at offset 18$#"
-			count: 1
-			path: library/Leave/Core/Notice/Parent/Abstract.php
-
-		-
 			message: "#^Cannot call method send\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Core/Notice/User/Abstract.php
