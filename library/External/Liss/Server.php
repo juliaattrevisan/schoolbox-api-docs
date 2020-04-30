@@ -935,7 +935,7 @@ class External_Liss_Server
     /**
      * A xmlrpcresp factory
      *
-     * @param $message
+     * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
     private function generateResponse($message): \xmlrpcresp

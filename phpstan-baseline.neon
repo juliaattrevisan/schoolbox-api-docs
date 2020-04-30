@@ -4215,10 +4215,6 @@ parameters:
 			count: 1
 			path: library/External/Liss/Server.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Liss/Server.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$classCode\\)\\: Unexpected token \"\\$classCode\", expected type at offset 117$#"
