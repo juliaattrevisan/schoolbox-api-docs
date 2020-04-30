@@ -4291,51 +4291,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 18$#"
-			count: 2
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$config\\)\\: Unexpected token \"\\$config\", expected type at offset 44$#"
-			count: 1
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 22$#"
-			count: 1
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$threadID\\)\\: Unexpected token \"\\$threadID\", expected type at offset 18$#"
-			count: 4
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$threadID\\)\\: Unexpected token \"\\$threadID\", expected type at offset 22$#"
-			count: 1
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$postID\\)\\: Unexpected token \"\\$postID\", expected type at offset 18$#"
-			count: 3
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 18$#"
-			count: 1
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 18$#"
-			count: 1
-			path: library/Forum.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 25$#"
-			count: 1
-			path: library/Forum.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\<type\\> \\$categoryId\\)\\: Unexpected token \"\\<\", expected type at offset 82$#"
 			count: 1
 			path: library/Group.php
