@@ -5231,11 +5231,6 @@ parameters:
 			path: library/Schoolbox/Discussion/Thread/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hashTuple\\)\\: Unexpected token \"\\$hashTuple\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Editor/FileFactory.php
-
-		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Edumate/Base/ResultIterator.php
