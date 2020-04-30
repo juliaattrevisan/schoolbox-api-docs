@@ -4201,21 +4201,6 @@ parameters:
 			path: library/External/Isams/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Isams/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$a\\)\\: Unexpected token \"\\$a\", expected type at offset 70$#"
-			count: 1
-			path: library/External/Isams/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$b\\)\\: Unexpected token \"\\$b\", expected type at offset 87$#"
-			count: 1
-			path: library/External/Isams/Timetable.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
 			count: 1
 			path: library/External/Isams/User.php
