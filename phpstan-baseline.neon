@@ -4276,52 +4276,12 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 81$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 105$#"
-			count: 1
-			path: library/Feed.php
-
-		-
 			message: "#^Variable \\$wiki might not be defined\\.$#"
 			count: 1
 			path: library/Feed.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 150$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 175$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 196$#"
-			count: 1
-			path: library/Feed.php
-
-		-
 			message: "#^Variable \\$blog might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 154$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 179$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 200$#"
 			count: 1
 			path: library/Feed.php
 
