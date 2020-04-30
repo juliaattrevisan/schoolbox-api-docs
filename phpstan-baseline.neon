@@ -4781,16 +4781,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$label\\)\\: Unexpected token \"\\$label\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
 			message: "#^Variable \\$usesMarkRange might not be defined\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
