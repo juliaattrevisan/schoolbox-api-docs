@@ -84,14 +84,14 @@ class Querystring
      *
      * Will be string if supplied, null otherwise
      *
-     * @var string[]|null[]
+     * @var ArrayAccess
      */
     private $querystring;
 
     /**
      * Querystring constructor.
      *
-     * @param ArrayAccess|string[]|null[] $data
+     * @param ArrayAccess $data
      */
     public function __construct(ArrayAccess $data)
     {
