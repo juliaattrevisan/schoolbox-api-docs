@@ -4346,11 +4346,6 @@ parameters:
 			path: library/PortfolioWebDAV.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 35$#"
-			count: 1
-			path: library/Report/Boarder.php
-
-		-
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
 			count: 1
 			path: library/Report/Boarder.php
