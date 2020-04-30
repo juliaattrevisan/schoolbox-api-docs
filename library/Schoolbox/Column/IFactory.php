@@ -11,7 +11,7 @@ namespace Schoolbox\Column;
 
 interface IFactory {
 	/**
-	 * @param $type
+	 * @param string $type
 	 *
 	 * @return IColumnType
 	 */
