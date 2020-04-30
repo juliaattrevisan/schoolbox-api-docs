@@ -5236,16 +5236,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/ResultIterator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/IDocument.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$source\\)\\: Unexpected token \"\\$source\", expected type at offset 85$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/IDocument.php
-
-		-
 			message: "#^Access to an undefined property Schoolbox\\\\External\\\\TimetablePeriod\\:\\:\\$Name\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php

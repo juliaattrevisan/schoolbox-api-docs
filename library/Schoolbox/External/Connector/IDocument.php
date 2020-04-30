@@ -23,10 +23,10 @@ interface IDocument
     public function getAcademicReportsForStudent(User $student, array $classificationCodes): array;
 
     /**
-     * @param User  $student
-     * @param       $documentId
-     * @param       $source
-     * @param array $classificationCodes
+     * @param User   $student
+     * @param string $documentId
+     * @param string $source
+     * @param array  $classificationCodes
      */
     public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes);
 }
