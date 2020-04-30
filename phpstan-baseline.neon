@@ -4301,26 +4301,6 @@ parameters:
 			path: library/Homepage.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$handle\\)\\: Unexpected token \"\\$handle\", expected type at offset 37$#"
-			count: 1
-			path: library/HtmlTemplate.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$handle\\)\\: Unexpected token \"\\$handle\", expected type at offset 59$#"
-			count: 1
-			path: library/HtmlTemplate.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$parent\\)\\: Unexpected token \"\\$parent\", expected type at offset 37$#"
-			count: 1
-			path: library/HtmlTemplate.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$varname\\)\\: Unexpected token \"\\$varname\", expected type at offset 37$#"
-			count: 1
-			path: library/HtmlTemplate.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$other\\)\\: Unexpected token \"\\$other\", expected type at offset 71$#"
 			count: 1
 			path: library/IComparable.php

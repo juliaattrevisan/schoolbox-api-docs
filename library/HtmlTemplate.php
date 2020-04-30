@@ -687,7 +687,7 @@ class HtmlTemplate
 
     /**
      * @deprecated
-     * @param $handle
+     * @param string $handle
      * @param string $filename
      * @return bool
      */
@@ -698,8 +698,8 @@ class HtmlTemplate
 
     /**
      * @deprecated
-     * @param $parent
-     * @param $handle
+     * @param string $parent
+     * @param string $handle
      * @param string $name
      * @return mixed
      */
@@ -721,7 +721,7 @@ class HtmlTemplate
 
     /**
      * @deprecated
-     * @param $varname
+     * @param string $varname
      * @return mixed
      */
     function get_var($varname)
