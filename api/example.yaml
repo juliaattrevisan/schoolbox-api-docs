@@ -66,6 +66,8 @@ paths:
       parameters:
         - $ref: 'common.yaml#/components/parameters/cursor'
         - $ref: 'common.yaml#/components/parameters/search'
+        - $ref: 'common.yaml#/components/parameters/filter'
+        - $ref: 'common.yaml#/components/parameters/properties'
 
     post:
       operationId: resourcePost

@@ -43,11 +43,11 @@ paths:
           $ref: '#/components/responses/userList'
         default:
           $ref: 'common.yaml#/components/responses/problem'
-
-    parameters:
-      - $ref: 'common.yaml#/components/parameters/cursor'
-      - $ref: 'common.yaml#/components/parameters/search'
-      - $ref: 'common.yaml#/components/parameters/filter'
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/cursor'
+        - $ref: 'common.yaml#/components/parameters/search'
+        - $ref: 'common.yaml#/components/parameters/filter'
+        - $ref: 'common.yaml#/components/parameters/properties'
 
     post:
       operationId: userPost
