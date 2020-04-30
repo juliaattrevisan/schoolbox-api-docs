@@ -34,7 +34,7 @@ if (count($this->arg) != 1) {
 
 $source     = $this->arg[0];
 // relationID is not numeric for office365
-$resourceId = isset($_REQUEST['relationID']) ? $_REQUEST['relationID'] : IFolder::ROOT_ID;
+$resourceId = $_REQUEST['relationID'] ?? IFolder::ROOT_ID;
 
 /* For rendering "Use this folder" ability
  */
