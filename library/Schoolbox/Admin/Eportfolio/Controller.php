@@ -84,7 +84,7 @@ class Controller extends Base
 
     /**
      * Retrieve all eportfolio pages for the specified user ID
-     * @param $userId
+     * @param int $userId
      */
     public function getUserPages($userId)
     {
@@ -410,9 +410,9 @@ class Controller extends Base
 
     /**
      * Save a log message
-     * @param $message
-     * @param $id
-     * @param $status
+     * @param string $message
+     * @param int $id
+     * @param string $status
      */
     private function log($message, $id, $status = null)
     {

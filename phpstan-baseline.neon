@@ -4361,26 +4361,6 @@ parameters:
 			path: library/Schoolbox/Admin/CourseBuilder/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Admin/Eportfolio/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 67$#"
-			count: 1
-			path: library/Schoolbox/Admin/Eportfolio/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Admin/Eportfolio/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$status\\)\\: Unexpected token \"\\$status\", expected type at offset 85$#"
-			count: 1
-			path: library/Schoolbox/Admin/Eportfolio/Controller.php
-
-		-
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php
