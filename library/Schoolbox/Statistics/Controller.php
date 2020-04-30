@@ -11,6 +11,7 @@ namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 
@@ -115,10 +116,11 @@ class Controller extends Base
 
     /**
      * Receiving the filter form data & redirecting
+     * @throws RouteNotFound
      */
     public function getFilter()
     {
-        $get    = $this->getRequest()->query;
+        $get    = $this->getRequest()->query->getArrayCopy();
         $chunks = [
             'folderId' => $get['folderId'],
         ];
@@ -202,7 +204,7 @@ class Controller extends Base
         /**
          * Recent visitors
          */
-        [$recentVisitors, $recentVisitorsMore] = $this->compileRecentVisitorsData($folder, $dataSource, $visitorCount);
+        $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC', self::MAX_RECENT_VISITORS);
 
 
         /**
@@ -246,8 +248,7 @@ class Controller extends Base
                     'topFileInfo'  => $topFileInfo,
                     'topFilesMore' => $topFilesMore,
 
-                    'recentVisitors'     => $recentVisitors,
-                    'recentVisitorsMore' => $recentVisitorsMore,
+                    'recentVisitors' => $recentVisitors,
 
                     'yetToVisit'     => $yetToVisitors,
                     'yetToVisitMore' => $yetToVisitMore,
@@ -380,7 +381,7 @@ class Controller extends Base
             [
                 'template' => '@statistics/recentVisitors.twig',
                 'data'     => [
-                    'pageRoute'         => 'getTopVisitors',
+                    'pageRoute'         => 'getRecentVisitors',
                     'folder'            => $folder,
                     'startDate'         => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate'           => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
@@ -657,28 +658,6 @@ class Controller extends Base
 
         $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
         return [$topFiles, $topFileInfo, count($topFilesAll) > self::MAX_TOP_FILES];
-    }
-
-
-    /**
-     * Compile data for recent visitors.
-     *
-     * @param FolderModel $folder
-     * @param DataSource  $dataSource
-     * @param int         $visitorCount
-     * @return array [$recentVisitors, $recentVisitorsMore]
-     *               $recentVisitors:     a list of `self::MAX_RECENT_VISITORS` recent visitors
-     *               $recentVisitorsMore: are there more visitors?
-     */
-    private function compileRecentVisitorsData(FolderModel $folder, DataSource $dataSource, int $visitorCount): array
-    {
-        $recentVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'datetime DESC', self::MAX_RECENT_VISITORS);
-
-        $recentVisitorsMore = false;
-        if ($visitorCount > self::MAX_RECENT_VISITORS) {
-            $recentVisitorsMore = true;
-        }
-        return [$recentVisitors, $recentVisitorsMore];
     }
 
 
