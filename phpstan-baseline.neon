@@ -5116,21 +5116,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Querystring.php
 
 		-
-			message: "#^PHPDoc tag @return with type mixed is not subtype of native type string\\|null\\.$#"
-			count: 5
-			path: library/Schoolbox/Comms/News/Querystring.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 119$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Querystring.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$encoded\\)\\: Unexpected token \"\\$encoded\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Querystring.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:getMessageById\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/SaveForLater/Module.php

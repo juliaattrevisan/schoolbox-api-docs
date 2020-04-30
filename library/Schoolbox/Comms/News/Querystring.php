@@ -114,7 +114,7 @@ class Querystring
     /**
      * Current compact mode setting
      *
-     * @return mixed
+     * @return string|null
      */
     public function getCompactMode(): ?string
     {
@@ -125,7 +125,7 @@ class Querystring
     /**
      * Currently-chosen topic slug
      *
-     * @return mixed
+     * @return string|null
      */
     public function getSlug(): ?string
     {
@@ -147,7 +147,7 @@ class Querystring
     /**
      * Number of articles to obtain and display
      *
-     * @return mixed
+     * @return string|null
      */
     public function getLimit(): ?string
     {
@@ -180,7 +180,7 @@ class Querystring
     /**
      * Get the status
      *
-     * @return mixed
+     * @return string|null
      */
     public function getStatus(): ?string
     {
@@ -191,7 +191,7 @@ class Querystring
     /**
      * Get the referrer string if one was specified
      *
-     * @return mixed
+     * @return string|null
      */
     public function getReferrer(): ?string
     {
@@ -333,7 +333,7 @@ class Querystring
      * Encode a url
      * TODO: merging library/Schoolbox/Learning/Assessment/Redirect.php ?
      *
-     * @param $url
+     * @param string|null $url
      * @return null|string
      */
     public static function encode(?string $url): ?string
@@ -348,7 +348,7 @@ class Querystring
     /**
      * Decode an encoded redirect url
      *
-     * @param $encoded
+     * @param string|null $encoded
      * @return null|string
      */
     public static function decode(?string $encoded): ?string
