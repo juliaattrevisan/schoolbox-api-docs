@@ -5151,21 +5151,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$gamma\\)\\: Unexpected token \"\\$gamma\", expected type at offset 176$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$max\\)\\: Unexpected token \"\\$max\", expected type at offset 157$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$min\\)\\: Unexpected token \"\\$min\", expected type at offset 138$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$name with type mixed is not subtype of native type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Config/Loader.php
