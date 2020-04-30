@@ -4426,11 +4426,6 @@ parameters:
 			path: library/Schoolbox/Admin/Lists/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageCurrent\\)\\: Unexpected token \"\\$pageCurrent\", expected type at offset 74$#"
-			count: 1
-			path: library/Schoolbox/Admin/Navigation/Renderer.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Oauth/Module.php
