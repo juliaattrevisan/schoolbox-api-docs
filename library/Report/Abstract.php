@@ -77,7 +77,7 @@ abstract class Report_Abstract
     /**
      * Set year level
      *
-     * @param $yearLevel
+     * @param string $yearLevel
      */
     protected function setYearLevel($yearLevel) {
         $this->yearLevel = $yearLevel;
@@ -86,7 +86,7 @@ abstract class Report_Abstract
     /**
      * Get year level
      *
-     * @return mixed
+     * @return string
      */
     public function getYearLevel() {
         return $this->yearLevel;
@@ -95,7 +95,7 @@ abstract class Report_Abstract
     /**
      * Set group handler
      *
-     * @param $groupHandler
+     * @param Group $groupHandler
      */
     protected function setGroupHandler($groupHandler) {
         $this->groupHandler = $groupHandler;
@@ -113,14 +113,14 @@ abstract class Report_Abstract
     /**
      * Set external user handler
      *
-     * @param $externalUserHandler
+     * @param External_User $externalUserHandler
      */
     protected function setExternalUserHandler($externalUserHandler) {
         $this->externalUserHandler = $externalUserHandler;
     }
 
     /**
-     * @param $userHandler
+     * @param User $userHandler
      */
     protected function setUserHandler($userHandler) {
         $this->userHandler = $userHandler;
@@ -145,7 +145,7 @@ abstract class Report_Abstract
     /**
      * Set page
      *
-     * @param $page
+     * @param SitePage $page
      */
     protected function setPage($page) {
         $this->page = $page;
@@ -163,7 +163,7 @@ abstract class Report_Abstract
     /**
      * Set all records
      *
-     * @param $allRecords
+     * @param array $allRecords
      */
     protected function setAllRecords($allRecords) {
         $this->allRecords = $allRecords;

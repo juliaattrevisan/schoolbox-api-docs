@@ -4346,36 +4346,6 @@ parameters:
 			path: library/PortfolioWebDAV.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$yearLevel\\)\\: Unexpected token \"\\$yearLevel\", expected type at offset 47$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$groupHandler\\)\\: Unexpected token \"\\$groupHandler\", expected type at offset 50$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserHandler\\)\\: Unexpected token \"\\$externalUserHandler\", expected type at offset 58$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userHandler\\)\\: Unexpected token \"\\$userHandler\", expected type at offset 18$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 41$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allRecords\\)\\: Unexpected token \"\\$allRecords\", expected type at offset 48$#"
-			count: 1
-			path: library/Report/Abstract.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 44$#"
 			count: 1
 			path: library/Report/Bialik/Parent.php
