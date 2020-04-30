@@ -31,6 +31,53 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var FileMapper;
+     */
+    protected $fileMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var EportfolioBlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var EportfolioBlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var EportfolioBlogImageMapper
+     */
+    protected $blogImageMapper;
+
+    /**
+     * @var EportfolioPageMapper
+     */
+    protected $eportfolioPageMapper;
+
+
     /**
      * Controller constructor.
      */
@@ -360,50 +407,6 @@ class Controller extends Base
      * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
      */
 
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
-
-    /**
-     * @var FileMapper;
-     */
-    protected $fileMapper;
-
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * @var EportfolioBlogMapper;
-     */
-    protected $blogMapper;
-
-    /**
-     * @var EportfolioBlogCommentMapper;
-     */
-    protected $blogCommentMapper;
-
-    /**
-     * @var EportfolioBlogImageMapper
-     */
-    protected $blogImageMapper;
-
-    /**
-     * @var EportfolioPageMapper
-     */
-    protected $eportfolioPageMapper;
 
     /**
      * @param $userAccessMapper
@@ -531,13 +534,3 @@ class Controller extends Base
         return $this->fileMapper;
     }
 }
-
-/*
- * This code will self-destruct in 5 seconds...
- *
-          ,--.!,
-       __/   -*-
-     ,d08b.  '|`
-     0088MM
-     `9MMP'
-*/
