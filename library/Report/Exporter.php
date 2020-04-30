@@ -14,8 +14,7 @@ class Report_Exporter {
     private $dataManipulatorCallback;
 
     /**
-     * @param Report_Abstract $report
-     * @param $filename
+     * @param string $filename
      */
     public function __construct($filename) {
         $this->filename = $filename;
@@ -40,7 +39,7 @@ class Report_Exporter {
 
     /**
      * Convenience function for output format
-     * @param $format
+     * @param string $format
      */
     public function export($format) {
         switch(strtolower($format)) {
@@ -90,8 +89,8 @@ class Report_Exporter {
 
     /**
      * Check for and perform any data manipulation that needs doing, then write the row to file
-     * @param $outstream
-     * @param $row
+     * @param resource $outstream
+     * @param array $row
      */
     protected function parseRow($outstream, $row) {
         if(is_callable($this->dataManipulatorCallback)) {

@@ -4356,31 +4356,6 @@ parameters:
 			path: library/Report/Boarder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 56$#"
-			count: 1
-			path: library/Report/Exporter.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$report$#"
-			count: 1
-			path: library/Report/Exporter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$format\\)\\: Unexpected token \"\\$format\", expected type at offset 64$#"
-			count: 1
-			path: library/Report/Exporter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$outstream\\)\\: Unexpected token \"\\$outstream\", expected type at offset 114$#"
-			count: 1
-			path: library/Report/Exporter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 139$#"
-			count: 1
-			path: library/Report/Exporter.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 52$#"
 			count: 1
 			path: library/Report/Parent.php
