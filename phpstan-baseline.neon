@@ -4306,11 +4306,6 @@ parameters:
 			path: library/Leave/Controller.php
 
 		-
-			message: "#^Cannot call method send\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/User/Abstract.php
-
-		-
 			message: "#^Variable \\$currentPerson in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$j, \\$period$#"
 			count: 1
 			path: library/Leave/Core/Report/House/CSV.php
@@ -4334,11 +4329,6 @@ parameters:
 			message: "#^Method Leave\\\\HostTypeMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Leave/HostTypeMapper.php
-
-		-
-			message: "#^Cannot call method setAjax\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Report/Catering/CSV.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$houseMapper\\)\\: Unexpected token \"\\$houseMapper\", expected type at offset 40$#"
