@@ -4476,11 +4476,6 @@ parameters:
 			path: library/Schoolbox/Application/BasicRequest/Kernel.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$outStream\\)\\: Unexpected token \"\\$outStream\", expected type at offset 194$#"
-			count: 1
-			path: library/Schoolbox/Application/CliTool/Composite.php
-
-		-
 			message: "#^Variable \\$e might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Application/CliTool/Composite.php
