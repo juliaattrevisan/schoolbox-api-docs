@@ -312,8 +312,6 @@ class Event implements ISoftDeletable
      * Derive start and end dates from a date.
      *
      * @param string $date A string in either "d-m-Y" or "d-m-Y H:i" format.
-     *
-     * @param $date
      */
     public function setupDates($date)
     {
