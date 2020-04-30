@@ -4226,11 +4226,6 @@ parameters:
 			path: library/External/Schooledge/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$timetabledClass\\)\\: Unexpected token \"\\$timetabledClass\", expected type at offset 18$#"
-			count: 1
-			path: library/External/Schooledge/Timetable.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 353$#"
 			count: 1
 			path: library/External/Schooledge/User.php
