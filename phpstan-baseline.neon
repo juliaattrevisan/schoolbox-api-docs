@@ -4216,16 +4216,6 @@ parameters:
 			path: library/External/Liss/Server.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 25$#"
-			count: 1
-			path: library/External/Offline/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 62$#"
-			count: 1
-			path: library/External/Offline/Timetable.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 68$#"
 			count: 1
 			path: library/External/Pcschools/Timetable.php
