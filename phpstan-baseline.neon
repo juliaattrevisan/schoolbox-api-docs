@@ -5151,11 +5151,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$scale\\)\\: Unexpected token \"\\$scale\", expected type at offset 56$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Scale/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$gamma\\)\\: Unexpected token \"\\$gamma\", expected type at offset 176$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
