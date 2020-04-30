@@ -59,12 +59,14 @@ class Controller extends Base
 
     /**
      * Modify an existing LTI provider
-     * @param $provider
+     *
+     * TODO: But I think this is never used?
+     *
+     * @param Provider $provider
      */
     public function getModify($provider)
     {
         // Render this thing out
-
         $this->getResponse()->content->set([
             'template' => '@adminLti/modify.twig',
             'data'     => [

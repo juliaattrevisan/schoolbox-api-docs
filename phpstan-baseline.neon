@@ -4416,11 +4416,6 @@ parameters:
 			path: library/Schoolbox/Admin/Import/UserAccount/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$provider\\)\\: Unexpected token \"\\$provider\", expected type at offset 57$#"
-			count: 1
-			path: library/Schoolbox/Admin/LTI/Controller.php
-
-		-
 			message: "#^Variable \\$table in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Lists/Controller.php
