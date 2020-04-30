@@ -4321,51 +4321,6 @@ parameters:
 			path: library/Leave/HostTypeMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 76$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$houseId\\)\\: Unexpected token \"\\$houseId\", expected type at offset 147$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$houseId\\)\\: Unexpected token \"\\$houseId\", expected type at offset 577$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$houseId\\)\\: Unexpected token \"\\$houseId\", expected type at offset 106$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestId\\)\\: Unexpected token \"\\$requestId\", expected type at offset 81$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$houseId\\)\\: Unexpected token \"\\$houseId\", expected type at offset 102$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestId\\)\\: Unexpected token \"\\$requestId\", expected type at offset 77$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$date\\)\\: Unexpected token \"\\$date\", expected type at offset 800$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 42$#"
-			count: 1
-			path: library/Leave/RequestMapper.php
-
-		-
 			message: "#^Constructor of class MSSQL has an unused parameter \\$db\\.$#"
 			count: 1
 			path: library/MSSQL.php
