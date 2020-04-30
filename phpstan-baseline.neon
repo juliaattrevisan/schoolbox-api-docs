@@ -5236,16 +5236,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/ResultIterator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$initializationVector\\)\\: Unexpected token \"\\$initializationVector\", expected type at offset 132$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/ICommunityPortal.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 113$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/ICommunityPortal.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 53$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/IDocument.php
