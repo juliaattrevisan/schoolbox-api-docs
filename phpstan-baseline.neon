@@ -5226,11 +5226,6 @@ parameters:
 			path: library/Schoolbox/Discussion/Test/DataGenerator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 120$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/Context/IThreadLocator.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Thread/Module.php
