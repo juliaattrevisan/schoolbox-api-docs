@@ -40,7 +40,7 @@ class MyFile extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param      $folderID
+     * @param int  $folderID
      * @param bool $config
      * @return array|bool
      */
@@ -89,8 +89,8 @@ class MyFile extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param $fileID
-     * @param $action
+     * @param int $fileID
+     * @param string $action
      */
     public function logAction($fileID, $action)
     {
@@ -109,7 +109,7 @@ class MyFile extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param $fileID
+     * @param int $fileID
      * @return bool
      */
     public function delete($fileID)
@@ -125,7 +125,7 @@ class MyFile extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param $parentID
+     * @param int $parentID
      */
     public function deleteByParent($parentID)
     {
