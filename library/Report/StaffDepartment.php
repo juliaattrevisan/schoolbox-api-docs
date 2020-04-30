@@ -15,7 +15,7 @@ class Report_StaffDepartment extends Report_Abstract
     /**
      * Constructor
      *
-     * @param $page
+     * @param SitePage $page
      * @throws InvalidArgumentException
      * @throws LogicException
      */
@@ -72,8 +72,8 @@ class Report_StaffDepartment extends Report_Abstract
      * Merge staff records method, used as an array_reduce() callback to merge
      * job position descriptions.
      *
-     * @param $mergedRecords
-     * @param $record
+     * @param array $mergedRecords
+     * @param array $record
      *
      * @return array
      */

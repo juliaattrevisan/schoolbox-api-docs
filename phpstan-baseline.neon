@@ -4351,21 +4351,6 @@ parameters:
 			path: library/Report/Boarder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 44$#"
-			count: 1
-			path: library/Report/StaffDepartment.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mergedRecords\\)\\: Unexpected token \"\\$mergedRecords\", expected type at offset 138$#"
-			count: 1
-			path: library/Report/StaffDepartment.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$record\\)\\: Unexpected token \"\\$record\", expected type at offset 167$#"
-			count: 1
-			path: library/Report/StaffDepartment.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/API/Module.php
