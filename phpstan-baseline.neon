@@ -4846,42 +4846,7 @@ parameters:
 			path: library/Schoolbox/Calendar/Event/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 88$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 68$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
 			message: "#^Variable \\$seriesId in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$endDate\\)\\: Unexpected token \"\\$endDate\", expected type at offset 102$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$excludeResourceBookings\\)\\: Unexpected token \"\\$excludeResourceBookings\", expected type at offset 124$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$startDate\\)\\: Unexpected token \"\\$startDate\", expected type at offset 78$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventMapper.php
 
