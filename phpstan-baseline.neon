@@ -4821,46 +4821,6 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Image/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userAccessMapper\\)\\: Unexpected token \"\\$userAccessMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleMapper\\)\\: Unexpected token \"\\$roleMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userMapper\\)\\: Unexpected token \"\\$userMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$errorMapper\\)\\: Unexpected token \"\\$errorMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogMapper\\)\\: Unexpected token \"\\$blogMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogImageMapper\\)\\: Unexpected token \"\\$blogImageMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogCommentMapper\\)\\: Unexpected token \"\\$blogCommentMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fileMapper\\)\\: Unexpected token \"\\$fileMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Controller.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$commentCollection contains unknown class Schoolbox\\\\Blog\\\\Homepage\\\\Comment\\\\Comment\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Comment/Notifier.php

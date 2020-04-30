@@ -409,7 +409,7 @@ class Controller extends Base
 
 
     /**
-     * @param $userAccessMapper
+     * @param UserAccessMapper $userAccessMapper
      */
     public function setUserAccessMapper($userAccessMapper) {
         $this->userAccessMapper = $userAccessMapper;
@@ -423,7 +423,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $roleMapper
+     * @param RoleMapper $roleMapper
      */
     public function setRoleMapper($roleMapper) {
         $this->roleMapper = $roleMapper;
@@ -437,7 +437,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $userMapper
+     * @param UserMapper $userMapper
      */
     public function setUserMapper($userMapper) {
         $this->userMapper = $userMapper;
@@ -451,7 +451,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $errorMapper
+     * @param ErrorMapper $errorMapper
      */
     public function setErrorMapper($errorMapper) {
         $this->errorMapper = $errorMapper;
@@ -465,7 +465,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogMapper
+     * @param EportfolioBlogMapper $blogMapper
      */
     public function setEportfolioBlogMapper($blogMapper) {
         $this->blogMapper = $blogMapper;
@@ -479,7 +479,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogImageMapper
+     * @param EportfolioBlogImageMapper $blogImageMapper
      */
     public function setEportfolioBlogImageMapper($blogImageMapper) {
         $this->blogImageMapper = $blogImageMapper;
@@ -493,7 +493,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogCommentMapper
+     * @param EportfolioBlogCommentMapper $blogCommentMapper
      */
     public function setEportfolioBlogCommentMapper($blogCommentMapper) {
         $this->blogCommentMapper = $blogCommentMapper;
@@ -521,7 +521,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $fileMapper
+     * @param FileMapper $fileMapper
      */
     public function setFileMapper($fileMapper) {
         $this->fileMapper = $fileMapper;
