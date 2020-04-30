@@ -4886,56 +4886,6 @@ parameters:
 			path: library/Schoolbox/Calendar/SidMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 18$#"
-			count: 4
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$result\\)\\: Unexpected token \"\\$result\", expected type at offset 89$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$authorKey\\)\\: Unexpected token \"\\$authorKey\", expected type at offset 159$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$effectorKey\\)\\: Unexpected token \"\\$effectorKey\", expected type at offset 108$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventKey\\)\\: Unexpected token \"\\$eventKey\", expected type at offset 135$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ownerKey\\)\\: Unexpected token \"\\$ownerKey\", expected type at offset 184$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$result\\)\\: Unexpected token \"\\$result\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 57$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$accessLevel\\)\\: Unexpected token \"\\$accessLevel\", expected type at offset 113$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 60$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 65$#"
 			count: 1
 			path: library/Schoolbox/CampusMapper.php
