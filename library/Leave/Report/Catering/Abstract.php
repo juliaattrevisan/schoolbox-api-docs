@@ -13,8 +13,8 @@ abstract class Leave_Report_Catering_Abstract {
 	/**
 	 * Constructor
 	 *
-	 * @param $page
-	 * @param $data
+	 * @param SitePage $page
+	 * @param array $data
 	 */
 	public function __construct($page, $data) {
 		$this->setPage($page);
@@ -36,7 +36,7 @@ abstract class Leave_Report_Catering_Abstract {
 	/**
 	 * Set data
 	 *
-	 * @param $data
+	 * @param array $data
 	 */
 	protected function setData($data) {
 		$this->data = $data;
@@ -54,7 +54,7 @@ abstract class Leave_Report_Catering_Abstract {
 	/**
 	 * Set page
 	 *
-	 * @param $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
@@ -63,8 +63,8 @@ abstract class Leave_Report_Catering_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
-	 */
+	 * @return SitePage
+     */
 	protected function getPage() {
 		return $this->page;
 	}

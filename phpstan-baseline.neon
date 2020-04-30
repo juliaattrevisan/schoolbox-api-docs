@@ -4381,26 +4381,6 @@ parameters:
 			path: library/Leave/HostTypeMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 52$#"
-			count: 1
-			path: library/Leave/Report/Catering/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 35$#"
-			count: 1
-			path: library/Leave/Report/Catering/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 32$#"
-			count: 1
-			path: library/Leave/Report/Catering/Abstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 32$#"
-			count: 1
-			path: library/Leave/Report/Catering/Abstract.php
-
-		-
 			message: "#^Cannot call method setAjax\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Report/Catering/CSV.php
