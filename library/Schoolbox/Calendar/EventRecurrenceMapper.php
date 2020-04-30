@@ -48,11 +48,11 @@ class EventRecurrenceMapper
     {
         $this->setEventMapper($eventMapper);
     }
-    
+
     /**
      * Get the series recurrence settings
      *
-     * @param $event
+     * @param Event $event
      * @return array
      */
     public function getSeriesRecurrence($event)
@@ -191,9 +191,9 @@ class EventRecurrenceMapper
     /**
      * Persist an entire series
      *
-     * @param Event $event
-     * @param EventRelations $eventRelations
-     * @param                     $access
+     * @param Event               $event
+     * @param EventRelations      $eventRelations
+     * @param int                 $access
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
      * @throws Schoolbox\Mapper\Exception
@@ -273,9 +273,9 @@ class EventRecurrenceMapper
     /**
      * Persist a single event
      *
-     * @param Event $event
-     * @param EventRelations $eventRelations
-     * @param                 $access
+     * @param Event           $event
+     * @param EventRelations  $eventRelations
+     * @param int             $access
      * @param EventRecurrence $eventRecurrence
      */
     protected function persistSingle(

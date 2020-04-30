@@ -4856,21 +4856,6 @@ parameters:
 			path: library/Schoolbox/Calendar/EventMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$event\\)\\: Unexpected token \"\\$event\", expected type at offset 67$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventRecurrenceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$access\\)\\: Unexpected token \"\\$access\", expected type at offset 149$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventRecurrenceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$access\\)\\: Unexpected token \"\\$access\", expected type at offset 143$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventRecurrenceMapper.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Module.php
