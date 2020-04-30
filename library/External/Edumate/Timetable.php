@@ -108,7 +108,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
 
     /**
-     * @param int|\Schoolbox\Campus $campus
+     * @param \Schoolbox\Campus $campus
      * @param int $date
      * @return bool|string
      */
