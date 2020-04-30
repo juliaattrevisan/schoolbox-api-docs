@@ -4216,11 +4216,6 @@ parameters:
 			path: library/External/Liss/Server.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 68$#"
-			count: 1
-			path: library/External/Pcschools/Timetable.php
-
-		-
 			message: "#^Binary operation \"\\-\\=\" between string and 12 results in an error\\.$#"
 			count: 2
 			path: library/External/Pcschools/Timetable.php
