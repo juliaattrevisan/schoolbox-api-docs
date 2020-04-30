@@ -4291,16 +4291,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 49$#"
-			count: 1
-			path: library/FileType.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mimeType\\)\\: Unexpected token \"\\$mimeType\", expected type at offset 89$#"
-			count: 1
-			path: library/FileType.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 18$#"
 			count: 2
 			path: library/Forum.php

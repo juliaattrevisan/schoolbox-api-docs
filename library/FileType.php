@@ -32,8 +32,8 @@ class FileType extends DeprecatedModel
     /**
      * Constructor
      *
-     * @param      $path
-     * @param null $mime
+     * @param string $path
+     * @param string|null $mime
      */
     public function __construct($path, $mime = null)
     {
@@ -92,7 +92,7 @@ class FileType extends DeprecatedModel
     /**
      * Find out what the iconFile for a particular mime type is
      *
-     * @param $mimeType
+     * @param string $mimeType
      * @return mixed
      */
     public function getIconFile($mimeType)
