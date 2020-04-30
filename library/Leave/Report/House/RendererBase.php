@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 use Leave\HostType;
+use Schoolbox\GenericCollection;
 
 /**
  * Online house report as found in the Schoolbox
@@ -29,8 +30,8 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /** @var  Alaress_Date_Format */
     protected $reportFinish;
 
-    protected $requestList = array();
-    protected $houseList = array();
+    protected $requestList;
+    protected $houseList;
     protected $range = -1;
     protected $combined = array();
     protected $currentHouse = null;
@@ -323,7 +324,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Set range
      *
-     * @param $range
+     * @param int $range
      */
     protected function setRange($range)
     {
@@ -333,7 +334,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Get range
      *
-     * @return mixed
+     * @return int
      */
     protected function getRange()
     {
@@ -343,7 +344,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Set request list
      *
-     * @param $requestList
+     * @param GenericCollection $requestList
      */
     protected function setRequestList($requestList)
     {
@@ -353,7 +354,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Get request list
      *
-     * @return mixed
+     * @return GenericCollection
      */
     protected function getRequestList()
     {
@@ -363,7 +364,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Set combined result
      *
-     * @param $combined
+     * @param array $combined
      */
     protected function setCombined($combined)
     {
@@ -383,7 +384,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Set house list
      *
-     * @param $houseList
+     * @param GenericCollection $houseList
      */
     protected function setHouseList($houseList)
     {
@@ -393,7 +394,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Get house list
      *
-     * @return array
+     * @return GenericCollection
      */
     protected function getHouseList()
     {
@@ -403,7 +404,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Set current house
      *
-     * @param $currentHouse
+     * @param HouseResidential $currentHouse
      */
     protected function setCurrentHouse($currentHouse)
     {
@@ -413,7 +414,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Get current house
      *
-     * @return null
+     * @return HouseResidential
      */
     protected function getCurrentHouse()
     {
