@@ -145,7 +145,6 @@ class Homepage
      * Resets a homepage to a template, or destroys the homepage if it is to be removed.
      * Returns the ID of the template used, or 0 if none.
      *
-     * @param int $categoryID
      * @param int $templateID
      * @return int
      */
