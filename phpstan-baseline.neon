@@ -4346,26 +4346,6 @@ parameters:
 			path: library/PortfolioWebDAV.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 18$#"
-			count: 3
-			path: library/PortfolioWebDAV.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 9
-			path: library/PortfolioWebDAV.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 18$#"
-			count: 2
-			path: library/PortfolioWebDAV.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 18$#"
-			count: 1
-			path: library/PortfolioWebDAV.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$yearLevel\\)\\: Unexpected token \"\\$yearLevel\", expected type at offset 47$#"
 			count: 1
 			path: library/Report/Abstract.php

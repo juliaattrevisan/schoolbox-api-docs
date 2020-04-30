@@ -303,7 +303,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return mixed
      */
     public function getDirectoryList($path)
@@ -323,7 +323,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /* myfolder interface */
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|mixed|string
      */
     public function getParent($id)
@@ -344,7 +344,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     public function getFolderNode($id)
@@ -380,7 +380,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
     public function hasChildren($id)
@@ -390,7 +390,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     public function getFolderList($id)
@@ -401,7 +401,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /* MYFILE INTERFACE */
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     public function getAllInFolder($id)
@@ -410,7 +410,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
     public function getFile($id)
@@ -452,7 +452,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
     public function getByID($id)
@@ -579,7 +579,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return bool
      */
     public function update($data)
@@ -612,7 +612,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
     public function delete($id)
@@ -628,7 +628,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return mixed
      */
     protected function getIndex($path)
@@ -638,7 +638,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return mixed
      */
     protected function getPath($index)
