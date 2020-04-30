@@ -4296,42 +4296,7 @@ parameters:
 			path: library/Group.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$left\\)\\: Unexpected token \"\\$left\", expected type at offset 54$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right\\)\\: Unexpected token \"\\$right\", expected type at offset 75$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$homepageCleanables \\\\Schoolbox\\\\IHomepageCleanable\\[\\]\\)\\: Unexpected token \"\\$homepageCleanables\", expected type at offset 9$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 172$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateID\\)\\: Unexpected token \"\\$templateID\", expected type at offset 198$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
 			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 135$#"
-			count: 1
-			path: library/Homepage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateID\\)\\: Unexpected token \"\\$templateID\", expected type at offset 161$#"
 			count: 1
 			path: library/Homepage.php
 

@@ -60,8 +60,8 @@ class Homepage
     /**
      * Update column widths
      *
-     * @param  $left
-     * @param  $right
+     * @param float $left
+     * @param float $right
      * @return void
      */
     public function updateColumnWidths($left, $right)
@@ -108,7 +108,7 @@ class Homepage
      */
     public function emptyHomepage()
     {
-        /** @var $homepageCleanables \Schoolbox\IHomepageCleanable[] */
+        /** @var \Schoolbox\IHomepageCleanable[] $homepageCleanables */
         $homepageCleanables = [
             new Assess_Main(),
             new Chat(),
@@ -145,8 +145,8 @@ class Homepage
      * Resets a homepage to a template, or destroys the homepage if it is to be removed.
      * Returns the ID of the template used, or 0 if none.
      *
-     * @param $categoryID
-     * @param $templateID
+     * @param int $categoryID
+     * @param int $templateID
      * @return int
      */
     public function resetHomepageToTemplate($templateID)
@@ -178,8 +178,7 @@ class Homepage
     /**
      * This simply copies a bunch of rows, changing 'homepage_template' to 'homepage'...quite simple, really.
      *
-     * @param $categoryID
-     * @param $templateID
+     * @param int $templateID
      */
     public function createHomepageFromTemplate($templateID)
     {
