@@ -4381,21 +4381,6 @@ parameters:
 			path: library/Leave/HostTypeMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestData\\)\\: Unexpected token \"\\$requestData\", expected type at offset 44$#"
-			count: 1
-			path: library/Leave/Notice/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classname\\)\\: Unexpected token \"\\$classname\", expected type at offset 46$#"
-			count: 1
-			path: library/Leave/Notice/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestData\\)\\: Unexpected token \"\\$requestData\", expected type at offset 49$#"
-			count: 1
-			path: library/Leave/Notice/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 52$#"
 			count: 1
 			path: library/Leave/Report/Catering/Abstract.php
