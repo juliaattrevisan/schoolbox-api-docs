@@ -166,9 +166,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get staff day timetable
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
+     * @param int $dayNumber
      *
      * @return IIterator
      */
