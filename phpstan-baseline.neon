@@ -4216,41 +4216,6 @@ parameters:
 			path: library/External/Liss/Server.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$i\\)\\: Unexpected token \"\\$i\", expected type at offset 59$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$date\\)\\: Unexpected token \"\\$date\", expected type at offset 70$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$date\\)\\: Unexpected token \"\\$date\", expected type at offset 49$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 163$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 93$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^Method External_Offline_Timetable\\:\\:getDayNumber\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: library/External/Offline/Timetable.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 25$#"
 			count: 1
 			path: library/External/Offline/Timetable.php
