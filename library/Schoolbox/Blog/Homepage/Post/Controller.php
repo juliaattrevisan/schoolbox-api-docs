@@ -426,10 +426,8 @@ class Controller extends Base
      * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
      */
 
-
-
     /**
-     * @param $userAccessMapper
+     * @param UserAccessMapper $userAccessMapper
      */
     public function setUserAccessMapper($userAccessMapper) {
         $this->userAccessMapper = $userAccessMapper;
@@ -443,7 +441,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $roleMapper
+     * @param RoleMapper $roleMapper
      */
     public function setRoleMapper($roleMapper) {
         $this->roleMapper = $roleMapper;
@@ -457,7 +455,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $userMapper
+     * @param UserMapper $userMapper
      */
     public function setUserMapper($userMapper) {
         $this->userMapper = $userMapper;
@@ -471,7 +469,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $errorMapper
+     * @param ErrorMapper $errorMapper
      */
     public function setErrorMapper($errorMapper) {
         $this->errorMapper = $errorMapper;
@@ -485,7 +483,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $folderMapper
+     * @param FolderMapper $folderMapper
      */
     public function setFolderMapper($folderMapper) {
         $this->folderMapper = $folderMapper;
@@ -499,7 +497,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $fileMapper
+     * @param FileMapper $fileMapper
      */
     public function setFileMapper($fileMapper) {
         $this->fileMapper = $fileMapper;
@@ -513,7 +511,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogMapper
+     * @param BlogMapper $blogMapper
      */
     public function setBlogMapper($blogMapper) {
         $this->blogMapper = $blogMapper;
@@ -527,7 +525,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogImageMapper
+     * @param BlogImageMapper $blogImageMapper
      */
     public function setBlogImageMapper($blogImageMapper) {
         $this->blogImageMapper = $blogImageMapper;
@@ -541,7 +539,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $blogCommentMapper
+     * @param BlogCommentMapper $blogCommentMapper
      */
     public function setBlogCommentMapper($blogCommentMapper) {
         $this->blogCommentMapper = $blogCommentMapper;
@@ -554,13 +552,3 @@ class Controller extends Base
         return $this->blogCommentMapper;
     }
 }
-
-/*
- * This code will self-destruct in 5 seconds...
- *
-          ,--.!,
-       __/   -*-
-     ,d08b.  '|`
-     0088MM
-     `9MMP'
-*/

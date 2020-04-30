@@ -4831,51 +4831,6 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Image/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userAccessMapper\\)\\: Unexpected token \"\\$userAccessMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleMapper\\)\\: Unexpected token \"\\$roleMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userMapper\\)\\: Unexpected token \"\\$userMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$errorMapper\\)\\: Unexpected token \"\\$errorMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderMapper\\)\\: Unexpected token \"\\$folderMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fileMapper\\)\\: Unexpected token \"\\$fileMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogMapper\\)\\: Unexpected token \"\\$blogMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogImageMapper\\)\\: Unexpected token \"\\$blogImageMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$blogCommentMapper\\)\\: Unexpected token \"\\$blogCommentMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Controller.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 107$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
