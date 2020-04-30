@@ -4731,11 +4731,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 399$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
