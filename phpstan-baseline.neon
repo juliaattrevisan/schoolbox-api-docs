@@ -4331,36 +4331,6 @@ parameters:
 			path: library/Leave/HostTypeMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 64$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 44$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fullClassname\\)\\: Unexpected token \"\\$fullClassname\", expected type at offset 65$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classname\\)\\: Unexpected token \"\\$classname\", expected type at offset 46$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 41$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 41$#"
-			count: 1
-			path: library/Leave/Report/House/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$range\\)\\: Unexpected token \"\\$range\", expected type at offset 42$#"
 			count: 1
 			path: library/Leave/Report/House/RendererBase.php
