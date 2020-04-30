@@ -160,7 +160,9 @@ components:
             when they attempt to log into the Schoolbox instance.
 
         role:
-          $ref: '#/components/schemas/role'
+          oneOf:
+            - $ref: '#/components/schemas/role'
+            - $ref: '#/components/schemas/writableRole'
 
         superuser:
           type: boolean
@@ -383,7 +385,7 @@ components:
             - guest
       required:
         - id
-        - type
+      readOnly: true
       example:
         - id:   3
           name: Parents
@@ -403,6 +405,16 @@ components:
         - id:   8
           name: Guests
           type: guest
+
+    writableRole:
+      title: Writable Role
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 1
+      writeOnly: true
 
     campus:
       title: Campus
@@ -431,7 +443,7 @@ components:
           description: The number of days in a cycle for this campus' timetable.
       required:
         - id
-        - code
+      readOnly: true
 
   securitySchemes:
     bearerAuth:
