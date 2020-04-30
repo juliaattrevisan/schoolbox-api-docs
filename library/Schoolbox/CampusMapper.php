@@ -155,7 +155,7 @@ class CampusMapper extends Mapper {
 	/**
 	 * Find all campuses matching a certain name
 	 *
-	 * @param $name
+	 * @param string $name
 	 * @return GenericCollection|Campus[]
 	 */
 	public function findCampuses($name = '')

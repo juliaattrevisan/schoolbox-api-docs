@@ -4886,11 +4886,6 @@ parameters:
 			path: library/Schoolbox/Calendar/SidMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/CampusMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 71$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
