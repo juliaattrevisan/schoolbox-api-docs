@@ -4341,11 +4341,6 @@ parameters:
 			path: library/Page.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 37$#"
-			count: 1
-			path: library/Poll.php
-
-		-
 			message: "#^Variable \\$response might not be defined\\.$#"
 			count: 1
 			path: library/PortfolioWebDAV.php
