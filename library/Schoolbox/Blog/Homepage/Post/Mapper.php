@@ -210,8 +210,10 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
     /**
      * Find all the blog entries for a homepage
      *
+     * TODO: But I don't think this is used?
+     *
      * @param FolderModel $folder
-     * @param $limit
+     * @param int|null $limit
      * @return Collection
      */
     public function findForCategory(FolderModel $folder, $limit = 0)

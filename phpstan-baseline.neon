@@ -4831,11 +4831,6 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Image/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 107$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @throws with type Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\DefinitionException is not subtype of Throwable$#"
 			count: 2
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
