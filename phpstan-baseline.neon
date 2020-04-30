@@ -4251,47 +4251,12 @@ parameters:
 			path: library/External/Tass/Timetable.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 70$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 94$#"
-			count: 1
-			path: library/Feed.php
-
-		-
 			message: "#^Variable \\$file might not be defined\\.$#"
 			count: 1
 			path: library/Feed.php
 
 		-
 			message: "#^Variable \\$link might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderIds\\)\\: Unexpected token \"\\$folderIds\", expected type at offset 101$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 127$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 74$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 99$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 120$#"
 			count: 1
 			path: library/Feed.php
 
