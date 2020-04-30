@@ -42,7 +42,7 @@ class Folder extends Composite
      * @param App             $subApp
      * @param array           $appOptions
      * @param Di\Container    $di
-     * @param                 $outStream
+     * @param resource        $outStream
      * @param LoggerInterface $logger
      * @param bool            $perform
      * @throws Di\Exception\ServiceNotFound

@@ -4811,11 +4811,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Repair/Base.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$outStream\\)\\: Unexpected token \"\\$outStream\", expected type at offset 206$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Repair/Folder.php
-
-		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\$commentObject Comment\\)\\: Unexpected token \"\\$commentObject\", expected type at offset 9$#"
 			count: 1
 			path: library/Schoolbox/Assessment/StudentReportCard/CommentMapper.php
