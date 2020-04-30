@@ -4306,11 +4306,6 @@ parameters:
 			path: library/Leave/Controller.php
 
 		-
-			message: "#^Cannot call method getStudentContactList\\(\\) on null\\.$#"
-			count: 1
-			path: library/Leave/Core/Notice/Parent/Abstract.php
-
-		-
 			message: "#^Cannot call method send\\(\\) on null\\.$#"
 			count: 1
 			path: library/Leave/Core/Notice/User/Abstract.php
