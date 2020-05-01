@@ -110,7 +110,6 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
     }
     
-    
     /**
      * Hit /resource-booking/item/<id>/edit with POST to edit a booking resource item. 
      * This test just changes the title and description.

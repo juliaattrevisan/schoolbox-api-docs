@@ -1,5 +1,4 @@
 <?php
-
 namespace Payload\ResourceBooking\Resource;
 
 use Payload;
