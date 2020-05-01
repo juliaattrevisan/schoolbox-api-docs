@@ -1064,7 +1064,7 @@ class Controller extends Base\Base
     /**
      * List the folders that are allowed to be course parents
      *
-     * @param $folderId
+     * @param int $folderId
      * @api   GET /course/parent
      * @since 160
      */

@@ -30,8 +30,8 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $categoryID
-     * @param $config
+     * @param int $categoryID
+     * @param array $config
      * @return array|bool
      */
     public function getRecentThreadList($categoryID, $config)
@@ -63,7 +63,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param     $categoryID
+     * @param int $categoryID
      * @param int $index
      * @param int $limit
      * @return array|bool
@@ -90,7 +90,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $threadID
+     * @param int $threadID
      * @return array|bool|null
      */
     public function getThread($threadID)
@@ -103,7 +103,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param     $threadID
+     * @param int $threadID
      * @param int $index
      * @param int $limit
      * @return array|bool
@@ -123,7 +123,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $postID
+     * @param int $postID
      * @return array|bool|null
      */
     public function getPost($postID)
@@ -137,7 +137,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $categoryID
+     * @param int $categoryID
      * @return bool
      */
     public function hasForum($categoryID)
@@ -155,7 +155,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $threadID
+     * @param int $threadID
      */
     public function lockThread($threadID)
     {
@@ -169,7 +169,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $threadID
+     * @param int $threadID
      */
     public function uniqueView($threadID)
     {
@@ -189,7 +189,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $postID
+     * @param int $postID
      * @return false|float
      */
     public function getPageNumber($postID)
@@ -217,7 +217,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $text
+     * @param string $text
      * @return string|string[]|null
      */
     public function parseBB($text)
@@ -237,7 +237,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $data
+     * @param array $data
      * @return int|string
      */
     public function create($data)
@@ -248,7 +248,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $threadID
+     * @param int $threadID
      * @return bool
      */
     public function delete($threadID)
@@ -309,7 +309,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param $postID
+     * @param int $postID
      * @return bool
      */
     public function deletePost($postID)
@@ -339,7 +339,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param        $keyword
+     * @param string $keyword
      * @param int    $offset
      * @param int    $limit
      * @param null   $count

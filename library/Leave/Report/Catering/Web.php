@@ -120,7 +120,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
     /**
 	 * Set house mapper
 	 *
-	 * @param $houseMapper
+	 * @param HouseResidentialMapper $houseMapper
 	 */
     protected function setHouseMapper($houseMapper)
     {
@@ -130,7 +130,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
     /**
 	 * Get house mapper
 	 *
-	 * @return null
+	 * @return HouseResidentialMapper
 	 */
     protected function getHouseMapper()
     {

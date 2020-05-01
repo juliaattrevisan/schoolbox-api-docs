@@ -1,7 +1,7 @@
 <?php
 /**
  * Model for normal (non-eportfolio) blog posts
- * 
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -167,7 +167,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param $comments
+     * @param \Schoolbox\Blog\Homepage\Comment\Mapper $comments
      * @return $this
      */
     public function setComments($comments) {
@@ -183,7 +183,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param $images
+     * @param \Schoolbox\Blog\Homepage\Image\Mapper $images
      * @return $this
      */
     public function setImages($images) {

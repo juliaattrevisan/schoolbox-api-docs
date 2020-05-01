@@ -152,7 +152,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     /**
      * Returns the name of the current day
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      *
      * @return String
      */

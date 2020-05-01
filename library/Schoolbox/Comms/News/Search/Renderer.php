@@ -33,7 +33,7 @@ class Renderer extends Base
      * Render html fragment
      *
      * @param MapperResult $mapperResult
-     * @param              $type
+     * @param string       $type
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \RuntimeException
      */

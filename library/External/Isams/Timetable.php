@@ -51,7 +51,7 @@ class External_Isams_Timetable implements External_TimetableInterface
               EndTime
             FROM V_TimetableStructure
             JOIN V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            JOIN V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID 
+            JOIN V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             WHERE CampusCode = :campus_code AND DayID = :day_id
             ORDER BY DayID, CAST(StartTime AS TIME)
 	    ";
@@ -76,8 +76,8 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         $queryPeriodCount = "
-            SELECT      COUNT(*) As PeriodCount 
-            FROM        V_TimetableStructure 
+            SELECT      COUNT(*) As PeriodCount
+            FROM        V_TimetableStructure
             WHERE       DayID = :day_id
         ";
 
@@ -146,14 +146,14 @@ class External_Isams_Timetable implements External_TimetableInterface
 
 
         $queryDay = "
-           SELECT   TblTimetableManagerDaysID as DayID 
-           FROM     V_Days 
+           SELECT   TblTimetableManagerDaysID as DayID
+           FROM     V_Days
            WHERE    intWeek = (
-              SELECT  TOP 1 MAX(TblTimetableManagerWeeksID) 
-              FROM    V_Weeks 
-              WHERE   txtShortName = :txt_short_name AND 
+              SELECT  TOP 1 MAX(TblTimetableManagerWeeksID)
+              FROM    V_Weeks
+              WHERE   txtShortName = :txt_short_name AND
                       intActive = 1
-           ) AND 
+           ) AND
            intDay = :day_of_week
         ";
 
@@ -173,7 +173,7 @@ class External_Isams_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return String
      */
     public function getDayName($dayNumber): string
@@ -207,7 +207,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                       PeriodID AS PeriodNumber,
                       1 AS PeriodNumberSeq
            FROM       V_TimetableStructure
-           WHERE      CAST(:time_val AS TIME) BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME) AND  
+           WHERE      CAST(:time_val AS TIME) BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME) AND
                       DayID = :day_id
         ";
 
@@ -269,7 +269,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         // Add classes into it
-        
+
         $queryTimetable = "
             SELECT  V_TimetableSchedule.venue AS Room,
                     V_TimetableSchedule.ClassName AS Description,
@@ -278,11 +278,11 @@ class External_Isams_Timetable implements External_TimetableInterface
                     V_TimetableSchedule.ClassCode AS ClassCode,
                     Tutor1ID AS StaffID
             FROM    V_TimetableSchedule
-            JOIN    V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableSchedule.PeriodID 
+            JOIN    V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableSchedule.PeriodID
             JOIN    V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN    V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN    V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = :day_id) AND   
+            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = :day_id) AND
                     CampusCode = :campus_code AND
                     (
                         V_Class.Tutor1ID = :external_user_id OR
@@ -340,7 +340,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         $queryTimetable = "
-            SELECT 
+            SELECT
                         V_TimetableSchedule.venue AS Room,
                         V_TimetableSchedule.ClassName AS Description,
                         V_Days.intOrder AS DayNumber,
@@ -355,7 +355,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN        V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableSchedule.PeriodID
             JOIN        V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN        V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            LEFT JOIN   V_Staff ON V_Staff.StaffID = V_Class.Tutor1ID 
+            LEFT JOIN   V_Staff ON V_Staff.StaffID = V_Class.Tutor1ID
             WHERE       (
                             V_Class.Tutor1ID = :external_user_id OR
                             V_Class.Tutor2ID = :external_user_id OR
@@ -370,7 +370,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             'campus_code'       => $campus->getExtTimetableCode()
         ]);
 
-        
+
 	// Create the timetable framework
 
         $timetable = [];
@@ -420,8 +420,8 @@ class External_Isams_Timetable implements External_TimetableInterface
     /**
      * Sort timetable in chronological order
      *
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     public function sortTimetable($a, $b)

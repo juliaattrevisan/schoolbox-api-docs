@@ -273,7 +273,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     /**
      * Returns a collection of requests by user id
      *
-     * @param $userId
+     * @param int $userId
      * @return \Schoolbox\Collection
      */
     public function findAllByUserId($userId)
@@ -304,7 +304,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
      *
      * Only show the most recent fortnight's worth of requests
      *
-     * @param $houseId
+     * @param int $houseId
      * @return \Schoolbox\Collection|Leave_Request[]
      */
     public function findAllByHouseId($houseId)
@@ -362,7 +362,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
      * id 59 (andrew) created 2012-05-17 16:27:26
      * id 56 (bobby) 2012-05-17 13:16:11
      *
-     * @param $houseId
+     * @param int $houseId
      * @return \Schoolbox\Collection
      */
     private function getAllLeaveRequests($houseId)
@@ -393,8 +393,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     /**
      * Returns the previous pending request by house id
      *
-     * @param $requestId
-     * @param $houseId
+     * @param int $requestId
+     * @param int $houseId
      *
      * @return Leave_Request
      */
@@ -418,8 +418,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     /**
      * Returns the next pending request by house id
      *
-     * @param $requestId
-     * @param $houseId
+     * @param int $requestId
+     * @param int $houseId
      *
      * @return Leave_Request
      */
@@ -530,7 +530,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
      * being absent for that segment. e.g. If you return between 00:00:00 and 11:59:59,
      * you are still considered as being away for the morning.
      *
-     * @param $date
+     * @param string $date
      * @return array
      */
     public function getCateringReport($date)
@@ -691,7 +691,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     /**
      * Set limit
      *
-     * @param $limit
+     * @param int $limit
      */
     private function setLimit($limit)
     {
@@ -701,7 +701,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     /**
      * Get limit
      *
-     * @return null
+     * @return int
      */
     private function getLimit()
     {

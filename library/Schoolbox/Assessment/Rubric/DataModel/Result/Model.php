@@ -45,7 +45,7 @@ class Model
     }
 
     /**
-     * @param $label
+     * @param string $label
      */
     public function setLabel($label)
     {
@@ -61,7 +61,7 @@ class Model
     }
 
     /**
-     * @param $value
+     * @param int $value
      */
     public function setValue($value)
     {

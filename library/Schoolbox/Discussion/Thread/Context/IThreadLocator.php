@@ -24,7 +24,7 @@ interface IThreadLocator
      * Find an item by its ID, which this context knows how to associate with a
      * thread.
      *
-     * @param $id
+     * @param int $id
      * @return IThreadLocation
      */
     public function findById($id): IThreadLocation;
@@ -34,7 +34,7 @@ interface IThreadLocator
      * Associates the given object with the thread.
      *
      * @param ThreadModel $thread
-     * @param IThreadLocation    $object
+     * @param IThreadLocation $object
      */
     public function associate(ThreadModel $thread, IThreadLocation $object): void;
 
@@ -43,7 +43,7 @@ interface IThreadLocator
      * Is this thread the correct association for this context?
      *
      * @param ThreadModel $thread
-     * @param IThreadLocation    $context
+     * @param IThreadLocation $context
      * @return bool
      */
     public function isContextForThread(ThreadModel $thread, IThreadLocation $context): bool;

@@ -32,7 +32,7 @@ class Renderer extends \Twig_Extension
 
     /**
      * @param \Twig_Environment $twig
-     * @param                   $pageCurrent
+     * @param string            $pageCurrent
      * @return string
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime

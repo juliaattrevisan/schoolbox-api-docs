@@ -287,7 +287,7 @@ class Leave_Controller extends Controller
     /**
      * Render host type dropdown
      *
-     * @param $request
+     * @param \Leave_Request $request
      */
     private function renderHostTypeDropdown($request)
     {
@@ -296,8 +296,6 @@ class Leave_Controller extends Controller
         /* Iterate through each option and preselect
 		 */
         foreach ($this->getHostTypes() as $currentHostType) {
-
-            /** @var \Leave_Request $request */
             if ($request->getHostType() instanceof \Leave\HostType && $request->getHostType()->getId() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
             } else {
@@ -528,7 +526,7 @@ class Leave_Controller extends Controller
 	 * Thresholds are measured from Friday 12PM of the weekend that
 	 * leave was intended to start
 	 *
-	 * @param $startDate
+	 * @param string $startDate
 	 * @return bool
 	 */
     private function isOutsideCreationThreshold($startDate)
@@ -1017,8 +1015,8 @@ class Leave_Controller extends Controller
     /**
      * Dump a csv file's contents w/ headers
      *
-     * @param $filename
-     * @param $allRows
+     * @param string $filename
+     * @param array $allRows
      */
     private function dumpCSV($filename, $allRows)
     {
@@ -1121,7 +1119,7 @@ class Leave_Controller extends Controller
     /**
      * Returns a collection of requests for a user
      *
-     * @param $userId
+     * @param int $userId
      * @return array
      * @throws ApplicationException\NotFound if user or their house isn't found.
      */
@@ -1158,7 +1156,7 @@ class Leave_Controller extends Controller
     /**
      * Export a csv of leave requests belonging to a particular student
      *
-     * @param $data
+     * @param array $data
      */
     public function exportUserRequestList($data)
     {
@@ -1515,7 +1513,7 @@ class Leave_Controller extends Controller
     /**
      * Render a list of Leave Requests for people in a particular House.
      *
-     * @param $data
+     * @param array $data
      */
     public function renderHouseReport($data)
     {
@@ -1528,7 +1526,7 @@ class Leave_Controller extends Controller
     /**
      * Export CSV of renderHouseReport()
      *
-     * @param $data
+     * @param array $data
      */
     public function exportHouseReport($data)
     {
@@ -1543,7 +1541,7 @@ class Leave_Controller extends Controller
     /**
      * Export CSV of renderHouseReport()
      *
-     * @param $data
+     * @param array $data
      */
     public function printHouseReport($data)
     {
@@ -1557,7 +1555,7 @@ class Leave_Controller extends Controller
      * Get catering requirements for the Friday, Saturday and Sunday.
      * This is the period of time when people can go on leave.
      *
-     * @param $date
+     * @param string $date
      * @return array
      */
     public function executeCateringReport($date)
@@ -1603,7 +1601,7 @@ class Leave_Controller extends Controller
      * Render catering data. Null values can exist for absent_morning etc. when a House
      * as no leave requests for it. Casting it as an integer forces it to zero.
      *
-     * @param $data
+     * @param array $data
      */
     public function renderCateringReport($data)
     {
@@ -1616,7 +1614,7 @@ class Leave_Controller extends Controller
      * renderCateringReport, but due to non-templating things have to be
      * fputcsv'd in order
      *
-     * @param $data
+     * @param array $data
      */
     public function exportCateringReport($data)
     {
@@ -1627,7 +1625,7 @@ class Leave_Controller extends Controller
     /**
      * Send email notification
      *
-     * @param $request
+     * @param \Leave_Request $request
      */
     public function sendUserNotice($request)
     {
@@ -1659,7 +1657,7 @@ class Leave_Controller extends Controller
      * At Kings Live, parent_notification started saving as integer 1/0, instead
      * of the usual true/false string?
      *
-     * @param $request
+     * @param \Leave_Request $request
      */
     public function sendAdminNotice($request)
     {
@@ -1684,7 +1682,7 @@ class Leave_Controller extends Controller
     /**
      * Set external user
      *
-     * @param $externalUser
+     * @param External_User $externalUser
      */
     public function setExternalUser($externalUser)
     {
@@ -1694,7 +1692,7 @@ class Leave_Controller extends Controller
     /**
      * Get external user
      *
-     * @return mixed
+     * @return External_User
      */
     public function getExternalUser()
     {
@@ -1790,7 +1788,7 @@ class Leave_Controller extends Controller
     /**
      * Set time map
      *
-     * @param $timeMap
+     * @param array $timeMap
      */
     private function setTimeMap($timeMap)
     {

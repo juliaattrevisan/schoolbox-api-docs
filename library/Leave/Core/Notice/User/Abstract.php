@@ -65,7 +65,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
     /**
      * Set email
      *
-     * @param $email
+     * @param Mailer $email
      */
     protected function setEmail($email)
     {
@@ -75,7 +75,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
     /**
      * Get email
      *
-     * @return null
+     * @return Mailer
      */
     protected function getEmail()
     {

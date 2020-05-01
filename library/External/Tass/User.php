@@ -469,7 +469,7 @@ class External_Tass_User implements External_UserInterface
     /**
     * Get enrolled students
     *
-    * @param $externalUserId
+    * @param string $externalUserId
     * @return array
     */
     public function getEnrolledStudents(string $externalUserId): array

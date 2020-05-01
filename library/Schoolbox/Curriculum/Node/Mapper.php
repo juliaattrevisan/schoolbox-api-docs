@@ -210,7 +210,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * Insert curriculum nodes associated with $assessment
      *
      * @param Collection $curriculumNodes
-     * @param $assessmentId
+     * @param int $assessmentId
      * @return $this
      */
     public function insertRelations(Collection $curriculumNodes, $assessmentId)

@@ -23,8 +23,8 @@ interface ICommunityPortal
     /**
      * Sets the secret key and initialization vector required for encryption/decryption
      *
-     * @param $key
-     * @param $initializationVector
+     * @param string $key
+     * @param string $initializationVector
      */
     public function setSecrets($key, $initializationVector);
 }

@@ -168,7 +168,7 @@ class Controller extends Base
      * @api   GET /adminv2/menu-side/modify/{id}
      * @since 165
      *
-     * @param $id
+     * @param int $id
      */
     public function getModify($id)
     {
@@ -422,7 +422,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuSideMapper $mapper
      * @return $this
      */
     public function setMenuSideMapper($mapper)
@@ -440,7 +440,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param RoleMapper $mapper
      * @return $this
      */
     public function setRoleMapper($mapper)
@@ -458,7 +458,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param CampusMapper $mapper
      * @return $this
      */
     public function setCampusMapper($mapper)
@@ -477,7 +477,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuSideCampusMapper $mapper
      * @return $this
      */
     public function setMenuSideCampusMapper($mapper)
@@ -495,7 +495,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuSideRoleMapper $mapper
      * @return $this
      */
     public function setMenuSideRoleMapper($mapper)
@@ -513,7 +513,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuSideSectionMapper $mapper
      * @return $this
      */
     public function setMenuSideSectionMapper($mapper)

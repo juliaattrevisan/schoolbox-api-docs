@@ -22,7 +22,7 @@ class Leave_Notice_Factory
     /**
      * Constructor
      *
-     * @param $requestData
+     * @param Leave_Request $requestData
      */
     public function __construct($requestData)
     {
@@ -84,7 +84,7 @@ class Leave_Notice_Factory
     /**
      * Set classname
      *
-     * @param $classname
+     * @param string $classname
      */
     private function setClassname($classname)
     {
@@ -104,7 +104,7 @@ class Leave_Notice_Factory
     /**
      * Set request data
      *
-     * @param $requestData
+     * @param Leave_Request $requestData
      */
     private function setRequestData($requestData)
     {
@@ -114,7 +114,7 @@ class Leave_Notice_Factory
     /**
      * Get request data
      *
-     * @return null
+     * @return Leave_Request
      */
     private function getRequestData()
     {

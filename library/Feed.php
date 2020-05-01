@@ -31,8 +31,8 @@ class Feed
 
     /**
      * @deprecated use \Schoolbox\Feed::aggregate()
-     * @param $folderId
-     * @param $limit
+     * @param int $folderId
+     * @param int $limit
      * @return array
      */
     public function getFeed($folderId, $limit)
@@ -82,7 +82,7 @@ class Feed
     /**
      * Generic filter function for get* methods.
      *
-     * @param mixed $folderId Either a number string, or an array of IDs
+     * @param string|array $folderId Either a number string, or an array of IDs
      * @return string
      */
     protected function getFilterFromCategoryId($folderId)
@@ -194,8 +194,8 @@ class Feed
     /**
      * Get a list of online assessments (aka 'quizzes') that were created.
      *
-     * @param  $folderIds
-     * @param  $limit
+     * @param string|array $folderIds
+     * @param int $limit
      * @return array
      */
     public function getOnlineAssessments($folderIds, $limit): array
@@ -267,9 +267,9 @@ class Feed
     /**
      * Get a list of surveys that were created.
      *
-     * @param  $folderId
-     * @param  $limit
-     * @return
+     * @param string|array $folderId
+     * @param int $limit
+     * @return array
      */
     public function getSurveys($folderId, $limit)
     {
@@ -399,8 +399,8 @@ class Feed
 
     /**
      * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
-     * @param $folderId
-     * @param $limit
+     * @param string|array $folderId
+     * @param int $limit
      * @return array
      */
     public function getWiki($folderId, $limit)
@@ -446,9 +446,9 @@ class Feed
      * Get a list of new blog entries to push into the feed.
      *
      * @deprecated use \Schoolbox\Blog\BlogNotifier::getFeed()
-     * @param  $folderId
-     * @param  $limit
-     * @return
+     * @param  string|array$folderId
+     * @param  int $limit
+     * @return array
      */
     public function getBlog($folderId, $limit)
     {
@@ -494,9 +494,9 @@ class Feed
      * Get a list of new blog comments to push into the feed.
      *
      * @deprecated use \Schoolbox\Blog\CommentNotifier::getFeed()
-     * @param  $folderId
-     * @param  $limit
-     * @return
+     * @param  string|array $folderId
+     * @param  int $limit
+     * @return array
      */
     public function getBlogComments($folderId, $limit)
     {

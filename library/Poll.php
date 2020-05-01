@@ -117,7 +117,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * @deprecated
-     * @param $id
+     * @param int $id
      * @return bool
      */
     public function delete($id)

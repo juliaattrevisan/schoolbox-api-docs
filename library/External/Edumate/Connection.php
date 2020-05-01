@@ -45,7 +45,7 @@ class External_Edumate_Connection
     /**
      * Quote input for safety
      *
-     * @param $value string
+     * @param string $value
      * @return string
      */
     public function quote($value) {

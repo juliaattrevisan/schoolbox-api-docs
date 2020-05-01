@@ -95,6 +95,8 @@ class Controller extends Base
     /**
      * Download the requested file from external document archive
      *
+     * TODO: But this is never used?
+     *
      * @param User   $student
      * @param string $documentId
      * @param string $source

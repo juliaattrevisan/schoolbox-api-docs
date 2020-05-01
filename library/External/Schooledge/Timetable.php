@@ -630,7 +630,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param $timetabledClass
+     * @param array $timetabledClass
      * @return array
      */
     protected function getTimetableEntries($timetabledClass): array

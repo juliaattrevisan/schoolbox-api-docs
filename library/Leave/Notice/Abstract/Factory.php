@@ -14,7 +14,7 @@ abstract class Leave_Notice_Abstract_Factory {
 	/**
 	 * Constructor
 	 *
-	 * @param $request
+	 * @param Leave_Request $request
 	 */
 	public function __construct($request) {
 		$this->setRequest($request);

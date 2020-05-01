@@ -67,8 +67,8 @@ class Group extends DeprecatedModel
     /**
      * Determine whether this group can be subscribed to
      *
-     * @param <type> $categoryId
-     * @return <type>
+     * @param int $categoryId
+     * @return bool
      */
     public function canSubscribe($categoryId)
     {
@@ -90,7 +90,6 @@ class Group extends DeprecatedModel
     /**
      * Get the array of ids for groups that can change passwords
      *
-     * @param  $name
      * @return array|bool
      */
     public function canChangePassword()
@@ -115,7 +114,7 @@ class Group extends DeprecatedModel
      * an array of id's which is synonymous with the old conf way
      * of serializing/unserializing this result set.
      *
-     * @param  $name
+     * @param string $name
      * @return array
      */
     public function getGroupTypeIds($name)
@@ -259,7 +258,7 @@ class Group extends DeprecatedModel
 
     /**
      * @deprecated replaced by Schoolbox\Permission\Access\RoleAccessMapper::roleMayOwnFolders()
-     * @param $userID
+     * @param int $userID
      * @return bool
      */
     function allowOwner($userID)
@@ -321,8 +320,8 @@ class Group extends DeprecatedModel
      * * sync scripts
      * * add users to group
      *
-     * @param     $relationID
-     * @param     $userID
+     * @param int $relationID
+     * @param int $userID
      * @param int $type
      * @return bool
      */
@@ -349,8 +348,8 @@ class Group extends DeprecatedModel
      * TODO remove this and update/remove everywhere which uses it:
      * * group delete
      *
-     * @param $relationID
-     * @param $userID
+     * @param int $relationID
+     * @param int $userID
      * @return resource
      */
     public function deleteUser($relationID, $userID)
@@ -498,8 +497,8 @@ class Group extends DeprecatedModel
     /**
      * Synonymous for isGuest(), isStudent(), isParent() and isStaff()
      *
-     * @param $userId
-     * @param $type
+     * @param int $userId
+     * @param string $type
      * @return bool
      */
     private function isUserOfType($userId, $type)
@@ -643,7 +642,7 @@ class Group extends DeprecatedModel
     /**
      * Get a list of subjects $userID is involved in
      *
-     * @param $userID
+     * @param int $userID
      * @return array
      */
     public function involvedInSubjects($userID)
@@ -672,7 +671,7 @@ class Group extends DeprecatedModel
                         continue;
                     }
 
-                    /** @var $folder Schoolbox\Resource\Folder\Model */
+                    /** @var Schoolbox\Resource\Folder\Model $folder */
                     $template = null;
                     if ($folder->getHomepage() instanceof \Schoolbox\Resource\HomepageConfig) {
                         $template = $folder->getHomepage()->getTemplate()->getId();

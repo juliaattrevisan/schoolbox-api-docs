@@ -60,11 +60,11 @@ class Report_Parent extends Report_Abstract
 
     /**
      * Report_Parent constructor.
-     * @param $page
-     * @param $yearLevel
-     * @param $searchName
-     * @param $searchBoardingStatus
-     * @param $searchForm
+     * @param SitePage $page
+     * @param string $yearLevel
+     * @param string $searchName
+     * @param string $searchBoardingStatus
+     * @param string $searchForm
      * @throws Exception
      */
     public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm)

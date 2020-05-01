@@ -11,11 +11,11 @@ class Report_Bialik_Parent extends \Report_Parent
     /**
      * Constructor
      *
-     * @param $page
-     * @param $yearLevel
-     * @param $searchName
-     * @param $searchBoardingStatus
-     * @param $searchForm
+     * @param SitePage $page
+     * @param string $yearLevel
+     * @param string $searchName
+     * @param string $searchBoardingStatus
+     * @param string $searchForm
      */
     public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
         $this->setGroupHandler(new Group());

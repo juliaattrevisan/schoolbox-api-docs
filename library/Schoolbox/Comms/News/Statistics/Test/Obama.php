@@ -485,9 +485,9 @@ class Obama
      * Weighted int
      * https://stackoverflow.com/questions/445235/generating-random-results-by-weight-in-php
      *
-     * @param $min
-     * @param $max
-     * @param $gamma
+     * @param int $min
+     * @param int $max
+     * @param float $gamma
      * @return int
      */
     private function getWeightedRandom($min, $max, $gamma): int {

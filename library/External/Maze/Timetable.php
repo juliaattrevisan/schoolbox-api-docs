@@ -152,7 +152,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Get timetable period label
      *
-     * @param $i
+     * @param int $i
      * @return string
      */
     private function getTimetablePeriodLabel($i)
@@ -194,7 +194,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return String
      */
     public function getDayName($dayNumber): string
@@ -286,7 +286,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Determine whether you're in a weekend
      *
-     * @param $date
+     * @param string $date
      * @return bool
      */
     private function isWeekend($date)
@@ -298,7 +298,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Find next Monday
      *
-     * @param $date
+     * @param string $date
      * @return string
      */
     private function nextMonday($date)
@@ -321,9 +321,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Spawn a staff timetable for a particular user and day number
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
+     * @param int $dayNumber
      * @param \Alaress_Date_Format $date
      * @return array
      */

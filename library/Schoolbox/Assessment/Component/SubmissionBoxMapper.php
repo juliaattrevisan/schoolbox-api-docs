@@ -383,7 +383,7 @@ class SubmissionBoxMapper extends BaseMapper
     /**
     * Calculates and returns the statistics of the given submission box
     *
-    * @param $submission_box
+    * @param int|SubmissionBox $submission_box
     * @return array
     */
     public function getStatistics($submission_box)
@@ -424,7 +424,7 @@ class SubmissionBoxMapper extends BaseMapper
     /**
     * Returns the progress of the given submission box, ie. the number of submissions made and returns given
     *
-    * @param $submission_box
+    * @param int|SubmissionBox $submission_box
     * @return array
     */
     public function getProgress($submission_box)

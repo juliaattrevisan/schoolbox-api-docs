@@ -142,7 +142,7 @@ class External_Maze_Helper
      * Glue a class code and class number together into a unique
      * Schoolbox ClassCode
      *
-     * @param $classCode
+     * @param string $classCode
      * @param int $classNumber
      * @return string
      */
@@ -154,7 +154,7 @@ class External_Maze_Helper
     /**
      * Deglue a unique Schoolbox ClassCode into its original constituents
      *
-     * @param $schoolboxClassCode
+     * @param string $schoolboxClassCode
      * @return array
      */
     public function degenerateClassCode($schoolboxClassCode)
@@ -189,7 +189,7 @@ class External_Maze_Helper
 
     /**
      * Alias
-     * 
+     *
      * @return bool
      */
     public function isBetweenSemesters() {

@@ -283,8 +283,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * Add a users attendance for event
      *
-     * @param $eventId
-     * @param $userId
+     * @param int $eventId
+     * @param int $userId
      */
     public function addAttendance($eventId, $userId)
     {
@@ -309,8 +309,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * Remove a users attendance for event
      *
-     * @param $eventId
-     * @param $userId
+     * @param int $eventId
+     * @param int $userId
      */
     public function removeAttendance($eventId, $userId)
     {
@@ -514,9 +514,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
     * Find all the events between two dates, inclusive
     *
-    * @param $startDate
-    * @param $endDate
-    * @param $excludeResourceBookings
+    * @param string $startDate
+    * @param string $endDate
+    * @param bool $excludeResourceBookings
     * @return Collection
     */
     public function findEventsBetween($startDate, $endDate, bool $excludeResourceBookings = false)

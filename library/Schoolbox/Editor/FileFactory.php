@@ -34,7 +34,7 @@ class FileFactory
     /**
      * Constructor
      *
-     * @param $hashTuple
+     * @param string $hashTuple
      */
     public function __construct($hashTuple) {
 

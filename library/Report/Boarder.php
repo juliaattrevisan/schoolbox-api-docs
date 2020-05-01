@@ -11,7 +11,7 @@ class Report_Boarder extends Report_Parent {
 	/**
 	 * Constructor
 	 *
-	 * @param $page
+	 * @param SitePage $page
 	 */
 	public function __construct($page) {
 		$this->setGroupHandler(new Group());

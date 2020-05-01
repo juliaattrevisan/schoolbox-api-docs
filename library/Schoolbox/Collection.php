@@ -39,7 +39,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Add an element ot the end of the stack
      *
-     * @param $element
+     * @param mixed $element
      * @return $this
      */
     public function add($element)
@@ -60,7 +60,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Prepend an element to the start of the stack
      *
-     * @param $element
+     * @param mixed $element
      * @return $this
      */
     public function prepend($element)
@@ -162,7 +162,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Set stack
      *
-     * @param $stack
+     * @param array $stack
      * @return $this
      */
     protected function setStack($stack)
@@ -245,7 +245,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * Regardless of whether its value is set to null.
      *
-     * @param $key
+     * @param string $key
      * @return bool
      */
     public function keyExists($key)
@@ -660,8 +660,8 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Put an object in a particular place in the stack
      *
-     * @param $index
-     * @param $value
+     * @param mixed $index
+     * @param mixed $value
      * @return $this
      */
     public function setOffset($index, $value)
@@ -673,7 +673,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Get the contents of a particular index in the stack
      *
-     * @param $index
+     * @param mixed $index
      * @return mixed
      */
     public function getOffset($index)

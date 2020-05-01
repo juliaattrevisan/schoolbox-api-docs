@@ -39,7 +39,7 @@ class AccessTest extends TestCase
     private $userAccess;
 
     /**
-     * @param $key
+     * @param string $key
      * @return mixed|Role
      */
     private function getRole($key)
@@ -56,7 +56,7 @@ class AccessTest extends TestCase
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return mixed|User
      */
     private function getUser($key)
@@ -116,7 +116,7 @@ class AccessTest extends TestCase
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return mixed|Event
      */
     private function getEvent($key)
@@ -151,7 +151,7 @@ class AccessTest extends TestCase
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return mixed|UserAccess
      */
     private function getUserAccess($key)
@@ -243,7 +243,7 @@ class AccessTest extends TestCase
     /**
      * Generate an array for running a test on checkDestination
      *
-     * @param $result
+     * @param bool $result
      * @param string $effectorKey
      * @param int $accessLevel
      * @param string $authorKey
@@ -275,11 +275,11 @@ class AccessTest extends TestCase
     /**
      * Generate an array for running a test on checkExisting
      *
-     * @param $result
-     * @param $effectorKey
-     * @param $eventKey
-     * @param $authorKey
-     * @param $ownerKey
+     * @param bool $result
+     * @param string $effectorKey
+     * @param string $eventKey
+     * @param string $authorKey
+     * @param string $ownerKey
      * @return array
      */
     private function generateTestExisting($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
@@ -553,7 +553,7 @@ class AccessTest extends TestCase
 
     /**
      * @dataProvider dataCheckExisting
-     * @param $expected
+     * @param bool $expected
      * @param User $effector
      * @param Event $event
      */
@@ -568,9 +568,9 @@ class AccessTest extends TestCase
 
     /**
      * @dataProvider dataCheckDestination
-     * @param $expected
+     * @param bool $expected
      * @param User $effector
-     * @param $accessLevel
+     * @param int $accessLevel
      * @param User $author
      * @param User $owner
      * @param array $groups

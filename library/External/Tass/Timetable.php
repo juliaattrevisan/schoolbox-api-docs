@@ -125,7 +125,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return String
      */
     public function getDayName($dayNumber): string

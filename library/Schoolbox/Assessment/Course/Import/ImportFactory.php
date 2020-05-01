@@ -87,7 +87,7 @@ class ImportFactory
         $unitSpecDBCache = [];
 
         $query = "
-            SELECT 
+            SELECT
                 us.id                 AS 'us.id',
                 usf.name              AS 'usf.name',
                 sa.id                 AS 'sa.id',
@@ -232,7 +232,7 @@ class ImportFactory
 
         // AssessmentSpecs in UnitSpecs, optionally with corresponding AssessmentImpl if it exists
         $query1 = "
-            SELECT 
+            SELECT
                 us.id                 AS 'us.id',
                 usf.name              AS 'usf.name',
                 sa.id                 AS 'sa.id',
@@ -737,7 +737,7 @@ class ImportFactory
      * the system has broken data. In this case the caller should throw and exception which
      * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
-     * @param $row
+     * @param array $row
      * @return IAssessable|null
      * @throws InvalidDataStateException if the assessment has no determinable type
      */

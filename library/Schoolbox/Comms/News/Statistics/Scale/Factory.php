@@ -41,7 +41,7 @@ class Factory
     /**
      * Enforce a default value
      *
-     * @param $scale
+     * @param null|string $scale
      * @return string
      */
     public static function assertScale(?string $scale): string

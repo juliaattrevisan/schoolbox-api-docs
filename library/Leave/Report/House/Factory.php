@@ -16,8 +16,8 @@ class Leave_Report_House_Factory
     /**
      * Constructor
      *
-     * @param $page
-     * @param $data
+     * @param SitePage $page
+     * @param array $data
      */
     public function __construct($page, $data)
     {
@@ -71,7 +71,7 @@ class Leave_Report_House_Factory
     /**
      * Produce class with required data
      *
-     * @param $fullClassname
+     * @param string $fullClassname
      * @return mixed
      */
     private function produce($fullClassname)
@@ -85,7 +85,7 @@ class Leave_Report_House_Factory
     /**
      * Set classname
      *
-     * @param $classname
+     * @param string $classname
      */
     private function setClassname($classname)
     {
@@ -105,7 +105,7 @@ class Leave_Report_House_Factory
     /**
      * Set data
      *
-     * @param $data
+     * @param array $data
      */
     private function setData($data)
     {
@@ -125,7 +125,7 @@ class Leave_Report_House_Factory
     /**
      * Set page
      *
-     * @param $page
+     * @param SitePage $page
      */
     private function setPage($page)
     {
@@ -135,7 +135,7 @@ class Leave_Report_House_Factory
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     private function getPage()
     {

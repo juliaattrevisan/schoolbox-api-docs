@@ -772,7 +772,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * upon the Folder associated with $submissionBox
      *
      * @param User $user
-     * @param $requiredAccessLevel
+     * @param int $requiredAccessLevel
      * @return bool
      */
     public function hasAccess(User $user, $requiredAccessLevel)

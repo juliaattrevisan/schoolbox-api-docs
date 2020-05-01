@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Calendar;
 
+use Schoolbox\Collection;
 
 class EventLevelCollection extends \Schoolbox\Collection {
 
@@ -16,7 +17,7 @@ class EventLevelCollection extends \Schoolbox\Collection {
 	 * Ram in hardcoded values
 	 *
 	 * @param array $groupList
-	 * @param $campusList
+	 * @param Collection $campusList
 	 */
 	public function __construct($groupList, $campusList) {
 		$this->add(new EventLevel(\Schoolbox\Calendar\Event::ACCESS_PERSONAL, 'Personal'));

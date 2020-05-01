@@ -10,7 +10,7 @@ interface IComparable {
 	/**
 	 * Compares two objects, ideally of the same type.
 	 *
-	 * @param $other
+	 * @param IComparable $other
 	 *
 	 * @return int -1 if $this < $other, 1 if $this > $other, 0 if $this = $other
 	 */

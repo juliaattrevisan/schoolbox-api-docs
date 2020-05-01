@@ -38,7 +38,7 @@ class Destinations
     /**
      * Find destinations into which a course can be imported
      *
-     * @param $keyword
+     * @param string $keyword
      * @return Collection|Model[]
      * @throws DefinitionException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -71,14 +71,14 @@ class Destinations
             AND (folder_id IS NOT NULL OR cid IS NOT NULL)
         */
         $query = "
-            (SELECT f.id 
+            (SELECT f.id
             FROM {$this->folderMapper->getTable()} f
             INNER JOIN folder_code fc ON f.id = fc.folder_id
             AND fc.deleted_at IS NULL)
             UNION
             (SELECT f.id
             FROM {$this->folderMapper->getTable()} f
-            INNER JOIN userGroups ug ON f.id = ug.cid) 
+            INNER JOIN userGroups ug ON f.id = ug.cid)
          ";
 
         $stmt = $this->folderMapper->getDatabase()->query($query);

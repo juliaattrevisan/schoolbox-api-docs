@@ -147,7 +147,7 @@ class Access
     }
 
     /**
-     * @param $folderAccess
+     * @param FolderAccess $folderAccess
      * @return $this
      */
     private function setFolderAccess($folderAccess)

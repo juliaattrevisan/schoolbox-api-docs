@@ -86,9 +86,9 @@ class Widgets {
     }
 
     /**
-     * Gets css style for a particular visiblity
+     * Gets css style for a particular visibility
      *
-     * @param $id
+     * @param int $id
      * @return mixed
      */
     static public function getCss($id) {

@@ -80,7 +80,7 @@ class Controller extends Base
      * @api   GET /adminv2/menu-top/modify/{id}
      * @since 165
      *
-     * @param $id
+     * @param int $id
      */
     public function getModify($id)
     {
@@ -279,7 +279,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuIconMapper $mapper
      * @return $this
      */
     public function setMenuIconMapper($mapper)
@@ -299,7 +299,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuTopMapper $mapper
      * @return $this
      */
     public function setMenuTopMapper($mapper)
@@ -317,7 +317,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuTopCampusMapper $mapper
      * @return $this
      */
     public function setMenuTopCampusMapper($mapper)
@@ -335,7 +335,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param MenuTopRoleMapper $mapper
      * @return $this
      */
     public function setMenuTopRoleMapper($mapper)
@@ -353,7 +353,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param RoleMapper $mapper
      * @return $this
      */
     public function setRoleMapper($mapper)
@@ -371,7 +371,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $mapper
+     * @param CampusMapper $mapper
      * @return $this
      */
     public function setCampusMapper($mapper)
