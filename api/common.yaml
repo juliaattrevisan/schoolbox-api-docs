@@ -35,7 +35,7 @@ components:
     id:
       title: ID
       description: Identifying ID number for most objects within Schoolbox
-      readOnly: true
+#      readOnly: true
       type: integer
       format: int32
       minimum: 1

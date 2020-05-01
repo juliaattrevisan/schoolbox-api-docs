@@ -63,7 +63,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/writableUser'
 
 
   /user/{id}:
@@ -79,7 +79,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/writableUser'
 
     patch:
       operationId: userPatch
@@ -93,7 +93,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/writableUser'
 
     delete:
       operationId: userDelete
@@ -143,12 +143,20 @@ components:
         * timetabled classes
 
     user:
+      allOf:
+        - $ref: '#/components/schemas/readableUserFields'
+        - $ref: '#/components/schemas/userFields'
+
+    writableUser:
+      allOf:
+        - $ref: '#/components/schemas/writableUserFields'
+        - $ref: '#/components/schemas/userFields'
+
+    userFields:
       title: User
       description: Common fields for users
       type: object
       properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
 
         externalId:
           $ref: '#/components/schemas/externalId'
@@ -158,11 +166,6 @@ components:
           description: |
             The user's username. This will be used as the user's identification
             when they attempt to log into the Schoolbox instance.
-
-        role:
-          oneOf:
-            - $ref: '#/components/schemas/role'
-            - $ref: '#/components/schemas/writableRole'
 
         superuser:
           type: boolean
@@ -175,11 +178,6 @@ components:
           type: boolean
           description: Is this user able to log in to the Schoolbox instance?
           default: true
-
-        campus:
-          type: array
-          items:
-            $ref: '#/components/schemas/campus'
 
         title:
           type: string
@@ -317,8 +315,30 @@ components:
               type: string
               format: uri-reference
               nullable: true
+
+    readableUserFields:
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        campus:
+          type: array
+          items:
+            $ref: '#/components/schemas/campus'
+        role:
+          $ref: '#/components/schemas/role'
       required:
         - id
+      readOnly: true
+
+    writableUserFields:
+      properties:
+        campus:
+          type: array
+          items:
+            $ref: '#/components/schemas/writableCampus'
+        role:
+          $ref: '#/components/schemas/writableRole'
+      writeOnly: true
 
     userList:
       title: User list
@@ -445,6 +465,14 @@ components:
         - id
       readOnly: true
 
+    writableCampus:
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+      writeOnly: true
+
+
   securitySchemes:
     bearerAuth:
       $ref: 'common.yaml#/components/securitySchemes/bearerAuth'
@@ -459,6 +487,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/user'
+
+    writableUser:
+      description: A user (for writing)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/writableUser'
 
     userList:
       description: A list of users
