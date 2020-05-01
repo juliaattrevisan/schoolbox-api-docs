@@ -216,7 +216,6 @@ class Controller extends Assessment\Controller
          *
          * Order them by submitted time to find the most recent, and use that
          */
-
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
@@ -236,6 +235,10 @@ class Controller extends Assessment\Controller
              */
             'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
+            /* Eportfolio Showcase
+             * Only show the "send to showcase" trophy button to teachers and students, not parents
+             */
+            'canShowcase' => $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $this->getUser()->getEportfolioEnable())
         ];
 
         $routeArgs = [
