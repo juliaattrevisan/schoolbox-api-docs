@@ -57,9 +57,6 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Application\Exception\NotFound
-     * @throws InvalidArgumentException
-     * @throws NotFound
      */
     private function preloadNews(array $params) :array
     {
@@ -68,8 +65,7 @@ class Module extends BaseModule
         } else {
             try {
                 $article = $this->getNewsMapper()->findById($params['articleId']);
-            } /** @noinspection PhpRedundantCatchClauseInspection */
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
             }
         }
@@ -157,27 +153,28 @@ class Module extends BaseModule
     private function getAuthRuleCanAddSavedForLater(): Rule\IAuthorizationRule
     {
         return new Rule\LazyCallback(function () {
-            return new Rule\Callback(function (array $params = []) {
-                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
-                if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
-                    throw new InvalidPath('This feature has been disabled.');
-                }
-                try {
-                    if ($params['article']) {
-                        $article = $params['article'];
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params = []) {
+                    // Intentionally not catching mapper exception, that's a 5xx, not 4xx
+                    if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
+                        throw new InvalidPath('This feature has been disabled.');
                     }
-                    else {
-                        $article = $this->getNewsMapper()->findById($params['articleId']);
+                    try {
+                        if ($params['article']) {
+                            $article = $params['article'];
+                        } else {
+                            $article = $this->getNewsMapper()->findById($params['articleId']);
+                        }
+                    } catch (MapperException $e) {
+                        throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
                     }
-                } catch (MapperException $e) {
-                    throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
-                }
-                if (!$article->isPublished() && !$article->isExpired()) {
-                    throw new Unauthorized('Only published or expired articles may be saved for later');
-                }
-                // TODO, can the user see this article? Probably: $article->isSharable() || isUserInAudience($user, $article)
-                return true;
-            });
+                    if (!$article->isPublished() && !$article->isExpired()) {
+                        throw new Unauthorized('Only published or expired articles may be saved for later');
+                    }
+                    // TODO, can the user see this article? Probably: $article->isSharable() || isUserInAudience($user, $article)
+                    return true;
+                }));
         });
     }
 
@@ -189,14 +186,16 @@ class Module extends BaseModule
      */
     private function getAuthRuleCanRemoveSavedForLater(): Rule\IAuthorizationRule
     {
-        return new Rule\LazyCallback(function(){
-            return new Rule\Callback(function (array $params = []) {
-                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
-                if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
-                    throw new InvalidPath('This feature has been disabled.');
-                }
-                return true;
-            });
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params = []) {
+                    // Intentionally not catching mapper exception, that's a 5xx, not 4xx
+                    if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
+                        throw new InvalidPath('This feature has been disabled.');
+                    }
+                    return true;
+                }));
         });
     }
 }
