@@ -4,15 +4,15 @@
      * Replace all placeholders with html elements
      * By default this replaces everything in #content, our main container
      */
-    $.fn.schoolboxResource_ProxyReplacement = function() {
+    $.fn.schoolboxResource_ProxyReplacement = function(identifier) {
 
         /* Replace all the placeholders with html fragments that a media player can understand
          */
-        $.fn.schoolboxResource_ReplaceAll($('#content'));
+        $.fn.schoolboxResource_ReplaceAll($(identifier));
 
         /* Initialise the media player on this container
          */
-        $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
+        $.fn.schoolboxResource_InitialiseMediaElementPlayer(identifier);
     };
 
 
@@ -129,5 +129,5 @@
     $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
         $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
     };
-    
+
 }(jQuery));

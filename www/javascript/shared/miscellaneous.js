@@ -25,7 +25,7 @@ $(function () {
 
     /* Replace all editor video/audio placeholders
     */
-    $.fn.schoolboxResource_ProxyReplacement();
+    $.fn.schoolboxResource_ProxyReplacement('#content');
 
     // Notifications dock/undock
     $('#right-menu-dock').on('click', function() {
