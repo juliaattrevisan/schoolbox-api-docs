@@ -17,6 +17,7 @@
 
 
     /**
+     * Mass-replace all media placeholders
      *
      * @param selector  a jquery selection. This element contains all the placeholders
      *                  that should be replaced with a media player
