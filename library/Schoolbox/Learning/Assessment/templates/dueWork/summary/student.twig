@@ -129,31 +129,18 @@ Data:
 {% if student.eportfolioEnable %}
     <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
 
-    <form class="hide" action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
-        <input type="hidden" name="action" value="publish">
-        <input type="hidden" name="userId" value="{{ student.id }}">
-        <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
-    </form>
+    <script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('[data-publish-to-eportfolio]').click(function (event) {
-                event.preventDefault();
-
-                var assessmentId = $(this).data('publishToEportfolio');
-
-                $(this).confirmDialog({
-                    header: "Publish to ePortfolio Showcase",
-                    text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
-                    confirmEvent: function () {
-                        $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
-                            activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
-                        });
-                    }
-                });
+            $('[data-publish-to-eportfolio]').eportfolioPublish({
+                assessmentId: '{{ assessment.id }}',
+                userId: '{{ student.id }}'
             });
         });
     </script>
 {% endif %}
+
+<div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
 
 {# Submit button: goes underneath history if it's empty, above history if not #}
 {% if timeline is not empty %}
