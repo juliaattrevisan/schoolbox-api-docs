@@ -94,6 +94,9 @@ Data:
         selfAssessmentFeedback: selfAssessmentFeedback,
         participant: participant,
         selfAssess: selfAssess,
+        assessment: assessment,
+        student: student,
+        canShowcase: student.eportfolioEnable
     } %}
 {% else %}
     {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
@@ -101,6 +104,7 @@ Data:
         selfAssessmentFeedback: selfAssessmentFeedback,
     } %}
 {% endif %}
+
 {% if (currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER)) and selfAssessmentFeedback.comment|length %}
     <div class="row">
         <div class="small-12 island">
@@ -122,22 +126,6 @@ Data:
             </div>
         </div>
     </div>
-{% endif %}
-
-{# Students must have ePortfolio enabled, otherwise they can't do this
- #}
-{% if student.eportfolioEnable %}
-    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
-
-    <script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('[data-publish-to-eportfolio]').eportfolioPublish({
-                assessmentId: '{{ assessment.id }}',
-                userId: '{{ student.id }}'
-            });
-        });
-    </script>
 {% endif %}
 
 <div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
