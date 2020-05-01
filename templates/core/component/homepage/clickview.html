@@ -42,6 +42,11 @@
 
                     $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
 
+                    /* Clear all handlers for this
+                     */
+                    let eventsApi = new CVEventsApi(document.getElementById(clickviewFrameId).contentWindow);
+                    eventsApi.off('cv-lms-addvideo');
+
                     self.foundation('reveal', 'close');
                 });
             });
