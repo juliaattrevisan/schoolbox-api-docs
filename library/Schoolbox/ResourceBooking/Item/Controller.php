@@ -9,11 +9,18 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Web\Exception\InvalidComponent;
+use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use DateTime;
 use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Exception as ResourceException;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
@@ -50,24 +57,30 @@ class Controller extends Base
 
     /**
      * Browses the list of items.
+     * @throws InvalidComponent
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws InvalidStatusCode
      */
-    public function browse()
+    public function browse(): void
     {
 
         // Get the list of items
-        $query  = array();
-        $catId  = $this->getRequest()->query['category'];
-        $search = trim($this->getRequest()->query['search']);
-        $page   = max(intval($this->getRequest()->query['page']), 1);
+        $query    = [];
+        $catId    = $this->getRequest()->query->get('category');
+        $search   = trim($this->getRequest()->query->get('search'));
+        $page     = max(intval($this->getRequest()->query->get('page')), 1);
+        $category = $this->mapper->getJoinMapper('category')->createModel();
+        $category->setName('All');
 
         // Use the paginator to limit searches
         $this->paginator->setUrl($this->request->url->get());
-        $list = array();
+        $list = $this->mapper->createCollection();
         if (strlen($search) > 0) {
             $total = $this->mapper->searchCount($search);
             $this->paginator->setTotal($total);
             if ($total > 0) {
-                $list = $this->getMapper()->search(
+                $list = $this->mapper->search(
                     $search,
                     $this->paginator->getOffset($page),
                     $this->paginator->getPageSize(),
@@ -79,15 +92,10 @@ class Controller extends Base
             if ($catId) {
                 $query['resource_category_id'] = $catId;
                 try {
-                    $category = $this->getMapper()->getJoinMapper('category')->findById($catId);
+                    $category = $this->mapper->getJoinMapper('category')->findById($catId);
                 } catch (SchoolboxNotFoundException $e) {
                     $this->getResponse()->status->setCode(404);
                 }
-            }
-            else {
-                $catId = '';
-                $category = $this->getMapper()->getJoinMapper('category')->createModel();
-                $category->setName('All');
             }
 
             // Get count before running list
@@ -96,32 +104,32 @@ class Controller extends Base
             if ($total > 0) {
                 $list = $this->mapper->findByColumnList(
                     $query,
-                    array(
-                        'order'  => array('name' => 'asc'),
+                    [
+                        'order'  => ['name' => 'asc'],
                         'limit'  => $this->paginator->getPageSize(),
                         'offset' => $this->paginator->getOffset($page),
-                    )
+                    ]
                 );
             }
         }
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceItem/browse.twig',
-                'data'     => array(
-                    'list' => $list->sortByCallback(static function (Model $a, Model $b) {
+                'data'     => [
+                    'list'         => $list->sortByCallback(static function (Model $a, Model $b) {
                         return strnatcasecmp($a->getName(), $b->getName());
                     }),
                     'categoryId'   => $catId,
                     'category'     => $category,
-                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',]
+                    'categoryList' => $this->mapper->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',],
                     ]),
                     'search'       => $search,
                     'paginator'    => $this->paginator,
                     'page'         => $page,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -130,49 +138,50 @@ class Controller extends Base
      *
      * @todo remove and integrate into browse() once BelgianSuggest is gone
      */
-    public function search()
+    public function search(): void
     {
-        $excludedId = $this->getRequest()->query['thisId'];
-        $search     = trim($this->getRequest()->query['query']);
-        $data       = $this->getMapper()->search($search)
-            ->filter(function(Model $item) use ($excludedId) {
-                return $item->getId() != $excludedId;
-            })
-            ->map(function(Model $item) {
-                return array(
-                    'id'   => $item->getId(),
-                    'name' => $item->getName(),
-                );
-            });
+        $excludedId = $this->getRequest()->query->get('thisId');
+        $search     = trim($this->getRequest()->query->get('query'));
+        $data       = $this->mapper->search($search)
+                           ->filter(function (Model $item) use ($excludedId) {
+                               return $item->getId() != $excludedId;
+                           })
+                           ->map(function (Model $item) {
+                               return [
+                                   'id'   => $item->getId(),
+                                   'name' => $item->getName(),
+                               ];
+                           });
         $data->reindex();
         $this->getResponse()->content->set(
-            array(
+            [
                 'format' => 'json',
                 'data'   => $data,
-            )
+            ]
         );
     }
 
     /**
      * Display form for adding another resource item
+     * @throws MapperException
      */
-    public function add()
+    public function add(): void
     {
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceItem/edit.twig',
-                'data'     => array(
+                'data'     => [
                     'item'            => new Model(),
-                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',]
+                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',],
                     ]),
-                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'   => array(),
-                    'relatedItemList' => array(),
+                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'   => [],
+                    'relatedItemList' => [],
                     'roleList'        => $this->roleMapper->findAll(),
-                    'attachzone'      => $this->getAttachZoneData($this->getMapper()->createModel()),
-                ),
-            )
+                    'attachzone'      => $this->getAttachZoneData($this->mapper->createModel()),
+                ],
+            ]
         );
     }
 
@@ -181,11 +190,11 @@ class Controller extends Base
      *
      * @param Model $item
      */
-    public function read(Model $item)
+    public function read(Model $item): void
     {
 
         // Show a given view and date
-        $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query['date']);
+        $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query->get('date'));
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
@@ -194,9 +203,9 @@ class Controller extends Base
                 'template' => '@resourceItem/read.twig',
                 'data'     => [
                     'item'         => $item,
-                    'currentTerm'  => $this->getTermMapper()->findForToday(),
+                    'currentTerm'  => $this->termMapper->findForToday(),
                     'selectedDate' => $calendarDate->format('Y-m-d'),
-                    'calendarView' => $this->request->query['view'] === 'day' ? 'timeGridDay' : '',
+                    'calendarView' => $this->request->query->get('view') === 'day' ? 'timeGridDay' : '',
                     'token'        => $_SESSION['key'],
                 ],
             ]
@@ -208,58 +217,60 @@ class Controller extends Base
      *
      * @param Model $item
      */
-    public function edit(Model $item)
+    public function edit(Model $item): void
     {
         // Build list of moderators and related items (for BelgianSuggest)
-        $moderatorList = array();
+        $moderatorList = [];
         foreach ($item->getModeratorList() as $moderator) {
-            $moderatorList[] = array(
+            $moderatorList[] = [
                 'id'   => $moderator->getId(),
                 'name' => $moderator->formatName(),
-            );
+            ];
         }
-        $relatedItemList = array();
+        $relatedItemList = [];
         foreach ($item->getRelatedResourceList() as $relatedItem) {
-            $relatedItemList[] = array(
+            $relatedItemList[] = [
                 'id'   => $relatedItem->getId(),
                 'name' => $relatedItem->getName(),
-            );
+            ];
         }
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceItem/edit.twig',
-                'data'     => array(
+                'data'     => [
                     'item'            => $item,
-                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
-                        'order' => ['name' => 'asc',]
+                    'categoryList'    => $this->mapper->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',],
                     ]),
-                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderationList'  => $this->mapper->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
                     'roleList'        => $this->roleMapper->findAll(),
                     'attachzone'      => $this->getAttachZoneData($item),
-                ),
-            )
+                ],
+            ]
         );
     }
 
     /**
      * Backend for adding a new resource item
+     * @throws MapperException
+     * @throws RouteNotFound
      */
-    public function create()
+    public function create(): void
     {
         $model = new Model();
         $this->updateItemWithFormValues(
             $model,
             $this->getRequest()->post
         );
-        $this->getMapper()->save($model);
+        $this->mapper->save($model);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.read', array('id'=>$model->getId()))
+            $this->getRouter()->generate('resourceItem.read', ['id' => $model->getId()])
         );
     }
 
@@ -267,19 +278,21 @@ class Controller extends Base
      * Backend for updating an existing resource item
      *
      * @param Model $item
+     * @throws RouteNotFound
+     * @throws MapperException
      */
-    public function update(Model $item)
+    public function update(Model $item): void
     {
         $this->updateItemWithFormValues(
             $item,
             $this->getRequest()->post
         );
-        $this->getMapper()->save($item);
+        $this->mapper->save($item);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.read', array('id'=>$item->getId()))
+            $this->getRouter()->generate('resourceItem.read', ['id' => $item->getId()])
         );
     }
 
@@ -287,12 +300,14 @@ class Controller extends Base
      * Deletes an item
      *
      * @param Model $item
+     * @throws MapperException
+     * @throws RouteNotFound
      */
-    public function delete(Model $item)
+    public function delete(Model $item): void
     {
-        $this->getMapper()->delete($item);
+        $this->mapper->delete($item);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.browse', array())
+            $this->getRouter()->generate('resourceItem.browse', [])
         );
     }
 
@@ -302,7 +317,7 @@ class Controller extends Base
      * @param Model        $model The resource to update
      * @param \ArrayObject $post  An array-like object that abstracts $_POST
      */
-    protected function updateItemWithFormValues(Model $model, $post)
+    protected function updateItemWithFormValues(Model $model, $post):void
     {
         $model
             ->setName($post['name'])
@@ -313,18 +328,18 @@ class Controller extends Base
             ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
             ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
             ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
-            ->setCurrentTermRestriction($post['current_term_restriction'])
-        ;
+            ->setCurrentTermRestriction($post['current_term_restriction']);
 
         // Rectumize the file that was uploaded
         if (is_array($post['attachment'])) {
             try {
                 // Get the file out of the rectum, and put it in the resource
                 $factory = new CollectorFactory();
-                $image = $factory->build($post['attachment'])->getFirst();
+                /** @var \Schoolbox\Resource\Storage\Model $image */
+                $image   = $factory->build($post['attachment'])->getFirst();
                 $model->setImage($image);
-            } catch (\Schoolbox\Resource\Exception $e) {
-                error(43);
+            } catch (ResourceException $e) {
+                error(ErrorMapper::ERROR_USER_NOT_FOUND);
                 exit;
             }
         } else {
@@ -357,7 +372,7 @@ class Controller extends Base
         if (is_array($post['role'])) {
             foreach ($post['role'] as $roleId => $allowed) {
                 $resourceRole = new RolePermission\Model();
-                $role         = new \Schoolbox\Role();
+                $role         = new Role();
                 $role->setId($roleId);
                 $resourceRole
                     ->setResource($model)
@@ -377,7 +392,7 @@ class Controller extends Base
      * @return \DateInterval
      * @throws \Exception if the date interval object can't be created.
      */
-    protected function getDateIntervalFromForm($formPart)
+    protected function getDateIntervalFromForm($formPart): \DateInterval
     {
         return new \DateInterval(
             sprintf('PT%dH%dM', ((int)$formPart['day'] * 24 + (int)$formPart['hour']), (int)$formPart['minute'])
@@ -388,7 +403,7 @@ class Controller extends Base
      * @param Model $model
      * @return array
      */
-    protected function getAttachZoneData(Model $model)
+    protected function getAttachZoneData(Model $model): array
     {
         $zone = new Zone('attachment');
         $zone
@@ -410,44 +425,20 @@ class Controller extends Base
      * @param  Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper)
+    public function setMapper($mapper): self
     {
         $this->mapper = $mapper;
         return $this;
     }
 
     /**
-     * @return Mapper
-     */
-    public function getMapper()
-    {
-        return $this->mapper;
-    }
-
-    /**
      * @param  UserMapper $userMapper
      * @return $this
      */
-    public function setUserMapper($userMapper)
+    public function setUserMapper($userMapper): self
     {
         $this->userMapper = $userMapper;
         return $this;
-    }
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @return TermMapper
-     */
-    public function getTermMapper()
-    {
-        return $this->termMapper;
     }
 
     /**
@@ -455,7 +446,7 @@ class Controller extends Base
      *
      * @return $this
      */
-    public function setTermMapper($termMapper)
+    public function setTermMapper($termMapper): self
     {
         $this->termMapper = $termMapper;
 
@@ -466,35 +457,19 @@ class Controller extends Base
      * @param  RoleMapper $roleMapper
      * @return $this
      */
-    public function setRoleMapper($roleMapper)
+    public function setRoleMapper($roleMapper): self
     {
         $this->roleMapper = $roleMapper;
         return $this;
     }
 
     /**
-     * @return RoleMapper
-     */
-    public function getRoleMapper()
-    {
-        return $this->roleMapper;
-    }
-
-    /**
      * @param  IUrlPaginator $paginator
      * @return $this
      */
-    public function setPaginator($paginator)
+    public function setPaginator($paginator): self
     {
         $this->paginator = $paginator;
         return $this;
-    }
-
-    /**
-     * @return IUrlPaginator
-     */
-    public function getPaginator()
-    {
-        return $this->paginator;
     }
 }

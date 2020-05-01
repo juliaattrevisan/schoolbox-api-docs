@@ -8061,11 +8061,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Category/Module.php
 
 		-
-			message: "#^Variable \\$category might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Controller.php
-
-		-
 			message: "#^Variable \\$callback in isset\\(\\) is always null\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
