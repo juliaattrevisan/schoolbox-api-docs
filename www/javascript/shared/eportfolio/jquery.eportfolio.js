@@ -35,10 +35,6 @@
                  */
                 url: '/eportfolio/showcase/modifyForm.php',
 
-                /* Assessment id
-                 */
-                assessmentId: null,
-
                 /* Student id
                  */
                 userId: null,
@@ -61,6 +57,7 @@
 
                 $(element).on('click', function() {
                     var activator = $(this);
+                    var assessmentId = activator.attr('data-publish-to-eportfolio');
 
                     /* Only publish items that haven't been published before
                      */
@@ -90,7 +87,7 @@
                                     url: config.url,
                                     data: {
                                         action: config.action,
-                                        assessmentId: config.assessmentId,
+                                        assessmentId: assessmentId,
                                         userId: config.userId
                                     },
                                     success: function (data) {
