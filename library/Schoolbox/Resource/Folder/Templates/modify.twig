@@ -194,6 +194,7 @@
             {% if not folder.getInherit  %}
                 $("#inherit").change(function() {
                     $("[data-alert-permissions]").toggleClass("hide", !this.checked);
+                    $("[data-alert-recursive-permissions] span").toggleClass("hide", !this.checked);
                 });
             {% endif %}
 
@@ -344,7 +345,7 @@
 
                         <div class="small-12 columns">
                             <div data-alert-recursive-permissions class="alert-box warning hide icon-alert">
-                                This will remove all role permissions, group memberships, and class codes from all subfolders.
+                                This will remove all role permissions<span class="hide">, group memberships, and class codes</span> from all subfolders.
                             </div>
                         </div>
                     {% endif %}
