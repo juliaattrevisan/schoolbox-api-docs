@@ -227,5 +227,33 @@ feedback: currentFeedback,
             </div>
         {% endif %}
 
+        {% if student.eportfolioEnable %}
+        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
+
+        <form class="hide" action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
+            <input type="hidden" name="action" value="publish">
+            <input type="hidden" name="userId" value="{{ student.id }}">
+            <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
+        </form>
+        <script type="text/javascript">
+            $(function () {
+                $('[data-publish-to-eportfolio]').click(function (event) {
+                    event.preventDefault();
+
+                    var assessmentId = $(this).data('publishToEportfolio');
+
+                    $(this).confirmDialog({
+                        header: "Publish to ePortfolio Showcase",
+                        text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
+                        confirmEvent: function () {
+                            $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
+                                activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+        {% endif %}
     </li>
 </ul>
