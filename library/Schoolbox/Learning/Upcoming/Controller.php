@@ -326,8 +326,7 @@ class Controller extends Base
         $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
         if(count($ids) > 0) {
             $allWork = $this->assessmentDataSource
-                ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids])
-                ->sortByCallback(new DueDateSortStrategy($student));
+                ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);
 
             $visibility = new Visibility($this->access);
             /** @var IAssessable[]|GenericCollection $upcomingWork */
@@ -335,7 +334,9 @@ class Controller extends Base
                 ->filter(function (IAssessable $assessable) use ($student, $visibility) {
                     $participation = $assessable->getParticipant($student);
                     return ($participation->isResponseRequired() || $participation->isResubmissionRequired()) && $visibility->isVisibleToUser($assessable, $student, false);
-                })->limit(self::UPCOMING_WORK_LIMIT);
+                })
+                ->sortByCallback(new DueDateSortStrategy($student))
+                ->limit(self::UPCOMING_WORK_LIMIT);
         }
         else {
             $upcomingWork = new Collection();
