@@ -333,7 +333,8 @@ class Controller extends Base
             /** @var IAssessable[]|GenericCollection $upcomingWork */
             $upcomingWork = $allWork
                 ->filter(function (IAssessable $assessable) use ($student, $visibility) {
-                    return $visibility->isVisibleToUser($assessable, $student, false);
+                    $participation = $assessable->getParticipant($student);
+                    return ($participation->isResponseRequired() || $participation->isResubmissionRequired()) && $visibility->isVisibleToUser($assessable, $student, false);
                 })->limit(self::UPCOMING_WORK_LIMIT);
         }
         else {

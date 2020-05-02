@@ -79,7 +79,8 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             ->sortByCallback(new DueDateSortStrategy($student))
             ->filter(function (IAssessable $assessable) use ($student, $visibility) {
                 // Only show work that the student has permission to view
-                return $visibility->isVisibleToUser($assessable, $student, false);
+                $participation = $assessable->getParticipant($student);
+                return ($participation->isResponseRequired() || $participation->isResubmissionRequired()) && $visibility->isVisibleToUser($assessable, $student, false);
             })
             ->limit($this->limit ?: null);
 
