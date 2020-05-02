@@ -55,6 +55,10 @@ HELP;
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt('help')) {
+            $this->displayHelp();
+            exit(0);
+        }
 
         $db = $this->getDatabaseInternal();
         $date = $this->getOpt('date:') ?? '2020-01-01';
