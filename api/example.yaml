@@ -81,11 +81,7 @@ paths:
         '201':
           $ref: '#/components/responses/resource'
       requestBody:
-        description: The resource to be created
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/resource'
+        $ref: '#/components/requestBodies/resource'
 
     parameters:
       - $ref: 'common.yaml#/components/parameters/token'
@@ -124,7 +120,7 @@ paths:
         default:
           $ref: 'common.yaml#/components/responses/problem'
       requestBody:
-        $ref: '#/components/responses/resource'
+        $ref: '#/components/requestBodies/resource'
 
     patch:
       operationId: resourcePatch
@@ -144,7 +140,7 @@ paths:
         default:
           $ref: 'common.yaml#/components/responses/problem'
       requestBody:
-        $ref: '#/components/responses/resource'
+        $ref: '#/components/requestBodies/resource'
 
     delete:
       operationId: resourceDelete
@@ -255,11 +251,47 @@ paths:
 components:
   schemas:
     resource:
-      title: Resource
-      description: |
-        Fields for the given resource.
+      allOf:
+        - $ref: '#/components/schemas/resourceFields'
+        - $ref: '#/components/schemas/resourceReadableFields'
+        - title: Resource
+          description: |
+            Readable version of the resource, as returned within responses to
+            requests.
 
-        This will always contain at least an ID.
+            This will usually be defined as above: the schema will match both
+            the resource's common fields and its read-only fields.
+
+    resourceWritable:
+      allOf:
+        - $ref: '#/components/schemas/resourceFields'
+        - $ref: '#/components/schemas/resourceWritableFields'
+        - title: Writable Resource
+          description: |
+            Writable version of the resource, as passed within the requests for
+            creating and updating the resource.
+
+            This will usually be defined as above: the schema will match both
+            the resource's common fields and its write-only fields.
+
+    resourceFields:
+      title: Resource Fields
+      description: |
+        Fields for the given resource that are both readable and writable.
+      type: object
+      properties:
+        exampleField:
+          type: string
+          description: |
+            A field within the resource, which may be either read or written.
+
+    resourceReadableFields:
+      title: Readable Resource Fields
+      description: |
+        Fields in the resource that are read-only.
+
+        The ID field of the resource will generally be read-only, as will any of
+        its links.
       type: object
       properties:
         id:
@@ -273,6 +305,17 @@ components:
           properties: {}
       required:
         - id
+      readOnly: true
+
+    resourceWritableFields:
+      title: Writable Resource Fields
+      description: |
+        Fields in the resource that are write-only.
+
+        In practice, fields are not usually write-only: instead, this will
+        contain writable variants of related fields, which contain only an ID.
+      type: object
+      writeOnly: true
 
     resourceList:
       title: Resource list
@@ -315,3 +358,11 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/resourceList'
+
+  requestBodies:
+    resource:
+      description: A request to create or update a single resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/resourceWritable'
