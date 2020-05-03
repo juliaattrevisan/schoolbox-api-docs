@@ -335,16 +335,16 @@ components:
           minItems: 1
           uniqueItems: true
           items:
-            $ref: '#/components/schemas/writableCampus'
+            $ref: 'common.yaml#/components/schemas/itemRelation'
 
         role:
-          $ref: '#/components/schemas/writableRole'
+          $ref: 'common.yaml#/components/schemas/itemRelation'
 
         schoolHouse:
-          $ref: '#/components/schemas/writableSchoolHouse'
+          $ref: 'common.yaml#/components/schemas/itemRelation'
 
         residentialHouse:
-          $ref: '#/components/schemas/writableResidentialHouse'
+          $ref: 'common.yaml#/components/schemas/itemRelation'
       writeOnly: true
 
     userList:
@@ -381,17 +381,6 @@ components:
       required:
         - id
 
-    writableSchoolHouse:
-      title: Writable School House
-      type: object
-      nullable: true
-      properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
-      writeOnly: true
-      required:
-        - id
-
     residentialHouse:
       title: Residential House
       description: |
@@ -405,16 +394,6 @@ components:
           type: string
           description: The name of the residential house.
       readOnly: true
-      required:
-        - id
-
-    writableResidentialHouse:
-      title: Writable Residential House
-      nullable: true
-      properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
-      writeOnly: true
       required:
         - id
 
@@ -463,16 +442,6 @@ components:
           name: Guests
           type: guest
 
-    writableRole:
-      title: Writable Role
-      type: object
-      properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
-      writeOnly: true
-      required:
-        - id
-
     campus:
       title: Campus
       description: |
@@ -501,16 +470,6 @@ components:
       required:
         - id
       readOnly: true
-
-    writableCampus:
-      title: Writable Campus
-      type: object
-      properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
-      writeOnly: true
-      required:
-        - id
 
 
   securitySchemes:

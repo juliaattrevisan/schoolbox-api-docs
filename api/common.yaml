@@ -120,6 +120,21 @@ components:
             - current
             - next
 
+    itemRelation:
+      title: Item relation
+      description: |
+        A relation to another item, consisting only of an ID.
+
+        Generally, this is used within request bodies for specifying that the
+        item is to be related to another item, without implying that any
+        properties of the related item are to be modified.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+      required:
+        - id
+
     problem:
       title: Problem Details
       description: Schema for RFC 7807 (Problem Details for HTTP APIs)
