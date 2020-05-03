@@ -9,8 +9,8 @@ class Create extends Payload\Request
 {
     use PostTrait;
     
-    /**
-     */
+    private $related_resources =[];
+    
     public function __construct()
     {
         $this->setReferer('/resource-booking/item/add');
@@ -47,6 +47,32 @@ class Create extends Payload\Request
     public function setResourceCat(string $resource_category_id)
     {
         $this->setFormParam('resource_category_id', $resource_category_id);
+    }
+    
+    public function addRelatedResource(\Schoolbox\ResourceBooking\Item\Model $res_item)
+    {
+        $resItemId=$res_item->getId();
+        if (!array_search($resItemId, $this->related_resources))
+        {
+            $this->related_resources[]=$resItemId;
+            $this->setFormParam('related_resource_id', $this->related_resources);
+        }
+    }
+    
+    public function deleteRelatedResource(\Schoolbox\ResourceBooking\Item\Model $res_item)
+    {
+        $resItemId=$res_item->getId();
+        $items_key=array_search($resItemId, $this->related_resources);
+        if($items_key)
+        {
+            unset($this->related_resources[$items_key]);
+        }
+        if ($this->related_resources == [])
+        {
+            $this->unsetFormParam('related_resource_id');
+        } else {
+            $this->setFormParam('related_resource_id', $this->related_resources[]);
+        }
     }
     
     public function setAllowedRole(string $role_id, bool $allowed)
