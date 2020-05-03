@@ -170,6 +170,45 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(200);
     }
     
+    /**
+     * Hit /resource-booking/booking/bookItem/<ID> with POST to create a new booking request with a sub resource.
+     * The test creates a new booking resource item to send a booking request to then we test the booking request.
+     *
+     * @param IntegrationTester $i
+     */
+    public function createBookingRequestWithSubResource(\IntegrationTester $i)
+    {
+        #GIVEN
+        $timestamp  = time();
+        
+        $testResource = new Payload\ResourceBooking\Resource\Create();
+        $resource_title = 'Test Book session a sub resource at ' . $timestamp;
+        $testResource->setResourceName($resource_title);
+        $i->sendRequest($testResource);
+        
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $newSubresource = $ItemMapper->findOneByColumn('name', $resource_title);
+        
+        $testResource = new Payload\ResourceBooking\Resource\Create();
+        $resource_title = 'Test Book session resource and sub resource create at ' . $timestamp;
+        $testResource->setResourceName($resource_title);
+        $testResource->addRelatedResource($newSubresource);
+        $i->sendRequest($testResource);
+        
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        
+        $booking_name = 'Book session at ' . $timestamp;
+        
+        #WHEN
+        $bookItemPayload = new Payload\ResourceBooking\Resource\BookItem($newItem, $booking_name);
+        $bookItemPayload->addRelatedResource($newSubresource->getId(), 'A sub resource notes');
+        $i->sendRequest($bookItemPayload);
+        
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+    
     public function updateBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
