@@ -118,17 +118,6 @@ paths:
       - $ref: 'common.yaml#/components/parameters/token'
 
 
-#  /user/profile:
-#    post:
-#      operationId: createUserProfile
-#      summary: Creates a user profile
-
-
-#  /user/search:
-#    get:
-#      operationId: searchUser
-#      summary: Search for users
-
 components:
   schemas:
     externalId:
