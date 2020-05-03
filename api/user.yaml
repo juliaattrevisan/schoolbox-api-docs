@@ -454,10 +454,10 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int32
-          minimum: 1
+          $ref: 'common.yaml#/components/schemas/id'
       writeOnly: true
+      required:
+        - id
 
     campus:
       title: Campus
@@ -489,11 +489,14 @@ components:
       readOnly: true
 
     writableCampus:
+      title: Writable Campus
       type: object
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
       writeOnly: true
+      required:
+        - id
 
 
   securitySchemes:
