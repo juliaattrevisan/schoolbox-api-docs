@@ -292,16 +292,19 @@ components:
 
 #        parents:
 #          type: array
+#          uniqueItems: true
 #          items:
 #            $ref: '#/components/schemas/userProfile'
 #          nullable: true
 #        children:
 #          type: array
+#          uniqueItems: true
 #          items:
 #            $ref: '#/components/schemas/userProfile'
 #          nullable: true
 #        linkedUsers:
 #          type: array
+#          uniqueItems: true
 #          items:
 #            $ref: '#/components/schemas/user'
 
@@ -322,6 +325,8 @@ components:
           $ref: 'common.yaml#/components/schemas/id'
         campus:
           type: array
+          minItems: 1
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/campus'
         role:
@@ -334,6 +339,8 @@ components:
       properties:
         campus:
           type: array
+          minItems: 1
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/writableCampus'
         role:
@@ -348,6 +355,7 @@ components:
       properties:
         data:
           type: array
+          uniqueItems: true
           items:
             allOf:
               - $ref: '#/components/schemas/user'
