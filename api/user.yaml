@@ -202,19 +202,6 @@ components:
           nullable: true
           description: The user's surname.
 
-        # Move this to readonly fields
-        email:
-          type: string
-          format: email
-          readOnly: true
-          description: |
-            The user's email address for receiving communication from this
-            Schoolbox instance, or its users.
-
-            This may be derived from the user's username and the instance's
-            hostname (see isEmailDerived); if not, it may be set via the
-            altEmail field.
-
         isEmailDerived:
           type: boolean
           description: |
@@ -315,6 +302,35 @@ components:
 #          items:
 #            $ref: '#/components/schemas/user'
 
+    readableUserFields:
+      description: |
+        Fields that are only relevant when reading a user's value.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+
+        campus:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/campus'
+
+        role:
+          $ref: '#/components/schemas/role'
+
+        email:
+          type: string
+          format: email
+          description: |
+            The user's email address for receiving communication from this
+            Schoolbox instance, or its users.
+
+            This may be derived from the user's username and the instance's
+            hostname (see isEmailDerived); if not, it may be set via the
+            altEmail field.
+
         _links:
           type: object
           properties:
@@ -325,24 +341,14 @@ components:
               type: string
               format: uri-reference
               nullable: true
-
-    readableUserFields:
-      properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
-        campus:
-          type: array
-          minItems: 1
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/campus'
-        role:
-          $ref: '#/components/schemas/role'
       required:
         - id
       readOnly: true
 
     writableUserFields:
+      description: |
+        Fields that are only relevant when writing a user's value.
+      type: object
       properties:
         campus:
           type: array
@@ -504,13 +510,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/user'
-
-    writableUser:
-      description: A user (for writing)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/writableUser'
 
     userList:
       description: A list of users
