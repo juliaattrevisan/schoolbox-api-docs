@@ -210,15 +210,9 @@ components:
             The user's year level. May be provided as a number, or as a textual
             description of their year level.
 
-        schoolHouse:
-          $ref: '#/components/schemas/schoolHouse'
-
         isBoarder:
           type: boolean
           description: Is this user a boarder?
-
-        residentialHouse:
-          $ref: '#/components/schemas/residentialHouse'
 
         flags:
           type: object
@@ -300,6 +294,12 @@ components:
         role:
           $ref: '#/components/schemas/role'
 
+        schoolHouse:
+          $ref: '#/components/schemas/schoolHouse'
+
+        residentialHouse:
+          $ref: '#/components/schemas/residentialHouse'
+
         email:
           type: string
           format: email
@@ -336,8 +336,15 @@ components:
           uniqueItems: true
           items:
             $ref: '#/components/schemas/writableCampus'
+
         role:
           $ref: '#/components/schemas/writableRole'
+
+        schoolHouse:
+          $ref: '#/components/schemas/writableSchoolHouse'
+
+        residentialHouse:
+          $ref: '#/components/schemas/writableResidentialHouse'
       writeOnly: true
 
     userList:
@@ -370,6 +377,20 @@ components:
         name:
           type: string
           description: The name of the school house.
+      readOnly: true
+      required:
+        - id
+
+    writableSchoolHouse:
+      title: Writable School House
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+      writeOnly: true
+      required:
+        - id
 
     residentialHouse:
       title: Residential House
@@ -383,6 +404,19 @@ components:
         name:
           type: string
           description: The name of the residential house.
+      readOnly: true
+      required:
+        - id
+
+    writableResidentialHouse:
+      title: Writable Residential House
+      nullable: true
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+      writeOnly: true
+      required:
+        - id
 
     role:
       title: Role
