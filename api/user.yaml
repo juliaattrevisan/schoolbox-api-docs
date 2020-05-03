@@ -163,6 +163,8 @@ components:
 
         username:
           type: string
+          # Apparently this is nullable?
+          nullable: true
           description: |
             The user's username. This will be used as the user's identification
             when they attempt to log into the Schoolbox instance.
@@ -181,10 +183,12 @@ components:
 
         title:
           type: string
+          nullable: true
           description: The user's title (Mr., Ms., etc.).
 
         firstName:
           type: string
+          nullable: true
           description: |
             The user's first name.
 
@@ -195,8 +199,10 @@ components:
 
         lastName:
           type: string
+          nullable: true
           description: The user's surname.
 
+        # Move this to readonly fields
         email:
           type: string
           format: email
@@ -225,13 +231,14 @@ components:
 
         positionTitle:
           type: string
+          nullable: true
           description: |
             The user's job or position title within the school which owns the
             Schoolbox instance.
-          nullable: true
 
         yearLevel:
           type: string
+          nullable: true
           description: |
             The user's year level. May be provided as a number, or as a textual
             description of their year level.
@@ -370,6 +377,7 @@ components:
       description: |
         A school house which a student may belong to.
       type: object
+      nullable: true
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
@@ -382,6 +390,7 @@ components:
       description: |
         A residential house at which a student may board.
       type: object
+      nullable: true
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
