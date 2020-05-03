@@ -60,10 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/user'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/writableUser'
+        $ref: '#/components/requestBodies/user'
 
 
   /user/{id}:
@@ -76,10 +73,7 @@ paths:
         default:
           $ref: 'common.yaml#/components/responses/problem'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/writableUser'
+        $ref: '#/components/requestBodies/user'
 
     patch:
       operationId: userPatch
@@ -90,10 +84,7 @@ paths:
         default:
           $ref: 'common.yaml#/components/responses/problem'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/writableUser'
+        $ref: '#/components/requestBodies/user'
 
     delete:
       operationId: userDelete
@@ -509,3 +500,11 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/userList'
+
+  requestBodies:
+    user:
+      description: A user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/writableUser'
