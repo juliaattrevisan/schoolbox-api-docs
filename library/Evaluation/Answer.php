@@ -10,20 +10,39 @@
  */
 abstract class Evaluation_Answer extends DeprecatedModel
 {
+    /**
+     * @var string
+     */
     public $_table = 'assess_answer';
+
+    /**
+     * @var string
+     */
     public $_index = 'answer_id';
 
+    /**
+     * @var string[]
+     */
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
-    /* Whether or not to include HTML formatting when exporting CSV results
-      */
+    /**
+     * Whether or not to include HTML formatting when exporting CSV results
+     *
+     * @var bool
+     */
     protected $legendHTML = false;
 
-    /* Template file used for graphing
-      */
-    protected $graphTemplateFile = null;
+    /**
+     * Template file used for graphing
+     *
+     * @var string
+     */
+    protected $graphTemplateFile;
 
-    /* Show letters 'A' or the full text corresponding to it
+    /**
+     * Show letters 'A' or the full text corresponding to it
+     *
+     * @var bool
      */
     protected $useLongAnswers = false;
 
@@ -58,7 +77,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
     /**
      * Sets legendHTML
      *
-     * @param $val
+     * @param string $val
      *
      * @return void
      */
@@ -137,7 +156,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
     /**
      * Gets the Answer record for a particular Question.
      *
-     * @param  $question_id
+     * @param int $question_id
      * @return array|bool
      */
     public function getForQuestion($question_id)
@@ -153,7 +172,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * Gets possible answer(s) for a particular Question. This is used when
      * attempting the test and might be customised for each Answer type.
      *
-     * @param  $question_id
+     * @param int $question_id
      * @return array|bool
      */
     public function getByQuestionID($question_id)
@@ -170,16 +189,16 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * handler so you can serialize it, store it in native format, or in
      * whatever format is required.
      *
-     * @param $data
-     * @return mixed
+     * @param array $data
+     * @return array
      */
     public abstract function saveResponse($data);
 
     /**
-     * @param  $attemptId
-     * @param  $section_id
-     * @param  $question_id
-     * @param  $processedResponse
+     * @param int $attemptId
+     * @param int $section_id
+     * @param int $question_id
+     * @param string|null $processedResponse
      *
      * @return array
      */
@@ -220,8 +239,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
     /**
      * Save the reviewed mark
      *
-     * @param  $data
-     * @param  $response_id
+     * @param array $data
+     * @param int $response_id
      * @return array
      */
     public function saveReviewedResponse($data, $response_id)
@@ -262,6 +281,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
 
     /**
      * Export response to csv - manually enforced in each subclass due to handlers
+     * @param int $attempt_id
+     * @param int $question_id
      */
     public function exportResponseToCSV($attempt_id, $question_id) {
     }
@@ -276,8 +297,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * the same method), is another level of abstraction that isn't needed
      * in most places
      *
-     * @param $attempt_id
-     * @param $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      * @return mixed
      */
     public function resultsForQuestion($attempt_id, $question_id) {
@@ -318,7 +339,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Set question handler
 	 *
-	 * @param null $questionHandler
+	 * @param Evaluation_Question $questionHandler
 	 */
 	protected function setQuestionHandler($questionHandler) {
 		$this->questionHandler = $questionHandler;
@@ -327,7 +348,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Get question handler
 	 *
-	 * @return null
+	 * @return Evaluation_Question
 	 */
 	protected function getQuestionHandler() {
 		return $this->questionHandler;
@@ -336,7 +357,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Set response handler
 	 *
-	 * @param Assess_Response|Survey_Response $responseHandler
+	 * @param Evaluation_Response $responseHandler
 	 */
 	protected function setResponseHandler($responseHandler) {
 		$this->responseHandler = $responseHandler;
@@ -345,7 +366,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Get response handler
 	 *
-	 * @return Assess_Response|Survey_Response
+	 * @return Evaluation_Response
 	 */
 	protected function getResponseHandler() {
 		return $this->responseHandler;
