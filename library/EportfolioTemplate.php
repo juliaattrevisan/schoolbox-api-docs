@@ -29,8 +29,10 @@ class EportfolioTemplate extends DeprecatedModel
     /**
      * Create an eportfolio template
      *
-     * @param $uid
-     * @param $templateID
+     * TODO: But is this even used? It's broken.
+     *
+     * @param int $uid
+     * @param int $templateID
      */
     public function createTemplate($uid, $templateID)
     {
