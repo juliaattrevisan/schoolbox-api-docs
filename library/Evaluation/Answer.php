@@ -288,6 +288,18 @@ abstract class Evaluation_Answer extends DeprecatedModel
     }
 
     /**
+     * Export response to array format
+     *
+     * @param int $attemptId
+     * @param int $questionId
+     * @return array
+     */
+    public function exportResponseToArray($attemptId, $questionId) {
+        return [];
+    }
+
+
+    /**
      * Identical to exportResponseToCSV(), which generates data on the
      * resultsForQuestion screen and the csv file itself, unless otherwise
      * specified.
@@ -323,6 +335,17 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     abstract public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id);
 
+    /**
+     * Get the text corresponding to multiple-choice index $value
+     *
+     * @param int $question_id
+     * @param int $value
+     * @return string
+     */
+    public function getAnswerText($question_id, $value)
+    {
+        return '';
+    }
 
 	/* Getters/Setters
  	 */
