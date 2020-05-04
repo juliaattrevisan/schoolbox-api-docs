@@ -186,11 +186,6 @@ parameters:
 			path: library/Alaress/Mail/AbstractMailer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$basename\\)\\: Unexpected token \"\\$basename\", expected type at offset 18$#"
-			count: 1
-			path: library/Alaress/Module/Module.php
-
-		-
 			message: "#^Method Alaress\\\\OAuth2\\\\Client\\\\Provider\\\\Office365\\:\\:createResourceOwner\\(\\) should return League\\\\OAuth2\\\\Client\\\\Provider\\\\ResourceOwnerInterface but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/OAuth2/Client/Provider/Office365.php

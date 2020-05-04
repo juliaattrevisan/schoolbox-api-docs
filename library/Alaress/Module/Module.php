@@ -704,7 +704,7 @@ class Module {
 
 
     /**
-     * @param $basename
+     * @param string $basename
      * @return $this
      */
     protected function setBasename($basename)
