@@ -434,34 +434,37 @@ components:
       schema:
         type: array
         # TODO is there a better way to define this enum?
-        enum:
-          - user
-#          - user:staff
-#          - user:student
-#          - user:parent
-#          - user:guest
-          - folder
-#          - folder:homepage
-#          - folder:course
-#          - folder:class
-#          - folder:class-archive
-#          - folder:other
-          - event
-          - comms
-          - assessment
-#          - assessment:duework
-#          - assessment:quiz
-#          - assessment:task
-#          - assessment:project
-          - file
-#          - file:image
-#          - file:audio
-#          - file:video
-#          - file:document
-#          - file:other
-          - textbox
-          - link
-          - tile
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+            - user
+#            - user:staff
+#            - user:student
+#            - user:parent
+#            - user:guest
+            - folder
+#            - folder:homepage
+#            - folder:course
+#            - folder:class
+#            - folder:class-archive
+#            - folder:other
+            - event
+            - comms
+            - assessment
+#            - assessment:duework
+#            - assessment:quiz
+#            - assessment:task
+#            - assessment:project
+            - file
+#            - file:image
+#            - file:audio
+#            - file:video
+#            - file:document
+#            - file:other
+            - textbox
+            - link
+            - tile
 
 #  examples:
 #    empty:
