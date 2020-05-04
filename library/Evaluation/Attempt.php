@@ -58,31 +58,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
         }
     }
 
-    /**
-     * Marks an attempt as being finished
-     *
-     * TODO: But is this even used?
-     *
-     * @param int $attempt_id
-     * @return bool
-     */
-    public function finish($attempt_id)
-    {
-        if (!is_numeric($attempt_id)) {
-            return false;
-        }
 
-        $attempt_id = $this->update(array(
-            'assess_id' => $attempt_id,
-            'finish' => date('Y-m-d H:i:s')
-        ));
-
-        if (is_numeric($attempt_id)) {
-            return $attempt_id;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Get a list of attempts that have been made, along with their authors
