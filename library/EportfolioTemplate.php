@@ -13,6 +13,11 @@ class EportfolioTemplate extends DeprecatedModel
         parent::__construct();
     }
 
+    /**
+     * TODO: But is this even used?
+     *
+     * @return mixed
+     */
     public function getTemplateListDropDown()
     {
         $templateList = $this->getAll('name');
@@ -67,6 +72,12 @@ class EportfolioTemplate extends DeprecatedModel
         }
     }
 
+    /**
+     * TODO: But is this even used?
+     *
+     * @param $template
+     * @return array|bool
+     */
     public function getTemplatePositions($template)
     {
         $query = "
