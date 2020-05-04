@@ -55,6 +55,7 @@ class Zip
     {
         if (empty($this->filenameTemp)) {
             $this->filenameTemp = tempnam($this->configLoader->get('zip_dir'), 'zip.');
+            unlink($this->filenameTemp);
         }
 
         return $this->filenameTemp;
