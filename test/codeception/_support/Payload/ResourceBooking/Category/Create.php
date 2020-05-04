@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Payload\ResourceBooking\Category;
 
 use Payload;
@@ -9,8 +14,6 @@ class Create extends Payload\Request
 {
     use PostTrait;
     
-    /**
-     */
     public function __construct()
     {
         $this->setReferer('/resource-booking/category/add');

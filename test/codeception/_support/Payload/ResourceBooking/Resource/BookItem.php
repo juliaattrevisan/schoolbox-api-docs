@@ -1,27 +1,14 @@
 <?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Payload\ResourceBooking\Resource;
 
 use Payload;
 
 use Payload\PostTrait;
-
-//https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/16
-// Referer: https://vagrant.dev.schoolbox.cloud/resource-booking/booking/bookItem/16?startDate=2020-04-19&startTime=14:00&callbackUrl=%2Fresource-booking%2Fcategory%2F1
-/*
- * callbackUrl	/resource-booking/category/1
- efficacy	self
- action
- name	srtstys4tys4ts4tsetsetetsertfgdxgf
- startDate	24/04/2020 2:00pm
- endDate	25/04/2020 2:00pm
- repeat
- campus	1
- repeat_until
- notes	<p>afasfewfrawr3ra3rawer</p>
- related_item[14][notes]
- related_item[28][resource_id]	28
- related_item[28][notes]	<p>afargrasg+afgsdg</p> 
- */
 
 class BookItem extends Payload\Request
 {
@@ -29,6 +16,12 @@ class BookItem extends Payload\Request
     
     var $ItemID;
     
+    /**
+     * Hit /resource-booking/category url with POST to create a category.
+     *
+     * @param \Schoolbox\ResourceBooking\Item\Model $Item
+     * @param string $title
+     */
     public function __construct(\Schoolbox\ResourceBooking\Item\Model $Item, string $title)
     {
         $this->ItemID=$Item->getId();

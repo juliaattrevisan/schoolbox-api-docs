@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 /** @noinspection PhpDocMissingThrowsInspection */
@@ -111,7 +111,8 @@ class ResourceBookingCest
     }
     
     /**
-     * Hit /resource-booking/item/<id>/edit with POST to edit a booking resource item. 
+     * Hit /resource-booking/item/<id>/edit with POST to edit a booking resource item.
+     * 
      * This test just changes the title and description.
      * The test creates a new booking resource item to edit, then tests the edit request.
      *
@@ -143,6 +144,7 @@ class ResourceBookingCest
     
     /**
      * Hit /resource-booking/booking/bookItem/<ID> with POST to create a new booking request.
+     * 
      * The test creates a new booking resource item to send a booking request to then we test the booking request.
      *
      * @param IntegrationTester $i
@@ -172,7 +174,9 @@ class ResourceBookingCest
     
     /**
      * Hit /resource-booking/booking/bookItem/<ID> with POST to create a new booking request with a sub resource.
-     * The test creates a new booking resource item to send a booking request to then we test the booking request.
+     * 
+     * The test creates a new related resource item and booking resource item to send a booking request 
+     * with a related resource item then we test the booking request with that related booking resource.
      *
      * @param IntegrationTester $i
      */
@@ -209,6 +213,13 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(200);
     }
     
+    /**
+     *  Hit /resource-booking/booking/<ID>/update with POST to update a current booking request.
+     *  
+     *  The test create a new booking resource item, booking for that resource item. Then sends the update request to edit it.
+     *  
+     * @param \IntegrationTester $i
+     */
     public function updateBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
@@ -239,6 +250,14 @@ class ResourceBookingCest
         
     }
     
+    
+    /**
+     *  Hit /resource-booking/booking/<ID>/approve with POST to approve booking request.
+     *  
+     *  The test create a new booking resource item, booking for that resource item. Then sends the approval moderation request.
+     *  
+     * @param \IntegrationTester $i
+     */
     public function approveBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
@@ -268,6 +287,13 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/");
     }
     
+    /**
+     *  Hit /resource-booking/booking/<ID>/reject with POST to reject booking request.
+     *
+     *  The test create a new booking resource item, booking for that resource item. Then sends the reject moderation request.
+     *
+     * @param \IntegrationTester $i
+     */
     public function rejectBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
@@ -298,6 +324,13 @@ class ResourceBookingCest
         $i->seeHttpHeader('location', "/");
     }
     
+    /**
+     *  Hit /resource-booking/booking/<ID>/cancel with POST to cancel booking request.
+     *
+     *  The test create a new booking resource item, booking for that resource item. Then sends the cancel request.
+     *
+     * @param \IntegrationTester $i
+     */
     public function cancelBookingRequest(\IntegrationTester $i)
     {
         #GIVEN
