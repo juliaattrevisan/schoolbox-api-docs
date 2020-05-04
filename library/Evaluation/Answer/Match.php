@@ -18,15 +18,22 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      */
     protected $plugin = 'evaluationMatchingPairs';
 
+    /**
+     * @var string
+     */
     protected $correctClass = 'matchCorrect';
+
+    /**
+     * @var string
+     */
     protected $incorrectClass = 'matchIncorrect';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param  $object
-     * @param  $question_id
+     * @param array $object
+     * @param int|string $question_id
      *
      * @return bool|int
      */
@@ -60,8 +67,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Updates an existing Answer.
      *
-     * @param  $object
-     *
+     * @param array $object
      * @return void
      */
     public function update($object)
@@ -74,8 +80,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param        $page
-     * @param string $question_id
+     * @param SitePage $page
+     * @param int|string $question_id
      *
      * @return void
      */
@@ -112,7 +118,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Render answers in the QuestionBank
      *
-     * @param        $page
+     * @param SitePage $page
      * @param string $answerGroup
      *
      * @return void
@@ -140,8 +146,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Serialize for db storage (we shouldn't be using serialize anymore)
      *
-     * @param $data
-     *
+     * @param string $data
      * @return string
      */
     public function encodeForQuestionBank($data)
@@ -152,8 +157,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
+     *
      * TODO: If a response for the current user and attempt already exists,
-     * prefill it.
+     *  prefill it.
      *
      * @inheritdoc
      */
@@ -228,8 +234,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
-     *
+     * @param SitePage $page
      * @return void
      */
     public function cleanupParse($page)
@@ -242,8 +247,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Saves a response for this Answer type. This should be customised based on
      * the format and structure of the answer (e.g. serialize multichoice)
      *
-     * @param  $data
-     *
+     * @param array $data
      * @return array
      */
     public function saveResponse($data)
@@ -286,17 +290,19 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  $xmlObj
-     * @param  $question_id
+     * @param SimpleXMLElement $xmlObj
+     * @param int $question_id
      *
      * @return bool|int
      */
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
-        foreach ($xmlObj->subquestion as $currentAnswer) {
-            /* Set up data object in accordance with $this->create();
-                         */
+        $allAnswers = [];
 
+        foreach ($xmlObj->subquestion as $currentAnswer) {
+
+            /* Set up data object in accordance with $this->create();
+             */
             $answer['answerLeft']  = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
             $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->answer), ENT_IGNORE | ENT_QUOTES);
 
@@ -316,8 +322,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      *
      * @return mixed
      */
@@ -349,7 +355,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Gets the text associated with an array-based multiple choice answer
      *
-     * @param  $question_id
+     * @param int $question_id
      * @param  $value
      *
      * @return string
@@ -372,8 +378,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      *
      * @return mixed
      */
@@ -390,9 +396,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
@@ -455,9 +461,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param $page
-     * @param $attemptId
-     * @param $currentQuestion
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param array $currentQuestion
      */
     public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
     {
@@ -523,8 +529,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * The answer for a question during horizontal marking, so it appears at the
      * top under the question itself, and not repeated for each attempt
      *
-     * @param $page
-     * @param $currentQuestion
+     * @param SitePage $page
+     * @param array $currentQuestion
      *
      * @return void
      */
