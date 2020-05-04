@@ -46,7 +46,7 @@ class Template {
 	/**
 	 * Set id
 	 *
-	 * @param  $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
