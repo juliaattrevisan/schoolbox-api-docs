@@ -364,11 +364,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
      */
     private function renderCurrentColours()
     {
+        $vars = [];
+
         foreach ($this->getColours() as $field => $colour) {
             $vars['current_' . $field] = $colour;
         }
 
-        if (isset($vars)) {
+        if (\count($vars)) {
             $this->getPage()->setVar($vars);
         }
     }

@@ -1276,11 +1276,6 @@ parameters:
 			path: library/Eportfolio/Page/Instance.php
 
 		-
-			message: "#^Variable \\$vars in isset\\(\\) is never defined\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Instance.php
-
-		-
 			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array.#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
