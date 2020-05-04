@@ -1260,55 +1260,13 @@ parameters:
 			count: 2
 			path: library/EOTC/ListGroup/Collection.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 66$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 44$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 52$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 83$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$left\\)\\: Unexpected token \"\\$left\", expected type at offset 54$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right\\)\\: Unexpected token \"\\$right\", expected type at offset 75$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageTitle\\)\\: Unexpected token \"\\$pageTitle\", expected type at offset 208$#"
-			count: 1
-			path: library/Eportfolio.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateID\\)\\: Unexpected token \"\\$templateID\", expected type at offset 233$#"
-			count: 1
-			path: library/Eportfolio.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$listColor\\)\\: Unexpected token \"\\$listColor\", expected type at offset 66$#"
-			count: 1
-			path: library/Eportfolio.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 62$#"
-			count: 1
-			path: library/Eportfolio.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentUserId\\)\\: Unexpected token \"\\$currentUserId\", expected type at offset 44$#"
