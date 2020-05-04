@@ -1311,11 +1311,6 @@ parameters:
 			path: library/Etherpad/PadMapper.php
 
 		-
-			message: "#^Default value of the parameter \\#2 \\$question_id \\(''\\) of method Evaluation_Answer_Exact\\:\\:create\\(\\) is incompatible with type int\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/Exact.php
-
-		-
 			message: "#^Variable \\$allAnswers might not be defined\\.$#"
 			count: 1
 			path: library/Evaluation/Answer/MultiOther.php
