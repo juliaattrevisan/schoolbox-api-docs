@@ -19,19 +19,19 @@ class Update extends Request
      end	23/05/2020
      */
     
-    private $fixtureID;
+    private $seasonID;
     
     public function __construct(\Schoolbox\Fixtures\Season\Model $Season)
     {
-        $this->fixtureID=$Season->getId();
+        $this->seasonID=$Season->getId();
         $name=$Season->getName();
         $start=date('d/m/Y', $Season->getStart()->getUnixTimeStamp());
         $end=date('d/m/Y',$Season->getEnd()->getUnixTimeStamp());
         
-        $this->setReferer('/fixtures/seasons/' . $this->fixtureID . '/edit');
+        $this->setReferer('/fixtures/seasons/' . $this->seasonID . '/edit');
         $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
         
-        $this->setFormParam('id', $this->fixtureID);
+        $this->setFormParam('id', $this->seasonID);
         $this->setFormParam('name', $name);
         
         $this->setFormParam('start', $start);
@@ -40,6 +40,6 @@ class Update extends Request
     
     public function getUrl():string
     {
-        return '/fixtures/seasons/'. $this->fixtureID;
+        return '/fixtures/seasons/'. $this->seasonID;
     }
 }

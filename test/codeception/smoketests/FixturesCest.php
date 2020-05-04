@@ -64,41 +64,71 @@ class FixturesCest
         $updateSeason->setFormParam('name', $seasonName);
         $i->sendRequest($updateSeason);
         
-        
         $i->seeResponseCodeIs('303');
-        $i->seeHttpHeader('location', '/fixtures/seasons');
-        
-        
+        $i->seeHttpHeader('location', '/fixtures/seasons');   
     }
     
     /**
      * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/archive
      * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
-     * @skip
      */
     public function archiveSeason(IntegrationTester $i): void
     {
+        $timestamp=time();
+        $seasonName = 'Auto Test Archive Season' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        $i->sendRequest($newSeason);
         
+        $SeasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $newSeason = $SeasonMapper->findOneByColumn('name', $seasonName);
+        
+        $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::ARCHIVE);
+        $i->sendRequest($archivePayload);
+        
+        $i->seeResponseCodeIs('200');
     }
     
     /**
      * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/unArchive
      * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
-     * @skip
      */
     public function restoreSeason(IntegrationTester $i): void
     {
+        $timestamp=time();
+        $seasonName = 'Auto Test Restore Season' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        $i->sendRequest($newSeason);
         
+        $SeasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $newSeason = $SeasonMapper->findOneByColumn('name', $seasonName);
+        
+        $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::ARCHIVE);
+        $i->sendRequest($archivePayload);
+        
+        $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::RESTORE);
+        $i->sendRequest($archivePayload);
+        
+        $i->seeResponseCodeIs('200');
     }
     
     /**
      * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/delete
      * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
-     * @skip
      */
     public function deleteSeason(IntegrationTester $i): void
     {
+        $timestamp=time();
+        $seasonName = 'Auto Test Delete Season' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        $i->sendRequest($newSeason);
         
+        $SeasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $newSeason = $SeasonMapper->findOneByColumn('name', $seasonName);
+        
+        $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::DELETE);
+        $i->sendRequest($archivePayload);
+        
+        $i->seeResponseCodeIs('200');
     }
 }
 ?>
