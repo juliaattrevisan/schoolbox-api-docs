@@ -1331,97 +1331,12 @@ parameters:
 			path: library/Evaluation/Answer/Multi.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 132$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 156$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 176$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 224$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 71$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 102$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allAnswers\\)\\: Unexpected token \"\\$allAnswers\", expected type at offset 92$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$num\\)\\: Unexpected token \"\\$num\", expected type at offset 67$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 147$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 186$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
 			message: "#^Variable \\$allAnswers might not be defined\\.$#"
 			count: 1
 			path: library/Evaluation/Answer/MultiOther.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 79$#"
-			count: 2
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 107$#"
-			count: 2
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^Variable \\$postprocessed might not be defined\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 104$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 133$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attemptId\\)\\: Unexpected token \"\\$attemptId\", expected type at offset 201$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 179$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 228$#"
 			count: 1
 			path: library/Evaluation/Answer/MultiOther.php
 
