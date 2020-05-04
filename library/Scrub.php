@@ -30,6 +30,14 @@ class Scrub
 
 
     /**
+     * Singleton CommonMark instance used by this class in `linkifyText`.
+     *
+     * @var CommonMark\MarkdownConverterInterface
+     */
+    private static $markdownConverter;
+
+
+    /**
      * Cleans plain text of all nasty stuff
      * Can be used on input to database or output
      *
@@ -347,11 +355,14 @@ class Scrub
      */
     private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
     {
-        $environment = new CommonMark\Environment();
-        // Need to add InlinesOnly, as adding only Autolink causes an error
-        $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
-        $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
-        return new CommonMark\CommonMarkConverter([], $environment);
+        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+            $environment = new CommonMark\Environment();
+            // Need to add InlinesOnly, as adding only Autolink causes an error
+            $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
+            $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
+            self::$markdownConverter = new CommonMark\CommonMarkConverter([], $environment);
+        }
+        return self::$markdownConverter;
     }
 
 
