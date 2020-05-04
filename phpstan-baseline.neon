@@ -1271,11 +1271,6 @@ parameters:
 			path: library/Eportfolio/CoverPhotoMapper.php
 
 		-
-			message: "#^Variable \\$eportfolioPage might not be defined\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
 			message: "#^Variable \\$tabList in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
