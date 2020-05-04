@@ -29,7 +29,7 @@ class Authenticator {
 	/**
 	 * Determine if you can create a pad for $homepageId
 	 *
-	 * @param $homepageId
+	 * @param int $homepageId
 	 * @return bool
 	 */
 	public function canCreate($homepageId) {
@@ -43,7 +43,7 @@ class Authenticator {
 	/**
 	 * Determine if a user is part of an authoring group
 	 *
-	 * @param $homepageId
+	 * @param int $homepageId
 	 * @return bool
 	 */
 	public function isParticipator($homepageId) {
