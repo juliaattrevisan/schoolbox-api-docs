@@ -1,5 +1,7 @@
 <?php
 
+use League\CommonMark;
+
 /**
  * Scrub
  *
@@ -338,17 +340,18 @@ class Scrub
 
 
     /**
-     * A HTMLPurifier that can do nothing but add anchor tags to things tha
-     * look like links.
+     * Create a cut-down Markdown converter which does little more than parse
+     * links out of text.
      *
-     * @return HTMLPurifier
+     * @return CommonMark\MarkdownConverterInterface
      */
-    private static function getLinkifyingHtmlPurifierInstance(): HTMLPurifier
+    private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
     {
-        $config = HTMLPurifier_Config::createDefault();
-        $config->set('HTML.Allowed', 'a[href]');
-        $config->set('AutoFormat.Linkify', true);
-        return new HTMLPurifier($config);
+        $environment = new CommonMark\Environment();
+        // Need to add InlinesOnly, as adding only Autolink causes an error
+        $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
+        $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
+        return new CommonMark\CommonMarkConverter([], $environment);
     }
 
 
@@ -361,7 +364,7 @@ class Scrub
      */
     public static function linkifyText(string $text): string
     {
-        return self::getLinkifyingHtmlPurifierInstance()->purify(self::text($text));
+        return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
     }
 
 
