@@ -1281,16 +1281,6 @@ parameters:
 			path: library/Eportfolio/Page/Instance.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 57$#"
-			count: 1
-			path: library/Eportfolio/Page/Instance.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$set\\)\\: Unexpected token \"\\$set\", expected type at offset 38$#"
-			count: 1
-			path: library/Eportfolio/Page/Instance.php
-
-		-
 			message: "#^Variable \\$vars in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
