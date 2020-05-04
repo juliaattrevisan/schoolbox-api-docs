@@ -1301,21 +1301,6 @@ parameters:
 			path: library/Eportfolio/PermissionMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\\\Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\)\\: Unexpected token \"\\\\n\\\\t \", expected variable at offset 91$#"
-			count: 1
-			path: library/Eportfolio/Showcase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$uid\\)\\: Unexpected token \"\\$uid\", expected type at offset 32$#"
-			count: 1
-			path: library/Eportfolio/Showcase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\\\Alaress_Date_Format\\)\\: Unexpected token \"\\\\n\\\\t \", expected variable at offset 58$#"
-			count: 2
-			path: library/Eportfolio/Showcase.php
-
-		-
 			message: "#^PHPDoc tag @throws has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 204$#"
 			count: 1
 			path: library/Eportfolio/ShowcaseMapper.php

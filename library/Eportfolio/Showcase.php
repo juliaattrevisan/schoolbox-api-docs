@@ -21,7 +21,7 @@ class Showcase implements ISoftDeletable
 	 *
 	 * @var int
 	 */
-	private $id = null;
+	private $id;
 
 	/**
 	 * The showcased submission box
@@ -75,7 +75,7 @@ class Showcase implements ISoftDeletable
 	/**
 	 * Set submission box id
 	 *
-	 * @param  \Schoolbox\Assessment\Component\SubmissionBox
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
 	 */
 	public function setSubmissionBox($submissionBox) {
 		$this->submissionBox = $submissionBox;
@@ -93,7 +93,7 @@ class Showcase implements ISoftDeletable
 	/**
 	 * Set uid
 	 *
-	 * @param  $uid
+	 * @param int $uid
 	 */
 	public function setUid($uid) {
 		$this->uid = $uid;
@@ -111,7 +111,7 @@ class Showcase implements ISoftDeletable
 	/**
 	 * Set created at
 	 *
-	 * @param \Alaress_Date_Format
+	 * @param \Alaress_Date_Format $created_at
 	 */
 	public function setCreatedAt($created_at) {
 		$this->created_at = $created_at;
@@ -129,7 +129,7 @@ class Showcase implements ISoftDeletable
 	/**
 	 * Set updated at
 	 *
-	 * @param \Alaress_Date_Format
+	 * @param \Alaress_Date_Format $updated_at
 	 */
 	public function setUpdatedAt($updated_at) {
 		$this->updated_at = $updated_at;
