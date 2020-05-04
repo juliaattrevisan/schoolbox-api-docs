@@ -1,23 +1,17 @@
 <?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 namespace Payload\Fixtures\Seasons;
 
 use Payload\Request;
 use Payload\PostTrait;
-use Alaress_Date_Format;
 
 class Update extends Request
 {
     use PostTrait;
-    
-    /* 
-     * Request URL:https://vagrant.dev.schoolbox.cloud
-     * Referer https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
-     * id
-     name	adsgf
-     start	04/05/2020FORMAT_DATE_PICKER
-     end	23/05/2020
-     */
     
     private $seasonID;
     

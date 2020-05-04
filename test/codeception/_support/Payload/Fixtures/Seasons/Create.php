@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 namespace Payload\Fixtures\Seasons;
 
@@ -9,12 +13,6 @@ class Create extends Request
 {
     use PostTrait;
     
-    /* Referer https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new
-    * id
-    name	adsgf
-    start	04/05/2020
-    end	23/05/2020
-    */
     public function __construct(string $seasonName)
     {
         $this->setReferer('/fixtures/seasons/new');

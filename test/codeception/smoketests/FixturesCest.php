@@ -1,6 +1,6 @@
 <?php 
 /**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 /** @noinspection PhpDocMissingThrowsInspection */
@@ -22,12 +22,9 @@ class FixturesCest
     }
     
     /**
-     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/
-     * Referer https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new
-     * id	
-        name	adsgf
-        start	04/05/2020
-        end	23/05/2020
+     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/ with post request to create new season.
+     * 
+     * @param IntegrationTester $i
      */
     public function createSeason(IntegrationTester $i): void
     {
@@ -41,13 +38,11 @@ class FixturesCest
     }
     
     /**
-     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4
-     * Refererhttps://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
-     * id	4
-     * name	Winter-2018-edit
-     * start	21/06/2018
-     * end	22/09/2018
+     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/<id> to edit a existing season.
      * 
+     * This test create a new season and then sends the request to edit the season.
+     * 
+     * @param IntegrationTester $i
      */
     public function updateSeason(IntegrationTester $i): void
     {
@@ -69,8 +64,11 @@ class FixturesCest
     }
     
     /**
-     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/archive
-     * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
+     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/<id>/archive to archive an existing season.
+     * 
+     * This test create a new season and then sends the request to archive the newly created season.
+     * 
+     * @param IntegrationTester $i
      */
     public function archiveSeason(IntegrationTester $i): void
     {
@@ -89,8 +87,11 @@ class FixturesCest
     }
     
     /**
-     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/unArchive
-     * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
+     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/<id>/unArchive to restore an existing archived season.
+     * 
+     * This test create a new season and archive it. Then sends the request to resotre the archived season.
+     * 
+     * @param IntegrationTester $i
      */
     public function restoreSeason(IntegrationTester $i): void
     {
@@ -112,8 +113,11 @@ class FixturesCest
     }
     
     /**
-     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/5/delete
-     * https://vagrant.dev.schoolbox.cloud/fixtures/seasons
+     * Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/seasons/<id>/delete to delete a newly created season.
+     * 
+     * This test creates a new season then deletes it.
+     * 
+     * @param IntegrationTester $i
      */
     public function deleteSeason(IntegrationTester $i): void
     {
