@@ -14,42 +14,42 @@ class CoverPhoto {
 	/**
 	 * The primary key
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $id;
 
 	/**
 	 * The owner of the page
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $uid;
 
 	/**
 	 * The blackhole storage hash
 	 *
-	 * @var
+	 * @var string
 	 */
 	private $imagehash;
 
 	/**
 	 * Created time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $created_at;
 
 	/**
 	 * Updated time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $updated_at;
 
 	/**
 	 * Deleted time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format|null
 	 */
 	private $deleted_at;
 
@@ -140,7 +140,7 @@ class CoverPhoto {
 	/**
 	 * Get updated at
 	 *
-	 * @return \Alaress_Date_Format|
+	 * @return \Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
