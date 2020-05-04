@@ -296,6 +296,15 @@ components:
       properties:
         id:
           $ref: 'common.yaml#/components/schemas/id'
+
+        exampleReadonlyField:
+          type: string
+          description: |
+            A field within the resource, which may only be read.
+
+        relatedResource:
+          $ref: '#/components/schemas/resourceRelation'
+
         _links:
           type: object
           description: |
@@ -315,7 +324,37 @@ components:
         In practice, fields are not usually write-only: instead, this will
         contain writable variants of related fields, which contain only an ID.
       type: object
+      properties:
+        exampleWriteonlyField:
+          type: string
+          description: |
+            A field within the resource, which may only be written.
+
+        relatedResource:
+          $ref: 'common.yaml#/components/schemas/itemRelation'
       writeOnly: true
+
+    resourceRelation:
+      title: Related Resource
+      description: |
+        A resource that is related to this resource.
+
+        In practice, responses that contain the related resource will contain
+        the entire resource.
+
+        Request bodies that accept a related resource as part of the main
+        resource will contain only the ID of the related resource, to imply that
+        only the base resource's relation is able to be modified. (This schema
+        is defined in common.yaml#/components/schemas/itemRelation.)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+
+        exampleField:
+          type: string
+          description: |
+            A field within the related resource.
 
     resourceList:
       title: Resource list
