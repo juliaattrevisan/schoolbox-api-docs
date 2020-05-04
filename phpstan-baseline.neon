@@ -1315,25 +1315,8 @@ parameters:
 			count: 1
 			path: library/Evaluation/Answer/Exact.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 132$#"
-			count: 1
-			path: library/Evaluation/Answer/Exact.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 64$#"
-			count: 1
-			path: library/Evaluation/Answer/Exact.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$str1\\)\\: Unexpected token \"\\$str1\", expected type at offset 140$#"
-			count: 1
-			path: library/Evaluation/Answer/Exact.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$str2\\)\\: Unexpected token \"\\$str2\", expected type at offset 161$#"
-			count: 1
-			path: library/Evaluation/Answer/Exact.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 132$#"
