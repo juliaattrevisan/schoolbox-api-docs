@@ -14,21 +14,18 @@ $pageId = $this->arg[1]? $this->arg[1]:'profile';
 $authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId);
 
 if ($authenticator->pageExists()) {
-	if ($authenticator->canCreate() || $authenticator->canModify()) {
-		$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, UserAccess::ACCESS_FULL);
-		$factory->getPage()->renderPage();
-	}
-	else if ($authenticator->canView()) {
-		$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, UserAccess::ACCESS_READ);
-		$factory->getPage()->renderPage();
-	}
-	else {
-		error(19);
-	}
+    if ($authenticator->canCreate() || $authenticator->canModify()) {
+        $eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageId, UserAccess::ACCESS_FULL);
+
+        null === $eportfolioPage ? $this->pageNotFound() : $eportfolioPage->renderPage();
+    } else if ($authenticator->canView()) {
+        $eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageId, UserAccess::ACCESS_READ);
+
+        null === $eportfolioPage ? $this->pageNotFound() : $eportfolioPage->renderPage();
+    } else {
+        error(19);
+    }
 }
 else {
-	$this->pageNotFound();
+    $this->pageNotFound();
 }
-
-
-
