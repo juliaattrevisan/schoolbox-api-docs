@@ -1271,11 +1271,6 @@ parameters:
 			path: library/Eportfolio/CoverPhotoMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 51$#"
-			count: 1
-			path: library/Eportfolio/CoverPhotoMapper.php
-
-		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 62$#"
 			count: 2
 			path: library/Eportfolio/Page.php
