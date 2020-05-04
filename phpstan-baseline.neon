@@ -1301,11 +1301,6 @@ parameters:
 			path: library/Eportfolio/PermissionMapper.php
 
 		-
-			message: "#^Return typehint of method Eportfolio\\\\PermissionMapper\\:\\:findValues\\(\\) has invalid type Eportfolio\\\\Collection\\.$#"
-			count: 1
-			path: library/Eportfolio/PermissionMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\\\Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\)\\: Unexpected token \"\\\\n\\\\t \", expected variable at offset 91$#"
 			count: 1
 			path: library/Eportfolio/Showcase.php
