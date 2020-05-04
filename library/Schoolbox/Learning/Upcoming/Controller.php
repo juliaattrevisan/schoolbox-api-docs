@@ -331,9 +331,11 @@ class Controller extends Base
             $visibility = new Visibility($this->access);
             /** @var IAssessable[]|GenericCollection $upcomingWork */
             $upcomingWork = $allWork
-                ->filter(function (IAssessable $assessable) use ($student, $visibility) {
-                    $participation = $assessable->getParticipant($student);
-                    return ($participation->isResponseRequired() || $participation->isResubmissionRequired()) && $visibility->isVisibleToUser($assessable, $student, false);
+                ->filter(static function (IAssessable $assessable) use ($student, $visibility) {
+                    $participation = $assessable->getParticipantIfExtant($student);
+                    return $participation
+                        && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
+                        && $visibility->isVisibleToUser($assessable, $student, false);
                 })
                 ->sortByCallback(new DueDateSortStrategy($student))
                 ->limit(self::UPCOMING_WORK_LIMIT);

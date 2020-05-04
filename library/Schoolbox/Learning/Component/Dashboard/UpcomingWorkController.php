@@ -76,10 +76,12 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
         $visibility                = new Visibility($this->getAccess());
         $this->upcomingAssessments = $this->assessmentDataSource
             ->findAllByStudentBetweenDates($student, true, \Alaress_Date_Format::now(), $term->getActualFinish())
-            ->filter(function (IAssessable $assessable) use ($student, $visibility) {
+            ->filter(static function (IAssessable $assessable) use ($student, $visibility) {
                 // Only show work that the student has permission to view
-                $participation = $assessable->getParticipant($student);
-                return ($participation->isResponseRequired() || $participation->isResubmissionRequired()) && $visibility->isVisibleToUser($assessable, $student, false);
+                $participation = $assessable->getParticipantIfExtant($student);
+                return $participation
+                    && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
+                    && $visibility->isVisibleToUser($assessable, $student, false);
             })
             ->sortByCallback(new DueDateSortStrategy($student))
             ->limit($this->limit ?: null);
