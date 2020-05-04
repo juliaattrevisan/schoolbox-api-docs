@@ -8821,11 +8821,6 @@ parameters:
 			path: library/Survey/Answer/Ranking.php
 
 		-
-			message: "#^Cannot call method getByID\\(\\) on null\\.$#"
-			count: 1
-			path: library/Survey/Answer/Ranking.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 85$#"
 			count: 1
 			path: library/Survey/Answer/Rating/Agree.php
