@@ -393,7 +393,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
 
         /* Answer text to appear in export
-            */
+         */
         if ($this->getUseLongAnswers()) {
             foreach ($data as $currentAnswer) {
                 $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
@@ -423,7 +423,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Gets the text associated with an array-based multiple choice answer
      *
      * @param int $question_id
-     * @param  $value
+     * @param int $value
      * @return string
      */
     public function getAnswerText($question_id, $value)

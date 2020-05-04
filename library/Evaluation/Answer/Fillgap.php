@@ -285,7 +285,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      * Gets the text associated with an array-based multiple choice answer
      *
      * @param int $question_id
-     * @param  $value
+     * @param int $value
      * @return string
      */
     public function getAnswerText($question_id, $value)
