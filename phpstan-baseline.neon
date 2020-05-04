@@ -1260,38 +1260,13 @@ parameters:
 			count: 2
 			path: library/EOTC/ListGroup/Collection.php
 
-
-
-
-
-
-
-
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentUserId\\)\\: Unexpected token \"\\$currentUserId\", expected type at offset 44$#"
-			count: 1
-			path: library/Eportfolio/Authenticator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ownerId\\)\\: Unexpected token \"\\$ownerId\", expected type at offset 73$#"
-			count: 1
-			path: library/Eportfolio/Authenticator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 96$#"
-			count: 1
-			path: library/Eportfolio/Authenticator.php
-
 		-
 			message: "#^Cannot call method getById\\(\\) on null\\.$#"
 			count: 1
 			path: library/Eportfolio/Authenticator.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 93$#"
-			count: 1
-			path: library/Eportfolio/Authenticator.php
+
+
 
 		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 36$#"
