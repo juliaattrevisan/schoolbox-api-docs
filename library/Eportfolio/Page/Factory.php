@@ -29,6 +29,9 @@ class Eportfolio_Page_Factory {
         $eportfolioPage = $this->produce($page, $userId, $pageId, $permissionValue);
 
         /* Invalid page; just 404
+         *
+         * TODO The Factory really shouldn't be doing this, it should be dealt with
+         *  in the class that uses the Factory
          */
         if (null === $eportfolioPage) {
             $page->pageNotFound();
