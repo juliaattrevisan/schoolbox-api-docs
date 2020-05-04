@@ -76,7 +76,7 @@ class ShowcaseMapper extends Schoolbox\Mapper
      * @return Schoolbox\GenericCollection|Showcase[]
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
-     * @throws
+     * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -112,8 +112,6 @@ class ShowcaseMapper extends Schoolbox\Mapper
      *
      * @param User $user
      * @return Collection
-     * @throws Schoolbox\Mapper\DefinitionException
-     * @throws Schoolbox\Mapper\Exception
      */
     public function getShowcasedSubmissionBoxes(User $user)
     {
@@ -134,7 +132,6 @@ class ShowcaseMapper extends Schoolbox\Mapper
      * @param \Schoolbox\User $user
      * @param int             $limit
      * @return Schoolbox\GenericCollection|Showcase[]
-     * @throws Schoolbox\Mapper\DefinitionException
      */
     public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5)
     {

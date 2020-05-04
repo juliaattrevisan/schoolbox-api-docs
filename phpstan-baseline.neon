@@ -1301,11 +1301,6 @@ parameters:
 			path: library/Eportfolio/PermissionMapper.php
 
 		-
-			message: "#^PHPDoc tag @throws has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 204$#"
-			count: 1
-			path: library/Eportfolio/ShowcaseMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 31$#"
 			count: 1
 			path: library/Eportfolio/Template.php
