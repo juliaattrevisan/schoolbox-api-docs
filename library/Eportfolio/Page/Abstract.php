@@ -76,10 +76,10 @@ abstract class Eportfolio_Page_Abstract
     /**
      * Constructor
      *
-     * @param $page
-     * @param $userId
-     * @param $pageId
-     * @param $permission
+     * @param SitePage $page
+     * @param int $userId
+     * @param int $pageId
+     * @param int $permission
      */
     public function __construct($page, $userId, $pageId, $permission)
     {
@@ -120,7 +120,7 @@ abstract class Eportfolio_Page_Abstract
      * Validate the user id to check that the user exists
      * If he does, remember his info
      *
-     * @param $userId
+     * @param int $userId
      */
     protected function validateUser($userId)
     {
@@ -297,7 +297,7 @@ abstract class Eportfolio_Page_Abstract
     /**
      * Get the user id for a person who exists
      *
-     * @return mixed
+     * @return int
      */
     public function getUserId()
     {
