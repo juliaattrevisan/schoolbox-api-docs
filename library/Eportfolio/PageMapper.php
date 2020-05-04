@@ -66,8 +66,8 @@ class PageMapper extends Schoolbox\Mapper
     /**
      * Finds all the pages owned by $ownerId that $viewerId can see
      *
-     * @param $viewerId
-     * @param $ownerId
+     * @param int $viewerId
+     * @param int $ownerId
      * @return GenericCollection|Page[]
      */
     public function findViewablePages($viewerId, $ownerId)
@@ -148,7 +148,7 @@ class PageMapper extends Schoolbox\Mapper
     /**
      * Finds all the pages owned by $ownerId with associated permissions
      *
-     * @param $ownerId
+     * @param int $ownerId
      * @return GenericCollection|Page[]
      */
     public function findPagesWithPermissions($ownerId)
