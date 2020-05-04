@@ -8,6 +8,7 @@
  */
 namespace Eportfolio;
 use Schoolbox;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -54,10 +55,10 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 *
 	 * Create/update all permissions for a particular page
 	 *
-	 * @param $pageId
-	 * @param $parent
-	 * @param $group
-	 * @param $individual
+	 * @param int $pageId
+	 * @param int $parent
+	 * @param array $group
+	 * @param array $individual
 	 */
 	public function updatePermissions($pageId, $parent, $group, $individual) {
 		$this->removeAllPermissions($pageId);
@@ -70,7 +71,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Remove all permissions for a particular page
 	 *
-	 * @param $pageId
+	 * @param int $pageId
 	 */
 	private function removeAllPermissions($pageId) {
 		$statement = $this->database->prepare("
@@ -85,8 +86,8 @@ class PermissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Add parent permissions to a particular page
 	 *
-	 * @param $pageId
-	 * @param $parent
+	 * @param int $pageId
+	 * @param int $parent
 	 */
 	private function addParentPermissions($pageId, $parent) {
 		if (is_numeric($parent)) {
@@ -102,8 +103,8 @@ class PermissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Add group permissions to a particular page
 	 *
-	 * @param $pageId
-	 * @param $allGroups
+	 * @param int $pageId
+	 * @param array $allGroups
 	 */
 	private function addGroupPermissions($pageId, $allGroups) {
 		if (is_array($allGroups) && count($allGroups)) {
@@ -123,8 +124,8 @@ class PermissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Add individual permissions to a particular page
 	 *
-	 * @param $pageId
-	 * @param $allIndividuals
+	 * @param int $pageId
+	 * @param array $allIndividuals
 	 */
 	private function addIndividualPermissions($pageId, $allIndividuals) {
 		if (is_array($allIndividuals) && count($allIndividuals)) {
@@ -144,7 +145,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Find the Parent permission settings for a particular page
 	 *
-	 * @param $pageId
+	 * @param int $pageId
      * @return Schoolbox\Collection|Permission[]
 	 */
 	public function findParentSetting($pageId) {
@@ -160,9 +161,9 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
 	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
 	 *
-	 * @param $pageId
-	 * @param $type
-	 * @param $permittedValues
+	 * @param int $pageId
+	 * @param string $type
+	 * @param array $permittedValues
 	 * @return Collection
 	 */
 	public function findValues($pageId, $type, $permittedValues) {
@@ -174,7 +175,6 @@ class PermissionMapper extends Schoolbox\Mapper {
             WHERE `page_id` = :pageId
 			AND `type` = :type
 			AND `value` IN ({$permittedValuesSql})
-
         ");
 
 		$statement->bindParam(':pageId', $pageId);
