@@ -1306,26 +1306,6 @@ parameters:
 			path: library/Eportfolio/TemplateMapper.php
 
 		-
-			message: "#^Variable \\$output might not be defined\\.$#"
-			count: 1
-			path: library/EportfolioTemplate.php
-
-		-
-			message: "#^Class Eportfolio constructor invoked with 1 parameter, 2 required\\.$#"
-			count: 1
-			path: library/EportfolioTemplate.php
-
-		-
-			message: "#^Call to an undefined method Eportfolio\\:\\:deleteComponentPositions\\(\\)\\.$#"
-			count: 1
-			path: library/EportfolioTemplate.php
-
-		-
-			message: "#^Call to an undefined method Eportfolio\\:\\:saveComponentPosition\\(\\)\\.$#"
-			count: 1
-			path: library/EportfolioTemplate.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageId\\)\\: Unexpected token \"\\$homepageId\", expected type at offset 73$#"
 			count: 2
 			path: library/Etherpad/Authenticator.php
