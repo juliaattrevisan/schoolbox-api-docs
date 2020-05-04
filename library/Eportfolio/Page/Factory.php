@@ -19,10 +19,10 @@ class Eportfolio_Page_Factory {
 	/**
 	 * Constructor
 	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
-	 * @param $permissionValue
+	 * @param SitePage $page
+	 * @param int $userId
+	 * @param int $pageId
+	 * @param int $permissionValue
 	 */
 	public function __construct($page, $userId, $pageId, $permissionValue) {
 		$this->setPage($this->produce($page, $userId, $pageId, $permissionValue));
@@ -31,10 +31,10 @@ class Eportfolio_Page_Factory {
 	/**
 	 * Decide which kind of page to manufacture
 	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
-	 * @param $permissionValue
+	 * @param SitePage $page
+	 * @param int $userId
+	 * @param int $pageId
+	 * @param int $permissionValue
 	 * @return Eportfolio_Page_Abstract
 	 */
 	private function produce($page, $userId, $pageId, $permissionValue) {

@@ -1271,46 +1271,6 @@ parameters:
 			path: library/Eportfolio/CoverPhotoMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 35$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 71$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$permissionValue\\)\\: Unexpected token \"\\$permissionValue\", expected type at offset 90$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 52$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 64$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 100$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$permissionValue\\)\\: Unexpected token \"\\$permissionValue\", expected type at offset 119$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 81$#"
-			count: 1
-			path: library/Eportfolio/Page/Factory.php
-
-		-
 			message: "#^Variable \\$eportfolioPage might not be defined\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Factory.php
