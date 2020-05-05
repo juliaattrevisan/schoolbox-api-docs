@@ -3846,11 +3846,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Exporter/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 15$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$gradeGroup with type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\|null is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php

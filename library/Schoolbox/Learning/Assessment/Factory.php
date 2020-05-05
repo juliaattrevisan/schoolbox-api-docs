@@ -72,8 +72,9 @@ class Factory
      */
     protected $title;
 
-
-    /** @var null|int */
+    /**
+     * @var null|int
+     */
     private $workType;
 
     /**
