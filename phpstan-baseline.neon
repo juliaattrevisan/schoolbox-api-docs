@@ -4001,11 +4001,6 @@ parameters:
 			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$code\\)\\: Unexpected token \"\\$code\", expected type at offset 64$#"
-			count: 1
-			path: library/Schoolbox/Learning/DueWork/StateMapper.php
-
-		-
 			message: "#^PHPDoc tag @return with type \\(iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection\\)\\|static\\(Schoolbox\\\\Learning\\\\Grades\\\\Controller\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Controller.php
