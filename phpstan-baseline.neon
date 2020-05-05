@@ -1891,11 +1891,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 18$#"
-			count: 1
-			path: library/External/Doublefirst/Class.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 61$#"
 			count: 1
 			path: library/External/Doublefirst/Helper.php
