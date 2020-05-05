@@ -130,6 +130,17 @@
                 .on('change', ':input', timeoutUpdate)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
+
+            // Listen to Kami events here
+            let kamiViewport = document.querySelector('#kami-viewport');
+            window.addEventListener('message', function (event) {
+                if (event.source === kamiViewport.contentWindow
+                    && event.data.type === 'kamiembedding'
+                    && (event.data.event_name === 'createdAnnotation' || event.data.event_name === 'deletedAnnotation')
+                ) {
+                    timeoutUpdate.apply(kamiViewport);
+                }
+            });
         }
 
 
@@ -272,22 +283,28 @@
             // We passed in  a 'this' to apply() which was already a jquery object
             var $this = this;
 
-            // Don't ignore if an attachzone, rubric mark or resubmit required checkbox
+            // Don't ignore if an:
+            // * attachzone
+            // * rubric mark
+            // * resubmit required checkbox
+            // * Kami document
             // Otherwise, ignore if its value hasn't changed since last save
-            if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
-                if ($this.val() == $this.data('preval')) {
-                    return;
+            if (!$this.is('#kami-viewport')) {
+                if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
+                    if ($this.val() === $this.data('preval')) {
+                        return;
+                    }
                 }
-            }
 
-            // update the pre-value
-            $this.data('preval', $this.val());
+                // update the pre-value (does not apply to Kami document)
+                $this.data('preval', $this.val());
+            }
 
             var $participant = $this.closest('[data-participant]'),
                 userId       = $participant.data('participant');
 
             // Is an auto-save in progress?
-            if(userId in autoSaveInProgress && autoSaveInProgress[userId]){
+            if (userId in autoSaveInProgress && autoSaveInProgress[userId]) {
                 // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
                 autoSavePending[userId] = true;
                 return;
