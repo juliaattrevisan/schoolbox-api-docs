@@ -80,6 +80,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @param TriggerBundle $bundle
      * @return void
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
      */
     public function bundleTriggers($bundle)
     {
@@ -109,10 +111,14 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Message being sent to students
      *
-     * @param Model $teamPlayer
-     * @param User $effector
+     * @param Model      $teamPlayer
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function notifyStudentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
     {
@@ -134,10 +140,14 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Message being sent to parents
      *
-     * @param Model $teamPlayer
-     * @param User $effector
+     * @param Model      $teamPlayer
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function notifyParentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
     {
@@ -163,12 +173,13 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param User $effector
-     * @param Model $teamPlayer
-     * @param Team $team
-     * @param $title
-     * @param array $params
+     * @param User   $effector
+     * @param Model  $teamPlayer
+     * @param Team   $team
+     * @param string $title
+     * @param array  $params
      * @return Builder
+     * @throws \OutOfBoundsException
      */
     private function notifyRemovedFromTeam(User $effector, TeamPlayer $teamPlayer, Team $team, $title, array $params) {
         $match = $this->getMatchMapper()->findNextMatch($team);
