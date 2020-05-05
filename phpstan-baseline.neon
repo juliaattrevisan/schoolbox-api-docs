@@ -4381,16 +4381,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hydrateRelatedRecords\\)\\: Unexpected token \"\\$hydrateRelatedRecords\", expected type at offset 37$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Mapper.php
-
-		-
 			message: "#^Variable \\$pastoralReport in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/ReportBuilder/Controller.php
