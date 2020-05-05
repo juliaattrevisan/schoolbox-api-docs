@@ -237,7 +237,7 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
-     * @param                $filename
+     * @param string         $filename
      *
      * @return array|bool|int[]
      * @throws MapperException
