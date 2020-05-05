@@ -629,6 +629,7 @@ class Controller extends Base
 
         foreach ($tags as $tagCurrent) {
             if (trim($tagCurrent) != '') {
+                $tag = null;
                 try {
                     /* Assign an existing tag to this pastoral record
                      */
@@ -646,7 +647,7 @@ class Controller extends Base
 
                 /* Tag doesn't exist - spawn it, save it, then assign it
                  */
-                if (!isset($tag) && $canCreate) {
+                if (!$tag && $canCreate) {
                     $tag = new PastoralTagsModel();
                     $tag->setName($tagCurrent);
                     $this->pastoralTagMapper->save($tag);
@@ -655,7 +656,6 @@ class Controller extends Base
                 if ($tag) {
                     $this->pastoralTagMapper->assignToRecord($record, $tag);
                 }
-                unset($tag);
             }
         }
     }
