@@ -48,6 +48,7 @@ class AccessTokenGenerator
 
     /**
      * Cached value of access token so we only request it once per execution
+     *
      * @var string
      */
     private $accessToken;
@@ -55,6 +56,7 @@ class AccessTokenGenerator
 
     /**
      * The time an access token is valid before it is reset
+     *
      * @var int
      */
     private $accessTokenExpiry = 3600;
@@ -62,7 +64,8 @@ class AccessTokenGenerator
 
     /**
      * The time the last access token was fetched
-     * @var
+     *
+     * @var int
      */
     private $accessTokenTime;
 
@@ -119,7 +122,7 @@ class AccessTokenGenerator
         $content = json_decode($response->getBody());
 
         if ($response->getStatusCode() == 200) {
-            $this->accessToken = $content->access_token;
+            $this->setAccessToken($content->access_token);
             return $content->access_token;
         }
 
@@ -144,5 +147,16 @@ class AccessTokenGenerator
         }
 
         return '';
+    }
+
+    /**
+     * Set the access token
+     *
+     * @param string $accessToken
+     */
+    private function setAccessToken($accessToken): void
+    {
+        $this->accessToken = $accessToken;
+        $this->accessTokenTime = time();
     }
 }
