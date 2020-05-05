@@ -11,7 +11,15 @@
  */
 abstract class Evaluation_Factory extends DeprecatedModel
 {
+
+    /**
+     * @var string
+     */
     protected $questionPrefix = 'Question';
+
+    /**
+     * @var string
+     */
     protected $answerPrefix = 'Answer';
 
     /**
@@ -32,8 +40,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * Spawn a Question type.
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return Evaluation_Question
+     * @throws Exception
      */
     public function createQuestionModel($type_id)
     {
@@ -47,8 +56,9 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * Spawn an Answer type.
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return Evaluation_Answer
+     * @throws Exception
      */
     public function createAnswerModel($type_id)
     {
@@ -63,9 +73,8 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Gets the class name given this question's type and the prefix (question
      * or answer).
      *
-     * @param $type_id
-     * @param $prefix
-     *
+     * @param int $type_id
+     * @param string $prefix
      * @return bool|string
      */
     protected function getFullClassName($type_id, $prefix)
@@ -88,8 +97,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Gets whether this question type is available - it is if its question and
      * answer classes both exist.
      *
-     * @param $type_id
-     *
+     * @param int $type_id
      * @return bool
      */
     public function isQuestionTypeAvailable($type_id) {
@@ -100,7 +108,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * Find out which html file to use
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return string
      */
     public function getQuestionType($type_id)
@@ -115,7 +123,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * Find out which php class file to use
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return string
      */
     public function getQuestionClass($type_id)
@@ -130,7 +138,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * Find out the moodle name
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return string|null
      */
     public function getMoodleQuestionType($type_id)

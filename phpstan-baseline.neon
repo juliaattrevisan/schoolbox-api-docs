@@ -1341,46 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 59$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 58$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$prefix\\)\\: Unexpected token \"\\$prefix\", expected type at offset 151$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 127$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 143$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 68$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 73$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 61$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 84$#"
 			count: 1
 			path: library/Evaluation/Main.php
