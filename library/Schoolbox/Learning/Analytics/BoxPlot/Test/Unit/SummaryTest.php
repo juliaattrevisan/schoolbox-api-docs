@@ -3,12 +3,10 @@
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Learning\Analytics\BoxPlot\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
-
 
 /**
  * Tests for Summary methods
@@ -175,8 +173,8 @@ class SummaryTest extends TestCase
      *
      * @dataProvider providerForGetSummary
      *
-     * @param $marks
-     * @param $expected
+     * @param array $marks
+     * @param array $expected
      */
     public function testGetSummary($marks, $expected)
     {
@@ -334,8 +332,8 @@ class SummaryTest extends TestCase
      *
      * @dataProvider providerForGetSummaryWithOutliers
      *
-     * @param $marks
-     * @param $expected
+     * @param array $marks
+     * @param array $expected
      */
     public function testGetSummaryWithOutliers($marks, $expected)
     {

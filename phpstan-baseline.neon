@@ -3276,26 +3276,6 @@ parameters:
 			path: library/Schoolbox/Greenhouse/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 96$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$marks\\)\\: Unexpected token \"\\$marks\", expected type at offset 75$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 108$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$marks\\)\\: Unexpected token \"\\$marks\", expected type at offset 87$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
 			message: "#^Variable \\$pairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessment, \\$normMark$#"
 			count: 1
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
