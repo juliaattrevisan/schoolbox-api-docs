@@ -152,7 +152,7 @@
             $(config.assessmentList).on('mousedown', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $participant = $(this).closest('[data-participant]'),
+                var $participant = findParticipantElement($(this)),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
@@ -267,9 +267,12 @@
                 return;
             }
 
-            var $form = $(this).closest('form');
-            $form.find('[data-action-bar]').slideDown();
-            $form.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
+            // Where's the form?
+            // * Kami isn't in the form
+            // * All other inputs are
+            var $actionBar = findParticipantElement($input).find('[data-action-bar]');
+            $actionBar.slideDown();
+            $actionBar.find('[data-draft=publish]').removeClass('hide');
         }
 
         /**
@@ -300,7 +303,7 @@
                 $this.data('preval', $this.val());
             }
 
-            var $participant = $this.closest('[data-participant]'),
+            var $participant = findParticipantElement($this),
                 userId       = $participant.data('participant');
 
             // Is an auto-save in progress?
@@ -414,10 +417,29 @@
         /* The form is never submitted synchronously */
         function disableFormSubmit() {
             $(config.assessmentList).find('form[data-feedback-form]').submit(function(e) {
-                e. preventDefault();
+                e.preventDefault();
 
                 $(this).find('[data-mark-input]').blur();
             });
+        }
+
+
+        /**
+         * Find the participant element.
+         * * If input is a form input, it will be the closest [data-participant]
+         * * If input is a Kami iframe, it will be the [data-participant] that
+         *   matches the iframe's user
+         *
+         * @param {jQuery} input
+         */
+        function findParticipantElement(input) {
+            let participant = input.closest('[data-participant]');
+            if (participant.length) {
+                return participant;
+            }
+
+            let participantId = input.attr('data-for-participant');
+            return $('[data-participant="' + String(participantId) + '"]');
         }
     }
 }(jQuery));
