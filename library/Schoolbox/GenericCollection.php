@@ -33,7 +33,8 @@ class GenericCollection extends Collection
      * Constructor
      *
      * @param string|object $elementType
-     * @param array $stack
+     * @param array         $stack
+     * @throws UnexpectedValueException
      */
     public function __construct($elementType, array $stack = [])
     {
@@ -54,6 +55,7 @@ class GenericCollection extends Collection
      * {@inheritDoc}
      *
      * @return static
+     * @throws UnexpectedValueException
      */
     public function emptyClone()
     {
@@ -65,6 +67,7 @@ class GenericCollection extends Collection
      *
      * @param array $stack
      * @return self
+     * @throws UnexpectedValueException
      */
     protected function setStack($stack)
     {
@@ -78,8 +81,9 @@ class GenericCollection extends Collection
     /**
      * {@inheritDoc}
      *
-     * @param $element
+     * @param mixed $element
      * @return static
+     * @throws UnexpectedValueException
      */
     public function add($element)
     {
@@ -91,8 +95,9 @@ class GenericCollection extends Collection
     /**
      * {@inheritDoc}
      *
-     * @param $element
+     * @param mixed $element
      * @return static
+     * @throws UnexpectedValueException
      */
     public function prepend($element)
     {
@@ -107,6 +112,7 @@ class GenericCollection extends Collection
      * @param mixed $offset
      * @param mixed $value
      * @return static
+     * @throws UnexpectedValueException
      */
     public function offsetSet($offset, $value)
     {
