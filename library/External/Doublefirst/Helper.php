@@ -43,14 +43,6 @@ class External_Doublefirst_Helper
         return $this->currentYear;
     }
 
-    /**
-     * Returns path to user portrait image
-     * @param $id
-     * @return string
-     */
-    public function getPhotoPath($id) {
-        return realpath(Config::get('portrait_dir')) . '/' . $id . '.jpg';
-    }
 
     /**
      * Return a time string given a value that is minutes from midnight
