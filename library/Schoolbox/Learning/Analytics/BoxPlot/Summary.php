@@ -77,7 +77,6 @@ class Summary
      *
      * @return array
      */
-
     public function getSummaryWithOutliers(): array
     {
         $fivePoints = $this->getSummary();
@@ -212,7 +211,7 @@ class Summary
     }
 
     /**
-     * @param $dataset
+     * @param array $dataset
      * @return array
      */
     private function filterDataset(array $dataset): array
