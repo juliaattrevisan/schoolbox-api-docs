@@ -3831,11 +3831,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/RelationalDelete.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 131$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
