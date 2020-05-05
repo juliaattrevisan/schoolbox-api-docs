@@ -3256,11 +3256,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$threadID\\)\\: Unexpected token \"\\$threadID\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Forum/PostMapper.php
-
-		-
 			message: "#^Variable \\$parent in PHPDoc tag @var does not match assigned variable \\$quotedId\\.$#"
 			count: 1
 			path: library/Schoolbox/Forum/PostNotifier.php
