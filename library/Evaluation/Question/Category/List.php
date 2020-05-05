@@ -262,7 +262,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set category handler
      *
-     * @param Assess_Question_Category $categoryHandler
+     * @param Evaluation_Question_Category $categoryHandler
      */
     private function setCategoryHandler($categoryHandler)
     {
@@ -272,7 +272,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get category handler
      *
-     * @return Assess_Question_Category
+     * @return Evaluation_Question_Category
      */
     private function getCategoryHandler()
     {
