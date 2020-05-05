@@ -3816,11 +3816,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$plagscanId\\)\\: Unexpected token \"\\$plagscanId\", expected type at offset 172$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Callback.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$apiKey\\)\\: Unexpected token \"\\$apiKey\", expected type at offset 70$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
