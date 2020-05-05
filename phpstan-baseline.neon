@@ -4381,11 +4381,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$involved\\)\\: Unexpected token \"\\$involved\", expected type at offset 563$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/DataSource.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$hydrateRelatedRecords\\)\\: Unexpected token \"\\$hydrateRelatedRecords\", expected type at offset 37$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Mapper.php
