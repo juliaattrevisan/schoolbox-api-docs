@@ -3006,11 +3006,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 133$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Test/ApiTest.php
-
-		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$classificationCode$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php

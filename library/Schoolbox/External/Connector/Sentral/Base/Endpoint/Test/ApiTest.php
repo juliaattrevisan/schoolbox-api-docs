@@ -27,7 +27,7 @@ class ApiTest extends TestCase
      *
      * @dataProvider provider_validDSNDecode
      * @param string $dsn
-     * @param        $expected
+     * @param array  $expected
      * @throws DomainException
      */
     public function testValidDSNDecode(string $dsn, $expected): void
