@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Match\Notifier;
 
 use Alaress\Async\Notification\Parameter\Param;
@@ -28,6 +27,33 @@ use Monolog\Logger;
  */
 class Helper
 {
+
+    /**
+     * @var MatchMapper
+     */
+    protected $matchMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var TeamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
+
+
     /**
      * Constructor
      *
@@ -56,6 +82,8 @@ class Helper
      *
      * @param int $teamId
      * @return Team
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function findTeam($teamId)
     {
@@ -65,6 +93,8 @@ class Helper
     /**
      * @param Match $match
      * @return Match
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function hydrateMatch(Match $match)
     {
@@ -88,12 +118,12 @@ class Helper
         $oldTeams = [];
         $newTeams = [];
         if (isset($diff['homeTeam'])) {
-            list($newTeam, $oldTeam) = $diff['homeTeam'];
+            [$newTeam, $oldTeam] = $diff['homeTeam'];
             $oldTeams[] = $oldTeam;
             $newTeams[] = $newTeam;
         }
         if (isset($diff['awayTeam'])) {
-            list($newTeam, $oldTeam) = $diff['awayTeam'];
+            [$newTeam, $oldTeam] = $diff['awayTeam'];
             $oldTeams[] = $oldTeam;
             $newTeams[] = $newTeam;
         }
@@ -130,10 +160,12 @@ class Helper
     /**
      * Posts an envelope and contents to all players of a team.
      *
-     * @param Envelope  $envelope
-     * @param Builder   $bob
-     * @param Team $team
+     * @param Envelope $envelope
+     * @param Builder  $bob
+     * @param Team     $team
      * @return Envelope
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function postToTeam(Envelope $envelope, Builder $bob, Team $team)
     {
@@ -150,10 +182,12 @@ class Helper
     /**
      * Posts an envelope and contents to all parents of players of a team.
      *
-     * @param Envelope  $envelope
-     * @param Builder   $bob
-     * @param Team $team
+     * @param Envelope $envelope
+     * @param Builder  $bob
+     * @param Team     $team
      * @return Envelope
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function postToParentsOfTeam(Envelope $envelope, Builder $bob, Team $team)
     {
@@ -171,11 +205,13 @@ class Helper
     /**
      * Posts an envelope and contents to all players of both a match's teams.
      *
-     * @param Envelope   $envelope
-     * @param Builder    $bob
-     * @param Match      $match
-     * @param int        $stacking The stacking setting to use for the match parameter
+     * @param Envelope $envelope
+     * @param Builder  $bob
+     * @param Match    $match
+     * @param int      $stacking The stacking setting to use for the match parameter
      * @return Envelope
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
@@ -190,11 +226,13 @@ class Helper
     /**
      * Posts an envelope and contents to all parents of players of both a match's teams.
      *
-     * @param Envelope   $envelope
-     * @param Builder    $bob
-     * @param Match      $match
-     * @param int        $stacking The stacking setting to use for the match parameter
+     * @param Envelope $envelope
+     * @param Builder  $bob
+     * @param Match    $match
+     * @param int      $stacking The stacking setting to use for the match parameter
      * @return Envelope
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
@@ -204,88 +242,5 @@ class Helper
             $this->postToParentsOfTeam($envelope, $bob, $team);
         }
         return $envelope;
-    }
-
-    /**
-     * Here be the mappers, nothing interesting to see past this point... (i promise)
-     *
-     *               ,---.
-     *            ,.'-.   \
-     *           ( ( ,'"""""-.
-     *           `,X          `.
-     *           /` `           `._
-     *          (            ,   ,_\
-     *          |          ,---.,'o `.
-     *          |         / o   \     )
-     *           \ ,.    (      .____,
-     *            \| \    \____,'     \
-     *          '`'\  \        _,____,'
-     *          \  ,--      ,-'     \
-     *            ( C     ,'         \
-     *             `--'  .'           |
-     *               |   |         .O |
-     *             __|    \        ,-'_
-     *            / `L     `._  _,'  ' `.
-     *           /    `--.._  `',.   _\  `
-     *           `-.       /\  | `. ( ,\  \
-     *          _/  `-._  /  \ |--'  (     \
-     *         '  `-.   `'    \/\`.   `.    )
-     *               \      -    \ `.  |    |
-     *
-     */
-
-    /** @var MatchMapper $matchMapper */
-    protected $matchMapper;
-
-    /** @var DivisionMapper $divisionMapper */
-    protected $divisionMapper;
-
-    /** @var SportMapper $sportMapper */
-    protected $sportMapper;
-
-    /** @var TeamPlayerMapper $teamPlayerMapper */
-    protected $teamPlayerMapper;
-
-    /** @var TeamMapper $teamMapper */
-    protected $teamMapper;
-
-    /**
-     * @param $mapper
-     */
-    protected function setMatchMapper($mapper)
-    {
-        $this->matchMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setDivisionMapper($mapper)
-    {
-        $this->divisionMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setSportMapper($mapper)
-    {
-        $this->sportMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamPlayerMapper($mapper)
-    {
-        $this->teamPlayerMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamMapper($mapper)
-    {
-        $this->teamMapper = $mapper;
     }
 }
