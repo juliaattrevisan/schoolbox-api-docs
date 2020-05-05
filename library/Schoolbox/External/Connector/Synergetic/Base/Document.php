@@ -219,6 +219,7 @@ class Document extends Base implements IDocument
      * @param string|null              $documentSeq
      * @param Alaress_Date_Format|null $date
      * @return array
+     * @throws AlaressDatabaseException
      */
     private function findDocumentsFromArchive(array $classificationCodes, string $externalId, ?string $documentSeq, ?Alaress_Date_Format $date)
     {
@@ -249,7 +250,7 @@ class Document extends Base implements IDocument
                         CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate,
                         'StudentReportsArchive' AS Source
             FROM        {$this->schema}.StudentReportsArchiveLink sral
-            JOIN        {$this->schema}.StudentReportsArchive sra ON 
+            JOIN        {$this->schema}.StudentReportsArchive sra ON
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             WHERE       ID = :externalId
             ";
@@ -271,11 +272,12 @@ class Document extends Base implements IDocument
 
     /**
      * Gets documents from pvDocumentReferences view
-     * @param                          $classificationCodes
-     * @param                          $externalId
+     * @param array                    $classificationCodes
+     * @param string                   $externalId
      * @param string|null              $documentSeq
      * @param Alaress_Date_Format|null $date
      * @return array
+     * @throws AlaressDatabaseException
      */
     private function findDocumentsFromReference($classificationCodes, $externalId, ?string $documentSeq, ?Alaress_Date_Format $date)
     {

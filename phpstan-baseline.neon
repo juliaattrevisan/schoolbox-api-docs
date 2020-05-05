@@ -3011,16 +3011,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classificationCodes\\)\\: Unexpected token \"\\$classificationCodes\", expected type at offset 96$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalId\\)\\: Unexpected token \"\\$externalId\", expected type at offset 156$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
-
-		-
 			message: "#^Variable \\$classCode in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
