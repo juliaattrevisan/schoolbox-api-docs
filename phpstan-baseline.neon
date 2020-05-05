@@ -4376,11 +4376,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Audience/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$method\\)\\: Unexpected token \"\\$method\", expected type at offset 51$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Comment/Notifier.php
-
-		-
 			message: "#^Variable \\$tag might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Controller.php

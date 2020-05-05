@@ -95,7 +95,7 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param Model $model
-     * @param       $method
+     * @param string $method
      *
      * @return Envelope
      */
