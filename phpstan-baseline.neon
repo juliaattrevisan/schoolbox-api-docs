@@ -3811,16 +3811,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 131$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
-
-		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 65$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
