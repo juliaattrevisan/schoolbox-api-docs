@@ -130,7 +130,7 @@ class MappingCollection extends Collection
     /**
      * Not supported. This collection must be keyed by model property
      *
-     * @param $element
+     * @param mixed $element
      * @return $this
      * @throws BadMethodCallException
      */
@@ -141,7 +141,7 @@ class MappingCollection extends Collection
 
 
     /**
-     * @param $element
+     * @param mixed $element
      * @return Collection|void
      * @throws BadMethodCallException
      */
