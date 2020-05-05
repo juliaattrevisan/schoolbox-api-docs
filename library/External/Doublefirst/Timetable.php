@@ -228,7 +228,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return String
      */
     public function getDayName($dayNumber): string
@@ -267,9 +267,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         // Get the time in minutes from midnight (sigh)
 
         if ($now != 0) {
-            $time = date("G", $now) * 60 + date("i", $now);
+            $time = ((int)date('G', $now) * 60) + (int)date('i', $now);
         } else {
-            $time = (date("G") * 60) + date("i");
+            $time = ((int)date('G') * 60) + (int)date('i');
         }
 
         // Get all periods
@@ -824,8 +824,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * Sort timetable in chronological order
      *
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     public function sortTimetable($a, $b)

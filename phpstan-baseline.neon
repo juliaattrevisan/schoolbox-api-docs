@@ -1891,26 +1891,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^Binary operation \"\\*\" between string and 60 results in an error\\.$#"
-			count: 2
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$a\\)\\: Unexpected token \"\\$a\", expected type at offset 70$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$b\\)\\: Unexpected token \"\\$b\", expected type at offset 87$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 45$#"
 			count: 1
 			path: library/External/Doublefirst/User.php
