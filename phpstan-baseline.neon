@@ -4111,16 +4111,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess\\)\\: Unexpected token \"\\$assess\", expected type at offset 102$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess\\)\\: Unexpected token \"\\$assess\", expected type at offset 134$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Mapper.php
-
-		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:getAnswers\\(\\) has invalid type Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\QuizQuestion\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php

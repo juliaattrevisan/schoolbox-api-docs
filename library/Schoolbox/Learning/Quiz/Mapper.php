@@ -97,13 +97,12 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
-
     }
 
 
     /**
      * @inheritdoc
-     * @throws Schoolbox\Mapper\DefinitionException
+     * @return string
      */
     protected function getSelectString(): string
     {
@@ -131,8 +130,7 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @return GenericCollection
-     * @throws Schoolbox\Mapper\DefinitionException
-     * @throws Schoolbox\Mapper\Exception
+     * @throws BaseMapper\Exception
      */
     public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
@@ -156,6 +154,7 @@ class Mapper extends BaseMapper
      *
      * @param Model $quiz
      * @return true
+     * @throws BaseMapper\DefinitionException
      */
     public function softDeleteSections(Model $quiz)
     {
@@ -171,6 +170,7 @@ class Mapper extends BaseMapper
      *
      * @param Model $quiz
      * @return true
+     * @throws BaseMapper\DefinitionException
      */
     public function softDeleteAttempts(Model $quiz)
     {
@@ -208,9 +208,15 @@ class Mapper extends BaseMapper
      * @param int $sourceAssessmentId
      * @param int $destinationAssessmentId
      * @return bool
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     * @throws \DomainException
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-	public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
+    public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
     {
         $sectionMapper = $this->getJoinMapper('sections');
         $questionMapper = QuizQuestionMapper::getInstance();
@@ -257,7 +263,8 @@ class Mapper extends BaseMapper
      *
      * Saves a record in external markbook system.
      *
-     * @param  Model $object
+     * @param Model $object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function syncToExternalMarkbook(Model $object): void
     {
@@ -273,6 +280,7 @@ class Mapper extends BaseMapper
      * Removes this assessment from the external markbook.
      *
      * @param Model $object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function deleteFromMarkbook(Model $object): void
     {
@@ -307,8 +315,9 @@ class Mapper extends BaseMapper
     /**
      * Calculates and returns the statistics for the given online assessment
      *
-     * @param $assess
+     * @param int|Model $assess
      * @return array
+     * @throws \PDOException
      */
     public function getStatistics($assess)
     {
@@ -318,35 +327,35 @@ class Mapper extends BaseMapper
             $assess_id = $assess;
         }
 
-        $sql = "
-			SELECT
-			    AVG(sum_mark) AS `mean`,
-			    STDDEV(sum_mark) AS `stdev`,
-			    MIN(sum_mark) AS `min`,
-			    MAX(sum_mark) AS `max`
-			FROM
-			(
-			  SELECT *
-			  FROM
-			  (
-			      SELECT (SUM(mark) / SUM(aq.marks) * 100) AS sum_mark, ar.attempt_id, t0.user_id, t0.finish
-			      FROM assess_response ar
-			      INNER JOIN
-			      (
-			            SELECT attempt_id, user_id, finish
-			            FROM assess_attempt aa
-			            WHERE assess_id = :assess_id
-			            AND aa.reviewed_at IS NOT NULL
-			            AND aa.deleted_at IS NULL
-			      ) t0
-			      ON ar.attempt_id = t0.attempt_id
-			      LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-			      GROUP BY t0.attempt_id
-			      ORDER BY finish DESC
-			  ) t1
-			  GROUP BY user_id
-			) t2;
-		";
+        $sql = '
+            SELECT
+                AVG(sum_mark) AS `mean`,
+                STDDEV(sum_mark) AS `stdev`,
+                MIN(sum_mark) AS `min`,
+                MAX(sum_mark) AS `max`
+            FROM
+            (
+              SELECT *
+              FROM
+              (
+                  SELECT (SUM(mark) / SUM(aq.marks) * 100) AS sum_mark, ar.attempt_id, t0.user_id, t0.finish
+                  FROM assess_response ar
+                  INNER JOIN
+                  (
+                        SELECT attempt_id, user_id, finish
+                        FROM assess_attempt aa
+                        WHERE assess_id = :assess_id
+                        AND aa.reviewed_at IS NOT NULL
+                        AND aa.deleted_at IS NULL
+                  ) t0
+                  ON ar.attempt_id = t0.attempt_id
+                  LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+                  GROUP BY t0.attempt_id
+                  ORDER BY finish DESC
+              ) t1
+              GROUP BY user_id
+            ) t2;
+        ';
 
         $stmt = $this->database->prepare($sql);
         $stmt->execute(array('assess_id' => $assess_id));
@@ -359,8 +368,9 @@ class Mapper extends BaseMapper
     /**
      * Returns the progress of the given online assess, ie. the number of submissions made and returns given
      *
-     * @param $assess
+     * @param int|Model $assess
      * @return array
+     * @throws \PDOException
      */
     public function getProgress($assess)
     {
@@ -370,23 +380,23 @@ class Mapper extends BaseMapper
             $assess_id = $assess;
         }
 
-        $stmt = $this->database->prepare("
-			SELECT COUNT(DISTINCT(user_id))
-			FROM assess_attempt
-			WHERE assess_id = :assess_id
-		");
+        $stmt = $this->database->prepare('
+            SELECT COUNT(DISTINCT(user_id))
+            FROM assess_attempt
+            WHERE assess_id = :assess_id
+        ');
 
         $stmt->execute(array('assess_id' => $assess_id));
         $progress['submission_count'] = $stmt->fetchColumn(0);
 
         $progress['accepts_submissions'] = true;
 
-        $stmt = $this->database->prepare("
-			SELECT COUNT(DISTINCT(user_id))
-			FROM assess_attempt
-			WHERE assess_id = :assess_id
-			AND reviewed_at IS NOT NULL
-		");
+        $stmt = $this->database->prepare('
+            SELECT COUNT(DISTINCT(user_id))
+            FROM assess_attempt
+            WHERE assess_id = :assess_id
+            AND reviewed_at IS NOT NULL
+        ');
 
         $stmt->execute(array('assess_id' => $assess_id));
         $progress['return_count'] = $stmt->fetchColumn(0);
@@ -397,8 +407,12 @@ class Mapper extends BaseMapper
 
     /**
      * @param int $identifierValue
-     * @throws BaseMapper\Exception
      * @return Model
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     * @throws BaseMapper\Exception\NotFound
+     * @throws \PDOException
      */
     public function findById($identifierValue)
     {
@@ -450,7 +464,10 @@ class Mapper extends BaseMapper
      *
      * @param Model                $quiz
      * @param \Alaress_Date_Format $now
+     * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): void
     {
@@ -476,6 +493,8 @@ class Mapper extends BaseMapper
      *
      * @param Model $quiz
      * @return Model
+     * @throws BaseMapper\DefinitionException
+     * @throws \DomainException
      */
     public function loadSectionsAndQuestions(Model $quiz): Model
     {
@@ -518,6 +537,7 @@ class Mapper extends BaseMapper
      * @param Model     $quiz
      * @param null|User $student If set, only load attempts made by this student.
      * @return Model
+     * @throws BaseMapper\DefinitionException
      */
     public function loadAttemptsAndAnswers(Model $quiz, ?User $student = null): Model
     {
