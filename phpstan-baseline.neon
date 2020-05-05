@@ -1366,11 +1366,6 @@ parameters:
 			path: library/Event/Attendance/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sourceName\\)\\: Unexpected token \"\\$sourceName\", expected type at offset 89$#"
-			count: 1
-			path: library/Event/Source/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$Guid$#"
 			count: 1
 			path: library/Event/Source/Model.php
