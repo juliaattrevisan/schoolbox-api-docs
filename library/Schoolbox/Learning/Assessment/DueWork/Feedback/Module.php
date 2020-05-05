@@ -41,7 +41,6 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws Forbidden If user authenticated but lacks perms for request
      * @throws InvalidArgumentException If assessment's due date is null
      */
     protected function registerRoutes()
@@ -83,12 +82,8 @@ class Module extends BaseModule
         // Preloads
 
         /**
-         * @param $params
-         *
+         * @param array $params
          * @return array
-         * @throws MapperException
-         * @throws MapperException\Deleted
-         * @throws \Aura\Di\Exception\ServiceNotFound
          */
         $preloadAssessable = function ($params) {
             return [
@@ -97,12 +92,8 @@ class Module extends BaseModule
         };
 
         /**
-         * @param $params
-         *
+         * @param array $params
          * @return array
-         * @throws MapperException
-         * @throws MapperException\Deleted
-         * @throws \Aura\Di\Exception\ServiceNotFound
          */
         $preloadParticipant = function ($params) {
             $student = $this->getUserDataSource()->findById($params['studentId']);
@@ -113,12 +104,8 @@ class Module extends BaseModule
         };
 
         /**
-         * @param $params
-         *
+         * @param array $params
          * @return array
-         * @throws MapperException
-         * @throws MapperException\Deleted
-         * @throws \Aura\Di\Exception\ServiceNotFound
          */
         $preloadFeedback = function ($params) {
             return [
@@ -127,12 +114,8 @@ class Module extends BaseModule
         };
 
         /**
-         * @param $params
-         *
+         * @param array $params
          * @return array
-         * @throws MapperException
-         * @throws MapperException\Deleted
-         * @throws \Aura\Di\Exception\ServiceNotFound
          */
         $preloadParticipantAndResponse = function ($params) use ($preloadParticipant) {
             $preloadedParticipant = $preloadParticipant($params);
@@ -195,6 +178,7 @@ class Module extends BaseModule
      * init time.
      *
      * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
@@ -223,9 +207,13 @@ class Module extends BaseModule
      * @param int $assessmentId
      *
      * @return IAssessable
-     * @throws MapperException
+     * @throws InvalidArgumentException
      * @throws MapperException\Deleted
+     * @throws Mapper\DefinitionException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     protected function preloadAssessable($assessmentId)
     {
@@ -237,9 +225,13 @@ class Module extends BaseModule
      * @param User $student
      *
      * @return IAssessable
-     * @throws MapperException
+     * @throws InvalidArgumentException
      * @throws MapperException\Deleted
+     * @throws Mapper\DefinitionException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     protected function preloadAssessableWithStudentParticipation($assessmentId, User $student)
     {
@@ -252,9 +244,14 @@ class Module extends BaseModule
      * @param int $responseId
      *
      * @return mixed|Assessment\IResponse
+     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws Mapper\DefinitionException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     protected function preloadResponse($assessmentId, $responseId)
     {
@@ -278,9 +275,14 @@ class Module extends BaseModule
      * @param int $feedbackId
      *
      * @return Assessment\IFeedback
+     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
+     * @throws Mapper\DefinitionException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     protected function preloadFeedback($assessmentId, $feedbackId)
     {
@@ -302,6 +304,7 @@ class Module extends BaseModule
 
     /**
      * @return Access
+     * @throws InvalidArgumentException
      */
     private function getAccess()
     {
@@ -311,6 +314,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws InvalidArgumentException
      */
     public function getUserDataSource()
     {
