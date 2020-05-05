@@ -3196,51 +3196,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Division/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 48$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 52$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 47$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text1\\)\\: Unexpected token \"\\$text1\", expected type at offset 92$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text2\\)\\: Unexpected token \"\\$text2\", expected type at offset 113$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 77$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$divisionName\\)\\: Unexpected token \"\\$divisionName\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$reader\\)\\: Unexpected token \"\\$reader\", expected type at offset 207$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$storageObject\\)\\: Unexpected token \"\\$storageObject\", expected type at offset 178$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(ImportMapper\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 30$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Import/Notifier.php

@@ -270,7 +270,7 @@ class Controller extends Base
 
     /**
      * Download CSV templates
-     * @param $template
+     * @param string $template
      * @throws \Exception
      */
     public function getUploadTemplate($template)
@@ -387,7 +387,7 @@ class Controller extends Base
 
     /**
      * Reverse geocode an address
-     * @param $string
+     * @param string $string
      * @return array|null
      */
     private function lookupAddress($string)
@@ -420,7 +420,7 @@ class Controller extends Base
 
     /**
      * Display import status
-     * @param $id
+     * @param int $id
      */
     public function getImport($id)
     {
@@ -493,7 +493,6 @@ class Controller extends Base
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
                                 $this->loadPositions($storageObject);
-//                                $this->loadDivisions($storageObject);
                             }
 
                             // Now we can load teams
@@ -539,8 +538,8 @@ class Controller extends Base
 
     /**
      * Trim a string to remove whitespace and convert it all to lowercase
-     * @param $text1
-     * @param $text2
+     * @param string $text1
+     * @param string $text2
      * @return string
      */
     private function compareKey($text1, $text2)
@@ -550,7 +549,7 @@ class Controller extends Base
 
     /**
      * Turn a text string into a usable key for comparison
-     * @param $text
+     * @param string $text
      * @return string
      */
     private function makeKey($text)
@@ -1501,11 +1500,11 @@ class Controller extends Base
     /**
      * Decide whether to use an existing Division or spawn a new one
      *
-     * @param        $divisionName
-     * @param Sport  $sport
+     * @param string $divisionName
+     * @param Sport $sport
      * @param Season $season
-     * @param        $storageObject
-     * @param        $reader
+     * @param \Schoolbox\Resource\Storage\Model $storageObject
+     * @param Reader $reader
      * @return Division
      * @throws MapperException
      * @throws \PDOException
