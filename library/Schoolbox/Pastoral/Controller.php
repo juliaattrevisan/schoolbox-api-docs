@@ -15,6 +15,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
+use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
@@ -635,22 +636,26 @@ class Controller extends Base
                     /** @var PastoralTagsModel $tag */
                     $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
-
                     /* Restore this tag to active duty SA-2737
                      * This was put here to reduce dupe tags from original implementation
                      */
-
                 } catch (MapperException $e) {
                     /* Tag doesn't exist - spawn it, save it, then assign it
                      */
-                    if ($canCreate) {
-                        $tag = new PastoralTagsModel();
-                        $tag->setName($tagCurrent);
-                        $this->pastoralTagMapper->save($tag);
-                    }
                 }
 
-                $this->pastoralTagMapper->assignToRecord($record, $tag);
+                /* Tag doesn't exist - spawn it, save it, then assign it
+                 */
+                if (!isset($tag) && $canCreate) {
+                    $tag = new PastoralTagsModel();
+                    $tag->setName($tagCurrent);
+                    $this->pastoralTagMapper->save($tag);
+                }
+
+                if ($tag) {
+                    $this->pastoralTagMapper->assignToRecord($record, $tag);
+                }
+                unset($tag);
             }
         }
     }
@@ -757,6 +762,11 @@ class Controller extends Base
      */
     private function processPastoralRecords($primaryStudentId, $post, array $duplicateStudentIds = [], PastoralModel $parent = null)
     {
+        $heading = trim($post->get("heading"));
+        if (empty($heading)) {
+            throw new InvalidArgumentException('Title cannot be empty');
+        }
+
         // External interface
 
         $pastoralExternal = new External_Pastoral();
@@ -818,7 +828,7 @@ class Controller extends Base
 
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
-            $record->setHeading(trim($post["heading"]));
+            $record->setHeading($heading);
             $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);

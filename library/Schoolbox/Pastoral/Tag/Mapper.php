@@ -83,6 +83,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
             {$this->getSelectString()}
             INNER JOIN      `pastoral_tags` ON `pastoral_tags`.`tag_id` = `{$this->getTable()}`.`id`
             WHERE           `pastoral_tags`.`pastoral_id` = :pastoralId
+            AND             `{$this->getTable()}`.`deleted_at` IS NULL
             ORDER BY        `name`
         ");
 

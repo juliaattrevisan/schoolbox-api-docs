@@ -4376,11 +4376,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Audience/Mapper.php
 
 		-
-			message: "#^Variable \\$tag might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
 			message: "#^Variable \\$pastoralReport in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/ReportBuilder/Controller.php
