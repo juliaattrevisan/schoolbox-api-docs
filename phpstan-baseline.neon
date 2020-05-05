@@ -3921,21 +3921,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 45$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$encoded\\)\\: Unexpected token \"\\$encoded\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 150$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$responseId\\)\\: Unexpected token \"\\$responseId\", expected type at offset 96$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Response/DataSource.php
