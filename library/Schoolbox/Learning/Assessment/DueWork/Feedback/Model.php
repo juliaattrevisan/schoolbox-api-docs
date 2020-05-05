@@ -226,6 +226,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
             && ($this->getNormalisedMark() === null)
             && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
             && ($this->getComment() === null || trim($this->getComment()) === '')
+            && !$this->hasResponseWithKamiDocs()
             && !$this->resubmissionRequired;
     }
 
