@@ -1,16 +1,9 @@
 <?php
 /**
- * Participant
- *
- * A "flattened" version of the Submission/Completion/Attempt--Feedback
- * hierarchy that currently exists, so you don't need to traverse so much
- * to find particular Feedbacks for a particular User
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
@@ -23,11 +16,18 @@ use \DomainException;
 use Alaress_Date_Format;
 
 /**
+ * Class Participant
+ *
  * The 'domain' version of a participant
+ *
+ * A "flattened" version of the Submission/Completion/Attempt--Feedback
+ * hierarchy that currently exists, so you don't need to traverse so much
+ * to find particular Feedbacks for a particular User
+ *
+ * @package Schoolbox\Learning\Assessment
  */
 class Participant
 {
-
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
@@ -38,6 +38,7 @@ class Participant
      * @var User
      */
     private $user;
+
 
     /**
      * The Plan this participant is in.
@@ -60,6 +61,7 @@ class Participant
      */
     private $allResponses;
 
+
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
@@ -73,6 +75,7 @@ class Participant
      *
      * @param User $user
      * @param Plan $plan
+     * @throws \UnexpectedValueException
      */
     public function __construct(User $user, Plan $plan)
     {
