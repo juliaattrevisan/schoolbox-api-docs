@@ -1341,36 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$parent_id\\)\\: Unexpected token \"\\$parent_id\", expected type at offset 91$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$destinationId\\)\\: Unexpected token \"\\$destinationId\", expected type at offset 101$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$position\\)\\: Unexpected token \"\\$position\", expected type at offset 131$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$targetId\\)\\: Unexpected token \"\\$targetId\", expected type at offset 76$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 95$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 71$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 97$#"
 			count: 1
 			path: library/Evaluation/Question/Category/List.php
