@@ -58,13 +58,6 @@ class Connector
     private const PLAGSCAN_FILESIZE_LIMIT = 104857600;
 
     /**
-     * Api url where stuff is sent
-     *
-     * @var string
-     */
-    private $apiUrl = 'https://api.plagscan.com/v3/';
-
-    /**
      * A secret hash that Plagscan generates from your
      * Plagscan account somehow. AccessTokenGenerator
      * instances spawns it
@@ -128,7 +121,7 @@ class Connector
 
         try {
             $client = new Client([
-                'base_uri'    => $this->apiUrl,
+                'base_uri'    => AccessTokenGenerator::API_URL,
                 'timeout'     => self::PLAGSCAN_TIMEOUT,
                 'http_errors' => false,
             ]);
@@ -199,7 +192,7 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
+            "base_uri"    => AccessTokenGenerator::API_URL,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -416,9 +409,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {
@@ -452,9 +445,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {
@@ -488,9 +481,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {

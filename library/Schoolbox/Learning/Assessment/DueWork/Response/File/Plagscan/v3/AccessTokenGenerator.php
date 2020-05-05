@@ -25,7 +25,7 @@ class AccessTokenGenerator
     /**
      * Api url where stuff is sent
      */
-    private const API_URL = 'https://api.plagscan.com/v3/';
+    public const API_URL = 'https://api.plagscan.com/v3/';
 
 
     /**
