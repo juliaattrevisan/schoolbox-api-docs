@@ -54,10 +54,13 @@ class Controller extends AbstractController
     /**
      * List of Seasons
      *
-     * @api GET /fixtures/seasons?query
+     * @api   GET /fixtures/seasons?query
      * @since 165
      *
      * @param object $context
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
     {
@@ -414,7 +417,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param MatchMapper matchMapper
+     * @param MatchMapper $matchMapper
      * @return static
      */
     protected function setMatchMapper($matchMapper)
@@ -422,5 +425,4 @@ class Controller extends AbstractController
         $this->matchMapper = $matchMapper;
         return $this;
     }
-
 }
