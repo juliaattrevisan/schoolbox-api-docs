@@ -3330,10 +3330,7 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Module.php
 
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$termMapper\\)\\: Unexpected token \"\\$termMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Controller.php
+
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 177$#"
