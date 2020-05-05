@@ -586,7 +586,7 @@ class ListController extends Web\Controller\Base
      *
      * @param IAssessable $assessment
      * @param array       $postPlans
-     * @return GenericCollection|ParticipantModels\Plan\Model[]
+     * @return GenericCollection|PlanModel[]
      * @throws UnexpectedValueException
      * @throws PDOException
      * @throws Exception
