@@ -188,7 +188,7 @@ class Notif implements NotifInterface
     /**
      * Detailed debug information.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -201,7 +201,7 @@ class Notif implements NotifInterface
     /**
      * Interesting events. Examples: User logs in, SQL logs.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -214,7 +214,7 @@ class Notif implements NotifInterface
     /**
      * Normal but significant events.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -228,7 +228,7 @@ class Notif implements NotifInterface
      * Exceptional occurrences that are not errors.
      * Examples: Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -241,7 +241,7 @@ class Notif implements NotifInterface
     /**
      * Runtime errors that do not require immediate action but should typically be logged and monitored.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -255,7 +255,7 @@ class Notif implements NotifInterface
      * Critical conditions.
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
@@ -269,7 +269,7 @@ class Notif implements NotifInterface
      * Action must be taken immediately.
      * Example: Entire website down, database unavailable, etc. This should trigger the SMS alerts and wake you up.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */

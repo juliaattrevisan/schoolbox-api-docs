@@ -4246,41 +4246,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 92$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 69$#"
-			count: 2
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 195$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 136$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 132$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 188$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
