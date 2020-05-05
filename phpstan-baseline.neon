@@ -4051,11 +4051,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mark\\)\\: Unexpected token \"\\$mark\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/IMarkScheme.php
-
-		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_humanReadable_withResponse\\(\\) has invalid type mixed\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
