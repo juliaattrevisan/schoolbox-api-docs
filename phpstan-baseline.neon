@@ -3816,21 +3816,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$apiKey\\)\\: Unexpected token \"\\$apiKey\", expected type at offset 90$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$clientId\\)\\: Unexpected token \"\\$clientId\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$accessToken\\)\\: Unexpected token \"\\$accessToken\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 161$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/Connector.php

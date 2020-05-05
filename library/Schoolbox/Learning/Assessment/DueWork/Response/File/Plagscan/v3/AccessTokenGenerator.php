@@ -1,33 +1,43 @@
 <?php
 /**
- * AccessTokenGenerator
- *
- * Generates an Access Token string from a username/api-key combination
- * The Access Token is appended into each request to plagscan api v3.0
- * for authentication purposes
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Client;
 
+/**
+ * Class AccessTokenGenerator
+ *
+ *
+ * Generates an Access Token string from a username/api-key combination
+ * The Access Token is appended into each request to plagscan api v3.0
+ * for authentication purposes
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3
+ */
 class AccessTokenGenerator
 {
 
     /**
-     * @var string
+     * Maximum time that we allow plagscan to connect for before dropping
      */
-    private $clientId = -1;
+    private const CONNECTION_TIMEOUT = 360;
+
 
     /**
      * @var string
      */
-    private $apiKey = '';
+    private $clientId;
+
+
+    /**
+     * @var string
+     */
+    private $apiKey;
 
 
     /**
@@ -36,11 +46,13 @@ class AccessTokenGenerator
      */
     private $accessToken;
 
+
     /**
      * The time an access token is valid before it is reset
      * @var int
      */
     private $accessTokenExpiry = 3600;
+
 
     /**
      * The time the last access token was fetched
@@ -48,10 +60,6 @@ class AccessTokenGenerator
      */
     private $accessTokenTime;
 
-    /**
-     * Maximum time that we allow plagscan to connect for before dropping
-     */
-    const CONNECTION_TIMEOUT = 360;
 
     /**
      * Api url where stuff is sent
@@ -60,22 +68,28 @@ class AccessTokenGenerator
      */
     private $apiUrl = 'https://api.plagscan.com/v3/';
 
+
     /**
      * AccessTokenGenerator constructor.
      *
-     * @param $clientId
-     * @param $apiKey
+     * @param string $clientId
+     * @param string $apiKey
      */
     public function __construct($clientId, $apiKey)
     {
-        $this->setClientId($clientId);
-        $this->setApiKey($apiKey);
+        $this->clientId = $clientId;
+        $this->apiKey = $apiKey;
     }
+
 
     /**
      * Generate an Access Token, may use a cached version if one exists that has not expired
+     * @return string
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function generate()
+    public function generate(): string
     {
         // Check if the token is cached and return that, otherwise generate a new one and cace
         if (!empty($accessToken = $this->getAccessToken())) {
@@ -84,14 +98,14 @@ class AccessTokenGenerator
 
         $postData = [
             'grant_type'    => 'client_credentials',
-            'client_id'     => $this->getClientId(),
-            'client_secret' => $this->getApiKey(),
+            'client_id'     => $this->clientId,
+            'client_secret' => $this->apiKey,
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
-            "timeout"     => self::CONNECTION_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => $this->apiUrl,
+            'timeout'     => self::CONNECTION_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {
@@ -107,7 +121,7 @@ class AccessTokenGenerator
         $content = json_decode($response->getBody());
 
         if ($response->getStatusCode() == 200) {
-            $this->setAccessToken($content->access_token);
+            $this->accessToken = $content->access_token;
             return $content->access_token;
         }
 
@@ -121,72 +135,16 @@ class AccessTokenGenerator
      */
 
     /**
-     * Set the access token
-     *
-     * @param $accessToken
-     */
-    private function setAccessToken($accessToken)
-    {
-        $this->accessToken = $accessToken;
-        $this->accessTokenTime = time();
-    }
-
-    /**
      * Gets access token if it has not yet expired
      *
      * @return string
      */
-    private function getAccessToken()
+    private function getAccessToken(): string
     {
-        if (!empty($this->accessToken)) {
-            if (time() < ($this->accessTokenTime + $this->accessTokenExpiry)) {
-                return $this->accessToken;
-            }
+        if (!empty($this->accessToken) && time() < ($this->accessTokenTime + $this->accessTokenExpiry)) {
+            return $this->accessToken;
         }
+
         return '';
-    }
-
-    /**
-     * @return string
-     */
-    private function getClientId()
-    {
-        return $this->clientId;
-    }
-
-    /**
-     * @param string $clientId
-     * @return $this
-     */
-    private function setClientId($clientId)
-    {
-        $this->clientId = $clientId;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    private function getApiKey()
-    {
-        return $this->apiKey;
-    }
-
-    /**
-     * @param string $apiKey
-     * @return $this
-     */
-    private function setApiKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    private function getApiUrl()
-    {
-        return $this->apiUrl;
     }
 }
