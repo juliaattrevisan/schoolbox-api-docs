@@ -8,7 +8,6 @@
  */
 
 namespace Eportfolio;
-use Eportfolio;
 use Schoolbox;
 
 class CoverPhotoMapper extends Schoolbox\Mapper {
@@ -64,7 +63,7 @@ class CoverPhotoMapper extends Schoolbox\Mapper {
 	/**
 	 * Find the latest cover photo
 	 *
-	 * @param $userId
+	 * @param int $userId
 	 * @return \Schoolbox\Collection
 	 */
 	public function findLatest($userId) {

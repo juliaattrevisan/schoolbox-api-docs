@@ -21,8 +21,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param  $object
-     * @param int $question_id
+     * @param array $object
+     * @param int|string $question_id
      * @return bool|int
      */
     public function create($object, $question_id = '') {
@@ -46,7 +46,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
     /**
      * Updates an existing Answer.
      *
-     * @param  $object
+     * @param array $object
      * @return void
      */
     public function update($object) {
@@ -383,8 +383,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      *
      * Returns true when identical
      *
-     * @param $str1
-     * @param $str2
+     * @param string $str1
+     * @param string $str2
      * @return bool
      */
     protected function compareStrings($str1, $str2) {

@@ -17,15 +17,22 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 	 */
 	protected $plugin = 'evaluationRadio';
 
+    /**
+     * @var string
+     */
     protected $correctClass = 'multiCorrect';
+
+    /**
+     * @var string
+     */
     protected $incorrectClass = 'multiIncorrect';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param  $object
-     * @param  $question_id
+     * @param array $object
+     * @param int|string $question_id
      * @return bool|int
      */
     public function create($object, $question_id = '') {
@@ -57,7 +64,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * Updates an existing Answer. In this particular case, delete previous
      * options and recreate new ones due to preprocessing requirement
      *
-     * @param  $object
+     * @param array $object
      * @return void
      */
     public function update($object) {
@@ -69,7 +76,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
+     * @param SitePage $page
      * @param string $question_id
      * @return void
      */
@@ -113,7 +120,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 	/**
 	 * Render answers in the QuestionBank
 	 *
-	 * @param  $page
+	 * @param SitePage $page
 	 * @param string $answerGroup
 	 * @return void
 	 */
@@ -144,7 +151,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 	/**
 	 * Serialize for db storage (we shouldn't be using serialize anymore)
 	 *
-	 * @param $data
+	 * @param string $data
 	 * @return string
 	 */
 	public function encodeForQuestionBank($data) {
@@ -155,7 +162,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
     /**
      * Translate an integer to letters
      *
-     * @param $num
+     * @param int $num
      * @return string
      */
     protected function findLetterIndex($num) {
@@ -255,7 +262,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
+     * @param SitePage $page
      * @return void
      */
     public function cleanupParse($page) {
@@ -265,8 +272,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * Saves a response for this Answer type. This should be customised based on
      * the format and structure of the answer (e.g. serialize multichoice)
      *
-     * @param  $data
-     *
+     * @param array $data
      * @return array
      */
     public function saveResponse($data) {
@@ -351,8 +357,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      * @return mixed
      */
     public function exportResponseToCSV($attempt_id, $question_id) {
@@ -393,8 +399,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
     /**
      * Gets the text associated with an array-based multiple choice answer
      *
-     * @param  $question_id
-     * @param  $value
+     * @param int $question_id
+     * @param int $value
      * @return string
      */
     public function getAnswerText($question_id, $value) {
@@ -414,8 +420,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      * @return mixed
      */
     public function exportResponseToArray($attempt_id, $question_id) {
@@ -430,9 +436,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)

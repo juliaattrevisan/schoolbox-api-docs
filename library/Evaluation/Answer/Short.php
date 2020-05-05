@@ -10,19 +10,19 @@
  */
 abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationShort';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationShort';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param  $object
-     * @param  $question_id
+     * @param array $object
+     * @param int|string $question_id
      * @return bool|int
      */
     public function create($object, $question_id = '') {
@@ -46,7 +46,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
     /**
      * Updates an existing Answer.
      *
-     * @param  $object
+     * @param array $object
      * @return void
      */
     public function update($object) {
@@ -60,8 +60,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
-     * @param string $question_id
+     * @param SitePage $page
+     * @param int|string $question_id
      * @return void
      */
     public function modify($page, $question_id = '') {
@@ -84,28 +84,28 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param  $page
-	 * @param string $answer
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answer) {
-		$page->setVar(array(
-			'ANSWER' => Scrub::text($answer),
-		));
-	}
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param SitePage $page
+     * @param string $answer
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answer) {
+        $page->setVar(array(
+            'ANSWER' => Scrub::text($answer),
+        ));
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return $data;
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param string $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data) {
+        return $data;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -126,8 +126,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
         if ($existing['response']) {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => Scrub::text($existing['response']),
                 )
@@ -135,8 +135,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
         } else {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => '',
                 )
@@ -150,7 +150,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
+     * @param SitePage $page
      * @return void
      */
     public function cleanupParse($page) {
@@ -160,8 +160,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * Saves a response for this Answer type. This should be customised based on
      * the format and structure of the answer (e.g. serialize multichoice)
      *
-     * @param $data
-     *
+     * @param array $data
      * @return array
      */
     public function saveResponse($data)
@@ -189,8 +188,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
      *
-     * @param  SimpleXMLElement $xmlObj
-     * @param  int $question_id
+     * @param SimpleXMLElement $xmlObj
+     * @param int $question_id
      * @return bool|int
      */
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
@@ -207,9 +206,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
-     *
+     * @param int $attempt_id
+     * @param int $question_id
      * @return array
      */
     public function exportResponseToCSV($attempt_id, $question_id) {
@@ -233,10 +231,9 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
-     *
-     * @return mixed
+     * @param int $attempt_id
+     * @param int $question_id
+     * @return array
      */
     public function exportResponseToArray($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
@@ -250,9 +247,9 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
@@ -288,53 +285,53 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
         $page->parse('answerOption_block', 'answerOption', true);
     }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param $page
-	 * @param $attemptId
-	 * @param $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param array $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		/* Removed this check because it was wrongly matching a blank saved
-		 * response with no response at all, preventing reviewed marks from
-		 * displaying properly.
-		 *
-		 * if ($existing['response'] != null) { ... } else { ... }
-		 */
-		$page->setVar(array(
-			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-			'USER_FIRSTNAME' => $currentQuestion['firstname'],
-			'USER_LASTNAME' => $currentQuestion['lastname'],
-			'ANSWER' => Scrub::text($existing['response']),
-			'RESPONSE_ID' => $existing['response_id'],
-			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-			'REVIEWED_MARKS' => $existing['mark'],
-		));
-	}
+        /* Removed this check because it was wrongly matching a blank saved
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
+        $page->setVar(array(
+            'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+            'USER_FIRSTNAME' => $currentQuestion['firstname'],
+            'USER_LASTNAME' => $currentQuestion['lastname'],
+            'ANSWER' => Scrub::text($existing['response']),
+            'RESPONSE_ID' => $existing['response_id'],
+            'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+            'REVIEWED_MARKS' => $existing['mark'],
+        ));
+    }
 
-	/**
-	 * The answer for a question during horizontal marking, so it appears at the
-	 * top under the question itself, and not repeated for each attempt
-	 *
-	 * @param $page
-	 * @param $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+    /**
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param SitePage $page
+     * @param array $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		/* Show correct answer
-		 */
-		$page->setVar(array(
-			'ANSWER_ID' => $currentAnswer['answer_id'],
-			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-		));
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'ANSWER_ID' => $currentAnswer['answer_id'],
+            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+        ));
 
-		$page->parse('answerTop_block', 'answerTop', true);
-	}
+        $page->parse('answerTop_block', 'answerTop', true);
+    }
 }

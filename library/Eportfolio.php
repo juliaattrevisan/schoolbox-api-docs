@@ -74,8 +74,8 @@ class Eportfolio
     /**
      * Constructor
      *
-     * @param $userId
-     * @param $pageId
+     * @param int $userId
+     * @param int $pageId
      */
     public function __construct($userId, $pageId)
     {
@@ -159,7 +159,7 @@ class Eportfolio
     /**
      * Update a page title
      *
-     * @param $value
+     * @param string $value
      */
     public function updatePageTitle($value)
     {
@@ -209,7 +209,7 @@ class Eportfolio
     /**
      * Get a template name by its id, from the entire set
      *
-     * @param $id
+     * @param int $id
      */
     public function getTemplateNameById($id)
     {
@@ -240,8 +240,8 @@ class Eportfolio
     /**
      * Update column widths
      *
-     * @param  $left
-     * @param  $right
+     * @param  float $left
+     * @param  float $right
      * @return void
      */
     public function updateColumnWidths($left, $right)
@@ -318,8 +318,8 @@ class Eportfolio
      *
      * "This simply copies a bunch of rows, changing 'eportfolio_template' to 'eportfolio'...quite simple, really."
      *
-     * @param $pageTitle
-     * @param $templateID
+     * @param string $pageTitle
+     * @param int $templateID
      */
     public function createEportfolioFromTemplate($pageTitle, $templateID)
     {
@@ -470,8 +470,8 @@ class Eportfolio
     /**
      * Save colours for individual pages
      *
-     * @param $listColor
-     * @return resource
+     * @param array $listColor
+     * @return PDOStatement
      */
     public function saveDisplayProperties($listColor)
     {
@@ -502,7 +502,7 @@ class Eportfolio
     /**
      * Create/Update a page template
      *
-     * @param $template
+     * @param int $template
      */
     public function savePageTemplate($template)
     {

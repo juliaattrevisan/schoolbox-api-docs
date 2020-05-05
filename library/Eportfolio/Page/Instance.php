@@ -334,8 +334,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     /**
      * Macro
      *
-     * @param $set
-     * @param $key
+     * @param array $set
+     * @param string $key
      */
     private function renderColourSet($set, $key)
     {
@@ -364,11 +364,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
      */
     private function renderCurrentColours()
     {
+        $vars = [];
+
         foreach ($this->getColours() as $field => $colour) {
             $vars['current_' . $field] = $colour;
         }
 
-        if (isset($vars)) {
+        if (\count($vars)) {
             $this->getPage()->setVar($vars);
         }
     }
@@ -536,7 +538,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     // Getters & Setters
 
     /**
-     * @param null $colours
+     * @param array $colours
      */
     private function setColours($colours)
     {
@@ -544,7 +546,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     }
 
     /**
-     * @return null
+     * @return array
      */
     private function getColours()
     {

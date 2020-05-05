@@ -7,74 +7,29 @@
  * @link        https://schoolbox.com.au/
  */
 
-class Eportfolio_Page_Factory {
+class Eportfolio_Page_Factory
+{
 
-	/**
-	 * An instance of Eportfolio_Page_Abstract
-	 *
-	 * @var Eportfolio_Page_Abstract
-	 */
-	private $page = null;
-
-	/**
-	 * Constructor
-	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
-	 * @param $permissionValue
-	 */
-	public function __construct($page, $userId, $pageId, $permissionValue) {
-		$this->setPage($this->produce($page, $userId, $pageId, $permissionValue));
-	}
-
-	/**
-	 * Decide which kind of page to manufacture
-	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
-	 * @param $permissionValue
-	 * @return Eportfolio_Page_Abstract
-	 */
-	private function produce($page, $userId, $pageId, $permissionValue) {
-		if (is_numeric($pageId)) {
-			$eportfolioPage = new Eportfolio_Page_Instance($page, $userId, $pageId, $permissionValue);
-		}
-		else if ($pageId == 'showcase') {
-			$eportfolioPage = new Eportfolio_Page_Showcase($page, $userId, $pageId, $permissionValue);
-		}
-		else if ($pageId == 'create') {
-			$eportfolioPage = new Eportfolio_Page_Create($page, $userId, $pageId, $permissionValue);
-		}
-		else if ($pageId == 'profile') {
-			$eportfolioPage = new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
-		}
-        else {
-            $page->pageNotFound();
+    /**
+     * Decide which kind of page to manufacture
+     *
+     * @param SitePage   $page
+     * @param int        $userId
+     * @param int|string $pageId
+     * @param int        $permissionValue
+     * @return Eportfolio_Page_Abstract|null
+     */
+    public function produce($page, $userId, $pageId, $permissionValue) {
+        if (is_numeric($pageId)) {
+            return new Eportfolio_Page_Instance($page, $userId, $pageId, $permissionValue);
+        } else if ($pageId == 'showcase') {
+            return new Eportfolio_Page_Showcase($page, $userId, $pageId, $permissionValue);
+        } else if ($pageId == 'create') {
+            return new Eportfolio_Page_Create($page, $userId, $pageId, $permissionValue);
+        } else if ($pageId == 'profile') {
+            return new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
         }
 
-		return $eportfolioPage;
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set page
-	 *
-	 * @param Eportfolio_Page_Abstract $page
-	 */
-	private function setPage($page) {
-		$this->page = $page;
-	}
-
-	/**
-	 * Get page
-	 *
-	 * @return Eportfolio_Page_Abstract
-	 */
-	public function getPage() {
-		return $this->page;
-	}
+        return null;
+    }
 }

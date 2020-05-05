@@ -71,9 +71,9 @@ class Eportfolio_Authenticator
     /**
      * Constructor
      *
-     * @param $currentUserId
-     * @param $ownerId
-     * @param $pageId
+     * @param int $currentUserId
+     * @param int $ownerId
+     * @param int $pageId
      */
     public function __construct($currentUserId, $ownerId, $pageId)
     {
@@ -97,7 +97,7 @@ class Eportfolio_Authenticator
     /**
      * Determine whether the owner's eportfolio is actually enabled
      *
-     * @param $user
+     * @param array $user
      * @return bool
      */
     private function isEportfolioEnabled($user)

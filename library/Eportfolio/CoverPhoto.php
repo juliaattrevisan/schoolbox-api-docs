@@ -14,42 +14,42 @@ class CoverPhoto {
 	/**
 	 * The primary key
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $id;
 
 	/**
 	 * The owner of the page
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $uid;
 
 	/**
 	 * The blackhole storage hash
 	 *
-	 * @var
+	 * @var string
 	 */
 	private $imagehash;
 
 	/**
 	 * Created time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $created_at;
 
 	/**
 	 * Updated time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $updated_at;
 
 	/**
 	 * Deleted time for the pic
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format|null
 	 */
 	private $deleted_at;
 
@@ -59,7 +59,7 @@ class CoverPhoto {
 	/**
 	 * Set created at
 	 *
-	 * @param  $created_at
+	 * @param \Alaress_Date_Format $created_at
 	 */
 	public function setCreatedAt($created_at) {
 		$this->created_at = $created_at;
@@ -68,7 +68,7 @@ class CoverPhoto {
 	/**
 	 * Get created at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->created_at;
@@ -77,7 +77,7 @@ class CoverPhoto {
 	/**
 	 * Set deleted at
 	 *
-	 * @param  $deleted_at
+	 * @param \Alaress_Date_Format $deleted_at
 	 */
 	public function setDeletedAt($deleted_at) {
 		$this->deleted_at = $deleted_at;
@@ -86,7 +86,7 @@ class CoverPhoto {
 	/**
 	 * Get deleted at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format|null
 	 */
 	public function getDeletedAt() {
 		return $this->deleted_at;
@@ -95,7 +95,7 @@ class CoverPhoto {
 	/**
 	 * Set id
 	 *
-	 * @param  $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -104,7 +104,7 @@ class CoverPhoto {
 	/**
 	 * Get id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -113,7 +113,7 @@ class CoverPhoto {
 	/**
 	 * Set uid
 	 *
-	 * @param  $uid
+	 * @param int $uid
 	 */
 	public function setUid($uid) {
 		$this->uid = $uid;
@@ -122,7 +122,7 @@ class CoverPhoto {
 	/**
 	 * Get uid
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getUid() {
 		return $this->uid;
@@ -131,7 +131,7 @@ class CoverPhoto {
 	/**
 	 * Set updated at
 	 *
-	 * @param  $updated_at
+	 * @param \Alaress_Date_Format $updated_at
 	 */
 	public function setUpdatedAt($updated_at) {
 		$this->updated_at = $updated_at;
@@ -140,7 +140,7 @@ class CoverPhoto {
 	/**
 	 * Get updated at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
@@ -149,7 +149,7 @@ class CoverPhoto {
 	/**
 	 * Set image hash
 	 *
-	 * @param  $imagehash
+	 * @param string $imagehash
 	 */
 	public function setImagehash($imagehash) {
 		$this->imagehash = $imagehash;
@@ -158,7 +158,7 @@ class CoverPhoto {
 	/**
 	 * Get image hash
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function getImagehash() {
 		return $this->imagehash;

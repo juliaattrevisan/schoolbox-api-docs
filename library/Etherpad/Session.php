@@ -38,7 +38,7 @@ class Session {
 	/**
 	 * Generate a cookie for authenticating access to etherpads
 	 *
-	 * @param $sessionId
+	 * @param string $sessionId
 	 */
 	public function generateCookie($sessionId)
     {
