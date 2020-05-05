@@ -218,8 +218,14 @@ class Module extends BaseModule
     /**
      * Convert route params into a context object
      *
-     * @param $params
+     * @param array $params
      * @return array
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Mapper\DefinitionException
+     * @throws NotFound
+     * @throws UnexpectedValueException
      */
     protected function preloadContext(array $params)
     {
