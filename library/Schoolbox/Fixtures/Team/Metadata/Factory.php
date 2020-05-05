@@ -32,7 +32,7 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param $match
+     * @param Match $match
      */
     public function __construct(Match $match)
     {
