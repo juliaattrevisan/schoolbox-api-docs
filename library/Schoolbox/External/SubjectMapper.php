@@ -13,6 +13,7 @@
 namespace Schoolbox\External;
 
 use Schoolbox;
+use Schoolbox\User;
 
 class SubjectMapper extends Schoolbox\External\Mapper
 {
@@ -76,11 +77,10 @@ class SubjectMapper extends Schoolbox\External\Mapper
     /**
     * Gets all subjects for the given student.
     *
-    * @param $user
-    *
+    * @param User $user
     * @return SubjectCollection
     */
-    public function findAllForStudent(\Schoolbox\User $user)
+    public function findAllForStudent(User $user)
     {
         $subjects = $this->external_user->getSubjectList($user);
 

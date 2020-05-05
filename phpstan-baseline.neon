@@ -3051,11 +3051,6 @@ parameters:
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/External/SubjectMapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\File\\\\ExtensionMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Schoolbox/File/ExtensionMapper.php
