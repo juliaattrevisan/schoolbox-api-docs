@@ -33,17 +33,6 @@ class StateMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
-    /**
-     * Convenience method for finding by code
-     *
-     * @param string $code
-     * @return \Schoolbox\Collection
-     */
-    public function findByCode($code)
-    {
-        return parent::findByColumn('code', $code);
-    }
-
 
     /**
      * Returns an list of the options
@@ -60,7 +49,10 @@ class StateMapper extends Mapper
         return $disp;
     }
 
-    /** @inheritDoc */
+
+    /**
+     * @inheritDoc
+     */
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
