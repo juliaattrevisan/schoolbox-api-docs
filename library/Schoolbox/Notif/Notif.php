@@ -282,7 +282,7 @@ class Notif implements NotifInterface
     /**
      * Emergency: system is unusable.
      *
-     * @param       $message
+     * @param string $message
      * @param array $context
      * @return bool
      */
