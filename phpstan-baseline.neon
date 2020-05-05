@@ -3251,11 +3251,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Snapshot/Type/Position.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 93$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Status/Module.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$match\\)\\: Unexpected token \"\\$match\", expected type at offset 53$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Metadata/Factory.php

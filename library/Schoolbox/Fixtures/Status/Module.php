@@ -30,6 +30,7 @@ class Module extends RestfulModule
      * Initializes any permissions on routes for this module.
      *
      * @param Authorizer $authorizer
+     * @throws \InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer) {
 
@@ -52,8 +53,10 @@ class Module extends RestfulModule
     /**
      * Specifically for this module, catch exceptions and hide them
      *
-     * @param $id
+     * @param int $id
      * @return object
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function findEntityById($id)
     {
