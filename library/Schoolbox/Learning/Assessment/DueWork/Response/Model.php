@@ -1,8 +1,5 @@
 <?php
-
 /**
- * Model
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,20 +11,23 @@ use Alaress_Date_NullDate;
 use \Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use UnexpectedValueException;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 /**
+ * Class Model
+ *
  * @method Collection|Feedback\Model[] getAllFeedback()
  */
 class Model extends AbstractResponse
 {
+
     /**
      * All the Files that are part of the Submission made by Student
      *
      * @var Collection
      */
     protected $allFiles;
+
 
     /**
      * The datetime at which the Student actually made the submission
@@ -36,6 +36,7 @@ class Model extends AbstractResponse
      * @var \Alaress_Date_Format
      */
     protected $submittedAt;
+
 
     /**
      * Model constructor.
@@ -48,6 +49,7 @@ class Model extends AbstractResponse
 
         $this->setAllFiles(new Collection());
     }
+
 
     /**
      * Add the contents of the wizzywig to this Response
@@ -72,22 +74,6 @@ class Model extends AbstractResponse
         return $this;
     }
 
-    /**
-     * Find a file called 'online-submission' or 'Online Submission'
-     * and get its content so you can pop it straight into an editor
-     *
-     * @return string
-     */
-    public function getOnlineSubmissionContent()
-    {
-        foreach ($this->getAllFiles() as $currentFile) {
-            if ($currentFile->getEditableInline()) {
-                return $currentFile->getStorage()->read();
-            }
-        }
-
-        return '';
-    }
 
     /**
      * Is this a draft? (In other words, has it not yet been submitted?)
@@ -98,6 +84,7 @@ class Model extends AbstractResponse
     {
         return !$this->isSubmitted();
     }
+
 
     /**
      * Find a file with a particular $hash
@@ -116,6 +103,7 @@ class Model extends AbstractResponse
 
         throw new \OutOfBoundsException('File not found in this response');
     }
+
 
     /* Getters/Setters
      */
@@ -154,28 +142,5 @@ class Model extends AbstractResponse
     {
         $this->submittedAt = $submittedAt ?: new Alaress_Date_NullDate();
         return $this;
-    }
-
-
-    /**
-     * Returns the most recent published self-reflected feedback for this submission
-     *
-     * @deprecated use `$this->findMostRecentSelfAssessedPublishedFeedback` instead
-     * @return null|Feedback\Model
-     * @throws UnexpectedValueException  If due-work feedback object property is not hydrated
-     */
-    public function findMostRecentPublishedSelfReflectedFeedback(): ?Feedback\Model
-    {
-        /** @var Feedback\Model $mostRecentFeedback */
-        $mostRecentFeedback = null;
-        foreach ($this->getAllFeedback() as $feedback) {
-            if (!$feedback->isPublished() || !$feedback->isSelfAssessment()) {
-                continue;
-            }
-            if (!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
     }
 }
