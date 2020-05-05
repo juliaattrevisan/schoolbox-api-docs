@@ -1891,11 +1891,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 45$#"
-			count: 1
-			path: library/External/Doublefirst/User.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$db\\.$#"
 			count: 1
 			path: library/External/Edumate/Class.php
