@@ -90,7 +90,10 @@ Usage:
 {# A preview of the file currently selected #}
 {% block responseFilePreview %}
     {% if response and file %}
-        {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data is defined ? subfragment.data : null} %}
+        {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {
+            data:        subfragment.data is defined ? subfragment.data : null,
+            participant: participant
+        } only %}
     {% endif %}
 {% endblock %}
 
@@ -139,7 +142,7 @@ Usage:
 {% endblock %}
 
 {# Grading logic and structure #}
-<div class="row mark-scheme" id="assessment-status" data-participant>
+<div class="row mark-scheme" id="assessment-status" data-participant="{{ participant.user.id }}">
     <div class="small-12 island">
         <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
             assessmentId: assessment.id,

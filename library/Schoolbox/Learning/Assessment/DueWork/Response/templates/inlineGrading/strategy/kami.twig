@@ -7,6 +7,14 @@
 <div class="row">
     <div class="small-12 columns">
         <h2 class="subheader">Document Preview</h2>
-        {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: data.session.viewerUrl, allow:'microphone; camera'} only %}
+        {# Tie this iframe to the participant somehow #}
+        {% include 'sub/iframeResponsive.twig' with {
+            id: 'kami-viewport',
+            src: data.session.viewerUrl,
+            allow: 'microphone; camera',
+            dataAttributes: {
+                'for-participant': participant.user.id,
+            },
+        } only %}
     </div>
 </div>
