@@ -3,32 +3,7 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- *
- * We allow the user to upload everything in either a single file, or separate files- thus we iterate over all attached
- * CSV files. We need to grab items in a particular order thus we need to loop through the files multiple times to make sure we
- * got everything
- *
- * ------------------------------------------------------------------------------------------------------------------------
- * CSV format
- * ------------------------------------------------------------------------------------------------------------------------
- * SPORT,name,url
- * POSITION,sport,name
- * VENUE,name,address,latitude,longitude
- * SCHOOL,name
- * STATUS,name
- * SEASON,name,start,end
- * DIVISION,season,sport,name,url,player1,player2,player3...player(n)
- * TEAM,season,sport,division,name,url,player1,player2,player3...player(n)
- * COACH,season,sport,division,team,coach1,coach2,coach3...coach(n)
- * FIXTURE,season,sport,division,name.date.time,venue,home_team_or_school,away_team_or_school,note,itinerary_date1,itinerary_time1,itinerary_description1...itinerary_date(n),itinerary_time(n),itinerary_description(n)
- * ------------------------------------------------------------------------------------------------------------------------
- *
- * The first column indicates type of entity (sport, position, venue, school, status, season, division, team, coach, fixture)
- * All player/coach ID's are expected to be the external ID
- * For the purposes of name matching all strings are trimmed and converted to lower case
- * Entities can appear in any order, code does multiple passes across all uploaded files looking for entities in a logical order
  */
-
 namespace Schoolbox\Fixtures\Import;
 
 use Alaress\Web\Controller\Base;
@@ -71,38 +46,162 @@ use Schoolbox\Fixtures\Import\Model as Import;
 use Schoolbox\Fixtures\Import\Errors\Mapper as ImportErrorsMapper;
 use Schoolbox\Fixtures\Import\Errors\Model as ImportErrors;
 use Schoolbox\UserMapper;
-use Schoolbox\User;
 
+/**
+ * Class Controller
+ *
+ * We allow the user to upload everything in either a single file, or separate files- thus we iterate over all attached
+ * CSV files. We need to grab items in a particular order thus we need to loop through the files multiple times to make sure we
+ * got everything
+ *
+ * ------------------------------------------------------------------------------------------------------------------------
+ * CSV format
+ * ------------------------------------------------------------------------------------------------------------------------
+ * SPORT,name,url
+ * POSITION,sport,name
+ * VENUE,name,address,latitude,longitude
+ * SCHOOL,name
+ * STATUS,name
+ * SEASON,name,start,end
+ * DIVISION,season,sport,name,url,player1,player2,player3...player(n)
+ * TEAM,season,sport,division,name,url,player1,player2,player3...player(n)
+ * COACH,season,sport,division,team,coach1,coach2,coach3...coach(n)
+ * FIXTURE,season,sport,division,name.date.time,venue,home_team_or_school,away_team_or_school,note,itinerary_date1,itinerary_time1,itinerary_description1...itinerary_date(n),itinerary_time(n),itinerary_description(n)
+ * ------------------------------------------------------------------------------------------------------------------------
+ *
+ * The first column indicates type of entity (sport, position, venue, school, status, season, division, team, coach, fixture)
+ * All player/coach ID's are expected to be the external ID
+ * For the purposes of name matching all strings are trimmed and converted to lower case
+ * Entities can appear in any order, code does multiple passes across all uploaded files looking for entities in a logical order
+ *
+ * @package Schoolbox\Fixtures\Import
+ */
 class Controller extends Base
 {
     // These are the keys used in the first column of the spreadsheet to denote entity type
 
-    const TYPE_SPORT = 'sport';
-    const TYPE_POSITION = 'position';
-    const TYPE_VENUE = 'venue';
-    const TYPE_SCHOOL = 'school';
-    const TYPE_STATUS = 'status';
-    const TYPE_SEASON = 'season';
-    const TYPE_DIVISION = 'division';
-    const TYPE_TEAM = 'team';
-    const TYPE_COACH = 'coach';
-    const TYPE_FIXTURE = 'fixture';
+    private const TYPE_SPORT = 'sport';
+    private const TYPE_POSITION = 'position';
+    private const TYPE_VENUE = 'venue';
+    private const TYPE_SCHOOL = 'school';
+    private const TYPE_STATUS = 'status';
+    private const TYPE_SEASON = 'season';
+    private const TYPE_DIVISION = 'division';
+    private const TYPE_TEAM = 'team';
+    private const TYPE_COACH = 'coach';
+    private const TYPE_FIXTURE = 'fixture';
 
-    const STATUS_RUNNING = 'started';
-    const STATUS_FAILED = 'failed';
-    const STATUS_COMPLETED = 'completed';
+    private const STATUS_RUNNING = 'started';
+    private const STATUS_FAILED = 'failed';
+    private const STATUS_COMPLETED = 'completed';
 
-    const RESULT_SUCCESS = 'success';
-    const RESULT_ERROR = 'error';
+    private const RESULT_SUCCESS = 'success';
+    private const RESULT_ERROR = 'error';
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $disableCache = ['cache' => false];
 
-    /** @var Import $import */
+    /**
+     * @var Import $import
+     */
     private $import;
 
-    /** @var string $result */
+    /**
+     * @var string $result
+     */
     private $result = '';
+
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var CoachMapper
+     */
+    protected $coachMapper;
+
+    /**
+     * @var SeasonMapper
+     */
+    protected $seasonMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var DivisionUserMapper
+     */
+    protected $divisionUserMapper;
+
+    /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var MatchMapper
+     */
+    protected $matchMapper;
+
+    /**
+     * @var VenueMapper
+     */
+    protected $venueMapper;
+
+    /**
+     * @var ItineraryItemMapper
+     */
+    protected $itineraryItemMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var SchoolMapper
+     */
+    protected $schoolMapper;
+
+    /**
+     * @var PositionMapper
+     */
+    protected $positionMapper;
+
+    /**
+     * @var StatusMapper
+     */
+    protected $statusMapper;
+
+    /**
+     * @var ImportMapper
+     */
+    protected $importMapper;
+
+    /**
+     * @var ImportErrorsMapper
+     */
+    protected $importErrorsMapper;
+
+    /**
+     * @var TeamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
+     * @var TeamCoachMapper
+     */
+    protected $teamCoachMapper;
 
     /**
      * Controller constructor.
@@ -131,12 +230,15 @@ class Controller extends Base
 
     /**
      * Update import progress in log table
-     * @param string $result (success/error)
-     * @param \Schoolbox\Resource\Storage\Model $file File currently being processed
-     * @param int $line Line number
-     * @param int $column Column number
-     * @param string $text Message to add to log
-     * @param string $status Status of CSV import
+     * @param string                            $result (success/error)
+     * @param \Schoolbox\Resource\Storage\Model $file   File currently being processed
+     * @param int                               $line   Line number
+     * @param int                               $column Column number
+     * @param string                            $text   Message to add to log
+     * @param string                            $status Status of CSV import
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function updateLog($result, $file, $line, $column, $text, $status = Controller::STATUS_RUNNING)
     {
@@ -590,125 +692,6 @@ class Controller extends Base
         }
     }
 
-//    /**
-//     * Iterate a CSV file looking for divisions
-//     * @param \Schoolbox\Resource\Storage\Model $storageObject
-//     * @throws \Exception
-//     */
-//    private function loadDivisions($storageObject)
-//    {
-//        // Go through the CSV and extract all of the information into an array
-//
-//        $reader = new Reader($storageObject->readStream());
-//        $reader->setLoadFromFirst(true);
-//
-//        while ($reader->valid()) {
-//
-//            $reader->next();
-//            $row = $reader->current();
-//
-//            if ($this->makeKey($row[0]) == Controller::TYPE_DIVISION) {
-//
-//                $error = false;
-//                $season = null;
-//
-//                if (empty(trim($row[1]))) {
-//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
-//                    $error = true;
-//
-//                } else {
-//                    try {
-//                        /** @var Season $season */
-//                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
-//                    } catch (MapperException $e) {
-//                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
-//                        $error = true;
-//                    }
-//                }
-//
-//                if (empty(trim($row[2]))) {
-//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
-//                    $error = true;
-//                }
-//
-//                if (empty(trim($row[3]))) {
-//                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
-//                    $error = true;
-//                }
-//
-//                if (!empty($row[4])) {
-//                    $url = new \Url($row[4]);
-//
-//                    if (!$url->isUrl()) {
-//                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
-//                        $error = true;
-//                    }
-//                }
-//
-//                if (!$error) {
-//
-//                    // Find the sport associated with the division, and create if doesn't exist
-//
-//                    try {
-//                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], $this->disableCache);
-//                    } catch (MapperException $e) {
-//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
-//                        $sport = new Sport();
-//                        $sport->setName($row[2]);
-//                        $this->getSportMapper()->save($sport);
-//                    }
-//
-//                    // Create or update the division
-//
-//                    try {
-//                        $division = $this->getDivisionMapper()->findOneByColumnList([
-//                            'sport_id' => $sport->getId(),
-//                            'season_id' => $season->getId(),
-//                            'name' => $row[3]
-//                        ], $this->disableCache);
-//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}'");
-//                    } catch (MapperException $e) {
-//                        $division = new Division();
-//                        $division->setName($row[3]);
-//                        $division->setSeason($season);
-//                        $division->setSport($sport);
-//                        $this->getDivisionMapper()->save($division);
-//                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
-//                    }
-//
-//                    // Add new players to division, this will not delete any existing players so as not to screw over existing
-//                    // match participants/results
-//
-//                    $players = [];
-//
-//                    for ($i = 5; $i < count($row); $i++) {
-//                        if (is_numeric($row[$i])) {
-//                            $players[] = $row[$i];
-//                        }
-//                    }
-//
-//                    foreach ($players as $player) {
-//                        try {
-//                            $this->getDivisionUserMapper()->findOneByColumnList([
-//                                'division_id' => $division->getId(),
-//                                'user_id' => $player
-//                            ], $this->disableCache);
-//                        } catch (MapperException $e) {
-//                            $user = new User();
-//                            $user->setId($player);
-//
-//                            $divisionUser = new DivisionUser();
-//                            $divisionUser->setDivision($division);
-//                            $divisionUser->setSequence(0);
-//                            $divisionUser->setUser($user);
-//                            $this->getDivisionUserMapper()->save($divisionUser);
-//                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     /**
      * Iterate a CSV file looking for venues
@@ -774,6 +757,7 @@ class Controller extends Base
         }
     }
 
+
     /**
      * Iterate a CSV file looking for schools
      * @param \Schoolbox\Resource\Storage\Model $storageObject
@@ -815,6 +799,7 @@ class Controller extends Base
         }
     }
 
+
     /**
      * Iterate a CSV file looking for match statuses
      * @param \Schoolbox\Resource\Storage\Model $storageObject
@@ -854,6 +839,7 @@ class Controller extends Base
             }
         }
     }
+
 
     /**
      * Iterate a CSV file looking for seasons
@@ -933,6 +919,7 @@ class Controller extends Base
             }
         }
     }
+
 
     /**
      * Iterate a CSV file looking for teams
@@ -1084,6 +1071,7 @@ class Controller extends Base
         }
     }
 
+
     /**
      * Iterate a CSV file looking for coaches
      * @param \Schoolbox\Resource\Storage\Model $storageObject
@@ -1210,6 +1198,7 @@ class Controller extends Base
             }
         }
     }
+
 
     /**
      * Iterate a CSV file looking for match fixtures
@@ -1508,15 +1497,19 @@ class Controller extends Base
         }
     }
 
+
     /**
      * Decide whether to use an existing Division or spawn a new one
      *
-     * @param $divisionName
-     * @param Sport $sport
+     * @param        $divisionName
+     * @param Sport  $sport
      * @param Season $season
-     * @param $storageObject
-     * @param $reader
+     * @param        $storageObject
+     * @param        $reader
      * @return Division
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function spawnDivision($divisionName, Sport $sport, Season $season, $storageObject, $reader)
     {
@@ -1566,96 +1559,6 @@ class Controller extends Base
 
     /* Getters/Setters
      */
-
-    /**
-     * @var SportMapper
-     */
-    protected $sportMapper;
-
-    /**
-     * @var CoachMapper
-     */
-    protected $coachMapper;
-
-    /**
-     * @var SeasonMapper
-     */
-    protected $seasonMapper;
-
-    /**
-     * @var DivisionMapper
-     */
-    protected $divisionMapper;
-
-    /**
-     * @var DivisionUserMapper
-     */
-    protected $divisionUserMapper;
-
-    /**
-     * @var TeamMapper
-     */
-    protected $teamMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var MatchMapper
-     */
-    protected $matchMapper;
-
-    /**
-     * @var VenueMapper
-     */
-    protected $venueMapper;
-
-    /**
-     * @var ItineraryItemMapper
-     */
-    protected $itineraryItemMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * @var SchoolMapper
-     */
-    protected $schoolMapper;
-
-    /**
-     * @var PositionMapper
-     */
-    protected $positionMapper;
-
-    /**
-     * @var StatusMapper
-     */
-    protected $statusMapper;
-
-    /**
-     * @var ImportMapper
-     */
-    protected $importMapper;
-
-    /**
-     * @var ImportErrorsMapper
-     */
-    protected $importErrorsMapper;
-
-    /**
-     * @var TeamPlayerMapper
-     */
-    protected $teamPlayerMapper;
-
-    /**
-     * @var TeamCoachMapper
-     */
-    protected $teamCoachMapper;
 
     /**
      * @return SportMapper
