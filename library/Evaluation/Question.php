@@ -11,23 +11,34 @@
  */
 abstract class Evaluation_Question extends DeprecatedModel
 {
+
+    /**
+     * @var string
+     */
     public $_table = 'assess_question';
+
+    /**
+     * @var string
+     */
     public $_index = 'question_id';
 
+    /**
+     * @var Evaluation_Section
+     */
     private $sectionHandler;
 
-	/**
-	 * Allowed fields to go into the db
-	 *
-	 * @var array
-	 */
-	protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
+    /**
+     * Allowed fields to go into the db
+     *
+     * @var array
+     */
+    protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
 
 
     /**
      * Creates a Question.
      *
-     * @param  $object
+     * @param array $object
      * @return bool|int
      */
     public function create($object)
@@ -46,7 +57,7 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Updates a question's details.
      *
-     * @param  $object
+     * @param array $object
      * @return void
      */
     public function update($object)
@@ -60,7 +71,7 @@ abstract class Evaluation_Question extends DeprecatedModel
      * For a new Question, find out what its sequence should be. If it's the
      * first Question for an Assess, return 1
      *
-     * @param  $section_id
+     * @param int $section_id
      * @return int
      */
     public function getNextSequence($section_id)
@@ -98,7 +109,7 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Get a specific question type
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return array|bool
      */
     public function getQuestionType($type_id)
@@ -113,15 +124,15 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Whether a question type has an applicable legend
      *
-     * @param  $type_id
+     * @param int $type_id
      * @return array|bool
      */
     public function hasLegend($type_id)
     {
         $query = "SELECT *
-				  FROM assess_luQuestionType
-				  WHERE type_id = " . $this->db->smartQuote($type_id) . "
-				  AND has_legend = 'true'";
+                  FROM assess_luQuestionType
+                  WHERE type_id = " . $this->db->smartQuote($type_id) . "
+                  AND has_legend = 'true'";
 
         return $this->db->getRow($query);
     }
@@ -129,28 +140,28 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Get all the questions in an assess
      *
-     * @param $assess_id
+     * @param int $assess_id
      * @return array|bool
      */
-    public function getAll($assess_id = '') {
+    public function getAll($assess_id) {
         $query = "
-			SELECT
-				assess_section.section_id,
-				assess_section.sequence AS section_sequence,
-				assess_section.title AS section_title,
-				assess_question.question_id AS question_id,
-				assess_question.type_id AS question_type_id,
-				assess_question.sequence AS question_sequence,
-				assess_question.marks AS question_marks,
-				assess_question.question AS question
-			FROM assess
-			INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
-			INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
-			AND assess_question.deleted_at IS NULL
-			AND assess_section.deleted_at IS NULL
-			ORDER BY assess_section.sequence, assess_question.sequence
-		";
+            SELECT
+                assess_section.section_id,
+                assess_section.sequence AS section_sequence,
+                assess_section.title AS section_title,
+                assess_question.question_id AS question_id,
+                assess_question.type_id AS question_type_id,
+                assess_question.sequence AS question_sequence,
+                assess_question.marks AS question_marks,
+                assess_question.question AS question
+            FROM assess
+            INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+            INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
+            WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
+            AND assess_question.deleted_at IS NULL
+            AND assess_section.deleted_at IS NULL
+            ORDER BY assess_section.sequence, assess_question.sequence
+        ";
 
         return $this->db->getAll($query);
     }
@@ -158,7 +169,7 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Get a list of questions in a section
      *
-     * @param  $section_id
+     * @param int $section_id
      * @return array|bool
      */
     public function getList($section_id)
@@ -175,8 +186,8 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Reorders a section's questions when a question has been deleted.
      *
-     * @param  $assess_id
-     * @param  $section_id
+     * @param int $assess_id
+     * @param int $section_id
      * @return void
      */
     public function resequenceQuestionsAfterDelete($assess_id, $section_id)
@@ -206,8 +217,7 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Find the number of questions in this assess
      *
-     * @param  $assess_id
-     *
+     * @param int $assess_id
      * @return mixed
      */
     public function numQuestions($assess_id)
@@ -217,64 +227,64 @@ abstract class Evaluation_Question extends DeprecatedModel
                   LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_question.deleted_at IS NULL
-				  AND assess_section.deleted_at IS NULL
+                  AND assess_section.deleted_at IS NULL
                   AND assess.assess_id = " . $this->db->smartQuote($assess_id);
 
         return $this->db->getOne($query);
     }
 
-	/**
-	 * Reorder questions via jquery sortable
-	 *
-	 * @param $allIds
-	 */
-	public function reorderQuestions($allIds) {
-		if (is_array($allIds) && count($allIds)) {
-			$queryComponents = array();
-			$sequence = 1;
+    /**
+     * Reorder questions via jquery sortable
+     *
+     * @param array $allIds
+     */
+    public function reorderQuestions($allIds) {
+        if (is_array($allIds) && count($allIds)) {
+            $queryComponents = array();
+            $sequence = 1;
 
-			foreach($allIds as $currentId) {
-				$id = str_replace('question_', '', $currentId);
+            foreach($allIds as $currentId) {
+                $id = str_replace('question_', '', $currentId);
 
-				$queryComponents[]= "($id, $sequence)";
+                $queryComponents[]= "($id, $sequence)";
 
-				$sequence++;
-			}
+                $sequence++;
+            }
 
-			$values = implode(',', $queryComponents);
+            $values = implode(',', $queryComponents);
 
-			/* :>
-			 */
-			$query = "
-				INSERT INTO {$this->_table} (question_id, sequence)
-				VALUES $values
-				ON DUPLICATE KEY UPDATE sequence = VALUES(sequence)
-			";
+            /* :>
+             */
+            $query = "
+                INSERT INTO {$this->_table} (question_id, sequence)
+                VALUES $values
+                ON DUPLICATE KEY UPDATE sequence = VALUES(sequence)
+            ";
 
-			$this->db->query($query);
-		}
-	}
+            $this->db->query($query);
+        }
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set allowed fields
-	 *
-	 * @param array $allowedFields
-	 */
-	public function setAllowedFields($allowedFields) {
-		$this->allowedFields = $allowedFields;
-	}
+    /**
+     * Set allowed fields
+     *
+     * @param array $allowedFields
+     */
+    public function setAllowedFields($allowedFields) {
+        $this->allowedFields = $allowedFields;
+    }
 
-	/**
-	 * Get allowed fielsd
-	 *
-	 * @return array
-	 */
-	public function getAllowedFields() {
-		return $this->allowedFields;
-	}
+    /**
+     * Get allowed fielsd
+     *
+     * @return array
+     */
+    public function getAllowedFields() {
+        return $this->allowedFields;
+    }
 
     /**
      * @return Evaluation_Section
