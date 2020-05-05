@@ -3046,42 +3046,7 @@ parameters:
 			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 59$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 120$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$boardingStatus\\)\\: Unexpected token \"\\$boardingStatus\", expected type at offset 426$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$form\\)\\: Unexpected token \"\\$form\", expected type at offset 456$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 406$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$yearlevel\\)\\: Unexpected token \"\\$yearlevel\", expected type at offset 381$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 84$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
 

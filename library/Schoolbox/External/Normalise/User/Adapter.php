@@ -57,7 +57,7 @@ class Adapter {
     /**
      * Get parent $externalUserId
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return Collection
      */
     public function getParent($externalUserId): Collection
@@ -184,7 +184,7 @@ class Adapter {
      *
      * TODO: This is a variation of getStudentContactListExtended()
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return Student
      */
     public function getStudent($externalUserId): Student
@@ -624,10 +624,10 @@ class Adapter {
      * yearlevel, name, boardingStatus and form - each of which are used
      * in a queryBuilder-style construct
      *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
+     * @param string $yearlevel
+     * @param string $name
+     * @param string $boardingStatus
+     * @param string $form
      *
      * @return Collection
      */
@@ -947,7 +947,7 @@ class Adapter {
     /**
      * Get a list of students belonging to $externalUserId
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return \Schoolbox\Collection
      */
     public function getEnrolledStudents($externalUserId): Collection
