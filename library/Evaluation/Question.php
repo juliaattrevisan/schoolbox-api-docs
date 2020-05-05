@@ -262,22 +262,6 @@ abstract class Evaluation_Question extends DeprecatedModel
         $this->allowedFields = $allowedFields;
     }
 
-    /**
-     * Get allowed fielsd
-     *
-     * @return array
-     */
-    public function getAllowedFields() {
-        return $this->allowedFields;
-    }
-
-    /**
-     * @return Evaluation_Section
-     */
-    public function getSectionHandler()
-    {
-        return $this->sectionHandler;
-    }
 
     /**
      * @param Evaluation_Section $sectionHandler
