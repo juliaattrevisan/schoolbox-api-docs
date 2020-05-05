@@ -4186,26 +4186,6 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dataModel\\)\\: Unexpected token \"\\$dataModel\", expected type at offset 206$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$domainObject\\)\\: Unexpected token \"\\$domainObject\", expected type at offset 178$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalValue\\)\\: Unexpected token \"\\$externalValue\", expected type at offset 95$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalValues\\)\\: Unexpected token \"\\$externalValues\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\IDatabase\\:\\:quoteIdentifier\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
