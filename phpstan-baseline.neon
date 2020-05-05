@@ -3811,21 +3811,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$plagscanId int Some id used by the third\\-party Plagscan\\)\\: Unexpected token \"\\$plagscanId\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$host\\)\\: Unexpected token \"\\$host\", expected type at offset 103$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestScheme\\)\\: Unexpected token \"\\$requestScheme\", expected type at offset 74$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 131$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
