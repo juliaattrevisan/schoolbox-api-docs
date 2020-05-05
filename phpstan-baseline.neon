@@ -3196,11 +3196,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Division/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(ImportMapper\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 30$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Notifier.php
-
-		-
 			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/ItineraryItem/Controller.php
