@@ -405,7 +405,7 @@ class Participant
     /**
      * Return the IResponse responsible for the participant's assessment mark
      *
-     * @param $publishedOnly
+     * @param bool $publishedOnly
      * @return null|IResponse
      */
     public function getAuthoritativeResponse($publishedOnly)
@@ -423,7 +423,7 @@ class Participant
     /**
      * Get the IFeedback responsible for the participant's assessment mark
      *
-     * @param $publishedOnly
+     * @param bool $publishedOnly
      * @return null|IFeedback
      */
     public function getAuthoritativeFeedback($publishedOnly)
