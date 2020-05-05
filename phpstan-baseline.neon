@@ -4246,11 +4246,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$tag\\)\\: Unexpected token \"\\$tag\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Notif/HandlerFactory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$exchange\\)\\: Unexpected token \"\\$exchange\", expected type at offset 43$#"
 			count: 1
 			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
