@@ -1366,11 +1366,6 @@ parameters:
 			path: library/Event/Attendance/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$Guid$#"
-			count: 1
-			path: library/Event/Source/Model.php
-
-		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Enrolment/Map.php
