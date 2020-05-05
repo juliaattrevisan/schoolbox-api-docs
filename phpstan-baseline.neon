@@ -3186,11 +3186,6 @@ parameters:
 			path: library/Schoolbox/Filter/Selection/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filters\\)\\: Unexpected token \"\\$filters\", expected type at offset 123$#"
-			count: 1
-			path: library/Schoolbox/Filter/Test/Assessment/TestableIdFinder.php
-
-		-
 			message: "#^Variable \\$fixturesAccess in PHPDoc tag @var does not match assigned variable \\$fixtureAccess\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Component/Homepage/Controller.php

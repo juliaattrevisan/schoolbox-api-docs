@@ -69,7 +69,7 @@ class TestableIdFinder extends IdFinder
     /**
      * Inserts null values for missing filters and ensures any scalars are wrapped in Collections
      *
-     * @param $filters
+     * @param array $filters
      * @return Collection[]|null[]|mixed[][]
      * @throws Filter\BrokenFilterException
      */
