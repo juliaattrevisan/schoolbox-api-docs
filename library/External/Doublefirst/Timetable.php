@@ -264,14 +264,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             return [];
         }
 
-        // Get the time in minutes from midnight (sigh)
-
-        if ($now != 0) {
-            $time = ((int)date('G', $now) * 60) + (int)date('i', $now);
-        } else {
-            $time = ((int)date('G') * 60) + (int)date('i');
-        }
-
         // Get all periods
 
         $query =
@@ -344,6 +336,14 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $time_current = $times['SchoolStartTime'];
 
+        // Get the time in minutes from midnight (sigh)
+
+        if ($now != 0) {
+            $time = ((int)date('G', $now) * 60) + (int)date('i', $now);
+        } else {
+            $time = ((int)date('G') * 60) + (int)date('i');
+        }
+
         // Begin the numbers dance keeping track of period times
 
         foreach ($periods as $period) {
@@ -352,7 +352,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
             // Check if this is the current period
 
-            if ($time >= $time_current && $time < $time_current + $period['PeriodDuration'] && $period['PeriodDuration'] > 0) {
+            if ($time >= $period_start && $time < $period_end && $period['PeriodDuration'] > 0) {
 
                 // Lets do some time based gymnastics because someone thought it'd be smart to store time as an integer
 
