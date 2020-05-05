@@ -3876,11 +3876,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 124$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 75$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Module.php

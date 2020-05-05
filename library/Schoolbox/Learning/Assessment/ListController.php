@@ -47,26 +47,36 @@ class ListController extends Web\Controller\Base
      * @var UserMapper
      */
     private $userMapper;
+
     /**
      * @var Error\Mapper
      */
     private $errorMapper;
+
     /**
      * @var MapperProxy
      */
     private $assessmentMapper;
+
     /**
      * @var Access
      */
     private $access;
+
     /**
      * @var Transactor
      */
     private $transactor;
+
     /**
      * @var Participant\DataSource
      */
     protected $participantDataSource;
+
+    /**
+     * @var GenericCollection|null $existingParticipationPerUser
+     */
+    private $existingParticipationPerUser;
 
 
     /**
@@ -100,10 +110,17 @@ class ListController extends Web\Controller\Base
      * NOTE: this is a debug route that is only available to supers, so don't go referencing this route in twigs...
      * It shows the functionality of the common "assessment component" logic for any context
      *
-     * @api GET /learning/{contextType}/{contextId}/assessments?user&readOnly
+     * @api   GET /learning/{contextType}/{contextId}/assessments?user&readOnly
      * @since 165
      *
      * @param AssessmentContext $context
+     * @throws Deleted
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws NotFound
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAssessmentsByContext(AssessmentContext $context)
     {
@@ -156,12 +173,12 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
+     * @throws LogicException
      * @throws Mapper\DefinitionException
-     * @throws Exception
-     * @throws Deleted
+     * @throws RouteNotFound
+     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
-     * @throws LogicException
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
@@ -198,6 +215,10 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
+     * @throws LogicException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function postReorderAssessments(AssessmentContext $context)
     {
@@ -264,6 +285,7 @@ class ListController extends Web\Controller\Base
     /**
      * @param string $type
      * @return Controller
+     * @throws ServiceNotFound
      */
     private function getDelegateController($type)
     {
@@ -275,8 +297,13 @@ class ListController extends Web\Controller\Base
      *
      * @api   POST /learning/weight/:assessmentId
      *
-     * @throws Exception
+     * @param IAssessable $assessment
      * @throws Deleted
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function updateWeight(IAssessable $assessment): void
     {
@@ -295,8 +322,11 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/visibility/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws Exception
      * @throws Deleted
+     * @throws Exception
+     * @throws LogicException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function updateVisibility(IAssessable $assessment): void
     {
@@ -313,6 +343,10 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
+     * @throws DomainException
+     * @throws Mapper\DefinitionException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
     {
@@ -373,7 +407,7 @@ class ListController extends Web\Controller\Base
      * @throws DomainException
      * @throws Mapper\DefinitionException
      * @throws RouteNotFound
-     * @throws LogicException
+     * @throws LogicException|ServiceNotFound
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
@@ -505,15 +539,13 @@ class ListController extends Web\Controller\Base
     }
 
 
-    /** @var GenericCollection|null $existingParticipationPerUser */
-    private $existingParticipationPerUser;
-
-
     /**
      * Gets existing participation
      * @param GenericCollection $plans
      * @param int               $userId
      * @return ParticipantModel|null
+     * @throws DomainException
+     * @throws Mapper\DefinitionException
      */
     private function getExistingParticipation(GenericCollection $plans, int $userId): ?ParticipantModel
     {
@@ -632,7 +664,7 @@ class ListController extends Web\Controller\Base
     /**
      * If XHR, return the redirect within JSON, otherwise just tell the browser to do the redirect
      *
-     * @param $url
+     * @param string $url
      */
     protected function redirect($url)
     {
