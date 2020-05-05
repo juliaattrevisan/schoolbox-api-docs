@@ -53,8 +53,10 @@ class Model extends AbstractResponse
      * Add the contents of the wizzywig to this Response
      * (add it as a file)
      *
-     * @param $body
+     * @param string $body
      * @return $this
+     * @throws \Schoolbox\File\Exception
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function attachOnlineSubmissionContent($body)
     {
@@ -100,7 +102,7 @@ class Model extends AbstractResponse
     /**
      * Find a file with a particular $hash
      *
-     * @param $hash
+     * @param string $hash
      * @return SingleFile\Model
      * @throws \OutOfBoundsException
      */
