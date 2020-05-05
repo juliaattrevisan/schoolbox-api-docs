@@ -167,7 +167,7 @@ abstract class RestfulModule extends AlaressModule
 
 
     /**
-     * @param $id
+     * @param int $id
      * @throws \Schoolbox\Application\Exception\Exception
      * @return object
      */
