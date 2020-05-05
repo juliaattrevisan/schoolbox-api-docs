@@ -1,14 +1,9 @@
 <?php
 /**
- * Decorator
- *
- * Decorate an IAssessable instance with Due Work-specific fields
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -24,6 +19,13 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
+/**
+ * Class Decorator
+ *
+ * Decorate an IAssessable instance with Due Work-specific fields
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork\Decorator
+ */
 class Decorator implements DecoratorInterface
 {
     use DueWorkTrait;
@@ -31,29 +33,29 @@ class Decorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * @param        $acceptOnline
-     * @param        $markType
-     * @param        $gradingScheme
-     * @param        $useRubric
-     * @param        $markPerCapability ,
-     * @param        $useMarkRange
-     * @param        $maxMark
-     * @param        $rubricData
-     * @param        $attachedFiles
-     * @param string $selfReviewable
-     * @param        $similarityCheckEnabled
+     * @param int        $acceptOnline
+     * @param int        $markType
+     * @param int        $gradingScheme
+     * @param bool       $useRubric
+     * @param bool       $markPerCapability
+     * @param bool       $useMarkRange
+     * @param float|null $maxMark
+     * @param array|null $rubricData
+     * @param array      $attachedFiles
+     * @param string     $selfReviewable
+     * @param bool       $similarityCheckEnabled
      */
     public function __construct(
-        $acceptOnline,
-        $markType,
-        $gradingScheme,
-        $useRubric,
-        $markPerCapability,
-        $useMarkRange,
-        $maxMark,
-        $rubricData,
-        $attachedFiles,
-        $selfReviewable,
+        int $acceptOnline,
+        int $markType,
+        int $gradingScheme,
+        bool $useRubric,
+        bool $markPerCapability,
+        bool $useMarkRange,
+        ?float $maxMark,
+        ?array $rubricData,
+        array $attachedFiles,
+        string $selfReviewable,
         bool $similarityCheckEnabled
     ) {
         $this->setAcceptOnline(trim($acceptOnline));
@@ -71,6 +73,12 @@ class Decorator implements DecoratorInterface
 
     /**
      * @param DueWork $assessment
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \RangeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function decorate($assessment)
     {

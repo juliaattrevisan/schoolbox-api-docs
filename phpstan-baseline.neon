@@ -3796,56 +3796,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$acceptOnline\\)\\: Unexpected token \"\\$acceptOnline\", expected type at offset 62$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attachedFiles\\)\\: Unexpected token \"\\$attachedFiles\", expected type at offset 336$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$gradingScheme\\)\\: Unexpected token \"\\$gradingScheme\", expected type at offset 128$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markPerCapability ,\\)\\: Unexpected token \"\\$markPerCapability\", expected type at offset 196$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markType\\)\\: Unexpected token \"\\$markType\", expected type at offset 97$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$maxMark\\)\\: Unexpected token \"\\$maxMark\", expected type at offset 273$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rubricData\\)\\: Unexpected token \"\\$rubricData\", expected type at offset 303$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$similarityCheckEnabled\\)\\: Unexpected token \"\\$similarityCheckEnabled\", expected type at offset 409$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$useMarkRange\\)\\: Unexpected token \"\\$useMarkRange\", expected type at offset 238$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$useRubric\\)\\: Unexpected token \"\\$useRubric\", expected type at offset 164$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
