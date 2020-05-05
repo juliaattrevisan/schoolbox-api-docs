@@ -18,10 +18,14 @@ class Model implements ISoftDeletable, JsonSerializable
     use Id;
     use DeletedAtDate;
 
-    /** @var PastoralType\Model */
+    /**
+     * @var PastoralType\Model
+     */
     private $pastoralType;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $name;
 
     /**
@@ -52,7 +56,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param $pastoralType
+     * @param PastoralType\Model $pastoralType
      *
      * @return $this
      */
