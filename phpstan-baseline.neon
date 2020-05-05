@@ -4146,11 +4146,6 @@ parameters:
 			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$subject\\)\\: Unexpected token \"\\$subject\", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Mail/TwigEmail.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
