@@ -1,12 +1,19 @@
 <?php
-
 /**
- * https://www.purplemath.com/modules/boxwhisk.htm
- * Class Summary
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Analytics\BoxPlot;
 
+/**
+ * Class Summary
+ *
+ * Calculate five point summary for boxplots
+ * https://www.purplemath.com/modules/boxwhisk.htm
+ *
+ * @package Schoolbox\Learning\Analytics\BoxPlot
+ */
 class Summary
 {
 
@@ -15,14 +22,17 @@ class Summary
      */
     private $dataset;
 
+
     /**
      * Summary constructor.
+     *
      * @param array $dataset
      */
     public function __construct(array $dataset)
     {
         $this->dataset = $this->filterDataset($dataset);
     }
+
 
     /**
      * Returns five points of quartile 1,2 and 3 and min
@@ -54,6 +64,7 @@ class Summary
         ];
     }
 
+
     /**
      * @return int|float
      */
@@ -62,6 +73,7 @@ class Summary
         return $this->dataset[0];
     }
 
+
     /**
      * @return int|float
      */
@@ -69,6 +81,7 @@ class Summary
     {
         return $this->dataset[\count($this->dataset) - 1];
     }
+
 
     /**
      * Returns five points as well as outliers.
@@ -143,6 +156,7 @@ class Summary
             ];
     }
 
+
     /**
      * Find the values used to calculate first quartile.
      *
@@ -156,6 +170,7 @@ class Summary
         return array_slice($this->dataset, 0, (int)floor(count($this->dataset) / 2));
     }
 
+
     /**
      * Find the values used to calculate third quartile.
      *
@@ -163,12 +178,12 @@ class Summary
      */
     private function setupThirdQuartile(): array
     {
-
         $countValues = count($this->dataset);
 
         if ($countValues === 1) {
             return $this->dataset;
         }
+
         $even = !($countValues % 2);
 
         if ($even) {
@@ -176,8 +191,10 @@ class Summary
         } else {
             $secondHalf = array_slice($this->dataset, (int)ceil($countValues / 2), $countValues);
         }
+
         return $secondHalf;
     }
+
 
     /**
      * Calculates medians
@@ -210,7 +227,10 @@ class Summary
         return (float)$median;
     }
 
+
     /**
+     * Only care about numeric and non-null values
+     *
      * @param array $dataset
      * @return array
      */
@@ -224,17 +244,19 @@ class Summary
         $values = array_values(array_filter($dataset, static function ($var) {
             return ((is_int($var) || is_float($var)) && $var >= 0);
         }));
+
         sort($values);
 
         return $values;
     }
+
 
     /**
      * Generates Interquartile range
      *
      * @return float|null
      */
-    private function generateInterquartileRange()
+    private function generateInterquartileRange(): ?float
     {
         return ($this->findMedian($this->setupThirdQuartile()) - $this->findMedian($this->setupFirstQuartile()));
     }
