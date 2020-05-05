@@ -1341,11 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 164$#"
-			count: 1
-			path: library/Event/Attendance/CanModifyAttendance.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 104$#"
 			count: 1
 			path: library/Event/Attendance/Controller.php

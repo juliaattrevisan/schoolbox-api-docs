@@ -1,12 +1,9 @@
 <?php
-
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Event\Attendance;
-
 
 use Alaress\Specification\Base;
 use Event_Attendance_Controller;
@@ -67,7 +64,7 @@ class CanModifyAttendance extends Base
      * Checks whether a user has permission to modify attendance for an event,
      * Also will throw exception if the event is not exist
      *
-     * @param  $eventId
+     * @param int $eventId
      * @return bool
      * @throws \Exception
      */
