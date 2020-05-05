@@ -1341,51 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 84$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 67$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 64$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 168$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sec\\)\\: Unexpected token \"\\$sec\", expected type at offset 223$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 92$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 150$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 79$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 84$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 53$#"
 			count: 1
 			path: library/Evaluation/Question.php

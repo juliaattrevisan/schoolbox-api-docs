@@ -40,18 +40,34 @@ use Schoolbox\Permission\Access\UserAccess;
 
 abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-    public $_table = 'assess';
-    public $_index = 'assess_id';
 
-    const ONLINE_ASSESSMENT_TYPE_ID = 11;
-    const UNLIMITED_DURATION        = -1;
+    /**
+     * This represents a particular work type for quiz
+     * It's being phased out though
+     */
+    public const ONLINE_ASSESSMENT_TYPE_ID = 11;
+
+    /**
+     * Const that represents an unlimited duration for people doing the quiz/survey
+     */
+    public const UNLIMITED_DURATION        = -1;
+
+    /**
+     * @var string
+     */
+    public $_table = 'assess';
+
+    /**
+     * @var string
+     */
+    public $_index = 'assess_id';
 
 
     /**
      * A list of assessments available for a category
      *
-     * @param      $category_id
-     * @param bool $limit
+     * @param int|array $category_id
+     * @param int|bool $limit
      *
      * @return array|bool
      */
@@ -83,8 +99,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Get an introduction to an Assess.
      *
-     * @param  $assess_id
-     *
+     * @param int $assess_id
      * @return array|bool
      */
     public function getIntro($assess_id)
@@ -99,7 +114,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Loads the summary for the test
      *
-     * @param  $assess_id
+     * @param int $assess_id
      *
      * @return array|bool
      */
@@ -127,7 +142,6 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      *
      * @param  int      $assess_id
      * @param  SitePage $page
-     *
      * @return void
      */
     public function renderAssessContents($assess_id, $page)
@@ -214,7 +228,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      * Gets a list of Questions that exist in a particular Assess. This is used
      * on the create question screens as a table of contents.
      *
-     * @param  $assess_id
+     * @param int $assess_id
      *
      * @return array|bool
      */
@@ -247,7 +261,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      *
      * but slightly modified for formatting.
      *
-     * @param      $sec
+     * @param int  $sec
      * @param bool $padHours
      *
      * @return string
@@ -295,9 +309,8 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Finds out if the specified user owns the assessment.
      *
-     * @param        $assess_id
+     * @param int    $assess_id
      * @param string $user_id
-     *
      * @return mixed
      */
     public function isOwner($assess_id, $user_id = '')
@@ -320,8 +333,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      * Determines whether the current user can take a test by checking which
      * categories the current user belongs to.
      *
-     * @param  $assess_id
-     *
+     * @param int $assess_id
      * @return bool
      */
     public function canDoAssessment($assess_id)
@@ -356,8 +368,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Find out whether this assessment has expired.
      *
-     * @param  $assess_id
-     *
+     * @param int $assess_id
      * @return bool
      */
     public function isExpired($assess_id)
@@ -379,8 +390,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Find out whether this assessment has been deleted.
      *
-     * @param  $assess_id
-     *
+     * @param int $assess_id
      * @return bool
      */
     public function isDeleted($assess_id)
@@ -403,7 +413,6 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      * Find out if this assess can be started
      *
      * @param  array $assess
-     *
      * @return bool
      */
     public function isOpen($assess)
