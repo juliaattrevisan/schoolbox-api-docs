@@ -300,6 +300,49 @@ components:
         residentialHouse:
           $ref: '#/components/schemas/residentialHouse'
 
+        guardians:
+          description: |
+            This user's guardians. (Only applicable if this user is of role
+            type: student.)
+
+            Guardians are not necessarily the same thing as parents: a guardian
+            is not always the child's parent (e.g. they may be a foster parent
+            or other relative), and a parent is not always the child's guardian
+            (e.g. the family might have separated).
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
+        students:
+          description: |
+            This user's students. (Only applicable if this user is of role type:
+            parent.)
+
+            Students are not necessarily the same thing as children, for the
+            same reason that guardians are not the same thing as parents.
+
+            Generally, the guardian => student relation is symmetrical to the
+            student => guardian relation.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
+        impersonableUsers:
+          description: |
+            The users whom this user may impersonate within a Schoolbox session.
+
+            This relation is asymmetric: A may impersonate B, but that does not
+            imply that B may impersonate A.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
         email:
           type: string
           format: email
@@ -345,6 +388,14 @@ components:
 
         residentialHouse:
           $ref: 'common.yaml#/components/schemas/itemRelation'
+
+        impersonableUsers:
+          description: |
+            The users whom this user may impersonate within a Schoolbox session.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: 'common.yaml#/components/schemas/itemRelation'
       writeOnly: true
 
     userList:
