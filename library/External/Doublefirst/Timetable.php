@@ -347,8 +347,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         // Begin the numbers dance keeping track of period times
 
         foreach ($periods as $period) {
-            $period_start = $time_current;
-            $period_end = $time_current + $period['PeriodDuration'];
+            $period_start = (int)$time_current;
+            $period_end = (int)($time_current + $period['PeriodDuration']);
 
             // Check if this is the current period
 
