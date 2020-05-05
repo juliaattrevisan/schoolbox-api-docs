@@ -21,11 +21,15 @@ use Schoolbox\User;
 class AbstractCSV
 {
 
-    /** @var resource */
+    /**
+     * @var resource
+     */
     protected $fp;
+
 
     /**
      * Opens file to export
+     *
      * @param string $filename
      */
     protected function initExport(string $filename): void
@@ -37,15 +41,18 @@ class AbstractCSV
         $this->fp = fopen("php://output", 'w');
     }
 
+
     /**
      * Exports a row
-     * @param $rowHeadings
-     * @param $rowData
+     *
+     * @param array $rowHeadings
+     * @param array $rowData
      */
     protected function exportRow(array $rowHeadings, array $rowData): void
     {
         fputcsv($this->fp, array_merge($rowHeadings, $rowData));
     }
+
 
     /**
      * Closes exported file
@@ -54,6 +61,7 @@ class AbstractCSV
     {
         fclose($this->fp);
     }
+
 
     /**
      * Write CSV column headers
@@ -75,6 +83,7 @@ class AbstractCSV
         }
         $this->exportRow($headings, $assessmentTitles);
     }
+
 
     /**
      * Append fields into header row for specified assessment
@@ -102,6 +111,7 @@ class AbstractCSV
         return $row;
     }
 
+
     /**
      * Parse the denominator from a total mark
      *
@@ -116,6 +126,7 @@ class AbstractCSV
         return null;
     }
 
+
     /**
      * Parse the numerator from a total mark
      *
@@ -129,6 +140,7 @@ class AbstractCSV
         }
         return null;
     }
+
 
     /**
      * Retrieves comment field value for this assessment and student.
@@ -146,6 +158,7 @@ class AbstractCSV
         $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
+
 
     /**
      * Does this assessment have a normalized mark column?
@@ -170,6 +183,7 @@ class AbstractCSV
         return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
     }
 
+
     /**
      * Does this assessment have a comment column?
      *
@@ -181,5 +195,4 @@ class AbstractCSV
         // Only DueWorks have comments at the moment
         return $assessment instanceof DueWork\Model;
     }
-
 }

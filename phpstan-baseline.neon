@@ -4061,16 +4061,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rowData\\)\\: Unexpected token \"\\$rowData\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/AbstractCSV.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rowHeadings\\)\\: Unexpected token \"\\$rowHeadings\", expected type at offset 39$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/AbstractCSV.php
-
-		-
 			message: "#^Class Schoolbox\\\\Learning\\\\Markbook\\\\Markbook referenced with incorrect case\\: Schoolbox\\\\Learning\\\\Markbook\\\\MarkBook\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Markbook/Controller.php
