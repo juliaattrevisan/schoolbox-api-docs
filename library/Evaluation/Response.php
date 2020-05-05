@@ -10,20 +10,33 @@
  */
 abstract class Evaluation_Response extends DeprecatedModel
 {
-    public $_table = 'assess_response';
-    public $_index = 'response_id';
 
-    /* A const to determine whether to randomise questions
+    /**
+     * A const to determine whether to randomise questions
      */
-    const RANDOMISE_QUESTIONS = 1;
-    const ORDERED_QUESTIONS = 2;
+    public const RANDOMISE_QUESTIONS = 1;
+
+    /**
+     * A const to determine whether to keep the original ordering of questions
+     */
+    public const ORDERED_QUESTIONS = 2;
+
+    /**
+     * @var string
+     */
+    public $_table = 'assess_response';
+
+    /**
+     * @var string
+     */
+    public $_index = 'response_id';
 
     /**
      * Finds out whether a response exists for a particular question during an
      * attempt.
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      * @return array|bool
      */
     public function isResponseExists($attempt_id, $question_id)
@@ -41,7 +54,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      * be marked automatically. The marking is performed by the answerType's
      * handler.
      *
-     * @param  $attempt_id
+     * @param int $attempt_id
      * @return array|bool
      */
     public function getAutomarkableResponses($attempt_id)
@@ -68,7 +81,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      * Remember which responses have been marked automatically, so we don't keep
      * refetching them every time the results page loads.
      *
-     * @param  $markedResponseIDs
+     * @param array $markedResponseIDs
      * @return void
      */
     public function updatedAutomatedMarks($markedResponseIDs)
@@ -88,8 +101,8 @@ abstract class Evaluation_Response extends DeprecatedModel
      * Find the number of STUB RESPONSES that have been set up in $attempt_id
      * and $section_id
      *
-     * @param  $attempt_id
-     * @param  $section_id
+     * @param int $attempt_id
+     * @param int $section_id
      *
      * @return mixed
      */
@@ -131,7 +144,7 @@ abstract class Evaluation_Response extends DeprecatedModel
         if ($randomise === self::RANDOMISE_QUESTIONS) {
             shuffle($allQuestions);
             shuffle($allQuestions);
-			shuffle($allQuestions);
+            shuffle($allQuestions);
         }
 
         /* Insert selected questions for this attempt
@@ -155,8 +168,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      * Find out when an attempt's responses were last updated, so we can see
      * when the student last saved data.
      *
-     * @param  $attempt_id
-     *
+     * @param int $attempt_id
      * @return mixed
      */
     public function getLastSave($attempt_id)
@@ -173,20 +185,19 @@ abstract class Evaluation_Response extends DeprecatedModel
      * Count the number of questions that were automarked AND not reviewed.
      * This indicates questions that remain to be reviewed manually.
      *
-     * @param  $attempt_id
-     *
+     * @param int $attempt_id
      * @return mixed
      */
     public function numAutomarked($attempt_id)
     {
         $query = "SELECT COUNT(*)
-				  FROM {$this->_table}
-				  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
-				  LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
-				  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
-				  AND assess_attempt.reviewed_at IS NULL
-				  AND assess_question.deleted_at IS NULL
-				  AND automarked_already = 'true'";
+                  FROM {$this->_table}
+                  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
+                  LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
+                  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  AND assess_attempt.reviewed_at IS NULL
+                  AND assess_question.deleted_at IS NULL
+                  AND automarked_already = 'true'";
 
         return $this->db->getOne($query);
     }
@@ -195,8 +206,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      * Count the number of questions that were not automarked AND not reviewed.
      * This indicates questions that remain to be reviewed manually.
      *
-     * @param  $attempt_id
-     *
+     * @param int $attempt_id
      * @return mixed
      */
     public function numNotAutomarked($attempt_id)
@@ -216,16 +226,16 @@ abstract class Evaluation_Response extends DeprecatedModel
     /**
      * The total number of marks that were not automarked AND not reviewed.
      *
-     * @param  $attempt_id
+     * @param int $attempt_id
      * @return int
      */
     public function valueNotAutomarked($attempt_id)
     {
         $query = "SELECT SUM(assess_question.marks)
-				  FROM assess_question
-				  LEFT JOIN {$this->_table} ON assess_question.question_id = {$this->_table}.question_id
-				  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
-				  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  FROM assess_question
+                  LEFT JOIN {$this->_table} ON assess_question.question_id = {$this->_table}.question_id
+                  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
+                  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
@@ -242,15 +252,14 @@ abstract class Evaluation_Response extends DeprecatedModel
     /**
      * Mark as deleted all the responses for an attempt.
      *
-     * @param  $attempt_id
-     *
+     * @param int $attempt_id
      * @return mixed
      */
     public function deleteResponsesForAttempt($attempt_id)
     {
         $query = "UPDATE {$this->_table}
-				  SET deleted_at = NOW()
-				  WHERE attempt_id = " . $this->db->smartQuote($attempt_id);
+                  SET deleted_at = NOW()
+                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id);
 
         return $this->db->query($query);
     }
@@ -258,17 +267,17 @@ abstract class Evaluation_Response extends DeprecatedModel
     /**
      * Get a response for a particular attempt/question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      * @return array|bool
      */
     public function getByAttemptAndQuestion($attempt_id, $question_id)
     {
         $query = "
-			SELECT *
-			FROM assess_response
-			WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-			AND question_id = " . $this->db->smartQuote($question_id);
+            SELECT *
+            FROM assess_response
+            WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
+            AND question_id = " . $this->db->smartQuote($question_id);
 
         return $this->db->getRow($query);
     }
@@ -276,7 +285,7 @@ abstract class Evaluation_Response extends DeprecatedModel
     /**
      * Fetches responses to a question, used by ranking question type for graphing
      *
-     * @param $question_id
+     * @param int $question_id
      * @return array
      */
     public function getResponsesToQuestion($question_id) {
