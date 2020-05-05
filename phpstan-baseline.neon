@@ -3051,11 +3051,6 @@ parameters:
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$separator\\)\\: Unexpected token \"\\$separator\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Student.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 70$#"
 			count: 1
 			path: library/Schoolbox/External/SubjectMapper.php
