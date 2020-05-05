@@ -36,6 +36,31 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'resultUpdated';
 
     /**
+     * @var MatchMapper $matchMapper
+     */
+    protected $matchMapper;
+
+    /**
+     * @var ResultMapper $resultMapper
+     */
+    protected $resultMapper;
+
+    /**
+     * @var DivisionMapper $divisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var SportMapper $sportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var TeamPlayerMapper $teamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
      * @param null $dependencies
      */
     public function loadDependencies($dependencies = null)
@@ -228,88 +253,5 @@ class Notifier extends AbstractModuleNotifier
         }
 
         return $envelope;
-    }
-
-    /**
-     * Here be the mappers, nothing interesting to see past this point... (i promise)
-     *
-     *               ,---.
-     *            ,.'-.   \
-     *           ( ( ,'"""""-.
-     *           `,X          `.
-     *           /` `           `._
-     *          (            ,   ,_\
-     *          |          ,---.,'o `.
-     *          |         / o   \     )
-     *           \ ,.    (      .____,
-     *            \| \    \____,'     \
-     *          '`'\  \        _,____,'
-     *          \  ,--      ,-'     \
-     *            ( C     ,'         \
-     *             `--'  .'           |
-     *               |   |         .O |
-     *             __|    \        ,-'_
-     *            / `L     `._  _,'  ' `.
-     *           /    `--.._  `',.   _\  `
-     *           `-.       /\  | `. ( ,\  \
-     *          _/  `-._  /  \ |--'  (     \
-     *         '  `-.   `'    \/\`.   `.    )
-     *               \      -    \ `.  |    |
-     *
-     */
-
-    /** @var MatchMapper $matchMapper */
-    protected $matchMapper;
-    
-    /** @var ResultMapper $resultMapper */
-    protected $resultMapper;
-
-    /** @var DivisionMapper $divisionMapper */
-    protected $divisionMapper;
-
-    /** @var SportMapper $sportMapper */
-    protected $sportMapper;
-
-    /** @var TeamPlayerMapper $teamPlayerMapper */
-    protected $teamPlayerMapper;
-
-    /**
-     * @param $mapper
-     */
-    protected function setMatchMapper($mapper)
-    {
-        $this->matchMapper = $mapper;
-    }
-    
-    /**
-     * @param $mapper
-     */
-    protected function setResultMapper($mapper)
-    {
-        $this->resultMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setDivisionMapper($mapper)
-    {
-        $this->divisionMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setSportMapper($mapper)
-    {
-        $this->sportMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamPlayerMapper($mapper)
-    {
-        $this->teamPlayerMapper = $mapper;
     }
 }

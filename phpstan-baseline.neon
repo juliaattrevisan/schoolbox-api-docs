@@ -3236,11 +3236,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Result/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mapper\\)\\: Unexpected token \"\\$mapper\", expected type at offset 18$#"
-			count: 5
-			path: library/Schoolbox/Fixtures/Result/Notifier.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$entityId int\\)\\: Unexpected token \"\\$entityId\", expected type at offset 47$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/School/Controller.php
