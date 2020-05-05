@@ -3271,11 +3271,6 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateName\\)\\: Unexpected token \"\\$templateName\", expected type at offset 51$#"
-			count: 1
-			path: library/Schoolbox/Greenhouse/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Greenhouse/Module.php
