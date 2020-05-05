@@ -1341,26 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 128$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionCategoryID\\)\\: Unexpected token \"\\$questionCategoryID\", expected type at offset 153$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionHandler\\)\\: Unexpected token \"\\$questionHandler\", expected type at offset 120$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionID\\)\\: Unexpected token \"\\$questionID\", expected type at offset 189$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$parent_id\\)\\: Unexpected token \"\\$parent_id\", expected type at offset 91$#"
 			count: 1
 			path: library/Evaluation/Question/Category.php
