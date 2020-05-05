@@ -97,24 +97,6 @@ abstract class Evaluation_Response extends DeprecatedModel
         }
     }
 
-    /**
-     * Find the number of STUB RESPONSES that have been set up in $attempt_id
-     * and $section_id
-     *
-     * @param int $attempt_id
-     * @param int $section_id
-     *
-     * @return mixed
-     */
-    public function numStubResponsesInSection($attempt_id, $section_id)
-    {
-        $query = "SELECT COUNT(*) AS num
-                  FROM {$this->_table}
-                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND section_id = " . $this->db->smartQuote($section_id);
-
-        return $this->db->getOne($query);
-    }
 
     /**
      * Assign random questions to a section, so we can remember them and
@@ -164,22 +146,6 @@ abstract class Evaluation_Response extends DeprecatedModel
         }
     }
 
-    /**
-     * Find out when an attempt's responses were last updated, so we can see
-     * when the student last saved data.
-     *
-     * @param int $attempt_id
-     * @return mixed
-     */
-    public function getLastSave($attempt_id)
-    {
-        $query = "SELECT updated_at
-                  FROM {$this->_table}
-                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  ORDER BY updated_at DESC";
-
-        return $this->db->getOne($query);
-    }
 
     /**
      * Count the number of questions that were automarked AND not reviewed.
