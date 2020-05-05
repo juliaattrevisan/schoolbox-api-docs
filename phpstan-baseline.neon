@@ -4391,11 +4391,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 100$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Revision/Mapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php

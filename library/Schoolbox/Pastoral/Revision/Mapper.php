@@ -125,7 +125,7 @@ class Mapper extends BaseMapper
     /**
      * This is also used by the PastoralRevision class to hydrate a record
      *
-     * @param $row
+     * @param array $row
      *
      * @return Model|bool
      * @throws DefinitionException If a specified mapper is not found in definition
