@@ -3851,16 +3851,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Factory.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessmentType\\)\\: Unexpected token \"\\$assessmentType\", expected type at offset 157$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$post \\(an array of post vars from the create/update forms\\)\\)\\: Unexpected token \"\\$post\", expected type at offset 79$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$gradeGroup with type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\|null is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
