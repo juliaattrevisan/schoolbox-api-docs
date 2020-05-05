@@ -3276,21 +3276,6 @@ parameters:
 			path: library/Schoolbox/Greenhouse/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 104$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 156$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$term string\\)\\: Unexpected token \"\\$term\", expected type at offset 321$#"
 			count: 1
 			path: library/Schoolbox/L10n/RosettaStone.php
