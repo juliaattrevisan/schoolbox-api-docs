@@ -10,15 +10,21 @@
  */
 abstract class Evaluation_Section extends DeprecatedModel
 {
-    public $_table = 'assess_section';
-    public $_index = 'section_id';
 
-    /* A const to determine whether to include sections in getContents
+    /**
+     * POOL_SIZE_ALL Indicates to use all questions in section
      */
-    const SECTION_EXCLUDE = true;
+    public const POOL_SIZE_ALL = 0;
 
-    /** @const int POOL_SIZE_ALL Indicates to use all questions in section */
-    const POOL_SIZE_ALL = 0;
+    /**
+     * @var string
+     */
+    public $_table = 'assess_section';
+
+    /**
+     * @var string
+     */
+    public $_index = 'section_id';
 
     /**
      * Creates a new section.
