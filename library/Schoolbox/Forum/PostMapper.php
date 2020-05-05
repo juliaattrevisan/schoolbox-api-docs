@@ -145,7 +145,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = date('Y-m-d H:i:s', $time ? : time());
+        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getUnixTimeStamp();
 
         $limit = (int)$limit;
         $offset = (int)$offset;
