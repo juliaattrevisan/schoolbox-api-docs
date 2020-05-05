@@ -366,46 +366,6 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Returns the progress of the given online assess, ie. the number of submissions made and returns given
-     *
-     * @param int|Model $assess
-     * @return array
-     * @throws \PDOException
-     */
-    public function getProgress($assess)
-    {
-        if ($assess instanceof Model) {
-            $assess_id = $assess->getId();
-        } else {
-            $assess_id = $assess;
-        }
-
-        $stmt = $this->database->prepare('
-            SELECT COUNT(DISTINCT(user_id))
-            FROM assess_attempt
-            WHERE assess_id = :assess_id
-        ');
-
-        $stmt->execute(array('assess_id' => $assess_id));
-        $progress['submission_count'] = $stmt->fetchColumn(0);
-
-        $progress['accepts_submissions'] = true;
-
-        $stmt = $this->database->prepare('
-            SELECT COUNT(DISTINCT(user_id))
-            FROM assess_attempt
-            WHERE assess_id = :assess_id
-            AND reviewed_at IS NOT NULL
-        ');
-
-        $stmt->execute(array('assess_id' => $assess_id));
-        $progress['return_count'] = $stmt->fetchColumn(0);
-
-        return $progress;
-    }
-
-
-    /**
      * @param int $identifierValue
      * @return Model
      * @throws BaseMapper\DefinitionException
