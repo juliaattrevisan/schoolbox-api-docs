@@ -522,6 +522,25 @@ components:
         - id
       readOnly: true
 
+    groupMembership:
+      title: Group Membership
+      description: |
+        A description of the membership a user has within a group.
+      type: object
+      properties:
+        group:
+          type: object
+          properties:
+            id:
+              $ref: 'common.yaml#/components/schemas/id'
+            name:
+              type: string
+        membershipType:
+          type: string
+          enum:
+            - admin
+            - write
+            - read
 
   securitySchemes:
     bearerAuth:
