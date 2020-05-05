@@ -62,6 +62,11 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 class Module extends BaseModule
 {
     /**
@@ -183,13 +188,14 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws ApplicationException\Exception If assessment is not found
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
-     * @throws LogicException If cyclic graph detected
-     * @throws ApplicationException\Exception If assessment is not found
-     * @throws NotFound
      * @throws InvalidPath
+     * @throws LogicException If cyclic graph detected
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws NotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadAssessmentAndStudent(array $params): array
     {
@@ -226,6 +232,7 @@ class Module extends BaseModule
      * @throws Mapper\DefinitionException
      * @throws NotFound
      * @throws UnexpectedValueException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadContext(array $params)
     {
@@ -255,12 +262,13 @@ class Module extends BaseModule
      * @param array     $params
      * @param null|User $student If provided, only load this student's participation
      * @return array
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
-     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws ApplicationException\Exception If assessment is not found
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
-     * @throws ApplicationException\Exception If assessment is not found
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadAssessment(array $params, User $student = null)
     {
@@ -299,6 +307,7 @@ class Module extends BaseModule
      * init time.
      *
      * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
@@ -380,6 +389,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws InvalidArgumentException
      */
     protected function getUserMapper()
     {
@@ -399,6 +409,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
+     * @throws InvalidArgumentException
      */
     protected function getErrorMapper()
     {
@@ -407,6 +418,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {
@@ -415,6 +427,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UnitImplementationMapper
+     * @throws InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
@@ -423,6 +436,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UnitSpecificationMapper
+     * @throws InvalidArgumentException
      */
     protected function getUnitSpecificationMapper()
     {
@@ -431,6 +445,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|StudentSubmissionMapper
+     * @throws InvalidArgumentException
      */
     protected function getStudentSubmissionMapper()
     {
@@ -439,6 +454,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|SubmissionReturnMapper
+     * @throws InvalidArgumentException
      */
     protected function getSubmissionReturnMapper()
     {
@@ -447,6 +463,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|StorageMapper
+     * @throws InvalidArgumentException
      */
     protected function getStorageMapper()
     {
@@ -455,6 +472,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws InvalidArgumentException
      */
     protected function getFolderMapper()
     {
@@ -464,6 +482,7 @@ class Module extends BaseModule
 
     /**
      * @return Access
+     * @throws InvalidArgumentException
      */
     protected function getAccess()
     {
@@ -482,8 +501,7 @@ class Module extends BaseModule
      * - students cannot if not participant, or a different student to that indicated in URL
      *
      * @return Rule\IAuthorizationRule
-     * @throws \InvalidArgumentException If required object not found in route params
-     * @throws NotFound
+     * @throws InvalidArgumentException If required object not found in route params
      */
     private function buildAuthRuleCanSubmit()
     {
@@ -521,8 +539,7 @@ class Module extends BaseModule
 
     /**
      * @return Rule\IAuthorizationRule
-     * @throws \InvalidArgumentException If required objects not found in route params
-     * @throws NotFound If unable to find assessment context in route params
+     * @throws InvalidArgumentException If required objects not found in route params
      */
     private function buildAuthRuleCanAcknowledgeSubmission()
     {
@@ -557,9 +574,7 @@ class Module extends BaseModule
      * Prevent navigation to non-project assessment spec status pages
      *
      * @return Rule\IAuthorizationRule
-     * @throws \InvalidArgumentException If unable to locate required object in route params
-     * @throws NotFound
-     * @throws InvalidPath
+     * @throws InvalidArgumentException If unable to locate required object in route params
      */
     private function buildAuthRuleCanViewStatus()
     {
@@ -581,7 +596,7 @@ class Module extends BaseModule
     /**
      * @param int $accessLevel One of the UserAccess::ACCESS_* constants
      * @return Rule\HasHomepageAccess
-     * @throws NotFound
+     * @throws InvalidArgumentException
      */
     private function buildAuthRuleHomepageAccess($accessLevel)
     {
