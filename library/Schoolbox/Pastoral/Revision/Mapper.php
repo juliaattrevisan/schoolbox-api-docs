@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('pastoral_revision');
-        $this->hasModel(Model::class);
+        $this->hasModel(PastoralRevision::class);
         $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
         $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('subtype_id', PastoralSubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
