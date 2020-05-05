@@ -3866,11 +3866,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Assessment\\\\ListController\\:\\:savePlanData\\(\\) has invalid type Schoolbox\\\\Learning\\\\Assessment\\\\ParticipantModels\\\\Plan\\\\Model\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Module.php
