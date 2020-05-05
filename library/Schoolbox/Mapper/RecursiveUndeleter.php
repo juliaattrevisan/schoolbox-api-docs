@@ -1021,7 +1021,7 @@ EXAMPLES:
 
     /**
      * @param IMapper $mapper
-     * @param         $model
+     * @param object  $model
      * @return string
      */
     private function buildId(IMapper $mapper, $model): string
