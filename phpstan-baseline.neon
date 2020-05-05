@@ -4161,17 +4161,7 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 165$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 264$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 167$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -4181,27 +4171,7 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$column\\)\\: Unexpected token \"\\$column\", expected type at offset 72$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\|Collection\\)\\: Unexpected token \"\\$object\", expected type at offset 156$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$property_map in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 70$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 91$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -4211,17 +4181,7 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$model\\)\\: Unexpected token \"\\$model\", expected type at offset 71$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$filterSoftDeleteSql in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 115$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
