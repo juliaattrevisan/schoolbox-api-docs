@@ -23,6 +23,12 @@ class AccessTokenGenerator
 {
 
     /**
+     * Api url where stuff is sent
+     */
+    private const API_URL = 'https://api.plagscan.com/v3/';
+
+
+    /**
      * Maximum time that we allow plagscan to connect for before dropping
      */
     private const CONNECTION_TIMEOUT = 360;
@@ -62,14 +68,6 @@ class AccessTokenGenerator
 
 
     /**
-     * Api url where stuff is sent
-     *
-     * @var string
-     */
-    private $apiUrl = 'https://api.plagscan.com/v3/';
-
-
-    /**
      * AccessTokenGenerator constructor.
      *
      * @param string $clientId
@@ -103,7 +101,7 @@ class AccessTokenGenerator
         ];
 
         $client = new Client([
-            'base_uri'    => $this->apiUrl,
+            'base_uri'    => self::API_URL,
             'timeout'     => self::CONNECTION_TIMEOUT,
             'http_errors' => false,
         ]);
