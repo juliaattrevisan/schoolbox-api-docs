@@ -147,7 +147,7 @@ class Controller extends AbstractController
     /**
      * @inheritdoc
      *
-     * @param $entity
+     * @param Result $entity
      * @throws \Exception
      */
     public function createResultForTeam($entity)

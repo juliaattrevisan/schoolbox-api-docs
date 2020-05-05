@@ -3221,11 +3221,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$entity\\)\\: Unexpected token \"\\$entity\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
 			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Result/Controller.php
