@@ -3811,36 +3811,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$apiKey\\)\\: Unexpected token \"\\$apiKey\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$username\\)\\: Unexpected token \"\\$username\", expected type at offset 46$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 123$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$retrieveMode\\)\\: Unexpected token \"\\$retrieveMode\", expected type at offset 149$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 207$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$parameterList\\)\\: Unexpected token \"\\$parameterList\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 114$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Mapper.php
