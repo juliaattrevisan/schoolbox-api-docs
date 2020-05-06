@@ -4706,16 +4706,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$column\\)\\: Unexpected token \"\\$column\", expected type at offset 68$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 89$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php
-
-		-
 			message: "#^Variable \\$resource in PHPDoc tag @var does not match assigned variable \\$event\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php
