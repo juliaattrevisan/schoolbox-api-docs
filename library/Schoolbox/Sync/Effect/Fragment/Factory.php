@@ -133,9 +133,9 @@ class Factory
             $this->allFieldKeys['userAccessRemove'] = 'Groups (Remove)';
         }
 
-        $this->setLookup(new Lookup());
-        $this->setRoleType($roleType);
-        $this->setAllFields($this->generateAllFields());
+        $this->lookup = new Lookup();
+        $this->roleType = $roleType;
+        $this->allFields = $this->generateAllFields();
     }
 
 
@@ -151,7 +151,7 @@ class Factory
         $mapper = new UserMapper();
         $allMaps = $mapper->getMap();
         $allJoins = $mapper->getJoin();
-        $allFieldKeys = $this->getAllFieldKeys();
+        $allFieldKeys = $this->allFieldKeys;
 
         /* Get the associative array of fields
          */
@@ -273,11 +273,11 @@ class Factory
         if ($this->isBoolean($userField)) {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
         } elseif ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField, $this->getRoleType()));
+            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
         } elseif ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
         } elseif ($this->isCollection($userField)) {
-            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->lookup->findData($userField));
             $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
 
             return $fragment;
@@ -339,7 +339,7 @@ class Factory
      * @return array
      */
     public function getAllFieldsKeyValue() {
-        $allFields = $this->getAllFields();
+        $allFields = $this->allFields;
 
         $stack = [];
 
@@ -348,102 +348,5 @@ class Factory
         }
 
         return $stack;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set Lookup instance
-     *
-     * @param Lookup $lookup
-     */
-    private function setLookup($lookup)
-    {
-        $this->lookup = $lookup;
-    }
-
-    /**
-     * Get Lookup instance
-     *
-     * @return Lookup
-     */
-    private function getLookup()
-    {
-        return $this->lookup;
-    }
-
-    /**
-     * Set all field keys
-     *
-     * @param array $allFieldKeys
-     */
-    private function setAllFieldKeys($allFieldKeys)
-    {
-        $this->allFieldKeys = $allFieldKeys;
-    }
-
-    /**
-     * Get all field keys
-     *
-     * @return array
-     */
-    private function getAllFieldKeys()
-    {
-        return $this->allFieldKeys;
-    }
-
-    /**
-     * Get all fields
-     *
-     * @return array
-     */
-    public function getAllFields() {
-        return $this->allFields;
-    }
-
-    /**
-     * Set all fields
-     *
-     * @param array $allFields
-     */
-    private function setAllFields($allFields) {
-        $this->allFields = $allFields;
-    }
-
-    /**
-     * @param string $roleType
-     */
-    private function setRoleType($roleType)
-    {
-        $this->roleType = $roleType;
-    }
-
-    /**
-     * @return string
-     */
-    private function getRoleType()
-    {
-        return $this->roleType;
-    }
-
-    /**
-     * Get all ajax urls
-     *
-     * @return array
-     */
-    private function getAllAjaxUrls()
-    {
-        return $this->allAjaxUrls;
-    }
-
-    /**
-     * Set all ajax urls
-     *
-     * @param array $allAjaxUrls
-     */
-    private function setAllAjaxUrls($allAjaxUrls)
-    {
-        $this->allAjaxUrls = $allAjaxUrls;
     }
 }
