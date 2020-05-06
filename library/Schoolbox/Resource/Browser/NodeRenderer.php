@@ -1,18 +1,19 @@
 <?php
 /**
- * NodeRenderer
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Browser;
-
 
 use Scrub;
 use SitePage;
 
+/**
+ * Class NodeRenderer
+ *
+ * @package Schoolbox\Resource\Browser
+ */
 class NodeRenderer
 {
 
@@ -51,6 +52,7 @@ class NodeRenderer
 
     /**
      * Render tree and excrete it
+     * @param bool $foldersSelectable
      */
     public function render($foldersSelectable = true)
     {
@@ -147,6 +149,7 @@ class NodeRenderer
 
     /**
      * Render all the contents of the current node
+     * @param bool $foldersSelectable
      */
     protected function renderContents($foldersSelectable = true)
     {
