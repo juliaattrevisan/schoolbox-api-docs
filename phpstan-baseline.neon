@@ -4596,11 +4596,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$injector\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/Resources/Module.php
