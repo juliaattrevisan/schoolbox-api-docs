@@ -1,15 +1,12 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Alaress\Web\Output\ThemedHtml;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
@@ -24,31 +21,52 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\UserMapper;
 
+/**
+ * Class AbstractController
+ *
+ * @package Schoolbox\Resource\Browser
+ */
 abstract class AbstractController extends BaseController
 {
 
-    /** @var AbstractTreeBuilder */
+    /**
+     * @var AbstractTreeBuilder
+     */
     protected $treeBuilder;
 
-    /** @var \Schoolbox\Mapper|Resource\File\ILocator */
+    /**
+     * @var \Schoolbox\Mapper|Resource\File\ILocator
+     */
     protected $fileMapper;
 
-    /** @var Config\Loader */
+    /**
+     * @var Config\Loader
+     */
     protected $conf;
 
-    /** @var \Schoolbox\Mapper|Resource\Folder\ILocator */
+    /**
+     * @var \Schoolbox\Mapper|Resource\Folder\ILocator
+     */
     protected $folderMapper;
 
-    /** @var UserMapper */
+    /**
+     * @var UserMapper
+     */
     protected $userMapper;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $namespace;
 
-    /** @var NodeFactory */
+    /**
+     * @var NodeFactory
+     */
     protected $nodeFactory;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $nodeType;
 
     /**
@@ -151,6 +169,7 @@ abstract class AbstractController extends BaseController
      *
      * @param int $folderId
      * @return array
+     * @throws Mapper\Exception
      * @throws Resource\Exception
      */
     protected function getFolderData($folderId)
@@ -219,9 +238,12 @@ abstract class AbstractController extends BaseController
         }
     }
 
+
     /**
      * Display embeddable file picker
      * @param $sourceSlug
+     * @throws Mapper\Exception
+     * @throws Resource\Exception
      */
     public function picker($sourceSlug)
     {
@@ -263,13 +285,18 @@ abstract class AbstractController extends BaseController
         $this->getResponse()->content->set($html);
     }
 
+
     /**
      * Displays 3-panel browser
      *
-     * @api GET /resources(/:folderId)
+     * @api   GET /resources(/:folderId)
      * @since 150
      *
      * @param int $folderId
+     * @throws Mapper\Exception
+     * @throws Resource\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function browse(?int $folderId)
     {
@@ -358,10 +385,12 @@ abstract class AbstractController extends BaseController
 
 
     /**
-     * @api GET /resources/:folderId/info
+     * @api   GET /resources/:folderId/info
      * @since 150
      *
      * @param int $folderId
+     * @throws Mapper\Exception
+     * @throws Resource\Exception
      */
     public function showFolderInfo(int $folderId)
     {
@@ -376,10 +405,11 @@ abstract class AbstractController extends BaseController
 
 
     /**
-     * @api GET /resources/file/:fileId/info
+     * @api   GET /resources/file/:fileId/info
      * @since 150
      *
      * @param int $fileId
+     * @throws Mapper\Exception
      */
     public function showFileInfo($fileId)
     {
@@ -406,11 +436,13 @@ abstract class AbstractController extends BaseController
         ]);
     }
 
+
     /**
-     * @api GET /resources/file/:fileId/ajax
+     * @api   GET /resources/file/:fileId/ajax
      * @since 150
      *
      * @param int $fileId
+     * @throws Mapper\Exception
      */
     public function getFileInfo($fileId)
     {
@@ -427,9 +459,14 @@ abstract class AbstractController extends BaseController
         );
     }
 
+
     /**
      * @api GET /resources/file/:fileIds/info
      * @param $fileIds
+     * @throws InvalidArgumentException
+     * @throws Mapper\Exception
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     public function showMultiFileInfo($fileIds)
     {
@@ -456,12 +493,15 @@ abstract class AbstractController extends BaseController
     /**
      * Post a whole set of new files into the folder.
      *
-     * @api POST /resources/folder/:folderId/files
+     * @api     POST /resources/folder/:folderId/files
      * @version 19.1
      *
      * @param int $folderId
+     * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function postFiles($folderId): void
     {
@@ -513,9 +553,11 @@ abstract class AbstractController extends BaseController
         return $file;
     }
 
+
     /**
      * @param int $folderId
      * @return FolderInterface
+     * @throws Mapper\Exception
      */
     protected function findFolder($folderId)
     {
@@ -543,12 +585,14 @@ abstract class AbstractController extends BaseController
         return $this->folderMapper->findById($folderId);
     }
 
+
     /**
      * Implements access right checks for the given folder type
      * @param int $folderId
      * @return int
      */
     abstract protected function getAccess($folderId);
+
 
     /**
      * @param  string $tab
