@@ -4671,31 +4671,6 @@ parameters:
 			path: library/Schoolbox/Resource/ResourceNotifier.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 212$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/MapperResult/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 378$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/MapperResult/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$offset\\)\\: Unexpected token \"\\$offset\", expected type at offset 340$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/MapperResult/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sortDirection\\)\\: Unexpected token \"\\$sortDirection\", expected type at offset 295$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/MapperResult/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sortProperty\\)\\: Unexpected token \"\\$sortProperty\", expected type at offset 251$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/MapperResult/Base.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 99$#"
 			count: 1
 			path: library/Schoolbox/Resource/Search/Renderer/Base.php
