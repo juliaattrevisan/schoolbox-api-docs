@@ -4796,16 +4796,6 @@ parameters:
 			path: library/Schoolbox/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$conditionType\\)\\: Unexpected token \"\\$conditionType\", expected type at offset 54$#"
-			count: 1
-			path: library/Schoolbox/Sync/Condition/Fragment/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Condition\\\\Fragment\\\\Factory\\:\\:produceType\\(\\) should return Schoolbox\\\\Sync\\\\Condition\\\\Fragment\\\\Fragment but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Condition/Fragment/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 44$#"
 			count: 1
 			path: library/Schoolbox/Sync/Condition/Fragment/Fragment.php
