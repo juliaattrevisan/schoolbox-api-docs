@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Browser;
 
 use Schoolbox\Collection;
@@ -18,19 +16,32 @@ use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress\Color\Color;
 
-
+/**
+ * Class AbstractTreeBuilder
+ *
+ * @package Schoolbox\Resource\Browser
+ */
 abstract class AbstractTreeBuilder
 {
-    /** @var Folder\ILocator */
+
+    /**
+     * @var Folder\ILocator
+     */
     protected $folderLocator;
 
-    /** @var File\ILocator */
+    /**
+     * @var File\ILocator
+     */
     protected $fileLocator;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $rootNodeLabel;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $namespace;
 
 
@@ -321,7 +332,7 @@ abstract class AbstractTreeBuilder
      * @param IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
-     * @param array    $parentList
+     * @param array $parentList
      * @return array
      */
     protected function generateFolderArray(
@@ -389,7 +400,7 @@ abstract class AbstractTreeBuilder
      * @param \Schoolbox\Resource\Storage\IStorage $coverImage
      * @param array $liAttributes
      * @param array $aAttributes
-     * @param array                                $parentList
+     * @param array $parentList
      * @return array
      */
     protected function generateNodeArray(
@@ -482,7 +493,7 @@ abstract class AbstractTreeBuilder
      * Gets a permission string out of a permission code returned from
      * $this->handler->getPermission().
      *
-     * @param  $code
+     * @param int $code
      *
      * @return string
      */
@@ -533,7 +544,7 @@ abstract class AbstractTreeBuilder
     protected function filterMime($files, $mimes)
     {
         // Check if the mime filter passed is a wildcard
-        if ($mimes != "*/*") {
+        if ($mimes != '*/*') {
 
             $filesFiltered = new Collection();
 
@@ -560,7 +571,7 @@ abstract class AbstractTreeBuilder
                         for ($i = 0; $i < 2; $i++) {
 
                             // If current filter is wildcard, dont need to test
-                            if ($allowedMimeParts[$i] != "*") {
+                            if ($allowedMimeParts[$i] != '*') {
                                 if (strtolower($fileMimeParts[$i] != strtolower($allowedMimeParts[$i]))) {
                                     $match = false;
                                 }
@@ -616,7 +627,7 @@ abstract class AbstractTreeBuilder
      * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected abstract function getNodeFiles($nodeId, $mime = "*/*");
+    protected abstract function getNodeFiles($nodeId, $mime = '*/*');
 
 
     /**
