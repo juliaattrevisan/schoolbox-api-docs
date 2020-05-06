@@ -200,7 +200,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     /**
      * Abstractify this check so subclasses can wrangle
      *
-     * @param $property
+     * @param string $property
      * @return bool
      */
     protected function isCollection($property)

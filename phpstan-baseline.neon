@@ -4801,11 +4801,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$property\\)\\: Unexpected token \"\\$property\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$map\\)\\: Unexpected token \"\\$map\", expected type at offset 40$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
