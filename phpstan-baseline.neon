@@ -4806,11 +4806,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Fragment.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$roleType\\)\\: Unexpected token \"\\$roleType\", expected type at offset 73$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Fragment/Lookup.php
