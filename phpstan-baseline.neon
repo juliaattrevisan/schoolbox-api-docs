@@ -4806,16 +4806,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleType\\)\\: Unexpected token \"\\$roleType\", expected type at offset 73$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Lookup.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userField\\)\\: Unexpected token \"\\$userField\", expected type at offset 48$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Lookup.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 54$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Type/Mapper.php
