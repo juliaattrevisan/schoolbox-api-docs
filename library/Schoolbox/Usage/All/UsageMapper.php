@@ -1,23 +1,27 @@
 <?php
 /**
- * Mapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Usage\All;
 
 use Alaress_Date_Format;
 use Database;
 
+/**
+ * Class UsageMapper
+ *
+ * @package Schoolbox\Usage\All
+ */
 class UsageMapper
 {
+
     /**
      * @var Database
      */
     protected $database;
+
 
     /**
      * Constructor - sets up database
@@ -27,17 +31,19 @@ class UsageMapper
         $this->database = Database::getInstance();
     }
 
+
     /**
      * The total number of users
      *
      * @return mixed
+     * @throws \PDOException
      */
     public function numUsers()
     {
-        $query = "
+        $query = '
             SELECT COUNT(`user`.id) AS num
             FROM `user`
-        ";
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->execute();
@@ -46,6 +52,7 @@ class UsageMapper
 
         return $result['num'];
     }
+
 
     /**
      * Find total usage
@@ -65,16 +72,18 @@ class UsageMapper
         );
     }
 
+
     /**
      * Find total category usage
      *
      * This does NOT summate files which have been marked as softdeleted in the db
      *
      * @return array
+     * @throws \PDOException
      */
     public function findGroupUsage()
     {
-        $query = "
+        $query = '
             SELECT `groups`.name, COALESCE(SUM(bytes), 0) AS bytes
             FROM groups
               LEFT JOIN
@@ -114,7 +123,7 @@ class UsageMapper
               ) allTotals ON `groups`.id = allTotals.id
             GROUP BY `groups`.name
             ORDER BY `groups`.id
-        ";
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->execute();
@@ -134,7 +143,8 @@ class UsageMapper
      * This summates the filesizes of all files in the specified location.
      * This includes files which may have been marked as softdeleted in the db
      *
-     * @return array
+     * @return \Schoolbox\Collection
+     * @throws \PDOException
      */
     public function findTypeUsage()
     {
@@ -217,11 +227,11 @@ class UsageMapper
 
         // Special handling for storage, as it's too big to `du` sensibly
         // Assume it's kept up to date with OTFS
-        $storageStatement = $this->database->prepare("
+        $storageStatement = $this->database->prepare('
             SELECT SUM(filesize) AS filesize
             FROM storage
             WHERE expired_at IS NULL OR expired_at >= :now
-        ");
+        ');
         $storageStatement->execute([
             'now' => Alaress_Date_Format::now()->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT),
         ]);
@@ -234,6 +244,7 @@ class UsageMapper
         return $collection;
     }
 
+
     /**
      * Find total user usage
      *
@@ -241,9 +252,10 @@ class UsageMapper
      *
      * @param string $orderBy
      * @param string $order
-     * @param int $index
-     * @param $usersPerPage
+     * @param int    $index
+     * @param int    $usersPerPage
      * @return array
+     * @throws \PDOException
      */
     public function findUserUsage($orderBy, $order, $index, $usersPerPage)
     {
