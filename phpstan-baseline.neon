@@ -4626,16 +4626,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Ancestry.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$cheaply bool Use this to switch between findCheaplyById\\(\\) and findById\\(\\)\\)\\: Unexpected token \"\\$cheaply\", expected type at offset 155$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Ancestry.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 137$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Ancestry.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/ClassListFactory.php
