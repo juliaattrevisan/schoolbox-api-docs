@@ -8,19 +8,21 @@
     </div>
 {% else %}
     {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
-    <div class="empty-state" id="twitter-view-{{ id }}-container">
-        <span class="icon-twitter" id="twitter-view-{{ id }}-icon"></span>
-        <p>
-            <a id="twitter-view-{{ id }}"
-               class="twitter-timeline"
-               href="{{ href }}"
-               target="_blank"
-               data-dnt="true"
-               {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
-               data-chrome="noheader nofooter noborders transparent noscrollbar"
-            >Loading tweets...</a>
+    <div class="empty-state" id="twitter-view-{{ id }}-loading-container">
+        <span class="icon-twitter"></span>
+        <p id="twitter-view-{{ id }}-loading-message">Loading tweets...</p>
+        <p id="twitter-view-{{ id }}-loading-message-waiting" class="hide">Still loading...</p>
+        <p id="twitter-view-{{ id }}-loading-message-failed" class="hide">
+            Cannot load tweets for @{{ username }}. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>.
         </p>
     </div>
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="{{ href }}"
+       data-dnt="true"
+       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
+       data-chrome="noheader nofooter noborders transparent noscrollbar"
+    ></a>
 
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -48,42 +50,47 @@
             twttr.ready(
                 function (t) {
                     let elementId = "twitter-view-{{ id }}",
-                        container = document.getElementById("twitter-view-{{ id }}-container"),
-                        icon      = document.getElementById("twitter-view-{{ id }}-icon"),
+                        container = document.getElementById("twitter-view-{{ id }}-loading-container"),
                         observer  = new MutationObserver(function (mutationsList, observer) {
-                            // If the observer doesn't find the element, the
-                            // Twitter feed has been loaded.
-                            // Remove the empty state.
+                            // If the observer doesn't find the base element,
+                            // the Twitter feed has been loaded successfully.
+                            // Remove the empty state and stop observing.
                             if (!document.getElementById(elementId)) {
-                                container.classList.remove('empty-state');
-                                icon.remove();
+                                console.log(mutationsList);
+                                container.remove();
                                 observer.disconnect();
                             }
                         }),
-                        timeout1  = function () {
+                        timeout1         = 5000,
+                        timeout2         = 15000,
+                        timeout1Callback = function () {
+                            // Feed hasn't loaded after timeout1 ms?
+                            // Show a "still loading" message
                             let element = document.getElementById(elementId);
                             if (element) {
-                                element.innerText = 'Still loading...';
+                                document.getElementById("twitter-view-{{ id }}-loading-message").classList.add('hide');
+                                document.getElementById("twitter-view-{{ id }}-loading-message-waiting").classList.remove('hide');
                             }
                         },
-                        timeout2  = function () {
+                        timeout2Callback = function () {
+                            // Feed hasn't loaded after timeout1 ms?
+                            // Show a "loading failed" message
                             let element = document.getElementById(elementId);
                             if (element) {
-                                element.innerText = 'Cannot load tweets for @{{ username }}.';
+                                document.getElementById("twitter-view-{{ id }}-loading-message-waiting").classList.add('hide');
+                                document.getElementById("twitter-view-{{ id }}-loading-message-failed").classList.remove('hide');
                             }
                         };
-                    observer.observe(container, { attributes: true, childList: true, subtree: true });
+
+                    // Finally load the widget
                     t.widgets.load(document.getElementById(elementId))
-                        .finally(
-                            function () {
-                                // The widget got loaded, apparently.
-                                // Wait and see if this item still exists?
-                                // If we detect the item doesn't exist: remove
-                                // the empty state
-                                setTimeout(timeout1, 5000);
-                                setTimeout(timeout2, 15000);
-                            }
-                        );
+
+                    // Set up the timeouts for loading pending and failed messages
+                    setTimeout(timeout1Callback, timeout1);
+                    setTimeout(timeout2Callback, timeout2);
+
+                    // Set up the observer on the children of the base element
+                    observer.observe(document.getElementById(elementId).parentNode, { childList: true });
                 }
             );
         </script>
