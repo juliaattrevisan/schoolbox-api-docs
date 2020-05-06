@@ -4796,11 +4796,6 @@ parameters:
 			path: library/Schoolbox/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Sync/Condition/Fragment/Fragment.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 184$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Controller.php

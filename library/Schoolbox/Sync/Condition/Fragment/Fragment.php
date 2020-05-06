@@ -1,46 +1,40 @@
 <?php
 /**
- * Fragment
- *
- * An Condition Fragment definition. The $filename is its twig template
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Condition\Fragment;
 
-class Fragment {
+/**
+ * Class Fragment
+ *
+ * An Condition Fragment definition. The $filename is its twig template
+ *
+ * @package Schoolbox\Sync\Condition\Fragment
+ */
+class Fragment
+{
 
     /**
      * Template filename
      *
      * @var string
      */
-    private $filename = '';
+    private $filename;
+
 
     /**
      * Constructor
      *
-     * @param $filename
+     * @param string $filename
      */
     public function __construct($filename) {
-        $this->setFilename($filename);
+        $this->filename = $filename;
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set filename
-     *
-     * @param string $filename
-     */
-    private function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
 
     /**
      * Get filename
