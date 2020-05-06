@@ -37,6 +37,15 @@ abstract class Base
         return null;
     }
 
+
+    /**
+     * Each subclass must execute this method
+     *
+     * @return mixed
+     */
+    abstract public function test();
+
+
     /* Getters/Setters
      */
 
