@@ -4676,31 +4676,6 @@ parameters:
 			path: library/Schoolbox/Resource/Search/Results.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 119$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Sanitiser.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$limit\\)\\: Unexpected token \"\\$limit\", expected type at offset 221$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Sanitiser.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$offset\\)\\: Unexpected token \"\\$offset\", expected type at offset 199$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Sanitiser.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sortDirection\\)\\: Unexpected token \"\\$sortDirection\", expected type at offset 170$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Sanitiser.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sortProperty\\)\\: Unexpected token \"\\$sortProperty\", expected type at offset 142$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Sanitiser.php
-
-		-
 			message: "#^Property Schoolbox\\\\Resource\\\\Test\\\\CategoryMapperTest\\:\\:\\$object has unknown class Schoolbox\\\\Resource\\\\Test\\\\FileMapper as its type\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Test/CategoryMapperTest.php

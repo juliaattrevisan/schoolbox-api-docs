@@ -1,6 +1,16 @@
 <?php
 /**
- * Sanitiser
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Resource\Search;
+
+use Schoolbox\Mapper;
+
+/**
+ * Class Sanitiser
+ *
  *
  * Santises search parameters Keyword, Sort Property, Sort Direction, Offset, Limit
  *
@@ -13,21 +23,15 @@
  *
  * - Also casts (int) on offset and limit.
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @package Schoolbox\Resource\Search
  */
-
-namespace Schoolbox\Resource\Search;
-
-use Schoolbox\Mapper;
-
 class Sanitiser
 {
     /**
      * Alias for the name to search by.
      */
     const SCORE_COLUMN = 'score';
+
 
     /**
      * Sort by this column name
@@ -36,12 +40,14 @@ class Sanitiser
      */
     private $sortBy = '';
 
+
     /**
      * Sort direction
      *
      * @var string
      */
     private $sortDir = 'DESC';
+
 
     /**
      * Offset
@@ -50,6 +56,7 @@ class Sanitiser
      */
     private $offset = 0;
 
+
     /**
      * Page Limit
      *
@@ -57,11 +64,13 @@ class Sanitiser
      */
     private $pageLimit = 0;
 
+
     /**
      * Max results limit
      * @var int
      */
     private $resultLimit = 500;
+
 
     /**
      * Keyword
@@ -70,12 +79,14 @@ class Sanitiser
      */
     private $keyword = '';
 
+
     /**
      * Keyword (unquoted)
      *
      * @var string
      */
     private $unquotedKeyword = '';
+
 
     /**
      * Is this sort on an actual table column?
@@ -84,17 +95,18 @@ class Sanitiser
      */
     private $sortOnTableColumn = false;
 
+
     /**
      * Sanitise search params
      *
      * Immutable
      *
      * @param \Schoolbox\Mapper $mapper
-     * @param $keyword
-     * @param $sortProperty
-     * @param $sortDirection
-     * @param $offset
-     * @param $limit
+     * @param string $keyword
+     * @param string $sortProperty
+     * @param string $sortDirection
+     * @param int $offset
+     * @param int $limit
      */
     public function __construct(Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
     {
