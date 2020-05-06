@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Realtime\Message;
 
-use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
@@ -59,43 +58,6 @@ class SourceMapper extends Mapper
 
 
     /**
-     * Returns a Collection of sources found in a namespace, looked up by slug
-     *
-     * @param string $slug
-     * @return Collection|Source[]
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    public function findByNamespaceSlug($slug) {
-
-        $nsJoin = $this->getJoinMapper('namespace');
-
-        $stmt = $this->database->prepare("
-            SELECT	{$this->getColumnString('src')},
-                    {$nsJoin->getColumnString('ns')}
-            FROM {$this->getTable()} `src`
-            LEFT JOIN {$this->getJoinSql('namespace', 'src', 'ns')}
-            WHERE ns.slug = :slug
-        ");
-
-        $stmt->execute(array('slug' => $slug));
-
-        $collection = $this->createCollection();
-
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Source $entity */
-            $entity = $this->hydrate($r, 'src');
-            $entity->setNamespace($nsJoin->hydrate($r, 'ns'));
-            $collection->add($entity);
-        }
-
-        return $collection;
-    }
-
-
-    /**
      * Override so we can implicitly search on namespace.slug
      *
      * @param array $columnList
@@ -119,5 +81,4 @@ class SourceMapper extends Mapper
 
         return parent::findByColumnList($columnList, $options);
     }
-
 }

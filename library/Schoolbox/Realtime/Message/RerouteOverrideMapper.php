@@ -54,25 +54,6 @@ class RerouteOverrideMapper extends Mapper
 
 
     /**
-     * Returns a collection of overrides that match the given route and, optionally, user ID.
-     *
-     * @param string $route
-     * @param int $userId
-     * @return Collection|RerouteOverride[]
-     */
-    public function findWhereMatching($route, $userId = 0) {
-        $coll = $this->findByColumn('user_id', array(0, $userId));
-        $regex = '`'. str_replace('*','[^\.]', $route) . '`';
-
-        return $coll->filter(function($override) use ($regex) {
-            /** @var RerouteOverride $override */
-            return preg_match($regex, $override->getRouteKey());
-        });
-
-    }
-
-
-    /**
      * Override to allow for regex pattern searching on the route key.
      * If no capture groups are specified, the result is identical to if this override did not exist
      * If capture groups are specified, each RerouteOverride::routeKey will be an array of the preg_matches
@@ -172,13 +153,15 @@ class RerouteOverrideMapper extends Mapper
         return $this->hydrateList($statement);
     }
 
+
     /**
      * Have message for this route key been muted?
      *
      * @param string $routeKey
-     * @param int    $userId   If supplied, the user to check.
+     * @param int    $userId If supplied, the user to check.
      *
      * @return string
+     * @throws \PDOException
      */
     public function isRouteMuted($routeKey, $userId = null)
     {
