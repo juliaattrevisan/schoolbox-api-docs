@@ -241,7 +241,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * Display embeddable file picker
-     * @param $sourceSlug
+     * @param string $sourceSlug
      * @throws Mapper\Exception
      * @throws Resource\Exception
      */
@@ -250,7 +250,7 @@ abstract class AbstractController extends BaseController
         $mime = $this->getRequest()->query['mime'];
 
         if (empty($mime)) {
-            $mime = "*/*";
+            $mime = '*/*';
         }
 
         $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
@@ -462,7 +462,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/file/:fileIds/info
-     * @param $fileIds
+     * @param array $fileIds
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \LogicException
