@@ -39,8 +39,8 @@ class Subscription implements ISubscription
     /**
      * Constructor
      *
-     * @param                        $instanceId
-     * @param                        $userId
+     * @param string                 $instanceId
+     * @param int                    $userId
      * @param Predis\ClientInterface $syncClient
      * @param Async\Client           $asyncClient
      * @param Async\EventListener    $listener
