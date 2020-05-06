@@ -61,7 +61,7 @@ class Controller extends Base
             'allNDSField'      => $ffactory->buildMap($rule->getRoleType()),
             'meta'             => [
                 'condition' => [
-                    $newCondition->getId() => $this->getMeta()
+                    $newCondition->getId() => $this->meta
                 ]
             ],
             'currentCondition' => $newCondition,
@@ -101,28 +101,5 @@ class Controller extends Base
         ]);
 
         return true;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set meta
-     *
-     * @param mixed $meta
-     */
-    private function setMeta($meta)
-    {
-        $this->meta = $meta;
-    }
-
-    /**
-     * Get meta
-     *
-     * @return mixed
-     */
-    private function getMeta()
-    {
-        return $this->meta;
     }
 }
