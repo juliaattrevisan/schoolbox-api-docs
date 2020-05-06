@@ -4866,26 +4866,6 @@ parameters:
 			path: library/Schoolbox/Sync/Iterator/Student.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userAccessRemove\\)\\: Unexpected token \"\\$userAccessRemove\", expected type at offset 69$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/User.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$campusCollectionRemove\\)\\: Unexpected token \"\\$campusCollectionRemove\", expected type at offset 185$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/User.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifiers\\)\\: Unexpected token \"\\$identifiers\", expected type at offset 98$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/User.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$level\\)\\: Unexpected token \"\\$level\", expected type at offset 125$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/User.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findAllGroupsForUser\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Provisioner/UserMapper.php
