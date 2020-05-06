@@ -4686,11 +4686,6 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Search/Renderer.php
-
-		-
 			message: "#^Variable \\$item in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Auth/CanBookItem.php
