@@ -36,6 +36,31 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'resultUpdated';
 
     /**
+     * @var MatchMapper $matchMapper
+     */
+    protected $matchMapper;
+
+    /**
+     * @var ResultMapper $resultMapper
+     */
+    protected $resultMapper;
+
+    /**
+     * @var DivisionMapper $divisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var SportMapper $sportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var TeamPlayerMapper $teamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
      * @param null $dependencies
      */
     public function loadDependencies($dependencies = null)
@@ -230,59 +255,19 @@ class Notifier extends AbstractModuleNotifier
         return $envelope;
     }
 
-    /**
-     * Here be the mappers, nothing interesting to see past this point... (i promise)
-     *
-     *               ,---.
-     *            ,.'-.   \
-     *           ( ( ,'"""""-.
-     *           `,X          `.
-     *           /` `           `._
-     *          (            ,   ,_\
-     *          |          ,---.,'o `.
-     *          |         / o   \     )
-     *           \ ,.    (      .____,
-     *            \| \    \____,'     \
-     *          '`'\  \        _,____,'
-     *          \  ,--      ,-'     \
-     *            ( C     ,'         \
-     *             `--'  .'           |
-     *               |   |         .O |
-     *             __|    \        ,-'_
-     *            / `L     `._  _,'  ' `.
-     *           /    `--.._  `',.   _\  `
-     *           `-.       /\  | `. ( ,\  \
-     *          _/  `-._  /  \ |--'  (     \
-     *         '  `-.   `'    \/\`.   `.    )
-     *               \      -    \ `.  |    |
-     *
+    /* These methods are dynamically accessed via AbstractModuleNotifier::loadDependencies
      */
 
-    /** @var MatchMapper $matchMapper */
-    protected $matchMapper;
-    
-    /** @var ResultMapper $resultMapper */
-    protected $resultMapper;
-
-    /** @var DivisionMapper $divisionMapper */
-    protected $divisionMapper;
-
-    /** @var SportMapper $sportMapper */
-    protected $sportMapper;
-
-    /** @var TeamPlayerMapper $teamPlayerMapper */
-    protected $teamPlayerMapper;
-
     /**
-     * @param $mapper
+     * @param MatchMapper $mapper
      */
     protected function setMatchMapper($mapper)
     {
         $this->matchMapper = $mapper;
     }
-    
+
     /**
-     * @param $mapper
+     * @param ResultMapper $mapper
      */
     protected function setResultMapper($mapper)
     {
@@ -290,7 +275,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param $mapper
+     * @param DivisionMapper $mapper
      */
     protected function setDivisionMapper($mapper)
     {
@@ -298,7 +283,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param $mapper
+     * @param SportMapper $mapper
      */
     protected function setSportMapper($mapper)
     {
@@ -306,7 +291,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param $mapper
+     * @param TeamPlayerMapper $mapper
      */
     protected function setTeamPlayerMapper($mapper)
     {

@@ -43,6 +43,7 @@ class RosettaStone
      * @param bool   $plural
      * @param bool   $capital
      * @return string
+     * @throws OutOfBoundsException
      */
     public function translate($term, $plural = false, $capital = false)
     {
@@ -55,6 +56,7 @@ class RosettaStone
      * @param string $term
      * @param bool   $capital
      * @return string
+     * @throws OutOfBoundsException
      */
     public function indefiniteArticle($term, $capital = false)
     {
@@ -95,8 +97,9 @@ class RosettaStone
      *   {{ locale.calendar.plural }} to return 'calendars'
      *   {{ locale.resource.properPlural }} to return 'Resources'
      *
-     * @param $term string
+     * @param string $term
      * @return Model
+     * @throws OutOfBoundsException
      */
     public function __get($term)
     {

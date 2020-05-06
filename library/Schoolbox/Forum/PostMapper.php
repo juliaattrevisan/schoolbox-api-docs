@@ -138,10 +138,14 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
      * @param int $offset
      * @param int $time
      * @return Collection|Post[]
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = date('Y-m-d H:i:s', $time ? : time());
+        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getUnixTimeStamp();
 
         $limit = (int)$limit;
         $offset = (int)$offset;
@@ -182,10 +186,13 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
     }
 
     /**
-     * @param $threadID
+     * @param int $threadID
      * @return object|null
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
+     * @throws Mapper\Exception\NotFound
+     * @throws \PDOException
      */
     public function findFirstPost($threadID)
     {
@@ -196,7 +203,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getJoinColumnString('owner', 'owner')}
             FROM {$this->getTable()} AS post
             LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
-            WHERE post.parentID IS NULL AND post.threadID=? 
+            WHERE post.parentID IS NULL AND post.threadID=?
             LIMIT 1";
 
         $statement = $this->database->prepare($query);

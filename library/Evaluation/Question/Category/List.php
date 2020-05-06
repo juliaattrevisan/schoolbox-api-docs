@@ -46,7 +46,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get a list of nodes that should be open, for the javascript tree
      *
-     * @param $category_id
+     * @param int $category_id
      * @return string
      */
     private function getJsNodePath($category_id)
@@ -72,8 +72,8 @@ abstract class Evaluation_Question_Category_List
     /**
      * Find the way back to parent
      *
-     * @param $category_id
-     * @param $pathArray
+     * @param int $category_id
+     * @param array $pathArray
      *
      * @return array
      */
@@ -136,7 +136,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Recursively construct and render a category hierarchy
      *
-     * @param $allCategories
+     * @param array $allCategories
      */
     private function build($allCategories)
     {
@@ -262,7 +262,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Set category handler
      *
-     * @param Assess_Question_Category $categoryHandler
+     * @param Evaluation_Question_Category $categoryHandler
      */
     private function setCategoryHandler($categoryHandler)
     {
@@ -272,7 +272,7 @@ abstract class Evaluation_Question_Category_List
     /**
      * Get category handler
      *
-     * @return Assess_Question_Category
+     * @return Evaluation_Question_Category
      */
     private function getCategoryHandler()
     {

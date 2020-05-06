@@ -10,9 +10,8 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
-use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 
-class RelationalDelete extends Deletable implements IRelationalDelete
+class RelationalDelete extends Deletable
 {
     /**
      * @var \Database
@@ -23,6 +22,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
      * RelationalDelete constructor.
      *
      * @param Mapper          $mapper
+     * @param LoggerInterface $logger
      */
     public function __construct(Mapper $mapper, LoggerInterface $logger)
     {
@@ -42,8 +42,8 @@ class RelationalDelete extends Deletable implements IRelationalDelete
             if ($performDryRun) {
                 $this->logger->notice('Will delete [' . $records->count() . '] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
             } else {
-                $query = 'DELETE pd FROM plagscan_document pd 
-                    INNER JOIN student_submission_file ssf ON pd.student_submission_file_id = ssf.id 
+                $query = 'DELETE pd FROM plagscan_document pd
+                    INNER JOIN student_submission_file ssf ON pd.student_submission_file_id = ssf.id
                     WHERE ssf.hash = :hash';
 
                 $statement = $this->database->prepare($query);
@@ -61,9 +61,10 @@ class RelationalDelete extends Deletable implements IRelationalDelete
     /**
      * Check if there's a record that needs to be purged in student_submission_file
      *
-     * @param $hash
+     * @param string $hash
      *
      * @return int
+     * @throws \PDOException
      */
     private function hasStudentSubmissionRecord($hash): int
     {

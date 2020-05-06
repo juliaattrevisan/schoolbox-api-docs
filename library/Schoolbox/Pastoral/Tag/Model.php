@@ -22,10 +22,14 @@ class Model implements ISoftDeletable, JsonSerializable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var Pastoral */
+    /**
+     * @var Pastoral
+     */
     protected $pastoral;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -57,7 +61,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param $pastoral
+     * @param Pastoral $pastoral
      *
      * @return $this
      */

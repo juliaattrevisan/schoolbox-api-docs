@@ -82,7 +82,7 @@ class DataSource implements IResponseDataSource
     /**
      * Find a particular $response by its id among a set of IResponses
      *
-     * @param $responseId
+     * @param int $responseId
      * @param IAssessable $assessment
      * @return IResponse
      * @throws \OutOfBoundsException

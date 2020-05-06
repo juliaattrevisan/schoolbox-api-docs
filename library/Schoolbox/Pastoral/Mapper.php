@@ -194,8 +194,8 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param $row
-     * @param $hydrateRelatedRecords
+     * @param array $row
+     * @param bool $hydrateRelatedRecords
      *
      * @return Model|bool
      * @throws DefinitionException If a specified mapper is not found in definition

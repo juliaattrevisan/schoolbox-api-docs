@@ -1,15 +1,9 @@
 <?php
 /**
- * Connector
- *
- * API v3.0 Connector for Plagscan
- * https://api.plagscan.com/v3/
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
@@ -17,6 +11,14 @@ use GuzzleHttp\Exception\TransferException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
 
+/**
+ * Class Connector
+ *
+ * API v3.0 Connector for Plagscan
+ * https://api.plagscan.com/v3/
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3
+ */
 class Connector
 {
 
@@ -54,13 +56,6 @@ class Connector
      * @see http://blog.plagscan.com/plagscan-updates-possible-uploading-file-size/
      */
     private const PLAGSCAN_FILESIZE_LIMIT = 104857600;
-
-    /**
-     * Api url where stuff is sent
-     *
-     * @var string
-     */
-    private $apiUrl = 'https://api.plagscan.com/v3/';
 
     /**
      * A secret hash that Plagscan generates from your
@@ -118,17 +113,17 @@ class Connector
 
         $postData = [
             [
-                "name"     => "fileUpload",
-                "contents" => $submissionFile->getStorage()->readStream(),
-                "filename" => $filename,
+                'name'     => 'fileUpload',
+                'contents' => $submissionFile->getStorage()->readStream(),
+                'filename' => $filename,
             ],
         ];
 
         try {
             $client = new Client([
-                "base_uri"    => $this->apiUrl,
-                "timeout"     => self::PLAGSCAN_TIMEOUT,
-                "http_errors" => false,
+                'base_uri'    => AccessTokenGenerator::API_URL,
+                'timeout'     => self::PLAGSCAN_TIMEOUT,
+                'http_errors' => false,
             ]);
         } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
@@ -145,7 +140,7 @@ class Connector
         if ($response->getStatusCode() == 201) {
             if (!(array_key_exists('data', $content) && array_key_exists('docID', $content['data']))) {
                 throw new \InvalidArgumentException(
-                    "response[data][docID] does not exist: PlagScan has changed their API again"
+                    'response[data][docID] does not exist: PlagScan has changed their API again'
                 );
             }
             return $content['data']['docID'];
@@ -161,7 +156,7 @@ class Connector
      * Create a filename that will be sent to plagscan to identify the file
      *
      * @param SubmissionFile $submissionFile
-     * @param                $filename
+     * @param string         $filename
      * @return string
      */
     private function makeFileName(SubmissionFile $submissionFile, string $filename): string
@@ -197,7 +192,7 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
+            "base_uri"    => AccessTokenGenerator::API_URL,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -414,9 +409,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {
@@ -450,9 +445,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {
@@ -486,9 +481,9 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri"    => $this->apiUrl,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
+            'base_uri'    => AccessTokenGenerator::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
         ]);
 
         try {

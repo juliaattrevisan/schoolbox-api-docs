@@ -140,8 +140,8 @@ abstract class AbstractMapperProxy
      * This can be used to sync ID properties from sub-objects from the data
      * model to the domain model.
      *
-     * @param $domainObject
-     * @param $dataModel
+     * @param object $domainObject
+     * @param object $dataModel
      */
     protected function postSave($domainObject, $dataModel)
     {
@@ -238,7 +238,7 @@ abstract class AbstractMapperProxy
     /**
      * Retrieves a single mapping from an external to an internal ID.
      *
-     * @param $externalValue
+     * @param int $externalValue
      * @return int
      */
     protected function getInternalValue($externalValue)
@@ -248,7 +248,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * @param $externalValues
+     * @param array $externalValues
      * @return array
      */
     protected function getInternalValues(array $externalValues)

@@ -132,7 +132,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     }
 
     /**
-     * @param $database
+     * @param MSSQL $database
      */
     private function setDatabase($database)
     {
@@ -158,7 +158,6 @@ class External_Doublefirst_Class implements External_ClassInterface
     /**
      * @param string $filetype
      * @param array  $timetableCode
-     *
      * @return array
      */
     public function findClassesByType(string $filetype, array $timetableCode): array

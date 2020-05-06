@@ -82,7 +82,7 @@ class Staff extends Base {
     /**
      * Get a concatenated string representation of all the emails everywhere
      *
-     * @param $separator
+     * @param string|null $separator
      * @return string
      */
     public function getAllEmails($separator = "\n") {
@@ -98,7 +98,7 @@ class Staff extends Base {
     /**
      * Get a concatenated string representation of all the campuse codes everywhere
      *
-     * @param $separator
+     * @param string|null $separator
      * @return string
      */
     public function getAllCampuses($separator = "\n") {

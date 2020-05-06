@@ -52,6 +52,7 @@ class External_Doublefirst_User implements External_UserInterface
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\File\Exception
      */
     public function getPortrait(User $user): ?Storage\Model
     {
@@ -405,7 +406,7 @@ class External_Doublefirst_User implements External_UserInterface
                             '' AS StaffVoiceMail,
                             '' AS StaffHouseDescription
             FROM            StaffPersonalDetails s
-		    JOIN            CurrentStaff cs ON cs.StaffID = s.StaffID
+            JOIN            CurrentStaff cs ON cs.StaffID = s.StaffID
             LEFT JOIN       LookupDetails cat ON cat.LookupID = 1203 AND cat.LookupDetailsID = s.StaffCategory
             LEFT JOIN       StaffTelephones tMobile on tMobile.StaffID = s.StaffID AND TelephoneType = 'M'
             WHERE           s.StaffId = '{$this->database->quote($externalUserId)}'
@@ -933,7 +934,7 @@ class External_Doublefirst_User implements External_UserInterface
                         ''                    AS StaffJobPositionStartDate,
                         ''                    AS StaffJobPositionEndDate
             FROM        StaffPersonalDetails spd
-	        JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
+            JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
             LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = 'D321'
             LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'
@@ -989,10 +990,10 @@ class External_Doublefirst_User implements External_UserInterface
 
             UNION
 
-	        SELECT            '' AS Code,
-	                          '' AS Description
+            SELECT            '' AS Code,
+                              '' AS Description
 
-	        ORDER BY	      Description
+            ORDER BY	      Description
         ";
 
         return $this->getDatabase()->getAll($query);
@@ -1019,7 +1020,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Set database
      *
-     * @param $database
+     * @param MSSQL $database
      */
     private function setDatabase($database)
     {

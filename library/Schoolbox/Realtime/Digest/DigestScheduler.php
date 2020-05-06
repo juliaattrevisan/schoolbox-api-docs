@@ -1,13 +1,10 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Realtime\Digest;
-
 
 use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
@@ -24,16 +21,29 @@ use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
+/**
+ * Class DigestScheduler
+ *
+ * @package Schoolbox\Realtime\Digest
+ */
 class DigestScheduler extends CronScheduler
 {
 
-    /** @var DigestTriggerFactory */
+    /**
+     * @var DigestTriggerFactory
+     */
     private $factory;
 
-    /** @var IConfigLoader */
+
+    /**
+     * @var IConfigLoader
+     */
     private $conf;
 
-    /** @var RoleMapper */
+
+    /**
+     * @var RoleMapper
+     */
     private $roleMapper;
 
 
@@ -60,45 +70,45 @@ class DigestScheduler extends CronScheduler
         $this->conf       = $conf;
         $this->factory    = $factory;
 
-		// instantiate schedule
-		$this->reload();
+        // instantiate schedule
+        $this->reload();
     }
 
 
-	/**
+    /**
      * (Re)compute the triggers for this particular scheduler
      *
-	 * @return TriggerInterface[]
-	 */
-	protected function computeTriggers()
+     * @return TriggerInterface[]
+     */
+    protected function computeTriggers()
     {
         $triggers = [];
 
         // gently release workers in case they're digesting
         $this->getDispatcher()->releaseWorkerPool(Pool::RELEASE_SOFT);
 
-		// read each role entry, and schedule a cron based on it
-		foreach ($this->roleMapper->findAll() as $role) {
-			$schedule = $role->getDigestSchedule();
+        // read each role entry, and schedule a cron based on it
+        foreach ($this->roleMapper->findAll() as $role) {
+            $schedule = $role->getDigestSchedule();
 
-			// cast 0 to "0", because loose typing equality because PHP -_-
-			if ((string)$schedule === (string)Role::DIGEST_NEVER) {
-				continue;
-			}
+            // cast 0 to "0", because loose typing equality because PHP -_-
+            if ((string)$schedule === (string)Role::DIGEST_NEVER) {
+                continue;
+            }
 
-			try {
-				$triggers[$role->getId()] = $this->factory->build($schedule, $role);
+            try {
+                $triggers[$role->getId()] = $this->factory->build($schedule, $role);
 
-			} catch (InvalidArgumentException $e) {
-			    $this->logException($e);
-
-			} catch (RuntimeException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->logException($e);
-			}
-		}
 
-		return $triggers;
-	}
+            } catch (RuntimeException $e) {
+                $this->logException($e);
+            }
+        }
+
+        return $triggers;
+    }
 
 
     /**
@@ -115,15 +125,15 @@ class DigestScheduler extends CronScheduler
 
 
     /**
-	 * Report in an appropriate way, based on the data returned by the worker
-	 *
-	 * @param $data
-	 * @return void
-	 */
-	protected function report($data)
+     * Report in an appropriate way, based on the data returned by the worker
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function report($data)
     {
-		$this->log->notice('Emails sent: ' . unserialize($data[0]));
-	}
+        $this->log->notice('Emails sent: ' . unserialize($data[0]));
+    }
 
 
     /**
@@ -142,5 +152,4 @@ class DigestScheduler extends CronScheduler
     {
         $this->conf->dropCache();
     }
-
 }

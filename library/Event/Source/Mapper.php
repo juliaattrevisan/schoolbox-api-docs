@@ -46,16 +46,16 @@ class Mapper extends BaseMapper
     /**
      * Find a list of eventIds that originated from $sourceName
      *
-     * @param $sourceName
+     * @param string $sourceName
      * @return array
      * @throws BaseMapper\DefinitionException
      */
     private function findEventIdsUsingSource($sourceName)
     {
         $query = "
-            SELECT 
+            SELECT
             {$this->getTable()}.`event_id`
-            FROM {$this->getTable()} 
+            FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('event')}
             WHERE {$this->getTable()}.`source_name` = :sourceName
         ";

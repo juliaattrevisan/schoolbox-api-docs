@@ -1,17 +1,9 @@
 <?php
 /**
- * Factory
- *
- * Build an IAssessable instance based on the common params
- *
- * The IAssessable instance can later be decorated with their
- * additional specific details
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
@@ -43,6 +35,16 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use UnexpectedValueException;
 
+/**
+ * Class Factory
+ *
+ * Build an IAssessable instance based on the common params
+ *
+ * The IAssessable instance can later be decorated with their
+ * additional specific details
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 class Factory
 {
     use DueWorkTrait;
@@ -70,8 +72,9 @@ class Factory
      */
     protected $title;
 
-
-    /** @var null|int */
+    /**
+     * @var null|int
+     */
     private $workType;
 
     /**
@@ -120,19 +123,19 @@ class Factory
     private $markVisibility;
 
     /**
-     * @var
+     * @var array
      */
     protected $curriculumNodes;
 
     /**
      * Factory constructor.
      * @param User $creator
-     * @param      $post (an array of post vars from the create/update forms)
-     * @param      $assessmentType
+     * @param array $post (an array of post vars from the create/update forms)
+     * @param string|null $assessmentType
      * @throws UnexpectedValueException
      */
-    public function __construct(User $creator, $post, $assessmentType) {
-
+    public function __construct(User $creator, $post, $assessmentType)
+    {
         $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContext($post['context']);
         $this->setTitle(trim($post['title']));
@@ -231,9 +234,12 @@ class Factory
      *
      * @param IAssessable|null $assessment
      * @return IAssessable
-     * @throws InvalidArgumentException
      * @throws DomainException
+     * @throws InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \RangeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function produce(IAssessable $assessment = null): IAssessable
     {
@@ -252,6 +258,9 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \RangeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function produceNew(): IAssessable
     {
@@ -277,6 +286,9 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \RangeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function produceFromExistingAssessment(IAssessable $assessment): IAssessable
     {
@@ -624,7 +636,7 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     protected function getCurriculumNodes()
     {

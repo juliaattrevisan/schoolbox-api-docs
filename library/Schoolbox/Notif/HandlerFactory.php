@@ -147,7 +147,7 @@ class HandlerFactory
     }
 
     /**
-     * @param $tag
+     * @param string $tag
      * @return HandlerInterface
      */
     public function getHandler($tag)

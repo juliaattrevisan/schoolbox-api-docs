@@ -4,12 +4,16 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Cyberhound\Url\Translator;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Preview
+ */
 class Controller extends Base
 {
 
@@ -17,7 +21,7 @@ class Controller extends Base
      * A list of test urls to try
      * Can delete this later
      *
-     * @param $params
+     * @param array $params
      */
     public function index($params)
     {
@@ -99,10 +103,8 @@ class Controller extends Base
         //Not required by preview.js
         unset($previewFragment['twig']);
 
-        $this->getResponse()->content->set(
-            [
-                'data' => $previewFragment,
-            ]
-        );
+        $this->getResponse()->content->set([
+            'data' => $previewFragment,
+        ]);
     }
 }

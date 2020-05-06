@@ -19,6 +19,11 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'updated';
 
     /**
+     * @var ImportMapper
+     */
+    protected $importMapper;
+
+    /**
      * @param Model $model
      * @param string $method
      * @return Envelope
@@ -99,7 +104,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param Model $model
-     * @param Model $model
      * @param User $userEffected
      * @param array $diff
      * @return Envelope
@@ -122,9 +126,6 @@ class Notifier extends AbstractModuleNotifier
 
     // Here be the getters/setter
 
-    /** @var ImportMapper $importMapper */
-    protected $importMapper;
-
     /**
      * @return ImportMapper
      */
@@ -133,7 +134,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param ImportMapper
+     * @param ImportMapper $importMapper
      * @return $this
      */
     public function setImportMapper($importMapper)
@@ -141,5 +142,4 @@ class Notifier extends AbstractModuleNotifier
         $this->importMapper = $importMapper;
         return $this;
     }
-
 }

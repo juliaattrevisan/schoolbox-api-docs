@@ -259,7 +259,7 @@ interface IMapper
     /**
      * @brief calls save(), but forces create by nulling the identifier field.
      *
-     * @param $object
+     * @param mixed $object
      *
      * @return array<int>
      */
@@ -268,7 +268,7 @@ interface IMapper
     /**
      * @brief Saves an object to the database. Updates or inserts
      *
-     * @param $object
+     * @param mixed $object
      *
      * @return array<int>|bool
      */
@@ -278,7 +278,7 @@ interface IMapper
      * Overrides delete() method to call softDelete if a soft delete field was
      * set up, or hardDelete() method if it wasn't.
      *
-     * @param $object
+     * @param mixed $object
      *
      * @return bool
      */

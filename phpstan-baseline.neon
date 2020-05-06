@@ -1341,366 +1341,6 @@ parameters:
 			path: library/Evaluation/Answer/Ranking.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 59$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 58$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$prefix\\)\\: Unexpected token \"\\$prefix\", expected type at offset 151$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 127$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 143$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 68$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 73$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 61$#"
-			count: 1
-			path: library/Evaluation/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 84$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 67$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 64$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 168$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sec\\)\\: Unexpected token \"\\$sec\", expected type at offset 223$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 92$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 150$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 79$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 84$#"
-			count: 1
-			path: library/Evaluation/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 53$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 63$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 149$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 62$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type_id\\)\\: Unexpected token \"\\$type_id\", expected type at offset 82$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 67$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 70$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 98$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 124$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 77$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allIds\\)\\: Unexpected token \"\\$allIds\", expected type at offset 61$#"
-			count: 1
-			path: library/Evaluation/Question.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 128$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionCategoryID\\)\\: Unexpected token \"\\$questionCategoryID\", expected type at offset 153$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionHandler\\)\\: Unexpected token \"\\$questionHandler\", expected type at offset 120$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$questionID\\)\\: Unexpected token \"\\$questionID\", expected type at offset 189$#"
-			count: 1
-			path: library/Evaluation/Question/Bank.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$parent_id\\)\\: Unexpected token \"\\$parent_id\", expected type at offset 91$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$destinationId\\)\\: Unexpected token \"\\$destinationId\", expected type at offset 101$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$position\\)\\: Unexpected token \"\\$position\", expected type at offset 131$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$targetId\\)\\: Unexpected token \"\\$targetId\", expected type at offset 76$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 95$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 71$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 97$#"
-			count: 1
-			path: library/Evaluation/Question/Category/List.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 60$#"
-			count: 1
-			path: library/Evaluation/Question/Category/List.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pathArray\\)\\: Unexpected token \"\\$pathArray\", expected type at offset 87$#"
-			count: 1
-			path: library/Evaluation/Question/Category/List.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allCategories\\)\\: Unexpected token \"\\$allCategories\", expected type at offset 86$#"
-			count: 1
-			path: library/Evaluation/Question/Category/List.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 121$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 148$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 198$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markedResponseIDs\\)\\: Unexpected token \"\\$markedResponseIDs\", expected type at offset 165$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 127$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 154$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 144$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 171$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 175$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 102$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 83$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 82$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 109$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 108$#"
-			count: 1
-			path: library/Evaluation/Response.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section\\)\\: Unexpected token \"\\$section\", expected type at offset 56$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 147$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 79$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sequence\\)\\: Unexpected token \"\\$sequence\", expected type at offset 105$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 80$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sequence\\)\\: Unexpected token \"\\$sequence\", expected type at offset 106$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 217$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 243$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attempt_id\\)\\: Unexpected token \"\\$attempt_id\", expected type at offset 273$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 300$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 71$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 72$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 97$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 82$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$section_id\\)\\: Unexpected token \"\\$section_id\", expected type at offset 84$#"
-			count: 1
-			path: library/Evaluation/Section.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 164$#"
-			count: 1
-			path: library/Event/Attendance/CanModifyAttendance.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 104$#"
 			count: 1
 			path: library/Event/Attendance/Controller.php
@@ -1724,16 +1364,6 @@ parameters:
 			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 82$#"
 			count: 1
 			path: library/Event/Attendance/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sourceName\\)\\: Unexpected token \"\\$sourceName\", expected type at offset 89$#"
-			count: 1
-			path: library/Event/Source/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$Guid$#"
-			count: 1
-			path: library/Event/Source/Model.php
 
 		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
@@ -2259,41 +1889,6 @@ parameters:
 			message: "#^Access to undefined constant Schoolbox\\\\IMapper\\:\\:CALLBACK_POSTSAVE\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 18$#"
-			count: 1
-			path: library/External/Doublefirst/Class.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 61$#"
-			count: 1
-			path: library/External/Doublefirst/Helper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dayNumber\\)\\: Unexpected token \"\\$dayNumber\", expected type at offset 53$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^Binary operation \"\\*\" between string and 60 results in an error\\.$#"
-			count: 2
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$a\\)\\: Unexpected token \"\\$a\", expected type at offset 70$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$b\\)\\: Unexpected token \"\\$b\", expected type at offset 87$#"
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$database\\)\\: Unexpected token \"\\$database\", expected type at offset 45$#"
-			count: 1
-			path: library/External/Doublefirst/User.php
 
 		-
 			message: "#^Anonymous function has an unused use \\$db\\.$#"
@@ -3411,22 +3006,7 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 133$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Test/ApiTest.php
-
-		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$classificationCode$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$classificationCodes\\)\\: Unexpected token \"\\$classificationCodes\", expected type at offset 96$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalId\\)\\: Unexpected token \"\\$externalId\", expected type at offset 156$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Base/Document.php
 
@@ -3466,69 +3046,9 @@ parameters:
 			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 59$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 120$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$boardingStatus\\)\\: Unexpected token \"\\$boardingStatus\", expected type at offset 426$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$form\\)\\: Unexpected token \"\\$form\", expected type at offset 456$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 406$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$yearlevel\\)\\: Unexpected token \"\\$yearlevel\", expected type at offset 381$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalUserId\\)\\: Unexpected token \"\\$externalUserId\", expected type at offset 84$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$separator\\)\\: Unexpected token \"\\$separator\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Common/Address.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$separator\\)\\: Unexpected token \"\\$separator\", expected type at offset 102$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Staff.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$separator\\)\\: Unexpected token \"\\$separator\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Staff.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$separator\\)\\: Unexpected token \"\\$separator\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Student.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$user\\)\\: Unexpected token \"\\$user\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/External/SubjectMapper.php
 
 		-
 			message: "#^Method Schoolbox\\\\File\\\\ExtensionMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
@@ -3666,11 +3186,6 @@ parameters:
 			path: library/Schoolbox/Filter/Selection/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filters\\)\\: Unexpected token \"\\$filters\", expected type at offset 123$#"
-			count: 1
-			path: library/Schoolbox/Filter/Test/Assessment/TestableIdFinder.php
-
-		-
 			message: "#^Variable \\$fixturesAccess in PHPDoc tag @var does not match assigned variable \\$fixtureAccess\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Component/Homepage/Controller.php
@@ -3679,56 +3194,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Division/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 48$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 52$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 47$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text1\\)\\: Unexpected token \"\\$text1\", expected type at offset 92$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text2\\)\\: Unexpected token \"\\$text2\", expected type at offset 113$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 77$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$divisionName\\)\\: Unexpected token \"\\$divisionName\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$reader\\)\\: Unexpected token \"\\$reader\", expected type at offset 207$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$storageObject\\)\\: Unexpected token \"\\$storageObject\", expected type at offset 178$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(ImportMapper\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 30$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Import/Notifier.php
 
 		-
 			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
@@ -3751,19 +3216,9 @@ parameters:
 			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mapper\\)\\: Unexpected token \"\\$mapper\", expected type at offset 18$#"
-			count: 5
-			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(Collection\\|\\)\\: Unexpected token \"\\\\n     \\*\", expected type at offset 164$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$entity\\)\\: Unexpected token \"\\$entity\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
 
 		-
 			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
@@ -3781,26 +3236,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Result/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mapper\\)\\: Unexpected token \"\\$mapper\", expected type at offset 18$#"
-			count: 5
-			path: library/Schoolbox/Fixtures/Result/Notifier.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$entityId int\\)\\: Unexpected token \"\\$entityId\", expected type at offset 47$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/School/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$entityId int\\)\\: Unexpected token \"\\$entityId\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/School/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(MatchMapper matchMapper\\)\\: Unexpected token \"matchMapper\", expected variable at offset 30$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Season/Controller.php
-
-		-
 			message: "#^Variable \\$participantCoach in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentCoach$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Snapshot/Type/Coach.php
@@ -3816,29 +3251,9 @@ parameters:
 			path: library/Schoolbox/Fixtures/Snapshot/Type/Position.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 93$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Status/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$match\\)\\: Unexpected token \"\\$match\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Metadata/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$title\\)\\: Unexpected token \"\\$title\", expected type at offset 104$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Player/Notifier.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$threadID\\)\\: Unexpected token \"\\$threadID\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Forum/PostMapper.php
 
 		-
 			message: "#^Variable \\$parent in PHPDoc tag @var does not match assigned variable \\$quotedId\\.$#"
@@ -3851,64 +3266,9 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 46$#"
-			count: 2
-			path: library/Schoolbox/GenericCollection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateName\\)\\: Unexpected token \"\\$templateName\", expected type at offset 51$#"
-			count: 1
-			path: library/Schoolbox/Greenhouse/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Greenhouse/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 104$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 156$#"
-			count: 1
-			path: library/Schoolbox/IMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$term string\\)\\: Unexpected token \"\\$term\", expected type at offset 321$#"
-			count: 1
-			path: library/Schoolbox/L10n/RosettaStone.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dataset\\)\\: Unexpected token \"\\$dataset\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Summary.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 96$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$marks\\)\\: Unexpected token \"\\$marks\", expected type at offset 75$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$expected\\)\\: Unexpected token \"\\$expected\", expected type at offset 108$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$marks\\)\\: Unexpected token \"\\$marks\", expected type at offset 87$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Test/Unit/SummaryTest.php
 
 		-
 			message: "#^Variable \\$pairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessment, \\$normMark$#"
@@ -3964,21 +3324,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$termMapper\\)\\: Unexpected token \"\\$termMapper\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 177$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Context/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type string ContextType string, with no plural\\)\\: Unexpected token \"\\$type\", expected type at offset 115$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Context/Factory.php
 
 		-
 			message: "#^Variable \\$context in isset\\(\\) always exists and is not nullable\\.$#"
@@ -4451,56 +3796,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$acceptOnline\\)\\: Unexpected token \"\\$acceptOnline\", expected type at offset 62$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attachedFiles\\)\\: Unexpected token \"\\$attachedFiles\", expected type at offset 336$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$gradingScheme\\)\\: Unexpected token \"\\$gradingScheme\", expected type at offset 128$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markPerCapability ,\\)\\: Unexpected token \"\\$markPerCapability\", expected type at offset 196$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$markType\\)\\: Unexpected token \"\\$markType\", expected type at offset 97$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$maxMark\\)\\: Unexpected token \"\\$maxMark\", expected type at offset 273$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rubricData\\)\\: Unexpected token \"\\$rubricData\", expected type at offset 303$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$similarityCheckEnabled\\)\\: Unexpected token \"\\$similarityCheckEnabled\", expected type at offset 409$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$useMarkRange\\)\\: Unexpected token \"\\$useMarkRange\", expected type at offset 238$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$useRubric\\)\\: Unexpected token \"\\$useRubric\", expected type at offset 164$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/Decorator.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
@@ -4511,119 +3806,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 22$#"
-			count: 4
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$plagscanId\\)\\: Unexpected token \"\\$plagscanId\", expected type at offset 172$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Callback.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$apiKey\\)\\: Unexpected token \"\\$apiKey\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$username\\)\\: Unexpected token \"\\$username\", expected type at offset 46$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 123$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$retrieveMode\\)\\: Unexpected token \"\\$retrieveMode\", expected type at offset 149$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentId\\)\\: Unexpected token \"\\$documentId\", expected type at offset 207$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$parameterList\\)\\: Unexpected token \"\\$parameterList\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Gateway.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 114$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$plagscanId int Some id used by the third\\-party Plagscan\\)\\: Unexpected token \"\\$plagscanId\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$host\\)\\: Unexpected token \"\\$host\", expected type at offset 103$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$requestScheme\\)\\: Unexpected token \"\\$requestScheme\", expected type at offset 74$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/RelationalDelete.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 131$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$documentName\\)\\: Unexpected token \"\\$documentName\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/ValidFiles.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$apiKey\\)\\: Unexpected token \"\\$apiKey\", expected type at offset 90$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$clientId\\)\\: Unexpected token \"\\$clientId\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$accessToken\\)\\: Unexpected token \"\\$accessToken\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/AccessTokenGenerator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 161$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/v3/Connector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$body\\)\\: Unexpected token \"\\$body\", expected type at offset 108$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hash\\)\\: Unexpected token \"\\$hash\", expected type at offset 68$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Model.php
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$submittedAt with type mixed is not subtype of native type Alaress_Date_Format\\|null\\.$#"
@@ -4661,21 +3846,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Exporter/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 15$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assessmentType\\)\\: Unexpected token \"\\$assessmentType\", expected type at offset 157$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$post \\(an array of post vars from the create/update forms\\)\\)\\: Unexpected token \"\\$post\", expected type at offset 79$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$gradeGroup with type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\|null is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
@@ -4696,21 +3866,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Assessment\\\\ListController\\:\\:savePlanData\\(\\) has invalid type Schoolbox\\\\Learning\\\\Assessment\\\\ParticipantModels\\\\Plan\\\\Model\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 124$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 75$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Module.php
@@ -4719,16 +3874,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 5
 			path: library/Schoolbox/Learning/Assessment/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$publishedOnly\\)\\: Unexpected token \"\\$publishedOnly\", expected type at offset 103$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Participant.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$publishedOnly\\)\\: Unexpected token \"\\$publishedOnly\", expected type at offset 100$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$participants with type Schoolbox\\\\GenericCollection\\|Schoolbox\\\\Learning\\\\Assessment\\\\Participant is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
@@ -4771,26 +3916,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 45$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$encoded\\)\\: Unexpected token \"\\$encoded\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 150$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Redirect.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$responseId\\)\\: Unexpected token \"\\$responseId\", expected type at offset 96$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Response/DataSource.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUrl\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
@@ -4814,21 +3939,6 @@ parameters:
 			message: "#^Variable \\$mostRecentResponse might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$attachedFile\\)\\: Unexpected token \"\\$attachedFile\", expected type at offset 105$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hasSelfAssessed\\)\\: Unexpected token \"\\$hasSelfAssessed\", expected type at offset 55$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Decorator/Decorator.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Decorator/Decorator.php
 
 		-
 			message: "#^Variable \\$project in PHPDoc tag @var does not match assigned variable \\$dueWork\\.$#"
@@ -4891,11 +4001,6 @@ parameters:
 			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$code\\)\\: Unexpected token \"\\$code\", expected type at offset 64$#"
-			count: 1
-			path: library/Schoolbox/Learning/DueWork/StateMapper.php
-
-		-
 			message: "#^PHPDoc tag @return with type \\(iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection\\)\\|static\\(Schoolbox\\\\Learning\\\\Grades\\\\Controller\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Controller.php
@@ -4946,11 +4051,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mark\\)\\: Unexpected token \"\\$mark\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/IMarkScheme.php
-
-		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_humanReadable_withResponse\\(\\) has invalid type mixed\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
@@ -4959,16 +4059,6 @@ parameters:
 			message: "#^PHPDoc tag @param for parameter \\$totalMark with type float\\|int\\|null is not subtype of native type float\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rowData\\)\\: Unexpected token \"\\$rowData\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/AbstractCSV.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$rowHeadings\\)\\: Unexpected token \"\\$rowHeadings\", expected type at offset 39$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/AbstractCSV.php
 
 		-
 			message: "#^Class Schoolbox\\\\Learning\\\\Markbook\\\\Markbook referenced with incorrect case\\: Schoolbox\\\\Learning\\\\Markbook\\\\MarkBook\\.$#"
@@ -5021,16 +4111,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess\\)\\: Unexpected token \"\\$assess\", expected type at offset 102$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess\\)\\: Unexpected token \"\\$assess\", expected type at offset 134$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Mapper.php
-
-		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:getAnswers\\(\\) has invalid type Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\QuizQuestion\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
@@ -5066,11 +4146,6 @@ parameters:
 			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$subject\\)\\: Unexpected token \"\\$subject\", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Mail/TwigEmail.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
@@ -5086,17 +4161,7 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 165$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 264$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 167$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -5106,27 +4171,7 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$column\\)\\: Unexpected token \"\\$column\", expected type at offset 72$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\|Collection\\)\\: Unexpected token \"\\$object\", expected type at offset 156$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$property_map in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 70$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 91$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -5136,39 +4181,9 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$model\\)\\: Unexpected token \"\\$model\", expected type at offset 71$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$filterSoftDeleteSql in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 115$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dataModel\\)\\: Unexpected token \"\\$dataModel\", expected type at offset 206$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$domainObject\\)\\: Unexpected token \"\\$domainObject\", expected type at offset 178$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalValue\\)\\: Unexpected token \"\\$externalValue\", expected type at offset 95$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$externalValues\\)\\: Unexpected token \"\\$externalValues\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
 
 		-
 			message: "#^Call to an undefined method Alaress\\\\IDatabase\\:\\:quoteIdentifier\\(\\)\\.$#"
@@ -5229,76 +4244,6 @@ parameters:
 			message: "#^Variable \\$mapperClass in PHPDoc tag @var does not match assigned variable \\$firstLoop\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$model\\)\\: Unexpected token \"\\$model\", expected type at offset 56$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 95$#"
-			count: 1
-			path: library/Schoolbox/MappingCollection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$element\\)\\: Unexpected token \"\\$element\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/MappingCollection.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Module/RestfulModule.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$tag\\)\\: Unexpected token \"\\$tag\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Notif/HandlerFactory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$exchange\\)\\: Unexpected token \"\\$exchange\", expected type at offset 43$#"
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 92$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 69$#"
-			count: 2
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 195$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 136$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 132$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 188$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"
@@ -5431,29 +4376,9 @@ parameters:
 			path: library/Schoolbox/Pastoral/Audience/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$method\\)\\: Unexpected token \"\\$method\", expected type at offset 51$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Comment/Notifier.php
-
-		-
 			message: "#^Variable \\$tag might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$involved\\)\\: Unexpected token \"\\$involved\", expected type at offset 563$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/DataSource.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$hydrateRelatedRecords\\)\\: Unexpected token \"\\$hydrateRelatedRecords\", expected type at offset 37$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Mapper.php
 
 		-
 			message: "#^Variable \\$pastoralReport in PHPDoc tag @var does not exist\\.$#"
@@ -5466,24 +4391,9 @@ parameters:
 			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$row\\)\\: Unexpected token \"\\$row\", expected type at offset 100$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Revision/Mapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pastoralType\\)\\: Unexpected token \"\\$pastoralType\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/SubType/Model.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pastoral\\)\\: Unexpected token \"\\$pastoral\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Tag/Model.php
 
 		-
 			message: "#^PHPDoc tag @return with type iterable\\<Schoolbox\\\\Pastoral\\\\Model\\>&Schoolbox\\\\GenericCollection is incompatible with native type array\\.$#"
@@ -5536,69 +4446,9 @@ parameters:
 			path: library/Schoolbox/Picker/DateTime/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\Base\\:\\:test\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Base.php
-
-		-
-			message: "#^Cannot call method test\\(\\) on bool\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$next\\)\\: Unexpected token \"\\$next\", expected type at offset 42$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$config\\)\\: Unexpected token \"\\$config\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 63$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Internal/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Internal/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 41$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Internal/Base.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 41$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Internal/Base.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 88$#"
-			count: 1
-			path: library/Schoolbox/Preview/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pdNumber\\)\\: Unexpected token \"\\$pdNumber\", expected type at offset 168$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/ValidProfessionalDevelopment.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$state\\)\\: Unexpected token \"\\$state\", expected type at offset 168$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/ValidProfessionalDevelopment.php
 
 		-
 			message: "#^Undefined variable\\: \\$this$#"
@@ -5634,26 +4484,6 @@ parameters:
 			message: "#^Variable \\$source might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Admin/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Digest/DigestScheduler.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$route\\)\\: Unexpected token \"\\$route\", expected type at offset 110$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Message/RerouteOverrideMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$slug\\)\\: Unexpected token \"\\$slug\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Message/SourceMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventObjectId\\)\\: Unexpected token \"\\$eventObjectId\", expected type at offset 93$#"
-			count: 1
-			path: library/Schoolbox/Realtime/MessageList/IListFactory.php
 
 		-
 			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$remoteAddress\\.$#"

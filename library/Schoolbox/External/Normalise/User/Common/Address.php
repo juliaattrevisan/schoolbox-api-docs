@@ -69,7 +69,7 @@ class Address {
     /**
      * Get entire address as a string
      *
-     * @param $separator
+     * @param string|null $separator
      * @return string
      */
     public function getAsString($separator = "\n") {
@@ -240,4 +240,4 @@ class Address {
     {
         return $this->suburb;
     }
-} 
+}

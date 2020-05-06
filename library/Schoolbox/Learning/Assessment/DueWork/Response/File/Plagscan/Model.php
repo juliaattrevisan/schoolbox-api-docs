@@ -1,12 +1,9 @@
 <?php
 /**
- * Plagscan Document
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Alaress_Date_Format;
@@ -17,6 +14,13 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\File\StorableTrait;
 
+/**
+ * Class Model
+ *
+ * Plagscan document
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan
+ */
 class Model implements IStorage, ISoftDeletable
 {
     use StorableTrait;
@@ -24,51 +28,70 @@ class Model implements IStorage, ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** Documents that are queued to be uploaded to plagscan servers */
-    const STATUS_QUEUED = 1;
+    /**
+     * Documents that are queued to be uploaded to plagscan servers
+     */
+    public const STATUS_QUEUED = 1;
 
-    /**  Documents that have been uploaded to plagscan but have not yet finished being analysed and thus provided a result */
-    const STATUS_PROCESSING = 2;
+    /**
+     * Documents that have been uploaded to plagscan but have not yet finished being analysed and thus provided a result
+     */
+    public const STATUS_PROCESSING = 2;
 
-    /** Plagscan completed, with results */
-    const STATUS_COMPLETE = 3;
+    /**
+     * Plagscan completed, with results
+     */
+    public const STATUS_COMPLETE = 3;
 
-    /** Documents that have returned errors from plagscan, for example deleted or cannot be analysed */
-    const STATUS_UNSCANNABLE = -1;
+    /**
+     * Documents that have returned errors from plagscan, for example deleted or cannot be analysed
+     */
+    public const STATUS_UNSCANNABLE = -1;
 
-    /** @var int $id */
-    protected $id;
-
-    /** @var $plagscanId int Some id used by the third-party Plagscan */
+    /**
+     * @var int Some id used by the third-party Plagscan
+     */
     protected $plagscanId;
 
-    /** @var int $status */
+    /**
+     * @var int
+     */
     protected $status;
 
-    /** @var float $score */
+    /**
+     * @var float
+     */
     protected $score;
 
-    /** @var string $interactiveUrl A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0 */
+    /**
+     * A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0
+     *
+     * @var string
+     */
     protected $interactiveUrl;
 
-    /** @var int $studentSubmissionFileId */
+    /**
+     * @var int
+     */
     protected $studentSubmissionFileId;
 
-    /** @var Alaress_Date_Format $privatisedAt */
+    /**
+     * @var Alaress_Date_Format
+     */
     protected $privatisedAt;
 
     /**
      * Figure out the url to the plagscan report
      *
-     * @param $requestScheme
-     * @param $host
+     * @param string $requestScheme
+     * @param string $host
      *
      * @return string
      */
-    public function getUrl($requestScheme, $host)
+    public function getUrl($requestScheme, $host): string
     {
         return sprintf(
-            "%s://%s/submission/plagiarismReport/%s/#zx_h=672px",
+            '%s://%s/submission/plagiarismReport/%s/#zx_h=672px',
             $requestScheme,
             $host,
             $this->getPlagscanId()
@@ -80,9 +103,9 @@ class Model implements IStorage, ISoftDeletable
      *
      * @return bool
      */
-    public function isPending()
+    public function isPending(): bool
     {
-        return $this->getStatus() == self::STATUS_QUEUED;
+        return $this->getStatus() === self::STATUS_QUEUED;
     }
 
     /**
@@ -90,9 +113,9 @@ class Model implements IStorage, ISoftDeletable
      *
      * @return bool
      */
-    public function isProcessing()
+    public function isProcessing(): bool
     {
-        return $this->getStatus() == self::STATUS_PROCESSING;
+        return $this->getStatus() === self::STATUS_PROCESSING;
     }
 
     /**
@@ -100,9 +123,9 @@ class Model implements IStorage, ISoftDeletable
      *
      * @return bool
      */
-    public function isComplete()
+    public function isComplete(): bool
     {
-        return $this->getStatus() == self::STATUS_COMPLETE;
+        return $this->getStatus() === self::STATUS_COMPLETE;
     }
 
     /**
@@ -114,9 +137,9 @@ class Model implements IStorage, ISoftDeletable
      *
      * @return bool
      */
-    public function isUnscannable()
+    public function isUnscannable(): bool
     {
-        return $this->getStatus() == self::STATUS_UNSCANNABLE || $this->getStatus() == null;
+        return $this->getStatus() === self::STATUS_UNSCANNABLE || $this->getStatus() === null;
     }
 
     /* Getters/Setters
@@ -133,7 +156,7 @@ class Model implements IStorage, ISoftDeletable
     /**
      * @param int $id
      *
-     * @return self|$this
+     * @return $this
      */
     public function setId($id)
     {
@@ -153,7 +176,7 @@ class Model implements IStorage, ISoftDeletable
     /**
      * @param int $plagscanId
      *
-     * @return self|$this
+     * @return $this
      */
     public function setPlagscanId($plagscanId)
     {
@@ -163,9 +186,9 @@ class Model implements IStorage, ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }
@@ -173,7 +196,7 @@ class Model implements IStorage, ISoftDeletable
     /**
      * @param int $status
      *
-     * @return self
+     * @return $this
      */
     public function setStatus($status)
     {
@@ -223,7 +246,7 @@ class Model implements IStorage, ISoftDeletable
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getStudentSubmissionFileId()
     {
@@ -231,7 +254,7 @@ class Model implements IStorage, ISoftDeletable
     }
 
     /**
-     * @param mixed $studentSubmissionFileId
+     * @param int $studentSubmissionFileId
      *
      * @return self|$this
      */

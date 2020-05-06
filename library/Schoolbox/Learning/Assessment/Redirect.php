@@ -1,26 +1,29 @@
 <?php
 /**
- * Redirect
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment;
 
-
+/**
+ * Class Redirect
+ *
+ * @package Schoolbox\Learning\Assessment
+ */
 class Redirect
 {
+
     /**
      * @const string GET parameter
      */
-    const RETURN_URL = 'returnUrl';
+    public const RETURN_URL = 'returnUrl';
+
 
     /**
      * Encode a url
      *
-     * @param $url
+     * @param string $url
      * @return string
      */
     public static function encode($url)
@@ -28,10 +31,11 @@ class Redirect
         return urlencode(base64_encode($url));
     }
 
+
     /**
      * Decode an encoded redirect url
      *
-     * @param $encoded
+     * @param string $encoded
      * @return string
      */
     public static function decode($encoded)
@@ -39,11 +43,12 @@ class Redirect
         return base64_decode(urldecode($encoded));
     }
 
+
     /**
      * Fabricate a querystring param representation so we don't have to
      * concatenate all day, every day in controllers
      *
-     * @param $url
+     * @param string $url
      * @return string
      */
     public static function queryString($url)

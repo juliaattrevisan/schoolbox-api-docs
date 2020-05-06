@@ -1,18 +1,20 @@
 <?php
 /**
- * Model
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Event\Source;
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
+/**
+ * Class Model
+ *
+ * @package Event\Source
+ */
 class Model implements ISoftDeletable
 {
     use ModelTrait\Id;
@@ -28,12 +30,14 @@ class Model implements ISoftDeletable
      */
     private $event;
 
+
     /**
      * An identifier string that identifies the source of an event e.g. "liss"
      *
      * @var string
      */
     private $sourceName;
+
 
     /**
      * A text string which uniquely identifies an event in the event source e.g. csv/ics/vcal file
@@ -93,7 +97,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $Guid
+     * @param string $guid
      * @return $this
      */
     public function setGuid($guid)

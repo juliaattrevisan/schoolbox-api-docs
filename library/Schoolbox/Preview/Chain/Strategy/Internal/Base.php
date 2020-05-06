@@ -1,18 +1,22 @@
 <?php
 /**
- * Base
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
-use Schoolbox\Resource\Storage\Model as StorageModel;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
 
-abstract class Base extends StrategyBase {
+/**
+ * Class Base
+ *
+ * @package Schoolbox\Preview\Chain\Strategy\Internal
+ */
+abstract class Base extends StrategyBase
+{
 
     /**
      * The url to test
@@ -21,24 +25,27 @@ abstract class Base extends StrategyBase {
      */
     protected $url = '';
 
+
     /**
      * A storage model to test
      * A link model to test
      *
-     * @var null
+     * @var Storage\Model|File\Model
      */
-    protected $item = null;
+    protected $item;
+
 
     /**
      * Constructor
      *
-     * @param $url
-     * @param $item
+     * @param string $url
+     * @param Storage\Model|File\Model $item
      */
     public function __construct($url, $item) {
         $this->setUrl($url);
         $this->setItem($item);
     }
+
 
     /* Getters/Setters
      */
@@ -53,6 +60,7 @@ abstract class Base extends StrategyBase {
         $this->url = $url;
     }
 
+
     /**
      * Get url
      *
@@ -63,20 +71,22 @@ abstract class Base extends StrategyBase {
         return $this->url;
     }
 
+
     /**
      * Set item
      *
-     * @param $item
+     * @param Storage\Model|File\Model $item
      */
     protected function setItem($item)
     {
         $this->item = $item;
     }
 
+
     /**
      * Get item
      *
-     * @return
+     * @return Storage\Model|File\Model
      */
     protected function getItem()
     {

@@ -1,8 +1,5 @@
 <?php
-
 /**
- * Decorator
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +10,11 @@ use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
+/**
+ * Class Decorator
+ *
+ * @package Schoolbox\Learning\Assessment\Task\Decorator
+ */
 class Decorator implements DecoratorInterface
 {
     use TaskTrait;
@@ -20,9 +22,9 @@ class Decorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * @param $hasSelfAssessed
-     * @param $url
-     * @param $attachedFile
+     * @param bool $hasSelfAssessed
+     * @param string $url
+     * @param string $attachedFile
      */
     public function __construct($hasSelfAssessed, $url, $attachedFile)
     {
@@ -33,6 +35,8 @@ class Decorator implements DecoratorInterface
 
     /**
      * @param Task $assessment
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     public function decorate($assessment)
     {

@@ -16,8 +16,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 interface IMarkScheme
 {
     // Range boundaries for normalised marks
-    const NORMALISED_MARK_MIN = 0.0;
-    const NORMALISED_MARK_MAX = 100.0;
+    public const NORMALISED_MARK_MIN = 0.0;
+    public const NORMALISED_MARK_MAX = 100.0;
 
     /**
      * Is this mark scheme quantitative?
@@ -83,7 +83,7 @@ interface IMarkScheme
 
     /**
      * Converts the mark to Javascript Comparable format
-     * @param            $mark
+     * @param int|float  $mark
      * @param float|null $maxValue
      * @param float|null $rowMaxSum
      * @return mixed

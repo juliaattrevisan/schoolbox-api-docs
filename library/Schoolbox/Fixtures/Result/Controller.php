@@ -31,7 +31,11 @@ use \Schoolbox\Fixtures\Team\Metadata\Factory as TeamMetadataFactory;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 use Schoolbox\Weather\WeatherstackClient;
 
-
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Fixtures\Result
+ */
 class Controller extends AbstractController
 {
     /**
@@ -91,7 +95,7 @@ class Controller extends AbstractController
      * @param object $entity
      * @param object $team
      * @param object $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
      * @return void
      */
     public function getCreateFormForTeam($entity, $team, $context = null)
@@ -147,7 +151,7 @@ class Controller extends AbstractController
     /**
      * @inheritdoc
      *
-     * @param $entity
+     * @param Result $entity
      * @throws \Exception
      */
     public function createResultForTeam($entity)
@@ -160,7 +164,7 @@ class Controller extends AbstractController
      *
      * @param Match $context
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound|\Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
     {
@@ -230,7 +234,7 @@ class Controller extends AbstractController
      * @param Match $context
      * @param Team $team
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
      */
     public function getResultForTeam($context, $team)
     {
@@ -336,6 +340,8 @@ class Controller extends AbstractController
      * @param Collection $allCoaches
      * @return bool
      * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function hasMatchModify(Collection $allCoaches): bool
     {
@@ -383,7 +389,7 @@ class Controller extends AbstractController
      * @param Match $context
      * @throws MapperException
      * @throws MapperException\Deleted
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
      */
     protected function getForm($entity, $context = null)
     {
@@ -422,6 +428,9 @@ class Controller extends AbstractController
      * @param Result $entity
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     protected function persistEntity($entity)
     {
@@ -470,12 +479,14 @@ class Controller extends AbstractController
     /**
      * Save Result data to db
      *
-     * @param Match $match
-     * @param Team $team
+     * @param Match  $match
+     * @param Team   $team
      * @param Status $status
      * @param string $description
      * @param Result $result
      * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function saveResult(Match $match, Team $team, Status $status, $description, Result $result)
     {

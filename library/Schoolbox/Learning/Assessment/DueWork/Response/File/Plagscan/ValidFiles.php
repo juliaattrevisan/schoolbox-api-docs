@@ -1,15 +1,18 @@
 <?php
 /**
- * ValidFiles
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-
+/**
+ * Class ValidFiles
+ *
+ * Filetypes accepted by plag
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan
+ */
 class ValidFiles
 {
 
@@ -36,22 +39,15 @@ class ValidFiles
         'numbers' => 'application/vnd.apple.numbers',
     ];
 
-    /**
-     * @return array
-     */
-    public function getValidDocuments()
-    {
-        return $this->validDocuments;
-    }
 
     /**
      * Determine whether filename $documentName is allowed to be sent
      * to plagscan for plagscannage
      *
-     * @param $documentName
+     * @param string $documentName
      * @return bool
      */
-    public function isPlagscannable($documentName)
+    public function isPlagscannable($documentName): bool
     {
         $documentExtension = strtolower(pathinfo($documentName, PATHINFO_EXTENSION));
 
@@ -65,8 +61,8 @@ class ValidFiles
     /**
      * Get the mime for a $documentName
      *
-     * @param $documentName
-     * @return mixed
+     * @param string $documentName
+     * @return string|null
      */
     public function getMime($documentName)
     {

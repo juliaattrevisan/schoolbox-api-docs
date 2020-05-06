@@ -29,7 +29,7 @@ class Controller extends Base
     /**
      * Load $templateName
      *
-     * @param $templateName
+     * @param string $templateName
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getGreenhouse($templateName)

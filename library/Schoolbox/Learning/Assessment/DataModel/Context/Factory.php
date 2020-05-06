@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
@@ -13,26 +12,33 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
-
+/**
+ * Class Factory
+ *
+ * @package Schoolbox\Learning\Assessment\DataModel\Context
+ */
 class Factory
 {
 
     /**
      * @var FolderMapper
      */
-    var $folderMapper;
+    private $folderMapper;
+
     /**
      * @var UnitImplementationMapper
      */
-    var $unitImplementationMapper;
+    private $unitImplementationMapper;
+
     /**
      * @var AssessmentMapperProxy
      */
-    var $assessmentMapperProxy;
+    private $assessmentMapperProxy;
+
     /**
      * @var UnitSpecificationMapper
      */
-    var $unitSpecificationMapper;
+    private $unitSpecificationMapper;
 
     /**
      * Factory constructor.
@@ -56,9 +62,16 @@ class Factory
 
     /**
      * Used to produce context model for a given type, will include parent if context is project
-     * @param $type string ContextType string, with no plural
-     * @param $id
+     * @param string $type ContextType string, with no plural
+     * @param int $id
      * @return AssessmentContext
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
     public function produce($type, $id)
     {
@@ -159,6 +172,4 @@ class Factory
         $this->unitSpecificationMapper = $unitSpecificationMapper;
         return $this;
     }
-
-
 }

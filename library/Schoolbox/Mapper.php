@@ -803,7 +803,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @param        $object
+     * @param mixed  $object
      * @param string $parentField
      * @param int    $currentDepth
      *
@@ -862,7 +862,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @param        $object
+     * @param mixed  $object
      * @param string $parentField
      * @param string $childField
      * @param int    $currentDepth
@@ -984,7 +984,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Translates a column to a property field
      *
-     * @param $column
+     * @param string $column
      * @return string
      */
     public function getPropertyFromColumn($column)
@@ -1379,7 +1379,7 @@ abstract class Mapper implements IMapper, Serializable
      * Overrides delete() method to call softDelete if a soft delete field was
      * set up, or hardDelete() method if it wasn't.
      *
-     * @param $object|Collection
+     * @param object|Collection $object
      *
      * @return bool
      * @throws Exception
@@ -1803,7 +1803,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Sets identifier for this mapper.
      *
-     * @param array
+     * @param array $identifier
      * @return $this
      */
     protected function setIdentifier($identifier)
@@ -1964,7 +1964,6 @@ abstract class Mapper implements IMapper, Serializable
      * @param string $columnName
      * @param mixed  $columnValue
      * @param array  $options @see findByColumnList() $options param
-     * @param  array $options
      *
      * @return GenericCollection
      */
@@ -2838,7 +2837,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @brief Saves an object to the database. Updates or inserts
      *
-     * @param $object
+     * @param object $object
      * @return bool|\int[]
      * @throws Exception
      * @throws PDOException If unable to execute SQL
@@ -3100,7 +3099,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Asserts all registered enums are valid
      *
-     * @param $model
+     * @param object $model
      * @throws UnexpectedValueException
      */
     protected function assertValidEnums($model): void
@@ -3494,7 +3493,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Retrieves an SQL fragment for filtering out or setting soft-deleted items.
      *
-     * @param         $value
+     * @param  mixed  $value
      * @param  string $alias The alias used for this table, if any.
      *
      * @return string

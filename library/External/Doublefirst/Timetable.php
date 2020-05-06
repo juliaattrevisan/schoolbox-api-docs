@@ -228,7 +228,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * Returns the day name
      *
-     * @param $dayNumber
+     * @param int $dayNumber
      * @return String
      */
     public function getDayName($dayNumber): string
@@ -262,14 +262,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         if ($user->getRole()->isStaff()) {
             return [];
-        }
-
-        // Get the time in minutes from midnight (sigh)
-
-        if ($now != 0) {
-            $time = date("G", $now) * 60 + date("i", $now);
-        } else {
-            $time = (date("G") * 60) + date("i");
         }
 
         // Get all periods
@@ -344,15 +336,23 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $time_current = $times['SchoolStartTime'];
 
+        // Get the time in minutes from midnight (sigh)
+
+        if ($now != 0) {
+            $time = ((int)date('G', $now) * 60) + (int)date('i', $now);
+        } else {
+            $time = ((int)date('G') * 60) + (int)date('i');
+        }
+
         // Begin the numbers dance keeping track of period times
 
         foreach ($periods as $period) {
-            $period_start = $time_current;
-            $period_end = $time_current + $period['PeriodDuration'];
+            $period_start = (int)$time_current;
+            $period_end = (int)($time_current + $period['PeriodDuration']);
 
             // Check if this is the current period
 
-            if ($time >= $time_current && $time < $time_current + $period['PeriodDuration'] && $period['PeriodDuration'] > 0) {
+            if ($time >= $period_start && $time < $period_end && $period['PeriodDuration'] > 0) {
 
                 // Lets do some time based gymnastics because someone thought it'd be smart to store time as an integer
 
@@ -824,8 +824,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * Sort timetable in chronological order
      *
-     * @param $a
-     * @param $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     public function sortTimetable($a, $b)

@@ -1,17 +1,20 @@
 <?php
 /**
- * Base
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
 use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
 
-abstract class Base extends StrategyBase {
+/**
+ * Class Base
+ *
+ * @package Schoolbox\Preview\Chain\Strategy\External
+ */
+abstract class Base extends StrategyBase
+{
 
     /**
      * The requested url
@@ -30,8 +33,8 @@ abstract class Base extends StrategyBase {
     /**
      * Constructor
      *
-     * @param $url
-     * @param $config
+     * @param string $url
+     * @param array $config
      */
     public function __construct($url, $config) {
         $this->setUrl($url);
@@ -77,4 +80,4 @@ abstract class Base extends StrategyBase {
     {
         return $this->url;
     }
-} 
+}

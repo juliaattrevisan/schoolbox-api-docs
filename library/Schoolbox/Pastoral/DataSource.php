@@ -296,7 +296,7 @@ class DataSource
                                     `p`.`parent_id` IN (
                                         SELECT    `id`
                                         FROM      `pastoral` as pl0
-                                        WHERE     `deleted_at` IS NULL 
+                                        WHERE     `deleted_at` IS NULL
                                           AND     {$whereClauses[0]}
                                     ) OR p.`parent_id` IN (
                                         SELECT    `parent_id`
@@ -307,7 +307,7 @@ class DataSource
                                     ) OR p.`id` IN (
                                         SELECT    `parent_id`
                                         FROM      `pastoral` as pl2
-                                        WHERE     `deleted_at` IS NULL 
+                                        WHERE     `deleted_at` IS NULL
                                           AND     {$whereClauses[2]}
                                     )
                         )
@@ -454,7 +454,7 @@ class DataSource
      * @param Collection            $students
      * @param Collection            $tags
      * @param Collection            $order
-     * @param                       $involved
+     * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
      *

@@ -41,6 +41,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \RuntimeException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -127,6 +129,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      *
      * @param String $templateHandle
      * @return boolean
+     * @throws \RuntimeException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
      */
     public function renderTemplate($templateHandle)
     {
@@ -141,14 +147,14 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @return string
      */
-    protected abstract function getTwigTemplate();
+    abstract protected function getTwigTemplate();
 
     /**
      * Return the type of assessment to retrieve
      *
      * @return string
      */
-    protected abstract function getAssessmentType();
+    abstract protected function getAssessmentType();
 
     /**
      * @param AssessmentMapperProxy $assessmentDataMapper
@@ -167,7 +173,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     }
 
     /**
-     * @param $termMapper
+     * @param TermMapper $termMapper
      * @return $this
      */
     public function setTermMapper($termMapper) {

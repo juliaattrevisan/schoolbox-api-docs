@@ -10,25 +10,34 @@
  */
 abstract class Evaluation_Question_Category extends DeprecatedModel
 {
+    /**
+     * @var string
+     */
     public $_table = 'assess_question_category';
+
+    /**
+     * @var string
+     */
     public $_index = 'question_category_id';
 
+    /**
+     * @var string
+     */
     protected $availability = '';
 
     /**
      * Get a list of QuestionCategories to chooze from
      *
      * @param int $parent_id
-     *
      * @return array|bool
      */
     public function getList($parent_id = 0)
     {
         $query = "SELECT *
-				  FROM {$this->_table}
-				  WHERE availability = '{$this->getAvailability()}'
-				  AND parent_id = " . $this->db->smartQuote($parent_id) . "
-				  ORDER BY name";
+                  FROM {$this->_table}
+                  WHERE availability = '{$this->getAvailability()}'
+                  AND parent_id = " . $this->db->smartQuote($parent_id) . "
+                  ORDER BY name";
 
         return $this->db->getAll($query);
     }
@@ -43,17 +52,17 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     public function getListWithQuestionCount($parent_id = 0)
     {
         $query = "SELECT
-					{$this->_table}.*,
-					COUNT(assess_question_bank.question_category_id) AS numQuestions
-				  FROM {$this->_table}
-				  LEFT JOIN assess_question_bank
-				    ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
-				    AND assess_question_bank.deleted_at IS NULL
-				  WHERE availability = '{$this->getAvailability()}'
-				  AND parent_id = " . $this->db->smartQuote($parent_id) . "
-				  AND {$this->_table}.deleted_at IS NULL
-				  GROUP BY question_category_id
-				  ORDER BY name";
+                    {$this->_table}.*,
+                    COUNT(assess_question_bank.question_category_id) AS numQuestions
+                  FROM {$this->_table}
+                  LEFT JOIN assess_question_bank
+                    ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
+                    AND assess_question_bank.deleted_at IS NULL
+                  WHERE availability = '{$this->getAvailability()}'
+                  AND parent_id = " . $this->db->smartQuote($parent_id) . "
+                  AND {$this->_table}.deleted_at IS NULL
+                  GROUP BY question_category_id
+                  ORDER BY name";
 
         return $this->db->getAll($query);
     }
@@ -73,7 +82,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     /**
      * Recursively generate a list of Question Bank categories
      *
-     * @param $parent_id
+     * @param int $parent_id
      * @return array
      */
     private function getPathSegment($parent_id)
@@ -98,9 +107,9 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     /**
      * Used in conjunction with javascript tree
      *
-     * @param $targetId
-     * @param $destinationId
-     * @param $position
+     * @param int $targetId
+     * @param int $destinationId
+     * @param string|null $position
      *
      * @internal param $target
      * @internal param $destination
@@ -112,13 +121,13 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
             $targetNode = $this->getByID($targetId);
 
             /* Move target to parent of destination
-                */
+            */
             if (($position == 'before') || ($position == 'after')) {
                 $parentNode = $this->getByID($destinationNode['parent_id']);
 
                 /* If you don't unset deleted_at, it gets rendered as 0000-00-00 00:00:00
-                     * in the db
-                     */
+                 * in the db
+                 */
                 $targetNode['parent_id'] = $parentNode['question_category_id'];
                 unset($targetNode['deleted_at']);
 
@@ -141,7 +150,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     /**
      * Create a new Questionbank Category, injecting $availability
      *
-     * @param $data
+     * @param array $data
      */
     public function create($data)
     {
@@ -155,7 +164,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     /**
      * Softdeletes a Questionbank Category
      *
-     * @param $data
+     * @param array $data
      */
     public function delete($data)
     {

@@ -65,7 +65,12 @@ class Controller extends Base
 
     /**
      * Update name of school
-     * @param $entityId int
+     * @param int $entityId
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function postEditSchool($entityId) {
 
@@ -95,7 +100,9 @@ class Controller extends Base
 
     /**
      * Delete external school from tag cloud
-     * @param $entityId int
+     * @param int $entityId
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function postDeleteSchool($entityId) {
         /** @var TagCloud $tag */
