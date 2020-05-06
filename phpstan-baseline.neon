@@ -4671,11 +4671,6 @@ parameters:
 			path: library/Schoolbox/Resource/ResourceNotifier.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentPage\\)\\: Unexpected token \"\\$currentPage\", expected type at offset 199$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Renderer/Handler.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 198$#"
 			count: 1
 			path: library/Schoolbox/Resource/Search/Results.php
