@@ -1,12 +1,9 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
@@ -27,15 +24,25 @@ use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule\Model as Rule;
 
-class Controller extends Base {
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Sync\Ruleset
+ */
+class Controller extends Base
+{
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $basePath;
+
 
     /**
      * @var Schoolbox\File\MimetypeMapper
      */
     protected $mimetypeMapper;
+
 
     /**
      * Constructor
@@ -47,8 +54,10 @@ class Controller extends Base {
         $this->mimetypeMapper = $mimetypeMapper;
     }
 
+
     /**
      * @return bool|string
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     function getBasePath()
     {
@@ -88,6 +97,7 @@ class Controller extends Base {
             ]
         ]);
     }
+
 
     /**
      * Ruleset view
@@ -168,6 +178,7 @@ class Controller extends Base {
      * @since 156
      *
      * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function logs()
     {
@@ -193,6 +204,8 @@ class Controller extends Base {
      *
      * @param int $logId
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function log($logId)
     {
@@ -207,6 +220,7 @@ class Controller extends Base {
      * @param int    $logId
      * @param string $format
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function logFormat($logId, $format = '')
     {
@@ -261,8 +275,7 @@ class Controller extends Base {
                     'created' => $model->getUsersCreated(),
                     'updated' => $model->getUsersUpdated(),
                     'skipped' => $model->getUsersSkipped(),
-                    'lines' => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter),
-                        $linesPerPage)
+                    'lines' => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter), $linesPerPage)
                 ];
 
                 $allBreadcrumbs = new Navigator([
@@ -468,6 +481,7 @@ class Controller extends Base {
      *
      * @param string      $rulesetId
      * @param Provisioner $provisioner
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function dryRun($rulesetId, Provisioner $provisioner)
     {
@@ -490,11 +504,13 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Perform live UPS run
      *
      * @param string      $rulesetId
      * @param Provisioner $provisioner
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function performUpdate($rulesetId, Provisioner $provisioner)
     {
@@ -517,6 +533,7 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Performs an actual dry run.
      *
@@ -534,6 +551,7 @@ class Controller extends Base {
         }
     }
 
+
     /**
      * Update the settings for a Ruleset (student, parent, staff)
      * @api POST /adminv2/ups/ruleset/update
@@ -550,6 +568,7 @@ class Controller extends Base {
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
+
 
     /**
      * Update a single Rule in the Ruleset.
@@ -573,14 +592,16 @@ class Controller extends Base {
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 
+
     /**
      * Update a Rule's sequencing
      *
      * Just do a direct query, to save us fetching and resaving
      * a Rule instance that we never had in the first place
      *
-     * @param $sequencing
+     * @param array $sequencing
      * @return bool Whether Rule Sequence was successfully saved
+     * @throws \PDOException
      */
     protected function updateRuleSequence($sequencing) {
 
@@ -589,10 +610,15 @@ class Controller extends Base {
         return false !== $mapper->updateRuleSequence($sequencing);
     }
 
+
     /**
-     * @param $roleType
-     * @param $config
+     * @param int $roleType
+     * @param array $config
      * @return bool Whether config was successfully saved
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     protected function updateConfig($roleType, $config)
     {
@@ -603,10 +629,13 @@ class Controller extends Base {
         return false !== $mapper->save($model);
     }
 
+
     /**
-     * @param int $ruleId
+     * @param int   $ruleId
      * @param array $conditions
      * @return array maps 'new-x' to newly assign id 'y'
+     * @throws Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     protected function updateConditions($ruleId, $conditions)
     {
@@ -663,10 +692,17 @@ class Controller extends Base {
         return $results;
     }
 
+
     /**
-     * @param int $ruleId
+     * @param int   $ruleId
      * @param array $effects
      * @return array maps 'new-x' to newly assign id 'y'
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     protected function updateEffects($ruleId, $effects)
     {
@@ -804,6 +840,9 @@ class Controller extends Base {
      * @param string $roleType
      * @param array  $customRules Custom rule options
      * @return bool Whether Custom Rules were successfully saved
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     protected function updateCustomRules($roleType, $customRules)
     {

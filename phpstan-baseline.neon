@@ -4871,21 +4871,6 @@ parameters:
 			path: library/Schoolbox/Sync/Provisioner/UserMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sequencing\\)\\: Unexpected token \"\\$sequencing\", expected type at offset 190$#"
-			count: 1
-			path: library/Schoolbox/Sync/Ruleset/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$config\\)\\: Unexpected token \"\\$config\", expected type at offset 42$#"
-			count: 1
-			path: library/Schoolbox/Sync/Ruleset/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleType\\)\\: Unexpected token \"\\$roleType\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Sync/Ruleset/Controller.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$fieldId\\)\\: Unexpected token \"\\$fieldId\", expected type at offset 145$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Mapper.php
