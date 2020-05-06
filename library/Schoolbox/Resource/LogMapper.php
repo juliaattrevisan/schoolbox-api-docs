@@ -106,7 +106,7 @@ class LogMapper extends Mapper
         ));
 
         $this->hasJoin('text', array(
-            'mapper'    => \Schoolbox\Resource\Textbox\Mapper::class,
+            'mapper'    => Textbox\Mapper::class,
             'this_key'  => 'objectId',
             'other_key' => 'textBoxID'
         ));
@@ -145,12 +145,14 @@ class LogMapper extends Mapper
      * @param int $offset
      * @param int $time
      *
+     * @param bool $showHidden
      * @return Collection|Log[]
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws \PDOException
      */
-    public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0) {
+    public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0, bool $showHidden = false)
+    {
         $time = \Alaress_Date_Format::newFromTimestamp($time ?: time())->getDatabase();
         $limit = (int)$limit;
         $offset = (int)$offset;
@@ -160,12 +162,12 @@ class LogMapper extends Mapper
                 INNER JOIN {$this->getJoinSql('link', 'log', 'l', true)}
                 AND object = 'link'
                 AND l.category = :ctxt
-            ",
+            " . ($showHidden ? '' : ' AND l.hidden = false '),
             self::KIND_FILE   => "
                 INNER JOIN {$this->getJoinSql('file', 'log', 'f', true)}
                 AND object = 'file'
                 AND f.category = :ctxt
-            ",
+            " . ($showHidden ? '' : ' AND f.hidden = false '),
             self::KIND_FOLDER => "
                 INNER JOIN {$this->getJoinSql('cat',  'log', 'c', true)}
                 AND object = 'folder'

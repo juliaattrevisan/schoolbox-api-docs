@@ -27,7 +27,7 @@ class LinkNotifier extends ResourceNotifier
      */
     public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
-        return $this->getFeedInternal($context, $user->getRole()->getType(), $limit, $offset, LogMapper::KIND_LINK);
+        return $this->getFeedInternal($context, $user, $limit, $offset, LogMapper::KIND_LINK);
     }
 
 

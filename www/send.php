@@ -13,39 +13,46 @@ use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
 
 if (is_numeric($_GET['id'])) {
-    $page = new SitePage;
-    $groupHandler = new Group;
+    $page        = new SitePage;
+    $access      = Access::getInstance();
     $fileHandler = false;
-    $fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
-
+    $fileMapper  = Schoolbox\Resource\File\Mapper::getInstance();
 
     if (isset($_GET['folder'])) {
-
-        if ($groupHandler->getPermission($_GET['id']) < UserAccess::ACCESS_READ) {
+        try {
+            $currentPermission = $access->getFolderAccess($_SESSION['user'], $_GET['id']);
+        } catch (Schoolbox\Mapper\Exception $e) {
+            error(Mapper::ERROR_FILE_NOT_FOUND);
+        }
+        if ($currentPermission < UserAccess::ACCESS_READ) {
             error(Mapper::ERROR_PERM_DOWNLOAD_FILE);
         }
 
-        $config = array(
-            'sort' => 'date',
-            'sortdir' => 'DESC',
-            'size' => 1,
-        );
+        $config = [
+            'sort'      => 'date',
+            'sortdir'   => 'DESC',
+            'size'      => 1,
+            'getHidden' => ($currentPermission > UserAccess::ACCESS_READ),
+        ];
 
-        $file = $fileMapper->findForFolders([ $_GET['id'] ], $config)->first();
+        $file = $fileMapper->findForFolders([$_GET['id']], $config)->first();
 
     } else {
         try {
-            $file = $fileMapper->findById($_GET['id']);
+            $file           = $fileMapper->findById($_GET['id']);
+            $requiredAccess = $file->isHidden() ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_READ;
 
-            if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
+            if ($access->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < $requiredAccess) {
                 error(Mapper::ERROR_PERM_DOWNLOAD_FILE);
             }
 
@@ -56,9 +63,11 @@ if (is_numeric($_GET['id'])) {
     }
 
     $attachmentType = (!$file->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
-    $contentType = ($file->getMime()) ?: 'application/octet-stream';
-    $basename = $file->getBasename();
-    $fileSystem = $file->getStorage()->getFilesystem();
+    $contentType    = ($file->getMime()) ?: 'application/octet-stream';
+    $basename       = $file->getBasename();
+    /** @var Storage $storage */
+    $storage      = $file->getStorage();
+    $fileSystem   = $storage->getFilesystem();
     $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
     if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
