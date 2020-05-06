@@ -76,92 +76,6 @@ abstract class AbstractController extends BaseController
      */
     protected $tab = 'resources';
 
-    /**
-     * @param UserMapper $userMapper
-     * @return self
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @param \Schoolbox\Mapper|Resource\Folder\ILocator $folderMapper
-     * @return self
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param AbstractTreeBuilder $treeBuilder
-     * @return self
-     */
-    public function setTreeBuilder($treeBuilder)
-    {
-        $this->treeBuilder = $treeBuilder;
-        return $this;
-    }
-
-
-    /**
-     * @param Config\Loader $conf
-     * @return self
-     */
-    public function setConfig($conf)
-    {
-        $this->conf = $conf;
-        return $this;
-    }
-
-
-    /**
-     * @param \Schoolbox\Mapper|Resource\File\ILocator $fileMapper
-     * @return self
-     */
-    public function setFileMapper($fileMapper)
-    {
-        $this->fileMapper = $fileMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param string $namespace
-     * @return self
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-        return $this;
-    }
-
-
-    /**
-     * @param NodeFactory $nodeFactory
-     * @return self
-     */
-    public function setNodeFactory($nodeFactory)
-    {
-        $this->nodeFactory = $nodeFactory;
-        return $this;
-    }
-
-
-    /**
-     * @param string $nodeType
-     * @return self
-     */
-    public function setNodeType($nodeType)
-    {
-        $this->nodeType = $nodeType;
-        return $this;
-    }
-
 
     /**
      *
@@ -601,6 +515,92 @@ abstract class AbstractController extends BaseController
     public function setTab($tab)
     {
         $this->tab = $tab;
+        return $this;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @param \Schoolbox\Mapper|Resource\Folder\ILocator $folderMapper
+     * @return self
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param AbstractTreeBuilder $treeBuilder
+     * @return self
+     */
+    public function setTreeBuilder($treeBuilder)
+    {
+        $this->treeBuilder = $treeBuilder;
+        return $this;
+    }
+
+
+    /**
+     * @param Config\Loader $conf
+     * @return self
+     */
+    public function setConfig($conf)
+    {
+        $this->conf = $conf;
+        return $this;
+    }
+
+
+    /**
+     * @param \Schoolbox\Mapper|Resource\File\ILocator $fileMapper
+     * @return self
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
+
+
+    /**
+     * @param NodeFactory $nodeFactory
+     * @return self
+     */
+    public function setNodeFactory($nodeFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+        return $this;
+    }
+
+
+    /**
+     * @param string $nodeType
+     * @return self
+     */
+    public function setNodeType($nodeType)
+    {
+        $this->nodeType = $nodeType;
         return $this;
     }
 }
