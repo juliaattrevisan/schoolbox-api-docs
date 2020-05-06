@@ -1,12 +1,9 @@
 <?php
 /**
- * Renderer
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Folder\Search;
 
 use Schoolbox\Permission\Access\Access;
@@ -19,6 +16,11 @@ use Scrub;
  */
 use Schoolbox\Resource\Folder;
 
+/**
+ * Class Renderer
+ *
+ * @package Schoolbox\Resource\Folder\Search
+ */
 class Renderer extends Base
 {
 
@@ -40,7 +42,11 @@ class Renderer extends Base
      * Render html fragment
      *
      * @param MapperResult $mapperResult
-     * @param $type
+     * @param string|null  $type
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function render(MapperResult $mapperResult, $type)
     {
