@@ -4621,11 +4621,6 @@ parameters:
 			path: library/Schoolbox/Resource/File/CompositeLocator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Resource/File/Search/Renderer.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Ancestry.php

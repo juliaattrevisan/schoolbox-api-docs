@@ -43,7 +43,7 @@ class Renderer extends Base
      * Render html fragment
      *
      * @param MapperResult $mapperResult
-     * @param $type
+     * @param string|null $type
      * @throws MapperException
      */
     public function render(MapperResult $mapperResult, $type)
