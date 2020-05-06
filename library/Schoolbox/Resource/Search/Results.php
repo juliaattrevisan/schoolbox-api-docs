@@ -1,24 +1,9 @@
 <?php
 /**
- * Results
- *
- * A composite class consisting of Searchable-interfaced Mappers
- *
- * The composite also commands each of its minions to render tabs,
- * pagination and search results independently of the other minions
- *
- * search() needs to run before any of the render* methods
- *
- * In the future I'd like to have render(), renderTabs() and
- * renderPagination() running adjacently in twig, but for phplib reasons
- * I have to keep them separate as they are called at different times
- * and I don't want to rock the boat so close to the beach
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Collection;
@@ -33,7 +18,25 @@ use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Resource\Textbox\Search\Renderer as TextboxRenderer;
+use SitePage;
 
+/**
+ * Class Results
+ *
+ * A composite class consisting of Searchable-interfaced Mappers
+ *
+ * The composite also commands each of its minions to render tabs,
+ * pagination and search results independently of the other minions
+ *
+ * search() needs to run before any of the render* methods
+ *
+ * In the future I'd like to have render(), renderTabs() and
+ * renderPagination() running adjacently in twig, but for phplib reasons
+ * I have to keep them separate as they are called at different times
+ * and I don't want to rock the boat so close to the beach
+ *
+ * @package Schoolbox\Resource\Search
+ */
 class Results implements Searchable
 {
 
@@ -42,12 +45,14 @@ class Results implements Searchable
      */
     public const MIN_SEARCH_LENGTH = 2;
 
+
     /**
      * Registry of mappers
      *
      * @var Collection|Definition[]
      */
     private $registry;
+
 
     /**
      * Tab that you clicked on
@@ -58,6 +63,7 @@ class Results implements Searchable
      */
     private $type;
 
+
     /**
      * Search results
      *
@@ -65,14 +71,15 @@ class Results implements Searchable
      */
     private $result;
 
+
     /**
      * Constructor
      *
      * $type is 'all' or specific to which tab you selected e.g. 'link'
      * This is used to generate a phplib for "see more" - see outputMore()
      *
-     * @param $page
-     * @param $type
+     * @param SitePage $page
+     * @param string|null $type
      */
     public function __construct($page, $type)
     {
@@ -100,7 +107,7 @@ class Results implements Searchable
      * @param null            $limit
      * @param string          $sortProperty
      * @param string          $sortDirection
-     * @return Collection|void
+     * @return void
      */
     public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC'): void
     {
@@ -120,6 +127,7 @@ class Results implements Searchable
         $this->result = $result;
     }
 
+
     /**
      * Render search tabs to chooze from
      */
@@ -134,6 +142,7 @@ class Results implements Searchable
         }
     }
 
+
     /**
      * Render search results
      */
@@ -147,6 +156,7 @@ class Results implements Searchable
             }
         }
     }
+
 
     /**
      * Render pagination
@@ -169,6 +179,7 @@ class Results implements Searchable
             }
         }
     }
+
 
     /**
      * Count the total number of results for all participants

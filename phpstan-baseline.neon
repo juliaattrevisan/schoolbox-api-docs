@@ -4671,21 +4671,6 @@ parameters:
 			path: library/Schoolbox/Resource/ResourceNotifier.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 198$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 218$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Collection\\|void is not subtype of native type void\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
 			message: "#^Cannot call method getOffset\\(\\) on null\\.$#"
 			count: 4
 			path: library/Schoolbox/Resource/Search/Results.php
