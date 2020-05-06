@@ -1,7 +1,5 @@
 <?php
 /**
- * IRenderer
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,6 +13,11 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Scrub;
 use SitePage;
 
+/**
+ * Class Base
+ *
+ * @package Schoolbox\Resource\Search\Renderer
+ */
 abstract class Base
 {
 
@@ -23,7 +26,8 @@ abstract class Base
      *
      * @var SitePage
      */
-    protected $page = null;
+    protected $page;
+
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -32,12 +36,14 @@ abstract class Base
      */
     protected $type = '';
 
+
     /**
      * Tab Name (e.g. 'Link', 'Blogs', etc);
      *
      * @var string
      */
     protected $tabName = '';
+
 
     /**
      * Constructor
@@ -53,51 +59,53 @@ abstract class Base
      * Render clickable tab menu
      *
      * @param MapperResult $mapperResult
-     * @param $type
+     * @param string|null $type
      */
     public function renderTab(MapperResult $mapperResult, $type)
     {
         if ($mapperResult->getCount()) {
             $this->getPage()->setVar(array(
-                    'TYPE_TYPE' => $this->getType(),
-                    'TYPE_NAME' => $this->getTabName(),
-                    'TYPE_COUNT' => $mapperResult->getCount(),
-                ));
+                'TYPE_TYPE' => $this->getType(),
+                'TYPE_NAME' => $this->getTabName(),
+                'TYPE_COUNT' => $mapperResult->getCount(),
+            ));
 
             /* Rage these styles in, because of css specificity
              */
             if ($this->getType() == 'all') {
                 $this->getPage()->setVar(array(
-                        'TYPE_CLASS' => ''
-                    ));
+                    'TYPE_CLASS' => ''
+                ));
             } elseif (!$mapperResult->getCount()) {
                 $this->getPage()->setVar(array(
-                        'TYPE_CLASS' => 'hide'
-                    ));
+                    'TYPE_CLASS' => 'hide'
+                ));
             } else {
                 $this->getPage()->setVar(array(
-                        'TYPE_CLASS' => ''
-                    ));
+                    'TYPE_CLASS' => ''
+                ));
             }
 
             $this->getPage()->parse('type_block', 'type', true);
 
             $this->getPage()->setVar(array(
-                    'RESULT_TYPE' => $this->getType(),
-                ));
+                'RESULT_TYPE' => $this->getType(),
+            ));
 
             $this->getPage()->parse('result_block', 'result', true);
         }
     }
 
+
     /**
      * Render html fragment
      *
      * @param MapperResult $mapperResult
-     * @param $type
-     * @return
+     * @param string|null $type
+     * @return void
      */
     abstract public function render(MapperResult $mapperResult, $type);
+
 
     /**
      * Render pagination
@@ -167,6 +175,7 @@ abstract class Base
         // render final output
         $this->getPage()->parse(TEMPLATE_content, 'RESULT', true);
     }
+
 
     /**
      * Breadcrumbs haha
