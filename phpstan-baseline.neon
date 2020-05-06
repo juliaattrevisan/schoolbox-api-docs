@@ -4806,11 +4806,6 @@ parameters:
 			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$property\\)\\: Unexpected token \"\\$property\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/UserRuleset.php
-
-		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Iterator/Guardian.php

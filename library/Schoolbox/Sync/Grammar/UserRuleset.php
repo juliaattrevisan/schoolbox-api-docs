@@ -1,15 +1,11 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Grammar;
 
-
-use Schoolbox\CampusMapper;
 use Schoolbox\User;
 use Schoolbox\Mapper;
 
@@ -25,7 +21,7 @@ class UserRuleset extends Ruleset
     /**
      * Abstractify this check so subclasses can wrangle
      *
-     * @param $property
+     * @param string $property
      * @return bool
      */
     protected function isCollection($property)
@@ -43,4 +39,4 @@ class UserRuleset extends Ruleset
 
         return false;
     }
-} 
+}
