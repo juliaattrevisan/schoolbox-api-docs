@@ -4656,11 +4656,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 108$#"
-			count: 1
-			path: library/Schoolbox/Resource/GroupMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$left_head_font\\)\\: Unexpected token \"\\$left_head_font\", expected type at offset 19$#"
 			count: 1
 			path: library/Schoolbox/Resource/HomepageConfig.php
