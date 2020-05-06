@@ -4496,11 +4496,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Admin/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$slug\\)\\: Unexpected token \"\\$slug\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Message/SourceMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$eventObjectId\\)\\: Unexpected token \"\\$eventObjectId\", expected type at offset 93$#"
 			count: 1
 			path: library/Schoolbox/Realtime/MessageList/IListFactory.php
