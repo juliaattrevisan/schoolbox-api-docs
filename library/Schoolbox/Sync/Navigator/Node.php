@@ -1,16 +1,17 @@
 <?php
-
 /**
- * Navigator Node
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Navigator;
 
-class Node {
+/**
+ * Class Node
+ * @package Schoolbox\Sync\Navigator
+ */
+class Node
+{
 
     /**
      * The name of this breadcrumb
@@ -36,9 +37,9 @@ class Node {
     /**
      * Constructor
      *
-     * @param $name
-     * @param $url
-     * @param $active
+     * @param string $name
+     * @param string $url
+     * @param bool $active
      */
     public function __construct($name, $url, $active) {
         $this->setName($name);
@@ -61,7 +62,7 @@ class Node {
     /**
      * Set active
      *
-     * @param boolean $active
+     * @param bool $active
      */
     private function setActive($active)
     {
@@ -71,7 +72,7 @@ class Node {
     /**
      * Get active
      *
-     * @return boolean
+     * @return bool
      */
     public function getActive()
     {

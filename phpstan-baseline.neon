@@ -4866,21 +4866,6 @@ parameters:
 			path: library/Schoolbox/Sync/Iterator/Student.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$active\\)\\: Unexpected token \"\\$active\", expected type at offset 83$#"
-			count: 1
-			path: library/Schoolbox/Sync/Navigator/Node.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Sync/Navigator/Node.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 64$#"
-			count: 1
-			path: library/Schoolbox/Sync/Navigator/Node.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$userAccessRemove\\)\\: Unexpected token \"\\$userAccessRemove\", expected type at offset 69$#"
 			count: 1
 			path: library/Schoolbox/Sync/Provisioner/User.php
