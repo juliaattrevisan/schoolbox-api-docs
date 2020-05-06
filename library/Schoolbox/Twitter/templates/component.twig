@@ -7,13 +7,20 @@
         </p>
     </div>
 {% else %}
-    <a id="twitter-view-{{ id }}"
-       class="twitter-timeline"
-       href="{{ href }}"
-       data-dnt="true"
-       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
-       data-chrome="noheader nofooter noborders transparent noscrollbar"
-    >Loading tweets...</a>
+    {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
+    <div class="empty-state" id="twitter-view-{{ id }}-container">
+        <span class="icon-twitter" id="twitter-view-{{ id }}-icon"></span>
+        <p>
+            <a id="twitter-view-{{ id }}"
+               class="twitter-timeline"
+               href="{{ href }}"
+               target="_blank"
+               data-dnt="true"
+               {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
+               data-chrome="noheader nofooter noborders transparent noscrollbar"
+            >Loading tweets...</a>
+        </p>
+    </div>
 
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -40,7 +47,43 @@
             // (This is only required when reloading the component's content)
             twttr.ready(
                 function (t) {
-                    t.widgets.load(document.getElementById("twitter-view-{{ id }}"));
+                    let elementId = "twitter-view-{{ id }}",
+                        container = document.getElementById("twitter-view-{{ id }}-container"),
+                        icon      = document.getElementById("twitter-view-{{ id }}-icon"),
+                        observer  = new MutationObserver(function (mutationsList, observer) {
+                            // If the observer doesn't find the element, the
+                            // Twitter feed has been loaded.
+                            // Remove the empty state.
+                            if (!document.getElementById(elementId)) {
+                                container.classList.remove('empty-state');
+                                icon.remove();
+                                observer.disconnect();
+                            }
+                        }),
+                        timeout1  = function () {
+                            let element = document.getElementById(elementId);
+                            if (element) {
+                                element.innerText = 'Still loading...';
+                            }
+                        },
+                        timeout2  = function () {
+                            let element = document.getElementById(elementId);
+                            if (element) {
+                                element.innerText = 'Cannot load tweets for @{{ username }}.';
+                            }
+                        };
+                    observer.observe(container, { attributes: true, childList: true, subtree: true });
+                    t.widgets.load(document.getElementById(elementId))
+                        .finally(
+                            function () {
+                                // The widget got loaded, apparently.
+                                // Wait and see if this item still exists?
+                                // If we detect the item doesn't exist: remove
+                                // the empty state
+                                setTimeout(timeout1, 5000);
+                                setTimeout(timeout2, 15000);
+                            }
+                        );
                 }
             );
         </script>

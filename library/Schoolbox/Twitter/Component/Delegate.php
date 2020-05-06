@@ -65,6 +65,7 @@ class Delegate
             'href'        => $this->buildHref(),
             'componentId' => $this->component->getInstance()->getId(),
             'limit'       => $this->component->getConfig('size'),
+            'username'    => $this->component->getConfig('username'),
         ];
     }
 
