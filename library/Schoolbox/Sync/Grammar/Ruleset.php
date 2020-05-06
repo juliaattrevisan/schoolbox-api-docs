@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Grammar;
 
 use Alaress\Rules\TokenizedRuleset;
@@ -15,13 +13,23 @@ use Schoolbox\Mapper;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
 
+/**
+ * Class Ruleset
+ *
+ * @package Schoolbox\Sync\Grammar
+ */
 class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
 
-    /** @var Mapper */
+    /**
+     * @var Mapper
+     */
     protected $mapper;
 
-    /** @var LoggerInterface */
+
+    /**
+     * @var LoggerInterface
+     */
     protected $log;
 
 
@@ -46,6 +54,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      * @param InternalUser $previous
      *
      * @return InternalUser
+     * @throws Mapper\Exception
      */
     public function hydrate(ExternalUser $input, InternalUser $previous)
     {
@@ -77,12 +86,14 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         return $result;
     }
 
+
     /**
      * The $input for this method should be an NDS record
      *
      * @param mixed  $input    - the NDS record to manipulate
      * @param object $previous - an instance of the object mapped by the mapper
      * @return object          - an instance of the object mapped by the mapper
+     * @throws Mapper\Exception
      */
     public function applyTo($input, $previous = null)
     {
@@ -90,6 +101,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
         return $this->applyPartial($precedences, $input, $previous);
     }
+
 
     /**
      * Apply specific rules from the ruleset
@@ -100,6 +112,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      * @param ExternalUser $input     - the NDS record to manipulate
      * @param InternalUser $previous  - an instance of the object mapped by the mapper
      * @return InternalUser           - an instance of the object mapped by the mapper
+     * @throws Mapper\Exception
      */
     public function applyPartial(array $sequences, $input, $previous = null)
     {
@@ -108,7 +121,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         $rules = $this->getRules();
 
         foreach ($rules as $sequence => $rule) {
-
             if (!in_array($sequence, $sequences)) {
                 continue;
             }
@@ -127,7 +139,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
             // Did the rule's conditions match the user?
             if (is_array($data)) {
-
                 foreach ($data as $property => $token) {
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
@@ -158,7 +169,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
                         // reassign the value to the now (maybe) changed array
                         $value = $modelProperty;
-
                     } else {
                         if (is_array($value)) {
                             // not a collection, so we can only accept one value: take the first one
@@ -186,6 +196,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         return $object;
     }
 
+
     /**
      * Abstractify this check so subclasses can wrangle
      *
@@ -197,12 +208,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         $map = $this->mapper->getMap();
         $mapping = $map->getOffset($property);
 
-        if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
-            return true;
-        }
-
-        return false;
+        return $mapping['type'] == Mapper::TYPE_COLLECTION;
     }
+
 
     /**
      * @param object $object   - the object to update with the new value
