@@ -4456,11 +4456,6 @@ parameters:
 			path: library/Schoolbox/Preview/Chain/Strategy/Base.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 88$#"
-			count: 1
-			path: library/Schoolbox/Preview/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
