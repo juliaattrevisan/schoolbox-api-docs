@@ -73,6 +73,7 @@ class Sync extends Base implements ISync
             INNER JOIN SCHOOLBOX_STUDENTS
                 AS S ON PS.STUDENT_NUMBER = S.STUDENT_NUMBER
             WHERE P.CARER_NUMBER IS NOT NULL
+            ORDER BY P.CARER_NUMBER
         ';
 
         return new Iterator\Guardian(
