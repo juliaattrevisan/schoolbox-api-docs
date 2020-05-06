@@ -4801,26 +4801,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$map\\)\\: Unexpected token \"\\$map\", expected type at offset 40$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$prefix\\)\\: Unexpected token \"\\$prefix\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$label\\)\\: Unexpected token \"\\$label\", expected type at offset 37$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$key\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Tokenizer.php

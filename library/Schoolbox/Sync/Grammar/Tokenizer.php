@@ -26,8 +26,8 @@ class Tokenizer extends Super
 
 
     /**
-     * @param $prefix
-     * @param $map
+     * @param string $prefix
+     * @param array $map
      */
     public function __construct($prefix, $map)
     {
@@ -54,8 +54,8 @@ class Tokenizer extends Super
 
 
     /**
-     * @param $key
-     * @param $label
+     * @param string $key
+     * @param string $label
      */
     protected function addTokenMapping($key, $label)
     {
