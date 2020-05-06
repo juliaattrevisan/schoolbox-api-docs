@@ -4596,26 +4596,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentRecord\\)\\: Unexpected token \"\\$currentRecord\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/NodeRenderer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$i\\)\\: Unexpected token \"\\$i\", expected type at offset 82$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/NodeRenderer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentRecord\\)\\: Unexpected token \"\\$currentRecord\", expected type at offset 57$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/NodeRenderer.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$i\\)\\: Unexpected token \"\\$i\", expected type at offset 86$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/NodeRenderer.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 18$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
