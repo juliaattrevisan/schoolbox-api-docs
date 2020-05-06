@@ -1,13 +1,16 @@
 <?php
 /**
- * Data
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Usage\Specific;
 
+/**
+ * Class AjaxFlot
+ *
+ * @package Schoolbox\Usage\Specific
+ */
 class AjaxFlot
 {
 
@@ -18,22 +21,24 @@ class AjaxFlot
      */
     private $mapper = null;
 
+
     /**
      * Constructor
      *
-     * @param $userId
+     * @param int $userId
      */
     public function __construct($userId)
     {
         $this->setMapper(new UsageMapper($userId));
     }
 
+
     /**
      * Delegation method
      *
      * Find total usage
      *
-     * @return bool|float|int|string
+     * @return string
      */
     public function findTotalUsage()
     {
@@ -47,12 +52,13 @@ class AjaxFlot
         return json_encode($result);
     }
 
+
     /**
      * Delegation method
      *
      * Find total group usage
      *
-     * @return bool|float|int|string
+     * @return string
      */
     public function findGroupUsage()
     {
@@ -72,11 +78,12 @@ class AjaxFlot
         return json_encode($allResults);
     }
 
+
     /**
      * Calculate percentage
      *
-     * @param $top
-     * @param $bottom
+     * @param int|float $top
+     * @param int|float $bottom
      * @return float|int
      */
     private function percentage($top, $bottom)
@@ -88,12 +95,13 @@ class AjaxFlot
         return 100*$top/$bottom;
     }
 
+
     /**
      * Delegation method
      *
      * Find total type usage and pie it out, which uses a percentage
      *
-     * @return bool|float|int|string
+     * @return string
      */
     public function findTypeUsage()
     {
@@ -103,13 +111,13 @@ class AjaxFlot
         $totalBytes = 0;
 
         /* Find the total
-		 */
+         */
         foreach ($allData as $currentData) {
             $totalBytes += $currentData['bytes'];
         }
 
         /* Find each segment
-		 */
+         */
         foreach ($allData as $currentData) {
             $result = array($currentData['name'], $this->percentage($currentData['bytes'], $totalBytes));
 
@@ -119,15 +127,17 @@ class AjaxFlot
         return json_encode($allResults);
     }
 
+
     /**
      * Delegation method
      *
      * Find total file usage
      *
-     * @param $orderBy
-     * @param $order
-     * @param $index
-     * @param $numPerPage
+     * @param string $orderBy
+     * @param string $order
+     * @param int $index
+     * @param int $numPerPage
+     * @return mixed
      */
     public function findFileUsage($orderBy, $order, $index, $numPerPage)
     {
@@ -160,10 +170,9 @@ class AjaxFlot
         ));
 
         /* Really? You should be passing the bytes as constructor arg
-		 */
+         */
         $bytes = new \Alaress_Byte_Format();
 
-//        var_dump($allData);
         foreach ($allData as $currentData) {
             $page->setVar(array(
                 'FILE_ID' => $currentData['id'],
@@ -186,7 +195,8 @@ class AjaxFlot
                 $page->parse('file_storage_block', 'file_storage');
                 $page->parse('no_category_block', 'no_category');
                 // Not deletable
-            } /* Link SBFS files
+            }
+            /* Link SBFS files
              */
             elseif ($currentData['groupName'] == 'File') {
                 $page->setVar(array(
@@ -197,7 +207,8 @@ class AjaxFlot
                 $page->parse('file_sbfs_block', 'file_sbfs');
                 $page->parse('has_category_block', 'has_category');
                 $page->parse('is_deletable_block', 'is_deletable');
-            } /* Link MyFile
+            }
+            /* Link MyFile
              */
             elseif ($currentData['groupName'] == 'My File') {
                 $page->setVar(array(
@@ -207,7 +218,8 @@ class AjaxFlot
                 $page->parse('file_myfile_block', 'file_myfile');
                 $page->parse('no_category_block', 'no_category');
                 $page->parse('is_deletable_block', 'is_deletable');
-            } /* Student Submissions
+            }
+            /* Student Submissions
              */
             elseif ($currentData['groupName'] == 'Submission') {
                 $page->setVar(array(
@@ -225,7 +237,8 @@ class AjaxFlot
                 $page->parse('file_return_block', 'file_return');
                 $page->parse('has_category_block', 'has_category');
                 $page->parse('is_deletable_block', 'is_deletable');
-            } /* None of the above
+            }
+            /* None of the above
              */
             else {
                 $page->setVar(array(
@@ -257,7 +270,7 @@ class AjaxFlot
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * Set mapper
