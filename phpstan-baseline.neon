@@ -4806,51 +4806,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleType\\)\\: Unexpected token \"\\$roleType\", expected type at offset 53$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$mappingType\\)\\: Unexpected token \"\\$mappingType\", expected type at offset 117$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Factory\\:\\:produce\\(\\) should return Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Fragment but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userField\\)\\: Unexpected token \"\\$userField\", expected type at offset 54$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Factory\\:\\:produceType\\(\\) should return Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Fragment but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$field\\)\\: Unexpected token \"\\$field\", expected type at offset 81$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$field\\)\\: Unexpected token \"\\$field\", expected type at offset 84$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$field\\)\\: Unexpected token \"\\$field\", expected type at offset 80$#"
-			count: 2
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allFields\\)\\: Unexpected token \"\\$allFields\", expected type at offset 47$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Fragment/Factory.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 44$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Fragment/Fragment.php

@@ -116,7 +116,7 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param $roleType
+     * @param string $roleType
      */
     public function __construct($roleType) {
 
@@ -238,16 +238,19 @@ class Factory
      * Determine which Effect Fragment to load for this field
      * (boolean, lookup, etc)
      *
-     * @param $mappingType
-     * @return Fragment
+     * @param int $mappingType
+     * @return Fragment|null
      */
     public function produce($mappingType) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             return new Fragment('@upsEffect/literal.twig');
-        }
-        else if ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
+        } elseif ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
             return new Fragment('@upsEffect/map.twig');
         }
+
+        /* You shouldn't be able to get here, but ok
+         */
+        return null;
     }
 
 
@@ -263,32 +266,33 @@ class Factory
     /**
      * Produce a Subfragment
      *
-     * @param $userField
-     * @return Fragment
+     * @param string $userField
+     * @return Fragment|null
      */
     public function produceType($userField) {
         if ($this->isBoolean($userField)) {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
-        }
-        else if ($this->isLookup($userField)) {
+        } elseif ($this->isLookup($userField)) {
             return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField, $this->getRoleType()));
-        }
-        else if ($this->isString($userField)) {
+        } elseif ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
-        }
-        else if ($this->isCollection($userField)) {
+        } elseif ($this->isCollection($userField)) {
             $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
             $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
 
             return $fragment;
         }
+
+        /* You shouldn't be able to get here, but ok
+         */
+        return null;
     }
 
 
     /**
      * Determine whether the current field is a Boolean
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isBoolean($field) {
@@ -299,7 +303,7 @@ class Factory
     /**
      * Determine whether the current field is a Collection
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isCollection($field) {
@@ -310,7 +314,7 @@ class Factory
     /**
      * Determine whether the current field is a Lookup
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isLookup($field) {
@@ -321,7 +325,7 @@ class Factory
     /**
      * Determine whether the current field is a String
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isString($field) {
@@ -401,7 +405,7 @@ class Factory
     /**
      * Set all fields
      *
-     * @param $allFields
+     * @param array $allFields
      */
     private function setAllFields($allFields) {
         $this->allFields = $allFields;
