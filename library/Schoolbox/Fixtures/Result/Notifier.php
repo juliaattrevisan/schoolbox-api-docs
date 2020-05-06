@@ -254,4 +254,47 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
+
+    /* These methods are dynamically accessed via AbstractModuleNotifier::loadDependencies
+     */
+
+    /**
+     * @param MatchMapper $mapper
+     */
+    protected function setMatchMapper($mapper)
+    {
+        $this->matchMapper = $mapper;
+    }
+
+    /**
+     * @param ResultMapper $mapper
+     */
+    protected function setResultMapper($mapper)
+    {
+        $this->resultMapper = $mapper;
+    }
+
+    /**
+     * @param DivisionMapper $mapper
+     */
+    protected function setDivisionMapper($mapper)
+    {
+        $this->divisionMapper = $mapper;
+    }
+
+    /**
+     * @param SportMapper $mapper
+     */
+    protected function setSportMapper($mapper)
+    {
+        $this->sportMapper = $mapper;
+    }
+
+    /**
+     * @param TeamPlayerMapper $mapper
+     */
+    protected function setTeamPlayerMapper($mapper)
+    {
+        $this->teamPlayerMapper = $mapper;
+    }
 }
