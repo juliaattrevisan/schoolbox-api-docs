@@ -4498,11 +4498,6 @@ parameters:
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$command\\)\\: Unexpected token \"\\$command\", expected type at offset 106$#"
 			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$command\\)\\: Unexpected token \"\\$command\", expected type at offset 106$#"
-			count: 1
 			path: library/Schoolbox/Realtime/Pipe/PipeInterface.php
 
 		-
