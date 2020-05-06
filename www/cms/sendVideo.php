@@ -93,12 +93,23 @@ if (isset($type) && isset($id)) {
         if ($config->get('otfs_s3_presigned_urls_enabled')) {
             $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
+            /** @var string $mimeType */
+            if ($video->getStorage()->getMimetype() instanceof \Schoolbox\File\Mimetype) {
+                if ($video->getStorage()->getMimetype()->isAudio()) {
+                    $mimeType = 'audio/mpeg';
+                } elseif ($video->getStorage()->getMimetype()->isVideo()) {
+                    $mimeType = 'video/mp4';
+                }
+            } else {
+                $mimeType = 'application/octet-stream';
+            }
+
             $preSignedUrlService = new PreSignedUrlService($config);
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
                 Alaress_Date_Format::now()->addDays(1),
-                $video->getStorage()->getMime(),
-                $video->getStorage()->getMime(),
+                $mimeType,
+                $mimeType,
                 $video->getTranscodePath(),
                 $video->getStorage()->getBasename(),
                 $cacheControl
