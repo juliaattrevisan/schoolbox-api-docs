@@ -1,27 +1,35 @@
 <?php
 /**
- * Factory (FragmentFactory)
- *
- * A Factory which produces instances of Fragment based on which
- * fields were selected, and the properties of that field in the
- * UserMapper definition
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Config\Loader as ConfigLoader;
 
-class Factory {
-    const TYPE_BOOLEAN = 1;
-    const TYPE_LOOKUP = 2;
-    const TYPE_STRING = 3;
-    const TYPE_COLLECTION = 4;
+/**
+ * Class Factory
+ *
+ * A Factory which produces instances of Fragment based on which
+ * fields were selected, and the properties of that field in the
+ * UserMapper definition
+ *
+ * @package Schoolbox\Sync\Effect\Fragment
+ */
+class Factory
+{
+
+    /**
+     * Various types
+     */
+    private const TYPE_BOOLEAN = 1;
+    private const TYPE_LOOKUP = 2;
+    private const TYPE_STRING = 3;
+    private const TYPE_COLLECTION = 4;
+
 
     /**
      * Manufacture a list of Schoolbox User fields to chooze from
@@ -29,6 +37,7 @@ class Factory {
      * from the UserMapper definition
      */
     private $allFields = [];
+
 
     /**
      * A list of all the Schoolbox UserMapper fields to
@@ -71,6 +80,7 @@ class Factory {
         'displayGradeGraph' => 'Display Graph on Student Grade Card',
     ];
 
+
     /**
      * Special ajax urls for selectize population
      * Uses same controller with different params
@@ -85,6 +95,7 @@ class Factory {
         'campusCollectionRemove' => 'campus',
     ];
 
+
     /**
      * The current Ruleset
      * Synonymous with Role Type
@@ -93,12 +104,14 @@ class Factory {
      */
     private $roleType = '';
 
+
     /**
      * A Lookup instance
      *
      * @var Lookup
      */
     private $lookup = null;
+
 
     /**
      * Factory constructor.
@@ -124,6 +137,7 @@ class Factory {
         $this->setRoleType($roleType);
         $this->setAllFields($this->generateAllFields());
     }
+
 
     /**
      * Figure out what each desired field's type is, via the UserMapper
@@ -219,6 +233,7 @@ class Factory {
         return $allFields;
     }
 
+
     /**
      * Determine which Effect Fragment to load for this field
      * (boolean, lookup, etc)
@@ -235,6 +250,7 @@ class Factory {
         }
     }
 
+
     /**
      * Return empty Fragment, prompting the user to choose
      * a User field to modify and a Mapping Type
@@ -242,6 +258,7 @@ class Factory {
     public function produceEmpty() {
         return new Fragment('@upsEffect/empty.twig');
     }
+
 
     /**
      * Produce a Subfragment
@@ -267,6 +284,7 @@ class Factory {
         }
     }
 
+
     /**
      * Determine whether the current field is a Boolean
      *
@@ -274,12 +292,9 @@ class Factory {
      * @return bool
      */
     public function isBoolean($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_BOOLEAN) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_BOOLEAN;
     }
+
 
     /**
      * Determine whether the current field is a Collection
@@ -288,12 +303,9 @@ class Factory {
      * @return bool
      */
     public function isCollection($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_COLLECTION) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_COLLECTION;
     }
+
 
     /**
      * Determine whether the current field is a Lookup
@@ -302,12 +314,9 @@ class Factory {
      * @return bool
      */
     public function isLookup($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_LOOKUP) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_LOOKUP;
     }
+
 
     /**
      * Determine whether the current field is a String
@@ -316,12 +325,9 @@ class Factory {
      * @return bool
      */
     public function isString($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_STRING) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_STRING;
     }
+
 
     /**
      * Gets the key/value representation of $allFields
