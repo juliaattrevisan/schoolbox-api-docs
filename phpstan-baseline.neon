@@ -4791,16 +4791,6 @@ parameters:
 			path: library/Schoolbox/Search/Mock/ResultBuilder.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$dataSource\\)\\: Unexpected token \"\\$dataSource\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Statistics/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$roleFilter\\)\\: Unexpected token \"\\$roleFilter\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Statistics/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Statistics/Module.php

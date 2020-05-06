@@ -714,7 +714,7 @@ class Controller extends Base
 
 
     /**
-     * @param $dataSource
+     * @param DataSource $dataSource
      */
     public function setDataSource($dataSource)
     {
@@ -762,7 +762,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $roleFilter
+     * @param string $roleFilter
      */
     protected function setRoleFilter($roleFilter)
     {
@@ -770,7 +770,7 @@ class Controller extends Base
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     protected function getRoleFilter()
     {
