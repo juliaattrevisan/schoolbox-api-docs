@@ -4446,11 +4446,6 @@ parameters:
 			path: library/Schoolbox/Picker/DateTime/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\Base\\:\\:test\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Base.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
