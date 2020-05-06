@@ -1,13 +1,10 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\My\File;
-
 
 use Component\Eportfolio\FileListMapper;
 use Schoolbox\Collection;
@@ -15,7 +12,6 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFileMapper;
 use Schoolbox\Resource\File\IFileMapper;
 use Schoolbox\Resource\File\ILocator;
-use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 /**
@@ -44,6 +40,7 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
      * Setup method. Implementing classes to define their SQL map here.
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -57,8 +54,6 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
         $this->joins($this->getFolderFieldname(), Resource\My\Folder\Mapper::class, 'id', null, null, 'folder');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteEportfolio' ]);
-
-
     }
 
 
@@ -85,15 +80,14 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
      */
     protected function getSessionUserId()
     {
-        return $this->sessionData['user'] instanceof User
-            ? $this->sessionData['user']->getId()
-            : null;
+        return $this->sessionData['user'] instanceof User ? $this->sessionData['user']->getId() : null;
     }
+
 
     /**
      * Find all image files owned by a particular user
      *
-     * @param $userId
+     * @param int $userId
      * @return Collection
      */
     public function findAllImagesByUser($userId)
@@ -123,5 +117,4 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
         $fileListMapper = FileListMapper::getInstance();
         $fileListMapper->deleteByColumn('file_id',$file->getId());
     }
-
 }

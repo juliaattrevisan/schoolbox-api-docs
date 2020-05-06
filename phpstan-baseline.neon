@@ -4656,11 +4656,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Resource/My/File/Mapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/ResourceNotifier.php
