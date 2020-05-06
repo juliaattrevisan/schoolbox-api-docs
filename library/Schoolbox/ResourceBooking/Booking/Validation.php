@@ -117,19 +117,20 @@ class Validation
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param  Item\Model     $resource
-     * @param  Booking        $existingBooking If provided, this is the booking that
-     *                                         is being updated.
+     * @param Item\Model     $resource
+     * @param Request\Values $postData
+     * @param Booking        $existingBooking  If provided, this is the booking that is being updated.
      *                                         Leave it out of conflict checks.
-     * @param  Request\Values $postData
-     * @throws InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
      * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
-        Booking $existingBooking = null,
-        $postData
+        $postData,
+        Booking $existingBooking = null
     ) {
         // Check:
         // Beginning and end of booking are valid datetime
