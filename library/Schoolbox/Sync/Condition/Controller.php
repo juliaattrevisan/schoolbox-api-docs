@@ -1,22 +1,24 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Condition;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
-use Schoolbox\Sync\Condition\Fragment\Fragment;
 use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
 
-class Controller extends Base {
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Sync\Condition
+ */
+class Controller extends Base
+{
 
     /**
      * A meta field for various Condition-specific UI
@@ -25,12 +27,15 @@ class Controller extends Base {
         'status' => 'Condition not yet saved'
     ];
 
+
     /**
      * Forge a data structure to feed into twig template,
      * so that new Conditions can be injected directly into
      * the ui after being received via ajax
      *
-     * @param $params
+     * @param array $params
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function add($params) {
 
@@ -79,6 +84,7 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Delete a Condition asynchronously
      *
@@ -93,6 +99,8 @@ class Controller extends Base {
             'format' => 'json',
             'data'   => $deleteCount > 0
         ]);
+
+        return true;
     }
 
     /* Getters/Setters

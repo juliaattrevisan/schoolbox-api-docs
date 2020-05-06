@@ -4796,16 +4796,6 @@ parameters:
 			path: library/Schoolbox/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 187$#"
-			count: 1
-			path: library/Schoolbox/Sync/Condition/Controller.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Condition\\\\Controller\\:\\:delete\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Condition/Controller.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$conditionType\\)\\: Unexpected token \"\\$conditionType\", expected type at offset 54$#"
 			count: 1
 			path: library/Schoolbox/Sync/Condition/Fragment/Factory.php
