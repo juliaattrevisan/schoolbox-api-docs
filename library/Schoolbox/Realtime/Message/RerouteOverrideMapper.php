@@ -1,70 +1,75 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Realtime\Message;
-
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
-class RerouteOverrideMapper extends Mapper {
+/**
+ * Class RerouteOverrideMapper
+ *
+ * @package Schoolbox\Realtime\Message
+ */
+class RerouteOverrideMapper extends Mapper
+{
 
-	/**
-	 * @return bool
-	 */
-	protected function mapping() {
-		$this->hasTable('msg_reroute_override');
-		$this->hasModel(RerouteOverride::class);
+    /**
+     * @return bool
+     * @throws Mapper\DefinitionException
+     * @throws \InvalidArgumentException
+     */
+    protected function mapping() {
+        $this->hasTable('msg_reroute_override');
+        $this->hasModel(RerouteOverride::class);
 
-		$this->hasMap(array(
-			'column'     => 'user_id',
-			'property'   => 'user',
-			'type'       => self::TYPE_MODEL,
-			'identifier' => true,
-			'join'       => 'user'
-		));
-		$this->hasMap(array(
-			'column'     => 'msg_route_key',
-			'property'   => 'routeKey',
-			'type'       => self::TYPE_STRING,
-			'identifier' => true,
-		));
+        $this->hasMap(array(
+            'column'     => 'user_id',
+            'property'   => 'user',
+            'type'       => self::TYPE_MODEL,
+            'identifier' => true,
+            'join'       => 'user'
+        ));
+        $this->hasMap(array(
+            'column'     => 'msg_route_key',
+            'property'   => 'routeKey',
+            'type'       => self::TYPE_STRING,
+            'identifier' => true,
+        ));
 
         $this->uses('delivery', self::TYPE_SET);
 
-		$this->hasJoin('user', array(
-			'mapper'     => '\\Schoolbox\\UserMapper',
-			'this_key'   => 'user_id',
-			'other_key'  => 'id'
-		));
+        $this->hasJoin('user', array(
+            'mapper'     => '\\Schoolbox\\UserMapper',
+            'this_key'   => 'user_id',
+            'other_key'  => 'id'
+        ));
 
-		return true;
-	}
+        return true;
+    }
 
 
-	/**
-	 * Returns a collection of overrides that match the given route and, optionally, user ID.
-	 *
-	 * @param $route
-	 * @param int $userId
-	 * @return Collection|RerouteOverride[]
-	 */
-	public function findWhereMatching($route, $userId = 0) {
-		$coll = $this->findByColumn('user_id', array(0, $userId));
-		$regex = '`'. str_replace('*','[^\.]', $route) . '`';
+    /**
+     * Returns a collection of overrides that match the given route and, optionally, user ID.
+     *
+     * @param string $route
+     * @param int $userId
+     * @return Collection|RerouteOverride[]
+     */
+    public function findWhereMatching($route, $userId = 0) {
+        $coll = $this->findByColumn('user_id', array(0, $userId));
+        $regex = '`'. str_replace('*','[^\.]', $route) . '`';
 
-		return $coll->filter(function($override) use ($regex) {
-			/** @var RerouteOverride $override */
-			return preg_match($regex, $override->getRouteKey());
-		});
+        return $coll->filter(function($override) use ($regex) {
+            /** @var RerouteOverride $override */
+            return preg_match($regex, $override->getRouteKey());
+        });
 
-	}
+    }
 
 
     /**
@@ -110,7 +115,6 @@ class RerouteOverrideMapper extends Mapper {
     }
 
 
-
     /**
      * @param string $routeKey
      * @param string $delivery
@@ -118,6 +122,7 @@ class RerouteOverrideMapper extends Mapper {
      * @param bool   $userExclusive If true, only routes that are exclusive to
      *                              $userId are retrieved.
      * @return Collection|RerouteOverride[]
+     * @throws \PDOException
      */
     public function getMatchingRoutes($routeKey, $delivery, $userId = null, $userExclusive = false)
     {
