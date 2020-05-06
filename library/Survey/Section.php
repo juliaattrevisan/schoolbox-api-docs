@@ -11,8 +11,4 @@
 class Survey_Section extends Evaluation_Section {
     public $_table = 'assess_section';
     public $_index = 'section_id';
-
-    /* A const to determine whether to include sections in getContents
-     */
-    const SECTION_EXCLUDE = true;
 }
