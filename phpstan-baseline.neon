@@ -4911,21 +4911,6 @@ parameters:
 			path: library/Schoolbox/Tile/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$tourTrigger contains unknown class Schoolbox\\\\Tour\\\\TourTrigger\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
-			message: "#^Call to method getJavascriptSelector\\(\\) on an unknown class Schoolbox\\\\Tour\\\\TourTrigger\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
-			message: "#^Call to method getJavascriptEvent\\(\\) on an unknown class Schoolbox\\\\Tour\\\\TourTrigger\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
 			message: "#^Property Schoolbox\\\\Tour\\\\Model\\:\\:\\$triggerList has unknown class Schoolbox\\\\Tour\\\\Trigger as its type\\.$#"
 			count: 1
 			path: library/Schoolbox/Tour/Model.php
