@@ -17,7 +17,6 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
@@ -191,7 +190,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string                $action
      * @param ParameterInterface    $param
      * @param User                  $effector
-     * @param Folder|ISoftDeletable $category
+     * @param Folder                $category
      * @param string                $roletype
      * @param int                   $accessLevel
      * @return Envelope

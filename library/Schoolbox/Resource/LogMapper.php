@@ -144,7 +144,6 @@ class LogMapper extends Mapper
      * @param int $limit
      * @param int $offset
      * @param int $time
-     *
      * @param bool $showHidden
      * @return Collection|Log[]
      * @throws Mapper\DefinitionException
