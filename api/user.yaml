@@ -109,6 +109,95 @@ paths:
       - $ref: 'common.yaml#/components/parameters/token'
 
 
+  # User group memberships
+  /user/{id}/groupMemberships:
+
+    get:
+      operationId: userGroupMembershipSearch
+      summary: Returns group memberships for a user.
+      responses:
+        '200':
+          $ref: '#/components/responses/groupMembershipList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/cursor'
+#        - $ref: 'common.yaml#/components/parameters/search'
+#        - $ref: 'common.yaml#/components/parameters/filter'
+#        - $ref: 'common.yaml#/components/parameters/properties'
+
+    post:
+      operationId: userGroupMembershipPost
+      summary: Creates a group membership for a user
+      responses:
+        '201':
+          description: The user that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groupMembership'
+      requestBody:
+        $ref: '#/components/requestBodies/groupMembership'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/token'
+
+
+  /user/{id}/groupMemberships/{groupId}:
+
+    put:
+      operationId: userGroupMembershipPut
+      summary: Updates a user's group membership
+      responses:
+        '200':
+          $ref: '#/components/responses/groupMembership'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        $ref: '#/components/requestBodies/groupMembership'
+
+    patch:
+      operationId: userGroupMembershipPatch
+      summary: Updates a subset of a user's group membership's fields
+      responses:
+        '200':
+          $ref: '#/components/responses/groupMembership'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        $ref: '#/components/requestBodies/groupMembership'
+
+    delete:
+      operationId: userGroupMembershipDelete
+      summary: Deletes a user's group membership
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    get:
+      operationId: userGroupMembershipGet
+      summary: Returns a user's group membership
+      responses:
+        '200':
+          $ref: '#/components/responses/groupMembership'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/token'
+      - name: groupId
+        in:       path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+
+
 components:
   schemas:
     externalId:
@@ -411,6 +500,23 @@ components:
         metadata:
           $ref: 'common.yaml#/components/schemas/listMetadata'
 
+    groupMembershipList:
+      title: Group membership list
+      description: A list of group memberships
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          uniqueItems: true
+          items:
+            allOf:
+              - $ref: '#/components/schemas/groupMembership'
+#              - $ref: 'common.yaml#/components/schemas/itemSearchRelevance'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
+
+
     # TODO create schemas for SIS user profiles
 
     schoolHouse:
@@ -647,6 +753,20 @@ components:
           schema:
             $ref: '#/components/schemas/userList'
 
+    groupMembership:
+      description: A group membership
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/groupMembership'
+
+    groupMembershipList:
+      description: A list of group memberships for a user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/groupMembershipList'
+
   requestBodies:
     user:
       description: A user
@@ -654,3 +774,10 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/writableUser'
+
+    groupMembership:
+      description: A group membership
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/writableGroupMembership'
