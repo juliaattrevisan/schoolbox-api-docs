@@ -23,6 +23,12 @@ class Ancestry
 {
 
     /**
+     * Maximum number of traversals before bugging out
+     */
+    private const RECURSION_LIMIT = 50;
+
+
+    /**
      * Cache of Folder instances
      *
      * @var array
@@ -39,14 +45,6 @@ class Ancestry
 
 
     /**
-     * Maximum number of traversals before bugging out
-     *
-     * @var int
-     */
-    private $recursionLimit = 50;
-
-
-    /**
      * @var self
      */
     private static $instance;
@@ -59,7 +57,7 @@ class Ancestry
      */
     private function __construct(FolderMapper $folderMapper)
     {
-        $this->setFolderMapper($folderMapper);
+        $this->folderMapper = $folderMapper;
     }
 
 
@@ -184,7 +182,7 @@ class Ancestry
          * a limit on the number of traversals/iterations/recurses that
          * can occur before arbitrarily ending
          */
-        while ($count++ < $this->getRecursionLimit()) {
+        while ($count++ < self::RECURSION_LIMIT) {
 
             /* Cycle through the parent of the current node until
              * it is no longer a node at which point we can stop
@@ -258,49 +256,14 @@ class Ancestry
          */
         if (!($this->cache[$id] instanceof Folder)) {
             if ($cheaply) {
-                $node = $this->getFolderMapper()->findCheaplyById($id);
+                $node = $this->folderMapper->findCheaplyById($id);
             } else {
-                $node = $this->getFolderMapper()->findById($id);
+                $node = $this->folderMapper->findById($id);
             }
 
             $this->cache[$id] = $node;
         }
 
         return $this->cache[$id];
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get folder mapper
-     *
-     * @return Mapper
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-
-    /**
-     * Set folder mapper
-     *
-     * @param Mapper $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-
-    /**
-     * Get recursion limit
-     *
-     * @return int
-     */
-    private function getRecursionLimit()
-    {
-        return $this->recursionLimit;
     }
 }
