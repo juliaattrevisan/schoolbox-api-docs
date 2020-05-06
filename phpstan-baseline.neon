@@ -4616,11 +4616,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/Resources/TreeBuilder.php
 
 		-
-			message: "#^Method Schoolbox\\\\Resource\\\\File\\\\CompositeLocator\\:\\:findById\\(\\) should return Schoolbox\\\\Resource\\\\File\\\\IFile but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/File/CompositeLocator.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Ancestry.php
