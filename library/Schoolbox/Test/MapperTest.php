@@ -1,14 +1,18 @@
 <?php
 /**
- * Test cases for mappers.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Test;
 
+/**
+ * Class MapperTest
+ *
+ * Test cases for mappers.
+ *
+ * @package Schoolbox\Test
+ */
 class MapperTest extends TestCase
 {
 
@@ -19,8 +23,12 @@ class MapperTest extends TestCase
      */
     protected $object;
 
-    /** @var MockDatabase */
+
+    /**
+     * @var MockDatabase
+     */
     protected $db;
+
 
     public function setUp()
     {
@@ -29,6 +37,7 @@ class MapperTest extends TestCase
         $this->db = new MockDatabase($this);
         $this->object->setDatabase($this->db);
     }
+
 
     /**
      * Data provider for testHydrate().
@@ -148,12 +157,13 @@ class MapperTest extends TestCase
         ];
     }
 
+
     /**
      * Test callback used by testHydrate().
      *
-     * @param $mapper
-     * @param $model
-     * @param $row
+     * @param mixed $mapper
+     * @param TestModel $model
+     * @param mixed $row
      *
      * @return mixed
      */
