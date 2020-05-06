@@ -53,7 +53,7 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Is this a Map Effect?
      *
-     * @param $type
+     * @param int $type
      * @return bool
      */
     public function isMap($type) {
@@ -64,7 +64,7 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Is this a Skip Effect?
      *
-     * @param $type
+     * @param int $type
      * @return bool
      */
     public function isSkip($type) {
