@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper for links in the resource browser and homepages.
- *
  * @author    James Leckie <jleckie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -22,9 +20,10 @@ use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
-
 /**
  * Class LinkMapper
+ *
+ * Mapper for links in the resource browser and homepages.
  *
  * @package Schoolbox\Resource
  * @method Link hydrate(array $row, $alias = '', $callback = null)
@@ -152,6 +151,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      * @param PDOStatement $statement
      * @return Link[]|Collection
      * @throws Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -244,7 +244,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      * Log action
      *
      * @param User $user
-     * @param $action
+     * @param string $action
      * @param Link $link
      */
     public function logAction(User $user, $action, Link $link)
