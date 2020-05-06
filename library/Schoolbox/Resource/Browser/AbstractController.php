@@ -376,15 +376,15 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/file/:fileIds/info
-     * @param array $fileIds
+     * @param string $fileIdsCSV
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function showMultiFileInfo($fileIds)
+    public function showMultiFileInfo($fileIdsCSV)
     {
-        $fileIds   = json_decode("[$fileIds]", true);
+        $fileIds   = json_decode("[$fileIdsCSV]", true);
         $files     = $this->fileMapper->findByColumn('id', $fileIds);
         $folders   = new Collection($files->getColumnValues('folder'));
         $folderIds = array_unique($folders->getColumnValues('id'));
