@@ -4796,16 +4796,6 @@ parameters:
 			path: library/Schoolbox/Statistics/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 184$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$params\\)\\: Unexpected token \"\\$params\", expected type at offset 58$#"
-			count: 1
-			path: library/Schoolbox/Sync/Effect/Controller.php
-
-		-
 			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Factory\\:\\:produce\\(\\) invoked with 2 parameters, 1 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Controller.php

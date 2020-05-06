@@ -33,7 +33,7 @@ class Controller extends Base
      * so that new Effects can be injected directly into
      * the ui after being received via ajax
      *
-     * @param $params
+     * @param array $params
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
@@ -110,7 +110,7 @@ class Controller extends Base
     /**
      * Add a special skip effect
      *
-     * @param $params
+     * @param array $params
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
@@ -211,6 +211,7 @@ class Controller extends Base
             'format' => 'nochrome'
         ]);
     }
+
 
     /**
      * Delete a Effect asynchronously
