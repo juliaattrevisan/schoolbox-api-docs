@@ -111,6 +111,8 @@ class User extends SchoolboxUser
      * Any campuses in $campusCollectionRemove are removed from this user's
      * campus collection.
      *
+     * TODO: But is this even used?
+     *
      * @param array $campusCollectionRemove
      * @throws \UnexpectedValueException
      */
