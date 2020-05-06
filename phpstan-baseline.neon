@@ -4871,32 +4871,7 @@ parameters:
 			path: library/Schoolbox/Sync/Provisioner/UserMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fieldId\\)\\: Unexpected token \"\\$fieldId\", expected type at offset 145$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fieldName\\)\\: Unexpected token \"\\$fieldName\", expected type at offset 168$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$tableName\\)\\: Unexpected token \"\\$tableName\", expected type at offset 120$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$string\\)\\: Unexpected token \"\\$string\", expected type at offset 87$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Mapper.php
 
