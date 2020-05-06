@@ -4941,36 +4941,6 @@ parameters:
 			path: library/Schoolbox/Tour/Step/Type/AbstractMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$bottom\\)\\: Unexpected token \"\\$bottom\", expected type at offset 60$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$top\\)\\: Unexpected token \"\\$top\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$index\\)\\: Unexpected token \"\\$index\", expected type at offset 109$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$numPerPage\\)\\: Unexpected token \"\\$numPerPage\", expected type at offset 127$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$order\\)\\: Unexpected token \"\\$order\", expected type at offset 91$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$orderBy\\)\\: Unexpected token \"\\$orderBy\", expected type at offset 71$#"
-			count: 1
-			path: library/Schoolbox/Usage/All/AjaxFlot.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$usersPerPage\\)\\: Unexpected token \"\\$usersPerPage\", expected type at offset 227$#"
 			count: 1
 			path: library/Schoolbox/Usage/All/UsageMapper.php
