@@ -4941,16 +4941,6 @@ parameters:
 			path: library/Schoolbox/Tour/Step/Type/AbstractMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 44$#"
-			count: 1
-			path: library/Schoolbox/Usage/Specific/UsageMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$numPerPage\\)\\: Unexpected token \"\\$numPerPage\", expected type at offset 137$#"
-			count: 1
-			path: library/Schoolbox/Usage/Specific/UsageMapper.php
-
-		-
 			message: "#^Variable \\$result might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/User/Controller.php
