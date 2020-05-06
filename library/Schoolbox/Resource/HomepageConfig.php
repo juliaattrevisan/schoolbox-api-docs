@@ -1,130 +1,134 @@
 <?php
 /**
- * Homepage config options are all stored in this object
- * It contains things such as which template was initially used to create the
- * homepage, the column widths and colours
- *
  * @author    James Leckie <james.leckie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
-
 namespace Schoolbox\Resource;
-
 
 use Schoolbox\Resource\Folder\Model as Category;
 
-class HomepageConfig {
-	/**
-	 * @var Category
-	 */
-	protected $category;
+/**
+ * Class HomepageConfig
+ *
+ * Homepage config options are all stored in this object
+ * It contains things such as which template was initially used to create the
+ * homepage, the column widths and colours
+ *
+ * @package Schoolbox\Resource
+ */
+class HomepageConfig
+{
 
-	/**
-	 * The template originally used to create the page
-	 *
+    /**
+     * @var Category
+     */
+    protected $category;
+
+    /**
+     * The template originally used to create the page
+     *
      * @var HomepageTemplate
-	 */
-	protected $template;
+     */
+    protected $template;
 
-	/**
-	 * Width of the left column as a percentage
-	 *
-	 * @var float
-	 */
-	protected $leftColumnWidth;
+    /**
+     * Width of the left column as a percentage
+     *
+     * @var float
+     */
+    protected $leftColumnWidth;
 
 
-	/**
-	 * Width of the right column as a percentage
-	 *
-	 * @var float
-	 */
-	protected $rightColumnWidth;
+    /**
+     * Width of the right column as a percentage
+     *
+     * @var float
+     */
+    protected $rightColumnWidth;
 
-	/**
-	 * Font colour
-	 *
-	 * @var string
-	 */
-	protected $left_head_font;
+    /**
+     * Font colour
+     *
+     * @var string
+     */
+    protected $left_head_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $left_head_bg;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $left_head_bg;
 
-	/**
-	 * Font color
-	 * @var string
-	 */
-	protected $left_font;
+    /**
+     * Font color
+     * @var string
+     */
+    protected $left_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $left_bg_primary;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $left_bg_primary;
 
-	/**
-	 * Font colour
-	 *
-	 * @var string
-	 */
-	protected $right_head_font;
+    /**
+     * Font colour
+     *
+     * @var string
+     */
+    protected $right_head_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $right_head_bg;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $right_head_bg;
 
-	/**
-	 * Font color
-	 *
-	 * @var string
-	 */
-	protected $right_font;
+    /**
+     * Font color
+     *
+     * @var string
+     */
+    protected $right_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $right_bg_primary;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $right_bg_primary;
 
-	/**
-	 * Font colour
-	 *
-	 * @var string
-	 */
-	protected $top_head_font;
+    /**
+     * Font colour
+     *
+     * @var string
+     */
+    protected $top_head_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $top_head_bg;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $top_head_bg;
 
-	/**
-	 * Font color
-	 *
-	 * @var string
-	 */
-	protected $top_font;
+    /**
+     * Font color
+     *
+     * @var string
+     */
+    protected $top_font;
 
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $top_bg_primary;
+    /**
+     * Background colour
+     *
+     * @var string
+     */
+    protected $top_bg_primary;
 
     /**
      * @param Category $category
@@ -218,7 +222,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $left_head_font
+     * @param string $left_head_font
      * @return $this
      */
     public function setLeftHeadFont($left_head_font)
@@ -254,7 +258,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $right_bg_primary
+     * @param string $right_bg_primary
      * @return $this
      */
     public function setRightBgPrimary($right_bg_primary)
@@ -272,7 +276,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $right_font
+     * @param string $right_font
      * @return $this
      */
     public function setRightFont($right_font)
@@ -290,7 +294,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $right_head_bg
+     * @param string $right_head_bg
      * @return $this
      */
     public function setRightHeadBg($right_head_bg)
@@ -308,7 +312,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $right_head_font
+     * @param string $right_head_font
      * @return $this
      */
     public function setRightHeadFont($right_head_font)
@@ -344,7 +348,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $top_bg_primary
+     * @param string $top_bg_primary
      * @return $this
      */
     public function setTopBgPrimary($top_bg_primary)
@@ -362,7 +366,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $top_font
+     * @param string $top_font
      * @return $this
      */
     public function setTopFont($top_font)
@@ -380,7 +384,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $top_head_bg
+     * @param string $top_head_bg
      * @return $this
      */
     public function setTopHeadBg($top_head_bg)
@@ -398,7 +402,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $top_head_font
+     * @param string $top_head_font
      * @return $this
      */
     public function setTopHeadFont($top_head_font)
@@ -414,6 +418,4 @@ class HomepageConfig {
     {
         return $this->top_head_font;
     }
-
-
 }

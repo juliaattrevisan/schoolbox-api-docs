@@ -4656,51 +4656,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$left_head_font\\)\\: Unexpected token \"\\$left_head_font\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right_bg_primary\\)\\: Unexpected token \"\\$right_bg_primary\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right_font\\)\\: Unexpected token \"\\$right_font\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right_head_bg\\)\\: Unexpected token \"\\$right_head_bg\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$right_head_font\\)\\: Unexpected token \"\\$right_head_font\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$top_bg_primary\\)\\: Unexpected token \"\\$top_bg_primary\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$top_font\\)\\: Unexpected token \"\\$top_font\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$top_head_bg\\)\\: Unexpected token \"\\$top_head_bg\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$top_head_font\\)\\: Unexpected token \"\\$top_head_font\", expected type at offset 19$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfig.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 94$#"
 			count: 1
 			path: library/Schoolbox/Resource/Link/Search/Renderer.php
