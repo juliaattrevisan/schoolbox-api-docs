@@ -4496,11 +4496,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Admin/Controller.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 94$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Digest/DigestScheduler.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$route\\)\\: Unexpected token \"\\$route\", expected type at offset 110$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Message/RerouteOverrideMapper.php
