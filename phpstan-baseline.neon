@@ -4461,16 +4461,6 @@ parameters:
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pdNumber\\)\\: Unexpected token \"\\$pdNumber\", expected type at offset 168$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/ValidProfessionalDevelopment.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$state\\)\\: Unexpected token \"\\$state\", expected type at offset 168$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/ValidProfessionalDevelopment.php
-
-		-
 			message: "#^Undefined variable\\: \\$this$#"
 			count: 2
 			path: library/Schoolbox/Profile/Test/Generator.php
