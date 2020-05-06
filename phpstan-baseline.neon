@@ -4911,11 +4911,6 @@ parameters:
 			path: library/Schoolbox/Tile/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 48$#"
-			count: 1
-			path: library/Schoolbox/Tour/Lists.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$tourTrigger contains unknown class Schoolbox\\\\Tour\\\\TourTrigger\\.$#"
 			count: 1
 			path: library/Schoolbox/Tour/Lists.php
