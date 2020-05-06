@@ -4941,11 +4941,6 @@ parameters:
 			path: library/Schoolbox/Tour/Step/Type/AbstractMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$bytes\\)\\: Unexpected token \"\\$bytes\", expected type at offset 55$#"
-			count: 1
-			path: library/Schoolbox/Usage/Item.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$userId\\)\\: Unexpected token \"\\$userId\", expected type at offset 44$#"
 			count: 1
 			path: library/Schoolbox/Usage/Specific/AjaxFlot.php
