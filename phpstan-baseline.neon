@@ -4741,11 +4741,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$item\\)\\: Unexpected token \"\\$item\", expected type at offset 30$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Category/Module.php
