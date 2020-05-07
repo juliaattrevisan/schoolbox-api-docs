@@ -4951,16 +4951,6 @@ parameters:
 			path: library/Schoolbox/UserMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Video/Queue.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$message\\)\\: Unexpected token \"\\$message\", expected type at offset 66$#"
-			count: 1
-			path: library/Schoolbox/Video/Queue.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:getUnknownUser\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Video/ResourceVideoMapper.php
