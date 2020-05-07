@@ -52,16 +52,14 @@ class Alaress_Lock
             return false;
         }
 
-        // No start timestamp at all?
-        // This is probably a lockfile from before that timestamp was stored:
-        // fall back to old behavior (i.e. assume it's still running)
-        if ($startTimestamp === 0) {
+        // No start timestamp at all? Assume it's still locked I guess.
+        if ($startTimestamp === 0 || $startTimestamp === false) {
             return true;
         }
 
         // The process is still running, but has its PID been reassigned?
-        // If the process started after the start time in the lock file, it must
-        // be a different process: release
+        // If the process started after the start timestamp, it must be a
+        // different process: release
         $elapsedTime           = (int)$output;
         $processStartTimestamp = $_SERVER['REQUEST_TIME'] - $elapsedTime;
         if ($processStartTimestamp > $startTimestamp) {
