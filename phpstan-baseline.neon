@@ -4936,16 +4936,6 @@ parameters:
 			path: library/Schoolbox/User/Password/Change/Module.php
 
 		-
-			message: "#^Variable \\$user in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$row$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^Variable \\$externals might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
 			message: "#^Variable \\$superuserStatus in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/UserMapper.php
