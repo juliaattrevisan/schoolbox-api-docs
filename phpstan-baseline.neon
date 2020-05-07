@@ -5016,37 +5016,7 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageId\\)\\: Unexpected token \"\\$homepageId\", expected type at offset 68$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$instance\\)\\: Unexpected token \"\\$instance\", expected type at offset 44$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$offset\\)\\: Unexpected token \"\\$offset\", expected type at offset 115$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$start\\)\\: Unexpected token \"\\$start\", expected type at offset 94$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
 			message: "#^Cannot call method getPostId\\(\\) on null\\.$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 74$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$tree\\)\\: Unexpected token \"\\$tree\", expected type at offset 54$#"
 			count: 1
 			path: library/SocialStream/Threads.php
 

@@ -1,16 +1,21 @@
 <?php
 /**
- * SocialStream_Ajax
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream;
 
+use Component_Instance;
 use Scrub;
 
+/**
+ * Class Threads
+ *
+ * Load the socialstream threads
+ *
+ * @package SocialStream
+ */
 class Threads
 {
 
@@ -21,12 +26,14 @@ class Threads
      */
     private $allPosts = null;
 
+
     /**
      * Resultant tree structure
      *
      * @var null
      */
     private $tree = null;
+
 
     /**
      * The homepage which you are currently on
@@ -35,6 +42,7 @@ class Threads
      * @var int
      */
     private $homepageId = 0;
+
 
     /**
      * Only fetch N posts newer than $dateThreshold
@@ -50,12 +58,14 @@ class Threads
      */
     private $offset = 0;
 
+
     /**
      * The component instance
      *
      * @var null
      */
     private $instance = null;
+
 
     /**
      * The output html structure
@@ -64,13 +74,14 @@ class Threads
      */
     private $ajaxHtml = '';
 
+
     /**
      * Constructor
      *
-     * @param $instance
-     * @param $homepageId
-     * @param $start
-     * @param $offset
+     * @param Component_Instance $instance
+     * @param int $homepageId
+     * @param int $start
+     * @param int $offset
      */
     public function __construct($instance, $homepageId, $start, $offset)
     {
@@ -82,6 +93,7 @@ class Threads
         $this->init();
         $this->growTree();
     }
+
 
     /**
      * Initialise data set before growing tree
@@ -116,10 +128,11 @@ class Threads
         $this->setAllPosts($tree);
     }
 
+
     /**
      * Grow a tree
      *
-     * @return array
+     * @return Threads
      */
     private function growTree()
     {
@@ -136,7 +149,7 @@ class Threads
          */
         foreach ($structure as $currentPost) {
             /* Only worry about moving deeper posts
-                         */
+             */
             if ($currentPost->getParentId()) {
                 $destination = $this->findNode($structure, $currentPost->getParentId());
 
@@ -181,13 +194,14 @@ class Threads
         return $this;
     }
 
+
     /**
      * Find a node in a tree
      *
-     * @param $tree
-     * @param $id
+     * @param array $tree
+     * @param int $id
      *
-     * @return mixed
+     * @return \SocialStream_Post_Abstract|null
      */
     private function findNode($tree, $id)
     {
@@ -196,7 +210,10 @@ class Threads
                 return $leaf;
             }
         }
+
+        return null;
     }
+
 
     /**
      * Generate ajax html
@@ -289,7 +306,7 @@ class Threads
                 'socialstream_comment_has_icon_block'          => '',
                 'socialstream_comment_has_image_block'         => '',
                 'socialstream_comment_has_thumbnail_block'     => '',
-                'socialstream_comment_has_link_block'             => '',
+                'socialstream_comment_has_link_block'          => '',
                 'socialstream_comment_has_player_block'        => '',
                 'socialstream_comment_has_video_block'         => '',
                 'socialstream_comment_has_video_pending_block' => '',
@@ -299,7 +316,7 @@ class Threads
                 'socialstream_reply_has_icon_block'            => '',
                 'socialstream_reply_has_image_block'           => '',
                 'socialstream_reply_has_thumbnail_block'       => '',
-                'socialstream_reply_has_link_block'             => '',
+                'socialstream_reply_has_link_block'            => '',
                 'socialstream_reply_has_player_block'          => '',
                 'socialstream_reply_has_video_block'           => '',
                 'socialstream_reply_has_video_pending_block'   => '',
