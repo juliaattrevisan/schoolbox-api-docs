@@ -1,15 +1,9 @@
 <?php
 /**
- * Creational
- *
- * Created populated SocialStream Post objects for further
- * manipulation in controllers
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream\Post\Factory;
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -22,6 +16,14 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SocialStream\UrlDetection;
 
+/**
+ * Class Creational
+ *
+ * Created populated SocialStream Post objects for further
+ * manipulation in controllers
+ *
+ * @package SocialStream\Post\Factory
+ */
 class Creational extends AbstractFactory
 {
 
@@ -33,12 +35,14 @@ class Creational extends AbstractFactory
      */
     private $type;
 
+
     /**
      * The object that was produced by the factory
      *
      * @var \SocialStream_Post_Abstract
      */
     private $product;
+
 
     /**
      * This class knows how to figure out which urls
@@ -48,10 +52,11 @@ class Creational extends AbstractFactory
      */
     private $urlDetection;
 
+
     /**
      * Constructor
      *
-     * @param $url
+     * @param string $url
      */
     public function __construct($url)
     {
@@ -203,10 +208,9 @@ class Creational extends AbstractFactory
         $this->spawnThumbnailFromUpload($uploadedFile);
     }
 
+
     /**
      * Construct a post from a link by doing url analysis
-     *
-     * @throws \UnexpectedValueException
      */
     private function constructFromUrl()
     {
@@ -243,9 +247,8 @@ class Creational extends AbstractFactory
     /**
      * Construct a post from a link by doing mimetype analysis
      *
-     * @param  StorageModel $resource
+     * @param StorageModel $resource
      * @return StorageModel
-     * @throws \UnexpectedValueException
      */
     private function constructFromUpload(StorageModel $resource): StorageModel
     {
@@ -271,7 +274,6 @@ class Creational extends AbstractFactory
      * @return \Schoolbox\Resource\File\Model
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
      */
     private function constructFromResource(string $url): \Schoolbox\Resource\File\Model
     {
@@ -299,11 +301,11 @@ class Creational extends AbstractFactory
     /**
      * Construct a post from a homepage URL
      *
-     * @param  string $url
+     * @param string $url
      * @return Folder
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
      */
     private function constructFromHomepage(string $url): Model {
         $this->product = new \SocialStream_Post_Url();
@@ -318,17 +320,18 @@ class Creational extends AbstractFactory
      * If it was not a video, link to the internet, etc then assume it's
      * just a plain old text message
      *
-     * @throws \UnexpectedValueException
+     * @return \SocialStream_Post_String
      */
     private function constructDefault() {
         return new \SocialStream_Post_String();
     }
 
+
     /**
      * Puts data from the $data array into $object
      * This is usually the result of a post
      *
-     * @param $data
+     * @param array $data
      */
     private function populate($data)
     {
@@ -362,7 +365,7 @@ class Creational extends AbstractFactory
     /**
      * Get the title and description
      *
-     * @param $curl
+     * @param \Alaress_Curl_Url $curl
      */
     private function spawnMetadataFromCurl($curl)
     {
@@ -372,9 +375,14 @@ class Creational extends AbstractFactory
         $this->product->setExternalBody($chain->getResult()->getDescription());
     }
 
+
     /**
      * Use a two-layer caching setup for spawning thumbnail images
      * For images, thumbnails are obtained via a series of regexes
+     *
+     * @param \Alaress_Curl_Url $curl
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function spawnThumbnailFromCurl($curl)
     {
@@ -405,6 +413,7 @@ class Creational extends AbstractFactory
             }
         }
     }
+
 
     /**
      * Get the title and description
@@ -457,10 +466,11 @@ class Creational extends AbstractFactory
         }
     }
 
+
     /**
      * Get the title and description
      *
-     * @param $file
+     * @param \Schoolbox\Resource\File\Model $file
      */
     private function spawnMetadataFromResource($file)
     {
@@ -503,7 +513,7 @@ class Creational extends AbstractFactory
              */
             $cache = new \SocialStream\Cache\Original();
             $cache->initPost($this->product);
-        }  else {
+        } else {
             /* Set up icon thumbnails
              */
             $url = "/send.php?id={$file->getId()}";
@@ -523,6 +533,7 @@ class Creational extends AbstractFactory
         $this->product->setExternalTitle($homepage->getName());
         $this->product->setExternalBody('');
     }
+
 
     /**
      * A homepage's icon will be the cover image, or nothing at all.
