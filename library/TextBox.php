@@ -1,6 +1,7 @@
 <?php
 
-class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
+class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+{
 
     function __construct() {
         $this->_table = 'textBox';
@@ -27,12 +28,13 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         return $this->update($data);
     }
 
+
     /**
      * Soft-deletes content
      *
      * TODO: Refactor
      *
-     * @param  $cid
+     * @param int $cid
      * @return void
      */
     public function homepageClean($cid) {
@@ -41,10 +43,11 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         $this->db->query($query);
     }
 
+
     /**
      * Search the user table for particular user(s)
      *
-     * @param $keyword
+     * @param string $keyword
      * @param int $offset
      * @param int $limit
      * @param null $count
@@ -65,6 +68,4 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
         return $this->db->getAll($query);
     }
-
-
 }
