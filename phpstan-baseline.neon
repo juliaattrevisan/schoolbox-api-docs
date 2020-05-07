@@ -4951,11 +4951,6 @@ parameters:
 			path: library/Schoolbox/UserMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 35$#"
-			count: 1
-			path: library/Schoolbox/Video/Factory/Thumbnail.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 18$#"
 			count: 1
 			path: library/Schoolbox/Video/Queue.php
