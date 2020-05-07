@@ -8,6 +8,7 @@ namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\File\Model;
 use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
@@ -29,7 +30,7 @@ abstract class Base
      *
      * @var Access
      */
-    protected $access = null;
+    protected $access;
 
 
     /**
@@ -37,7 +38,7 @@ abstract class Base
      *
      * @var string
      */
-    protected $type = '';
+    protected $type;
 
 
     /**
@@ -45,14 +46,14 @@ abstract class Base
      *
      * @var string
      */
-    protected $id = '';
+    protected $id;
 
 
     /**
      * Constructor
      *
-     * @param $id
-     * @param $type
+     * @param int $id
+     * @param string $type
      */
     public function __construct($id, $type) {
         $this->setAccess(Access::getInstance());
@@ -99,7 +100,8 @@ abstract class Base
 
     /**
      * Permission check prior to instantiation
-     * @param $video
+     *
+     * @param Model $video
      */
     abstract protected function permissionCheck($video);
 
