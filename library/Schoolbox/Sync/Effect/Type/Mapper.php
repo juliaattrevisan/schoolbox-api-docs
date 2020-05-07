@@ -1,37 +1,44 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect\Type;
-
 
 use Schoolbox;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Sync\Effect\Type
+ */
 class Mapper extends Schoolbox\Mapper
 {
-    /* As per ups_effect_type in the db
+    /**
+     * As per ups_effect_type in the db
      * Used to determine Effect Fragment templates
      *
      * Mapped Key/Value Pairs
      */
-    const EFFECT_TYPE_MAP = 1;
+    public const EFFECT_TYPE_MAP = 1;
 
-    /* Freeform Text Input/Single Select Dropdown Effect Type
+    /**
+     * Freeform Text Input/Single Select Dropdown Effect Type
      */
-    const EFFECT_TYPE_LITERAL = 2;
+    public const EFFECT_TYPE_LITERAL = 2;
 
-    /* Skip Effect Type
+    /**
+     * Skip Effect Type
      */
-    const EFFECT_TYPE_SKIP = 3;
+    public const EFFECT_TYPE_SKIP = 3;
+
 
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -42,42 +49,38 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
     }
 
+
     /**
      * Is this a Map Effect?
      *
-     * @param $type
+     * @param int $type
      * @return bool
      */
     public function isMap($type) {
-        if ($type == self::EFFECT_TYPE_MAP) {
-            return true;
-        }
-
-        return false;
+        return $type == self::EFFECT_TYPE_MAP;
     }
+
 
     /**
      * Is this a Skip Effect?
      *
-     * @param $type
+     * @param int $type
      * @return bool
      */
     public function isSkip($type) {
-        if ($type == self::EFFECT_TYPE_SKIP) {
-            return true;
-        }
-
-        return false;
+        return $type == self::EFFECT_TYPE_SKIP;
     }
+
 
     /**
      *
      * This function will scan through UPS effects and remove the object element from any rules that contain the deleted object
      *
      * @param string $userProperty
-     * @param int $id
+     * @param int    $id
      *
      * @return bool
+     * @throws \PDOException
      */
     public function removeRules(string $userProperty, int $id): bool
     {

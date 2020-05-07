@@ -1,14 +1,18 @@
 <?php
 /**
- * SocialStream_Post_Factory
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace SocialStream\Post\Factory;
 
-class Display extends AbstractFactory {
+/**
+ * Class Display
+ *
+ * @package SocialStream\Post\Factory
+ */
+class Display extends AbstractFactory
+{
 
     /**
      * The type of SocialStream Post to manufacture
@@ -18,10 +22,11 @@ class Display extends AbstractFactory {
      */
     private $type;
 
+
     /**
      * Constructor
      *
-     * @param $type
+     * @param string $type
      */
     public function __construct(string $type) {
         $this->type = trim($type);
@@ -33,7 +38,6 @@ class Display extends AbstractFactory {
      *
      * @param array $data
      * @return \SocialStream_Post_Abstract
-     * @throws \UnexpectedValueException
      */
     public function produce(array $data = null): \SocialStream_Post_Abstract
     {

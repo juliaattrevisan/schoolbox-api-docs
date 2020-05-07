@@ -1,22 +1,25 @@
 <?php
 /**
- * Lookup
- *
- * Extract a value/label tuple from any of the Lookup possibilities
- * found in the UserMapper. These are typically used to construct
- * select dropdowns in Effect Fragments
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\ValueLabelInterface;
 
-class Lookup {
+/**
+ * Class Lookup
+ *
+ * Extract a value/label tuple from any of the Lookup possibilities
+ * found in the UserMapper. These are typically used to construct
+ * select dropdowns in Effect Fragments
+ *
+ * @package Schoolbox\Sync\Effect\Fragment
+ */
+class Lookup
+{
 
     /**
      * A list of mappers to use when retrieving lookup data
@@ -37,8 +40,8 @@ class Lookup {
     /**
      * Get lookup data
      *
-     * @param $userField
-     * @param $roleType
+     * @param string $userField
+     * @param string $roleType
      * @return Collection
      */
     public function findData($userField, $roleType = null) {
@@ -83,4 +86,4 @@ class Lookup {
 
         return $stack;
     }
-} 
+}

@@ -1,18 +1,19 @@
 <?php
 /**
- * NodeRenderer
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Browser;
-
 
 use Scrub;
 use SitePage;
 
+/**
+ * Class NodeRenderer
+ *
+ * @package Schoolbox\Resource\Browser
+ */
 class NodeRenderer
 {
 
@@ -51,6 +52,7 @@ class NodeRenderer
 
     /**
      * Render tree and excrete it
+     * @param bool $foldersSelectable
      */
     public function render($foldersSelectable = true)
     {
@@ -147,6 +149,8 @@ class NodeRenderer
 
     /**
      * Render all the contents of the current node
+     *
+     * @param bool $foldersSelectable
      */
     protected function renderContents($foldersSelectable = true)
     {
@@ -154,15 +158,13 @@ class NodeRenderer
 
         $allRecords = $nodeData['records'];
 
-        for ($i = 0; $i < count($allRecords); $i++) {
-            $currentRecord = $allRecords[$i];
-
+        foreach ($allRecords as $currentRecord) {
             switch ($currentRecord['type']) {
                 case 'category':
-                    $this->renderFolder($currentRecord, $i);
+                    $this->renderFolder($currentRecord);
                     break;
                 case 'file':
-                    $this->renderFile($currentRecord, $i);
+                    $this->renderFile($currentRecord);
                     break;
                 default:
                     break;
@@ -179,13 +181,11 @@ class NodeRenderer
     /**
      * Render a file record
      *
-     * @param $currentRecord
-     * @param $i
+     * @param array $currentRecord
      */
-    protected function renderFile($currentRecord, $i)
+    protected function renderFile($currentRecord)
     {
         $this->getPage()->setVar(array(
-            'NODE_FILE_ON_OFF' => $i % 2 ? '' : 'dark',
             'NODE_FILE_ID'     => $currentRecord['fileId'],
             'NODE_FILE_NAME'   => Scrub::text($currentRecord['name']),
             'NODE_FILE_ICON'   => $currentRecord['icon'],
@@ -200,13 +200,11 @@ class NodeRenderer
     /**
      * Render a category record
      *
-     * @param $currentRecord
-     * @param $i
+     * @param array $currentRecord
      */
-    protected function renderFolder($currentRecord, $i)
+    protected function renderFolder($currentRecord)
     {
         $this->getPage()->setVar(array(
-            'NODE_CATEGORY_ON_OFF' => $i % 2 ? '' : 'dark',
             'NODE_CATEGORY_ID'     => $currentRecord['categoryId'],
             'NODE_CATEGORY_NAME'   => Scrub::text($currentRecord['name']),
             'NODE_CATEGORY_TYPE'   => $currentRecord['folderType'],

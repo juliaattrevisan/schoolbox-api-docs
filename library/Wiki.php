@@ -28,7 +28,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * Gets the latest revision record for the specified wiki.
      * @deprecated use \Schoolbox\Wiki\Wiki::getLatestRevision()
      *
-     * @param $wikiID
+     * @param int $wikiID
      * @return array|bool
      */
     public function getLatestRevision($wikiID)
@@ -44,7 +44,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Gets a wiki by its id
      *
-     * @param  $wikiID
+     * @param int $wikiID
      * @param int $revisionID
      * @return array|bool
      */
@@ -68,7 +68,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * @deprecated use \Schoolbox\Wiki\RevisionMapper::findByColumn('wikiID')
-     * @param $wikiID
+     * @param int $wikiID
      * @return array|bool
      */
     public function getRevisionList($wikiID)
@@ -86,7 +86,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * Get a wiki for a category
      *
      * @deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
-     * @param        $categoryID
+     * @param int    $categoryID
      * @param string $orderBy
      * @param string $sortDir
      * @param bool   $limit
@@ -133,7 +133,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * @deprecated use \Schoolbox\Wiki\RevisionMapper::save()
-     * @param $data
+     * @param array $data
      * @return int|string
      */
     public function createRevision($data)
@@ -150,7 +150,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * Note that wikis now know whether they are stubs or not
      *
      * @deprecated use \Schoolbox\Wiki\WikiMapper::save()
-     * @param  $data
+     * @param array $data
      * @return void
      */
     public function update($data) {
@@ -182,9 +182,9 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param $wikiID
-     * @param $revisionID
-     * @return bool|int|string
+     * @param int $wikiID
+     * @param int $revisionID
+     * @return bool|int
      */
     public function revert($wikiID, $revisionID)
     {
@@ -206,7 +206,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     /**
      * @deprecated use \Schoolbox\Wiki\WikiMapper::delete()
-     * @param $wikiID
+     * @param int $wikiID
      * @return bool
      */
     public function delete($wikiID)
@@ -218,7 +218,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 
     /**
-     * @param        $keyword
+     * @param string $keyword
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
@@ -281,7 +281,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Turns all stub links red
      *
-     * @param  $body
+     * @param string $body
      * @return mixed
      */
     public function activateStubLinks($body) {
@@ -314,8 +314,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * Gets a wiki by its category id and its slug.
      * This can also be used to check for uniqueness
      *
-     * @param     $categoryID
-     * @param     $slug
+     * @param int $categoryID
+     * @param string $slug
      * @param int $revisionID
      * @return array|bool
      */

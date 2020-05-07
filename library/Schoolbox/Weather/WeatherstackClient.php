@@ -3,7 +3,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Weather;
@@ -12,12 +11,18 @@ use Alaress_Date_Format;
 
 /**
  * Class ApixuClient
+ *
  * Helper class for making API calls to the Apixu weather API.
  *
  * @package Schoolbox\Weather
  */
 class WeatherstackClient
 {
+
+    /**
+     * Used to extract a particular data node out of the apixu payload
+     * The node represents today's data
+     */
     private const NOW = 'Now';
 
 
@@ -72,8 +77,8 @@ class WeatherstackClient
      * Get weather for particular date and location
      *
      * @param Alaress_Date_Format $date
-     * @param                     $latitude
-     * @param                     $longitude
+     * @param string              $latitude
+     * @param string              $longitude
      *
      * @return array|mixed
      */
@@ -220,6 +225,7 @@ class WeatherstackClient
 
         return $twigData;
     }
+
 
     /**
      * Given a unix timestamp, get a string representing the day of the week.

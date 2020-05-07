@@ -121,7 +121,7 @@ abstract class Thumbnail
     /**
      * Set next
      *
-     * @param Player|bool $next
+     * @param Thumbnail|bool $next
      */
     public function setNext($next): void
     {
@@ -131,7 +131,7 @@ abstract class Thumbnail
     /**
      * Get next
      *
-     * @return Player|bool
+     * @return Thumbnail|bool
      */
     public function getNext()
     {

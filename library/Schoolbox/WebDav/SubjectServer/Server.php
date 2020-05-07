@@ -4,11 +4,9 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -25,36 +23,46 @@ use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\NameGenerator;
 
 /**
+ * Class Server
+ *
  * DAV server for a student's My Subjects screen.
+ *
+ * @package Schoolbox\WebDav\SubjectServer
  */
 class Server extends DAV\Collection
 {
     use HasUserSource;
+
 
     /**
      * @var string
      */
     private $name;
 
+
     /**
      * @var AssessmentDataSource
      */
     private $assessmentDataSource;
+
 
     /**
      * @var StorageDataSource
      */
     private $storageDataSource;
 
+
     /**
      * @var DueWorkResponseDataSource
      */
     private $dueWorkResponseDataSource;
 
+
     /**
      * @var ErrorMapper
      */
     private $errorMapper;
+
 
     /**
      * A list of child nodes, cached whenever getChildren() is called.
@@ -63,6 +71,7 @@ class Server extends DAV\Collection
      */
     private $childNodeCache = null;
 
+
     /**
      * A name generator, for sanitising and deduping names.
      *
@@ -70,10 +79,11 @@ class Server extends DAV\Collection
      */
     private $nameGenerator;
 
+
     /**
      * Constructor
      *
-     * @param                           $name
+     * @param string                    $name
      * @param callable                  $userSource
      * @param AssessmentDataSource      $assessmentDataSource
      * @param StorageDataSource         $storageDataSource
@@ -99,24 +109,25 @@ class Server extends DAV\Collection
         $this->nameGenerator             = $nameGenerator;
     }
 
+
     /**
      * Is the subject list shown for the given path?
      * The subject list will only be shown for the root path, usually.
      *
-     * @param  string $path The path that is being displayed.
-     *
+     * @param string $path The path that is being displayed.
      * @return bool
+     * @throws \InvalidArgumentException
      */
     public function isSubjectListShown($path)
     {
         return $this->retrieveUserFromSource()->getSubjectCollection()->count() > 0 && $this->isThisDirectChildOfPath($path);
     }
 
+
     /**
      * Is this subject list a direct descendant of the given path?
      *
-     * @param $path
-     *
+     * @param string $path
      * @return bool
      */
     private function isThisDirectChildOfPath($path)
@@ -127,12 +138,12 @@ class Server extends DAV\Collection
         return $this_path_parts === $path_parts;
     }
 
+
     /**
      * Gets the parts of the given path, used by isThisDirectChildOfPath() to
      * determine whether this item is in another path.
      *
-     * @param $path
-     *
+     * @param string $path
      * @return array
      */
     private function getPathParts($path)
@@ -145,8 +156,12 @@ class Server extends DAV\Collection
      * Gets list of child nodes from the given user's subjects.
      *
      * @return DAV\INode[]
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
      * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function getChildren()
     {

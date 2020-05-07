@@ -1,29 +1,35 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Browser\Office365;
 
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\File\Remote\FetcherInterface;
-use Alaress_Date_Format;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Proxy;
 use RuntimeException;
 use Schoolbox\Resource;
 
+/**
+ * Class Locator
+ *
+ * @package Schoolbox\Resource\Browser\Office365
+ */
 class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, FetcherInterface
 {
-    /** @var Tenant */
+    /**
+     * @var Tenant
+     */
     protected $tenant;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $oAuthToken;
 
 
@@ -65,6 +71,11 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      *
      * @param string $nodeId
      * @return Resource\File\IFile|Resource\Folder\IFolder
+     * @throws AuthenticationTimedOut
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws Unauthorized
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findById($nodeId)
     {
@@ -84,6 +95,10 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      *
      * @param string $nodeId
      * @return Resource\File\IFile[]
+     * @throws AuthenticationTimedOut
+     * @throws RuntimeException
+     * @throws Unauthorized
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findByFolderId($nodeId)
     {
@@ -110,6 +125,9 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      *
      * @param string $nodeId
      * @return Resource\Folder\IFolder[]
+     * @throws AuthenticationTimedOut
+     * @throws RuntimeException
+     * @throws Unauthorized
      */
     public function findByParentId($nodeId)
     {
@@ -132,8 +150,10 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
 
 
     /**
-     * @param $item
+     * @param array $item
      * @return Resource\File\Model
+     * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function parseFile($item)
     {
@@ -172,6 +192,8 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
     /**
      * @param array $item
      * @return Resource\Folder\Model
+     * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function parseFolder(array $item)
     {
@@ -196,6 +218,9 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
     /**
      * @param string $path
      * @return array
+     * @throws AuthenticationTimedOut
+     * @throws RuntimeException
+     * @throws Unauthorized
      */
     protected function rq($path)
     {
@@ -235,6 +260,9 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      *
      * @param int $nodeId
      * @return array
+     * @throws AuthenticationTimedOut
+     * @throws RuntimeException
+     * @throws Unauthorized
      */
     public function fetchMetaData($nodeId)
     {
@@ -246,8 +274,11 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      * Attempts to retrieve remote source to local destination, returns the path of the saved file.
      *
      * @param int $fileId
-     * @throws OutOfBoundsException
      * @return string
+     * @throws AuthenticationTimedOut
+     * @throws OutOfBoundsException
+     * @throws RuntimeException
+     * @throws Unauthorized
      */
     public function fetchToFile($fileId)
     {
@@ -268,6 +299,8 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
 
         $ch = Proxy\Server::getInstance()->curlInit($url);
 
+        /* TODO: Alaress Curl Url exists; or, replace with guzzle
+         */
         curl_setopt_array($ch, [
             CURLOPT_FILE       => $fp,
             CURLOPT_HTTPHEADER => [ 'Authorization: Bearer ' . $this->oAuthToken ],

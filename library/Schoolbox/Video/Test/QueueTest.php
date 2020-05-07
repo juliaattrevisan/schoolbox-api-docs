@@ -1,17 +1,21 @@
 <?php
 /**
- *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
-
 namespace Schoolbox\Video\Test;
 
 use Schoolbox\Video\Queue;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class QueueTest
+ *
+ * @package Schoolbox\Video\Test
+ */
 class QueueTest extends TestCase
 {
+
     /**
      * Tests the thumbnail cover function to ensure that the video is resized to at least 64 on one of the aspects
      *
@@ -20,6 +24,7 @@ class QueueTest extends TestCase
      * @param array $dimensions      Resolution to test
      * @param array $coverDimensions Resolution to cover
      * @param array $output          Resolution after constraint
+     * @throws \ReflectionException
      */
     public function testCoverForThumbnail($dimensions, $coverDimensions, $output)
     {
@@ -39,6 +44,7 @@ class QueueTest extends TestCase
      * @param array $dimensions    Resolution to test
      * @param array $maxDimensions Resolution to contain within
      * @param array $output        Resolution after constraint
+     * @throws \ReflectionException
      */
     public function testContainForVideo($dimensions, $maxDimensions, $output)
     {
@@ -47,6 +53,7 @@ class QueueTest extends TestCase
         $result = $this->invokeMethod($queue, 'contain', [$dimensions, $maxDimensions]);
         $this->assertEquals($output, $result, "{$result[0]}x{$result[1]} does not equal {$output[0]}x{$output[1]}");
     }
+
 
     /**
      * List of standard and odd video resolutions, to be contained within 1280x720
@@ -88,6 +95,7 @@ class QueueTest extends TestCase
         ];
     }
 
+
     /**
      * List of standard and odd video resolutions, to be contained within 1280x720
      * @return array
@@ -126,14 +134,16 @@ class QueueTest extends TestCase
         ];
     }
 
+
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object Instantiated object that we will run method on.
-     * @param string $methodName Method name to call
-     * @param array  $parameters Array of parameters to pass into method.
+     * @param object  $object     Instantiated object that we will run method on.
+     * @param string  $methodName Method name to call
+     * @param array   $parameters Array of parameters to pass into method.
      *
      * @return mixed Method return.
+     * @throws \ReflectionException
      */
     private function invokeMethod(&$object, $methodName, array $parameters = [])
     {

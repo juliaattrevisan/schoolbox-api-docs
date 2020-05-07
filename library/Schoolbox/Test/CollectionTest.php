@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Test;
 
 use PHPUnit\Framework\TestCase;
@@ -62,7 +61,7 @@ class CollectionTest extends TestCase
 
     /**
      * @dataProvider provider_object
-     * @param $input
+     * @param mixed $input
      */
     public function test_from_Object($input)
     {

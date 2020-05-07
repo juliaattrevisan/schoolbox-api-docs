@@ -1,124 +1,134 @@
 <?php
 /**
- * SocialStream_File
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream;
 
-class File {
+use Schoolbox\Resource\Storage\Model;
 
-	/**
-	 * The url to curl, to obtain an file
-	 */
-	private $url = '';
+/**
+ * Class File
+ *
+ * @package SocialStream
+ */
+class File
+{
 
-	/**
-	 * The owner of the file
-	 */
-	private $ownerId = -1;
+    /**
+     * The url to curl, to obtain an file
+     */
+    private $url = '';
 
-	/**
-	 * An instance of Schoolbox\File
-	 *
-	 * @var null
-	 */
-	private $savedFile = null;
 
-	/**
-	 * Constructor
-	 *
-	 * Finds the file at url $url
-	 * @param $url
-	 * @param $ownerId
-	 */
-	public function __construct($url, $ownerId) {
-		$this->setUrl($url);
-		$this->setOwnerId($ownerId);
-	}
+    /**
+     * The owner of the file
+     */
+    private $ownerId = -1;
 
-	/**
-	 * Save image
-	 */
-	public function saveImage() {
-		$brownhole = tmpfile();
 
-		$curl = new \Alaress_Curl_Url($this->getUrl());
+    /**
+     * An instance of Schoolbox\File
+     *
+     * @var null
+     */
+    private $savedFile = null;
 
-		$curl->addOptions(array(
-			CURLOPT_FILE => $brownhole,
-		));
 
-		$curl->exec();
+    /**
+     * Constructor
+     *
+     * Finds the file at url $url
+     *
+     * @param string $url
+     * @param int $ownerId
+     */
+    public function __construct($url, $ownerId) {
+        $this->setUrl($url);
+        $this->setOwnerId($ownerId);
+    }
 
-		$metadata = stream_get_meta_data($brownhole);
 
-		if (file_exists($metadata['uri'])) {
-			$savedFile = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
+    /**
+     * Save image
+     */
+    public function saveImage() {
+        $brownhole = tmpfile();
 
-			$this->setSavedFile($savedFile);
-		}
+        $curl = new \Alaress_Curl_Url($this->getUrl());
 
-		fclose($brownhole);
-	}
+        $curl->addOptions(array(
+            CURLOPT_FILE => $brownhole,
+        ));
 
-	/* Getters/Setters
-	 */
+        $curl->exec();
 
-	/**
-	 * Set owner id
-	 *
-	 * @param $ownerId
-	 */
-	public function setOwnerId($ownerId) {
-		$this->ownerId = $ownerId;
-	}
+        $metadata = stream_get_meta_data($brownhole);
 
-	/**
-	 * Get owner id
-	 *
-	 * @return int
-	 */
-	public function getOwnerId() {
-		return $this->ownerId;
-	}
+        if (file_exists($metadata['uri'])) {
+            $savedFile = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
 
-	/**
-	 * Set url
-	 *
-	 * @param $url
-	 */
-	public function setUrl($url) {
-		$this->url = $url;
-	}
+            $this->setSavedFile($savedFile);
+        }
 
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	public function getUrl() {
-		return $this->url;
-	}
+        fclose($brownhole);
+    }
 
-	/**
-	 * Set saved file
-	 *
-	 * @param null $savedFile
-	 */
-	public function setSavedFile($savedFile) {
-		$this->savedFile = $savedFile;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get saved file
-	 *
-	 * @return null
-	 */
-	public function getSavedFile() {
-		return $this->savedFile;
-	}
+    /**
+     * Set owner id
+     *
+     * @param int $ownerId
+     */
+    public function setOwnerId($ownerId) {
+        $this->ownerId = $ownerId;
+    }
+
+    /**
+     * Get owner id
+     *
+     * @return int
+     */
+    public function getOwnerId() {
+        return $this->ownerId;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     */
+    public function setUrl($url) {
+        $this->url = $url;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl() {
+        return $this->url;
+    }
+
+    /**
+     * Set saved file
+     *
+     * @param Model $savedFile
+     */
+    public function setSavedFile($savedFile) {
+        $this->savedFile = $savedFile;
+    }
+
+    /**
+     * Get saved file
+     *
+     * @return Model
+     */
+    public function getSavedFile() {
+        return $this->savedFile;
+    }
 }

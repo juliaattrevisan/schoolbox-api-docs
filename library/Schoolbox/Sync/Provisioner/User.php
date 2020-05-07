@@ -1,18 +1,20 @@
 <?php
 /**
- * User
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox\CampusMapper;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class User
+ *
+ * @package Schoolbox\Sync\Provisioner
+ */
 class User extends SchoolboxUser
 {
     /**
@@ -76,7 +78,7 @@ class User extends SchoolboxUser
     /**
      * Get user access remove
      *
-     * @return mixed
+     * @return array
      */
     public function getUserAccessRemove()
     {
@@ -86,7 +88,7 @@ class User extends SchoolboxUser
     /**
      * Remove selected UserAccess instances
      *
-     * @param $userAccessRemove
+     * @param array $userAccessRemove
      */
     public function setUserAccessRemove($userAccessRemove)
     {
@@ -96,7 +98,7 @@ class User extends SchoolboxUser
     /**
      * Get campus collection remove
      *
-     * @return mixed
+     * @return array
      */
     public function getCampusCollectionRemove()
     {
@@ -109,7 +111,10 @@ class User extends SchoolboxUser
      * Any campuses in $campusCollectionRemove are removed from this user's
      * campus collection.
      *
-     * @param $campusCollectionRemove
+     * TODO: But is this even used?
+     *
+     * @param array $campusCollectionRemove
+     * @throws \UnexpectedValueException
      */
     public function setCampusCollectionRemove($campusCollectionRemove)
     {
@@ -136,8 +141,8 @@ class User extends SchoolboxUser
     /**
      * Set $identifiers to access level $level in $accessList collection
      *
-     * @param $identifiers
-     * @param $level
+     * @param array $identifiers
+     * @param int $level
      */
     private function setAccessLevel($identifiers, $level)
     {

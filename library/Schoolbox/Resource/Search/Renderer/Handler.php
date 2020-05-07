@@ -70,7 +70,7 @@ abstract class Handler
      * @param \SitePage $page
      * @param Base[] $result Equivalent of $result['blog'] etc.
      * @param array $count Equivalent of $count['blog'] etc.
-     * @param $currentPage
+     * @param int $currentPage
      */
     public function __construct(\SitePage $page, $result, $count, $currentPage)
     {

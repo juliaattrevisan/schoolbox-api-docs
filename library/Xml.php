@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Alaress_Rss_Cache
  *
@@ -12,21 +11,25 @@
  */
 class Xml
 {
+
     /**
      * Stores the XML
      * @var SimpleXMLElement
      */
     public $xml;
 
+
     /**
      * @var Alaress_Rss_Cache
      */
     private $cache;
 
+
     /**
      * Constructor
      *
-     * @param  string $url
+     * @param string $url
+     * @throws InvalidArgumentException
      */
     public function __construct($url)
     {
@@ -34,66 +37,32 @@ class Xml
             return;
         }
 
-
         /* Set up cached file
          */
-        $this->setCache(new Alaress_Rss_Cache());
+        $this->cache = new Alaress_Rss_Cache();
 
-        $this->getCache()->init($url);
+        $this->cache->init($url);
 
         /* Load from cached file
          * Delete the cached file if it can't be loaded correctly
          */
         try {
-            $this->setXml($this->getCache()->load());
+            $this->xml = $this->cache->load();
         } catch (Exception $e) {
             return;
         }
     }
 
-    /**
-     * Set xml
-     *
-     * @param  SimpleXMLElement $val
-     * @return void
-     */
-    private function setXml(SimpleXMLElement $val)
-    {
-        $this->xml = $val;
-    }
-
-    /**
-     * Set cached file
-     *
-     * @param  $val
-     * @return void
-     */
-    private function setCache($val)
-    {
-        $this->cache = $val;
-    }
-
-    /**
-     * Get cached file
-     *
-     * @return null
-     */
-    private function getCache()
-    {
-        return $this->cache;
-    }
 
     /**
      * Arbitrary get a property
      *
-     * @param  $property
-     * @return
+     * @param string $property
+     * @return SimpleXMLElement|null
      */
     public function __get($property)
     {
-        if (isset($this->xml->$property)) {
-            return $this->xml->$property;
-        }
+        return $this->xml->$property ?? null;
     }
 }
 

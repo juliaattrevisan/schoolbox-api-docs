@@ -1,40 +1,50 @@
 <?php
 /**
- * Tag Cloud Mapper
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\TagCloud;
 
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Collection;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\TagCloud
+ */
 class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
 
     const SCHOOL_PREFIX = 'school:';
 
-    /** @var string $tableName */
+    /**
+     * @var string
+     */
     protected $tableName;
 
-    /** @var string $fieldId */
+
+    /**
+     * @var string
+     */
     protected $fieldId;
 
-    /** @var string $fieldName */
+
+    /**
+     * @var string
+     */
     protected $fieldName;
+
 
     /**
      * Mapper constructor.
      *
-     * @param string $tableName        Table name
-     * @param string $fieldId          Column name of tag ID
-     * @param string $fieldName       Column name of tag name
+     * @param string $tableName Table name
+     * @param string $fieldId   Column name of tag ID
+     * @param string $fieldName Column name of tag name
      */
     public function __construct($tableName, $fieldId, $fieldName)
     {
@@ -45,12 +55,13 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         parent::__construct();
     }
 
+
     /**
      * Retrieves the singleton instance of this class for the specified tag cloud table/fields
      *
-     * @param $tableName
-     * @param $fieldId
-     * @param $fieldName
+     * @param string $tableName
+     * @param string $fieldId
+     * @param string $fieldName
      *
      * @return static
      */
@@ -63,7 +74,9 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             self::$instance[$instance_name]->postSetup();
         }
 
-        return self::$instance[$instance_name];    }
+        return self::$instance[$instance_name];
+    }
+
 
     /**
      * Setup mapping using the table/field names specified during construction
@@ -79,12 +92,14 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
+
     /**
      * Retrieve all tags containing the specified string
      * @param string $string
-     * @param int $offset
-     * @param int $limit
+     * @param int    $offset
+     * @param int    $limit
      * @return Collection
+     * @throws \PDOException
      */
     public function getTagLike($string, $offset = 0, $limit = 0)
     {
@@ -122,13 +137,13 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         return $records;
     }
 
+
     /**
      * Retrieve name of tag given the ID number
-     * @param $id
+     * @param int $id
      * @return null|string
      */
     public function getTagName($id) {
-
         try {
             /** @var Model $row */
             $row = self::findOneByColumn($this->fieldId, $id);
@@ -138,11 +153,15 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         }
     }
 
+
     /**
      * Retrieve tag ID creating new tag if it does not already exist
-     * @param $string
+     * @param string $string
      * @param bool $create
      * @return null|int
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function getTagId($string, $create = true) {
 
@@ -171,12 +190,14 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         }
     }
 
+
     /**
-     * @param User        $user
-     * @param string      $keyword
-     * @param int         $offset
-     * @param int         $limit
+     * @param User   $user
+     * @param string $keyword
+     * @param int    $offset
+     * @param int    $limit
      * @return Collection|Model[]
+     * @throws \PDOException
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {

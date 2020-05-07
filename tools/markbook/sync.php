@@ -43,7 +43,7 @@ $kernel = new Daemon\Kernel(
 /**
  * Recursive function that retrieves the children of a folder that have class codes attached.
  *
- * @param                                  $folderId
+ * @param int                              $folderId
  * @param Schoolbox\Resource\Folder\Mapper $folderMapper
  * @param array                            $catsWithCodes
  * @return Folder[]

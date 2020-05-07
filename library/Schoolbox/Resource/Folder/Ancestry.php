@@ -1,12 +1,9 @@
 <?php
 /**
- * Ancestry
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Folder;
 
 use OverflowException;
@@ -15,8 +12,22 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
 
+/**
+ * Class Ancestry
+ *
+ * Get insights about folders who are parents of other folders
+ *
+ * @package Schoolbox\Resource\Folder
+ */
 class Ancestry
 {
+
+    /**
+     * Maximum number of traversals before bugging out
+     */
+    private const RECURSION_LIMIT = 50;
+
+
     /**
      * Cache of Folder instances
      *
@@ -24,22 +35,31 @@ class Ancestry
      */
     private $cache = [];
 
+
     /**
      * A FolderMapper
      *
      * @var FolderMapper
      */
-    private $folderMapper = null;
+    private $folderMapper;
+
 
     /**
-     * Maximum number of traversals before bugging out
-     *
-     * @var int
+     * @var self
      */
-    private $recursionLimit = 50;
-
-    /** @var self */
     private static $instance;
+
+
+    /**
+     * Constructor
+     *
+     * @param FolderMapper $folderMapper
+     */
+    private function __construct(FolderMapper $folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
 
     /**
      * @param Mapper $folderMapper
@@ -50,18 +70,10 @@ class Ancestry
         if (!self::$instance) {
             self::$instance = new static($folderMapper);
         }
+
         return self::$instance;
     }
 
-    /**
-     * Constructor
-     *
-     * @param FolderMapper $folderMapper
-     */
-    private function __construct(FolderMapper $folderMapper)
-    {
-        $this->setFolderMapper($folderMapper);
-    }
 
     /**
      * Clear out all the objects you accumulated
@@ -77,8 +89,12 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $parent
-     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return bool
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @throws MapperException\Deleted
+     * @throws OverflowException
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function hasParent(Folder $folder, Folder $parent)
     {
@@ -94,13 +110,16 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $stopFolder
-     * @throws OverflowException if the folder is its own parent somehow
-     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @throws MapperException\Deleted
+     * @throws OverflowException if the folder is its own parent somehow
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function findParents(Folder $folder, Folder $stopFolder = null)
     {
-        return $this->findParentAncestry($folder, $stopFolder, false);
+        return $this->findParentAncestry($folder, false, $stopFolder);
     }
 
     /**
@@ -108,13 +127,16 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $stopFolder
-     * @throws OverflowException if the folder is its own parent somehow
-     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @throws MapperException\Deleted
+     * @throws OverflowException if the folder is its own parent somehow
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
     {
-        return $this->findParentAncestry($folder, $stopFolder, true);
+        return $this->findParentAncestry($folder, true, $stopFolder);
     }
 
     /**
@@ -122,17 +144,18 @@ class Ancestry
      * topmost parent first. Stores in a local cache for the Ancestry instance
      * to save on db calls where possible
      *
-     * @param  Folder $folder
-     * @param  Folder $stopFolder If supplied, the parent list is truncated
-     *                                 above this category.
-     * @param bool $cheaply If true, use the findCheaplyById() for speed
-     * @throws OverflowException if the folder is its own parent somehow
-     * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @param Model      $folder
+     * @param bool       $cheaply    If true, use the findCheaplyById() for speed
+     * @param Model|null $stopFolder If supplied, the parent list is truncated above this category.
      * @return Collection
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
+     * @throws MapperException\Deleted
+     * @throws OverflowException if the folder is its own parent somehow
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply)
+    private function findParentAncestry(Folder $folder, bool $cheaply, Folder $stopFolder = null): Collection
     {
-        /** @var Model[] $stack */
         $stack = array($folder);
         $count = 0;
         $stop_id = null;
@@ -159,7 +182,7 @@ class Ancestry
          * a limit on the number of traversals/iterations/recurses that
          * can occur before arbitrarily ending
          */
-        while ($count++ < $this->getRecursionLimit()) {
+        while ($count++ < self::RECURSION_LIMIT) {
 
             /* Cycle through the parent of the current node until
              * it is no longer a node at which point we can stop
@@ -194,9 +217,9 @@ class Ancestry
 
                 // Send this to NewRelic.
                 if ($e instanceof MapperException\Deleted) {
-                    $msg = "Deleted Ancestor contains non-deleted Descendants";
+                    $msg = 'Deleted Ancestor contains non-deleted Descendants';
                 } else {
-                    $msg = "General Mapper Exception";
+                    $msg = 'General Mapper Exception';
                 }
 
                 trigger_error("$msg: $e", E_USER_WARNING);
@@ -212,25 +235,30 @@ class Ancestry
         return new Collection($stack);
     }
 
+
     /**
      * Cache discovered nodes locally; when generating Ancestries
      * look here before slapping the db again
      *
-     * @param $id
-     * @param $cheaply bool Use this to switch between findCheaplyById() and findById()
+     * @param int $id
+     * @param bool $cheaply Use this to switch between findCheaplyById() and findById()
      * @return mixed
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws MapperException\NotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function findCachedNode($id, $cheaply)
+    private function findCachedNode($id, bool $cheaply)
     {
         /* If it wasn't already cached, decide how complex the Folder
          * instance should be, and cache that for future reference
          */
         if (!($this->cache[$id] instanceof Folder)) {
             if ($cheaply) {
-                $node = $this->getFolderMapper()->findCheaplyById($id);
-            }
-            else {
-                $node = $this->getFolderMapper()->findById($id);
+                $node = $this->folderMapper->findCheaplyById($id);
+            } else {
+                $node = $this->folderMapper->findById($id);
             }
 
             $this->cache[$id] = $node;
@@ -238,38 +266,4 @@ class Ancestry
 
         return $this->cache[$id];
     }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get folder mapper
-     *
-     * @return Mapper
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * Set folder mapper
-     *
-     * @param Mapper $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * Get recursion limit
-     *
-     * @return int
-     */
-    private function getRecursionLimit()
-    {
-        return $this->recursionLimit;
-    }
-
 }

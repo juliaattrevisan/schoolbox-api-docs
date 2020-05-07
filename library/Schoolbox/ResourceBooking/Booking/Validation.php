@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
@@ -28,9 +27,13 @@ use Aura\Web\Request;
 use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 use Calendar_Api_Config_Mapper;
 
+/**
+ * Class Validation
+ *
+ * @package Schoolbox\ResourceBooking\Booking
+ */
 class Validation
 {
-
     const START_DATETIME = 'start_datetime';
     const END_DATETIME = 'end_datetime';
     const ERROR_INVALID = 'invalid';
@@ -43,46 +46,56 @@ class Validation
     const ERROR_TIMETABLED_CLASS = 'timetabled_class';
     const ERROR_CURRENT_TERM = 'current_term';
 
+
     /**
      * @var User
      */
     private $user;
+
 
     /**
      * @var BookingMapper
      */
     private $bookingMapper;
 
+
     /**
      * @var StatusMapper
      */
     private $statusMapper;
+
 
     /**
      * @var ResourceMapper
      */
     private $resourceMapper;
 
+
     /**
      * @var TermMapper
      */
     private $termMapper;
+
 
     /**
      * @var External_Timetable
      */
     private $externalTimetableHandler;
 
+
     /**
      * @var CampusMapper
      */
     private $campusMapper;
 
+
     /**
-     * @param User         $user
-     * @param Mapper       $bookingMapper
-     * @param StatusMapper $statusMapper
-     * @param TermMapper   $termMapper
+     * @param User               $user
+     * @param Mapper             $bookingMapper
+     * @param StatusMapper       $statusMapper
+     * @param TermMapper         $termMapper
+     * @param External_Timetable $externalTimetableHandler
+     * @param CampusMapper       $campusMapper
      */
     public function __construct(
         User $user,
@@ -104,19 +117,20 @@ class Validation
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param  Item\Model     $resource
-     * @param  Booking        $existingBooking If provided, this is the booking that
-     *                                         is being updated.
+     * @param Item\Model     $resource
+     * @param Request\Values $postData
+     * @param Booking        $existingBooking  If provided, this is the booking that is being updated.
      *                                         Leave it out of conflict checks.
-     * @param  Request\Values $postData
-     * @throws InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
      * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
-        Booking $existingBooking = null,
-        $postData
+        $postData,
+        Booking $existingBooking = null
     ) {
         // Check:
         // Beginning and end of booking are valid datetime
@@ -212,7 +226,7 @@ class Validation
                 );
                 foreach ($dateParts as $check) {
                     /** @var Item\Model $thisResource */
-                    list($thisResource, $thisStart, $thisEnd) = $check;
+                    [$thisResource, $thisStart, $thisEnd] = $check;
 
                     // Validate for matching the current term
                     if ($thisResource->getCurrentTermRestriction()) {
@@ -242,7 +256,7 @@ class Validation
                     $postData['efficacy']
                 ) as $check) {
                     /** @var Item\Model $thisResource */
-                    list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
+                    [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
 
                     // Validate for matching the current term
                     if ($thisResource->getCurrentTermRestriction()) {
@@ -262,6 +276,7 @@ class Validation
 
         return $errors;
     }
+
 
     /**
      * Validates the status change for this booking
@@ -291,7 +306,6 @@ class Validation
      *
      * @param DateTime $startDate
      * @param DateTime $endDate
-     *
      * @return array
      */
     public function validateBeforeTime(DateTime $startDate, DateTime $endDate)
@@ -308,8 +322,7 @@ class Validation
     /**
      * Validate start date not in the past
      *
-     * @param DateTime   $startDate
-     *
+     * @param DateTime $startDate
      * @return array
      */
     public function validatePastTime(DateTime $startDate)
@@ -325,12 +338,12 @@ class Validation
         return $errors;
     }
 
+
     /**
      * Validate start date not too early
      *
-     * @param Item\Model   $resource
-     * @param DateTime   $startDate
-     *
+     * @param Item\Model $resource
+     * @param DateTime $startDate
      * @return array
      */
     public function validateLeadTime(Item\Model $resource, DateTime $startDate)
@@ -346,13 +359,13 @@ class Validation
         return $errors;
     }
 
+
     /**
      * Validate the minimum length of the booking
      *
-     * @param Item\Model    $resource
-     * @param DateTime      $startDate
-     * @param DateTime      $endDate
-     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
      * @return array
      */
     public function validateTooShort(Item\Model $resource, DateTime $startDate, DateTime $endDate)
@@ -369,13 +382,13 @@ class Validation
         return $errors;
     }
 
+
     /**
      * Validate the maximum length of the booking
      *
-     * @param Item\Model    $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     *
+     * @param Item\Model $resource
+     * @param DateTime $startDate
+     * @param DateTime $endDate
      * @return array
      */
     public function validateTooLong(Item\Model $resource, DateTime $startDate, DateTime $endDate)
@@ -393,16 +406,18 @@ class Validation
         return $errors;
     }
 
+
     /**
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
      *
-     * @param  Item\Model    $resource
-     * @param  DateTime   $startDate
-     * @param  DateTime   $endDate
-     * @param  Model      $existingBooking
-     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param Model      $existingBooking
      * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function validateForConflicts(
         Item\Model $resource,
@@ -418,7 +433,6 @@ class Validation
         // that the previous booking ended.
         // (We may need to implement a down time between bookings.)
         /** @var Collection|Model[] $conflictingBookings */
-
         $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
 
         // Conflicting bookings could include the existing booking.
@@ -430,17 +444,16 @@ class Validation
         // long it overlaps the next item in series!), but I'm not going to
         // worry about those.
         if ($existingBooking instanceof Model) {
-
             $existingId = $existingBooking->getId();
-            if ($existingId) {
-                $existingSeriesId      = $existingBooking->getEvent()->getSeriesId();
 
+            if ($existingId) {
+                $existingSeriesId = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-                /**
-                 * @param $item
-                 *
-                 * @return bool
-                 */
+
+                    /**
+                     * @param Model $item
+                     * @return bool
+                     */
                     function ($item) use ($existingId, $existingSeriesId) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
@@ -459,8 +472,7 @@ class Validation
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
             $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
-        }
-        elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+        } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
 
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
@@ -477,12 +489,12 @@ class Validation
         return $errors;
     }
 
+
     /**
      * Validates if booking needs to be within the current term
      *
      * @param DateTime $endDate
      * @param Term\Model $currentTerm
-     *
      * @return array
      */
     public function validateCurrentTermRestriction(DateTime $endDate, Term\Model $currentTerm)
@@ -497,14 +509,15 @@ class Validation
         return $errors;
     }
 
+
     /**
      * @return Term\Model
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function getCurrentTerm()
     {
         return $this->getTermMapper()->findForToday();
     }
+
 
     /**
      * Get all bookings for a resource in a window
@@ -514,8 +527,9 @@ class Validation
      * @param DateTime   $endDate
      *
      * @return Collection|Model[]
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         return $this->getBookingMapper()->findForResource(
@@ -524,8 +538,8 @@ class Validation
             $endDate->getTimestamp() - 1,
             [Status\Model::STATUS_APPROVED]
         );
-
     }
+
 
     /**
      * Get all events for a room in specified period
@@ -533,7 +547,6 @@ class Validation
      * @param string $roomCode
      * @param DateTime $startDate
      * @param DateTime $endDate
-     *
      * @return \Calendar\Event\Collection
      */
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)

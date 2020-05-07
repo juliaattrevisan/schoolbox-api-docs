@@ -1,20 +1,23 @@
 <?php
 /**
- * Fragment
- *
- * An Effect Fragment definition. The $filename is its twig template
- * and $data is the key/value set which the twig template utilises
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Collection;
 
-class Fragment {
+/**
+ * Class Fragment
+ *
+ * An Effect Fragment definition. The $filename is its twig template
+ * and $data is the key/value set which the twig template utilises
+ *
+ * @package Schoolbox\Sync\Effect\Fragment
+ */
+class Fragment
+{
 
     /**
      * Template filename
@@ -23,12 +26,14 @@ class Fragment {
      */
     private $filename = '';
 
+
     /**
      * A Collection of ValueLabelInterface instances
      *
-     * @var array
+     * @var Collection
      */
     private $data = null;
+
 
     /**
      * If this is of type "Collection", it might use Selectize.
@@ -42,35 +47,26 @@ class Fragment {
      */
     private $ajaxUrl = null;
 
+
     /**
      * Constructor
      *
-     * @param $filename
+     * @param string $filename
      * @param Collection $data
      */
     public function __construct($filename, $data = null) {
-        $this->setFilename($filename);
+        $this->filename = $filename;
 
         if ($data instanceof Collection) {
-            $this->setData($data);
+            $this->data = $data;
         }
         else {
-            $this->setData(new Collection());
+            $this->data = new Collection();
         }
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set data
-     *
-     * @param Collection $data
-     */
-    private function setData($data)
-    {
-        $this->data = $data;
-    }
 
     /**
      * Get data
@@ -82,15 +78,6 @@ class Fragment {
         return $this->data;
     }
 
-    /**
-     * Set filename
-     *
-     * @param string $filename
-     */
-    private function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
 
     /**
      * Get filename
@@ -102,6 +89,7 @@ class Fragment {
         return $this->filename;
     }
 
+
     /**
      * Get ajax url
      *
@@ -111,6 +99,7 @@ class Fragment {
     {
         return $this->ajaxUrl;
     }
+
 
     /**
      * Set ajax url

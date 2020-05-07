@@ -1,13 +1,10 @@
 <?php
 /**
- * This represents a video that has been placed in the processing queue
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Video;
 
 use Psr\Log\LoggerInterface;
@@ -19,6 +16,13 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
+/**
+ * Class Queue
+ *
+ * This represents a video that has been placed in the processing queue
+ *
+ * @package Schoolbox\Video
+ */
 class Queue extends ResourceVideo
 {
     use CreatedAtDate;
@@ -82,7 +86,6 @@ class Queue extends ResourceVideo
         // Grab mappers
 
         $this->storageMapper = StorageMapper::getInstance();
-
     }
 
     /**
@@ -386,40 +389,38 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param $filename
-     *
-     * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @param string $filename
      */
     private function uploadTranscode($filename)
     {
-        $this->log("Saving transcode to storage");
+        $this->log('Saving transcode to storage');
         $this->getStorage()->getFilesystem()->put($this->getTranscodePath(), file_get_contents($filename));
 
-        $this->log("Deleting local transcode file");
+        $this->log('Deleting local transcode file');
         unlink($filename);
     }
+
 
     /**
      * Returns the storage objects local filesystem filename. This path should never be assumed to be correct as
      * the file may be stored off-site in cloud storage. Test for the existence of the file before using.
      *
      * @param Storage $sourceObject
-     *
      * @return string
      */
     private function getSourceLocation($sourceObject)
     {
-        return $this->getConfig()->get("storage_dir") . "/" . $sourceObject->getPath();
+        return $this->getConfig()->get('storage_dir') . '/' . $sourceObject->getPath();
     }
+
 
     /**
      * Take a storage object, makes sure it is stored locally (if not, it downloads it from storage to the local disk)
      * and then returns the local filename to be used when performing the various transcodes
      *
      * @param Storage $storage Storage object
-     *
      * @return string Filename on disk
+     * @throws RuntimeException
      */
     private function getLocalFilename(Storage $storage)
     {
@@ -431,8 +432,8 @@ class Queue extends ResourceVideo
             // Try to retrieve the media file using Flysystem (may be located off-site on S3) and copy across to the
             // local disk in a temporary file
 
-            $this->log("Media Source Location:  Flysystem");
-            $this->log("Downloading file to local disk");
+            $this->log('Media Source Location:  Flysystem');
+            $this->log('Downloading file to local disk');
             $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", $storage->getExtension());
             $mediaFileOut  = fopen($mediaFilename, "w");
             $this->getStorage()->pipe($mediaFileOut);
@@ -444,21 +445,21 @@ class Queue extends ResourceVideo
 
             // If the file is zero bytes we have nothing to transcode, so bomb out
             if (filesize($mediaFilename) <= 0) {
-                throw new RuntimeException("Unable to locate media file for processing");
+                throw new RuntimeException('Unable to locate media file for processing');
             }
         } else {
-            $this->log("Media Source Location:  Local disk");
+            $this->log('Media Source Location:  Local disk');
         }
 
         return $mediaFilename;
     }
 
+
     /**
      * Upload preview image to storage
      *
      * @param string $fileName Local filename to be uploaded
-     * @param string $destinationPath  Destination to which the image should be uploaded
-     *
+     * @param string $destinationPath Destination to which the image should be uploaded
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
      */
@@ -479,15 +480,16 @@ class Queue extends ResourceVideo
         unlink($fileName);
     }
 
+
     // ----------------------------------------------------------------------------------------------------------------
     // Functions to help determine dimensions when scaling videos and thumbnails
     // ----------------------------------------------------------------------------------------------------------------
+
 
     /**
      * Return video metadata
      *
      * @param string $infoMessage Output of the video information command line
-     *
      * @return array
      */
     private function getVideoMetadata($infoMessage)
@@ -518,10 +520,10 @@ class Queue extends ResourceVideo
 
 
         if ($width && $height) {
-            list($containedWidth, $containedHeight) = $this->contain([$width, $height], [1280, 720]);
+            [$containedWidth, $containedHeight] = $this->contain([$width, $height], [1280, 720]);
             $videoScale = sprintf("-vf scale=%d:%d", $containedWidth, $containedHeight);
 
-            list($thumbWidth, $thumbHeight) = $this->cover([$width, $height], [64, 64]);
+            [$thumbWidth, $thumbHeight] = $this->cover([$width, $height], [64, 64]);
             $thumbScale = sprintf("scale=%d:%d,", $thumbWidth, $thumbHeight);
         }
 
@@ -533,18 +535,18 @@ class Queue extends ResourceVideo
         ];
     }
 
+
     /**
      * Ensures specified dimensions are constrained with maximums
      *
      * @param array $dimensions    [width, height]
      * @param array $maxDimensions [maxWidth, maxHeight]
-     *
      * @return array [containedWidth, containedHeight]
      */
     private function contain($dimensions, $maxDimensions)
     {
-        list($width, $height) = $dimensions;
-        list($maxWidth, $maxHeight) = $maxDimensions;
+        [$width, $height] = $dimensions;
+        [$maxWidth, $maxHeight] = $maxDimensions;
 
         if ($maxWidth > 0 && $width > $maxWidth) {
             $height = $height * ($maxWidth / $width);
@@ -559,6 +561,7 @@ class Queue extends ResourceVideo
         return [(int)(ceil($width /2)*2), (int)(ceil($height / 2) * 2)];
     }
 
+
     /**
      * Resize dimensions so that they are as small as possible while still fully covering the minimum dimensions
      *
@@ -571,16 +574,18 @@ class Queue extends ResourceVideo
     {
         // Expand dimensions, and contain to coverDimensions
 
-        list($width, $height) = $dimensions;
-        list($coverWidth, $coverHeight) = $coverDimensions;
+        [$width, $height] = $dimensions;
+        [$coverWidth, $coverHeight] = $coverDimensions;
         $newRatio = max($coverWidth / $width, $coverHeight / $height);
 
         return [(int)(ceil(($width * $newRatio) / 2) * 2), (int)(ceil(($height * $newRatio) / 2) * 2)];
     }
 
+
     // ----------------------------------------------------------------------------------------------------------------
     // Boring helper functions
     // ----------------------------------------------------------------------------------------------------------------
+
 
     /**
      * Returns the filename of the utility used to perform the media transcode
@@ -596,6 +601,7 @@ class Queue extends ResourceVideo
         return null;
     }
 
+
     /**
      * Returns the filename of the utility used to retrieve media information
      *
@@ -610,6 +616,7 @@ class Queue extends ResourceVideo
         return null;
     }
 
+
     /**
      * Tests if a given executable is available on the system
      *
@@ -619,16 +626,16 @@ class Queue extends ResourceVideo
      */
     private function isCommandAvailable($executable)
     {
-        exec("which " . escapeshellarg($executable), $unused, $result);
+        exec('which ' . escapeshellarg($executable), $unused, $result);
 
         return !$result;
     }
+
 
     /**
      * Helper function to execute a shell command and log the output in a readable format in 'video_queue' table
      *
      * @param string $command Command-line to execute
-     *
      * @return string
      * @throws RuntimeException
      */
@@ -652,6 +659,7 @@ class Queue extends ResourceVideo
         return $outputString;
     }
 
+
     /**
      * Remove any temporary files associated with the storage object that were creating during transcoding
      */
@@ -665,24 +673,25 @@ class Queue extends ResourceVideo
         }
     }
 
+
     // ----------------------------------------------------------------------------------------------------------------
     // Debugging functions
     // ----------------------------------------------------------------------------------------------------------------
 
+
     /**
      * To allow logging during transcode
      *
-     * @param $message
+     * @param string $message
      */
     private function log($message)
     {
         // Make sure we actually have an instance of a logger before we try and log anything
-
-        /** @noinspection PhpUndefinedClassInspection */
         if ($this->log instanceof LoggerInterface) {
             $this->log->info("    - {$message}");
         }
     }
+
 
     // ----------------------------------------------------------------------------------------------------------------
     // Getters & Setters

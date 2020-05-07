@@ -1,37 +1,43 @@
 <?php
 /**
- * Data
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Usage\All;
 
+/**
+ * Class AjaxFlot
+ *
+ * @package Schoolbox\Usage\All
+ */
 class AjaxFlot
 {
-    /**
-	 * An instance of UsageMapper
-	 *
-	 * @var UsageMapper
-	 */
-    private $mapper;
 
     /**
-	 * Constructor
-	 */
+     * An instance of UsageMapper
+     *
+     * @var UsageMapper
+     */
+    private $mapper;
+
+
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->setMapper(new UsageMapper());
     }
 
+
     /**
-	 * Delegation method
-	 *
-	 * Find total usage
-	 *
-	 * @return bool|float|int|string
-	 */
+     * Delegation method
+     *
+     * Find total usage
+     *
+     * @return string
+     */
     public function findTotalUsage()
     {
         $currentData = $this->getMapper()->findTotalUsage();
@@ -50,13 +56,14 @@ class AjaxFlot
         return json_encode($result);
     }
 
+
     /**
-	 * Delegation method
-	 *
-	 * Find total group usage
-	 *
-	 * @return bool|float|int|string
-	 */
+     * Delegation method
+     *
+     * Find total group usage
+     *
+     * @return string
+     */
     public function findGroupUsage()
     {
         $allData = $this->getMapper()->findGroupUsage();
@@ -75,13 +82,14 @@ class AjaxFlot
         return json_encode($allResults);
     }
 
+
     /**
-	 * Calculate percentage
-	 *
-	 * @param $top
-	 * @param $bottom
-	 * @return float|int
-	 */
+     * Calculate percentage
+     *
+     * @param int|float $top
+     * @param int|float $bottom
+     * @return float|int
+     */
     private function percentage($top, $bottom)
     {
         if (!$bottom) {
@@ -91,13 +99,14 @@ class AjaxFlot
         return 100*$top/$bottom;
     }
 
+
     /**
-	 * Delegation method
-	 *
-	 * Find total type usage and pie it out, which uses a percentage
-	 *
-	 * @return bool|float|int|string
-	 */
+     * Delegation method
+     *
+     * Find total type usage and pie it out, which uses a percentage
+     *
+     * @return string
+     */
     public function findTypeUsage()
     {
         $allData = $this->getMapper()->findTypeUsage();
@@ -106,13 +115,13 @@ class AjaxFlot
         $totalBytes = 0;
 
         /* Find the total
-		 */
+         */
         foreach ($allData as $currentData) {
             $totalBytes += $currentData->getBytes();
         }
 
         /* Find each segment
-		 */
+         */
         foreach ($allData as $currentData) {
             $result = array($currentData->getName(), $this->percentage($currentData->getBytes(), $totalBytes));
 
@@ -122,16 +131,17 @@ class AjaxFlot
         return json_encode($allResults);
     }
 
+
     /**
-	 * Delegation method
-	 *
-	 * Find total user usage
-	 *
-	 * @param $orderBy
-	 * @param $order
-	 * @param $index
-	 * @param $numPerPage
-	 */
+     * Delegation method
+     *
+     * Find total user usage
+     *
+     * @param string $orderBy
+     * @param string $order
+     * @param int $index
+     * @param int $numPerPage
+     */
     public function findUserUsage($orderBy, $order, $index, $numPerPage)
     {
         $allData = $this->getMapper()->findUserUsage($orderBy, $order, $index, $numPerPage);
@@ -141,7 +151,7 @@ class AjaxFlot
         $page->setBlock('user_list', 'user', 'user_block');
 
         /* Really? You should be passing the bytes as constructor arg
-		 */
+         */
         $bytes = new \Alaress_Byte_Format();
 
         foreach ($allData as $currentData) {
@@ -160,23 +170,23 @@ class AjaxFlot
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
-	 * Set mapper
-	 *
-	 * @param UsageMapper $mapper
-	 */
+     * Set mapper
+     *
+     * @param UsageMapper $mapper
+     */
     private function setMapper($mapper)
     {
         $this->mapper = $mapper;
     }
 
     /**
-	 * Get mapper
-	 *
-	 * @return UsageMapper
-	 */
+     * Get mapper
+     *
+     * @return UsageMapper
+     */
     public function getMapper()
     {
         return $this->mapper;

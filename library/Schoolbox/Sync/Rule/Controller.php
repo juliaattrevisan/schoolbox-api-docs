@@ -1,24 +1,27 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Rule;
 
 use Alaress\Web\Controller\Base;
 use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
 
-class Controller extends Base {
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Sync\Rule
+ */
+class Controller extends Base
+{
 
     /**
      * Form
      *
-     * @param $params
+     * @param array $params
      */
     public function add($params) {
 
@@ -44,10 +47,12 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Perform
      *
-     * @param $params
+     * @param array $params
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function create($params)
     {
@@ -71,10 +76,13 @@ class Controller extends Base {
         $this->getResponse()->redirect->to("/adminv2/ups/$roleType#rule-{$rule->getId()}");
     }
 
+
     /**
      * Form
      *
-     * @param $params
+     * @param array $params
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function edit($params)
     {
@@ -100,10 +108,15 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Perform
      *
-     * @param $params
+     * @param array $params
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
     public function update($params)
     {
@@ -120,10 +133,11 @@ class Controller extends Base {
         $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
     }
 
+
     /**
      * Test Method
      *
-     * @param $params
+     * @param array $params
      */
     public function delete($params)
     {
@@ -134,6 +148,5 @@ class Controller extends Base {
             'format' => 'json',
             'data'   => $deleteCount > 0
         ]);
-
     }
 }

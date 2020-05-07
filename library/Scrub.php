@@ -26,29 +26,31 @@ class Scrub
      */
     protected static $htmlpurifier_instance;
 
+
     /**
      * Cleans plain text of all nasty stuff
      * Can be used on input to database or output
      *
-     * @param  $text
+     * @param string $text
      * @return string
      */
-    static public function text($text)
+    public static function text($text)
     {
         //
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlentities($text, ENT_IGNORE | ENT_QUOTES, "UTF-8");
+        return htmlentities($text, ENT_IGNORE | ENT_QUOTES, 'UTF-8');
     }
+
 
     /**
      * Scrubs text for XML output.
      *
-     * @param  $text
+     * @param string $text
      * @return string
      */
-    static public function xml($text)
+    public static function xml($text)
     {
         //
         // Don't think ENT_IGNORE is a problem here.
@@ -57,14 +59,15 @@ class Scrub
         return htmlspecialchars($text, ENT_QUOTES);
     }
 
+
     /**
      * Turns html into plaintext.
      * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
      * @static
-     * @param $html
+     * @param string $html
      * @return string
      */
-    static public function html2text($html)
+    public static function html2text($html)
     {
         // 0: replace all text-style block-level elements with newlines
         $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html);
@@ -76,25 +79,27 @@ class Scrub
         return html_entity_decode($text, ENT_QUOTES);
     }
 
+
     /**
      * Convert smart quotes to apostrophes/double quotes
      *
      * @static
-     * @param $text
-     * @return mixed
+     * @param string $text
+     * @return string
      */
-    static public function smartQuotes($text)
+    public static function smartQuotes($text)
     {
         $search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
         $replace = array("'", "'", '"', '"', '-');
 
         $data = str_replace($search, $replace, $text);
 
-        $search = array("&#8220;", "&#8221;", "&#8216;", "&#8217;", "&#8243;");
-        $replace = array("&quot;", "&quot;", "&#39;", "&#39;", "&quot;");
+        $search = array('&#8220;', '&#8221;', '&#8216;', '&#8217;', '&#8243;');
+        $replace = array('&quot;', '&quot;', '&#39;', '&#39;', '&quot;');
 
         return str_replace($search, $replace, $data);
     }
+
 
     /**
      * Retrieves the singleton HTMLPurifier instance with our special config,
@@ -331,6 +336,7 @@ class Scrub
         return self::$htmlpurifier_instance;
     }
 
+
     /**
      * Mangles HTML-purified DOM - this is needed for things that HTMLPurifier
      * can't do, such as adding new nodes.
@@ -341,7 +347,7 @@ class Scrub
      * @param string $html
      * @return string
      */
-    static protected function htmlDomModify($html)
+    protected static function htmlDomModify($html)
     {
         // Don't bother parsing anything if $html is empty
         if (strlen($html) === 0) {
@@ -386,15 +392,15 @@ class Scrub
         return $html;
     }
 
+
     /**
      * Cleans crap out of input using HTMLPurifier.
      * Now caches previous calls in Redis!
      *
      * @param  string $html
-     *
      * @return mixed
      */
-    static public function html($html)
+    public static function html($html)
     {
         return Alaress\Redis::getInstance()->cacheFunctionCall(
             'scrub.html',
@@ -406,13 +412,15 @@ class Scrub
         );
     }
 
+
     /**
      * Variant of html
+     *
      * @param string $html
      * @param string $domain
      * @return string
      */
-    static public function htmlAbsoluteUri(string $html, string $domain): string
+    public static function htmlAbsoluteUri(string $html, string $domain): string
     {
         return Alaress\Redis::getInstance()->cacheFunctionCall(
             'scrub.htmlAbsoluteUri',

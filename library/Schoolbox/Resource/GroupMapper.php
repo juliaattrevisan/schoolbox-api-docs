@@ -1,7 +1,5 @@
 <?php
 /**
- * Used for mappings group types to categories
- *
  * @author    James Leckie <james.leckie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -12,19 +10,20 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use \PDO;
-use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\User;
 
 /**
  * Class GroupMapper
+ *
+ * Used for mappings group types to categories
  *
  * @package Schoolbox\Resource
  * @method Group createModel($idValue = null)
  * @method Group hydrate(array $row, $alias = '', $callback = null)
  * @method Group[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class GroupMapper extends Mapper {
+class GroupMapper extends Mapper
+{
 
     protected function mapping() {
         $this->hasModel(Group::class);
@@ -75,14 +74,16 @@ class GroupMapper extends Mapper {
     }
 
 
-
-
     /**
      * Find all folders matching a certain name,
      * associated with userGroups
      *
-     * @param $name
+     * @param string $name
      * @return GenericCollection|Folder\Model[]
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function findFolders($name = '')
     {

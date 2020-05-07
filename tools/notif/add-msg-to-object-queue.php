@@ -107,7 +107,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     /**
      * Displays ttl in human readable format
-     * @param $ttl
+     * @param int $ttl
      * @return string
      */
     private static function ttlToDate($ttl): string

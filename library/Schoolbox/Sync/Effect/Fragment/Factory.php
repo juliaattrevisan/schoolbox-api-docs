@@ -1,27 +1,35 @@
 <?php
 /**
- * Factory (FragmentFactory)
- *
- * A Factory which produces instances of Fragment based on which
- * fields were selected, and the properties of that field in the
- * UserMapper definition
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Config\Loader as ConfigLoader;
 
-class Factory {
-    const TYPE_BOOLEAN = 1;
-    const TYPE_LOOKUP = 2;
-    const TYPE_STRING = 3;
-    const TYPE_COLLECTION = 4;
+/**
+ * Class Factory
+ *
+ * A Factory which produces instances of Fragment based on which
+ * fields were selected, and the properties of that field in the
+ * UserMapper definition
+ *
+ * @package Schoolbox\Sync\Effect\Fragment
+ */
+class Factory
+{
+
+    /**
+     * Various types
+     */
+    private const TYPE_BOOLEAN = 1;
+    private const TYPE_LOOKUP = 2;
+    private const TYPE_STRING = 3;
+    private const TYPE_COLLECTION = 4;
+
 
     /**
      * Manufacture a list of Schoolbox User fields to chooze from
@@ -29,6 +37,7 @@ class Factory {
      * from the UserMapper definition
      */
     private $allFields = [];
+
 
     /**
      * A list of all the Schoolbox UserMapper fields to
@@ -71,6 +80,7 @@ class Factory {
         'displayGradeGraph' => 'Display Graph on Student Grade Card',
     ];
 
+
     /**
      * Special ajax urls for selectize population
      * Uses same controller with different params
@@ -85,6 +95,7 @@ class Factory {
         'campusCollectionRemove' => 'campus',
     ];
 
+
     /**
      * The current Ruleset
      * Synonymous with Role Type
@@ -93,6 +104,7 @@ class Factory {
      */
     private $roleType = '';
 
+
     /**
      * A Lookup instance
      *
@@ -100,10 +112,11 @@ class Factory {
      */
     private $lookup = null;
 
+
     /**
      * Factory constructor.
      *
-     * @param $roleType
+     * @param string $roleType
      */
     public function __construct($roleType) {
 
@@ -120,10 +133,11 @@ class Factory {
             $this->allFieldKeys['userAccessRemove'] = 'Groups (Remove)';
         }
 
-        $this->setLookup(new Lookup());
-        $this->setRoleType($roleType);
-        $this->setAllFields($this->generateAllFields());
+        $this->lookup = new Lookup();
+        $this->roleType = $roleType;
+        $this->allFields = $this->generateAllFields();
     }
+
 
     /**
      * Figure out what each desired field's type is, via the UserMapper
@@ -137,7 +151,7 @@ class Factory {
         $mapper = new UserMapper();
         $allMaps = $mapper->getMap();
         $allJoins = $mapper->getJoin();
-        $allFieldKeys = $this->getAllFieldKeys();
+        $allFieldKeys = $this->allFieldKeys;
 
         /* Get the associative array of fields
          */
@@ -219,21 +233,26 @@ class Factory {
         return $allFields;
     }
 
+
     /**
      * Determine which Effect Fragment to load for this field
      * (boolean, lookup, etc)
      *
-     * @param $mappingType
-     * @return Fragment
+     * @param int $mappingType
+     * @return Fragment|null
      */
     public function produce($mappingType) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             return new Fragment('@upsEffect/literal.twig');
-        }
-        else if ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
+        } elseif ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
             return new Fragment('@upsEffect/map.twig');
         }
+
+        /* You shouldn't be able to get here, but ok
+         */
+        return null;
     }
+
 
     /**
      * Return empty Fragment, prompting the user to choose
@@ -243,85 +262,76 @@ class Factory {
         return new Fragment('@upsEffect/empty.twig');
     }
 
+
     /**
      * Produce a Subfragment
      *
-     * @param $userField
-     * @return Fragment
+     * @param string $userField
+     * @return Fragment|null
      */
     public function produceType($userField) {
         if ($this->isBoolean($userField)) {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
-        }
-        else if ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField, $this->getRoleType()));
-        }
-        else if ($this->isString($userField)) {
+        } elseif ($this->isLookup($userField)) {
+            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
+        } elseif ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
-        }
-        else if ($this->isCollection($userField)) {
-            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+        } elseif ($this->isCollection($userField)) {
+            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->lookup->findData($userField));
             $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
 
             return $fragment;
         }
+
+        /* You shouldn't be able to get here, but ok
+         */
+        return null;
     }
+
 
     /**
      * Determine whether the current field is a Boolean
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isBoolean($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_BOOLEAN) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_BOOLEAN;
     }
+
 
     /**
      * Determine whether the current field is a Collection
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isCollection($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_COLLECTION) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_COLLECTION;
     }
+
 
     /**
      * Determine whether the current field is a Lookup
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isLookup($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_LOOKUP) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_LOOKUP;
     }
+
 
     /**
      * Determine whether the current field is a String
      *
-     * @param $field
+     * @param string $field
      * @return bool
      */
     public function isString($field) {
-        if ($this->allFields[$field]['type'] == self::TYPE_STRING) {
-            return true;
-        }
-
-        return false;
+        return $this->allFields[$field]['type'] == self::TYPE_STRING;
     }
+
 
     /**
      * Gets the key/value representation of $allFields
@@ -329,7 +339,7 @@ class Factory {
      * @return array
      */
     public function getAllFieldsKeyValue() {
-        $allFields = $this->getAllFields();
+        $allFields = $this->allFields;
 
         $stack = [];
 
@@ -338,102 +348,5 @@ class Factory {
         }
 
         return $stack;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set Lookup instance
-     *
-     * @param Lookup $lookup
-     */
-    private function setLookup($lookup)
-    {
-        $this->lookup = $lookup;
-    }
-
-    /**
-     * Get Lookup instance
-     *
-     * @return Lookup
-     */
-    private function getLookup()
-    {
-        return $this->lookup;
-    }
-
-    /**
-     * Set all field keys
-     *
-     * @param array $allFieldKeys
-     */
-    private function setAllFieldKeys($allFieldKeys)
-    {
-        $this->allFieldKeys = $allFieldKeys;
-    }
-
-    /**
-     * Get all field keys
-     *
-     * @return array
-     */
-    private function getAllFieldKeys()
-    {
-        return $this->allFieldKeys;
-    }
-
-    /**
-     * Get all fields
-     *
-     * @return array
-     */
-    public function getAllFields() {
-        return $this->allFields;
-    }
-
-    /**
-     * Set all fields
-     *
-     * @param $allFields
-     */
-    private function setAllFields($allFields) {
-        $this->allFields = $allFields;
-    }
-
-    /**
-     * @param string $roleType
-     */
-    private function setRoleType($roleType)
-    {
-        $this->roleType = $roleType;
-    }
-
-    /**
-     * @return string
-     */
-    private function getRoleType()
-    {
-        return $this->roleType;
-    }
-
-    /**
-     * Get all ajax urls
-     *
-     * @return array
-     */
-    private function getAllAjaxUrls()
-    {
-        return $this->allAjaxUrls;
-    }
-
-    /**
-     * Set all ajax urls
-     *
-     * @param array $allAjaxUrls
-     */
-    private function setAllAjaxUrls($allAjaxUrls)
-    {
-        $this->allAjaxUrls = $allAjaxUrls;
     }
 }

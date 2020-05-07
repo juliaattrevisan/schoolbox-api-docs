@@ -1,35 +1,39 @@
 <?php
 /**
- * Vimeo
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream\Post\Player;
 
+/**
+ * Class Vimeo
+ *
+ * @package SocialStream\Post\Player
+ */
+class Vimeo extends Player
+{
 
-class Vimeo extends Player {
+    /**
+     * Fetch thumbnail
+     *
+     * @return string|null
+     */
+    public function fetchThumbnail() {
+        $matches = array();
 
-	/**
-	 *
-	 *
-	 * @return mixed
-	 */
-	public function fetchThumbnail() {
-		$matches = array();
+        preg_match('/vimeo.com\/([0-9]+)/', $this->getUrl(), $matches);
 
-		preg_match('/vimeo.com\/([0-9]+)/', $this->getUrl(), $matches);
+        if (count($matches)) {
+            return "http://player.vimeo.com/video/{$matches[1]}?color=999999";
+        }
 
-		if (count($matches)) {
-			return "http://player.vimeo.com/video/{$matches[1]}?color=999999";
-		}
+        /* Otherwise get the next class to deal with it
+         */
+        if ($this->getNext()) {
+            return $this->getNext()->fetchThumbnail();
+        }
 
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-	}
+        return null;
+    }
 }

@@ -191,7 +191,7 @@ class Pipe implements PipeInterface
     /**
      * Prevent additional commands being executed by this pipe until it releases
      *
-     * @param $command
+     * @param string $command
      * @return void
      */
     public function lock($command)

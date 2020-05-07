@@ -146,8 +146,8 @@ class User extends DeprecatedModel
     /**
      * Search for a user by synergy ID, restricted to a group or group array
      *
-     * @param $sid
-     * @param $gid
+     * @param int $sid
+     * @param int|array $gid
      *
      * @return array|bool
      */
@@ -612,7 +612,7 @@ class User extends DeprecatedModel
     /**
      * Gets all in the system who are in a particular groupID, restricted by index and limit
      *
-     * @param      $groupID
+     * @param int|array $groupID
      * @param bool $hasSynergy
      * @param int  $index
      * @param int  $limit

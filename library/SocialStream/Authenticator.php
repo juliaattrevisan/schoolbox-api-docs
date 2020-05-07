@@ -1,20 +1,24 @@
 <?php
 /**
- * SocialStream_Authenticator
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream;
 
 use Component_Instance;
+use InvalidArgumentException;
+use LogicException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
+use SocialStream_Post_Abstract;
+use UnexpectedValueException;
 
 /**
  * Class Authenticator
+ *
  * @package SocialStream
  */
 class Authenticator
@@ -27,6 +31,7 @@ class Authenticator
      */
     private $newPost;
 
+
     /**
      * A component instance
      *
@@ -34,12 +39,14 @@ class Authenticator
      */
     private $instance;
 
+
     /**
      * A user instance
      *
-     * @var \Schoolbox\User
+     * @var User
      */
     private $currentUser;
+
 
     /**
      * Default permission level
@@ -48,14 +55,19 @@ class Authenticator
      */
     private $permission = -1;
 
+
     /**
      * Constructor
      *
-     * @param \SocialStream_Post_Abstract $newPost
-     * @param Component_Instance $instance
-     * @param \Schoolbox\User $currentUser
+     * @param SocialStream_Post_Abstract $newPost
+     * @param Component_Instance          $instance
+     * @param User                        $currentUser
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function __construct(\SocialStream_Post_Abstract $newPost, Component_Instance $instance, \Schoolbox\User $currentUser)
+    public function __construct(SocialStream_Post_Abstract $newPost, Component_Instance $instance, User $currentUser)
     {
         $this->setNewPost($newPost);
         $this->setInstance($instance);
@@ -63,10 +75,15 @@ class Authenticator
         $this->setPermission($this->determinePermission());
     }
 
+
     /**
      * Determine permission level for the current homepage
      *
-     * @return bool|int
+     * @return int
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
     private function determinePermission()
     {
@@ -87,10 +104,11 @@ class Authenticator
         return $permission;
     }
 
+
     /**
      * Find a particular config value
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
     private function findConfigValue($key)
@@ -105,7 +123,10 @@ class Authenticator
                 return $value;
             }
         }
+
+        return null;
     }
+
 
     /**
      * Determine whether $currentUser can softdelete $newPost and its threads
@@ -128,6 +149,7 @@ class Authenticator
         return false;
     }
 
+
     /**
      * Determine whether $currentUser can collaborate on $instance
      *
@@ -139,14 +161,13 @@ class Authenticator
             return true;
         }
 
-        if ($this->findConfigValue('collaborate')) {
-            if ($this->getPermission() >= UserAccess::ACCESS_READ) {
-                return true;
-            }
+        if ($this->findConfigValue('collaborate') && $this->getPermission() >= UserAccess::ACCESS_READ) {
+            return true;
         }
 
         return false;
     }
+
 
     /**
      * Determine whether $currentUser can comment on $instance
@@ -172,6 +193,7 @@ class Authenticator
 
         return false;
     }
+
 
     /**
      * Determine whether $currentUser can comment on $instance
@@ -200,7 +222,7 @@ class Authenticator
     /**
      * Set current user
      *
-     * @param \Schoolbox\User $currentUser
+     * @param User $currentUser
      */
     private function setCurrentUser($currentUser)
     {
@@ -210,7 +232,7 @@ class Authenticator
     /**
      * Get current user
      *
-     * @return \Schoolbox\User
+     * @return User
      */
     private function getCurrentUser()
     {
@@ -262,7 +284,7 @@ class Authenticator
      *
      * Public for setting values from within a loop
      *
-     * @param \SocialStream_Post_Abstract $newPost
+     * @param SocialStream_Post_Abstract $newPost
      */
     public function setNewPost($newPost)
     {
@@ -272,7 +294,7 @@ class Authenticator
     /**
      * Get new post
      *
-     * @return \SocialStream_Post_Abstract
+     * @return SocialStream_Post_Abstract
      */
     private function getNewPost()
     {

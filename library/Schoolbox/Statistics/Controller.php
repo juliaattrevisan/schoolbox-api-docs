@@ -1,12 +1,9 @@
 <?php
 /**
- * Controller for statistics
- *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
@@ -15,29 +12,34 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Statistics
+ */
 class Controller extends Base
 {
 
     /**
-     * @var DataSource $dataSource
+     * @var DataSource
      */
     private $dataSource;
 
 
     /**
-     * @var Alaress_Date_Format $startDate
+     * @var Alaress_Date_Format
      */
     protected $startDate;
 
 
     /**
-     * @var Alaress_Date_Format $endDate
+     * @var Alaress_Date_Format
      */
     protected $endDate;
 
 
     /**
-     * @var string $roleFilter
+     * @var string
      */
     protected $roleFilter;
 
@@ -64,13 +66,15 @@ class Controller extends Base
     /**
      * A list of role types.
      *
-     * @var array $roleTypes
+     * @var array
      */
     private $roleTypes;
 
 
     /**
      * List of months & year for the date filter
+     *
+     * @var array
      */
     private $filterDateOptions;
 
@@ -178,9 +182,7 @@ class Controller extends Base
             $this->setRoleFilter($roleFilter);
         }
 
-
         [$colours, $graphData] = $this->compileVisitorGraphData($folder, $dataSource);
-
 
         /**
          * visitorCount is used for both top visitors and recent visitors
@@ -647,6 +649,8 @@ class Controller extends Base
      *               $topFiles:     a list of `self::MAX_TOP_FILES` files accessed
      *               $topFileInfo:  info about the most accessed file
      *               $topFilesMore: are there more files?
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function compileTopFilesData(FolderModel $folder, DataSource $dataSource): array
     {
@@ -692,6 +696,8 @@ class Controller extends Base
      *               $topLinks:     a list of `self::MAX_TOP_LINKS` links accessed
      *               $topLinkInfo:  info about the most accessed link
      *               $topLinksMore: are there more links?
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function compileTopLinksData(FolderModel $folder, DataSource $dataSource): array
     {
@@ -708,7 +714,7 @@ class Controller extends Base
 
 
     /**
-     * @param $dataSource
+     * @param DataSource $dataSource
      */
     public function setDataSource($dataSource)
     {
@@ -756,7 +762,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $roleFilter
+     * @param string $roleFilter
      */
     protected function setRoleFilter($roleFilter)
     {
@@ -764,7 +770,7 @@ class Controller extends Base
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     protected function getRoleFilter()
     {

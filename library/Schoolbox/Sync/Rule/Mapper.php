@@ -1,13 +1,10 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Rule;
-
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -29,6 +26,8 @@ class Mapper extends Schoolbox\Mapper
      * Setup method. Implementing classes to define their SQL map here.
      *
      * @return void
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -62,10 +61,10 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @param PDOStatement $statement
      * @return Collection
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Model[] $collection */
         $collection = parent::hydrateSelect($statement);
 
         // ideally this would have been all captured in the initial query, but hydrating a cross-product isn't straightforward...
@@ -84,18 +83,20 @@ class Mapper extends Schoolbox\Mapper
      */
     public function findNextAvailableSequence($roleType)
     {
-        return $this->database->query("
+        return $this->database->query('
           SELECT COALESCE(MAX(sequence), 0) + 1
           FROM ups_rule
           WHERE role_type = ?
-        ", [ $roleType ])->fetchColumn();
+        ', [$roleType ])->fetchColumn();
     }
+
 
     /**
      * Resequence Rules
      *
-     * @param $sequencing
+     * @param array $sequencing
      * @return bool
+     * @throws \PDOException
      */
     public function updateRuleSequence($sequencing)
     {

@@ -1,17 +1,19 @@
 <?php
 /**
- * UserBulkMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use \Alaress\Lumberjack\Logger;
 use \Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * Class UserBulkMapper
+ *
+ * @package Schoolbox
+ */
 class UserBulkMapper extends UserMapper
 {
 
@@ -22,6 +24,7 @@ class UserBulkMapper extends UserMapper
      */
     private const UNCHANGED = -1;
 
+
     /**
      * After bulk processing this will contain a log of all the success and fail results
      *
@@ -29,11 +32,13 @@ class UserBulkMapper extends UserMapper
      */
     private $outputMessage = '';
 
+
     /**
      * Bulk modify logger
      * @var Logger
      */
     private $logger;
+
 
     /**
      * Construct the log system for bulk logging
@@ -44,14 +49,18 @@ class UserBulkMapper extends UserMapper
         $this->logger = new Logger($file, null, 200, [], true);
     }
 
+
     /**
      * Cheesy query agglutination
      *
-     * @param $searchCampus
-     * @param $searchRole
-     * @param $searchEportfolio
-     * @param $searchYear
+     * @param int    $searchCampus
+     * @param int    $searchRole
+     * @param string $searchEportfolio
+     * @param string $searchYear
      * @return \Schoolbox\Collection
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear)
     {
@@ -133,11 +142,15 @@ class UserBulkMapper extends UserMapper
         return $userCollection;
     }
 
+
     /**
      * Update campus involvement for this user
      *
      * @param User  $user
      * @param array $allCampusIds
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \UnexpectedValueException
      */
     private function assignCampuses(User $user, $allCampusIds)
     {
@@ -154,22 +167,27 @@ class UserBulkMapper extends UserMapper
         }
     }
 
+
     /**
      * Mass Modify 3
      *
-     * @param User $user
-     * @param      $allCampusIds
-     * @param      $roleId
-     * @param      $year
-     * @param      $eportfolioEnabled
-     * @param      $emailFromUsername
-     * @param      $externalMailClient
-     * @param      $webmail
-     * @param      $enabled
-     * @param      $hideContacts
-     * @param      $hideTimetable
-     * @param      $positionTitle
-     * @param      $displayGradeGraph
+     * @param User   $user
+     * @param array  $allCampusIds
+     * @param int    $roleId
+     * @param string $year
+     * @param string $eportfolioEnabled
+     * @param string $emailFromUsername
+     * @param string $externalMailClient
+     * @param string $webmail
+     * @param string $enabled
+     * @param string $hideContacts
+     * @param string $hideTimetable
+     * @param string $positionTitle
+     * @param string $displayGradeGraph
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function bulkModifyUpdate(
         User $user,
@@ -216,6 +234,12 @@ class UserBulkMapper extends UserMapper
         if (strlen($newPositionTitle)) {
             $user->setPositionTitle($newPositionTitle);
         }
+
+        /* TODO: Instead of comparing to an int self::UNCHANGED, these should compare against null
+         *  to avoid you having to mix data types in comparisons. In this old place everything came
+         *  from a form, which means their data types are typically strings, preventing you from
+         *  using typesafe comparisons.
+         */
 
         /* Update eportfolio settings
          */
@@ -287,6 +311,7 @@ class UserBulkMapper extends UserMapper
         $this->log($message);
     }
 
+
     /**
      * Mass-delete of a collection of users, plus logging.
      *
@@ -302,6 +327,7 @@ class UserBulkMapper extends UserMapper
         }
         return $result;
     }
+
 
     /**
      * Log to file
@@ -324,6 +350,4 @@ class UserBulkMapper extends UserMapper
     {
         return $this->outputMessage;
     }
-
-
 }

@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\WebDav\FileServer;
 
 use Sabre\DAV;
@@ -16,23 +15,31 @@ use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
 use Schoolbox\WebDav\HasUserSource;
 
 /**
+ * Class File
+ *
  * A WebDAV node that represents a file within the Schoolbox file system.
+ *
+ * @package Schoolbox\WebDav\FileServer
  */
 class File extends DAV\File
 {
     use HasUserSource;
 
-    /** @var FileModel */
+
+    /**
+     * @var FileModel
+     */
     private $file;
+
 
     /**
      * @var FileMapper
      */
     private $fileMapper;
+
 
     /**
      * A folder mapper
@@ -41,12 +48,14 @@ class File extends DAV\File
      */
     private $folderMapper;
 
+
     /**
      * A storage mapper
      *
      * @var StorageMapper
      */
     private $storageMapper;
+
 
     /**
      * Folder where file is located
@@ -55,17 +64,19 @@ class File extends DAV\File
      */
     private $folder;
 
+
     /**
      * Permissions mapper for determining access rights
      *
-     * @var \Schoolbox\Permission\Access\Access
+     * @var Access
      */
     private $accessor;
+
 
     /**
      * Constructor
      *
-     * @param               $path
+     * @param string        $path
      * @param callable      $userSource
      * @param FolderMapper  $folderMapper
      * @param FileMapper    $fileMapper
@@ -103,6 +114,11 @@ class File extends DAV\File
      *
      * @param string $newName
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function setName($newName)
     {
@@ -129,6 +145,11 @@ class File extends DAV\File
      * Modify file
      * @param resource $data
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function put($data)
     {
@@ -177,6 +198,10 @@ class File extends DAV\File
     /**
      * @return void
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function delete()
     {

@@ -193,7 +193,7 @@ class Controller extends Base
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
+        $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
@@ -298,7 +298,7 @@ class Controller extends Base
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item->getResource(), $item, $this->getRequest()->post);
+        $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
 
         if (empty($errors)) {
             $item

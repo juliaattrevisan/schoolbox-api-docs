@@ -1,24 +1,24 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Effect;
 
 use Alaress\Web\Controller\Base;
-use PDepend\Util\Type;
-use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
-use Alaress\ObjectReader;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
-class Controller extends Base {
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Sync\Effect
+ */
+class Controller extends Base
+{
 
     /**
      * A meta field for various Condition-specific UI
@@ -27,12 +27,15 @@ class Controller extends Base {
         'status' => 'Effect not yet saved'
     ];
 
+
     /**
      * Forge a data structure to feed into twig template,
      * so that new Effects can be injected directly into
      * the ui after being received via ajax
      *
-     * @param $params
+     * @param array $params
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function add($params) {
 
@@ -87,7 +90,7 @@ class Controller extends Base {
             ],
             'meta' => [
                 'effect' => [
-                    $newEffect->getId() => $this->getMeta()
+                    $newEffect->getId() => $this->meta
                 ]
             ],
             'currentEffect' => $newEffect,
@@ -103,10 +106,13 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Add a special skip effect
      *
-     * @param $params
+     * @param array $params
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function addSkip($params) {
 
@@ -144,7 +150,7 @@ class Controller extends Base {
         $data = [
             'meta' => [
                 'effect' => [
-                    $newEffect->getId() => $this->getMeta()
+                    $newEffect->getId() => $this->meta
                 ]
             ],
             'currentEffect' => $newEffect,
@@ -156,6 +162,7 @@ class Controller extends Base {
             'format'   => 'nochrome'
         ]);
     }
+
 
     /**
      * Decide whether to return
@@ -205,6 +212,7 @@ class Controller extends Base {
         ]);
     }
 
+
     /**
      * Delete a Effect asynchronously
      *
@@ -219,7 +227,10 @@ class Controller extends Base {
             'format' => 'json',
             'data'   => $deleteCount > 0
         ]);
+
+        return true;
     }
+
 
     /**
      * Spawn a new mapped row fragment
@@ -245,7 +256,7 @@ class Controller extends Base {
             'currentEffect' => $effect,
             'meta' => [
                 'effect' => [
-                    $queryData['effectId'] => $this->getMeta()
+                    $queryData['effectId'] => $this->meta
                 ]
             ],
             'allEffectStructures' => [
@@ -270,28 +281,5 @@ class Controller extends Base {
             'data'     => $data,
             'format'   => 'nochrome'
         ]);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set meta
-     *
-     * @param mixed $meta
-     */
-    private function setMeta($meta)
-    {
-        $this->meta = $meta;
-    }
-
-    /**
-     * Get meta
-     *
-     * @return mixed
-     */
-    private function getMeta()
-    {
-        return $this->meta;
     }
 }

@@ -1,12 +1,9 @@
 <?php
 /**
- * Base
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Search\MapperResult;
 
 use CallbackFilterIterator;
@@ -21,6 +18,11 @@ use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Traversable;
 
+/**
+ * Class Base
+ *
+ * @package Schoolbox\Resource\Search\MapperResult
+ */
 abstract class Base
 {
 
@@ -31,6 +33,7 @@ abstract class Base
      */
     protected $result;
 
+
     /**
      * Total count of items without limits
      *
@@ -38,12 +41,14 @@ abstract class Base
      */
     protected $count = 0;
 
+
     /**
      * The object that is used to determine whether a user has access to a resource.
      *
      * @var Access
      */
     protected $accessor;
+
 
     /**
      * Constructor
@@ -65,11 +70,11 @@ abstract class Base
      * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
-     * @param                 $keyword
-     * @param                 $sortProperty
-     * @param                 $sortDirection
-     * @param                 $offset
-     * @param                 $limit
+     * @param string          $keyword
+     * @param string          $sortProperty
+     * @param string          $sortDirection
+     * @param int             $offset
+     * @param int             $limit
      */
     public function search(ArticleResolver $articleResolver, User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
     {
@@ -116,6 +121,7 @@ abstract class Base
      */
     abstract protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser);
 
+
     /**
      * Builds a paged result set, filtered by whether $user can view it.
      *
@@ -130,6 +136,7 @@ abstract class Base
     {
         return new LimitIterator($this->buildFilteredResult($rawResult, $user, $folderColumn), $offset, $limit);
     }
+
 
     /**
      * Determines the total number of results in a result set that are viewable by $user.
@@ -148,6 +155,7 @@ abstract class Base
         }
         return $count;
     }
+
 
     /**
      * Builds a filtered result set, which returns only results viewable by a user.

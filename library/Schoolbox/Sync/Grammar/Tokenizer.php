@@ -1,29 +1,33 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Grammar;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Token\Filter;
 use Alaress\Rules\Token\Token;
 use Alaress\Rules\Token\Tokenizer as Super;
-use Schoolbox\External;
-use Schoolbox\User;
 
-class Tokenizer extends Super {
+/**
+ * Class Tokenizer
+ *
+ * @package Schoolbox\Sync\Grammar
+ */
+class Tokenizer extends Super
+{
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $prefix = '';
 
 
     /**
-     * @param $prefix
-     * @param $map
+     * @param string $prefix
+     * @param array $map
      */
     public function __construct($prefix, $map)
     {
@@ -46,13 +50,12 @@ class Tokenizer extends Super {
             $pos = strrpos($input, '\\');
             return ($pos !== false) ? substr($input, $pos + 1) : $input;
         }));
-
     }
 
 
     /**
-     * @param $key
-     * @param $label
+     * @param string $key
+     * @param string $label
      */
     protected function addTokenMapping($key, $label)
     {
@@ -77,5 +80,4 @@ class Tokenizer extends Super {
     {
         return parent::applyToken($token, $dataset, [ $token ]);
     }
-
 }

@@ -1,12 +1,9 @@
 <?php
 /**
- * A mapper for bookings.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Schoolbox\Calendar\Event;
@@ -14,9 +11,19 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 
+/**
+ * Class Mapper
+ *
+ * A mapper for bookings.
+ *
+ * @package Schoolbox\ResourceBooking\Booking
+ */
 class Mapper extends BaseMapper
 {
 
+    /**
+     * @inheritDoc
+     */
     public function mapping()
     {
         $this->hasTable('resource_booking');
@@ -149,38 +156,6 @@ class Mapper extends BaseMapper
         );
     }
 
-    /**
-    * Find a booking matching a partial name
-    *
-    * @param $column
-    * @param $value
-    * @return Collection
-    */
-    public function findColumnLike($column, $value)
-    {
-        $searchTerm = '%' . $this->getDatabase()->escapeForLike($value) .'%';
-
-        $query = "
-			SELECT {$this->getColumnString('b')}
-			FROM {$this->table} b
-			WHERE b.{$column} LIKE :like
-		";
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'like' => $searchTerm
-        ));
-
-        $mapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
-
-        $collection = new \Schoolbox\Collection();
-
-        while ($row = $statement->fetch()) {
-            $collection->add($mapper->hydrate($row, 'b'));
-        }
-
-        return $collection;
-    }
 
     /**
      * Retrieves all bookings between a given timespan.
@@ -196,26 +171,11 @@ class Mapper extends BaseMapper
      *                             category_id: filters by a resource booking category
      *
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array())
     {
-        // If using Aura:sql_query
-//        $this->queryFactory->newSelect()
-//            ->cols($this->getColumnArray('x'))
-//            ->from($this->getTable().' AS x')
-//            ->join('left', $this->getJoinMapper('event')->getTable().' AS y', $this->getJoinParameters('event', 'x', 'y'))
-//        ;
-//        $query = $this->createSelectQuery($alias);
-//        $this->addJoinToQuery($query, 'event', $alias, 'y');
-//        $this->addJoinToQuery($query, 'resource', $alias, '');
-//        $query
-//            ->andWhere('y.startTime <= :fromTimestamp')
-//            ->andWhere('y.endTime   >= :toTimestamp')
-//        ;
-//        if ($resourceId) {
-//            $query->andWhere('x.resource_id = :resource_id');
-//        }
-
         if (empty($statusIds)) {
             $statusIds = array(Status\Model::STATUS_PENDING, Status\Model::STATUS_APPROVED);
         }
@@ -311,6 +271,7 @@ class Mapper extends BaseMapper
         );
     }
 
+
     /**
      * Retrieves all bookings for the given owner.
      *
@@ -322,6 +283,8 @@ class Mapper extends BaseMapper
      *                             Status\Model::STATUS_APPROVED only.
      *
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array())
     {
@@ -332,6 +295,7 @@ class Mapper extends BaseMapper
             array('owner_id' => array($ownerId))
         );
     }
+
 
     /**
      * Retrieves all bookings for the given category.
@@ -344,6 +308,8 @@ class Mapper extends BaseMapper
      *                             Status\Model::STATUS_APPROVED only.
      *
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findForCategory($categoryId, $fromTimestamp, $toTimestamp, $statusIds = array())
     {
@@ -367,6 +333,8 @@ class Mapper extends BaseMapper
      *                             Status\Model::STATUS_APPROVED only.
      *
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findForResource(array $resourceIds, $fromTimestamp, $toTimestamp, $statusIds = array())
     {
@@ -378,12 +346,15 @@ class Mapper extends BaseMapper
         );
     }
 
+
     /**
      * Is the user a moderator of the item this booking is for?
      *
-     * @param  int $bookingId The ID of the booking that is being checked (not the item's ID)
-     * @param  int $userId    The ID of the user that is being checked
+     * @param int $bookingId The ID of the booking that is being checked (not the item's ID)
+     * @param int $userId    The ID of the user that is being checked
      * @return bool
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function isUserModeratorOfBookingItem($bookingId, $userId)
     {
@@ -400,6 +371,7 @@ class Mapper extends BaseMapper
         $statement->execute();
         return $statement->fetchColumn() > 0;
     }
+
 
     /**
      * Hydrates this item along with its event and resource.
@@ -439,11 +411,14 @@ class Mapper extends BaseMapper
         throw new BaseMapper\Exception\NotFound();
     }
 
+
     /**
      * Gets related bookings for this resource
      *
-     * @param  int $id
+     * @param int $id
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findRelatedBookings($id)
     {
@@ -477,14 +452,17 @@ class Mapper extends BaseMapper
         });
     }
 
+
     /**
      * Finds all series bookings for resource booking $id, excluding booking $id.
      *
      * This only finds items that are for the same item that $booking is.
      *
-     * @param  int $id
-     * @param  int $seriesId
+     * @param int $id
+     * @param int $seriesId
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findSeriesBookings($id, $seriesId)
     {
@@ -496,7 +474,6 @@ class Mapper extends BaseMapper
         if ($resourceId === false) {
             return new Collection();
         }
-
 
         // Only fetch series ID if booking $id is in series ID
         $query = "

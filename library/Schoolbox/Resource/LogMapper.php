@@ -1,13 +1,10 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource;
-
 
 use PDO;
 use Schoolbox\Collection;
@@ -15,7 +12,13 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class LogMapper extends Mapper {
+/**
+ * Class LogMapper
+ *
+ * @package Schoolbox\Resource
+ */
+class LogMapper extends Mapper
+{
 
     const ACTION_CREATE = 'create';
     const ACTION_READ   = 'access';
@@ -31,7 +34,7 @@ class LogMapper extends Mapper {
     const KIND_MYFOLDER = 'myfolder';
 
     /**
-     * @return void
+     * @inheritDoc
      */
     protected function mapping() {
         $this->hasTable('cmsLog');
@@ -107,15 +110,15 @@ class LogMapper extends Mapper {
             'this_key'  => 'objectId',
             'other_key' => 'textBoxID'
         ));
-
     }
+
 
     /**
      * Return recent log entries
      *
      * @param int $limit
-     *
      * @return array
+     * @throws \PDOException
      */
     public function findRecent(int $limit = 30): array
     {
@@ -132,20 +135,23 @@ class LogMapper extends Mapper {
         return $stmt->fetchAll();
     }
 
+
     /**
      * Return a collection of log items appropriate for aggregation
      *
-     * @param     $context
-     * @param     $filter
-     * @param     $limit
+     * @param int $context
+     * @param string $filter
+     * @param int $limit
      * @param int $offset
      * @param int $time
      *
      * @return Collection|Log[]
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
+     * @throws \PDOException
      */
     public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0) {
-        $time = date('Y-m-d H:i:s', $time ?: time());
+        $time = \Alaress_Date_Format::newFromTimestamp($time ?: time())->getDatabase();
         $limit = (int)$limit;
         $offset = (int)$offset;
 
@@ -224,7 +230,7 @@ class LogMapper extends Mapper {
 
     /**
      * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param $user
+     * @param User $user
      *
      * @throws Mapper\Exception
      */
@@ -233,9 +239,10 @@ class LogMapper extends Mapper {
         $this->putLog(self::ACTION_CREATE, $object, $user);
     }
 
+
     /**
      * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param $user
+     * @param User $user
      *
      * @throws Mapper\Exception
      */
@@ -244,9 +251,10 @@ class LogMapper extends Mapper {
         $this->putLog(self::ACTION_READ, $object, $user);
     }
 
+
     /**
      * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param $user
+     * @param User $user
      *
      * @throws Mapper\Exception
      */
@@ -255,9 +263,10 @@ class LogMapper extends Mapper {
         $this->putLog(self::ACTION_UPDATE, $object, $user);
     }
 
+
     /**
      * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param $user
+     * @param User $user
      *
      * @throws Mapper\Exception
      */
@@ -265,6 +274,7 @@ class LogMapper extends Mapper {
     {
         $this->putLog(self::ACTION_DELETE, $object, $user);
     }
+
 
     /**
      * @param string                                     $action
@@ -293,5 +303,4 @@ class LogMapper extends Mapper {
     {
         return true;
     }
-
 }

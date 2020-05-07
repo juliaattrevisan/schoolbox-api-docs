@@ -1,33 +1,38 @@
 <?php
 /**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Usage\Specific;
+
+use Database;
+
+/**
+ * Class UsageMapper
+ *
  * Usage report mapper for the filesystem.
  *
  * Currently, files that are related to deleted fields (i.e. deleted files)
  * are NOT included in report totals.
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @package Schoolbox\Usage\Specific
  */
-
-namespace Schoolbox\Usage\Specific;
-
-use Database;
-
 class UsageMapper
 {
-    /**
-     * Constant: join onto storage table
-     */
-    const STORAGE_JOIN =  "INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`";
 
     /**
-     * Constant: join from storage table onto mimetype table
+     * join onto storage table
      */
-    const MIMETYPE_JOIN = "
+    private const STORAGE_JOIN = 'INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`';
+
+    /**
+     * join from storage table onto mimetype table
+     */
+    private const MIMETYPE_JOIN = '
         LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
         LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
-    ";
+    ';
 
     /**
      * The user to generate stats for
@@ -35,32 +40,35 @@ class UsageMapper
      */
     private $userId = 0;
 
+
     /**
      * @var Database
      */
     protected $database;
 
+
     /**
      * Constructor
      *
-     * @param $userId
+     * @param int $userId
      */
     public function __construct($userId)
     {
-
         $this->database = Database::getInstance();
 
         $this->setUserId($userId);
     }
 
+
     /**
      * Gets usage bytes and total files as part of a single query.
      *
      * @return array bytes: bytes used, num: total files
+     * @throws \PDOException
      */
     protected function getUsage()
     {
-        $query = "
+        $query = '
             SELECT
               COALESCE(SUM(bytes), 0) AS bytes,
               COALESCE(SUM(num), 0) AS num
@@ -96,36 +104,42 @@ class UsageMapper
                        AND `submission_return_file`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
               ) AS allTotals
-        ";
+        ';
         $statement = $this->database->prepare($query);
         $statement->execute(['userId' => $this->getUserId()]);
         return $statement->fetch(\PDO::FETCH_ASSOC);
     }
 
+
     /**
      * Find total usage
      *
      * @return mixed
+     * @throws \PDOException
      */
     public function findTotalUsage()
     {
         return $this->getUsage()['bytes'];
     }
 
+
     /**
      * The total number of files
      *
      * @return mixed
+     * @throws \PDOException
      */
     public function numFiles()
     {
         return $this->getUsage()['num'];
     }
 
+
     /**
      * Find total category usage
      *
      * @return array
+     * @throws \PDOException
      */
     public function findGroupUsage()
     {
@@ -192,7 +206,7 @@ class UsageMapper
                 (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
                 INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
-                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'image/%'
@@ -201,7 +215,7 @@ class UsageMapper
                 (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
                 INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
-                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'video/%'
@@ -210,7 +224,7 @@ class UsageMapper
                 (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
                 FROM `student_submission` `f`
                 INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
-                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `t`.`mime` LIKE 'audio/%'
@@ -282,10 +296,12 @@ class UsageMapper
         return $result;
     }
 
+
     /**
      * Find total type usage
      *
      * @return array
+     * @throws \PDOException
      */
     public function findTypeUsage()
     {
@@ -341,18 +357,19 @@ class UsageMapper
      *
      * @param string $orderBy
      * @param string $order
-     * @param int $index
-     * @param $numPerPage
+     * @param int    $index
+     * @param int    $numPerPage
      * @return array
+     * @throws \PDOException
      */
     public function findFileUsage($orderBy, $order, $index, $numPerPage)
     {
         $storageJoin = self::STORAGE_JOIN;
         $mimeJoin    = self::MIMETYPE_JOIN;
-        $boxJoin     = "
+        $boxJoin     = '
             INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
             INNER JOIN `folder` `c` ON `b`.`category` = `c`.`id`
-        ";
+        ';
         $query = "
             SELECT *
             FROM
@@ -399,7 +416,7 @@ class UsageMapper
                     `c`.`name` AS categoryName
                 FROM `student_submission` `f`
                 INNER JOIN `student_submission_file` ON `student_submission_file`.`student_submission_id` = `f`.id
-                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash 
+                INNER JOIN `storage` `s` ON `s`.hash = `student_submission_file`.hash
                 $mimeJoin
                 $boxJoin
                 WHERE `f`.`owner` = :userId

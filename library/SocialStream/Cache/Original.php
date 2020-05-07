@@ -1,18 +1,22 @@
 <?php
 /**
- * Social stream cache image fetch
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream\Cache;
 
 use Schoolbox\Resource\Storage;
 use SocialStream\PostMapper;
 use SocialStream_Post_Abstract;
 
+/**
+ * Class Original
+ *
+ * Social stream cache image fetch
+ *
+ * @package SocialStream\Cache
+ */
 class Original extends \Alaress_Cache_Abstract
 {
 
@@ -23,8 +27,12 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected $result = false;
 
-    /** @var SocialStream_Post_Abstract */
+
+    /**
+     * @var SocialStream_Post_Abstract
+     */
     protected $post;
+
 
     /**
      * A prefix for cached filenames
@@ -32,6 +40,7 @@ class Original extends \Alaress_Cache_Abstract
      * @var string
      */
     protected $cacheFilePrefix = 'socialstream_thumbnail';
+
 
     /**
      * A Storage instance for a thumbnail image
@@ -42,6 +51,7 @@ class Original extends \Alaress_Cache_Abstract
      * @var Storage\IStorage
      */
     private $file;
+
 
     /**
      * Hook method
@@ -76,6 +86,7 @@ class Original extends \Alaress_Cache_Abstract
         return $this;
     }
 
+
     /**
      * Figger out what the cached filename should be
      *
@@ -101,6 +112,7 @@ class Original extends \Alaress_Cache_Abstract
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      */
     protected function retrieveStreamContents(): void
@@ -120,14 +132,15 @@ class Original extends \Alaress_Cache_Abstract
      *
      * @return bool
      * @throws \PDOException
+     * @throws \Schoolbox\File\Exception
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     protected function saveStreamContents(): bool
     {
         $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         if ($urlDetection->isLocalUrl()) {
-
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
                 $this->file = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
@@ -144,9 +157,12 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * Process url using fopen in the usual way
      *
-     * @param $url
+     * @param string $url
      * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\File\Exception
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function processUrl($url): bool
     {
@@ -181,6 +197,7 @@ class Original extends \Alaress_Cache_Abstract
     {
         return $this->file;
     }
+
 
     /**
      * Has thumbnail is either when file has successfully downloaded or the cache file already exists

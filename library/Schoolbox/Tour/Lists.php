@@ -1,17 +1,20 @@
 <?php
 /**
- *
- * Generates a list of tours, this is used to help a page know if tours exist
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Tour;
 
 use Schoolbox\User;
 
+/**
+ * Class Lists
+ *
+ * Generates a list of tours, this is used to help a page know if tours exist
+ *
+ * @package Schoolbox\Tour
+ */
 class Lists
 {
 
@@ -20,24 +23,30 @@ class Lists
      */
     private $tourMapper;
 
+
     /**
      * @var Step\Mapper;
      */
     private $stepMapper;
 
+
     /**
      * Lists constructor.
-     * @param Mapper $tourMapper
+     *
+     * @param Mapper      $tourMapper
+     * @param Step\Mapper $stepMapper
      */
     public function __construct(Mapper $tourMapper, Step\Mapper $stepMapper) {
         $this->tourMapper = $tourMapper;
         $this->stepMapper = $stepMapper;
     }
 
+
     /**
      * @param User $user
-     * @param      $url
+     * @param string $url
      * @return array
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTours(User $user, $url) : array {
         // Store the tours we are going to serve in an array
@@ -50,7 +59,6 @@ class Lists
 
         $tours = $this->tourMapper->findByUserForUrl($user, $url);
 
-
         // Iterate through them and add the required information into the array
 
         /** @var Model $tour */
@@ -59,7 +67,7 @@ class Lists
             // Create an array to store the selectors/events
             $triggerArray = [];
 
-            /** @var TourTrigger $tourTrigger */
+            /** @var Trigger\Model $tourTrigger */
             foreach ($tour->getTriggerList() as $tourTrigger) {
 
                 // Add the selector/event to the return data
@@ -81,6 +89,7 @@ class Lists
                 ];
             }
         }
+
         return $data;
     }
 }
