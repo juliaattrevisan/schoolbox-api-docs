@@ -5016,16 +5016,6 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: "#^Cannot call method getPostId\\(\\) on null\\.$#"
-			count: 1
-			path: library/SocialStream/Threads.php
-
-		-
-			message: "#^Cannot call method getId\\(\\) on null\\.$#"
-			count: 3
-			path: library/SocialStream/Threads.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 97$#"
 			count: 1
 			path: library/Survey/Answer/Numeric.php
