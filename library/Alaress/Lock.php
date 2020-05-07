@@ -42,9 +42,10 @@ class Alaress_Lock
         }
 
         // Get the list of all processes matching the PID in the lockfile.
-        [$pid, $startTimestamp] = $this->parseLockfile();
-        $cmd                    = sprintf('ps -p %s -o etimes --no-headers', escapeshellarg($pid));
-        $output                 = trim(shell_exec($cmd));
+        $pid            = file_get_contents($this->filename);
+        $startTimestamp = filemtime($this->filename);
+        $cmd            = sprintf('ps -p %s -o etimes --no-headers', escapeshellarg($pid));
+        $output         = trim(shell_exec($cmd));
         if (empty($output)) {
             // Process no longer exists: kill lockfile and continue
             $this->release();
@@ -81,14 +82,7 @@ class Alaress_Lock
         if ($this->isLocked()) {
             return false;
         }
-
-        // Data that goes in the lockfile:
-        // * PID
-        // * process' start time
-        file_put_contents(
-            $this->filename,
-            implode(',', [getmypid(), $_SERVER['REQUEST_TIME']])
-        );
+        file_put_contents($this->filename, getmypid());
         return true;
     }
 
@@ -113,29 +107,10 @@ class Alaress_Lock
     public function killProcess($signal = SIGKILL)
     {
         if (file_exists($this->filename)) {
-            [$pid] = $this->parseLockfile();
-            if (posix_kill($pid, $signal)) {
+            if (posix_kill(file_get_contents($this->filename), $signal)) {
                 return true;
             }
         }
         return false;
-    }
-
-
-    /**
-     * Parse the lockfile's contents
-     *
-     * @return array&int[] [pid, start timestamp]
-     */
-    private function parseLockfile(): array
-    {
-        return array_map(
-            'intval',
-            array_pad(
-                explode(',', file_get_contents($this->filename), 2),
-                2,
-                0
-            )
-        );
     }
 }
