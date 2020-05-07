@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Survey_Answer_Ranking
  *
@@ -9,12 +8,14 @@
  */
 class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 {
+
     /**
      * Template file containing the graph
      *
      * @var string
      */
     protected $graphTemplateFile = 'survey/answer/ranking/graph.html';
+
 
     /**
      * Number of ticks on the x axis
@@ -23,11 +24,12 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      */
     private $ticks = 0;
 
+
     /**
      * Graph the results for this answer type
      *
-     * @param  $page
-     * @param  $currentQuestion
+     * @param SitePage $page
+     * @param array $currentQuestion
      * @return void
      */
     public function graphResults($page, $currentQuestion)
@@ -39,7 +41,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $page->setBlock('series', 'series_separator', 'series_separator_block');
 
         $dataset = $this->process($this->generateDataSet((int)$currentQuestion['question_id']));
-        $ticks   = $this->generateTicks($this->getTicks());
+        $ticks   = $this->generateTicks($this->ticks);
 
         $i = 0;
 
@@ -81,12 +83,13 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $page->parse('graph_block', $componentHandle);
     }
 
+
     /**
      * Ordinal
      *
      * From php.net
      *
-     * @param $num
+     * @param int $num
      * @return string
      */
     private function ordinal($num)
@@ -108,10 +111,11 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         return $num . 'th';
     }
 
+
     /**
      * Generate ticks
      *
-     * @param $numTicks
+     * @param int $numTicks
      * @return string
      */
     private function generateTicks($numTicks)
@@ -125,10 +129,11 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         return '{'.implode(', ', $ticks).'}';
     }
 
+
     /**
      * Manufacture a flot stacked barchart
      *
-     * @param $dataset
+     * @param array $dataset
      * @return array
      */
     private function process($dataset)
@@ -166,6 +171,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 
         return $finalDataset;
     }
+
 
     /**
      * Generate a "scoreboard" of items.
@@ -230,7 +236,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      * )
      * )
      *
-     * @param $questionId
+     * @param int $questionId
      * @return array
      */
     private function generateDataSet($questionId)
@@ -250,7 +256,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
          */
         for ($i = 0; $i < count($values); $i++) {
             $possibilities[] = $values[$i]->answerRight;
-            $this->setTicks(count($possibilities));
+            $this->ticks = count($possibilities);
         }
 
         /* Keep this for zerofilling
@@ -288,13 +294,14 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         return $finalScoreboard;
     }
 
+
     /**
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
@@ -336,30 +343,12 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         }
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * @param int $ticks
-     */
-    private function setTicks($ticks)
-    {
-        $this->ticks = $ticks;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTicks()
-    {
-        return $this->ticks;
-    }
 
     /**
      * Configure mandatoryness and other settings for this response
      *
-     * @param $page
-     * @param $question_id
+     * @param SitePage $page
+     * @param int $question_id
      */
     protected function configureResponse($page, $question_id)
     {
