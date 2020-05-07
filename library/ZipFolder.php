@@ -3,7 +3,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder;
 use \Schoolbox\Resource\File;
@@ -35,7 +34,7 @@ class ZipFolder
     /**
      * @var string
      */
-    private $allowedChars = "[^0-9a-zA-Z()_-]";
+    private $allowedChars = '[^0-9a-zA-Z()_-]';
 
 
     /**
@@ -85,7 +84,8 @@ class ZipFolder
 
     /**
      * ZipFolder constructor.
-     * @param $folder
+     *
+     * @param int $folder
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function __construct($folder)
@@ -128,8 +128,8 @@ class ZipFolder
 
 
     /**
-     * @param $folder
-     * @param $permission
+     * @param int $folder
+     * @param int $permission
      * @return \Schoolbox\Collection|File\Model[]
      */
     private function getResources($folder, $permission)
@@ -142,7 +142,7 @@ class ZipFolder
 
 
     /**
-     * @param $folderId
+     * @param int $folderId
      * @return \Schoolbox\GenericCollection|Folder\Model[]
      */
     private function getFolders($folderId)
@@ -152,7 +152,7 @@ class ZipFolder
 
 
     /**
-     * @param $name
+     * @param string $name
      * @return string|string[]|null
      */
     private function cleanName($name)
@@ -162,7 +162,7 @@ class ZipFolder
 
 
     /**
-     * @param     $fileName
+     * @param string $fileName
      * @param int $depth
      * @return mixed
      */
@@ -179,6 +179,7 @@ class ZipFolder
 
 
     /**
+     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     public function sendZip()
@@ -202,9 +203,9 @@ class ZipFolder
 
 
     /**
-     * @param     $currentDir
-     * @param     $parentFolder
-     * @param     $permission
+     * @param string $currentDir
+     * @param Folder\Model $parentFolder
+     * @param int $permission
      * @param int $depth
      * @throws Exception
      */
@@ -252,6 +253,7 @@ class ZipFolder
 
     /**
      * @return bool
+     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
     public function createZip()
@@ -317,7 +319,7 @@ class ZipFolder
 
 
     /**
-     * @param $path
+     * @param string $path
      */
     private function removeDir($path)
     {
@@ -360,7 +362,7 @@ class ZipFolder
     /**
      * Gets a Group permission level for the given folder
      *
-     * @param $folder_id
+     * @param int $folder_id
      * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
     protected function getPermission($folder_id)
