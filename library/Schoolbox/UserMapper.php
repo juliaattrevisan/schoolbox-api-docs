@@ -183,6 +183,7 @@ class UserMapper extends Mapper
         if ($model->getDisplayGradeGraph() === null) {
             $model->setDisplayGradeGraph((bool)$this->getConfigLoader()->get('display_grade_graph'));
         }
+
         return true;
     }
 
@@ -192,8 +193,6 @@ class UserMapper extends Mapper
      *
      * @param User $model
      * @throws DomainException if community portal isn't set up at all
-     * @throws UnexpectedValueException if community portal wasn't set up properly
-     *                                  (it may be missing an encryption key or something)
      */
     public function updateCommunityPortalPassword(User $model)
     {
@@ -427,38 +426,6 @@ class UserMapper extends Mapper
 
 
     /**
-     * Find a user by their external id and come with roles, campus, etc
-     *
-     * @param array $ids
-     * @return array
-     * @throws \PDOException
-     */
-    public function findCheaplyByExternalIds($ids) {
-
-        $inQuery = implode(',', array_fill(0, count($ids), '?'));
-
-        $query = "
-            SELECT u.id, u.synergy_id
-            FROM `user` u
-            WHERE u.synergy_id IN ({$inQuery}) AND u.deleted_at is null
-        ";
-        $statement = $this->database->prepare($query);
-
-        foreach ($ids as $k => $id)
-            $statement->bindValue(($k+1), $id);
-
-        $statement->execute();
-
-        /** @var User $user */
-        foreach ($statement as $row) {
-            $externals[$row['synergy_id']] = $row['id'];
-        }
-
-        return $externals;
-    }
-
-
-    /**
      * Fetches the user, and all of the user's subjects.
      *
      * @param  int $id
@@ -508,8 +475,6 @@ class UserMapper extends Mapper
 
         foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
-
-            /** @var Role $role */
             $role = $roleMapper->hydrate($row, 'g');
 
             $user->setRole($role);
@@ -520,26 +485,6 @@ class UserMapper extends Mapper
         return $collection;
     }
 
-
-    /**
-     * Fetches a single user ID, for use by GizaUser_DataMapper.
-     *
-     * This is to be @deprecated when the whole User object is stored in the
-     * session, but has been added for now because it's injection safe (unlike
-     * the Giza mappers)
-     *
-     * @param string $username
-     * @return int
-     * @throws \PDOException
-     */
-    public function getIdForUsername($username)
-    {
-        $query = "SELECT `id` FROM `{$this->getTable()}` WHERE `username` = :username";
-        $statement = $this->database->prepare($query);
-        $statement->bindValue('username', $username, \PDO::PARAM_STR);
-        $statement->execute();
-        return $statement->fetchColumn();
-    }
 
     /**
      * Get a user object stub, for when a user does not exist
