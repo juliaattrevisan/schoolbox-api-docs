@@ -5016,11 +5016,6 @@ parameters:
 			path: library/SocialStream/PostMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 48$#"
-			count: 1
-			path: library/SocialStream/PostMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$homepageId\\)\\: Unexpected token \"\\$homepageId\", expected type at offset 68$#"
 			count: 1
 			path: library/SocialStream/Threads.php

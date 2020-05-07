@@ -146,7 +146,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
     /**
      * Custom findById
      *
-     * @param $identifier
+     * @param int $identifier
      * @return SocialStream_Post_Abstract
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
@@ -169,7 +169,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":postId", $identifier);
+        $statement->bindParam(':postId', $identifier);
         $statement->execute();
 
         $row = $statement->fetch();
@@ -446,7 +446,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      */
     public function findChildren($post)
     {
-
         $stmt = $this->database->prepare("
             SELECT
                 {$this->getColumnString('p')}
