@@ -97,11 +97,14 @@
         form.alaressValidate({
             ignore: ':disabled',
             rules: {
-                'heading': {required: true}
+                'heading': {requiredNotBlank: true}
             },
 
             messages: {
-                'heading': {required: 'You must enter a title before you can proceed'}
+                'heading': {
+                    required: 'You must enter a title before you can proceed',
+                    requiredNotBlank: 'You must enter a title before you can proceed'
+                }
             },
 
             submitHandler: function (form) {
