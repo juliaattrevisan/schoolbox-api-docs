@@ -1,18 +1,21 @@
 <?php
 /**
- * SocialStream_Post_Video
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-class SocialStream_Post_Video extends SocialStream_Post_Abstract {
+/**
+ * Class SocialStream_Post_Video
+ */
+class SocialStream_Post_Video extends SocialStream_Post_Abstract
+{
 
     /**
      * @var string
      */
     public const TYPE = 'video';
+
 
     /**
      * SocialStream_Post_Video constructor.
@@ -26,20 +29,22 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
         $this->type = self::TYPE;
     }
 
+
     /**
      * Never render metadata for videos
      *
-     * @param $curl
+     * @param \Alaress_Curl_Url $curl
      */
     public function spawnMetadata($curl) {
     }
+
 
     /**
      * Contextually render thumbnail images
      *
      * @param string   $context
      * @param SitePage $page
-     * @return bool|mixed
+     * @return bool
      */
     public function renderThumbnail(string $context, SitePage $page) {
         $chain = new \SocialStream\Post\Player\Chain($this->getUrl());
