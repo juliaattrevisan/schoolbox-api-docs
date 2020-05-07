@@ -1,12 +1,9 @@
 <?php
 /**
- * PostMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace SocialStream;
 
 use Alaress\Async\Notification\Instance\Instance;
@@ -17,6 +14,11 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
+/**
+ * Class PostMapper
+ *
+ * @package SocialStream
+ */
 class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Schoolbox\IHomepageCleanable
 {
 
@@ -149,7 +151,8 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
      * @throws Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
+     * @throws Schoolbox\Mapper\Exception\NotFound
+     * @throws \PDOException
      */
     public function findById($identifier): \SocialStream_Post_Abstract
     {
@@ -192,6 +195,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      *
      * @param int $homepageId
      * @return mixed
+     * @throws \PDOException
      */
     public function findCount(int $homepageId)
     {
@@ -224,7 +228,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @return Collection
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function findLatestForHomepage(int $homepageId, int $start, int $offset): Collection
     {
@@ -288,7 +292,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @return Collection
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function findLatestForHomepageSlow(int $homepageId, int $end, int $offset): Collection
     {
@@ -341,7 +345,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @return Collection
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function findHierarchy(array $ids)
     {
@@ -384,7 +388,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      *
      * @param array $row
      * @return SocialStream_Post_Abstract
-     * @throws \UnexpectedValueException
      */
     public function createModel($row = null): \SocialStream_Post_Abstract
     {
@@ -409,7 +412,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @param string   $alias
      * @param callable $callback
      * @return SocialStream_Post_Abstract
-     * @throws \UnexpectedValueException
      */
     public function hydrate(array $row, $alias = '', $callback = null): \SocialStream_Post_Abstract
     {
@@ -440,7 +442,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      *
      * @param SocialStream_Post_Abstract $post
      * @return Collection|SocialStream_Post_Abstract[]
-     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function findChildren($post)
     {
@@ -476,11 +478,12 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
      * @return \Schoolbox\Collection|Instance[]
      * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = date('Y-m-d H:i:s', $time ?: time());
+        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getDatabase();
 
         $limit = (int)$limit;
         $offset = (int)$offset;
@@ -510,7 +513,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
         $c = $this->createCollection();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var SocialStream_Post_Abstract $post */
             $post = $this->hydrate($r, 'p');
             $post->setOwner($ownerMapper->hydrate($r, 'u'));
             $c->add($post);
