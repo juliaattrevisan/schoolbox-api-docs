@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Video;
 
 use Component\Eportfolio\FileListMapper;
@@ -20,10 +19,18 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
+/**
+ * Class ResourceVideoMapper
+ *
+ * @package Schoolbox\Video
+ */
 class ResourceVideoMapper extends Mapper
 {
+
     /**
      * @return void
+     * @throws Mapper\DefinitionException
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -58,14 +65,14 @@ class ResourceVideoMapper extends Mapper
     /**
      * Find videos for a particular category
      *
-     * @param int        $category The category to search
-     * @param array      $options  sort, sortdir, mime, getHidden
-     * @param int|null   $limit
-     *
+     * @param int      $category The category to search
+     * @param array    $options  sort, sortdir, mime, getHidden
+     * @param int|null $limit
      * @return Collection|ResourceVideo[]
      * @throws MapperException
      * @throws Mapper\DefinitionException
      * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function findByCategory(int $category, array $options, ?int $limit = Component_Config_Size::SIZE_ALL): Collection
     {
@@ -73,8 +80,8 @@ class ResourceVideoMapper extends Mapper
         $fileMapper = FileMapper::getInstance();
 
         $query = "
-            SELECT    {$this->getJoinMapper('file')->getColumnString('f')}, 
-                      {$this->getColumnString('vq')}, 
+            SELECT    {$this->getJoinMapper('file')->getColumnString('f')},
+                      {$this->getColumnString('vq')},
                       {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
             FROM      `{$this->getTable()}` vq
             JOIN      {$this->getJoinSQL('file', 'vq', 'f')}
@@ -82,8 +89,8 @@ class ResourceVideoMapper extends Mapper
             JOIN      storage s ON s.hash = f.hash
             JOIN      allowedFileExtension e ON s.ext = e.extension
             JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
-            WHERE     category = :cat AND 
-                      vq.status != 'failed' AND 
+            WHERE     category = :cat AND
+                      vq.status != 'failed' AND
                       ft.mime like :mime
         ";
 
@@ -145,15 +152,17 @@ class ResourceVideoMapper extends Mapper
         return $videoList;
     }
 
+
     /**
      * Find videos for a particular MyFiles user
      *
      * @param      $pageId
      * @param      $options
      * @param bool $limit
-     *
      * @return Collection
      * @throws MapperException
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
     public function findByEportfolioPage($pageId, $options, $limit = false)
     {
@@ -224,9 +233,11 @@ class ResourceVideoMapper extends Mapper
 
     /**
      * @param $id
-     *
      * @return ResourceVideo
      * @throws MapperException
+     * @throws MapperException\NotFound
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
     public function findByFileId($id)
     {
@@ -255,6 +266,7 @@ class ResourceVideoMapper extends Mapper
 
     }
 
+
     /**
      * Find a video in the MyFile table
      *
@@ -262,7 +274,9 @@ class ResourceVideoMapper extends Mapper
      *
      * @return ResourceVideo
      * @throws MapperException
-     *
+     * @throws MapperException\NotFound
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      * @deprecated
      */
     public function findByMyFileId($id)
@@ -297,28 +311,31 @@ class ResourceVideoMapper extends Mapper
         return $video;
     }
 
+
     /**
      * Like findByStorageId() except it accepts a brownhole hash instead of a
      * brownhole storage ID.
      *
-     * @throws MapperException if no video with this hash was found
-     *
-     * @param  string $hash
+     * @param string $hash
      *
      * @return ResourceVideo
+     * @throws MapperException if no video with this hash was found
+     * @throws MapperException\NotFound
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
     public function findByStorageHash($hash)
     {
         $storageMapper = $this->getJoinMapper('storage');
 
         $sql = "
-            SELECT      {$storageMapper->getColumnString('s')}, 
+            SELECT      {$storageMapper->getColumnString('s')},
                         {$this->getColumnString('vq')},
                         {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        `{$this->getTable()}` vq
             JOIN        {$this->getJoinSQL('storage', 'vq', 's')}
             LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
-            WHERE       s.hash = ? AND 
+            WHERE       s.hash = ? AND
                         vq.status != 'failed'
         ";
 
