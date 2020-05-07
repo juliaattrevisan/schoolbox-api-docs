@@ -1,7 +1,5 @@
 <?php
 /**
- * SocialStream_Post_Url
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,6 +7,9 @@
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\MimetypeMapper;
 
+/**
+ * Class SocialStream_Post_Url
+ */
 class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
     /**
@@ -32,7 +33,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      * Determine whether this should display an icon or something
      * via the image transform
      *
-     * @param $iconSize
+     * @param string $iconSize
      * @return string
      */
     public function determineIcon($iconSize = 'square64'): string
