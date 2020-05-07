@@ -5021,26 +5021,6 @@ parameters:
 			path: library/SocialStream/Post/Metadata/OpenGraph.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 56$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Player.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 35$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Player.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$next\\)\\: Unexpected token \"\\$next\", expected type at offset 33$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Player.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 31$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Player.php
-
-		-
 			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Player/Resource.php
