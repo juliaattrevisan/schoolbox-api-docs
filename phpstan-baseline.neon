@@ -4981,21 +4981,6 @@ parameters:
 			path: library/Schoolbox/WebDav/Rules/Tokenizer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 70$#"
-			count: 1
-			path: library/Schoolbox/WebDav/SubjectServer/Server.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 92$#"
-			count: 1
-			path: library/Schoolbox/WebDav/SubjectServer/Server.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 158$#"
-			count: 1
-			path: library/Schoolbox/WebDav/SubjectServer/Server.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$text\\)\\: Unexpected token \"\\$text\", expected type at offset 120$#"
 			count: 1
 			path: library/Scrub.php

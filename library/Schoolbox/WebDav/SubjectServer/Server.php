@@ -83,7 +83,7 @@ class Server extends DAV\Collection
     /**
      * Constructor
      *
-     * @param                           $name
+     * @param string                    $name
      * @param callable                  $userSource
      * @param AssessmentDataSource      $assessmentDataSource
      * @param StorageDataSource         $storageDataSource
@@ -127,7 +127,7 @@ class Server extends DAV\Collection
     /**
      * Is this subject list a direct descendant of the given path?
      *
-     * @param $path
+     * @param string $path
      * @return bool
      */
     private function isThisDirectChildOfPath($path)
@@ -143,7 +143,7 @@ class Server extends DAV\Collection
      * Gets the parts of the given path, used by isThisDirectChildOfPath() to
      * determine whether this item is in another path.
      *
-     * @param $path
+     * @param string $path
      * @return array
      */
     private function getPathParts($path)
