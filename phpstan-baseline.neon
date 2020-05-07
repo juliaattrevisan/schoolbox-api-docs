@@ -5046,21 +5046,6 @@ parameters:
 			path: library/Wiki.php
 
 		-
-			message: "#^Cannot call method init\\(\\) on null\\.$#"
-			count: 1
-			path: library/Xml.php
-
-		-
-			message: "#^Cannot call method load\\(\\) on null\\.$#"
-			count: 1
-			path: library/Xml.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\r\\\\n     \", expected type at offset 86$#"
-			count: 1
-			path: library/Xml.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: tools/assessment/csv.php
