@@ -5211,11 +5211,6 @@ parameters:
 			path: tools/mq/schedule-safe-restart.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ttl\\)\\: Unexpected token \"\\$ttl\", expected type at offset 63$#"
-			count: 1
-			path: tools/notif/add-msg-to-object-queue.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$opts\\.$#"
 			count: 1
 			path: tools/notif/route/routed.php
