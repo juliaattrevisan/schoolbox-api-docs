@@ -5036,77 +5036,12 @@ parameters:
 			path: library/User.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$wikiID\\)\\: Unexpected token \"\\$wikiID\", expected type at offset 153$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$wikiID\\)\\: Unexpected token \"\\$wikiID\", expected type at offset 55$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$wikiID\\)\\: Unexpected token \"\\$wikiID\", expected type at offset 96$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 143$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 80$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 214$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
 			message: "#^Variable \\$coreData might not be defined\\.$#"
 			count: 1
 			path: library/Wiki.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$revisionID\\)\\: Unexpected token \"\\$revisionID\", expected type at offset 40$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$wikiID\\)\\: Unexpected token \"\\$wikiID\", expected type at offset 18$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$wikiID\\)\\: Unexpected token \"\\$wikiID\", expected type at offset 78$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$keyword\\)\\: Unexpected token \"\\$keyword\", expected type at offset 25$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
 			message: "#^Variable \\$user in PHPDoc tag @var does not match assigned variable \\$keyword\\.$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$body\\)\\: Unexpected token \"\\$body\", expected type at offset 58$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$categoryID\\)\\: Unexpected token \"\\$categoryID\", expected type at offset 134$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$slug\\)\\: Unexpected token \"\\$slug\", expected type at offset 164$#"
 			count: 1
 			path: library/Wiki.php
 
