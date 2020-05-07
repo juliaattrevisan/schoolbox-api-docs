@@ -4956,11 +4956,6 @@ parameters:
 			path: library/Schoolbox/Weather/WeatherstackClient.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 58$#"
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
 			message: "#^Variable \\$result in PHPDoc tag @var does not match assigned variable \\$realname\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/FileServer/Folder.php

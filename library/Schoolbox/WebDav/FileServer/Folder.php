@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\WebDav\FileServer;
 
 use Sabre\DAV;
@@ -20,23 +19,40 @@ use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
 
 /**
+ * Class Folder
+ *
  * A WebDAV node that represents a folder within the Schoolbox file system.
+ *
+ * @package Schoolbox\WebDav\FileServer
  */
 class Folder extends DAV\Collection
 {
     use HasUserSource;
 
-    /** @var FolderModel */
+
+    /**
+     * @var FolderModel
+     */
     private $folder;
 
-    /** @var FileMapper */
+
+    /**
+     * @var FileMapper
+     */
     private $fileMapper;
 
-    /** @var Access */
+
+    /**
+     * @var Access
+     */
     private $accessor;
 
-    /** @var FolderMapper */
+
+    /**
+     * @var FolderMapper
+     */
     private $folderMapper;
+
 
     /**
      * A storage mapper
@@ -45,10 +61,12 @@ class Folder extends DAV\Collection
      */
     private $storageMapper;
 
+
     /**
      * @var SubjectList
      */
     private $subjectList;
+
 
     /**
      * Requested folder path string
@@ -60,12 +78,13 @@ class Folder extends DAV\Collection
     /**
      * Constructor
      *
-     * @param               $path
+     * @param string        $path
      * @param callable      $userSource
      * @param FolderMapper  $folderMapper
      * @param FileMapper    $fileMapper
      * @param StorageMapper $storageMapper
      * @param Access        $accessor
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function __construct(
         $path,
@@ -82,10 +101,8 @@ class Folder extends DAV\Collection
         $this->setUserSource($userSource);
         $this->setPath($path);
         $this->setFolderFromPath($path);
-
-//        // Name may be configurable later on.
-//        $this->subject_list = new DAV_SubjectServer_SubjectList('My Subjects');
     }
+
 
     /**
      * Injects a preconfigured subject list into this folder.
@@ -99,8 +116,13 @@ class Folder extends DAV\Collection
         return $this;
     }
 
+
     /**
      * @return DAV\INode[]
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function getChildren()
     {
@@ -157,8 +179,8 @@ class Folder extends DAV\Collection
     /**
      * Sort callback for children.
      *
-     * @param DAV\INode  $child1
-     * @param DAV\INode  $child2
+     * @param DAV\INode $child1
+     * @param DAV\INode $child2
      *
      * @return int
      */
@@ -174,9 +196,13 @@ class Folder extends DAV\Collection
      * Checks if name refers to a folder it then returns a folder object otherwise searches for a file in the current path
      *
      * @param string $name
+     * @return DAV\INode
      * @throws DAV\Exception\Forbidden
      * @throws DAV\Exception\NotFound
-     * @return DAV\INode
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function getChild($name)
     {
@@ -206,7 +232,6 @@ class Folder extends DAV\Collection
                 $this->getStorageMapper(),
                 $this->getAccessor()
             );
-
         } else {
 
             /** @var Collection|FileModel[] $result */
@@ -231,7 +256,6 @@ class Folder extends DAV\Collection
                 throw new DAV\Exception\NotFound('The file with name "' . $name . '" could not be found');
             }
         }
-
     }
 
 
@@ -247,7 +271,6 @@ class Folder extends DAV\Collection
     {
         if ($this->isFolder($name, $this->getFolderID())) {
             return true;
-
         } else {
             $realname = pathinfo($name,PATHINFO_FILENAME);
 
@@ -259,10 +282,16 @@ class Folder extends DAV\Collection
         return false;
     }
 
+
     /**
      * Delete a folder
      * @return void
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function delete()
     {
@@ -280,6 +309,12 @@ class Folder extends DAV\Collection
      * @param resource $data
      * @return void
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\File\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function createFile($name, $data = null)
     {
@@ -326,6 +361,11 @@ class Folder extends DAV\Collection
      *
      * @param string $newName
      * @throws DAV\Exception\Forbidden
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function setName($newName)
     {
@@ -338,6 +378,7 @@ class Folder extends DAV\Collection
             throw new DAV\Exception\Forbidden('Permission denied to modify directory');
         }
     }
+
 
     /**
      * Determine if $name is a folder
@@ -372,6 +413,7 @@ class Folder extends DAV\Collection
 
     /**
      * @param string $path
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function setFolderFromPath($path)
     {
