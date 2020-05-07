@@ -5006,16 +5006,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$curl\\)\\: Unexpected token \"\\$curl\", expected type at offset 195$#"
-			count: 1
-			path: library/SocialStream/Post/Thumbnail/Chain.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 212$#"
-			count: 1
-			path: library/SocialStream/Post/Thumbnail/Chain.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$iconSize\\)\\: Unexpected token \"\\$iconSize\", expected type at offset 122$#"
 			count: 1
 			path: library/SocialStream/Post/Url.php
