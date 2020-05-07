@@ -171,19 +171,23 @@ class UserBulkMapper extends UserMapper
     /**
      * Mass Modify 3
      *
-     * @param User $user
-     * @param      $allCampusIds
-     * @param      $roleId
-     * @param      $year
-     * @param      $eportfolioEnabled
-     * @param      $emailFromUsername
-     * @param      $externalMailClient
-     * @param      $webmail
-     * @param      $enabled
-     * @param      $hideContacts
-     * @param      $hideTimetable
-     * @param      $positionTitle
-     * @param      $displayGradeGraph
+     * @param User   $user
+     * @param array  $allCampusIds
+     * @param int    $roleId
+     * @param string $year
+     * @param string $eportfolioEnabled
+     * @param string $emailFromUsername
+     * @param string $externalMailClient
+     * @param string $webmail
+     * @param string $enabled
+     * @param string $hideContacts
+     * @param string $hideTimetable
+     * @param string $positionTitle
+     * @param string $displayGradeGraph
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function bulkModifyUpdate(
         User $user,
@@ -230,6 +234,12 @@ class UserBulkMapper extends UserMapper
         if (strlen($newPositionTitle)) {
             $user->setPositionTitle($newPositionTitle);
         }
+
+        /* TODO: Instead of comparing to an int self::UNCHANGED, these should compare against null
+         *  to avoid you having to mix data types in comparisons. In this old place everything came
+         *  from a form, which means their data types are typically strings, preventing you from
+         *  using typesafe comparisons.
+         */
 
         /* Update eportfolio settings
          */
