@@ -6,8 +6,6 @@
  */
 namespace SocialStream\Post\Player;
 
-use SocialStream\Post\Metadata\Metadata;
-
 /**
  * Class Thumbnail
  *
@@ -27,7 +25,7 @@ abstract class Player
     /**
      * Next class to deal with the problem
      *
-     * @var Metadata
+     * @var Player
      */
     protected $next;
 
@@ -45,7 +43,7 @@ abstract class Player
     /**
      * Subclasses define how to fetch thumbnails
      *
-     * @return string
+     * @return string|null
      */
     abstract public function fetchThumbnail();
 
@@ -56,7 +54,7 @@ abstract class Player
     /**
      * Set next
      *
-     * @param Metadata $next
+     * @param Player $next
      */
     public function setNext($next) {
         $this->next = $next;
@@ -65,7 +63,7 @@ abstract class Player
     /**
      * Get next
      *
-     * @return Metadata|null
+     * @return Player|null
      */
     public function getNext() {
         return $this->next;

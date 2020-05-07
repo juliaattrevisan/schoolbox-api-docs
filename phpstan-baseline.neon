@@ -5006,31 +5006,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Resource.php
-
-		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Storage.php
-
-		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Ted.php
-
-		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Vimeo.php
-
-		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Player/Youtube.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$curl\\)\\: Unexpected token \"\\$curl\", expected type at offset 195$#"
 			count: 1
 			path: library/SocialStream/Post/Thumbnail/Chain.php
@@ -5056,17 +5031,7 @@ parameters:
 			path: library/SocialStream/Post/Video/Chain.php
 
 		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Video/Resource.php
-
-		-
 			message: "#^Variable \\$video in PHPDoc tag @var does not match assigned variable \\$storage\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Video/Storage.php
-
-		-
-			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Video/Storage.php
 
