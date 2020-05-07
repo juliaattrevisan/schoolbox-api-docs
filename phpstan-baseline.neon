@@ -5006,21 +5006,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^Cannot call method fetchMetadata\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/MetaTag.php
-
-		-
-			message: "#^Cannot call method query\\(\\) on string\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/MetaTag.php
-
-		-
-			message: "#^Cannot call method fetchMetadata\\(\\) on bool\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/OpenGraph.php
-
-		-
 			message: "#^Cannot call method fetchThumbnail\\(\\) on bool\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Player/Resource.php

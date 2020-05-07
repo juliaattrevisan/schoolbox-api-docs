@@ -41,6 +41,7 @@ abstract class Player
         $this->setUrl($url);
     }
 
+
     /**
      * Subclasses define how to fetch thumbnails
      *
