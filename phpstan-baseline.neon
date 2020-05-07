@@ -5136,11 +5136,6 @@ parameters:
 			path: tools/markbook/sync.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$folderId\\)\\: Unexpected token \"\\$folderId\", expected type at offset 144$#"
-			count: 1
-			path: tools/markbook/sync.php
-
-		-
 			message: "#^Function traverse not found\\.$#"
 			count: 2
 			path: tools/markbook/sync.php
