@@ -5016,51 +5016,6 @@ parameters:
 			path: library/SocialStream/Post/Metadata/MetaTag.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 56$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 51$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$xml\\)\\: Unexpected token \"\\$xml\", expected type at offset 35$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$allowableAttributes\\)\\: Unexpected token \"\\$allowableAttributes\", expected type at offset 96$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$query\\)\\: Unexpected token \"\\$query\", expected type at offset 78$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^Cannot call method query\\(\\) on string\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^Method SocialStream\\\\Post\\\\Metadata\\\\Metadata\\:\\:analyse\\(\\) should return string but return statement is missing\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$next\\)\\: Unexpected token \"\\$next\", expected type at offset 33$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 31$#"
-			count: 1
-			path: library/SocialStream/Post/Metadata/Metadata.php
-
-		-
 			message: "#^Cannot call method fetchMetadata\\(\\) on bool\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Metadata/OpenGraph.php
