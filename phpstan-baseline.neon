@@ -5026,26 +5026,6 @@ parameters:
 			path: library/SocialStream/Threads.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 97$#"
-			count: 1
-			path: library/Survey/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 75$#"
-			count: 1
-			path: library/Survey/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 96$#"
-			count: 1
-			path: library/Survey/Answer/Multi.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$question_id\\)\\: Unexpected token \"\\$question_id\", expected type at offset 117$#"
-			count: 1
-			path: library/Survey/Answer/Multi.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 85$#"
 			count: 1
 			path: library/Survey/Answer/MultiOther.php

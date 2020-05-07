@@ -11,17 +11,26 @@
  */
 class Survey_Answer_Multi extends Evaluation_Answer_Multi
 {
+
+    /**
+     * @var string
+     */
     protected $graphTemplateFile = 'survey/answer/multi/graph.html';
 
-    /* Use this to toggle between letters and actual answers
+
+    /**
+     * Use this to toggle between letters and actual answers
+     *
+     * @var bool
      */
     protected $useLongAnswers = true;
+
 
     /**
      * Graph the results for this answer type
      *
-     * @param  $page
-     * @param  $currentQuestion
+     * @param SitePage $page
+     * @param array $currentQuestion
      * @return void
      */
     public function graphResults($page, $currentQuestion)
@@ -29,6 +38,7 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi
         $graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
         $graph->graph();
     }
+
 
     /**
      * Get the css class to use for incorrect responses
@@ -40,6 +50,7 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi
     {
         return $this->correctClass;
     }
+
 
     /**
      * @inheritdoc
@@ -53,11 +64,12 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi
         ));
     }
 
+
     /**
      * Configure mandatoryness and other settings for this response
      *
-     * @param $page
-     * @param $question_id
+     * @param SitePage $page
+     * @param int $question_id
      */
     protected function configureResponse($page, $question_id)
     {
