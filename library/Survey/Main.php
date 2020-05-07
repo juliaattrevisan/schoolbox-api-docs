@@ -1,6 +1,9 @@
 <?php
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Permission\Access\UserAccess;
+
 /**
- * Survey
+ * Class Survey_Main
  *
  * Class for Surveys
  *
@@ -38,19 +41,17 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Permission\Access\UserAccess;
-
 class Survey_Main extends Evaluation_Main
 {
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
     const UNLIMITED_DURATION = -1;
 
+
     /**
      * Determines whether the current user can take a test by checking which
      * categories the current user belongs to.
      *
-     * @param  $assess_id
+     * @param int $assess_id
      * @return bool
      */
     public function canDoAssessment($assess_id)
@@ -58,17 +59,14 @@ class Survey_Main extends Evaluation_Main
         $groupHandler = new Group();
         $assess = $this->getByID($assess_id);
 
-        if ($groupHandler->getPermission($assess['category_id']) >= UserAccess::ACCESS_READ) {
-            return true;
-        }
-
-        return false;
+        return $groupHandler->getPermission($assess['category_id']) >= UserAccess::ACCESS_READ;
     }
+
 
     /**
      * A list of assessments available for a category
      *
-     * @param  $category_id
+     * @param int|array $category_id
      * @param bool $limit
      * @return array|bool
      */
@@ -99,10 +97,11 @@ class Survey_Main extends Evaluation_Main
         return $this->db->getAll($query);
     }
 
+
     /**
      * Soft-deletes content
      *
-     * @param  $category_id
+     * @param int $category_id
      * @return void
      */
     public function homepageClean($category_id)
@@ -114,15 +113,15 @@ class Survey_Main extends Evaluation_Main
         if (is_array($allAssess) && count($allAssess)) {
 
             /* Get a list of questions and answers to softdelete
-                */
+             */
             $assessHandler = new Survey_Main();
             $questionHandler = new Survey_Question();
             $answerHandler = new Survey_Answer();
             $sectionHandler = new Survey_Section();
 
             /* Shamelessly stolen from delete.php and squished
-                * into position here
-                */
+             * into position here
+             */
             foreach ($allAssess as $currentAssess) {
                 $sectionList = $sectionHandler->getList($currentAssess['assess_id']);
 
@@ -155,7 +154,7 @@ class Survey_Main extends Evaluation_Main
                 }
 
                 /* Remove assess
-                     */
+                 */
                 $assessHandler->update(array(
                     'assess_id' => $currentAssess['assess_id'],
                     'deleted_at' => 'NOW()'
@@ -163,6 +162,7 @@ class Survey_Main extends Evaluation_Main
             }
         }
     }
+
 
     /**
      * @return string

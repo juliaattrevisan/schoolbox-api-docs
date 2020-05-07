@@ -5056,21 +5056,6 @@ parameters:
 			path: library/Survey/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$assess_id\\)\\: Unexpected token \"\\$assess_id\", expected type at offset 154$#"
-			count: 1
-			path: library/Survey/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 83$#"
-			count: 1
-			path: library/Survey/Main.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$category_id\\)\\: Unexpected token \"\\$category_id\", expected type at offset 57$#"
-			count: 1
-			path: library/Survey/Main.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$cid\\)\\: Unexpected token \"\\$cid\", expected type at offset 83$#"
 			count: 1
 			path: library/TextBox.php
