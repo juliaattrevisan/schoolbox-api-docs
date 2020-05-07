@@ -4991,16 +4991,6 @@ parameters:
 			path: library/SocialStream/Authenticator.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$filename\\)\\: Unexpected token \"\\$filename\", expected type at offset 98$#"
-			count: 1
-			path: library/SocialStream/Cache/Filesystem.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 119$#"
-			count: 1
-			path: library/SocialStream/Cache/Filesystem.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 73$#"
 			count: 1
 			path: library/SocialStream/Cache/Original.php
