@@ -141,7 +141,6 @@ class Original extends \Alaress_Cache_Abstract
         $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         if ($urlDetection->isLocalUrl()) {
-
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
                 $this->file = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
@@ -158,7 +157,7 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * Process url using fopen in the usual way
      *
-     * @param $url
+     * @param string $url
      * @return bool
      * @throws \PDOException
      * @throws \Schoolbox\File\Exception
