@@ -143,7 +143,6 @@ class ResourceVideoMapper extends Mapper
             if ($row['u.id']) {
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->hydrate($row, 'u'));
             } else {
-                /** @noinspection PhpUndefinedMethodInspection */
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
             $videoList->add($video);
@@ -156,8 +155,8 @@ class ResourceVideoMapper extends Mapper
     /**
      * Find videos for a particular MyFiles user
      *
-     * @param      $pageId
-     * @param      $options
+     * @param int $pageId
+     * @param array $options
      * @param bool $limit
      * @return Collection
      * @throws MapperException
@@ -201,7 +200,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if ($limit != false) {
-            $query .= "LIMIT 0,:lim";
+            $query .= 'LIMIT 0,:lim';
         }
 
         $statement = $this->database->prepare($query);
@@ -220,7 +219,6 @@ class ResourceVideoMapper extends Mapper
             if ($row['o.id']) {
                 $video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->hydrate($row, 'o'));
             } else {
-                /** @noinspection PhpUndefinedMethodInspection */
                 $video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->getUnknownUser());
             }
 
@@ -232,7 +230,7 @@ class ResourceVideoMapper extends Mapper
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return ResourceVideo
      * @throws MapperException
      * @throws MapperException\NotFound
@@ -270,7 +268,7 @@ class ResourceVideoMapper extends Mapper
     /**
      * Find a video in the MyFile table
      *
-     * @param $id
+     * @param int $id
      *
      * @return ResourceVideo
      * @throws MapperException

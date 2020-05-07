@@ -4956,26 +4956,6 @@ parameters:
 			path: library/Schoolbox/Video/ResourceVideoMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$options\\)\\: Unexpected token \"\\$options\", expected type at offset 106$#"
-			count: 1
-			path: library/Schoolbox/Video/ResourceVideoMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageId\\)\\: Unexpected token \"\\$pageId\", expected type at offset 79$#"
-			count: 1
-			path: library/Schoolbox/Video/ResourceVideoMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 18$#"
-			count: 1
-			path: library/Schoolbox/Video/ResourceVideoMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/Video/ResourceVideoMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(object &\\$object Instantiated object that we will run method on\\.\\)\\: Unexpected token \"&\", expected variable at offset 81$#"
 			count: 1
 			path: library/Schoolbox/Video/Test/QueueTest.php
