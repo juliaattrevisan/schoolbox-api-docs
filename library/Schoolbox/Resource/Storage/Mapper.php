@@ -105,7 +105,7 @@ class Mapper extends BaseMapper implements Receiver
             });
         }
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, self::CALLBACK_POSTSAVE]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
 
