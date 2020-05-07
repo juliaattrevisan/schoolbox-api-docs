@@ -1,14 +1,9 @@
 <?php
 /**
- * Factory
- *
- * Spawn a video object based on its type and identifier
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Mapper\Exception as MapperException;
@@ -19,55 +14,67 @@ use \Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 
-abstract class Base {
+/**
+ * Class Base
+ *
+ * Spawn a video object based on its type and identifier
+ *
+ * @package Schoolbox\Video\Factory
+ */
+abstract class Base
+{
 
-	/**
-	 * Folder permission access
-	 *
-	 * @var Access
-	 */
-	protected $access = null;
+    /**
+     * Folder permission access
+     *
+     * @var Access
+     */
+    protected $access = null;
 
-	/**
-	 * The type of video (submission, sbfs, storage etc)
-	 *
-	 * @var string
-	 */
-	protected $type = '';
 
-	/**
-	 * The identifier of the file (could be a hash or numeric index)
-	 *
-	 * @var string
-	 */
-	protected $id = '';
+    /**
+     * The type of video (submission, sbfs, storage etc)
+     *
+     * @var string
+     */
+    protected $type = '';
 
-	/**
-	 * Constructor
-	 *
-	 * @param $id
-	 * @param $type
-	 */
-	public function __construct($id, $type) {
-		$this->setAccess(Access::getInstance());
-		$this->setType($type);
-		$this->setId($id);
-	}
 
-	/**
-	 * Spawn a video object
-	 *
-	 * @return ResourceVideo
-	 * @throws MapperException
-	 */
-	public function produce() {
-		$videoMapper = new ResourceVideoMapper();
+    /**
+     * The identifier of the file (could be a hash or numeric index)
+     *
+     * @var string
+     */
+    protected $id = '';
 
-		switch($this->getType()) {
-			case QueueMapper::FILE_TYPE_STORAGE:
-				return $videoMapper->findByStorageHash($this->getId());
 
-			case QueueMapper::FILE_TYPE_SBFS:
+    /**
+     * Constructor
+     *
+     * @param $id
+     * @param $type
+     */
+    public function __construct($id, $type) {
+        $this->setAccess(Access::getInstance());
+        $this->setType($type);
+        $this->setId($id);
+    }
+
+
+    /**
+     * Spawn a video object
+     *
+     * @return ResourceVideo
+     * @throws MapperException
+     */
+    public function produce() {
+        $videoMapper = new ResourceVideoMapper();
+
+        switch($this->getType()) {
+            case QueueMapper::FILE_TYPE_STORAGE:
+                return $videoMapper->findByStorageHash($this->getId());
+
+            case QueueMapper::FILE_TYPE_SBFS:
 
                 // For SBFS we must first load file, then resolve the hash
                 $file = FileMapper::getInstance()->findById($this->getId());
@@ -75,24 +82,27 @@ abstract class Base {
 
                 return $videoMapper->findByStorageHash($file->getHash());
 
-			case QueueMapper::FILE_TYPE_SUBMISSION:
+            case QueueMapper::FILE_TYPE_SUBMISSION:
                 return $videoMapper->findByStorageHash($this->getId());
 
-			case QueueMapper::FILE_TYPE_MYFILE:
+            case QueueMapper::FILE_TYPE_MYFILE:
 
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
 
                 return $videoMapper->findByStorageHash($file->getHash());
-		}
+        }
 
         throw new MapperException\NotFound();
-	}
+    }
 
-	/**
-	 * Permission check prior to instantiation
-	 */
-	abstract protected function permissionCheck($video);
+
+    /**
+     * Permission check prior to instantiation
+     * @param $video
+     */
+    abstract protected function permissionCheck($video);
+
 
     /**
      * @return Access
@@ -101,6 +111,7 @@ abstract class Base {
     {
         return $this->access;
     }
+
 
     /**
      * @param Access $access
@@ -111,39 +122,42 @@ abstract class Base {
     }
 
 
-	/**
-	 * Set id
-	 *
-	 * @param string $id
-	 */
-	protected function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Set id
+     *
+     * @param string $id
+     */
+    protected function setId($id) {
+        $this->id = $id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return string
-	 */
-	protected function getId() {
-		return $this->id;
-	}
 
-	/**
-	 * Set type
-	 *
-	 * @param string $type
-	 */
-	protected function setType($type) {
-		$this->type = $type;
-	}
+    /**
+     * Get id
+     *
+     * @return string
+     */
+    protected function getId() {
+        return $this->id;
+    }
 
-	/**
-	 * Get type
-	 *
-	 * @return string
-	 */
-	protected function getType() {
-		return $this->type;
-	}
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    protected function setType($type) {
+        $this->type = $type;
+    }
+
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    protected function getType() {
+        return $this->type;
+    }
 }
