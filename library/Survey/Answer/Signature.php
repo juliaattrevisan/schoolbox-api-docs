@@ -11,17 +11,26 @@
  */
 class Survey_Answer_Signature extends Evaluation_Answer_Signature
 {
+
+    /**
+     * @var string
+     */
     protected $graphTemplateFile = 'survey/answer/signature/graph.html';
 
-    /* Use this to toggle between letters and actual answers
+
+    /**
+     * Use this to toggle between letters and actual answers
+     *
+     * @var bool
      */
     protected $useLongAnswers = true;
+
 
     /**
      * Graph the results for this answer type
      *
-     * @param  $page
-     * @param  $currentQuestion
+     * @param SitePage $page
+     * @param array $currentQuestion
      * @return void
      */
     public function graphResults($page, $currentQuestion)
@@ -33,15 +42,16 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         $page->parse('graph_block', $componentHandle);
     }
 
+
     /**
      * Generate signature representation differently for some screens and
      * for the csv file itself. The CSV file probably won't benefit from
      * having a numerical representation of svg graphics, so it uses
      * the states "Signed" and "Unsigned", whereas this draws the sig itself
      *
-     * @param $attempt_id
-     * @param $question_id
-     * @return mixed
+     * @param int $attempt_id
+     * @param int $question_id
+     * @return array
      */
     public function resultsForQuestion($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
@@ -77,12 +87,12 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         return $data;
     }
 
+
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
-     *
+     * @param int $attempt_id
+     * @param int $question_id
      * @return array
      */
     public function exportResponseToCSV($attempt_id, $question_id)
@@ -108,6 +118,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
 
         return $data;
     }
+
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -150,13 +161,14 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         $page->parse('answerOption_block', 'answerOption', true);
     }
 
+
     /**
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
@@ -180,6 +192,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         );
     }
 
+
     /**
      * @inheritdoc
      */
@@ -193,6 +206,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
             )
         );
     }
+
 
     /**
      * Configure question/configure answer during creation/modification
@@ -229,11 +243,12 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         }
     }
 
+
     /**
      * Configure mandatoryness and other settings for this response
      *
-     * @param $page
-     * @param $question_id
+     * @param SitePage $page
+     * @param int $question_id
      */
     protected function configureResponse($page, $question_id)
     {
