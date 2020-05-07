@@ -76,7 +76,7 @@ class File extends DAV\File
     /**
      * Constructor
      *
-     * @param               $path
+     * @param string        $path
      * @param callable      $userSource
      * @param FolderMapper  $folderMapper
      * @param FileMapper    $fileMapper

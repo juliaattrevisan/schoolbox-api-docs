@@ -4958,11 +4958,6 @@ parameters:
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 58$#"
 			count: 1
-			path: library/Schoolbox/WebDav/FileServer/File.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$path\\)\\: Unexpected token \"\\$path\", expected type at offset 58$#"
-			count: 1
 			path: library/Schoolbox/WebDav/FileServer/Folder.php
 
 		-
