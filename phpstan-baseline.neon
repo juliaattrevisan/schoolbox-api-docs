@@ -5271,11 +5271,6 @@ parameters:
 			path: tools/socket/socketd.php
 
 		-
-			message: "#^Access to undefined constant Schoolbox\\\\External\\\\Importer\\\\Endpoint\\\\Specification\\\\CliRenderer\\:\\:STATUS_EMPTY\\.$#"
-			count: 2
-			path: tools/synchronise/suds/kamar/specification.php
-
-		-
 			message: "#^Call to an undefined method League\\\\Flysystem\\\\FilesystemInterface\\:\\:getAdapter\\(\\)\\.$#"
 			count: 1
 			path: tools/video/processor.php

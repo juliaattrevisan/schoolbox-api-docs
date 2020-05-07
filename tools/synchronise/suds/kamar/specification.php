@@ -15,6 +15,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
@@ -82,12 +83,12 @@ HELP;
             } catch (\RuntimeException $e) {
                 $result[] = [
                     'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
-                    'status' => CliRenderer::STATUS_EMPTY
+                    'status' => ISpecification::STATUS_EMPTY
                 ];
             } catch (InvalidUriPartException|InvalidArgumentException $e) {
                 $result[] = [
                     'message' => "Cannot access api endpoint, bad url: {$e->getMessage()}",
-                    'status' => CliRenderer::STATUS_EMPTY
+                    'status' => ISpecification::STATUS_EMPTY
                 ];
             }
         }
