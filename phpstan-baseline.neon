@@ -5056,16 +5056,6 @@ parameters:
 			path: library/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 52$#"
-			count: 1
-			path: library/Xml.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$property\\)\\: Unexpected token \"\\$property\", expected type at offset 61$#"
-			count: 1
-			path: library/Xml.php
-
-		-
 			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\r\\\\n     \", expected type at offset 86$#"
 			count: 1
 			path: library/Xml.php
