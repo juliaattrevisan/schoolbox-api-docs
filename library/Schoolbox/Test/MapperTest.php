@@ -4,6 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Test;
 
 /**
@@ -34,7 +35,7 @@ class MapperTest extends TestCase
     {
         parent::setUp();
         $this->object = new TestMapper($this);
-        $this->db = new MockDatabase($this);
+        $this->db     = new MockDatabase($this);
         $this->object->setDatabase($this->db);
     }
 
@@ -96,7 +97,7 @@ class MapperTest extends TestCase
                     'file'       => 'Awesome',
                 ],
                 null,
-                function ($mapper, $model, $row) {
+                static function ($mapper, $model, $row) {
                     $model
                         ->setFilename(strtoupper($model->getFilename()))
                         ->setFile(strtoupper($model->getFile()));
@@ -161,9 +162,9 @@ class MapperTest extends TestCase
     /**
      * Test callback used by testHydrate().
      *
-     * @param mixed $mapper
-     * @param TestModel $model
-     * @param mixed $row
+     * @param TestMapper $mapper
+     * @param TestModel  $model
+     * @param array      $row
      *
      * @return mixed
      */
@@ -177,11 +178,16 @@ class MapperTest extends TestCase
      * Tests for data hydration.
      *
      * @dataProvider getHydrateData
+     * @param array         $expected
+     * @param array         $data
+     * @param string|null   $alias
+     * @param callable|null $callback
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function testHydrate($expected, $data, $alias = null, $callback = null)
     {
         $model = $this->object->hydrate($data, $alias, $callback);
-        $this->assertInstanceOf('Schoolbox\\Test\\TestModel', $model);
+        $this->assertInstanceOf(TestModel::class, $model);
         $this->assertEquals($expected['id'], $model->getId());
         $this->assertEquals($expected['filename'], $model->getFilename());
         $this->assertEquals($expected['is_viewed'], $model->getIsViewed());
@@ -194,7 +200,7 @@ class MapperTest extends TestCase
      */
     public function testGetJoin()
     {
-        $this->assertInstanceOf('Schoolbox\\Test\\TestMapper', $this->object->getJoinMapper('parent'));
+        $this->assertInstanceOf(TestMapper::class, $this->object->getJoinMapper('parent'));
     }
 
 
@@ -203,10 +209,10 @@ class MapperTest extends TestCase
      * The glaring exception to this is when you're saving and retrieving the previous version of the object.
      *
      * @dataProvider getHydrateData
-     * @param array    $expected
-     * @param array    $data
-     * @param string   $alias
-     * @param callable $callback
+     * @param array         $expected
+     * @param array         $data
+     * @param string|null   $alias
+     * @param callable|null $callback
      */
     public function testObjectIdempotence($expected, $data, $alias = null, $callback = null)
     {
