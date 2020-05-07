@@ -7,6 +7,7 @@
 namespace SocialStream;
 
 use Component_Instance;
+use Schoolbox\Collection;
 use Scrub;
 
 /**
@@ -22,17 +23,17 @@ class Threads
     /**
      * A schoolbox collection of SocialStream_Post instances
      *
-     * @var null
+     * @var Collection
      */
-    private $allPosts = null;
+    private $allPosts;
 
 
     /**
      * Resultant tree structure
      *
-     * @var null
+     * @var array
      */
-    private $tree = null;
+    private $tree;
 
 
     /**
@@ -41,7 +42,7 @@ class Threads
      *
      * @var int
      */
-    private $homepageId = 0;
+    private $homepageId;
 
 
     /**
@@ -49,22 +50,23 @@ class Threads
      *
      * @var int
      */
-    private $start = 0;
+    private $start;
+
 
     /**
      * Only fetch posts newer than this date
      *
-     * @var string
+     * @var int
      */
-    private $offset = 0;
+    private $offset;
 
 
     /**
      * The component instance
      *
-     * @var null
+     * @var Component_Instance
      */
-    private $instance = null;
+    private $instance;
 
 
     /**
@@ -85,10 +87,10 @@ class Threads
      */
     public function __construct($instance, $homepageId, $start, $offset)
     {
-        $this->setInstance($instance);
-        $this->setHomepageId($homepageId);
-        $this->setStart($start);
-        $this->setOffset($offset);
+        $this->instance = $instance;
+        $this->homepageId = $homepageId;
+        $this->start = $start;
+        $this->offset = $offset;
 
         $this->init();
         $this->growTree();
@@ -103,7 +105,7 @@ class Threads
 
         /* Get all the posts that should appear
          */
-        $allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getStart(), $this->getOffset());
+        $allPosts = PostMapper::getInstance()->findLatestForHomepage($this->homepageId, $this->start, $this->offset);
 
         $ids = array();
 
@@ -114,18 +116,18 @@ class Threads
         if (count($ids)) {
             /* Get each posts' hierarchy
              */
-            $tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
+            $tree = PostMapper::getInstance()->findHierarchy($ids);
 
             /* And merge it all together
              */
             $tree = $tree->merge($allPosts);
         } else {
-            $tree = new \Schoolbox\Collection();
+            $tree = new Collection();
         }
 
         /* Save it for later!
          */
-        $this->setAllPosts($tree);
+        $this->allPosts = $tree;
     }
 
 
@@ -141,7 +143,7 @@ class Threads
 
         /* Move everything into an array to start with
          */
-        foreach ($this->getAllPosts() as $currentPost) {
+        foreach ($this->allPosts as $currentPost) {
             $structure[] = $currentPost;
         }
 
@@ -181,7 +183,7 @@ class Threads
         /* Transform it back into a collection, because we normally don't
          * remove elements from iterator classes
          */
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
 
         foreach ($tree as $node) {
             $collection->add($node);
@@ -189,7 +191,7 @@ class Threads
 
         /* Save that one for later!
          */
-        $this->setTree($collection);
+        $this->tree = $collection;
 
         return $this;
     }
@@ -226,7 +228,7 @@ class Threads
          */
         $newPost       = new \SocialStream_Post_String();
         $currentUser   = $_SESSION['user'];
-        $authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
+        $authenticator = new Authenticator($newPost, $this->instance, $currentUser);
 
         /* Simply hide the comment icon if you can't view it
          */
@@ -329,10 +331,10 @@ class Threads
          */
         $i = 0;
 
-        foreach ($this->getTree() as $currentPost) {
+        foreach ($this->tree as $currentPost) {
             $page->setVar(
                 array(
-                    'COMPONENT_INSTANCE_ID'              => Scrub::text($this->getInstance()->getId()),
+                    'COMPONENT_INSTANCE_ID'              => Scrub::text($this->instance->getId()),
                     'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
                     'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::text($currentPost->getBody())),
                     'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
@@ -406,7 +408,7 @@ class Threads
             foreach ($currentPost->getChildren() as $currentComment) {
                 $page->setVar(
                     array(
-                        'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->getInstance()->getId()),
+                        'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->instance->getId()),
                         'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
                         'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::text($currentComment->getBody())),
                         'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
@@ -479,7 +481,7 @@ class Threads
                 foreach ($currentComment->getChildren() as $currentReply) {
                     $page->setVar(
                         array(
-                            'COMPONENT_INSTANCE_ID'               => Scrub::text($this->getInstance()->getId()),
+                            'COMPONENT_INSTANCE_ID'               => Scrub::text($this->instance->getId()),
                             'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
                             'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::text($currentReply->getBody())),
                             'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
@@ -607,157 +609,19 @@ class Threads
 
         /* Save output for later!
          */
-        $this->setAjaxHtml($page->template->_varVals['socialstream_post_block']);
+        $this->ajaxHtml = $page->template->_varVals['socialstream_post_block'];
 
         /* Chain it
          */
         return $this;
     }
 
+
     /**
      * Render out a bunch of html containing each SocialStream Post
      */
     public function render()
     {
-        return $this->getAjaxHtml();
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @param null $allPosts
-     */
-    private function setAllPosts($allPosts)
-    {
-        $this->allPosts = $allPosts;
-    }
-
-    /**
-     * @return null
-     */
-    private function getAllPosts()
-    {
-        return $this->allPosts;
-    }
-
-    /**
-     * Set tree
-     *
-     * @param null $tree
-     */
-    private function setTree($tree)
-    {
-        $this->tree = $tree;
-    }
-
-    /**
-     * Get tree
-     *
-     * @return \SocialStream_Post_Abstract[]
-     */
-    private function getTree()
-    {
-        return $this->tree;
-    }
-
-    /**
-     * Set homepage id
-     *
-     * @param $homepageId
-     */
-    private function setHomepageId($homepageId)
-    {
-        $this->homepageId = $homepageId;
-    }
-
-    /**
-     * Get homepage id
-     *
-     * @return int
-     */
-    private function getHomepageId()
-    {
-        return $this->homepageId;
-    }
-
-    /**
-     * Set instance
-     *
-     * @param null $instance
-     */
-    private function setInstance($instance)
-    {
-        $this->instance = $instance;
-    }
-
-    /**
-     * Get instance
-     *
-     * @return null
-     */
-    private function getInstance()
-    {
-        return $this->instance;
-    }
-
-    /**
-     * Set ajax html
-     *
-     * @param string $ajaxHtml
-     */
-    private function setAjaxHtml($ajaxHtml)
-    {
-        $this->ajaxHtml = $ajaxHtml;
-    }
-
-    /**
-     * Get ajax html
-     *
-     * @return string
-     */
-    private function getAjaxHtml()
-    {
         return $this->ajaxHtml;
-    }
-
-    /**
-     * Set start
-     *
-     * @param int $start
-     */
-    public function setStart($start)
-    {
-        $this->start = $start;
-    }
-
-    /**
-     * Get start
-     *
-     * @return int
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Set offset
-     *
-     * @param string $offset
-     */
-    private function setOffset($offset)
-    {
-        $this->offset = $offset;
-    }
-
-    /**
-     * Get offset
-     *
-     * @return string
-     */
-    private function getOffset()
-    {
-        return $this->offset;
     }
 }
