@@ -438,38 +438,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
 
 
     /**
-     * Returns a collection of posts that are immediate children of the given post
-     *
-     * @param SocialStream_Post_Abstract $post
-     * @return Collection|SocialStream_Post_Abstract[]
-     * @throws \PDOException
-     */
-    public function findChildren($post)
-    {
-        $stmt = $this->database->prepare("
-            SELECT
-                {$this->getColumnString('p')}
-            FROM
-                `{$this->getTable()}` p
-            WHERE p.parent_id = :pid
-            AND p.deleted_at IS NULL
-        ");
-
-        $stmt->execute(array(
-            'pid' => $post->getPostId()
-        ));
-
-        $collection = new Collection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $collection->add($this->hydrate($r, 'p'));
-        }
-
-        return $collection;
-    }
-
-
-    /**
      * @param int $context
      * @param int $limit
      * @param int $offset
