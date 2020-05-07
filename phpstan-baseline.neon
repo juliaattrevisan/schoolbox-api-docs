@@ -4986,11 +4986,6 @@ parameters:
 			path: library/SitePage.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 63$#"
-			count: 1
-			path: library/SocialStream/Authenticator.php
-
-		-
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/SocialStream/Authenticator.php

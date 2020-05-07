@@ -108,7 +108,7 @@ class Authenticator
     /**
      * Find a particular config value
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
     private function findConfigValue($key)
@@ -123,6 +123,8 @@ class Authenticator
                 return $value;
             }
         }
+
+        return null;
     }
 
 
