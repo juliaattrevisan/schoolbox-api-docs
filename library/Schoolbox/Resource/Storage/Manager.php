@@ -155,6 +155,10 @@ class Manager
             throw new FileException("Failed to copy uploaded file, '{$storage->getBasename()}', to storage");
         }
 
+        if (!unlink(sys_get_temp_dir() . $tempPath)) {
+            trigger_error('Unable to delete temp file', E_USER_WARNING);
+        }
+
         return true;
     }
 
