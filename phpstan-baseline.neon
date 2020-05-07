@@ -5021,21 +5021,6 @@ parameters:
 			path: library/Survey/Answer/Radio.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 54$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 36$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$templateFile\\)\\: Unexpected token \"\\$templateFile\", expected type at offset 83$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
 			message: "#^Cannot call method setFile\\(\\) on null\\.$#"
 			count: 1
 			path: library/Survey/Graph/Render.php
@@ -5053,21 +5038,6 @@ parameters:
 		-
 			message: "#^Cannot call method parse\\(\\) on null\\.$#"
 			count: 3
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 45$#"
-			count: 2
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 42$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$val\\)\\: Unexpected token \"\\$val\", expected type at offset 33$#"
-			count: 1
 			path: library/Survey/Graph/Render.php
 
 		-
