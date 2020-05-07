@@ -5271,11 +5271,6 @@ parameters:
 			path: tools/socket/socketd.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fields\\)\\: Unexpected token \"\\$fields\", expected type at offset 58$#"
-			count: 1
-			path: tools/synchronise/import/csv.php
-
-		-
 			message: "#^Access to undefined constant Schoolbox\\\\External\\\\Importer\\\\Endpoint\\\\Specification\\\\CliRenderer\\:\\:STATUS_EMPTY\\.$#"
 			count: 2
 			path: tools/synchronise/suds/kamar/specification.php

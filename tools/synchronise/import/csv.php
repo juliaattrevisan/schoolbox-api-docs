@@ -16,8 +16,7 @@ $update  = isset($options['perform-update']);
 /**
  * Method for outputting display format.
  *
- * @param $fields
- *
+ * @param array $fields
  * @return string
  */
 $displayFormat = function ($fields) {
