@@ -4986,16 +4986,6 @@ parameters:
 			path: library/SitePage.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$error$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$page$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$key\\)\\: Unexpected token \"\\$key\", expected type at offset 63$#"
 			count: 1
 			path: library/SocialStream/Authenticator.php
