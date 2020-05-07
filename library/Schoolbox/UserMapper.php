@@ -1,12 +1,9 @@
 <?php
 /**
- * Mapper between user objects and database rows.
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -21,9 +18,10 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
-
 /**
  * Class UserMapper
+ *
+ * Mapper between user objects and database rows.
  *
  * @package Schoolbox
  * @method User findById($id)
@@ -47,6 +45,7 @@ class UserMapper extends Mapper
      * @var array|null $usernameCache Maps 'username' => 'id'.
      */
     protected $usernameCache;
+
 
     /**
      * Fetches the community portal out of DI on a need-to-know basis only.
@@ -72,6 +71,7 @@ class UserMapper extends Mapper
             'externalCommunityPortal service is not an \Schoolbox\External\Connector\ICommunityPortal instance'
         );
     }
+
 
     /**
      * Setup mapping
@@ -171,6 +171,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
     }
 
+
     /**
      * Pre-save callback: if the user's display grade average flag isn't set, set it to its default value.
      *
@@ -184,6 +185,7 @@ class UserMapper extends Mapper
         }
         return true;
     }
+
 
     /**
      * Update password in community portal.
@@ -203,6 +205,7 @@ class UserMapper extends Mapper
         }
     }
 
+
     /**
      * Pre-save hook: Set key in user, if it's not set.
      *
@@ -218,6 +221,7 @@ class UserMapper extends Mapper
         return true;
     }
 
+
     /**
      * Pre-save hook: Set hash if password has changed.
      *
@@ -232,6 +236,7 @@ class UserMapper extends Mapper
         return true;
     }
 
+
     /**
      * Finds a user by their email address.
      *
@@ -239,6 +244,10 @@ class UserMapper extends Mapper
      *
      * @param string $email
      * @return Collection|User[]
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     * @throws \PDOException
      */
     public function findByEmail($email)
     {
@@ -248,7 +257,7 @@ class UserMapper extends Mapper
             $emailParts = explode('@', $email, 2);
             if (count($emailParts) === 2) {
                 // Compare this email's hostname against the actual hostname
-                list($username, $domain) = $emailParts;
+                [$username, $domain] = $emailParts;
                 $thisDomain = $this->getConfigLoader()->get('mail_address');
                 if ($domain == $thisDomain) {
                     $query = '((' . $query . ') OR (user.username = :username AND user.local_email IS TRUE))';
@@ -270,7 +279,7 @@ class UserMapper extends Mapper
     protected function getSelectString(): string
     {
         return "
-            SELECT 
+            SELECT
                 {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                 {$this->getJoinColumnString('role', 'g')},
                 {$this->getJoinColumnString('userCampus', 'c')},
@@ -295,6 +304,7 @@ class UserMapper extends Mapper
     /**
      * @param PDOStatement $statement
      * @return Collection
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
      */
@@ -361,6 +371,7 @@ class UserMapper extends Mapper
         return $this->createCollection(array_values($users));
     }
 
+
     /**
      * All Permissions
      *
@@ -369,6 +380,7 @@ class UserMapper extends Mapper
      *
      * @param User $user
      * @return mixed
+     * @throws Mapper\DefinitionException
      */
     protected function findAccessList(User $user)
     {
@@ -378,18 +390,21 @@ class UserMapper extends Mapper
         return $userAccessMapper->findAllForUser($user);
     }
 
+
     /**
      * Find a user by their external id and come with roles, campus, etc
      *
-     * @param string    $id
+     * @param string $id
      * @param string $roleType If provided, restrict to this role type.
      *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
      * @return User
      * @throws Mapper\Exception
+     * @throws Mapper\Exception\NotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findByExternalId($id, $roleType = null) {
 
-        if ( \strlen($id) === 0) {
+        if (\strlen($id) === 0) {
             throw new Schoolbox\Mapper\Exception('An ID must be provided');
         }
 
@@ -410,12 +425,13 @@ class UserMapper extends Mapper
         return $user;
     }
 
+
     /**
      * Find a user by their external id and come with roles, campus, etc
      *
      * @param array $ids
      * @return array
-     * @throws Mapper\Exception
+     * @throws \PDOException
      */
     public function findCheaplyByExternalIds($ids) {
 
@@ -441,6 +457,7 @@ class UserMapper extends Mapper
         return $externals;
     }
 
+
     /**
      * Fetches the user, and all of the user's subjects.
      *
@@ -458,12 +475,15 @@ class UserMapper extends Mapper
         return $user;
     }
 
+
     /**
      * Find all the users which match $name and are in group_id array $permittedValues
      *
      * @param $name
      * @param $permittedValues
      * @return Schoolbox\Collection
+     * @throws Mapper\Exception
+     * @throws \PDOException
      */
     public function findByNameAndGroup($name, $permittedValues)
     {
@@ -500,6 +520,7 @@ class UserMapper extends Mapper
         return $collection;
     }
 
+
     /**
      * Fetches a single user ID, for use by GizaUser_DataMapper.
      *
@@ -509,6 +530,7 @@ class UserMapper extends Mapper
      *
      * @param string $username
      * @return int
+     * @throws \PDOException
      */
     public function getIdForUsername($username)
     {
@@ -531,11 +553,13 @@ class UserMapper extends Mapper
         return $user;
     }
 
+
     /**
      * Do a keyword search for students
      *
      * @param $search
      * @return Collection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findStudents($search)
     {
@@ -584,17 +608,20 @@ class UserMapper extends Mapper
         return $students;
     }
 
+
     /**
      * Retrieves all users who have the given level of access (or higher) to the
      * requested service.
      *
-     * @param int $service The service level. A UserAccess::SERVICE_* constant
-     * @param int $accessLevel The access level. A UserAccess::ACCESS_* constant
-     * @param int $serviceIdentifier If provided, the campus or homepage that $service is for
-     * @param array $order Sort order array
-     * @param int $limit If provided, limit the amount of users to query
-     * @return Collection|User[] A list of users who have this level of access
-     *                           to the given service.
+     * @param int   $service           The service level. A UserAccess::SERVICE_* constant
+     * @param int   $accessLevel       The access level. A UserAccess::ACCESS_* constant
+     * @param int   $serviceIdentifier If provided, the campus or homepage that $service is for
+     * @param array $order             Sort order array
+     * @param int   $limit             If provided, limit the amount of users to query
+     * @return Collection|User[]       A list of users who have this level of access to the given service.
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \PDOException
      */
     public function findByAccess($service, $accessLevel, $serviceIdentifier = null, $order = [], $limit = null)
     {
@@ -647,12 +674,14 @@ class UserMapper extends Mapper
         return $users;
     }
 
+
     /**
      * @deprecated Don't even ask what a password hashing method is doing in a mapper.
      *             (this will be removed in 16 and replaced with `password_hash`)
      *
-     * @param  string $password
+     * @param string $password
      * @return string
+     * @throws \PDOException
      */
     public function hashPassword($password)
     {
@@ -668,9 +697,11 @@ class UserMapper extends Mapper
      * For data-integrity, this method relies on a post-save/restore
      * callback to add any new users to the cache.
      *
-     * @param  User $user
+     * @param User $user
      * @return bool Always true, as long as it doesn't throw
      * @throws UnexpectedValueException if it isn't unique
+     * @throws \PDOException
+     * @throws \UnderflowException
      */
     public function verifyUniqueUsername(User $user)
     {
@@ -702,6 +733,7 @@ class UserMapper extends Mapper
         return true;
     }
 
+
     /**
      * Post-save + Post-restore callback to ensure username cache is up-to-date
      *
@@ -713,6 +745,7 @@ class UserMapper extends Mapper
             $this->usernameCache[strtolower($user->getUsername())] = $user->getId();
         }
     }
+
 
     /**
      * Post-delete + Post-softDelete callback to ensure username cache is up-to-date
@@ -760,8 +793,10 @@ class UserMapper extends Mapper
         if ($user->getUsername() === null || !strlen($user->getUsername())) {
             throw new UnexpectedValueException('Username cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for verifying whether a user's role type is set.
@@ -775,8 +810,10 @@ class UserMapper extends Mapper
         if (!$user->getRole() instanceof Role || null === $user->getRole()->getId()) {
             throw new UnexpectedValueException('User role cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for ensuring a user has at least one campus
@@ -799,8 +836,10 @@ class UserMapper extends Mapper
                 return true;
             }
         }
+
         throw new UnexpectedValueException('User must have at least one valid campus');
     }
+
 
     /**
      * Pre-save callback for ensuring a user's firstname is not null or zero-length
@@ -814,8 +853,10 @@ class UserMapper extends Mapper
         if ($user->getFirstname() === null || !strlen($user->getFirstname())) {
             throw new UnexpectedValueException('Firstname cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for ensuring a user's Local email flag is not null
@@ -829,8 +870,10 @@ class UserMapper extends Mapper
         if ($user->getLocalEmail() === null) {
             throw new UnexpectedValueException('Local email flag cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for ensuring a user's webmail flag is not null
@@ -844,8 +887,10 @@ class UserMapper extends Mapper
         if ($user->getWebmail() === null) {
             throw new UnexpectedValueException('Webmail flag cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for ensuring a user's internal mail flag is not null
@@ -861,8 +906,10 @@ class UserMapper extends Mapper
             // eg see UPS Effects and user modify screens
             throw new UnexpectedValueException('Use External Mail Client flag cannot be null');
         }
+
         return true;
     }
+
 
     /**
      * Pre-save callback for ensuring a user's Eportfolio enabled flag is not null
@@ -876,6 +923,7 @@ class UserMapper extends Mapper
         if ($user->getEportfolioEnable() === null) {
             throw new UnexpectedValueException('Eportfolio enabled flag cannot be null');
         }
+
         return true;
     }
 
@@ -884,6 +932,7 @@ class UserMapper extends Mapper
      * Post-save callback for updating a user's superuser status.
      *
      * @param User $user
+     * @throws \PDOException
      */
     public function updateSuperuserStatus(User $user)
     {
@@ -899,9 +948,11 @@ class UserMapper extends Mapper
         }
     }
 
+
     /**
      * Retrieve a list of all year levels currently assigned to users
      * @return array
+     * @throws \PDOException
      */
     public function getYearLevels()
     {
@@ -914,11 +965,12 @@ class UserMapper extends Mapper
         $years = [];
 
         foreach ($results as $result) {
-            $years[] = $result["year"];
+            $years[] = $result['year'];
         }
 
         return $years;
     }
+
 
     /**
      * Port of `\User::transferOwnership` - transfers ownership of content from
@@ -933,25 +985,25 @@ class UserMapper extends Mapper
     {
         // Update all files
         $params = ['from' => $fromId, 'to' => $toId,];
-        $query = "UPDATE file SET owner = :toId WHERE owner = :fromId";
+        $query = 'UPDATE file SET owner = :toId WHERE owner = :fromId';
         $this->database->query($query, $params);
 
         // Update all links
-        $query = "UPDATE link SET owner = :toId WHERE owner = :fromId";
+        $query = 'UPDATE link SET owner = :toId WHERE owner = :fromId';
         $this->database->query($query, $params);
 
         // Update wikis
-        $query = "UPDATE wikiRevision SET userID = :toId WHERE userID = :fromId";
+        $query = 'UPDATE wikiRevision SET userID = :toId WHERE userID = :fromId';
         $this->database->query($query, $params);
 
         // Update all forums
-        $query = "UPDATE forumPost SET userID = :toId WHERE userID = :fromId";
+        $query = 'UPDATE forumPost SET userID = :toId WHERE userID = :fromId';
         $this->database->query($query, $params);
-        $query = "UPDATE forumThread SET userID = :toId WHERE userID = :fromId";
+        $query = 'UPDATE forumThread SET userID = :toId WHERE userID = :fromId';
         $this->database->query($query, $params);
 
         // Update events
-        $query = "UPDATE event SET owner = :toId WHERE owner = :fromId";
+        $query = 'UPDATE event SET owner = :toId WHERE owner = :fromId';
         $this->database->query($query, $params);
     }
 
