@@ -7,9 +7,11 @@
 
 declare(strict_types=1);
 
+use Alaress\Scheduler\Trigger\CancelTrigger;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -106,7 +108,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     /**
      * Extracts instance
-     * @param $instance
+     * @param CompressedTrigger|CancelTrigger|Alaress\Async\Notification\Instance\Instance $instance
      */
     private function extractInstance($instance): void
     {
@@ -115,7 +117,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
-        if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
+        if ($instance instanceof CompressedTrigger) {
             $this->getLogger()->info("CompressedTrigger");
             try {
                 $output = $instance->extractTrigger();
@@ -138,7 +140,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             } catch (Exception $e) {
                 $this->getLogger()->warning($e->getMessage());
             }
-        } elseif ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+        } elseif ($instance instanceof CancelTrigger) {
             $this->getLogger()->info("CancelTrigger");
             $this->getLogger()->info($instance->getLabel());
             if ($instance->getTimestamp()) {
@@ -157,12 +159,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
             $this->getLogger()->info($message);
         }
-
     }
 
     /**
      * Converts seconds to readable date time.
-     * @param $seconds
+     * @param int $seconds
      * @return string
      */
     private static function secondsToTime($seconds): string
@@ -178,7 +179,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     /**
      * Displays ttl in human readable format
-     * @param $ttl
+     * @param int $ttl
      * @return string
      */
     private static function ttlToDate($ttl): string
@@ -192,8 +193,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 return date('Y-m-d H:i:s', time() + $ttl) ?: '';
         }
     }
-
-
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

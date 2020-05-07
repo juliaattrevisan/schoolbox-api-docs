@@ -5161,21 +5161,6 @@ parameters:
 			path: tools/mq/diagnose-pqueue.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$instance\\)\\: Unexpected token \"\\$instance\", expected type at offset 43$#"
-			count: 1
-			path: tools/mq/list-redis.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$seconds\\)\\: Unexpected token \"\\$seconds\", expected type at offset 65$#"
-			count: 1
-			path: tools/mq/list-redis.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ttl\\)\\: Unexpected token \"\\$ttl\", expected type at offset 63$#"
-			count: 1
-			path: tools/mq/list-redis.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$ttl\\)\\: Unexpected token \"\\$ttl\", expected type at offset 63$#"
 			count: 1
 			path: tools/mq/remove-old-triggers.php
