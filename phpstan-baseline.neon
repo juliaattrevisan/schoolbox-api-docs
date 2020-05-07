@@ -5021,31 +5021,6 @@ parameters:
 			path: library/Survey/Answer/Radio.php
 
 		-
-			message: "#^Cannot call method setFile\\(\\) on null\\.$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^Cannot call method setBlock\\(\\) on null\\.$#"
-			count: 2
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^Cannot call method setVar\\(\\) on null\\.$#"
-			count: 4
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^Cannot call method parse\\(\\) on null\\.$#"
-			count: 3
-			path: library/Survey/Graph/Render.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n\\\\t \", expected type at offset 44$#"
-			count: 1
-			path: library/Survey/Graph/Render.php
-
-		-
 			message: "#^Call to an undefined method Evaluation\\\\Import\\\\Parser\\\\IParser\\:\\:getAnonymousResult\\(\\)\\.$#"
 			count: 1
 			path: library/Survey/Import/Xml.php
