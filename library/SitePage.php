@@ -142,7 +142,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $pageFile
+     * @param string $pageFile
      * @param bool $execute
      * @return bool
      */
@@ -202,7 +202,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $state
+     * @param bool $state
      */
     public function setLite($state)
     {
@@ -315,7 +315,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $tab
+     * @param string $tab
      */
     public function setTab($tab)
     {
@@ -417,7 +417,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $page
+     * @param int $page
      */
     public static function backToTheFuture($page)
     {
@@ -449,8 +449,8 @@ class SitePage extends Page
     }
 
     /**
-     * @param $handle
-     * @param $file
+     * @param string $handle
+     * @param string $file
      * @return bool
      */
     public function setFile($handle, $file)
@@ -476,7 +476,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $template
+     * @param string $template
      * @return bool|string
      */
     public function getTemplate($template)
@@ -494,7 +494,7 @@ class SitePage extends Page
     }
 
     /**
-     * @param $varname
+     * @param string $varname
      * @return mixed
      */
     public function getVar($varname)
@@ -623,8 +623,6 @@ class SitePage extends Page
 
     /**
      *
-     * @param string $error An error message to display on the login page.
-     * @param string $page If set, this page is set as the path to redirect to.
      */
     public function goLoginPage()
     {
@@ -648,8 +646,8 @@ class SitePage extends Page
     }
 
     /**
-     * @param $handle
-     * @param $data
+     * @param string $handle
+     * @param mixed $data Any traversable; array, or collection of objects
      * @param array $selected
      * @param string $template
      * @param array $mapping

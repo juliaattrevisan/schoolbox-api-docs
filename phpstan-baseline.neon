@@ -4981,47 +4981,7 @@ parameters:
 			path: library/Schoolbox/WebDav/Rules/Tokenizer.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$pageFile\\)\\: Unexpected token \"\\$pageFile\", expected type at offset 18$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$state\\)\\: Unexpected token \"\\$state\", expected type at offset 18$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$tab\\)\\: Unexpected token \"\\$tab\", expected type at offset 18$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$page\\)\\: Unexpected token \"\\$page\", expected type at offset 18$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$file\\)\\: Unexpected token \"\\$file\", expected type at offset 40$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$handle\\)\\: Unexpected token \"\\$handle\", expected type at offset 18$#"
-			count: 2
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$template\\)\\: Unexpected token \"\\$template\", expected type at offset 18$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$varname\\)\\: Unexpected token \"\\$varname\", expected type at offset 18$#"
 			count: 1
 			path: library/SitePage.php
 
@@ -5032,11 +4992,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$page$#"
-			count: 1
-			path: library/SitePage.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 40$#"
 			count: 1
 			path: library/SitePage.php
 
