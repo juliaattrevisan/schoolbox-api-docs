@@ -4936,26 +4936,6 @@ parameters:
 			path: library/Schoolbox/User/Password/Change/Module.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$searchCampus\\)\\: Unexpected token \"\\$searchCampus\", expected type at offset 59$#"
-			count: 1
-			path: library/Schoolbox/UserBulkMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$searchEportfolio\\)\\: Unexpected token \"\\$searchEportfolio\", expected type at offset 113$#"
-			count: 1
-			path: library/Schoolbox/UserBulkMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$searchRole\\)\\: Unexpected token \"\\$searchRole\", expected type at offset 87$#"
-			count: 1
-			path: library/Schoolbox/UserBulkMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$searchYear\\)\\: Unexpected token \"\\$searchYear\", expected type at offset 145$#"
-			count: 1
-			path: library/Schoolbox/UserBulkMapper.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$allCampusIds\\)\\: Unexpected token \"\\$allCampusIds\", expected type at offset 76$#"
 			count: 1
 			path: library/Schoolbox/UserBulkMapper.php

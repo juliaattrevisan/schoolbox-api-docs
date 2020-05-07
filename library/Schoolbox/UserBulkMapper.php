@@ -1,17 +1,19 @@
 <?php
 /**
- * UserBulkMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use \Alaress\Lumberjack\Logger;
 use \Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * Class UserBulkMapper
+ *
+ * @package Schoolbox
+ */
 class UserBulkMapper extends UserMapper
 {
 
@@ -22,6 +24,7 @@ class UserBulkMapper extends UserMapper
      */
     private const UNCHANGED = -1;
 
+
     /**
      * After bulk processing this will contain a log of all the success and fail results
      *
@@ -29,11 +32,13 @@ class UserBulkMapper extends UserMapper
      */
     private $outputMessage = '';
 
+
     /**
      * Bulk modify logger
      * @var Logger
      */
     private $logger;
+
 
     /**
      * Construct the log system for bulk logging
@@ -44,14 +49,18 @@ class UserBulkMapper extends UserMapper
         $this->logger = new Logger($file, null, 200, [], true);
     }
 
+
     /**
      * Cheesy query agglutination
      *
-     * @param $searchCampus
-     * @param $searchRole
-     * @param $searchEportfolio
-     * @param $searchYear
+     * @param int    $searchCampus
+     * @param int    $searchRole
+     * @param string $searchEportfolio
+     * @param string $searchYear
      * @return \Schoolbox\Collection
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear)
     {
@@ -133,11 +142,15 @@ class UserBulkMapper extends UserMapper
         return $userCollection;
     }
 
+
     /**
      * Update campus involvement for this user
      *
      * @param User  $user
      * @param array $allCampusIds
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \UnexpectedValueException
      */
     private function assignCampuses(User $user, $allCampusIds)
     {
@@ -153,6 +166,7 @@ class UserBulkMapper extends UserMapper
             }
         }
     }
+
 
     /**
      * Mass Modify 3
@@ -287,6 +301,7 @@ class UserBulkMapper extends UserMapper
         $this->log($message);
     }
 
+
     /**
      * Mass-delete of a collection of users, plus logging.
      *
@@ -302,6 +317,7 @@ class UserBulkMapper extends UserMapper
         }
         return $result;
     }
+
 
     /**
      * Log to file
@@ -324,6 +340,4 @@ class UserBulkMapper extends UserMapper
     {
         return $this->outputMessage;
     }
-
-
 }
