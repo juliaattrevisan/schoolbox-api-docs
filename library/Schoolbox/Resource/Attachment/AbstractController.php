@@ -22,19 +22,23 @@ abstract class AbstractController implements ControllerInterface
     /** @var string */
     protected $slug;
 
-
     /**
      * @var bool
      */
     protected $useFolder = true;
 
+    /**
+     * @var int
+     */
+    protected $defaultFolderId = 0;
 
     /**
      * @param bool   $multi
      * @param string $mimeFilter
      * @param bool   $useFolder
+     * @param int    $defaultFolderId
      */
-    public function __construct($multi, $mimeFilter = null, $useFolder = true)
+    public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
     {
         $regex = '`([A-Za-z0-9_]+\\\\[A-Za-z0-9_]+)Controller$`';
         $class = get_class($this);
@@ -46,6 +50,7 @@ abstract class AbstractController implements ControllerInterface
         $this->slug       = strtolower(str_replace('\\', '/', $matches[1]));
         $this->template   = $this->slug;
         $this->useFolder  = $useFolder;
+        $this->defaultFolderId = $defaultFolderId;
     }
 
 
@@ -80,6 +85,10 @@ abstract class AbstractController implements ControllerInterface
          */
         if ($this->useFolder) {
             $args['f'] = true;
+        }
+
+        if ($this->defaultFolderId) {
+            $args['fid'] = $this->defaultFolderId;
         }
 
         return $prefix . '?' . http_build_query($args);

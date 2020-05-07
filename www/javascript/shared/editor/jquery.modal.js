@@ -58,7 +58,8 @@
 
                 /* Whether Use This Folder is available
                  */
-                useFolder: true
+                useFolder: true,
+                categorySelector: null
             };
 
             return $.extend(defaults, options);
@@ -105,6 +106,10 @@
              */
             if (config.useFolder) {
                 qString += '&f';
+            }
+
+            if (config.categorySelector && $(config.categorySelector).val()) {
+                qString += '&fid=' + $(config.categorySelector).val();
             }
 
             return qString;
@@ -381,6 +386,7 @@
                 element: $(this),
                 allowedFiles: null,
                 allowedFilesystems: 'link',
+                categorySelector: null
             },
 
             /* Combine with modal configuration requirements
@@ -404,6 +410,7 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
+                categorySelector: config.categorySelector
             });
 
             /* Send the message up and deal with the dialog, if one was specified

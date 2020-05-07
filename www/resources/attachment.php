@@ -24,6 +24,7 @@ $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
 $multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
+$defaultFolderId   = (int)$_GET['fid'];
 
 if (!isset($_GET['mime'])) {
     $mimeFilter = null;
@@ -55,7 +56,8 @@ $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
         ->setConfig($configLoader)
         ->setRosetta($rosettaStone)
-        ->setUseFolder($useFolder);
+        ->setUseFolder($useFolder)
+        ->setDefaultFolderId($defaultFolderId);
 
 foreach ($factory->getMappedControllers() as $controller) {
 

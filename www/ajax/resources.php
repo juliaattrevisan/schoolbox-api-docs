@@ -32,6 +32,7 @@ if (!isset($_GET['mime'])) {
 /* Whether there is a Use This Folder button
  */
 $useFolder = isset($_GET['f']);
+$defaultFolderId = (int)$_GET['fid'];
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
@@ -48,5 +49,6 @@ $configLoader = $this->getDi()->get('config');
     ->allowMulti($multi)
     ->setConfig($configLoader)
     ->setUseFolder($useFolder)
+    ->setDefaultFolderId($defaultFolderId)
     ->build($source)
     ->parse($this);
