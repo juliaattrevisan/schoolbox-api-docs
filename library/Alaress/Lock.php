@@ -12,15 +12,18 @@
  */
 class Alaress_Lock
 {
-
+    /**
+     * The file to use as the lock. It will contain the PID of the current
+     * process, and its start time.
+     *
+     * @var string
+     */
     protected $filename;
 
     /**
      * Constructor
      *
-     * @param string $filename The file to use as the lock. It will contain the
-     *                         PID of the current process.
-     *
+     * @param string $filename
      */
     public function __construct($filename)
     {
