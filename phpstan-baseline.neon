@@ -4956,16 +4956,6 @@ parameters:
 			path: library/Schoolbox/Video/ResourceVideoMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$latitude\\)\\: Unexpected token \"\\$latitude\", expected type at offset 137$#"
-			count: 1
-			path: library/Schoolbox/Weather/WeatherstackClient.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$longitude\\)\\: Unexpected token \"\\$longitude\", expected type at offset 181$#"
-			count: 1
-			path: library/Schoolbox/Weather/WeatherstackClient.php
-
-		-
 			message: "#^Binary operation \"\\*\" between string and 3600 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Weather/WeatherstackClient.php
