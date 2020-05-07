@@ -5021,11 +5021,6 @@ parameters:
 			path: library/Survey/Answer/Radio.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$survey\\)\\: Unexpected token \"\\$survey\", expected type at offset 173$#"
-			count: 1
-			path: library/Survey/Export/CSV.php
-
-		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$currentQuestion\\)\\: Unexpected token \"\\$currentQuestion\", expected type at offset 54$#"
 			count: 1
 			path: library/Survey/Graph/Render.php
