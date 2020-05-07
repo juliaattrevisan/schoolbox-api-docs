@@ -4946,21 +4946,6 @@ parameters:
 			path: library/Schoolbox/UserMapper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 112$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$permittedValues\\)\\: Unexpected token \"\\$permittedValues\", expected type at offset 132$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$search\\)\\: Unexpected token \"\\$search\", expected type at offset 65$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
 			message: "#^Variable \\$superuserStatus in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/UserMapper.php

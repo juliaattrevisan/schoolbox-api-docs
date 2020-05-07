@@ -479,8 +479,8 @@ class UserMapper extends Mapper
     /**
      * Find all the users which match $name and are in group_id array $permittedValues
      *
-     * @param $name
-     * @param $permittedValues
+     * @param string $name
+     * @param array $permittedValues
      * @return Schoolbox\Collection
      * @throws Mapper\Exception
      * @throws \PDOException
@@ -557,7 +557,7 @@ class UserMapper extends Mapper
     /**
      * Do a keyword search for students
      *
-     * @param $search
+     * @param string $search
      * @return Collection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
