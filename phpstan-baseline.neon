@@ -5006,11 +5006,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$url\\)\\: Unexpected token \"\\$url\", expected type at offset 35$#"
-			count: 1
-			path: library/SocialStream/Post/Video/Chain.php
-
-		-
 			message: "#^Variable \\$video in PHPDoc tag @var does not match assigned variable \\$storage\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Video/Storage.php
