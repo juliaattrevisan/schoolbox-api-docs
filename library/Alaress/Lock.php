@@ -39,15 +39,32 @@ class Alaress_Lock
         }
 
         // Get the list of all processes matching the PID in the lockfile.
-        [$pid, $instanceId, $startTime] = $this->parseLockfile();
-        $cmd    = sprintf('ps -p %s --no-headers', escapeshellarg($pid));
-        $output = trim(shell_exec($cmd));
+        [$pid, $startTimestamp] = $this->parseLockfile();
+        $cmd                    = sprintf('ps -p %s -o etimes --no-headers', escapeshellarg($pid));
+        $output                 = trim(shell_exec($cmd));
         if (empty($output)) {
             // Process no longer exists: kill lockfile and continue
             $this->release();
             return false;
         }
-        // The process is still running, so it's still locked.
+
+        // No start timestamp at all?
+        // This is probably a lockfile from before that timestamp was stored:
+        // fall back to old behavior (i.e. assume it's still running)
+        if ($startTimestamp === 0) {
+            return true;
+        }
+
+        // The process is still running, but has its PID been reassigned?
+        // If the process started after the start time in the lock file, it must
+        // be a different process: release
+        $elapsedTime           = (int)$output;
+        $processStartTimestamp = $_SERVER['REQUEST_TIME'] - $elapsedTime;
+        if ($processStartTimestamp > $startTimestamp) {
+            $this->release();
+            return false;
+        }
+
         return true;
     }
 
@@ -65,10 +82,9 @@ class Alaress_Lock
         // Data that goes in the lockfile:
         // * PID
         // * process' start time
-        // * the instance ID
         file_put_contents(
             $this->filename,
-            implode(',', [getmypid(), defined('INSTANCE_ID') ? INSTANCE_ID : '', $_SERVER['REQUEST_TIME']])
+            implode(',', [getmypid(), $_SERVER['REQUEST_TIME']])
         );
         return true;
     }
@@ -106,10 +122,17 @@ class Alaress_Lock
     /**
      * Parse the lockfile's contents
      *
-     * @return array [pid, instance ID, start time]
+     * @return array&int[] [pid, start timestamp]
      */
     private function parseLockfile(): array
     {
-        return array_pad(explode(',', file_get_contents($this->filename), 3), 3, '');
+        return array_map(
+            'intval',
+            array_pad(
+                explode(',', file_get_contents($this->filename), 2),
+                2,
+                0
+            )
+        );
     }
 }
