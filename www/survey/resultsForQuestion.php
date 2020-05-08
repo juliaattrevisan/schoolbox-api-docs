@@ -68,16 +68,7 @@ $sectionValues = $surveyExporter->getSectionValues();
 $this->setFile(TEMPLATE_content, 'survey/resultsForQuestion.html');
 $this->setBlock(TEMPLATE_content, 'respondent', 'respondent_block');
 $this->setBlock(TEMPLATE_content, 'graph', 'graph_block');
-$this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
 $this->setBlock('respondent', 'respondent_name', 'respondent_name_block');
-
-/* If not using Anonymous Result, set respondent details
- */
-if ($survey['anonymous_result']) {
-    $this->setVar('respondent_heading_block', '');
-} else {
-    $this->parse('respondent_heading_block', 'respondent_heading');
-}
 
 $this->setVar('respondent_block', '');
 
