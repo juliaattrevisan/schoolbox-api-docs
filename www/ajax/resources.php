@@ -21,6 +21,9 @@ if (count($this->arg) < 3) {
 $source = $this->arg[1];
 $multi  = $this->arg[2] === 'multi';
 
+/* This is the second instance of two places where this is specified
+ * The other is www/resources/attachment.php
+ */
 if (!isset($_GET['mime'])) {
     $mimeFilter = null;
 } elseif ('' === $_GET['mime']) {
@@ -43,6 +46,7 @@ $this->setVar([
 $configLoader = $this->getDi()->get('config');
 
 /* Parse individual template in the accordion
+ * This is the inner shell of each accordion which loads when you expand an accordion
  */
 (new Schoolbox\Resource\Attachment\Factory())
     ->setMimeFilter($mimeFilter)

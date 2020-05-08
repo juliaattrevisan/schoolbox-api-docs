@@ -26,6 +26,9 @@ $multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
 $defaultFolderId   = (int)$_GET['fid'];
 
+/* This is the first instance of two places where this is specified
+ * The other is www/ajax/resources.php
+ */
 if (!isset($_GET['mime'])) {
     $mimeFilter = null;
 } elseif ('' === $_GET['mime']) {
@@ -52,6 +55,10 @@ $configLoader = $this->getDi()->get('config');
 /** @var RosettaStone $rosettaStone */
 $rosettaStone = $this->getDi()->get('l10n');
 
+/* This loads the set of accordions in the modal - it's basically the outer shell
+ * Each of the accordions asynchronously calls www/ajax/resources.php, loading that
+ * specific accordion's contents
+ */
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
         ->setConfig($configLoader)

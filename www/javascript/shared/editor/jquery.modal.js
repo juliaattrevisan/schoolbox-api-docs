@@ -111,6 +111,9 @@
                 qString += '&f';
             }
 
+            /* If a default Folder is specified, just go straight to that node to
+             * save users the immense hassle of navigating the folder tree
+             */
             if (config.defaultFolderSelector && $(config.defaultFolderSelector).val()) {
                 qString += '&fid=' + $(config.defaultFolderSelector).val();
             }
