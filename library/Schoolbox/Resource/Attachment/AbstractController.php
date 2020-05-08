@@ -87,6 +87,8 @@ abstract class AbstractController implements ControllerInterface
             $args['f'] = true;
         }
 
+        /* ID of the default folder to start browsing resources from
+        */
         if ($this->defaultFolderId) {
             $args['fid'] = $this->defaultFolderId;
         }

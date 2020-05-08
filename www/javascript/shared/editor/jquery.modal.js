@@ -59,7 +59,10 @@
                 /* Whether Use This Folder is available
                  */
                 useFolder: true,
-                categorySelector: null
+
+                /* Selector to get the default folder to start browsing resources from
+                 */
+                defaultFolderSelector: null
             };
 
             return $.extend(defaults, options);
@@ -108,8 +111,8 @@
                 qString += '&f';
             }
 
-            if (config.categorySelector && $(config.categorySelector).val()) {
-                qString += '&fid=' + $(config.categorySelector).val();
+            if (config.defaultFolderSelector && $(config.defaultFolderSelector).val()) {
+                qString += '&fid=' + $(config.defaultFolderSelector).val();
             }
 
             return qString;
@@ -386,7 +389,7 @@
                 element: $(this),
                 allowedFiles: null,
                 allowedFilesystems: 'link',
-                categorySelector: null
+                defaultFolderSelector: null
             },
 
             /* Combine with modal configuration requirements
@@ -410,7 +413,7 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
-                categorySelector: config.categorySelector
+                defaultFolderSelector: config.defaultFolderSelector
             });
 
             /* Send the message up and deal with the dialog, if one was specified
