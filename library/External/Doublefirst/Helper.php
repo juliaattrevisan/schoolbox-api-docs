@@ -102,7 +102,6 @@ class External_Doublefirst_Helper
         if (!$term) {
 
             // TODO: Remove hack, this just picks the last term that was open for testing purposes during the holidays.
-
             $query =
                 "
                 SELECT TOP 1 st.StartDate,
@@ -120,6 +119,11 @@ class External_Doublefirst_Helper
                     'startDate' => $date->endOfDay()->getDatabase(),
                 ]
             );
+        }
+
+        if (!$term) {
+            // if still failing to find a term, just return 0
+            return 0;
         }
 
         $start = new \Alaress_Date_Format(strtotime($term['StartDate']), 'U');
