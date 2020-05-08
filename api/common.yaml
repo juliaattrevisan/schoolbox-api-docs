@@ -35,7 +35,7 @@ components:
     id:
       title: ID
       description: Identifying ID number for most objects within Schoolbox
-      readOnly: true
+#      readOnly: true
       type: integer
       format: int32
       minimum: 1
@@ -48,6 +48,47 @@ components:
         Each endpoint whose data accepts a cursor will return a cursor that
         points to the next page of the result set.
       type: string
+
+    itemSearchRelevance:
+      title: Item search relevance metadata
+      description: |
+        If this item is retrieved as part of a search, this field may contain
+        the item's relevance to the search term.
+      type: object
+      properties:
+        _relevance:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: |
+            A floating-point number between 0 and 1: the higher the number, the
+            more relevant to the search this item is.
+
+    item:
+      title: Item
+      description: An example of a schema for a single item.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+
+    itemList:
+      title: Item list
+      description: |
+        An example of a schema for a list of items.
+
+        Contains metadata for the list of items, as well as the list itself.
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/item'
+              - $ref: '#/components/schemas/itemSearchRelevance'
+        metadata:
+          $ref: '#/components/schemas/listMetadata'
 
     listMetadata:
       title: List metadata
@@ -78,6 +119,21 @@ components:
           required:
             - current
             - next
+
+    itemRelation:
+      title: Item relation
+      description: |
+        A relation to another item, consisting only of an ID.
+
+        Generally, this is used within request bodies for specifying that the
+        item is to be related to another item, without implying that any
+        properties of the related item are to be modified.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+      required:
+        - id
 
     problem:
       title: Problem Details
@@ -187,6 +243,31 @@ components:
 
 
   responses:
+
+    item:
+      description: |
+        A response for a single item.
+
+        Currently this serves only as an example of how a response for a single
+        item should look: OpenAPI doesn't currently allow a response to
+        reference another response, and also define its own schema.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/item'
+
+    itemList:
+      description: |
+        A list of items.
+
+        Currently this serves only as an example of how a response for a single
+        item should look: OpenAPI doesn't currently allow a response to
+        reference another response, and also define its own schema.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/itemList'
+
     problem:
       description: RFC 7807 Problem Details
       content:
@@ -233,6 +314,94 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+
+    search:
+      name:        search
+      in:          query
+      description: |
+        A search term.
+
+        Each endpoint which accepts this parameter will have its own logic for
+        determining whether an item matches this search term.
+
+        In addition, each returned item should return how close a match it is
+        for this search term.
+      schema:
+        type: string
+
+    properties:
+      name: properties
+      in: query
+      description: |
+        If this is set, then only these properties are included in any items
+        that this endpoint retrieves. (If not provided, all properties will be
+        included.)
+
+        This parameter is useful for if only a subset of the item's properties
+        is required for an operation.
+      schema:
+        type: array
+        items:
+          type: string
+      example:
+        # fetch only the ID, first name and last name properties
+        - [id, firstname, lastname]
+
+    filter:
+      name:        filter
+      in:          query
+      description: |
+        A set of filters (if any) which will be used to filter out the list of
+        items that this endpoint returns.
+
+        Generally, the structure of this object will match the structure of
+        the object that the endpoint returns: any object which is like the
+        filter object passed in will be returned in the search.
+
+        Values in the object may either be scalars (the field must equal this
+        value), or objects with a particular key:
+        * equals: the field must equal the value of this key
+        * in: the field must be one of the values of this key
+        * between: the field must be between the two values of this key
+        * lessThan, greaterThan: the field must be one of the values of this key
+
+        Fields of sub-objects may also be used in filters.
+
+        Inspired by https://www.algolia.com/doc/api-reference/api-parameters/filters/
+      schema:
+        type: object
+      example:
+        # fetch an item whose ID = 5
+        - id: 5
+        # fetch an item whose ID = 5
+        - id:
+            equals: 5
+        # fetch an item whose ID is 1, 3 or 5
+        - id:
+            in: [1, 3, 5]
+        # fetch an item whose ID is less than 17
+        - id:
+            lessThan: 17
+        # fetch an item whose ID is between 1 and 5
+        - id:
+            between: [1, 5]
+        # fetch an item whose role ID is 1
+        - role:
+            id: 1
+        # fetch an item whose role type is staff
+        - role:
+            type: staff
+        # fetch an item whose role type is staff or parent
+        - role:
+            type:
+                in: [staff, parent]
+        # fetch an item whose role type is staff or parent,
+        # and whose ID < 17
+        - role:
+            type:
+                in: [staff, parent]
+          id:
+            lessThan: 17
 
     cursor:
       name:        cursor

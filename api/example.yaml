@@ -1,0 +1,407 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox Example RESTful API
+  description: |
+    Schoolbox Example RESTful API.
+
+    This may be used as an example for how to define RESTful APIs for your own
+    resources.
+  # This API ID should be regenerated for each new API document.
+  # See https://opensource.zalando.com/restful-api-guidelines/#215 for the
+  # inspiration behind this.
+  x-api-id:    45db1eda-7945-4bf8-8210-49d8adfd1ca0
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+# TODO reference servers to common.yaml once this is actually possible
+# See https://github.com/OAI/OpenAPI-Specification/issues/1527 for why it's not
+servers:
+  - url: https://{hostname}.{domain}/
+    description: |
+      A server from which this API will be accessible.
+
+      In practice, this will always be a school's Schoolbox instance.
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+# Authorization is handled by Schoolbox itself once a user is authenticated:
+# therefore, no scopes are defined for any security scheme.
+# Anyway, these all match an entry in #/components/securitySchemes
+security:
+  - bearerAuth: []
+  - cookieAuth: []
+
+
+# Paths for the resource are defined here.
+# Each resource should define at least the paths under /resource and
+# /resource/{id},
+paths:
+  /resource:
+    get:
+      operationId: resourceSearch
+      description: |
+        Returns all resources which match the search parameters provided in the
+        query string.
+
+        This path should return a 200 status code (with a list of the found
+        resources, plus metadata for the list) if successful, or may return any
+        4xx or 5xx code if the request cannot be fulfilled.
+      responses:
+        '200':
+          $ref: '#/components/responses/resourceList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/cursor'
+        - $ref: 'common.yaml#/components/parameters/search'
+        - $ref: 'common.yaml#/components/parameters/filter'
+        - $ref: 'common.yaml#/components/parameters/properties'
+
+    post:
+      operationId: resourcePost
+      description: |
+        Creates a resource.
+
+        This path should return a 201 status code (with the created resource in
+        the response body) if successful, or may return any 4xx or 5xx code if
+        the request cannot be fulfilled.
+      responses:
+        '201':
+          $ref: '#/components/responses/resource'
+      requestBody:
+        $ref: '#/components/requestBodies/resource'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/token'
+
+
+  /resource/{id}:
+    get:
+      operationId: resourceGet
+      description: |
+        Finds a single resource by its ID, and returns it.
+
+        This path should return a 200 status code (with the found resource in
+        the response body) if successful, or may return any 4xx or 5xx code if
+        the request cannot be fulfilled.
+      responses:
+        '200':
+          $ref: '#/components/responses/resource'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    put:
+      operationId: resourcePut
+      description: |
+        Updates a resource.
+
+        Any fields that are not provided in the resource in the request body are
+        blanked out.
+
+        This path may return either an empty 204 status code if successful, or
+        any 4xx or 5xx code if the request cannot be fulfilled. (Usually there
+        is no need to return the post-update state of the resource, but this is
+        up to the developer's discretion.)
+      responses:
+        '204':
+          description: The resource was updated successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        $ref: '#/components/requestBodies/resource'
+
+    patch:
+      operationId: resourcePatch
+      description: |
+        Partially updates an resource.
+
+        Any fields that are not provided in the resource in the request body are
+        ignored; only the fields provided in the resource will be updated.
+
+        This path may return either an empty 204 status code if successful, or
+        any 4xx or 5xx code if the request cannot be fulfilled. (Usually there
+        is no need to return the post-update state of the resource, but this is
+        up to the developer's discretion.)
+      responses:
+        '204':
+          description: The resource was updated successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        $ref: '#/components/requestBodies/resource'
+
+    delete:
+      operationId: resourceDelete
+      description: |
+        Deletes a resource.
+
+        This path may return either an empty 204 status code, if successful, or
+        any 4xx or 5xx code if the request cannot be fulfilled. (There is no
+        need to return any content, as the content no longer exists if this
+        operation was successful.)
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - $ref: 'common.yaml#/components/parameters/token'
+
+
+  /resource/{id}/actions/{action}:
+    put:
+      operationId: resourceNonStandardAction
+      description: |
+        Perform a non-standard action (i.e. one which doesn't map onto the
+        the standard HTTP verbs) on this resource. (Generally, this will be
+        performed as a PUT?)
+
+        For example: for users you may wish to separate the action for changing
+        a password, so that it can't be changed via the standard PUT or PATCH
+        options.
+
+        Before adding a non-standard action: consider whether it cannot be
+        expressed as a standard RESTful action.
+
+        This path may return (at the discretion of the developer):
+        * a 200 status code (with the changed resource in the response body) if
+          the action was successful
+        * an empty 204 status code, if successful and there's no need to inform
+          the client of what changed
+        * any 4xx or 5xx code if the request cannot be fulfilled.
+      responses:
+        '200':
+          $ref: '#/components/responses/resource'
+        '204':
+          description: The action was completed successfully.
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - name:        action
+        in:          path
+        required:    true
+        description: |
+          The action to perform.
+
+          (In practice, actions will be split into different paths so that they
+          can be documented separately; but for example purposes the action is
+          provided as a path parameter.)
+        schema:
+          type: string
+
+
+  /resource/{id}/{subresource}:
+    get:
+      operationId: resourceGetSubresources
+      description: |
+        Returns all sub-resources (of a particular type) for this resource.
+
+        For example: for users you may wish to easily access their children, so
+        you would have the ability to fetch children as a sub-path of the user's
+        path set.
+
+        A sub-resource will generally be a join model, which contains metadata
+        about the relation between the resource and sub-resource: this metadata
+        will be modifiable directly, whereas the sub-resource itself will not be
+        modifiable by this path.
+
+        Any of the paths defined above may be available on sub-resources:
+        * GET    /user/1/children/  gets all children of a user
+        * POST   /user/1/children/  adds a parent/child relation
+        * PUT    /user/1/children/2 replaces the parent/child relation
+        * PATCH  /user/1/children/2 patches the parent/child relation
+        * DELETE /user/1/children/2 removes the parent/child relation
+      responses:
+        '200':
+          # This will generally not be the same type as the base resource.
+          # In the above example, children are also users.
+          $ref: '#/components/responses/resourceList'
+
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/id'
+      - name:        subresource
+        in:          path
+        required:    true
+        description: |
+          The type of sub-resource to retrieve.
+
+          (In practice, each sub-resource will have its own path so multiple
+          different types of sub-resource may be defined; but for example
+          purposes the subresource is provided as a path parameter.)
+        schema:
+          type: string
+
+
+# Reusable references to definitions go here.
+components:
+  schemas:
+    resource:
+      allOf:
+        - $ref: '#/components/schemas/resourceFields'
+        - $ref: '#/components/schemas/resourceReadableFields'
+        - title: Resource
+          description: |
+            Readable version of the resource, as returned within responses to
+            requests.
+
+            This will usually be defined as above: the schema will match both
+            the resource's common fields and its read-only fields.
+
+    resourceWritable:
+      allOf:
+        - $ref: '#/components/schemas/resourceFields'
+        - $ref: '#/components/schemas/resourceWritableFields'
+        - title: Writable Resource
+          description: |
+            Writable version of the resource, as passed within the requests for
+            creating and updating the resource.
+
+            This will usually be defined as above: the schema will match both
+            the resource's common fields and its write-only fields.
+
+    resourceFields:
+      title: Resource Fields
+      description: |
+        Fields for the given resource that are both readable and writable.
+      type: object
+      properties:
+        exampleField:
+          type: string
+          description: |
+            A field within the resource, which may be either read or written.
+
+    resourceReadableFields:
+      title: Readable Resource Fields
+      description: |
+        Fields in the resource that are read-only.
+
+        The ID field of the resource will generally be read-only, as will any of
+        its links.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+
+        exampleReadonlyField:
+          type: string
+          description: |
+            A field within the resource, which may only be read.
+
+        relatedResource:
+          $ref: '#/components/schemas/resourceRelation'
+
+        _links:
+          type: object
+          description: |
+            Resources may also contain contextual links to RESTful actions that
+            may be performed on them, or to related information (i.e. images or
+            documentation).
+          properties: {}
+      required:
+        - id
+      readOnly: true
+
+    resourceWritableFields:
+      title: Writable Resource Fields
+      description: |
+        Fields in the resource that are write-only.
+
+        In practice, fields are not usually write-only: instead, this will
+        contain writable variants of related fields, which contain only an ID.
+      type: object
+      properties:
+        exampleWriteonlyField:
+          type: string
+          description: |
+            A field within the resource, which may only be written.
+
+        relatedResource:
+          $ref: 'common.yaml#/components/schemas/itemRelation'
+      writeOnly: true
+
+    resourceRelation:
+      title: Related Resource
+      description: |
+        A resource that is related to this resource.
+
+        In practice, responses that contain the related resource will contain
+        the entire resource.
+
+        Request bodies that accept a related resource as part of the main
+        resource will contain only the ID of the related resource, to imply that
+        only the base resource's relation is able to be modified. (This schema
+        is defined in common.yaml#/components/schemas/itemRelation.)
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+
+        exampleField:
+          type: string
+          description: |
+            A field within the related resource.
+
+    resourceList:
+      title: Resource list
+      description: |
+        A list of resources.
+
+        This will contain not only the list itself, but also metadata about the
+        list (i.e. the total count of resources which matches the search, a
+        cursor to the next page of results).
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/resource'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
+
+  securitySchemes:
+    bearerAuth:
+      $ref: 'common.yaml#/components/securitySchemes/bearerAuth'
+
+    cookieAuth:
+      $ref: 'common.yaml#/components/securitySchemes/cookieAuth'
+
+  responses:
+    resource:
+      description: A response that describes a single resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/resource'
+
+    resourceList:
+      description: |
+        A response that describes a list of resources, along with metadata for
+        the list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/resourceList'
+
+  requestBodies:
+    resource:
+      description: A request to create or update a single resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/resourceWritable'

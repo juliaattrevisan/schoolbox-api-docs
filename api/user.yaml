@@ -35,8 +35,22 @@ security:
 paths:
 
   /user:
+    get:
+      operationId: userSearch
+      summary: Returns users which match a search term and set of filters.
+      responses:
+        '200':
+          $ref: '#/components/responses/userList'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/cursor'
+        - $ref: 'common.yaml#/components/parameters/search'
+        - $ref: 'common.yaml#/components/parameters/filter'
+        - $ref: 'common.yaml#/components/parameters/properties'
+
     post:
-      operationId: createUser
+      operationId: userPost
       summary: Creates a user
       responses:
         '201':
@@ -46,15 +60,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/user'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/user'
+        $ref: '#/components/requestBodies/user'
 
 
   /user/{id}:
     put:
-      operationId: putUser
+      operationId: userPut
       summary: Updates a user
       responses:
         '200':
@@ -62,13 +73,21 @@ paths:
         default:
           $ref: 'common.yaml#/components/responses/problem'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/user'
+        $ref: '#/components/requestBodies/user'
+
+    patch:
+      operationId: userPatch
+      summary: Updates a subset of a user's fields
+      responses:
+        '200':
+          $ref: '#/components/responses/user'
+        default:
+          $ref: 'common.yaml#/components/responses/problem'
+      requestBody:
+        $ref: '#/components/requestBodies/user'
 
     delete:
-      operationId: deleteUser
+      operationId: userDelete
       summary: Deletes a user
       responses:
         '204':
@@ -77,7 +96,7 @@ paths:
           $ref: 'common.yaml#/components/responses/problem'
 
     get:
-      operationId: getUser
+      operationId: userGet
       summary: Returns a user
       responses:
         '200':
@@ -90,47 +109,240 @@ paths:
       - $ref: 'common.yaml#/components/parameters/token'
 
 
-#  /user/profile:
-#    post:
-#      operationId: createUserProfile
-#      summary: Creates a user profile
-
-
-#  /user/search:
-#    get:
-#      operationId: searchUser
-#      summary: Search for users
-
 components:
   schemas:
     externalId:
       type: string
+      description: |
+        This user's ID in the school's School Information System (SIS).
+
+        This value is used to query the SIS for data that is stored in the SIS,
+        in particular:
+        * relationships with other users
+        * class enrolments
+        * timetabled classes
 
     user:
+      allOf:
+        - $ref: '#/components/schemas/readableUserFields'
+        - $ref: '#/components/schemas/userFields'
+
+    writableUser:
+      allOf:
+        - $ref: '#/components/schemas/writableUserFields'
+        - $ref: '#/components/schemas/userFields'
+
+    userFields:
       title: User
       description: Common fields for users
       type: object
       properties:
-        id:
-          $ref: 'common.yaml#/components/schemas/id'
+
         externalId:
           $ref: '#/components/schemas/externalId'
+
+        username:
+          type: string
+          # Apparently this is nullable?
+          nullable: true
+          description: |
+            The user's username. This will be used as the user's identification
+            when they attempt to log into the Schoolbox instance.
+
+        superuser:
+          type: boolean
+          description: |
+            Does this user have superuser permissions over the Schoolbox
+            instance?
+          default: false
+
+        enabled:
+          type: boolean
+          description: Is this user able to log in to the Schoolbox instance?
+          default: true
+
         title:
           type: string
+          nullable: true
+          description: The user's title (Mr., Ms., etc.).
+
         firstName:
           type: string
+          nullable: true
+          description: |
+            The user's first name.
+
+            Schoolbox doesn't distinguish between a person's actual first name
+            and any other names, and in any case is not the definitive source of
+            naming information; therefore in practice this will usually be the
+            user's given name.
+
         lastName:
           type: string
-        parents:
-          type: array
-          items:
-            $ref: '#/components/schemas/userProfile'
           nullable: true
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/userProfile'
+          description: The user's surname.
+
+        isEmailDerived:
+          type: boolean
+          description: |
+            Is this user's email address derived directly from their username
+            and the host name of the Schoolbox instance?
+
+        altEmail:
+          type: string
+          format: email
           nullable: true
+          description: |
+            The user's email address, if it is not derived from their username
+            and hostname.
+
+        positionTitle:
+          type: string
+          nullable: true
+          description: |
+            The user's job or position title within the school which owns the
+            Schoolbox instance.
+
+        yearLevel:
+          type: string
+          nullable: true
+          description: |
+            The user's year level. May be provided as a number, or as a textual
+            description of their year level.
+
+        isBoarder:
+          type: boolean
+          description: Is this user a boarder?
+
+        flags:
+          type: object
+          description: |
+            A set of flags which control the behavior of a user's Schoolbox
+            session.
+          properties:
+            showWebmailTab:
+              type: boolean
+              description: Does the Webmail tab display for this user?
+            showContacts:
+              type: boolean
+              description: Does this user's contacts get shown to other users?
+            enableTimetable:
+              type: boolean
+              description: Does this user get to see their timetabled classes?
+            showSideNav:
+              type: boolean
+              description: Does the side navigation show for this user?
+            showNotificationsPanel:
+              type: boolean
+              description: Does the notifications panel show for this user?
+            showGradeGraph:
+              type: boolean
+              description: Does the grade graph show for this user?
+            enableEportfolio:
+              type: boolean
+              description: Is this user able to create ePortfolio content?
+            useInternalMail:
+              type: boolean
+              description: |
+                Does this user use Schoolbox's internal mail system to send
+                email?
+
+                If false, they use webmail instead.
+            calendarView:
+              type: string
+              description: Which calendar view will the user default to?
+              enum:
+                - month
+                - agendaWeek
+                - agendaDay
+                - list
+
+    readableUserFields:
+      description: |
+        Fields that are only relevant when reading a user's value.
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+
+        campus:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/campus'
+
+        role:
+          $ref: '#/components/schemas/role'
+
+        groups:
+          description: |
+            This user's group memberships.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: 'user/groupMembership.yaml#/components/schemas/groupMembership'
+
+        schoolHouse:
+          $ref: '#/components/schemas/schoolHouse'
+
+        residentialHouse:
+          $ref: '#/components/schemas/residentialHouse'
+
+        guardians:
+          description: |
+            This user's guardians. (Only applicable if this user is of role
+            type: student.)
+
+            Guardians are not necessarily the same thing as parents: a guardian
+            is not always the child's parent (e.g. they may be a foster parent
+            or other relative), and a parent is not always the child's guardian
+            (e.g. the family might have separated).
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
+        students:
+          description: |
+            This user's students. (Only applicable if this user is of role type:
+            parent.)
+
+            Students are not necessarily the same thing as children, for the
+            same reason that guardians are not the same thing as parents.
+
+            Generally, the guardian => student relation is symmetrical to the
+            student => guardian relation.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
+        impersonableUsers:
+          description: |
+            The users whom this user may impersonate within a Schoolbox session.
+
+            This relation is asymmetric: A may impersonate B, but that does not
+            imply that B may impersonate A.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/user'
+          nullable: true
+
+        email:
+          type: string
+          format: email
+          description: |
+            The user's email address for receiving communication from this
+            Schoolbox instance, or its users.
+
+            This may be derived from the user's username and the instance's
+            hostname (see isEmailDerived); if not, it may be set via the
+            altEmail field.
+
         _links:
           type: object
           properties:
@@ -143,72 +355,170 @@ components:
               nullable: true
       required:
         - id
+      readOnly: true
 
-    userProfile:
-      title: User Profile
-      description: Common fields for user profiles
-      type: object
-      allOf:
-        - type: object
-          properties:
-            id:
-              $ref: 'common.yaml#/components/schemas/id'
-            externalId:
-              $ref: '#/components/schemas/externalId'
-        - oneOf:
-          - $ref: '#/components/schemas/userProfileGuardian'
-          - $ref: '#/components/schemas/userProfileStaff'
-          - $ref: '#/components/schemas/userProfileStudent'
-          discriminator:
-            propertyName: type
-            mapping:
-              guardian: '#/components/schemas/userProfileGuardian'
-              staff:    '#/components/schemas/userProfileStaff'
-              student:  '#/components/schemas/userProfileStudent'
-
-    userProfileStaff:
-      title: User Profile Staff fields
-      description: Fields for user profiles (staff only)
+    writableUserFields:
+      description: |
+        Fields that are only relevant when writing a user's value.
       type: object
       properties:
-        category:
-          type: string
-        positionDescription:
-          type: string
-        department:
-          type: string
-        extension:
-          type: string
-        room:
-          type: string
+        campus:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: 'common.yaml#/components/schemas/itemRelation'
 
-    userProfileStudent:
-      title: User Profile Student fields
-      description: Fields for user profiles (students only)
+        role:
+          $ref: 'common.yaml#/components/schemas/itemRelation'
+
+        groups:
+          description: |
+            This user's group memberships.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: 'user/groupMembership.yaml#/components/schemas/writableGroupMembership'
+
+        schoolHouse:
+          $ref: 'common.yaml#/components/schemas/itemRelation'
+
+        residentialHouse:
+          $ref: 'common.yaml#/components/schemas/itemRelation'
+
+        impersonableUsers:
+          description: |
+            The users whom this user may impersonate within a Schoolbox session.
+          type: array
+          uniqueItems: true
+          items:
+            $ref: 'common.yaml#/components/schemas/itemRelation'
+      writeOnly: true
+
+    userList:
+      title: User list
+      description: A list of users
+      readOnly: true
       type: object
       properties:
-        dateOfBirth:
-          $ref: 'common.yaml#/components/schemas/dateTime'
-        medicalAlert:
-          type: string
-        specialNeeds:
-          type: string
-        internationalBaccalaureate:
-          type: boolean
-        englishSecondLanguage:
-          type: boolean
+        data:
+          type: array
+          uniqueItems: true
+          items:
+            allOf:
+              - $ref: '#/components/schemas/user'
+              - $ref: 'common.yaml#/components/schemas/itemSearchRelevance'
+        metadata:
+          $ref: 'common.yaml#/components/schemas/listMetadata'
 
-    userProfileGuardian:
-      title: User Profile Guardian fields
-      description: Fields for user profiles (guardians only)
+    # TODO create schemas for SIS user profiles
+
+    schoolHouse:
+      title: School House
+      description: |
+        A school house which a student may belong to.
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the school house.
+      readOnly: true
+      required:
+        - id
+
+    residentialHouse:
+      title: Residential House
+      description: |
+        A residential house at which a student may board.
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
+          type: string
+          description: The name of the residential house.
+      readOnly: true
+      required:
+        - id
+
+    role:
+      title: Role
+      description: |
+        A type of user account at the school. Roles are generally used to group
+        users by the type of position that they have at the school.
       type: object
       properties:
-        phoneMobile:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
           type: string
-        phoneHome:
+          description: The name of the role.
+        type:
           type: string
-        phoneWork:
+          description: |
+            The type of this role. Different role types have different levels of
+            access to different parts of Schoolbox.
+          enum:
+            - staff
+            - student
+            - parent
+            - guest
+      required:
+        - id
+      readOnly: true
+      example:
+        - id:   3
+          name: Parents
+          type: parent
+        - id:   4
+          name: Senior Students
+          type: student
+        - id:   5
+          name: Teaching Staff
+          type: staff
+        - id:   6
+          name: Non-teaching Staff
+          type: staff
+        - id:   7
+          name: Alumni
+          type: student
+        - id:   8
+          name: Guests
+          type: guest
+
+    campus:
+      title: Campus
+      description: |
+        A sub-division within the school.
+
+        All users within the school belong to one or more campuses:
+        * a teacher may have classes across multiple campuses
+        * a student will generally only attend one campus
+        * a parent may have children who belong to different campuses
+      type: object
+      properties:
+        id:
+          $ref: 'common.yaml#/components/schemas/id'
+        name:
           type: string
+          description: The name of the campus.
+        code:
+          type: string
+          description: |
+            The identifying code for the campus in the school's SIS.
+        days:
+          type: integer
+          minimum: 5
+          maximum: 10
+          description: The number of days in a cycle for this campus' timetable.
+      required:
+        - id
+      readOnly: true
+
 
   securitySchemes:
     bearerAuth:
@@ -224,7 +534,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/user'
-        text/html:
+
+    userList:
+      description: A list of users
+      content:
+        application/json:
           schema:
-            type: string
-            description: The user, rendered into HTML on the server.
+            $ref: '#/components/schemas/userList'
+
+  requestBodies:
+    user:
+      description: A user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/writableUser'

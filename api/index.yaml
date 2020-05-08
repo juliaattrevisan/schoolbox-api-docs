@@ -1,0 +1,71 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox API
+  description: |
+    Schoolbox API.
+
+    An umbrella spec for all the other API specs that have been developed for
+    Schoolbox.
+  x-api-id:    0609d493-8804-4e97-b5ac-0ed7b3c99db8
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+
+# TODO reference servers to common.yaml once this is actually possible
+# See https://github.com/OAI/OpenAPI-Specification/issues/1527 for why it's not
+servers:
+  - url: https://{hostname}.{domain}/
+    variables:
+      hostname:
+        description: The subdomain of the school's domain name on which Schoolbox is hosted.
+        default: demo
+      domain:
+        description: The school's domain name.
+        default: schoolbox.com.au
+
+
+security:
+  # Authorization is handled by Schoolbox itself once a user is authenticated:
+  # therefore, no scopes are defined for any security scheme.
+  - bearerAuth:     []
+
+
+paths:
+
+  /user:
+    $ref: 'user.yaml#/paths/~1user'
+
+  /user/{id}:
+    $ref: 'user.yaml#/paths/~1user~1{id}'
+
+  /user/{id}/groupMemberships:
+    $ref: 'user/groupMembership.yaml#/paths/~1user~1{id}~1groupMemberships'
+
+  /user/{id}/groupMemberships/{groupId}:
+    $ref: 'user/groupMembership.yaml#/paths/~1user~1{id}~1groupMemberships~1{groupId}'
+
+  /discussion/{contextType}/{contextId}/comments/{id}:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1comments~1{id}'
+
+  /discussion/{contextType}/{contextId}/comments/{id}/comments:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1comments~1{id}~1comments'
+
+  /discussion/{contextType}/{contextId}/threads/{id}:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1threads~1{id}'
+
+  /discussion/{contextType}/{contextId}/threads:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1threads'
+
+  /discussion/{contextType}/{contextId}/threads/{id}/comments:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1threads~1{id}~1comments'
+
+  /discussion/{contextType}/{contextId}/threads/{id}/open:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1threads~1{id}~1open'
+
+  /discussion/{contextType}/{contextId}/threads/{id}/close:
+    $ref: 'discussion.yaml#/paths/~1discussion~1{contextType}~1{contextId}~1threads~1{id}~1open'
