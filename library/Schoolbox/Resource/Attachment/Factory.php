@@ -61,6 +61,12 @@ class Factory
 
 
     /**
+     * @var int
+     */
+    protected $defaultFolderId = 0;
+
+
+    /**
      * @param array $classmap
      */
     public function __construct(array $classmap = [])
@@ -80,6 +86,17 @@ class Factory
     public function setUseFolder(bool $useFolder): self
     {
         $this->useFolder = $useFolder;
+        return $this;
+    }
+
+
+    /**
+     * @param int $defaultFolderId
+     * @return $this
+     */
+    public function setDefaultFolderId(int $defaultFolderId): self
+    {
+        $this->defaultFolderId = $defaultFolderId;
         return $this;
     }
 
@@ -141,7 +158,7 @@ class Factory
             throw new OutOfRangeException("No controller found: {$source}");
         }
 
-        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta, $this->useFolder);
+        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta, $this->useFolder, $this->defaultFolderId);
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException('Controller does not implement ControllerInterface');

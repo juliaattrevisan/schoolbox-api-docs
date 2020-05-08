@@ -58,7 +58,11 @@
 
                 /* Whether Use This Folder is available
                  */
-                useFolder: true
+                useFolder: true,
+
+                /* Selector to get the default folder to start browsing resources from
+                 */
+                defaultFolderSelector: 0
             };
 
             return $.extend(defaults, options);
@@ -105,6 +109,13 @@
              */
             if (config.useFolder) {
                 qString += '&f';
+            }
+
+            /* If a default Folder is specified, just go straight to that node to
+             * save users the immense hassle of navigating the folder tree
+             */
+            if (config.defaultFolderSelector) {
+                qString += '&fid=' + config.defaultFolderSelector;
             }
 
             return qString;
@@ -381,6 +392,7 @@
                 element: $(this),
                 allowedFiles: null,
                 allowedFilesystems: 'link',
+                defaultFolderSelector: null
             },
 
             /* Combine with modal configuration requirements
@@ -404,6 +416,7 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
+                defaultFolderSelector: config.defaultFolderSelector
             });
 
             /* Send the message up and deal with the dialog, if one was specified

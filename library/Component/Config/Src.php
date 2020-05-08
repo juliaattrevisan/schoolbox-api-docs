@@ -38,7 +38,7 @@ class Component_Config_Src extends Component_Config_Abstract
         $vars = array(
             'COMPONENT_CONFIG_SRC_ID'   => '',
             'COMPONENT_CONFIG_SRC_NAME' => 'Local',
-            'COMPONENT_CONFIG_SRC_CID'  => '0'
+            'COMPONENT_CONFIG_SRC_CID'  => $this->getContext() ? $this->getContext()->getId() : 0
         );
         if ($configValue) {
             try {

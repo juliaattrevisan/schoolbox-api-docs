@@ -4,6 +4,7 @@
         $('#modalLinkButton-src-{COMPONENT_HANDLE}').schoolboxLink({
             allowedFiles: false,
             allowedFilesystems: 'folder',
+            defaultFolderSelector: $('#src-folder-id-{COMPONENT_HANDLE}').val(),
             onSelect: function(url, name, dialog) {
                 const currentFolderId = parseInt('{ID}');
                 const folderId = parseInt(url.replace('/homepage/', ''));
@@ -23,6 +24,7 @@
                 /* Save the actual value
                  */
                 $('#src-{COMPONENT_HANDLE}').val(url);
+                $('#src-folder-id-{COMPONENT_HANDLE}').val(folderId);
 
                 // Update a select box.
                 // How that's done depends on exactly what type it is: textbox or tile
@@ -46,6 +48,7 @@
 </script>
 <a id="modalLinkButton-src-{COMPONENT_HANDLE}" class="button icon-link">Browse</a>
 <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="src" id="src-{COMPONENT_HANDLE}"/>
+<input type="hidden" value="{COMPONENT_CONFIG_SRC_CID}" name="src-folder-id" id="src-folder-id-{COMPONENT_HANDLE}"/>
 <span>
   <a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}" class="src-folder" title="{COMPONENT_CONFIG_SRC_NAME}">
     {COMPONENT_CONFIG_SRC_NAME}
