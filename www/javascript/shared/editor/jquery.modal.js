@@ -62,7 +62,7 @@
 
                 /* Selector to get the default folder to start browsing resources from
                  */
-                defaultFolderSelector: null
+                defaultFolderSelector: 0
             };
 
             return $.extend(defaults, options);
@@ -114,8 +114,8 @@
             /* If a default Folder is specified, just go straight to that node to
              * save users the immense hassle of navigating the folder tree
              */
-            if (config.defaultFolderSelector && $(config.defaultFolderSelector).val()) {
-                qString += '&fid=' + $(config.defaultFolderSelector).val();
+            if (config.defaultFolderSelector) {
+                qString += '&fid=' + config.defaultFolderSelector;
             }
 
             return qString;

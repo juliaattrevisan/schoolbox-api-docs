@@ -43,6 +43,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             },
             regex: /^\/storage\/image/
         },
+
+        /* ID of the default folder from which to start browsing resources
+         */
+        defaultFolderSelector: 0
     };
 
     /**
@@ -551,13 +555,19 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var previousModal = $('#'+domId).closest('.cke_dialog');
                                     previousModal.addClass('hide');
 
+                                    /* Homepages have a hidden input field containing the homepage id
+                                     * If that exists, use it; otherwise assume root node 0
+                                     */
+                                    var defaultFolderSelector = $('#categoryID').val() ?? config.defaultFolderSelector;
+
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
                                         allowedFilesystems: 'files',
                                         allowedFiles: 'image/*,audio/*,video/*',
                                         previousModal: previousModal,
-                                        useFolder: false
+                                        useFolder: false,
+                                        defaultFolderSelector: defaultFolderSelector
                                     });
 
                                     $(window).unbind('message').on('message', function(event) {

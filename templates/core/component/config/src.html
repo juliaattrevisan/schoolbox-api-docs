@@ -4,7 +4,7 @@
         $('#modalLinkButton-src-{COMPONENT_HANDLE}').schoolboxLink({
             allowedFiles: false,
             allowedFilesystems: 'folder',
-            defaultFolderSelector: '#src-folder-id-{COMPONENT_HANDLE}',
+            defaultFolderSelector: $('#src-folder-id-{COMPONENT_HANDLE}').val(),
             onSelect: function(url, name, dialog) {
                 const currentFolderId = parseInt('{ID}');
                 const folderId = parseInt(url.replace('/homepage/', ''));
