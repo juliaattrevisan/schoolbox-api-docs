@@ -640,6 +640,12 @@ then
 	truncateTables;
 fi
 
+# If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
+if [ -f /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf ] && [ -f /etc/nginx/conf.d/nginx-vhost-schoolboxdev-websocket.conf ]; then
+    echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
+    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
+fi
+
 # Restart nginx
 echo -e "\nRestarting Nginx\c";
 if [ `which nginx | wc -l` -ne 0 ];
