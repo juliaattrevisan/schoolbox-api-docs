@@ -10,6 +10,7 @@
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
+use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -77,6 +78,25 @@ if (isset($type) && isset($id)) {
     $config = $kernel->getDependencyInjector()->get('config');
 
     // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve mime type
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /** @var string $mimeType */
+    if ($storage->getMimetype() instanceof Mimetype) {
+        if ($storage->getMimeType()->isAudio()) {
+            // If audio trancode, assume transcode format is audio/mpeg (mp3)
+            $mimeType = 'audio/mpeg';
+        } elseif ($storage->getMimeType()->isVideo()) {
+            // If video trancode, assume transcode format is video/mp4 (mp4)
+            $mimeType = 'video/mp4';
+        }
+    } else {
+        // If unknown, just flail about and choose the original file mimetype
+        $mimeType = 'application/octet-stream';
+    }
+
+
+    // ----------------------------------------------------------------------------------------------------------------
     // Retrieve stream
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -92,17 +112,6 @@ if (isset($type) && isset($id)) {
         // AWS S3
         if ($config->get('otfs_s3_presigned_urls_enabled')) {
             $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
-
-            /** @var string $mimeType */
-            if ($video->getStorage()->getMimetype() instanceof \Schoolbox\File\Mimetype) {
-                if ($video->getStorage()->getMimetype()->isAudio()) {
-                    $mimeType = 'audio/mpeg';
-                } elseif ($video->getStorage()->getMimetype()->isVideo()) {
-                    $mimeType = 'video/mp4';
-                }
-            } else {
-                $mimeType = 'application/octet-stream';
-            }
 
             $preSignedUrlService = new PreSignedUrlService($config);
 
@@ -140,25 +149,6 @@ if (isset($type) && isset($id)) {
     if ($videoSize <= 0) {
         fail();
     }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Retrieve mime type
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /** @var string $mimeType */
-    if ($storage->getMimetype() instanceof \Schoolbox\File\Mimetype) {
-        if ($storage->getMimeType()->isAudio()) {
-            // If audio trancode, assume transcode format is audio/mpeg (mp3)
-            $mimeType = 'audio/mpeg';
-        } elseif ($storage->getMimeType()->isVideo()) {
-            // If video trancode, assume transcode format is video/mp4 (mp4)
-            $mimeType = 'video/mp4';
-        }
-    } else {
-        // If unknown, just flail about and choose the original file mimetype
-        $mimeType = 'application/octet-stream';
-    }
-
 
 
     // ----------------------------------------------------------------------------------------------------------------
