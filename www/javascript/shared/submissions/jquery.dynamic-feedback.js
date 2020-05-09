@@ -130,6 +130,17 @@
                 .on('change', ':input', timeoutUpdate)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
+
+            // Listen to Kami events here
+            let kamiViewport = document.querySelector('#kami-viewport');
+            window.addEventListener('message', function (event) {
+                if (event.source === kamiViewport.contentWindow
+                    && event.data.type === 'kamiembedding'
+                    && (event.data.event_name === 'createdAnnotation' || event.data.event_name === 'deletedAnnotation')
+                ) {
+                    timeoutUpdate.apply(kamiViewport);
+                }
+            });
         }
 
 
@@ -141,7 +152,7 @@
             $(config.assessmentList).on('mousedown', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $participant = $(this).closest('[data-participant]'),
+                var $participant = findParticipantElement($(this)),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
@@ -256,9 +267,12 @@
                 return;
             }
 
-            var $form = $(this).closest('form');
-            $form.find('[data-action-bar]').slideDown();
-            $form.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
+            // Where's the form?
+            // * Kami isn't in the form
+            // * All other inputs are
+            var $actionBar = findParticipantElement($input).find('[data-action-bar]');
+            $actionBar.slideDown();
+            $actionBar.find('[data-draft=publish]').removeClass('hide');
         }
 
         /**
@@ -272,22 +286,28 @@
             // We passed in  a 'this' to apply() which was already a jquery object
             var $this = this;
 
-            // Don't ignore if an attachzone, rubric mark or resubmit required checkbox
+            // Don't ignore if an:
+            // * attachzone
+            // * rubric mark
+            // * resubmit required checkbox
+            // * Kami document
             // Otherwise, ignore if its value hasn't changed since last save
-            if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
-                if ($this.val() == $this.data('preval')) {
-                    return;
+            if (!$this.is('#kami-viewport')) {
+                if (!($this.is('.attachzone') || $this.is('[name="resubmissionRequired"]') || $this.is('[name^="rubric"]'))) {
+                    if ($this.val() === $this.data('preval')) {
+                        return;
+                    }
                 }
+
+                // update the pre-value (does not apply to Kami document)
+                $this.data('preval', $this.val());
             }
 
-            // update the pre-value
-            $this.data('preval', $this.val());
-
-            var $participant = $this.closest('[data-participant]'),
+            var $participant = findParticipantElement($this),
                 userId       = $participant.data('participant');
 
             // Is an auto-save in progress?
-            if(userId in autoSaveInProgress && autoSaveInProgress[userId]){
+            if (userId in autoSaveInProgress && autoSaveInProgress[userId]) {
                 // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
                 autoSavePending[userId] = true;
                 return;
@@ -397,10 +417,29 @@
         /* The form is never submitted synchronously */
         function disableFormSubmit() {
             $(config.assessmentList).find('form[data-feedback-form]').submit(function(e) {
-                e. preventDefault();
+                e.preventDefault();
 
                 $(this).find('[data-mark-input]').blur();
             });
+        }
+
+
+        /**
+         * Find the participant element.
+         * * If input is a form input, it will be the closest [data-participant]
+         * * If input is a Kami iframe, it will be the [data-participant] that
+         *   matches the iframe's user
+         *
+         * @param {jQuery} input
+         */
+        function findParticipantElement(input) {
+            let participant = input.closest('[data-participant]');
+            if (participant.length) {
+                return participant;
+            }
+
+            let participantId = input.attr('data-for-participant');
+            return $('[data-participant="' + String(participantId) + '"]');
         }
     }
 }(jQuery));
