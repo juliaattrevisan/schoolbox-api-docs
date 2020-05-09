@@ -129,6 +129,7 @@ $app = new class extends CliTool\App{
         } catch (Throwable $e) {
             $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
             $this->getLogger()->error($e->getTraceAsString());
+            $lock->release();
             exit(1);
         }
         $this->getLogger()->notice(sprintf(
@@ -136,6 +137,7 @@ $app = new class extends CliTool\App{
             $results->getCountSuccess(),
             $results->getCountFailure()
         ));
+        $lock->release();
         exit($results->getCountFailure() ? 1 : 0);
     }
 
