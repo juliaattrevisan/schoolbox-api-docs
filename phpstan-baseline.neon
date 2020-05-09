@@ -4651,16 +4651,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/ResourceNotifier.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getName\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/ResourceNotifier.php
-
-		-
 			message: "#^Cannot call method getOffset\\(\\) on null\\.$#"
 			count: 4
 			path: library/Schoolbox/Resource/Search/Results.php

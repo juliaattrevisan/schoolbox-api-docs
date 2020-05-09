@@ -17,11 +17,12 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -127,19 +128,31 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
      *
-     * @param int    $context  - most likely a category ID or ignored
-     * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-     * @param int    $limit    - how many messages to retrieve
-     * @param int    $offset   - by default, most recent
-     * @param string $filter   - optionally limit to a particular kind of resource
+     * @param int    $context - most likely a category ID or ignored
+     * @param User   $currentUser
+     * @param int    $limit   - how many messages to retrieve
+     * @param int    $offset  - by default, most recent
+     * @param string $filter  - optionally limit to a particular kind of resource
      * @return Collection|Instance[]
      */
-    protected function getFeedInternal($context, $roletype, $limit, $offset, $filter)
+    protected function getFeedInternal($context, User $currentUser, $limit, $offset, $filter)
     {
         $c = new Collection();
+        $roletype = $currentUser->getRole()->getType();
+        $access      = Access::getInstance();
 
         try {
-            $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
+            $currentPermission = $access->getFolderAccess($currentUser, $context);
+        } catch (Exception $e) {
+            return $c;
+        }
+
+        if ($currentPermission < UserAccess::ACCESS_READ) {
+            return $c;
+        }
+
+        try {
+            $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset, 0, $currentPermission > UserAccess::ACCESS_READ);
         } catch (Mapper\Exception|\Error $e) {
             return $c;
             // mute failures where things were logged about resources that no longer exist
@@ -177,7 +190,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string                $action
      * @param ParameterInterface    $param
      * @param User                  $effector
-     * @param Folder|ISoftDeletable $category
+     * @param Folder                $category
      * @param string                $roletype
      * @param int                   $accessLevel
      * @return Envelope
