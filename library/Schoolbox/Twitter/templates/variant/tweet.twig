@@ -1,0 +1,13 @@
+{% extends '@twitter/component.twig' %}
+
+{% block failureMessage %}
+    Cannot load tweet. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>.
+{% endblock failureMessage %}
+
+{% block twitterView %}
+    <blockquote id="twitter-view-{{ id }}"
+                class="twitter-tweet"
+                data-dnt="true">
+        <a href="{{ href }}"></a>
+    </blockquote>
+{% endblock twitterView %}

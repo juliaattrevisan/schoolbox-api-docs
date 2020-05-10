@@ -13,16 +13,16 @@
         <p id="twitter-view-{{ id }}-loading-message">Loading tweets...</p>
         <p id="twitter-view-{{ id }}-loading-message-waiting" class="hide">Still loading...</p>
         <p id="twitter-view-{{ id }}-loading-message-failed" class="hide">
-            Cannot load tweets for @{{ username }}. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>.
+            {% block failureMessage %}
+                {# Child templates should put a loading failed message here. #}
+                {# Cannot load tweets for @{{ username }}. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>. #}
+            {% endblock failureMessage %}
         </p>
     </div>
-    <a id="twitter-view-{{ id }}"
-       class="twitter-timeline"
-       href="{{ href }}"
-       data-dnt="true"
-       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
-       data-chrome="noheader nofooter noborders transparent noscrollbar"
-    ></a>
+
+    {% block twitterView %}
+        {# Child templates should put their Twitter widget here. #}
+    {% endblock twitterView %}
 
     {% autoescape 'js' %}
         <script type="text/javascript">
