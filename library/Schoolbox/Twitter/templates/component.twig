@@ -2,7 +2,7 @@
     <div class="empty-state">
         <span class="icon-twitter"></span>
         <p>
-            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter an author</a>
+            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">Enter a URL or username</a>
             to show a feed of tweets.
         </p>
     </div>
@@ -56,7 +56,6 @@
                             // the Twitter feed has been loaded successfully.
                             // Remove the empty state and stop observing.
                             if (!document.getElementById(elementId)) {
-                                console.log(mutationsList);
                                 container.remove();
                                 observer.disconnect();
                             }
