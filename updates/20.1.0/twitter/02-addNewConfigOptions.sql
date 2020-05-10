@@ -17,4 +17,4 @@ AND   ccd.key = 'keywords';
 DELETE ccd FROM component_config_definition ccd
 INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
 WHERE cd.class IN ('Schoolbox\\Twitter\\Component\\Homepage\\Controller', 'Schoolbox\\Twitter\\Component\\Dashboard\\Controller')
-AND   ccd.key = 'keywords';
+AND   ccd.key IN ('keywords', 'username');
