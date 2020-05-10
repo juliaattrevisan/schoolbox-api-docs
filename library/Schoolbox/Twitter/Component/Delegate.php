@@ -16,10 +16,8 @@ use Component_ControllerAbstract;
  */
 class Delegate
 {
-    public const  TEMPLATE                 = '@twitter/component.twig';
-    private const HREF_PROFILE_TIMELINE    = 'https://twitter.com/%s';
-    private const HREF_LIST_TIMELINE       = 'https://twitter.com/%s/lists/%s';
-    private const HREF_COLLECTION_TIMELINE = 'https://twitter.com/%s/timelines/%d';
+    public const  TEMPLATE              = '@twitter/component.twig';
+    private const HREF_PROFILE_TIMELINE = 'https://twitter.com/%s';
 
 
     /**
@@ -48,8 +46,7 @@ class Delegate
      */
     public function isEmptyState(): bool
     {
-        $username = $this->component->getConfig('username') ?? '';
-        return $username === '';
+        return ($this->component->getConfig('url') ?? '') === '';
     }
 
 
@@ -65,7 +62,6 @@ class Delegate
             'href'        => $this->buildHref(),
             'componentId' => $this->component->getInstance()->getId(),
             'limit'       => $this->component->getConfig('size'),
-            'username'    => $this->component->getConfig('username'),
         ];
     }
 
@@ -78,21 +74,22 @@ class Delegate
      */
     private function buildHref(): ?string
     {
-        $username = $this->component->getConfig('username') ?? '';
-        if ($username === '') {
+        // Put everything in a Twitter URL or username tag
+        $url = $this->component->getConfig('url') ?? '';
+        if ($url === '') {
             return null;
         }
 
-        $listSlug = $this->component->getConfig('twitterListSlug') ?? '';
-        if ((string)$listSlug !== '') {
-            return sprintf(self::HREF_LIST_TIMELINE, $username, $listSlug);
+        // We have a URL, but maybe it's actually a username
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!isset($host)) {
+            return sprintf(self::HREF_PROFILE_TIMELINE, $url);
         }
 
-        $collectionId = $this->component->getConfig('twitterCollectionId') ?? '';
-        if ((string)$collectionId !== '') {
-            return sprintf(self::HREF_COLLECTION_TIMELINE, $username, $collectionId);
+        if ($host !== 'twitter.com') {
+            return null;
         }
 
-        return sprintf(self::HREF_PROFILE_TIMELINE, $username);
+        return $url;
     }
 }
