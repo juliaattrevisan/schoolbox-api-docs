@@ -1,21 +1,7 @@
-INSERT IGNORE INTO component_config_definition (
-    component_definition_id,
-    `key`,
-    default_value,
-    label,
-    description
-)
-SELECT cd.id, 'twitterListSlug', '', 'List Slug', 'The slug of the list (if any) to show in this component'
-FROM component_definition cd
-WHERE cd.class IN ('Schoolbox\\Twitter\\Component\\Homepage\\Controller', 'Schoolbox\\Twitter\\Component\\Dashboard\\Controller');
-
-INSERT IGNORE INTO component_config_definition (
-    component_definition_id,
-    `key`,
-    default_value,
-    label,
-    description
-)
-SELECT cd.id, 'twitterCollectionId', '', 'Collection ID', 'The ID of the collection (if any) to show in this component'
-FROM component_definition cd
+-- Just use the "url" config, and migrate the existing "username" setting into it
+UPDATE IGNORE component_config_definition ccd
+INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+SET ccd.key         = 'url',
+    ccd.label       = 'URL or Username',
+    ccd.description = 'The URL of the Twitter content to show, or a username to show a feed for'
 WHERE cd.class IN ('Schoolbox\\Twitter\\Component\\Homepage\\Controller', 'Schoolbox\\Twitter\\Component\\Dashboard\\Controller');
