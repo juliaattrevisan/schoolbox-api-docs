@@ -50,62 +50,51 @@ if (isset($type, $id)) {
         $videoQueue       = $thumbnailFactory->produce();
     } catch (Exception $e) {
         // If anything goes wrong, fall through to sad mountain
-        $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-        // Stop storm complaining
-        exit;
     }
 
-    // If it has failed transcoding, display sad mountain
-    // (Do not cache, because the video should be re-encoded soon)
-    if ($videoQueue->isFailed()) {
-        SitePage::localRedir("/images/core/video-failed-thumb.png");
-        exit;
-    }
-
-    // If it hasn't finished processing, display please wait image
-    // (Do not cache, because the video should be done processing soon)
-    if (!$videoQueue->isComplete()) {
-        SitePage::localRedir("/images/core/video-processing-thumb.png");
-        exit;
-    }
-
-    try {
-        // Try to find a video record with associated poster and thumbnail links
-
-        if ($size == 'poster') {
-            $imageFilename = $videoQueue->getPosterPath();
-        } else {
-            $imageFilename = $videoQueue->getThumbnailPath();
-        }
-
-        /** @var \League\Flysystem\FilesystemInterface $filesystem */
-        $filesystem = $videoQueue->getStorage()->getFilesystem();
-
-        if ($filesystem->has($imageFilename)) {
-            $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-            /** \League\Flysystem\File $image */
-            $image = $filesystem->get($imageFilename);
-            header('Content-Type: image/jpeg');
-            /** @noinspection PhpUndefinedMethodInspection */
-            header("Content-Length: {$image->getSize()}");
-            /** @noinspection PhpUndefinedMethodInspection */
-            fpassthru($image->readStream());
+    if ($videoQueue) {
+        // If it has failed transcoding, display sad mountain
+        // (Do not cache, because the video should be re-encoded soon)
+        if ($videoQueue->isFailed()) {
+            SitePage::localRedir("/images/core/video-failed-thumb.png");
             exit;
         }
 
-        // No thumbnail found in storage: fdll through to sad mountain
-//        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-//        exit;
+        // If it hasn't finished processing, display please wait image
+        // (Do not cache, because the video should be done processing soon)
+        if (!$videoQueue->isComplete()) {
+            SitePage::localRedir("/images/core/video-processing-thumb.png");
+            exit;
+        }
 
-    } catch (Exception $e) {
-        // If anything else goes wrong, fall through to sad mountain
+        try {
+            // Try to find a video record with associated poster and thumbnail links
 
-//        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-//        exit;
+            if ($size == 'poster') {
+                $imageFilename = $videoQueue->getPosterPath();
+            } else {
+                $imageFilename = $videoQueue->getThumbnailPath();
+            }
+
+            /** @var \League\Flysystem\FilesystemInterface $filesystem */
+            $filesystem = $videoQueue->getStorage()->getFilesystem();
+
+            if ($filesystem->has($imageFilename)) {
+                $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+                $image = $filesystem->get($imageFilename);
+                header('Content-Type: image/jpeg');
+                header("Content-Length: {$image->getSize()}");
+                fpassthru($image->readStream());
+                exit;
+            }
+
+            // No thumbnail found in storage: fall through to sad mountain
+        } catch (Exception $e) {
+            // If anything else goes wrong, fall through to sad mountain
+        }
     }
 }
 
-// If goes wrong, head over to sad mountain
+// Fallthrough for if something went wrong
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 SitePage::redirectToBrokenImageOfSize(64, 64, 500);
