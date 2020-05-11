@@ -800,11 +800,14 @@ class ProjectTest extends TestCase
         $q4->getAssessmentModel()->setContextProject($p3);
 
         /** @var Project $p1DomainModel */
-        /** @var Project $p2DomainModel */
-        /** @var Project $p3DomainModel */
         $p1DomainModel = $this->translator->translateToDomainModel($p1);
+
+        /** @var Project $p2DomainModel */
         $p2DomainModel = $p1DomainModel->getAssessables()[2];
+
+        /** @var Project $p3DomainModel */
         $p3DomainModel = $p1DomainModel->getAssessables()[3];
+
         $this->assertInstanceOf(Project::class, $p1DomainModel);
         $this->assertInstanceOf(Project::class, $p2DomainModel);
         $this->assertInstanceOf(Project::class, $p3DomainModel);
@@ -1051,18 +1054,24 @@ class ProjectTest extends TestCase
         $q4->setContext($p3);
 
         /** @var ProjectModel $p1DataModel */
-        /** @var ProjectModel $p2DataModel */
-        /** @var ProjectModel $p3DataModel */
-        /** @var QuizModel    $q4DataModel */
         $p1DataModel = $this->translator->translateToDataModel($p1);
+
+        /** @var ProjectModel $p2DataModel */
         $p2DataModel = $p1DataModel->getAssessments()[2]->getProject();
+
+        /** @var ProjectModel $p3DataModel */
         $p3DataModel = $p1DataModel->getAssessments()[3]->getProject();
+
         $this->assertInstanceOf(ProjectModel::class, $p1DataModel);
         $this->assertInstanceOf(ProjectModel::class, $p2DataModel);
         $this->assertInstanceOf(ProjectModel::class, $p3DataModel);
 
+        /** @var QuizModel $p2q4DataModel */
         $p2q4DataModel = $p2DataModel->getAssessments()[4]->getQuiz();
+
+        /** @var QuizModel $p3q4DataModel */
         $p3q4DataModel = $p3DataModel->getAssessments()[4]->getQuiz();
+
         $this->assertInstanceOf(QuizModel::class, $p2q4DataModel);
         $this->assertInstanceOf(QuizModel::class, $p3q4DataModel);
         $this->assertSame($p2q4DataModel, $p3q4DataModel);

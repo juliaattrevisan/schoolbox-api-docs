@@ -3616,18 +3616,8 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
-			message: "#^Variable \\$p3DomainModel in PHPDoc tag @var does not match assigned variable \\$p1DomainModel\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
 			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
-			message: "#^Variable \\$q4DataModel in PHPDoc tag @var does not match assigned variable \\$p1DataModel\\.$#"
-			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
 
 		-
