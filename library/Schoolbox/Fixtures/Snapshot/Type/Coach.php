@@ -49,7 +49,6 @@ class Coach implements ISnapshot
      */
     public function snapshot()
     {
-        /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
         /** @var Team $currentTeam */
