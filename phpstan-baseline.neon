@@ -4231,11 +4231,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n    \", expected type at offset 128$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Model.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Module.php
