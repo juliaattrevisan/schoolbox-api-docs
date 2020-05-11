@@ -49,7 +49,6 @@ class Player implements ISnapshot
      */
     public function snapshot()
     {
-        /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
         /** @var Team $currentTeam */
@@ -74,8 +73,9 @@ class Player implements ISnapshot
                 $allPlayers = $this->getMetadata()->getStrategy()->getAllPlayers($currentTeam);
 
                 /** @var CurrentPlayer $currentPlayer */
-                /** @var ParticipantPlayer $participantPlayer */
                 foreach ($allPlayers as $currentPlayer) {
+
+                    /** @var ParticipantPlayer $participantPlayer */
                     $participantPlayer = $this->getParticipantMapper()->createModel();
                     $participantPlayer->setMatch($match);
                     $participantPlayer->setTeam($currentTeam);
