@@ -4,15 +4,12 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
 use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
-use Aura\Web\Request;
-use InvalidArgumentException;
 use Schoolbox\Collection;
 use External_Timetable;
 use Schoolbox\Campus;
@@ -24,6 +21,11 @@ use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 
+/**
+ * Class Series
+ *
+ * @package Schoolbox\ResourceBooking\Booking
+ */
 class Series
 {
 
@@ -32,15 +34,18 @@ class Series
      */
     private $bookingMapper;
 
+
     /**
      * @var StatusMapper
      */
     protected $statusMapper;
 
+
     /**
      * @var External_Timetable
      */
     protected $externalTimetableHandler;
+
 
     /**
      * @param Mapper       $bookingMapper
@@ -54,18 +59,20 @@ class Series
 
     }
 
+
     /**
      * Get all recursive booking dates
      *
      * @param Item\Model  $resource
      * @param DateTime    $startDate
      * @param DateTime    $endDate
-     * @param String|null        $repeatUntil
-     * @param String|null        $related
-     * @param String|null        $repeat
+     * @param String|null $repeatUntil
+     * @param String|null $related
+     * @param String|null $repeat
      * @param Campus|null $campus
      *
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function getNewBookingSeries(
         Item\Model $resource,
@@ -132,6 +139,7 @@ class Series
         return $dateParts;
     }
 
+
     /**
      * Get all related booking dates
      *
@@ -180,6 +188,7 @@ class Series
         return $dateParts;
     }
 
+
     /**
      * Gets a series for update, adjusting their start and end dates.
      *
@@ -191,6 +200,9 @@ class Series
      *
      * @return Collection|Model[]
      * @throws MapperException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getUpdatedSeries(
         Model $item,
