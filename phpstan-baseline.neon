@@ -1881,11 +1881,6 @@ parameters:
 			path: library/External/Liss/Authenticator.php
 
 		-
-			message: "#^Variable \\$eventType in PHPDoc tag @var does not match assigned variable \\$allEventTypes\\.$#"
-			count: 1
-			path: library/External/Liss/Server.php
-
-		-
 			message: "#^Binary operation \"\\-\\=\" between string and 12 results in an error\\.$#"
 			count: 2
 			path: library/External/Pcschools/Timetable.php
