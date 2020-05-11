@@ -1326,11 +1326,6 @@ parameters:
 			path: library/External/AscTimetables/Translator/Enrolment/Map.php
 
 		-
-			message: "#^Variable \\$campus in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$period$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Structure.php
-
-		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Structure/Map.php
