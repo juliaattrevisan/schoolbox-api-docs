@@ -466,7 +466,6 @@ class Kernel extends WebKernelAbstract
         // AFAIK this isn't fakeable, and this gets called by some CLI scripts
         // despite it being the WebRequest bootstrap. (Go figure.)
 
-        /** @var IConfigLoader $config */
         $di             = $this->getDependencyInjector();
         $config         = $di->get('config');
         $fqdn           = trim($config->get('site_hostname') . '.' . $config->get('site_domain'), ';.');
