@@ -4106,11 +4106,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
 
 		-
-			message: "#^Variable \\$messageIds in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$id$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
-
-		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:sRem\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
