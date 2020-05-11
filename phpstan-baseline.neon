@@ -4266,11 +4266,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Item/RelatedResource/Mapper.php
 
 		-
-			message: "#^Variable \\$resources in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Report/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Report/Module.php

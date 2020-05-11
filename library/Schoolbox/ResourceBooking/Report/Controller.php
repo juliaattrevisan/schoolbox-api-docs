@@ -112,13 +112,16 @@ class Controller extends Base
         }
 
         // Fill in resources
-        /** @var Item\Model[] $resources */
         if (!empty($selectedCategories)) {
+
+            /** @var Item\Model[] $resources */
             $resources = $this->getItemMapper()->findByColumn(
                 'resource_category_id',
                 $selectedCategories
             );
         } else {
+
+            /** @var Item\Model[] $resources */
             $resources = $this->getItemMapper()->findAll();
         }
 
