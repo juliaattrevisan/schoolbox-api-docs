@@ -4241,11 +4241,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Notifier.php
 
 		-
-			message: "#^Variable \\$series in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
-
-		-
 			message: "#^Variable \\$campus might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php

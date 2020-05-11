@@ -223,9 +223,9 @@ class Series
 
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
-        /** @var Collection|Model[] $series */
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
             // Load whole series
+            /** @var Collection|Model[] $series */
             $series = $this->getBookingMapper()->findSeriesBookings(
                 $item->getId(),
                 $item->getEvent()->getSeriesId()
