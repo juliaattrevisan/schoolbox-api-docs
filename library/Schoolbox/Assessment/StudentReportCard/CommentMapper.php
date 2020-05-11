@@ -190,6 +190,7 @@ class CommentMapper extends Mapper
         $commentCollection = new Collection();
 
         while ($record = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var Comment $commentObject */
             $commentObject = $this->hydrate($record, 'com');
             $commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
             $commentObject->setStudent($studentMapper->hydrate($record, 'su'));
