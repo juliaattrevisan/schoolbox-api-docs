@@ -94,7 +94,7 @@ class Freedom implements IQueryHelper
         $sql = "
             SELECT
             CONVERT(varchar(10), I.MEMBER#)     AS IDENTITY_ID#,
-            I.EMAIL                             AS EMAIL
+            I.EMAIL_HOME                        AS EMAIL
             FROM dbo.[IDENTITY] AS I
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
