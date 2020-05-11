@@ -4396,11 +4396,6 @@ parameters:
 			path: library/Schoolbox/Tile/Component/TileControllerDelegate.php
 
 		-
-			message: "#^Variable \\$tileMapper in PHPDoc tag @var does not match assigned variable \\$model\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Layout/Mapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForLayout\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Layout/Mapper.php
