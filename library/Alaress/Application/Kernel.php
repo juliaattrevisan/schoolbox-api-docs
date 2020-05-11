@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Alaress\Application;
 
 use Aura\Di;
@@ -29,7 +27,6 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
-use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Alaress\Session\Factory;
