@@ -49,10 +49,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     {
         $enabledOnly          = true;
         $userConfigurableOnly = false;
-        $pageFilters          = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
-        $keyConverters        = $this->createKeyConverterCollection();
 
         /** @var Page\Model[] $pageFilters */
+        $pageFilters          = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
+
+        $keyConverters        = $this->createKeyConverterCollection();
+
         foreach ($pageFilters as $pageFilter) {
             $filter        = $pageFilter->getFilter();
             $filterFactory = $this->buildFilterFactoryForFilter($filter->getClass());

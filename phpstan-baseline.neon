@@ -2841,11 +2841,6 @@ parameters:
 			path: library/Schoolbox/File/ExtensionMapper.php
 
 		-
-			message: "#^Variable \\$pageFilters in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$pageFilter$#"
-			count: 1
-			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForPageAndEntity\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
