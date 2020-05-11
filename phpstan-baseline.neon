@@ -2951,11 +2951,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
-			message: "#^Variable \\$participantCoach in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentCoach$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Snapshot/Type/Coach.php
-
-		-
 			message: "#^Variable \\$participantPlayer in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentPlayer$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Snapshot/Type/Player.php
