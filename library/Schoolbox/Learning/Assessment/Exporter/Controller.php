@@ -34,20 +34,28 @@ class Controller extends BaseController
      */
     protected $access;
 
+
     /**
      * @var AssessmentDataSource
      */
     protected $assessmentDataSource;
+
 
     /**
      * @var UnitImplementation\Mapper
      */
     private $unitImplementationMapper;
 
-    /** @var Replicator */
+
+    /**
+     * @var Replicator
+     */
     private $replicator;
 
-    /** @var AssessmentFilter\IdFinder */
+
+    /**
+     * @var AssessmentFilter\IdFinder
+     */
     private $assessmentIdFinder;
 
 
@@ -92,6 +100,9 @@ class Controller extends BaseController
      *
      * @param IAssessable $assessmentSpec
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function getExportForm(IAssessable $assessmentSpec)
     {
@@ -151,6 +162,7 @@ class Controller extends BaseController
      * @throws \Alaress\Web\Controller\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
+     * @throws \LogicException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @internal param string $_GET ['returnUrl']            a URL to return to once done
@@ -328,6 +340,9 @@ class Controller extends BaseController
      *
      * @param IAssessable $assessment
      * @return IAssessable[]|GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     protected function buildImplementationsForSpecification(IAssessable $assessment): GenericCollection
     {
@@ -399,7 +414,6 @@ class Controller extends BaseController
 
         // Force download/
         if (file_exists($filename)) {
-
             $headers = $this->getResponse()->headers;
 
             // per header
