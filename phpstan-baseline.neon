@@ -2376,11 +2376,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$commentObject Comment\\)\\: Unexpected token \"\\$commentObject\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Assessment/StudentReportCard/CommentMapper.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Eportfolio/Image/Mapper.php
