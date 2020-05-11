@@ -2346,11 +2346,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Variable \\$collection in PHPDoc tag @var does not match assigned variable \\$capabilityMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForOtherMapper\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
