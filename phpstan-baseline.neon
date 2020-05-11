@@ -11,11 +11,6 @@ parameters:
 			path: library/Alaress/Application/Kernel.php
 
 		-
-			message: "#^Variable \\$bookMarkMapper in PHPDoc tag @var does not match assigned variable \\$config\\.$#"
-			count: 1
-			path: library/Alaress/Application/Kernel.php
-
-		-
 			message: "#^Method Alaress\\\\Async\\\\Notification\\\\Cloud\\\\Google\\\\GCM\\:\\:propagate\\(\\) should return bool but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
