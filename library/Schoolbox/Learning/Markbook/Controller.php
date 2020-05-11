@@ -341,7 +341,7 @@ class Controller extends Base
          * * Assessment is/was not due in a term that is archived, and
          * * User has write+ perm to the page
          */
-        /** @var bool[] $writableAssessments Indexed by assessment.id */
+        /** @var bool[] $writable Indexed by assessment.id */
         $writable = [];
 
         $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);

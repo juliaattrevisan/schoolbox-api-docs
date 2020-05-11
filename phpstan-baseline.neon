@@ -3701,11 +3701,6 @@ parameters:
 			path: library/Schoolbox/Learning/Markbook/Controller.php
 
 		-
-			message: "#^Variable \\$writableAssessments in PHPDoc tag @var does not match assigned variable \\$writable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Learning/Module.php
