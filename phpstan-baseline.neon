@@ -3842,7 +3842,7 @@ parameters:
 
 		-
 			message: "#^Cannot call static method getInstance\\(\\) on \\(int\\|string\\)\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
@@ -4127,16 +4127,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\File\\\\IFile\\:\\:getFolder\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\:\\:setOwner\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\:\\:getStorage\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Resource/Browser/AbstractController.php
 
