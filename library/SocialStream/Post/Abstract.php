@@ -1,12 +1,9 @@
 <?php
 /**
- * SocialStream_Post_Abstract
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -14,6 +11,9 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
+/**
+ * Class SocialStream_Post_Abstract
+ */
 abstract class SocialStream_Post_Abstract implements ISoftDeletable
 {
     use CreatedAtDate;
@@ -293,7 +293,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * Get type
      *
-     * @return null|\Alaress_Date_Format
+     * @return null|string
      */
     public function getType(): ?string
     {

@@ -4446,11 +4446,6 @@ parameters:
 			path: library/SocialStream/Authenticator.php
 
 		-
-			message: "#^PHPDoc tag @return with type Alaress_Date_Format\\|null is not subtype of native type string\\|null\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Abstract.php
-
-		-
 			message: "#^Cannot call method getTitle\\(\\) on string\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Factory/Creational.php
