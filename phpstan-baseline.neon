@@ -4221,11 +4221,6 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Mapper.php
 
 		-
-			message: "#^Variable \\$item in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Auth/CanBookItem.php
-
-		-
 			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
 			count: 2
 			path: library/Schoolbox/ResourceBooking/Booking/Component/ResourceManagement.php
