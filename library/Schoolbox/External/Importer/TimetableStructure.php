@@ -338,8 +338,8 @@ class TimetableStructure extends AbstractImporter
                 $this->log->info(sprintf('Pretending to save campus cycle for campus "%s"', $code));
             }
 
+            /** @var Collection|TimetablePeriod[] $periods */
             foreach ($row['periods'] as $day => $periods) {
-                /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
                     if ($this->performUpdate) {
                         $this->log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));
