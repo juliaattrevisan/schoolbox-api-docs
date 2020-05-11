@@ -10,7 +10,11 @@
     {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
     <div class="empty-state" id="twitter-view-{{ id }}-loading-container">
         <span class="icon-twitter"></span>
-        <p id="twitter-view-{{ id }}-loading-message">Loading tweets...</p>
+        <p id="twitter-view-{{ id }}-loading-message">
+            {% block loadingMessage %}
+                {# Child templates should put a simple loading message here. #}
+            {% endblock loadingMessage %}
+        </p>
         <p id="twitter-view-{{ id }}-loading-message-waiting" class="hide">Still loading...</p>
         <p id="twitter-view-{{ id }}-loading-message-failed" class="hide">
             {% block failureMessage %}
