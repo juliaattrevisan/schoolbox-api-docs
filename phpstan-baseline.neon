@@ -681,11 +681,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^Variable \\$assessables in PHPDoc tag @var does not match assigned variable \\$allAssessments\\.$#"
-			count: 1
-			path: library/Component/Dashboard/RecentSubmissionsController.php
-
-		-
 			message: "#^Method Component\\\\Eportfolio\\\\AdvancedListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Component/Eportfolio/AdvancedListMapper.php
