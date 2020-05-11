@@ -409,7 +409,8 @@
             },
             stop: function (event, ui) {
                 var element = ui.item,
-                    data, cl;
+                    cl,
+                    request;
 
                 // check to see if this was dragged from the palette
                 if (masonry.options.palette && element.is(masonry.options.palette.handleSelector)) {
@@ -439,7 +440,10 @@
                         });
                 } else {
                     ui.item.removeClass(sortingClass);
-                    masonry.saveSorting();
+                    masonry.saveSorting(element)
+                        .done(function (response) {
+                            masonry.insertComponentInstance($(response), ui.item);
+                        });
                     if (masonry.spectrum) {
                         masonry.spectrum.masonrySpectrum('reapplyColors');
                     }
@@ -487,21 +491,30 @@
 
     /**
      * Persists the current sorting layout
+     *
+     * @param element If provided, pass this as the actual component that was moved
+     * @return {null|object} A jQuery AJAX object if element was passed
      */
-    Masonry.prototype.saveSorting = function () {
-        var page = $(this.element);
+    Masonry.prototype.saveSorting = function (element) {
 
         this.columns.sortable('refresh');
 
         this.refreshColumns();
 
-        data = this.options.component.calcSequenceData.call(this, this.getIndexedColumns());
+        var data = this.options.component.calcSequenceData.call(this, this.getIndexedColumns());
+        if (element) {
+            data.movedComponentId = element.attr('id').replace(/^component/, '');
+        }
 
         // don't send an empty request, or to a blank resource
         if (data && this.options.component.url) {
             // append our context to the request and fire it off
-            $.post(this.options.component.url, $.extend({}, data, this.getContext()));
+            return $.post(
+                this.options.component.url,
+                $.extend({}, data, this.getContext())
+            );
         }
+        return null;
     };
 
 
