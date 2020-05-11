@@ -189,7 +189,6 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            /** @var Match $match */
             $matchId = $this->getRequest()->post['matchId'];
             $match   = $this->getMatchMapper()->findById($matchId);
         } catch (MapperException $e) {

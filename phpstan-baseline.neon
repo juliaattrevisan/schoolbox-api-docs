@@ -2931,11 +2931,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Division/Module.php
 
 		-
-			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/ItineraryItem/Controller.php
-
-		-
 			message: "#^Cannot call method sortBy\\(\\) on array\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Controller.php
