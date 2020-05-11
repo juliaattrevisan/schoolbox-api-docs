@@ -147,7 +147,7 @@ abstract class Base extends CliTool\App
     /**
      * The fully-qualified domain name for this instance.
      *
-     * @var
+     * @var string
      */
     protected $fqdn;
 

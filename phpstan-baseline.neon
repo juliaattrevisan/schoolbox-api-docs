@@ -2381,11 +2381,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Repair/Base.php
-
-		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\$commentObject Comment\\)\\: Unexpected token \"\\$commentObject\", expected type at offset 9$#"
 			count: 1
 			path: library/Schoolbox/Assessment/StudentReportCard/CommentMapper.php
