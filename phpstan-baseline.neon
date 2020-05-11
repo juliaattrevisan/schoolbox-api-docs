@@ -3616,11 +3616,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
-			message: "#^Variable \\$project in PHPDoc tag @var does not match assigned variable \\$dueWork\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/DueWorkTest.php
-
-		-
 			message: "#^Variable \\$p3DomainModel in PHPDoc tag @var does not match assigned variable \\$p1DomainModel\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
