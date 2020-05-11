@@ -3766,16 +3766,6 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 264$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 299$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$property_map in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
