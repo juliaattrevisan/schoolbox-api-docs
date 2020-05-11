@@ -2916,11 +2916,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\[\\]\\)\\: Unexpected token \"\\[\", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$capabilities with type \\(iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Capability\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|null is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
