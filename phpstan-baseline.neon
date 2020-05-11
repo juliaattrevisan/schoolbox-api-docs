@@ -2696,11 +2696,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$item Node\\\\Model\\)\\: Unexpected token \"\\$item\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Import/Module.php
