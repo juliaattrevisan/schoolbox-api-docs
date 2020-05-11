@@ -801,11 +801,6 @@ parameters:
 			path: library/Component/Instance.php
 
 		-
-			message: "#^Variable \\$configDef in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
 			message: "#^Return typehint of method Component_InstanceMapper\\:\\:save\\(\\) has invalid type int\\.$#"
 			count: 1
 			path: library/Component/InstanceMapper.php

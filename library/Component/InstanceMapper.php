@@ -297,7 +297,6 @@ class Component_InstanceMapper extends BaseMapper
         /** @var Component_Instance $instance */
         /** @var Component_Definition $definition */
         /** @var Component_Config $configInstance */
-        /** @var Component_ConfigDefinition $configDef */
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $instanceId   = $row['id'];
