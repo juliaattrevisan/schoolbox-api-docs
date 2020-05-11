@@ -228,7 +228,6 @@ class Controller extends Base\Base
          */
         $data = [];
 
-        /** @var Folder\Model[] $folders */
         foreach ($folders as $folder) {
 
             // Ignore folders with CourseSpecs
@@ -334,9 +333,8 @@ class Controller extends Base\Base
         // Hydrate + Validate dates
         $canReadUnitSpecs = $this->canReadUnitSpecs($courseSpec);
         try {
-
             $countImportedUnits = 0;
-            /** @var array $units */
+
             foreach ($units as $idx => $unit) {
                 if (isset($unit['import'])) {
                     $countImportedUnits++;
@@ -434,9 +432,7 @@ class Controller extends Base\Base
      *
      * @api   POST /course/import/activities
      * @since 160
-     * @var          $_GET  $query
      * @var string   $query [Redirect::RETURN_URL]                              Optional return URL set by caller
-     * @var          $_POST $post
      * @var string   $post  ['action']                                           {'import' | 'modify'}
      * @var int      $post  ['course_spec_id']
      * @var int|null $post  ['course_impl_id']
@@ -456,6 +452,12 @@ class Controller extends Base\Base
      * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['due']
      * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['date']
      * @throws Base\Exception
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function postAssessments()
     {
@@ -491,7 +493,6 @@ class Controller extends Base\Base
 
         // Collect folders for unit and course pages - needed for criteria import
         $unitSpecs = [];
-        /** @var mixed[] $unitImplData */
         foreach ($unitImplData as $unitImp) {
             $unitSpecs[] = (int)$unitImp['unit_spec_id'];
         }
@@ -666,11 +667,11 @@ class Controller extends Base\Base
      *
      * @param AssessmentContext $context
      * @param array             $data
-     * @var null|int            $data ['spec_id']    Will be null if not imported from a Spec
-     * @var null|int            $data ['impl_id']    Will be null if not yet imported
-     * @var null|1              $data['checked']    Did user check the item?
-     * @var null|string[]       $data ['dates']
-     * @var null|mixed[]        $data ['a']          If this assessment is a Project, the data for its sub-assessables
+     * @var null|int            $data['spec_id']    Will be null if not imported from a Spec
+     * @var null|int            $data['impl_id']    Will be null if not yet imported
+     * @var null|int            $data['checked']     Did user check the item?
+     * @var null|string[]       $data['dates']
+     * @var null|mixed[]        $data['a']          If this assessment is a Project, the data for its sub-assessables
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws \DomainException

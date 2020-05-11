@@ -2226,42 +2226,12 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Module.php
 
 		-
-			message: "#^Variable \\$folders in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$folder$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$units in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$idx, \\$unit$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$_GET  \\$query\\)\\: Unexpected token \"\\$_GET\", expected type at offset 223$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$_POST \\$post\\)\\: Unexpected token \"\\$_POST\", expected type at offset 372$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$unitImplData in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$unitImp$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getFolder\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(null\\|1              \\$data\\['checked'\\]    Did user check the item\\?\\)\\: Unexpected token \"1\", expected type at offset 356$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
