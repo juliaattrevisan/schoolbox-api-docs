@@ -4631,11 +4631,6 @@ parameters:
 			path: tools/mq/schedule-safe-restart.php
 
 		-
-			message: "#^Variable \\$stomp in PHPDoc tag @var does not match assigned variable \\$loop\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
 			message: "#^Function extractEvent not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
 			count: 1
 			path: tools/mq/schedule-safe-restart.php
