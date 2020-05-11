@@ -4026,11 +4026,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$event EventBase\\)\\: Unexpected token \"\\$event\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Picker/DateTime/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
