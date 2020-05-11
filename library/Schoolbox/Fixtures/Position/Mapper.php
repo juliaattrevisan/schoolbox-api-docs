@@ -43,7 +43,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @param string      $keyword
      * @param int         $offset
      * @param int         $limit
-     * @return Collection|
+     * @return Collection
      * @throws \PDOException
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)

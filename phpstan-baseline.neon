@@ -2941,11 +2941,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(Collection\\|\\)\\: Unexpected token \"\\\\n     \\*\", expected type at offset 164$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Position/Mapper.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
