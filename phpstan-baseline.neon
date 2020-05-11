@@ -2571,11 +2571,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Controller.php
 
 		-
-			message: "#^Variable \\$threadMapper in PHPDoc tag @var does not match assigned variable \\$newsMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Discussion/Comment/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Discussion\\\\Thread\\\\Context\\\\IThreadLocation\\:\\:setAudience\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
