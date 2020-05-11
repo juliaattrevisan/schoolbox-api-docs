@@ -49,7 +49,6 @@ class Position implements ISnapshot
      */
     public function snapshot()
     {
-        /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
         /** @var Team $currentTeam */
@@ -74,8 +73,9 @@ class Position implements ISnapshot
                 $allPositions = $this->getMetadata()->getStrategy()->getAllPositions($currentTeam);
 
                 /** @var CurrentPosition $currentPosition */
-                /** @var ParticipantPosition $participantPosition */
                 foreach ($allPositions as $currentPosition) {
+
+                    /** @var ParticipantPosition $participantPosition */
                     $participantPosition = $this->getParticipantMapper()->createModel();
                     $participantPosition->setMatch($match);
                     $participantPosition->setTeam($currentTeam);

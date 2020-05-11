@@ -2951,11 +2951,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
-			message: "#^Variable \\$participantPosition in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentPosition$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Snapshot/Type/Position.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
