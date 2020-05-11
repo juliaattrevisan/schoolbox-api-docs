@@ -96,13 +96,12 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
                 $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
             );
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }

@@ -3621,11 +3621,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^Variable \\$currentResponse in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentAssessable$#"
-			count: 11
-			path: library/Schoolbox/Learning/Assessment/Test/SummatorTest.php
-
-		-
 			message: "#^PHPDoc tag @return with type PHPUnit_Framework_MockObject_MockObject\\|Schoolbox\\\\Permission\\\\Access\\\\Access is not subtype of native type PHPUnit_Framework_MockObject_MockObject\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/VisibilityTests.php
