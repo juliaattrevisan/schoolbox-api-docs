@@ -278,7 +278,7 @@ class Eportfolio
             $colourSet = array_merge($colourSet, [
                 $position . '_head_font'  => Config::get('homepage_colour_head_font'),
                 $position . '_head_bg'    => Config::get('homepage_colour_head_bg'),
-                $position . '_font'       => Config::get('homepage_colour_font'),
+                $position . '_font_primary' => Config::get('homepage_colour_font'),
                 $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
             ]);
         }
@@ -296,17 +296,17 @@ class Eportfolio
         $colourList = [
             'left_head_font'  => $this->getPageInstance()->getLeftHeadFont(),
             'left_head_bg'    => $this->getPageInstance()->getLeftHeadBg(),
-            'left_font'       => $this->getPageInstance()->getLeftFont(),
+            'left_font_primary' => $this->getPageInstance()->getLeftFont(),
             'left_bg_primary' => $this->getPageInstance()->getLeftBgPrimary(),
 
             'right_head_font'  => $this->getPageInstance()->getRightHeadFont(),
             'right_head_bg'    => $this->getPageInstance()->getRightHeadBg(),
-            'right_font'       => $this->getPageInstance()->getRightFont(),
+            'right_font_primary' => $this->getPageInstance()->getRightFont(),
             'right_bg_primary' => $this->getPageInstance()->getRightBgPrimary(),
 
             'top_head_font'  => $this->getPageInstance()->getTopHeadFont(),
             'top_head_bg'    => $this->getPageInstance()->getTopHeadBg(),
-            'top_font'       => $this->getPageInstance()->getTopFont(),
+            'top_font_primary' => $this->getPageInstance()->getTopFont(),
             'top_bg_primary' => $this->getPageInstance()->getTopBgPrimary(),
         ];
 
@@ -484,6 +484,7 @@ class Eportfolio
         $stack = [];
 
         foreach ($listColor as $key => $color) {
+            $key = str_replace('font_primary', 'font', $key);
             $field = $this->db->quote($key);
             $value = $this->db->quote($color);
 

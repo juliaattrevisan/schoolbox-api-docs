@@ -91,9 +91,9 @@ class Homepage
 
     public function getColorList()
     {
-        $query      = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary,
-						right_head_font, right_head_bg, right_font, right_bg_primary,
-						top_head_font, top_head_bg, top_font, top_bg_primary
+        $query      = "SELECT left_head_font, left_head_bg, left_font as left_font_primary, left_bg_primary,
+						right_head_font, right_head_bg, right_font as right_font_primary, right_bg_primary,
+						top_head_font, top_head_bg, top_font as top_font_primary, top_bg_primary
 						FROM homepage_config WHERE cid = '{$this->cid}'";
         $colourList = $this->db->getRow($query);
 
@@ -212,7 +212,7 @@ class Homepage
             $homepageConfig = array_merge($homepageConfig, [
                 $position . '_head_font'  => Config::get('homepage_colour_head_font'),
                 $position . '_head_bg'    => Config::get('homepage_colour_head_bg'),
-                $position . '_font'       => Config::get('homepage_colour_font'),
+                $position . '_font_primary' => Config::get('homepage_colour_font'),
                 $position . '_bg_primary' => Config::get('homepage_colour_bg_primary'),
             ]);
         }
@@ -279,6 +279,7 @@ class Homepage
     {
         $query = "UPDATE homepage_config SET ";
         foreach ($listColor as $key => $color) {
+            $key = str_replace('font_primary', 'font', $key);
             $query .= "`" . $this->db->quote($key) . "` = '" . $this->db->quote($color) . "', ";
         }
         $query = substr($query, 0, -2);
@@ -295,9 +296,9 @@ class Homepage
 
         $query = "
             SELECT `cid`, `template`, `left_column_width`, `right_column_width`, `left_head_font`, `left_head_bg`,
-                `left_font`, `left_bg_primary`, `right_head_font`,
-                `right_head_bg`, `right_font`, `right_bg_primary`,
-                `top_head_font`, `top_head_bg`, `top_font`, `top_bg_primary`
+                `left_font` as `left_font_primary`, `left_bg_primary`, `right_head_font`,
+                `right_head_bg`, `right_font` as `right_font_primary`, `right_bg_primary`,
+                `top_head_font`, `top_head_bg`, `top_font` as `top_font_primary`, `top_bg_primary`
             FROM homepage_config
             WHERE `cid` = $categoryId
         ";
