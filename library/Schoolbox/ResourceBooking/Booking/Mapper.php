@@ -245,20 +245,21 @@ class Mapper extends BaseMapper
 
         // Hydration:
         // progress through each join that was passed.
+        /** @var self  $mapper */
+        /** @var Model $model */
+        /** @var array $row */
         return $this->hydrateList(
             $statement, 'b',
             function($mapper, $model, $row) {
-                /** @var self       $mapper */
-                /** @var Model      $model */
-                /** @var array      $row */
-                /** @var Event      $event */
-                /** @var Item\Model $resource */
+                /** @var Event $event */
                 $event = $mapper->hydrateJoin($row, 'event', 'e');
                 $event->setOwner($mapper->hydrateJoin($row, 'event.owner', 'eo'));
                 $event->setAuthor($mapper->hydrateJoin($row, 'event.owner', 'ea'));
                 $model->setEvent($event);
                 $model->setStatus($mapper->hydrateJoin($row, 'status', 's'));
                 $model->setReviewer($mapper->hydrateJoin($row, 'reviewer', 'r'));
+
+                /** @var Item\Model $resource */
                 $resource = $mapper->hydrateJoin($row, 'resource', 'i', false);
                 $resource->setCategory($mapper->hydrateJoin($row, 'resource.category', 'ic'));
                 $resource->setImage($mapper->hydrateJoin($row, 'resource.image', 'im'));

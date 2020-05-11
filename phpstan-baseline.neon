@@ -4231,11 +4231,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^Variable \\$resource in PHPDoc tag @var does not match assigned variable \\$event\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n    \", expected type at offset 128$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Model.php
