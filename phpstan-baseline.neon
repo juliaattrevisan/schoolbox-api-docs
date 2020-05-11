@@ -2346,11 +2346,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForOtherMapper\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
-
-		-
 			message: "#^Variable \\$usesMarkRange might not be defined\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
