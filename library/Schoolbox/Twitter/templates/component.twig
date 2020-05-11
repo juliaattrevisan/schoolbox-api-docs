@@ -1,11 +1,7 @@
 {% if href is null %}
     <div class="empty-state">
         <span class="icon-twitter"></span>
-        <p>
-            <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">
-                Enter a Twitter user's username to display their feed, or enter a link to a single tweet, list or collection.
-            </a>
-        </p>
+        <p>Enter a Twitter <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">@username</a>, or <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">provide a link</a> to a tweet, list or collection.</p>
     </div>
 {% else %}
     {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
