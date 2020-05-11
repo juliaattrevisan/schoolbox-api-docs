@@ -2951,21 +2951,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
-			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
-			message: "#^Variable \\$team in PHPDoc tag @var does not match assigned variable \\$teamId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
-			message: "#^Variable \\$status in PHPDoc tag @var does not match assigned variable \\$statusId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
 			message: "#^Variable \\$participantCoach in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentCoach$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Snapshot/Type/Coach.php
