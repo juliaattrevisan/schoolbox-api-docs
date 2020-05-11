@@ -17,27 +17,37 @@ use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
 use \Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Fixtures\ItineraryItem
+ */
 class Controller extends AbstractController
 {
+
     /**
      * @var SportMapper
      */
     protected $sportMapper;
+
 
     /**
      * @var DivisionMapper
      */
     protected $divisionMapper;
 
+
     /**
      * @var MatchMapper
      */
     protected $matchMapper;
 
+
     /**
      * @var ErrorMapper
      */
     protected $errorMapper;
+
 
     /**
      * Controller constructor.
@@ -51,10 +61,13 @@ class Controller extends AbstractController
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
+
     /**
      * List of ItineraryItems and the Match they are in
      *
      * @param Match $context
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
     {
@@ -85,10 +98,13 @@ class Controller extends AbstractController
         ]));
     }
 
+
     /**
      * View a single Itinerary Item
      *
      * @param Model $entity
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getEntity($entity)
     {
@@ -118,11 +134,14 @@ class Controller extends AbstractController
         ]));
     }
 
+
     /**
      * Display form for create/update Itinerary Items
      *
      * @param Model $entity
      * @param Match $context
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function getForm($entity, $context = null)
     {
@@ -155,10 +174,17 @@ class Controller extends AbstractController
         ]));
     }
 
+
     /**
      * Persist method for entity
      *
      * @param Model $entity
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     protected function persistEntity($entity)
     {
@@ -185,14 +211,17 @@ class Controller extends AbstractController
         ]));
     }
 
+
     /**
      * Save ItineraryItem data to db
      *
-     * @param Match $match
-
-     * @param string $description
+     * @param Match               $match
+     * @param string              $description
      * @param Alaress_Date_Format $startAt
-     * @param Model $itineraryItem
+     * @param Model               $itineraryItem
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function saveItineraryItem(Match $match, $description, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
     {
@@ -203,6 +232,7 @@ class Controller extends AbstractController
 
         $this->mapper->save($itineraryItem);
     }
+
 
     /* Getters/Setters
      */
