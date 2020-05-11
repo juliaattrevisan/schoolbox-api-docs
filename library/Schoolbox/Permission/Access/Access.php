@@ -425,14 +425,16 @@ class Access
         }
 
         // Find the NNIAN ancestors for the folder
-        /** @var Folder\Model $nnian */
         $folder = $this->folderMapper->findCheaplyById($folderId);
         try {
             $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
         } catch (Mapper\Exception $e) {
             return UserAccess::ACCESS_DENY;
         }
+
+        /** @var Folder\Model $nnian */
         $nnian   = $nnianAncestors->last();
+
         $nnianId = $nnian->getId();
 
         // Assume access is denied until proven otherwise

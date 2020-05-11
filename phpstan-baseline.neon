@@ -3996,11 +3996,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/Access.php
 
 		-
-			message: "#^Variable \\$nnian in PHPDoc tag @var does not match assigned variable \\$folder\\.$#"
-			count: 2
-			path: library/Schoolbox/Permission/Access/Access.php
-
-		-
 			message: "#^PHPDoc tag @return contains generic type Alaress\\\\DataStructures\\\\ObjectTree\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\> but class Alaress\\\\DataStructures\\\\ObjectTree is not generic\\.$#"
 			count: 1
 			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
