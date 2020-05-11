@@ -12,7 +12,7 @@
     }
 
     #component-layout .column-top .island section {
-        color: {top_font};
+        color: {top_font_primary};
         background-color: {top_bg_primary};
     }
 
@@ -25,7 +25,7 @@
     }
 
     #component-layout .column-left .island section {
-        color: {left_font};
+        color: {left_font_primary};
         background-color: {left_bg_primary};
     }
 
@@ -38,7 +38,7 @@
     }
 
     #component-layout .column-right .island section {
-        color: {right_font};
+        color: {right_font_primary};
         background-color: {right_bg_primary};
     }
 
@@ -65,17 +65,17 @@
     colours['{COLOUR_ARRAY}'] = {
         'top_head_font'      : '{top_head_font}',
         'top_head_bg'        : '{top_head_bg}',
-        'top_font'           : '{top_font}',
+        'top_font_primary'   : '{top_font_primary}',
         'top_bg_primary'     : '{top_bg_primary}',
 
         'left_head_font'     : '{left_head_font}',
         'left_head_bg'       : '{left_head_bg}',
-        'left_font'          : '{left_font}',
+        'left_font_primary'  : '{left_font_primary}',
         'left_bg_primary'    : '{left_bg_primary}',
 
         'right_head_font'    : '{right_head_font}',
         'right_head_bg'      : '{right_head_bg}',
-        'right_font'         : '{right_font}',
+        'right_font_primary' : '{right_font_primary}',
         'right_bg_primary'   : '{right_bg_primary}'
     };
     // <!-- END colour_list -->
@@ -498,8 +498,8 @@
                         <div class="small-12 medium-6 columns">
                             <fieldset>
                                 <legend>Content Colours</legend>
-                                <label for="font">Text</label>
-                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="font_primary">Text</label>
+                                <input id="font_primary" class="colorBox" name="colors[font_primary]" type="text" data-colorpicker />
                                 <label for="bg_primary">Background</label>
                                 <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
                             </fieldset>

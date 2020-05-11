@@ -257,7 +257,7 @@
         if (matches) {
             var column = this.masonry.columns.filter('[data-position="'+matches[1]+'"]');
             switch (matches[2]) {
-                case 'font':
+                case 'font_primary':
                     column.find('.island section').css({color: colorString});
                     break;
                 case 'bg_primary':
