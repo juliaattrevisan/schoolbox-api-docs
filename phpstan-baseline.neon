@@ -4351,11 +4351,6 @@ parameters:
 			path: library/Schoolbox/TagCloud/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @return with type string\\|null is not subtype of native type string\\.$#"
-			count: 1
-			path: library/Schoolbox/Test/ISoftDeletableTest.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getName\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Test/SoftDeleteTest.php
