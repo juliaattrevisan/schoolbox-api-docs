@@ -2926,11 +2926,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
 
 		-
-			message: "#^Variable \\$filterSelections in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$selection$#"
-			count: 1
-			path: library/Schoolbox/Filter/Selection/Mapper.php
-
-		-
 			message: "#^Variable \\$fixturesAccess in PHPDoc tag @var does not match assigned variable \\$fixtureAccess\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Component/Homepage/Controller.php
