@@ -4701,11 +4701,6 @@ parameters:
 			path: tools/quiz/autoFinish.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 80$#"
-			count: 1
-			path: tools/rubric/repairSpecAssessments.php
-
-		-
 			message: "#^Variable \\$newCustomSha might not be defined\\.$#"
 			count: 1
 			path: tools/skin/builder.php

@@ -344,7 +344,7 @@ $kernel->run(new class extends App {
     /**
      * The fully-qualified domain name for this instance.
      *
-     * @var
+     * @var string
      */
     private $fqdn;
 
