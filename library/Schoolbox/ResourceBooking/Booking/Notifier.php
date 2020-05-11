@@ -136,9 +136,11 @@ class Notifier extends AbstractModuleNotifier
 
         // Hydrate event owner
         /** @var EventMapper $eventMapper */
-        /** @var Event $calendarEvent */
         $eventMapper    = $this->mapper->getJoinMapper('event');
+
+        /** @var Event $calendarEvent */
         $calendarEvent  = $eventMapper->findById($object->getEvent()->getId());
+
         $seriesId       = $calendarEvent->getSeriesId();
         if ($seriesId) {
             // Only create a notice for the next in series

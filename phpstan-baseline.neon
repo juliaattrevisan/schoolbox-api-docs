@@ -4236,11 +4236,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Module.php
 
 		-
-			message: "#^Variable \\$calendarEvent in PHPDoc tag @var does not match assigned variable \\$eventMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Notifier.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findNextInSeries\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Notifier.php
