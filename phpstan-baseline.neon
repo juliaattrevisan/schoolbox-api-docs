@@ -2731,11 +2731,6 @@ parameters:
 			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/SparqlClient.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$classname IDiConfigurable\\)\\: Unexpected token \"\\$classname\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Di/Configurator.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Module.php
