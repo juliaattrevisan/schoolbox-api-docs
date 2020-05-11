@@ -189,7 +189,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $model = $trigger->getEvent()->getObject();
         $label = $trigger->getLabel();
 
-        /** @var TimerInterface $timer */
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
         $timer = $this->loop->addTimer($interval, $callable);
         $this->putTimer($model, $label, $timer);
