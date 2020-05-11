@@ -2926,11 +2926,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
 
 		-
-			message: "#^Variable \\$rosettaStone in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Module.php
-
-		-
 			message: "#^Variable \\$filterSelections in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$selection$#"
 			count: 1
 			path: library/Schoolbox/Filter/Selection/Mapper.php
