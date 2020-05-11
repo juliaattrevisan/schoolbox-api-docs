@@ -141,18 +141,18 @@ use Schoolbox\Learning\InlineGrader\Kami;
  */
 abstract class Kernel
 {
-	/** @var Di\Container */
-	protected $di;
+    /** @var Di\Container */
+    protected $di;
 
-	/** @var callable */
-	protected $shutdown;
+    /** @var callable */
+    protected $shutdown;
 
-	/**
-	 * A list of callbacks to call after an uncaught exception has been raised.
-	 * This includes ErrorException instances.
-	 *
-	 * @var callable[]
-	 */
+    /**
+     * A list of callbacks to call after an uncaught exception has been raised.
+     * This includes ErrorException instances.
+     *
+     * @var callable[]
+     */
     private $exceptionCallbacks = [];
 
     /**
@@ -225,28 +225,28 @@ abstract class Kernel
     abstract protected function registerShutdownHandling(): void;
 
 
-	/**
-	 * @param Di\Container $di
-	 * @throws RuntimeException
-	 */
-	protected function setDependencyInjector(Di\Container $di): void
+    /**
+     * @param Di\Container $di
+     * @throws RuntimeException
+     */
+    protected function setDependencyInjector(Di\Container $di): void
     {
-		// only allow once
-		if($this->di === null) {
-			$this->di = $di;
-		}
-		else {
-			throw new RuntimeException("Dependency injector has already been set, cannot set again");
-		}
-	}
+        // only allow once
+        if($this->di === null) {
+            $this->di = $di;
+        }
+        else {
+            throw new RuntimeException("Dependency injector has already been set, cannot set again");
+        }
+    }
 
 
-	/**
-	 * @return Di\Container
-	 */
-	public function getDependencyInjector() {
-		return $this->di;
-	}
+    /**
+     * @return Di\Container
+     */
+    public function getDependencyInjector() {
+        return $this->di;
+    }
 
 
     /**
@@ -269,35 +269,35 @@ abstract class Kernel
     }
 
 
-	/**
-	 * @param callable $callable
-	 */
-	public function registerCustomShutdown($callable) {
-		if(is_callable($callable)) {
-			$this->shutdown = $callable;
-		}
-	}
+    /**
+     * @param callable $callable
+     */
+    public function registerCustomShutdown($callable) {
+        if(is_callable($callable)) {
+            $this->shutdown = $callable;
+        }
+    }
 
-	/**
-	 * @param callable $callable
-	 */
-	public function registerExceptionCallback($callable) {
-		if(is_callable($callable)) {
-			$this->exceptionCallbacks[] = $callable;
-		}
-	}
+    /**
+     * @param callable $callable
+     */
+    public function registerExceptionCallback($callable) {
+        if(is_callable($callable)) {
+            $this->exceptionCallbacks[] = $callable;
+        }
+    }
 
-	/**
-	 * Calls all exception callbacks with the given exception.
-	 *
-	 * @param Throwable $e
-	 */
-	protected function callExceptionCallbacks($e)
-	{
-		foreach ($this->exceptionCallbacks as $callback) {
-			call_user_func($callback, $e);
-		}
-	}
+    /**
+     * Calls all exception callbacks with the given exception.
+     *
+     * @param Throwable $e
+     */
+    protected function callExceptionCallbacks($e)
+    {
+        foreach ($this->exceptionCallbacks as $callback) {
+            call_user_func($callback, $e);
+        }
+    }
 
 
     /**
@@ -518,28 +518,37 @@ abstract class Kernel
             'commsNewsArticleResolver',
             $di->lazy(
                 static function () use ($di) {
-                    /**
-                     * @var IConnector                            $db
-                     * @var External_UserInterface                $externalUser
-                     * @var External_ClassInterface               $externalClass
-                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
-                     * @var MapperFactory                         $mapperFactory
-                     * @var UserAccessMapper                      $userAccessMapper
-                     * @var Folder\Mapper                         $folderMapper
-                     * @var UserMapper                            $userMapper
-                     * @var News\Audience\Complex\Mapper          $complexMapper
-                     * @var News\Mapper                           $newsMapper
-                     */
-                    $db               = $di->get('databaseInternal');
-                    $externalUser     = $di->get('externalUser');
-                    $externalClass    = $di->get('externalClass');
-                    $strategyFactory  = $di->get('commsNewsAudienceStrategyFactory');
-                    $mapperFactory    = $di->get('mapperFactory');
+
+                    /** @var IConnector $db */
+                    $db = $di->get('databaseInternal');
+
+                    /** @var External_UserInterface $externalUser */
+                    $externalUser = $di->get('externalUser');
+
+                    /** @var External_ClassInterface $externalClass */
+                    $externalClass = $di->get('externalClass');
+
+                    /** @var News\Audience\Segment\StrategyFactory $strategyFactory */
+                    $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
+
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $di->get('mapperFactory');
+
+                    /** @var UserAccessMapper $userAccessMapper */
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
-                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
-                    $userMapper       = $mapperFactory->get(UserMapper::class);
-                    $complexMapper    = $mapperFactory->get(News\Audience\Complex\Mapper::class);
-                    $newsMapper       = $mapperFactory->get(News\Mapper::class);
+
+                    /** @var Folder\Mapper $folderMapper */
+                    $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $mapperFactory->get(UserMapper::class);
+
+                    /** @var News\Audience\Complex\Mapper $complexMapper */
+                    $complexMapper = $mapperFactory->get(News\Audience\Complex\Mapper::class);
+
+                    /** @var News\Mapper $newsMapper */
+                    $newsMapper = $mapperFactory->get(News\Mapper::class);
+
                     return new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
                         $strategyFactory->getValidRelationshipEntityMap(),
@@ -565,24 +574,31 @@ abstract class Kernel
             'commsNewsUserResolver',
             $di->lazy(
                 static function() use ($di) {
-                    /**
-                     * @var IConnector              $db
-                     * @var External_UserInterface  $externalUser
-                     * @var External_ClassInterface  $externalClass
-                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
-                     * @var MapperFactory $mapperFactory
-                     */
-                    $db              = $di->get('databaseInternal');
-                    $externalUser    = $di->get('externalUser');
-                    $externalClass   = $di->get('externalClass');
+
+                    /** @var IConnector $db */
+                    $db = $di->get('databaseInternal');
+
+                    /** @var External_UserInterface $externalUser */
+                    $externalUser = $di->get('externalUser');
+
+                    /** @var External_ClassInterface $externalClass */
+                    $externalClass = $di->get('externalClass');
+
+                    /** @var News\Audience\Segment\StrategyFactory $strategyFactory */
                     $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
-                    $mapperFactory   = $di->get('mapperFactory');
+
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $di->get('mapperFactory');
+
                     /** @var Folder\Mapper $folderMapper */
                     $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+
                     /** @var UserMapper $userMapper */
                     $userMapper = $mapperFactory->get(UserMapper::class);
+
                     /** @var UserAccessMapper $userAccessMapper */
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+
                     return new News\Audience\UserResolver(
                         $db,
                         new News\Audience\RelationshipFilterer(
@@ -603,28 +619,36 @@ abstract class Kernel
             'commsNewsAudienceStrategyFactory',
             $di->lazy(
                 function () use ($di) {
-                    /**
-                     * @var MapperFactory          $mapperFactory
-                     * @var UserAccessMapper       $userAccessMapper
-                     * @var Folder\Mapper          $folderMapper
-                     * @var RoleAccessMapper       $roleAccessMapper
-                     * @var Access                 $access
-                     * @var IConfigLoader          $config
-                     * @var External_UserInterface $externalUser
-                     * @var IConnector             $db
-                     * @var Session                $session
-                     * @var User                   $user
-                     */
-                    $mapperFactory    = $di->get('mapperFactory');
+
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $di->get('mapperFactory');
+
+                    /** @var UserAccessMapper $userAccessMapper */
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
-                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+
+                    /** @var Folder\Mapper $folderMapper */
+                    $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+
+                    /** @var RoleAccessMapper $roleAccessMapper */
                     $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
-                    $access           = $mapperFactory->get(Access::class);
-                    $config           = $di->get('config');
-                    $externalUser     = $di->get('externalUser');
-                    $db               = $di->get('databaseInternal');
-                    $session          = $di->get('session');
-                    $user             = $session->get('user');
+
+                    /** @var Access $access */
+                    $access = $mapperFactory->get(Access::class);
+
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    /** @var External_UserInterface $externalUser */
+                    $externalUser = $di->get('externalUser');
+
+                    /** @var IConnector $db */
+                    $db = $di->get('databaseInternal');
+
+                    /** @var Session $session */
+                    $session = $di->get('session');
+
+                    /** @var User $user */
+                    $user = $session->get('user');
 
                     // Get known user-to-class mapping from the session and inject into factory
                     $knownUserClasses = [];
