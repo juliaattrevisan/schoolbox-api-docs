@@ -2861,16 +2861,6 @@ parameters:
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
 
 		-
-			message: "#^Variable \\$filterSelectionArray in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$isSelected$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
-
-		-
-			message: "#^Variable \\$filterSelections in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$selection$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php

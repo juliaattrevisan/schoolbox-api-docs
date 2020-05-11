@@ -54,6 +54,8 @@ class Codec
 
         // Has any data been passed in? (will be empty if no filters enabled on this page)
         if (\count($request)) {
+
+            /** @var string[]|bool[] $filterSelectionArray */
             foreach ($request as $filterId => $filterSelectionArray) {
 
                 // Create the collection before checking if empty.
@@ -69,7 +71,6 @@ class Codec
                 $filter = $this->filterMapper->createModel($filterId);
                 $page   = (string)$page;
 
-                /** @var string[]|bool[] $filterSelectionArray */
                 foreach ($filterSelectionArray as $key => $isSelected) {
                     $selection = $this->selectionMapper->createModel();
                     $selection
@@ -93,6 +94,7 @@ class Codec
     {
         $queryStrings = [];
 
+        /** @var Selection\Model[] $filterSelections */
         foreach ($selections as $filterId => $filterSelections) {
             if (!$filterSelections instanceof Collection) {
                 continue;
@@ -104,7 +106,6 @@ class Codec
                 continue;
             }
 
-            /** @var Selection\Model[] $filterSelections */
             foreach ($filterSelections as $selection) {
                 if ($selection->getSelected()) {
                     $queryStrings[] = "{$filterId}[{$selection->getKey()}]=1";
