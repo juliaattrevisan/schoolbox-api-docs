@@ -4581,11 +4581,6 @@ parameters:
 			path: tools/mq/diagnose-pqueue.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ttl\\)\\: Unexpected token \"\\$ttl\", expected type at offset 63$#"
-			count: 1
-			path: tools/mq/remove-old-triggers.php
-
-		-
 			message: "#^Function interrogate not found\\.$#"
 			count: 2
 			path: tools/mq/schedule-safe-restart.php
