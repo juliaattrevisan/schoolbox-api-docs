@@ -1,12 +1,9 @@
 <?php
 /**
- * Player
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Snapshot\Type;
 
 use \Schoolbox\Fixtures\Snapshot\ISnapshot;
@@ -15,8 +12,12 @@ use \Schoolbox\Fixtures\Team\Player\Model as CurrentPlayer;
 use \Schoolbox\Fixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use \Schoolbox\Fixtures\Team\Player\Participant\Mapper as ParticipantPlayerMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Metadata;
-use \Schoolbox\Fixtures\Match\Model as Match;
 
+/**
+ * Class Player
+ *
+ * @package Schoolbox\Fixtures\Snapshot\Type
+ */
 class Player implements ISnapshot
 {
     /**

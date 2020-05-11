@@ -1,12 +1,9 @@
 <?php
 /**
- * Position
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Snapshot\Type;
 
 use \Schoolbox\Fixtures\Snapshot\ISnapshot;
@@ -15,8 +12,12 @@ use \Schoolbox\Fixtures\Team\Position\Model as CurrentPosition;
 use \Schoolbox\Fixtures\Team\Position\Participant\Model as ParticipantPosition;
 use \Schoolbox\Fixtures\Team\Position\Participant\Mapper as ParticipantPositionMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Metadata;
-use \Schoolbox\Fixtures\Match\Model as Match;
 
+/**
+ * Class Position
+ *
+ * @package Schoolbox\Fixtures\Snapshot\Type
+ */
 class Position implements ISnapshot
 {
     /**
