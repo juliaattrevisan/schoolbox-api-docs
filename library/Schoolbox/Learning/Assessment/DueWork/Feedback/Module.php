@@ -66,7 +66,7 @@ class Module extends BaseModule
             new Rule\All(
             // User must have write access to the folder the assessment is in
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                    /** @var IAssessable $assessmentId */
+                    /** @var IAssessable $assessable */
                     $assessable = $params['assessment'];
                     if ($assessable instanceof IAssessable) {
                         return $assessable->getContext()->getFolder()->getId();

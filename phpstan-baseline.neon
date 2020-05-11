@@ -3491,11 +3491,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
 
 		-
-			message: "#^Variable \\$assessmentId in PHPDoc tag @var does not match assigned variable \\$assessable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
