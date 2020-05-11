@@ -70,12 +70,12 @@ class AllRubrics
         }
 
         // Aggregate student results per criteria
+        /** @var float[][][] $boxData */
         foreach ($studentRubricMarks as $assessmentId => $boxData) {
             if (empty($unitImplAssessmentIds[$assessmentId])) {
                 continue;
             }
 
-            /** @var float[][][] $boxData */
             foreach ($boxData as $criterionId => $criteria) {
                 $key = $this->buildCriterionArrayKey($criteria['grouping'], $criteria['name']);
                 foreach ($criteria['marks'] as $studentId => $mark) {
@@ -88,8 +88,8 @@ class AllRubrics
         }
 
         // Average student marks
+        /** @var float[][] $criteria */
         foreach ($rubricData as $criteriaName => $criteria) {
-            /** @var float[][] $criteria */
             foreach ($criteria as $studentId => $studentMarks) {
                 $rubricData[$criteriaName][$studentId] = array_sum($studentMarks) / count($studentMarks);
             }

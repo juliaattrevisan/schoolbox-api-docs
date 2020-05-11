@@ -3761,16 +3761,6 @@ parameters:
 			path: library/Schoolbox/Learning/Upcoming/Module.php
 
 		-
-			message: "#^Variable \\$boxData in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$criterionId, \\$criteria$#"
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
-
-		-
-			message: "#^Variable \\$criteria in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$studentId, \\$studentMarks$#"
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
