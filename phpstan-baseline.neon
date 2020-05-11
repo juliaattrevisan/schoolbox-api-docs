@@ -3621,11 +3621,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$model has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\Id\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/InteractionMapperProxy.php
-
-		-
 			message: "#^Variable \\$currentResponse in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentAssessable$#"
 			count: 11
 			path: library/Schoolbox/Learning/Assessment/Test/SummatorTest.php
