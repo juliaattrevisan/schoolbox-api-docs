@@ -347,7 +347,7 @@
                             ? $response
                             : $response.find('#'+existingId)
                         ;
-                        masonry.insertComponentInstance(newContent, existing);
+                        masonry.insertComponentInstance(newContent, existing, true, true);
                     })
                     .fail(function() {
                         existing.addClass('failed');
@@ -428,7 +428,7 @@
                     // retrieve a new instance of this component
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
-                            masonry.insertComponentInstance($(response), ui.item);
+                            masonry.insertComponentInstance($(response), ui.item, true, true);
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -442,7 +442,7 @@
                     ui.item.removeClass(sortingClass);
                     masonry.saveSorting(element)
                         .done(function (response) {
-                            masonry.insertComponentInstance($(response), ui.item);
+                            masonry.insertComponentInstance($(response), ui.item, false, false);
                         });
                     if (masonry.spectrum) {
                         masonry.spectrum.masonrySpectrum('reapplyColors');
@@ -596,7 +596,7 @@
      * @param response    The new HTML for the component
      * @param replacement The old HTML to replace
      */
-    Masonry.prototype.insertComponentInstance = function(response, replacement)
+    Masonry.prototype.insertComponentInstance = function(response, replacement, saveSorting, animate)
     {
         var masonry = this;
 
@@ -616,7 +616,8 @@
             // grab its computed height
             css.height = response.height;
         }
-        replacement.animate(css, 550, function () {
+
+        var insertReplacement = function () {
 
             /* Collapse content on components (if it exists)
              */
@@ -626,12 +627,20 @@
             }
 
             replacement.empty().replaceWith(response.removeAttr('style'));
-            masonry.saveSorting();
+            if (saveSorting) {
+                masonry.saveSorting();
+            }
             masonry.refreshPalette();
             if (masonry.spectrum) {
                 masonry.spectrum.masonrySpectrum('reapplyColors');
             }
-        });
+        };
+
+        if (animate) {
+            replacement.animate(css, 550, insertReplacement);
+        } else {
+            insertReplacement();
+        }
     };
 
 
@@ -673,7 +682,7 @@
                     column.prepend(placeholder);
                     masonry.newComponentInstance(element)
                         .done(function(response) {
-                            masonry.insertComponentInstance($(response), placeholder);
+                            masonry.insertComponentInstance($(response), placeholder, true, true);
                         })
                         .fail(function() {
                             masonry.refreshColumns();
