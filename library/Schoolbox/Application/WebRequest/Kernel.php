@@ -467,7 +467,10 @@ class Kernel extends WebKernelAbstract
         // despite it being the WebRequest bootstrap. (Go figure.)
 
         $di             = $this->getDependencyInjector();
+
+        /** @var IConfigLoader $config */
         $config         = $di->get('config');
+
         $fqdn           = trim($config->get('site_hostname') . '.' . $config->get('site_domain'), ';.');
         $csrfCheck      = new Csrf\HeaderCheck($_SERVER, $fqdn);
         $csrfMiddleware = new Csrf\Middleware($csrfCheck);
