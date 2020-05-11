@@ -1,0 +1,19 @@
+{% extends '@twitter/component.twig' %}
+
+{% block loadingMessage %}
+    Loading tweets...
+{% endblock loadingMessage %}
+
+{% block failureMessage %}
+    Cannot load tweets for @{{ username }}. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>.
+{% endblock failureMessage %}
+
+{% block twitterView %}
+    <a id="twitter-view-{{ id }}"
+       class="twitter-timeline"
+       href="{{ href }}"
+       data-dnt="true"
+       {% if limit %}data-tweet-limit="{{ limit }}"{% endif %}
+       data-chrome="noheader nofooter noborders transparent noscrollbar"
+    ></a>
+{% endblock twitterView %}

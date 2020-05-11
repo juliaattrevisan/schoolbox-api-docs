@@ -1,0 +1,106 @@
+{% if href is null %}
+    <div class="empty-state">
+        <span class="icon-twitter"></span>
+        <p>Enter a Twitter <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">@username</a>, or <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">provide a link</a> to a tweet, list or collection.</p>
+    </div>
+{% else %}
+    {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
+    <div class="empty-state" id="twitter-view-{{ id }}-loading-container">
+        <span class="icon-twitter"></span>
+        <p id="twitter-view-{{ id }}-loading-message">
+            {% block loadingMessage %}
+                {# Child templates should put a simple loading message here. #}
+            {% endblock loadingMessage %}
+        </p>
+        <p id="twitter-view-{{ id }}-loading-message-waiting" class="hide">Still loading...</p>
+        <p id="twitter-view-{{ id }}-loading-message-failed" class="hide">
+            {% block failureMessage %}
+                {# Child templates should put a loading failed message here. #}
+                {# Cannot load tweets for @{{ username }}. <a href="{{ href }}" target="_blank">Try viewing on Twitter instead</a>. #}
+            {% endblock failureMessage %}
+        </p>
+    </div>
+
+    {% block twitterView %}
+        {# Child templates should put their Twitter widget here. #}
+    {% endblock twitterView %}
+
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            // Include Twitter's JS API
+            window.twttr = (function (d, s, id) {
+                let js,
+                    fjs = d.getElementsByTagName(s)[0],
+                    t = window.twttr || { };
+                if (d.getElementById(id)) return t;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "//platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+
+                t._e = [];
+                t.ready = function (f) {
+                    t._e.push(f);
+                };
+
+                return t;
+            }(document, "script", "twitter-wjs"));
+
+            // Wait for Twitter API to become available, then load the widget.
+            // (This is only required when reloading the component's content)
+            twttr.ready(
+                function (t) {
+                    let elementId = "twitter-view-{{ id }}",
+                        container = document.getElementById("twitter-view-{{ id }}-loading-container"),
+                        observer  = new MutationObserver(function (mutationsList, observer) {
+                            // If the observer doesn't find the base element,
+                            // the Twitter feed has been loaded successfully.
+                            // Remove the empty state and stop observing.
+                            if (!document.getElementById(elementId)) {
+                                container.remove();
+                                observer.disconnect();
+                            }
+                        }),
+                        loadingMessage   = document.getElementById("twitter-view-{{ id }}-loading-message"),
+                        waitingMessage   = document.getElementById("twitter-view-{{ id }}-loading-message-waiting"),
+                        failedMessage    = document.getElementById("twitter-view-{{ id }}-loading-message-failed"),
+                        timeout1         = 5000,
+                        timeout2         = 15000,
+                        timeout1Callback = function () {
+                            // Feed hasn't loaded after timeout1 ms?
+                            // Show a "still loading" message
+                            let element = document.getElementById(elementId);
+                            if (element) {
+                                loadingMessage.classList.add('hide');
+                                waitingMessage.classList.remove('hide');
+                            }
+                        },
+                        timeout2Callback = function () {
+                            // Feed hasn't loaded after timeout1 ms?
+                            // Show a "loading failed" message
+                            let element = document.getElementById(elementId);
+                            if (element) {
+                                waitingMessage.classList.add('hide');
+                                failedMessage.classList.remove('hide');
+                            }
+                        };
+
+                    // Control waiting messages
+                    loadingMessage.classList.remove('hide');
+                    waitingMessage.classList.add('hide');
+                    failedMessage.classList.add('hide');
+
+                    // Finally load the widget
+                    t.widgets.load(document.getElementById(elementId))
+
+                    // Set up the timeouts for loading pending and failed messages
+                    setTimeout(timeout1Callback, timeout1);
+                    setTimeout(timeout2Callback, timeout2);
+
+                    // Set up the observer on the children of the base element
+                    observer.observe(document.getElementById(elementId).parentNode, { childList: true });
+                }
+            );
+        </script>
+    {% endautoescape %}
+{% endif %}

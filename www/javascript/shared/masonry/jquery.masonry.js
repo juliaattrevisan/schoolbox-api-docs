@@ -347,7 +347,7 @@
                             ? $response
                             : $response.find('#'+existingId)
                         ;
-                        masonry.insertComponentInstance(newContent, existing);
+                        masonry.insertComponentInstance(newContent, existing, true, true);
                     })
                     .fail(function() {
                         existing.addClass('failed');
@@ -409,7 +409,8 @@
             },
             stop: function (event, ui) {
                 var element = ui.item,
-                    data, cl;
+                    cl,
+                    request;
 
                 // check to see if this was dragged from the palette
                 if (masonry.options.palette && element.is(masonry.options.palette.handleSelector)) {
@@ -427,7 +428,7 @@
                     // retrieve a new instance of this component
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
-                            masonry.insertComponentInstance($(response), ui.item);
+                            masonry.insertComponentInstance($(response), ui.item, true, true);
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -439,7 +440,10 @@
                         });
                 } else {
                     ui.item.removeClass(sortingClass);
-                    masonry.saveSorting();
+                    masonry.saveSorting(element)
+                        .done(function (response) {
+                            masonry.insertComponentInstance($(response), ui.item, false, false);
+                        });
                     if (masonry.spectrum) {
                         masonry.spectrum.masonrySpectrum('reapplyColors');
                     }
@@ -487,21 +491,30 @@
 
     /**
      * Persists the current sorting layout
+     *
+     * @param element If provided, pass this as the actual component that was moved
+     * @return {null|object} A jQuery AJAX object if element was passed
      */
-    Masonry.prototype.saveSorting = function () {
-        var page = $(this.element);
+    Masonry.prototype.saveSorting = function (element) {
 
         this.columns.sortable('refresh');
 
         this.refreshColumns();
 
-        data = this.options.component.calcSequenceData.call(this, this.getIndexedColumns());
+        var data = this.options.component.calcSequenceData.call(this, this.getIndexedColumns());
+        if (element) {
+            data.movedComponentId = element.attr('id').replace(/^component/, '');
+        }
 
         // don't send an empty request, or to a blank resource
         if (data && this.options.component.url) {
             // append our context to the request and fire it off
-            $.post(this.options.component.url, $.extend({}, data, this.getContext()));
+            return $.post(
+                this.options.component.url,
+                $.extend({}, data, this.getContext())
+            );
         }
+        return null;
     };
 
 
@@ -583,7 +596,7 @@
      * @param response    The new HTML for the component
      * @param replacement The old HTML to replace
      */
-    Masonry.prototype.insertComponentInstance = function(response, replacement)
+    Masonry.prototype.insertComponentInstance = function(response, replacement, saveSorting, animate)
     {
         var masonry = this;
 
@@ -603,7 +616,8 @@
             // grab its computed height
             css.height = response.height;
         }
-        replacement.animate(css, 550, function () {
+
+        var insertReplacement = function () {
 
             /* Collapse content on components (if it exists)
              */
@@ -613,12 +627,20 @@
             }
 
             replacement.empty().replaceWith(response.removeAttr('style'));
-            masonry.saveSorting();
+            if (saveSorting) {
+                masonry.saveSorting();
+            }
             masonry.refreshPalette();
             if (masonry.spectrum) {
                 masonry.spectrum.masonrySpectrum('reapplyColors');
             }
-        });
+        };
+
+        if (animate) {
+            replacement.animate(css, 550, insertReplacement);
+        } else {
+            insertReplacement();
+        }
     };
 
 
@@ -660,7 +682,7 @@
                     column.prepend(placeholder);
                     masonry.newComponentInstance(element)
                         .done(function(response) {
-                            masonry.insertComponentInstance($(response), placeholder);
+                            masonry.insertComponentInstance($(response), placeholder, true, true);
                         })
                         .fail(function() {
                             masonry.refreshColumns();
