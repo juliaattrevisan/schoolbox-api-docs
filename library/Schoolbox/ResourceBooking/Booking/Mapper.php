@@ -245,11 +245,15 @@ class Mapper extends BaseMapper
 
         // Hydration:
         // progress through each join that was passed.
-        /** @var self  $mapper */
-        /** @var Model $model */
-        /** @var array $row */
         return $this->hydrateList(
             $statement, 'b',
+
+            /**
+             * @param self $mapper
+             * @param Model $model
+             * @param array $row
+             * @return Model
+             */
             function($mapper, $model, $row) {
                 /** @var Event $event */
                 $event = $mapper->hydrateJoin($row, 'event', 'e');
