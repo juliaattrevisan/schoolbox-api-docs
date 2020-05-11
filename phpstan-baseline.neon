@@ -2261,26 +2261,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: "#^Variable \\$unitSpecAssessmentSpecs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentSpec$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$unitSpecAssessmentImpls in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentImpl$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$unitSpecAssessmentPairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentPair$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$assessmentPairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentPair$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getOffset\\(\\)\\.$#"
 			count: 4
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
@@ -2292,11 +2272,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$assessmentSpec in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$spec$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
