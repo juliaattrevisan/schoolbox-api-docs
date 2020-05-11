@@ -2926,11 +2926,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
 
 		-
-			message: "#^Variable \\$sortedTerms in PHPDoc tag @var does not match assigned variable \\$currentTerm\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/Term/Factory.php
-
-		-
 			message: "#^Variable \\$rosettaStone in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Module.php
