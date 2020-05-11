@@ -3616,16 +3616,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAssessments\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getOwner\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
