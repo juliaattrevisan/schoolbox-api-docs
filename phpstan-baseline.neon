@@ -4231,11 +4231,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^Variable \\$bookings in PHPDoc tag @var does not match assigned variable \\$source\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
-
-		-
 			message: "#^Variable \\$resource in PHPDoc tag @var does not match assigned variable \\$event\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php

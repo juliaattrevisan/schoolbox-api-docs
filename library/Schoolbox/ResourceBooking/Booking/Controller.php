@@ -607,7 +607,6 @@ class Controller extends Base
         // For testing, output the calendar for current user first.
         // the find method should receive:
         // Datetime objects?
-        /** @var Model[] $bookings */
         $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->getUser(),
