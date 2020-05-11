@@ -185,9 +185,10 @@ class Connector implements IConnector
 
         $request  = new Request('GET', self::PATH_LIST_DOCUMENTS);
         $response = $this->client->send($request, $this->getOptions());
+
+        /** @var \StdClass[] $decoded */
         $decoded  = $this->decodeResponseContent($response->getBody())->documents;
 
-        /** @var \stdClass[] $decoded */
         foreach ($decoded as $obj) {
             try {
                 $document = $this->buildDocument($obj);

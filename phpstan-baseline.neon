@@ -3656,11 +3656,6 @@ parameters:
 			path: library/Schoolbox/Learning/Grades/Module.php
 
 		-
-			message: "#^Variable \\$decoded in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$obj$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Mapper.php
