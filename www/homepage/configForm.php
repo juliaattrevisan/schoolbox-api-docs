@@ -13,6 +13,7 @@ $kernel = new Kernel();
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
+$folderMapper = FolderMapper::getInstance();
 
 if (is_numeric($_REQUEST['cid'])) {
     if ($groupHandler->getPermission($_REQUEST['cid']) < UserAccess::ACCESS_WRITE) {
@@ -37,7 +38,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $columns = array(
             'left'  => $_POST['column1'],
             'right' => $_POST['column2'],
-            'top'   => $_POST['column3']
+            'top'   => $_POST['column3'],
         );
 
         foreach ($columns as $position => $componentString) {
@@ -61,6 +62,16 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             Component_InstanceMapper::getInstance()->save($instanceList);
+        }
+
+        // Was any one component requested?
+        // If so render it only so it can be re-rendered
+        if ($_POST['movedComponentId']) {
+            $instance   = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+            $cClass     = $instance->getDefinition()->getClass();
+            $controller = new $cClass($instance, $page->getDi()->get('session')->get('user'), $page);
+            $renderer   = new Component_Renderer();
+            $renderer->renderHomepageComponent($page, $folderMapper->findById($_POST['cid']), $controller);
         }
     } // AJAX request to delete component from homepage
     elseif ($_POST['cid'] && is_numeric($_POST['delete'])) {
@@ -109,8 +120,7 @@ if (is_numeric($_REQUEST['cid'])) {
             exit("<div class='alert alert-box'>Couldn't create component.</div>");
         }
 
-        $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-        $folder = $folderMapper->findById($_POST['cid']);
+        $folder   = $folderMapper->findById($_POST['cid']);
         $renderer = new Component_Renderer();
         $renderer->renderHomepageComponent($page, $folder, $component);
     } // AJAX Save homepage colours
@@ -131,8 +141,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-            $folderMapper = FolderMapper::getInstance();
-            $folder = $folderMapper->findById($config['cid']);
+            $folder                          = $folderMapper->findById($config['cid']);
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
                 'component_definition_id', $instance->getDefinitionId()
