@@ -2346,16 +2346,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Variable \\$levelModels in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$levelModel$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: "#^Variable \\$srcIndicatorUsages in PHPDoc tag @var does not match assigned variable \\$srcCapabilityUsages\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
 			message: "#^Variable \\$collection in PHPDoc tag @var does not match assigned variable \\$capabilityMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php

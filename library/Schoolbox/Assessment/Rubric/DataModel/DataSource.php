@@ -414,7 +414,6 @@ class DataSource
 
 
         // Add levels
-        /** @var LevelModel[] $levelModels */
         foreach ($levelModels as $levelModel) {
             $levelId = $levelModel->getId();
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
@@ -1495,11 +1494,12 @@ class DataSource
 
         // Get Source Usages
         /** @var CapabilityUsageModel[]|GenericCollection $srcCapabilityUsages */
-        /** @var IndicatorUsageModel[]|GenericCollection $srcIndicatorUsages */
         $srcCapabilityUsages = $capabilityUsageMapper->findByColumnList([
             'rubric_capability_id' => $srcCapabilities->getPropertyValues('id'),
             'submission_box_id'    => $sourceBox->getId(),
         ]);
+
+        /** @var IndicatorUsageModel[]|GenericCollection $srcIndicatorUsages */
         $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
             'rubric_indicator_id' => $srcIndicators->getPropertyValues('id'),
             'submission_box_id'   => $sourceBox->getId(),
