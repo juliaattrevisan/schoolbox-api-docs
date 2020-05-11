@@ -109,7 +109,7 @@ $colorFactory = new \Alaress\Color\ColorFactory();
 $defaultColour = array(
     'head_font' => Config::get('homepage_colour_head_font'),
     'head_bg' => Config::get('homepage_colour_head_bg'),
-    'font' => Config::get('homepage_colour_font'),
+    'font_primary' => Config::get('homepage_colour_font'),
     'bg_primary' => Config::get('homepage_colour_bg_primary')
 );
 
@@ -410,7 +410,7 @@ $this->parse('colour_list_block', 'colour_list', true);
 $defaultColour = array(
     'head_font' => Config::get('homepage_colour_head_font'),
     'head_bg' => Config::get('homepage_colour_head_bg'),
-    'font' => Config::get('homepage_colour_font'),
+    'font_primary' => Config::get('homepage_colour_font'),
     'bg_primary' => Config::get('homepage_colour_bg_primary')
 );
 
