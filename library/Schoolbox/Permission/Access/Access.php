@@ -499,14 +499,18 @@ class Access
         }
 
         // Ensure we take role-permission from NNIAN
-        /** @var Folder\Model $nnian */
+
         $folder = $this->folderMapper->findCheaplyById($folderId);
+
         try {
             $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
         } catch (Mapper\Exception $e) {
             return UserAccess::ACCESS_DENY;
         }
+
+        /** @var Folder\Model $nnian */
         $nnian   = $nnianAncestors->last();
+
         $nnianId = $nnian->getId();
 
         // Permission check #2 - Query the DB (unique constraints ensure 0:1 results)
