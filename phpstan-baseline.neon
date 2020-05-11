@@ -1246,16 +1246,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
 
 		-
-			message: "#^Variable \\$allImages in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentImage$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
-
-		-
-			message: "#^Variable \\$allBlogs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentBlog$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
-
-		-
 			message: "#^Method Eportfolio\\\\PageMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Eportfolio/PageMapper.php
