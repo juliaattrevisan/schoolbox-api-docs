@@ -151,11 +151,6 @@ parameters:
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
 
 		-
-			message: "#^Variable \\$uaMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
-
-		-
 			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: library/Alaress/Lumberjack/CliFormatter.php

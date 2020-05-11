@@ -1015,7 +1015,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function getAccessList(): GenericCollection
     {
-        /** @var UserAccessMapper $uaMapper */
         if (!isset($this->accessList)) {
             $uaMapper = UserAccessMapper::getInstance();
             $this->setAccessList($uaMapper->findAllForUser($this));
