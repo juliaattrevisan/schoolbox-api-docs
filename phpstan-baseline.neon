@@ -2381,11 +2381,6 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Image/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$commentCollection contains unknown class Schoolbox\\\\Blog\\\\Homepage\\\\Comment\\\\Comment\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Comment/Notifier.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Image/Mapper.php
