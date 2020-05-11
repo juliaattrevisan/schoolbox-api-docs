@@ -4451,11 +4451,6 @@ parameters:
 			path: library/Schoolbox/Weather/WeatherstackClient.php
 
 		-
-			message: "#^Variable \\$result in PHPDoc tag @var does not match assigned variable \\$realname\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
 			message: "#^Binary operation \"\\+\" between \\(float\\|int\\) and string results in an error\\.$#"
 			count: 11
 			path: library/Schoolbox/WebDav/LegacyConfiguration/Factory.php
