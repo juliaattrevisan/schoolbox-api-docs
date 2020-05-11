@@ -1961,11 +1961,6 @@ parameters:
 			path: library/Homepage.php
 
 		-
-			message: "#^Variable \\$currentPerson in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$j, \\$period$#"
-			count: 1
-			path: library/Leave/Core/Report/House/CSV.php
-
-		-
 			message: "#^Variable \\$totals might not be defined\\.$#"
 			count: 2
 			path: library/Leave/Core/Report/House/HTML.php

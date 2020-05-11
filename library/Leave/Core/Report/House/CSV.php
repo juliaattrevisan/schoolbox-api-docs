@@ -124,7 +124,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
                         $fieldList[] = $i ? '' : $currentPerson['user_boarding_status'];
 
                         // Periods
-                        /** @var string[][][][] $currentPerson ['periods'] */
                         foreach ($currentPerson['periods'] as $j => $period) {
                             $currentPeriod = $period['request_period'];
 
