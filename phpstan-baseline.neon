@@ -6,11 +6,6 @@ parameters:
 			path: conf/modules/SportsFixtures.php
 
 		-
-			message: "#^Variable \\$inst in PHPDoc tag @var does not match assigned variable \\$instance\\.$#"
-			count: 1
-			path: library/AjaxChat.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 3
 			path: library/Alaress/Application/Kernel.php
