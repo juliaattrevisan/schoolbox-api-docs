@@ -3516,11 +3516,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
 
 		-
-			message: "#^Variable \\$assessmentImpl in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$subAssessmentSpec$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Exporter/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Exporter/Controller.php

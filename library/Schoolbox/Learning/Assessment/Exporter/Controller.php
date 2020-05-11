@@ -321,12 +321,14 @@ class Controller extends BaseController
 
         // Recursive case
         if ($assessmentSpec instanceof Project) {
-            /** @var Project $assessmentImpl */
             foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
                 if ($subAssessmentSpec->isDeleted()) {
                     continue;
                 }
+
+                /** @var Project $assessmentImpl */
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
+
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
             }
         }
