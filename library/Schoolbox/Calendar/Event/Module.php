@@ -145,6 +145,7 @@ class Module extends BaseModule
 
     /**
      * @return EventMapper
+     * @throws \InvalidArgumentException
      */
     private function getEventMapper(): EventMapper
     {
@@ -156,7 +157,6 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
-        /** @var Container $injector */
         $injector->params[Controller::class] = [
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),

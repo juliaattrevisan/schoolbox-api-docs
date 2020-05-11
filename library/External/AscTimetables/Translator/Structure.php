@@ -41,7 +41,6 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
             $termFinish = clone $result['termStart'];
             $termFinish = $termFinish->addYears(1)->getDatabaseDate();
             foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
-                /** @var \Schoolbox\Campus $campus */
                 foreach ($result['periods'] as $period) {
                     foreach ($result['days'] as $day) {
                         $endResult[] = [

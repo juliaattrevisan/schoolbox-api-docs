@@ -106,10 +106,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         /**
          * Check if user is a fixture admin
          */
-        /** @var UserAccess $fixturesAccess */
+        /** @var UserAccess|null $fixtureAccess */
         $fixtureAccess = $this->getUser()->getAccessList()->getBy('service', UserAccess::SERVICE_SPORTS_ADMINISTRATOR);
 
-        if ((!empty($fixtureAccess) && $fixtureAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) || $this->getUser()->isSuperuser()) {
+        if (($fixtureAccess !== null && $fixtureAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) || $this->getUser()->isSuperuser()) {
             $this->fixtureAdmin = true;
         }
 

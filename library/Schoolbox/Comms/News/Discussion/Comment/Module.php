@@ -3,7 +3,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Discussion\Comment;
@@ -19,6 +18,7 @@ use Schoolbox\Discussion\Thread;
  */
 class Module extends Comment\Module
 {
+
     /**
      * @var string
      */
@@ -30,13 +30,16 @@ class Module extends Comment\Module
      * related to a discussion thread.
      *
      * @return Thread\Context\IThreadLocator
+     * @throws \InvalidArgumentException
      */
     protected function buildContext(): Thread\Context\IThreadLocator
     {
         /** @var News\Mapper   $newsMapper */
-        /** @var Thread\Mapper $threadMapper */
         $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
+
+        /** @var Thread\Mapper $threadMapper */
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
+
         return new News\Discussion\ThreadLocator($threadMapper, $newsMapper);
     }
 
@@ -46,6 +49,7 @@ class Module extends Comment\Module
      * comments.
      *
      * @return Auth\Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException
      */
     protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
@@ -71,6 +75,7 @@ class Module extends Comment\Module
      * comments.
      *
      * @return Auth\Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException
      */
     protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {

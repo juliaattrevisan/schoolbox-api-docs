@@ -233,11 +233,9 @@ class Folder extends DAV\Collection
                 $this->getAccessor()
             );
         } else {
-
-            /** @var Collection|FileModel[] $result */
-
             $realname = pathinfo($name,PATHINFO_FILENAME);
 
+            /** @var Collection|FileModel[] $result */
             $result = $this->getFileMapper()->findByColumnList([
                 'realname'  => $realname,
                 'category'  => $this->getFolderID()

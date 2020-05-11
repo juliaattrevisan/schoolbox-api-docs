@@ -29,7 +29,7 @@ class Model implements ISoftDeletable, JsonSerializable
     * Name of the booking, which can be used to identify this booking
     * when using beavis suggests etc.
     *
-    * @var
+    * @var string
     */
     protected $name;
 

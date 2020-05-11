@@ -181,7 +181,6 @@ class Controller extends Base
      */
     public function create()
     {
-        /** @var $item Node\Model */
         $item = $this->nodeMapper->createModel();
 
         // Default learning area and level, or a preselected one?

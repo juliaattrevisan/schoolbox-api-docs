@@ -6,18 +6,8 @@ parameters:
 			path: conf/modules/SportsFixtures.php
 
 		-
-			message: "#^Variable \\$inst in PHPDoc tag @var does not match assigned variable \\$instance\\.$#"
-			count: 1
-			path: library/AjaxChat.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 3
-			path: library/Alaress/Application/Kernel.php
-
-		-
-			message: "#^Variable \\$bookMarkMapper in PHPDoc tag @var does not match assigned variable \\$config\\.$#"
-			count: 1
 			path: library/Alaress/Application/Kernel.php
 
 		-
@@ -121,11 +111,6 @@ parameters:
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
-			message: "#^Variable \\$userList in PHPDoc tag @var does not match assigned variable \\$users\\.$#"
-			count: 1
-			path: library/Alaress/Image/Cache/Portrait.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Image\\\\Filetype\\\\FiletypeInterface\\:\\:getImageManager\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
@@ -154,11 +139,6 @@ parameters:
 			message: "#^Call to an undefined method Alaress\\\\Json\\\\Serializable\\:\\:getPrimitive\\(\\)\\.$#"
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: "#^Variable \\$uaMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
 
 		-
 			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
@@ -234,11 +214,6 @@ parameters:
 			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
 			count: 1
 			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
-			message: "#^Variable \\$timer in PHPDoc tag @var does not match assigned variable \\$interval\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/AbstractScheduler.php
 
 		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
@@ -576,11 +551,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$currentEvent \\\\Sabre\\\\VObject\\\\Component\\\\VEvent\\)\\: Unexpected token \"\\$currentEvent\", expected type at offset 9$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
 			message: "#^Return typehint of method Calendar_Api_EventType_Event_Vcal_Default\\:\\:buildCalendarEventFromVevent\\(\\) has invalid type Calendar_Event_Type_Day\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
@@ -701,11 +671,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^Variable \\$assessables in PHPDoc tag @var does not match assigned variable \\$allAssessments\\.$#"
-			count: 1
-			path: library/Component/Dashboard/RecentSubmissionsController.php
-
-		-
 			message: "#^Method Component\\\\Eportfolio\\\\AdvancedListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Component/Eportfolio/AdvancedListMapper.php
@@ -824,11 +789,6 @@ parameters:
 			message: "#^Variable \\$val in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Component/Instance.php
-
-		-
-			message: "#^Variable \\$configDef in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
 
 		-
 			message: "#^Return typehint of method Component_InstanceMapper\\:\\:save\\(\\) has invalid type int\\.$#"
@@ -1251,11 +1211,6 @@ parameters:
 			path: library/EOTC/ListGroup/Chain.php
 
 		-
-			message: "#^Variable \\$location in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Collection.php
-
-		-
 			message: "#^Cannot call method getListGroupIndex\\(\\) on string\\.$#"
 			count: 2
 			path: library/EOTC/ListGroup/Collection.php
@@ -1279,16 +1234,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array.#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
-
-		-
-			message: "#^Variable \\$allImages in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentImage$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
-
-		-
-			message: "#^Variable \\$allBlogs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentBlog$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
 
 		-
 			message: "#^Method Eportfolio\\\\PageMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
@@ -1371,19 +1316,9 @@ parameters:
 			path: library/External/AscTimetables/Translator/Enrolment/Map.php
 
 		-
-			message: "#^Variable \\$campus in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$period$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Structure.php
-
-		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Structure/Map.php
-
-		-
-			message: "#^Variable \\$campus in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$term$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
 
 		-
 			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
@@ -1936,11 +1871,6 @@ parameters:
 			path: library/External/Liss/Authenticator.php
 
 		-
-			message: "#^Variable \\$eventType in PHPDoc tag @var does not match assigned variable \\$allEventTypes\\.$#"
-			count: 1
-			path: library/External/Liss/Server.php
-
-		-
 			message: "#^Binary operation \"\\-\\=\" between string and 12 results in an error\\.$#"
 			count: 2
 			path: library/External/Pcschools/Timetable.php
@@ -1964,11 +1894,6 @@ parameters:
 			message: "#^Call to an undefined method GuzzleHttp\\\\ClientInterface\\:\\:get\\(\\)\\.$#"
 			count: 1
 			path: library/External/Tass/Api/Connector.php
-
-		-
-			message: "#^Variable \\$udDates in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$idx, \\$dateString$#"
-			count: 1
-			path: library/External/Tass/Api/ModelFactory.php
 
 		-
 			message: "#^Variable \\$longestDay might not be defined\\.$#"
@@ -2024,16 +1949,6 @@ parameters:
 			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
 			count: 1
 			path: library/Homepage.php
-
-		-
-			message: "#^Variable \\$travelType in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Leave/Controller.php
-
-		-
-			message: "#^Variable \\$currentPerson in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$j, \\$period$#"
-			count: 1
-			path: library/Leave/Core/Report/House/CSV.php
 
 		-
 			message: "#^Variable \\$totals might not be defined\\.$#"
@@ -2246,11 +2161,6 @@ parameters:
 			path: library/Schoolbox/Application/WebRequest/Kernel.php
 
 		-
-			message: "#^Variable \\$config in PHPDoc tag @var does not match assigned variable \\$di\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWork/SingleFile/Mapper.php
@@ -2274,11 +2184,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
-
-		-
-			message: "#^Variable \\$model in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBoxMapper.php
 
 		-
 			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\:\\:getOpenDate\\(\\)\\.$#"
@@ -2311,42 +2216,12 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Module.php
 
 		-
-			message: "#^Variable \\$folders in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$folder$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$units in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$idx, \\$unit$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$_GET  \\$query\\)\\: Unexpected token \"\\$_GET\", expected type at offset 223$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$_POST \\$post\\)\\: Unexpected token \"\\$_POST\", expected type at offset 372$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$unitImplData in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$unitImp$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getFolder\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(null\\|1              \\$data\\['checked'\\]    Did user check the item\\?\\)\\: Unexpected token \"1\", expected type at offset 356$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
@@ -2376,26 +2251,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: "#^Variable \\$unitSpecAssessmentSpecs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentSpec$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$unitSpecAssessmentImpls in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentImpl$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$unitSpecAssessmentPairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentPair$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$assessmentPairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessmentPair$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getOffset\\(\\)\\.$#"
 			count: 4
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
@@ -2407,11 +2262,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Variable \\$assessmentSpec in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$spec$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
@@ -2486,26 +2336,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Variable \\$levelModels in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$levelModel$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: "#^Variable \\$srcIndicatorUsages in PHPDoc tag @var does not match assigned variable \\$srcCapabilityUsages\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: "#^Variable \\$collection in PHPDoc tag @var does not match assigned variable \\$capabilityMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForOtherMapper\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
-
-		-
 			message: "#^Variable \\$usesMarkRange might not be defined\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
@@ -2531,24 +2361,9 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Module.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Repair/Base.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$commentObject Comment\\)\\: Unexpected token \"\\$commentObject\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Assessment/StudentReportCard/CommentMapper.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Eportfolio/Image/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$commentCollection contains unknown class Schoolbox\\\\Blog\\\\Homepage\\\\Comment\\\\Comment\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Comment/Notifier.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -2562,11 +2377,6 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Module.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$injector contains unknown class Schoolbox\\\\Calendar\\\\Event\\\\Container\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event/Module.php
 
@@ -2746,22 +2556,12 @@ parameters:
 			path: library/Schoolbox/Comms/News/Controller.php
 
 		-
-			message: "#^Variable \\$threadMapper in PHPDoc tag @var does not match assigned variable \\$newsMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Discussion/Comment/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Discussion\\\\Thread\\\\Context\\\\IThreadLocation\\:\\:setAudience\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForArticles\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
-
-		-
-			message: "#^Variable \\$threadMapper in PHPDoc tag @var does not match assigned variable \\$newsMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
 
@@ -2881,11 +2681,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$item Node\\\\Model\\)\\: Unexpected token \"\\$item\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Import/Module.php
@@ -2921,16 +2716,6 @@ parameters:
 			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/SparqlClient.php
 
 		-
-			message: "#^Variable \\$flatList in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Source/BrowserAbstract.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$classname IDiConfigurable\\)\\: Unexpected token \"\\$classname\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Di/Configurator.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Module.php
@@ -2944,11 +2729,6 @@ parameters:
 			message: "#^Return typehint of method Schoolbox\\\\Discussion\\\\Comment\\\\Module\\:\\:getErrorMapper\\(\\) has invalid type Schoolbox\\\\Discussion\\\\Comment\\\\Error\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Module.php
-
-		-
-			message: "#^Variable \\$articlesForDiscussion in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$article$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Test/DataGenerator.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -3026,11 +2806,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
 
 		-
-			message: "#^Variable \\$periods in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$period$#"
-			count: 2
-			path: library/Schoolbox/External/Importer/TimetableStructure.php
-
-		-
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
@@ -3054,11 +2829,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\File\\\\ExtensionMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/Schoolbox/File/ExtensionMapper.php
-
-		-
-			message: "#^Variable \\$pageFilters in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$pageFilter$#"
-			count: 1
-			path: library/Schoolbox/Filter/AbstractFactoryFactory.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForPageAndEntity\\(\\)\\.$#"
@@ -3089,16 +2859,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
-
-		-
-			message: "#^Variable \\$filterSelectionArray in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$isSelected$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
-
-		-
-			message: "#^Variable \\$filterSelections in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$selection$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\.$#"
@@ -3156,11 +2916,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\[\\]\\)\\: Unexpected token \"\\[\", expected type at offset 80$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$capabilities with type \\(iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Capability\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|null is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
@@ -3171,34 +2926,9 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
 
 		-
-			message: "#^Variable \\$sortedTerms in PHPDoc tag @var does not match assigned variable \\$currentTerm\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/Term/Factory.php
-
-		-
-			message: "#^Variable \\$rosettaStone in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Module.php
-
-		-
-			message: "#^Variable \\$filterSelections in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$key, \\$selection$#"
-			count: 1
-			path: library/Schoolbox/Filter/Selection/Mapper.php
-
-		-
-			message: "#^Variable \\$fixturesAccess in PHPDoc tag @var does not match assigned variable \\$fixtureAccess\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Component/Homepage/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Division/Module.php
-
-		-
-			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/ItineraryItem/Controller.php
 
 		-
 			message: "#^Cannot call method sortBy\\(\\) on array\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>\\.$#"
@@ -3221,44 +2951,9 @@ parameters:
 			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
-			message: "#^Variable \\$match in PHPDoc tag @var does not match assigned variable \\$matchId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
-			message: "#^Variable \\$team in PHPDoc tag @var does not match assigned variable \\$teamId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
-			message: "#^Variable \\$status in PHPDoc tag @var does not match assigned variable \\$statusId\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Controller.php
-
-		-
-			message: "#^Variable \\$participantCoach in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentCoach$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Snapshot/Type/Coach.php
-
-		-
-			message: "#^Variable \\$participantPlayer in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentPlayer$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Snapshot/Type/Player.php
-
-		-
-			message: "#^Variable \\$participantPosition in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentPosition$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Snapshot/Type/Position.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
-
-		-
-			message: "#^Variable \\$parent in PHPDoc tag @var does not match assigned variable \\$quotedId\\.$#"
-			count: 1
-			path: library/Schoolbox/Forum/PostNotifier.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -3269,11 +2964,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Greenhouse/Module.php
-
-		-
-			message: "#^Variable \\$pairs in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$assessment, \\$normMark$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -3801,11 +3491,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
 
 		-
-			message: "#^Variable \\$assessmentId in PHPDoc tag @var does not match assigned variable \\$assessable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
@@ -3824,16 +3509,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable is not subtype of native type Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
-
-		-
-			message: "#^Variable \\$assessmentImpl in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$subAssessmentSpec$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Exporter/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Exporter/Controller.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -3941,44 +3616,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
-			message: "#^Variable \\$project in PHPDoc tag @var does not match assigned variable \\$dueWork\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/DueWorkTest.php
-
-		-
-			message: "#^Variable \\$p3DomainModel in PHPDoc tag @var does not match assigned variable \\$p1DomainModel\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
-			message: "#^Variable \\$q4DataModel in PHPDoc tag @var does not match assigned variable \\$p1DataModel\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAssessments\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/ProjectTest.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getOwner\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$model has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\Id\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/InteractionMapperProxy.php
-
-		-
-			message: "#^Variable \\$currentResponse in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$currentAssessable$#"
-			count: 11
-			path: library/Schoolbox/Learning/Assessment/Test/SummatorTest.php
 
 		-
 			message: "#^PHPDoc tag @return with type PHPUnit_Framework_MockObject_MockObject\\|Schoolbox\\\\Permission\\\\Access\\\\Access is not subtype of native type PHPUnit_Framework_MockObject_MockObject\\.$#"
@@ -4014,11 +3654,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Module.php
-
-		-
-			message: "#^Variable \\$decoded in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$obj$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -4066,11 +3701,6 @@ parameters:
 			path: library/Schoolbox/Learning/Markbook/Controller.php
 
 		-
-			message: "#^Variable \\$writableAssessments in PHPDoc tag @var does not match assigned variable \\$writable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Learning/Module.php
@@ -4089,11 +3719,6 @@ parameters:
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Module.php
-
-		-
-			message: "#^Variable \\$user in PHPDoc tag @var does not match assigned variable \\$reviewer\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
 
 		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:finalizeReview\\(\\) has invalid type int\\.$#"
@@ -4134,16 +3759,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Upcoming/Module.php
-
-		-
-			message: "#^Variable \\$boxData in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$criterionId, \\$criteria$#"
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
-
-		-
-			message: "#^Variable \\$criteria in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$studentId, \\$studentMarks$#"
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Rubrics/AllRubrics.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -4226,32 +3841,12 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$childModel has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\DeletedAtDate\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$model has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\DeletedAtDate\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
 			message: "#^Cannot call static method getInstance\\(\\) on \\(int\\|string\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Variable \\$mapperClass in PHPDoc tag @var does not match assigned variable \\$firstLoop\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$roleCollection Collection\\|Role\\[\\]\\)\\: Unexpected token \"\\$roleCollection\", expected type at offset 9$#"
 			count: 1
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
 
@@ -4376,11 +3971,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Audience/Mapper.php
 
 		-
-			message: "#^Variable \\$pastoralReport in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/ReportBuilder/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
@@ -4398,11 +3988,6 @@ parameters:
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
-			path: library/Schoolbox/Permission/Access/Access.php
-
-		-
-			message: "#^Variable \\$nnian in PHPDoc tag @var does not match assigned variable \\$folder\\.$#"
-			count: 2
 			path: library/Schoolbox/Permission/Access/Access.php
 
 		-
@@ -4434,11 +4019,6 @@ parameters:
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$event EventBase\\)\\: Unexpected token \"\\$event\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Picker/DateTime/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -4491,11 +4071,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
 
 		-
-			message: "#^Variable \\$data in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$msgId$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
-
-		-
 			message: "#^Part \\$data \\(array\\) of encapsed string cannot be cast to string\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/PipeManager.php
@@ -4526,11 +4101,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
 
 		-
-			message: "#^Variable \\$messageIds in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$id$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
-
-		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:sRem\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
@@ -4557,21 +4127,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\File\\\\IFile\\:\\:getFolder\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
-			message: "#^Variable \\$results in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$file$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\:\\:setOwner\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\:\\:getStorage\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Resource/Browser/AbstractController.php
 
@@ -4666,11 +4221,6 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Mapper.php
 
 		-
-			message: "#^Variable \\$item in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Auth/CanBookItem.php
-
-		-
 			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
 			count: 2
 			path: library/Schoolbox/ResourceBooking/Booking/Component/ResourceManagement.php
@@ -4681,39 +4231,9 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^Variable \\$bookings in PHPDoc tag @var does not match assigned variable \\$source\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
-
-		-
-			message: "#^Variable \\$resource in PHPDoc tag @var does not match assigned variable \\$event\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n    \", expected type at offset 128$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Model.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Module.php
-
-		-
-			message: "#^Variable \\$calendarEvent in PHPDoc tag @var does not match assigned variable \\$eventMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Notifier.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findNextInSeries\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Notifier.php
-
-		-
-			message: "#^Variable \\$series in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
 
 		-
 			message: "#^Variable \\$campus might not be defined\\.$#"
@@ -4731,11 +4251,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
 
 		-
-			message: "#^Variable \\$item in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Module.php
@@ -4744,11 +4259,6 @@ parameters:
 			message: "#^Cannot call method getId\\(\\) on resource\\.$#"
 			count: 4
 			path: library/Schoolbox/ResourceBooking/Item/RelatedResource/Mapper.php
-
-		-
-			message: "#^Variable \\$resources in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Report/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -4881,16 +4391,6 @@ parameters:
 			path: library/Schoolbox/Tile/Component/TileControllerDelegate.php
 
 		-
-			message: "#^Variable \\$tileMapper in PHPDoc tag @var does not match assigned variable \\$model\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Layout/Mapper.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForLayout\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Layout/Mapper.php
-
-		-
 			message: "#^Variable \\$order in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Mapper.php
@@ -4941,11 +4441,6 @@ parameters:
 			path: library/Schoolbox/Weather/WeatherstackClient.php
 
 		-
-			message: "#^Variable \\$result in PHPDoc tag @var does not match assigned variable \\$realname\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/FileServer/Folder.php
-
-		-
 			message: "#^Binary operation \"\\+\" between \\(float\\|int\\) and string results in an error\\.$#"
 			count: 11
 			path: library/Schoolbox/WebDav/LegacyConfiguration/Factory.php
@@ -4991,11 +4486,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^Variable \\$video in PHPDoc tag @var does not match assigned variable \\$storage\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Video/Storage.php
-
-		-
 			message: "#^Method SocialStream\\\\PostMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/SocialStream/PostMapper.php
@@ -5026,11 +4516,6 @@ parameters:
 			path: library/Wiki.php
 
 		-
-			message: "#^Variable \\$user in PHPDoc tag @var does not match assigned variable \\$keyword\\.$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: tools/assessment/csv.php
@@ -5054,11 +4539,6 @@ parameters:
 			message: "#^Function jsonHarFileToUrlRequestedArray not found\\.$#"
 			count: 3
 			path: tools/dev-tools-har-to-url-csv.php
-
-		-
-			message: "#^Variable \\$destUserList in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/eportfolio/import.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -5141,11 +4621,6 @@ parameters:
 			path: tools/mq/schedule-safe-restart.php
 
 		-
-			message: "#^Variable \\$stomp in PHPDoc tag @var does not match assigned variable \\$loop\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
 			message: "#^Function extractEvent not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
 			count: 1
 			path: tools/mq/schedule-safe-restart.php
@@ -5206,11 +4681,6 @@ parameters:
 			path: tools/pastoral/generateTestData.php
 
 		-
-			message: "#^Variable \\$currentDocument in PHPDoc tag @var does not match assigned variable \\$allDocuments\\.$#"
-			count: 1
-			path: tools/plagscan/submit.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: tools/quiz/autoFinish.php
@@ -5219,11 +4689,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForAssessmentAndUser\\(\\)\\.$#"
 			count: 1
 			path: tools/quiz/autoFinish.php
-
-		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 80$#"
-			count: 1
-			path: tools/rubric/repairSpecAssessments.php
 
 		-
 			message: "#^Variable \\$newCustomSha might not be defined\\.$#"

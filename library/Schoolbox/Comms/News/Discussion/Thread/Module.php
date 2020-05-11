@@ -70,9 +70,11 @@ class Module extends Thread\Module
     protected function buildContext(): Thread\Context\IThreadLocator
     {
         /** @var News\Mapper   $newsMapper */
-        /** @var Thread\Mapper $threadMapper */
         $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
+
+        /** @var Thread\Mapper $threadMapper */
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
+
         return new News\Discussion\ThreadLocator($threadMapper, $newsMapper);
     }
 

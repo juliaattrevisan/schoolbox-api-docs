@@ -57,7 +57,6 @@ class AjaxChat {
         $this->output = [];
 
         if($this->componentID) {
-            /** @var Component_Instance[] $inst */
             $instance = Component_InstanceMapper::getInstance()->findByInstanceId($this->componentID);
             if ($instance instanceof Component_Instance) {
                 foreach ($instance->getConfig() as $conf) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -208,9 +208,11 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $bob = $this->newBuilder($post, $thread, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
             ->addFilter('roletype', array($roletype));
 
-        /** @var Post $parent */
         $quotedId = 0;
+
+        /** @var Post $parent */
         $parent = $post->getParent();
+
         if ($parent instanceof Post) {
             try {
                 $parent   = $this->mapper->findById($parent->getId());

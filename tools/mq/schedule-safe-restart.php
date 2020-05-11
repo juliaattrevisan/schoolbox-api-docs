@@ -132,8 +132,9 @@ foreach ($sqlq as $qi) {
 
 // now move onto stuff in rabbit
 /** @var LoopInterface $loop */
-/** @var IClient $stomp */
 $loop  = $kernel->getDependencyInjector()->values['react.loop'];
+
+/** @var IClient $stomp */
 $stomp = $kernel->getDependencyInjector()->get('stomp');
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();

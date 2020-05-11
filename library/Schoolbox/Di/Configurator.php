@@ -40,9 +40,12 @@ class Configurator
             throw new ReflectionFailure($e->getMessage(), $e->getCode(), $e);
         }
 
-        /** @var $classname IDiConfigurable */
-        $this->di->params[$classname]  = $classname::getParams($this->di);
-        $this->di->setters[$classname] = $classname::getSetters($this->di);
+        /** @var IDiConfigurable $classname */
+        $diParams = $classname::getParams($this->di);
+        $diSetters = $classname::getSetters($this->di);
+
+        $this->di->params[$classname]  = $diParams;
+        $this->di->setters[$classname] = $diSetters;
     }
 
 

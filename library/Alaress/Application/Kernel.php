@@ -659,29 +659,39 @@ abstract class Kernel
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
         $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
+
             /** @var IConfigLoader $config */
-            /** @var Session $session */
-            /** @var Router $router */
-            /** @var Predis\ClientInterface $redis */
-            /** @var TourMapper $tourMapper */
-            /** @var StepMapper $tourStepMapper */
-            /** @var Environment $templateEngine */
-            /** @var TopMenuMapper $topMenuMapper */
-            /** @var SideMenuSectionMapper $sideMenuSectionMapper */
-            /** @var SideMenuMapper $sideMenuMapper */
-            /** @var BookmarkMapper $bookMarkMapper */
             $config  = $di->get('config');
+
+            /** @var Session $session */
             $session = $di->get('session');
+
+            /** @var TourMapper $tourMapper */
             $tourMapper = $mapperFactory->get(TourMapper::class);
+
+            /** @var StepMapper $tourStepMapper */
             $tourStepMapper = $mapperFactory->get(StepMapper::class);
             $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
+
+            /** @var Predis\ClientInterface $redis */
             $redis   = $di->get('redis');
             $output  = new Output\ThemedHtml();
+
+            /** @var Environment $templateEngine */
             $templateEngine = $di->get('templateEngine');
+
+            /** @var TopMenuMapper $topMenuMapper */
             $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
+
+            /** @var SideMenuSectionMapper $sideMenuSectionMapper */
             $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
+
+            /** @var SideMenuMapper $sideMenuMapper */
             $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
+
+            /** @var BookmarkMapper $bookMarkMapper */
             $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
+
             $output
                 ->setTemplateEngine($templateEngine)
                 ->addDataGenerator(

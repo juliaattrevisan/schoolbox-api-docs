@@ -1,12 +1,9 @@
 <?php
 /**
- * Position
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Snapshot\Type;
 
 use \Schoolbox\Fixtures\Snapshot\ISnapshot;
@@ -15,8 +12,12 @@ use \Schoolbox\Fixtures\Team\Position\Model as CurrentPosition;
 use \Schoolbox\Fixtures\Team\Position\Participant\Model as ParticipantPosition;
 use \Schoolbox\Fixtures\Team\Position\Participant\Mapper as ParticipantPositionMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Metadata;
-use \Schoolbox\Fixtures\Match\Model as Match;
 
+/**
+ * Class Position
+ *
+ * @package Schoolbox\Fixtures\Snapshot\Type
+ */
 class Position implements ISnapshot
 {
     /**
@@ -49,7 +50,6 @@ class Position implements ISnapshot
      */
     public function snapshot()
     {
-        /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
         /** @var Team $currentTeam */
@@ -74,8 +74,9 @@ class Position implements ISnapshot
                 $allPositions = $this->getMetadata()->getStrategy()->getAllPositions($currentTeam);
 
                 /** @var CurrentPosition $currentPosition */
-                /** @var ParticipantPosition $participantPosition */
                 foreach ($allPositions as $currentPosition) {
+
+                    /** @var ParticipantPosition $participantPosition */
                     $participantPosition = $this->getParticipantMapper()->createModel();
                     $participantPosition->setMatch($match);
                     $participantPosition->setTeam($currentTeam);

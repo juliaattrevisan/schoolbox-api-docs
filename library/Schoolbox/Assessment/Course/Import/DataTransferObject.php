@@ -487,7 +487,6 @@ class DataTransferObject
     private function addAssessmentSpecs(GenericCollection $assessmentSpecs)
     {
         foreach ($assessmentSpecs as $unitSpecId => $unitSpecAssessmentSpecs) {
-            /** @var GenericCollection|IAssessable[] $unitSpecAssessmentSpecs */
             foreach ($unitSpecAssessmentSpecs as $assessmentSpec) {
                 $this->addAssessmentSpec($unitSpecId, $assessmentSpec);
             }
@@ -504,7 +503,6 @@ class DataTransferObject
     private function addAssessmentImpls(GenericCollection $assessmentImpls)
     {
         foreach ($assessmentImpls as $unitSpecId => $unitSpecAssessmentImpls) {
-            /** @var GenericCollection|IAssessable[] $unitSpecAssessmentImpls */
             foreach ($unitSpecAssessmentImpls as $assessmentImpl) {
                 $this->addAssessmentImpl($unitSpecId, $assessmentImpl);
             }
@@ -521,7 +519,6 @@ class DataTransferObject
     private function addAssessmentPairs(GenericCollection $assessmentPairs)
     {
         foreach ($assessmentPairs as $unitSpecId => $unitSpecAssessmentPairs) {
-            /** @var GenericCollection|AssessmentPair[] $unitSpecAssessmentPairs */
             foreach ($unitSpecAssessmentPairs as $assessmentPair) {
                 $this->addAssessmentPair($unitSpecId, $assessmentPair);
             }
@@ -537,9 +534,10 @@ class DataTransferObject
     private function calculateAvailableAssessmentCounts()
     {
         $this->availableAssessmentCounts = [];
+
+        /** @var AssessmentPair[] $assessmentPairs */
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
             $count = 0;
-            /** @var AssessmentPair[] $assessmentPairs */
             foreach ($assessmentPairs as $assessmentPair) {
                 $count += $assessmentPair->getAssessmentCount();
             }
@@ -561,6 +559,7 @@ class DataTransferObject
     private function calculateSelectedAssessmentCounts()
     {
         $this->selectedAssessmentCounts = [];
+
         /** @var AssessmentPair[] $assessmentPairs */
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
 
@@ -570,7 +569,6 @@ class DataTransferObject
             } // Else modification of existing unit import.
             else {
                 $count = 0;
-                /** @var AssessmentPair[] $assessmentPairs */
                 foreach ($assessmentPairs as $assessmentPair) {
                     $count += $assessmentPair->getAssessmentImplCount();
                 }
@@ -585,6 +583,7 @@ class DataTransferObject
     /**
      * @param UnitImplementation $unitImpl
      * @return bool Whether it was added. False if already existed.
+     * @throws \UnexpectedValueException
      */
     private function addUnitImplementation(UnitImplementation $unitImpl)
     {
@@ -605,6 +604,7 @@ class DataTransferObject
      * @param bool        $isNested
      * @return AssessmentPair
      * @throws \DomainException If attempting to register a spec with an impl as a spec only
+     * @throws \UnexpectedValueException
      */
     private function addAssessmentSpec($unitSpecId, IAssessable $assessmentSpec, $isNested = false)
     {
@@ -673,6 +673,7 @@ class DataTransferObject
      * @param bool           $isNested
      * @return AssessmentPair
      * @throws \DomainException If attempting to register a pair without a valid spec and impl
+     * @throws \UnexpectedValueException
      */
     private function addAssessmentPair($unitSpecId, AssessmentPair $pair, $isNested = false)
     {
@@ -706,7 +707,7 @@ class DataTransferObject
                 }
 
             }
-            /** @var Project $assessmentSpec */
+
             foreach ($assessmentSpec->getAssessables() as $spec) {
                 // Have we already added this spec as part of a pair?
                 if ($subPairs->offsetExists($spec->getId())) {
@@ -728,6 +729,7 @@ class DataTransferObject
      *
      * @param int $unitSpecId
      * @return bool
+     * @throws \UnexpectedValueException
      */
     private function checkUnitSpecCollection($unitSpecId)
     {

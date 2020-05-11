@@ -59,6 +59,9 @@ class Mapper extends \Schoolbox\Mapper
      * @param string                                   $page
      * @param Collection|GenericCollection[]|Model[][] $selectionsPerFilter Indexed by filter.id, selection.key
      * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function updateSelections(User $user, $page, Collection $selectionsPerFilter)
     {
@@ -70,8 +73,9 @@ class Mapper extends \Schoolbox\Mapper
 
         // Save User's current selections
         $selectionsToSave = $this->createCollection();
+
+        /** @var Model[] $filterSelections */
         foreach ($selectionsPerFilter as $filterId => $filterSelections) {
-            /** @var Model[] $filterSelections */
             foreach ($filterSelections as $key => $selection) {
                 $selectionsToSave->add($selection);
             }
@@ -92,6 +96,4 @@ class Mapper extends \Schoolbox\Mapper
     {
         return true;
     }
-
-
 }

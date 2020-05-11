@@ -161,17 +161,20 @@ class Mapper extends BaseMapper
     /**
      * Gets the tile layout, and fetches any tiles that are a part of it.
      *
-     * @param  mixed $identifierValue
+     * @param mixed $identifierValue
      * @return Model
+     * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      * @throws BaseMapper\Exception\Deleted
      */
     public function findById($identifierValue)
     {
         /** @var Model $model */
-        /** @var TileMapper $tileMapper */
         $model      = parent::findById($identifierValue);
+
+        /** @var TileMapper $tileMapper */
         $tileMapper = $this->getJoinMapper('tile');
+
         $model->setTileList($tileMapper->findForLayout($model->getId()));
         return $model;
     }

@@ -179,6 +179,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param BlogCommentModel $comment
      * @param User             $author
      * @return Envelope
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     * @throws \InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     protected function notifyFollowed($comment, $author)
     {
@@ -192,7 +196,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->setTitle(':author commented on :title in :catname')
                     ->addTopic("{$this->getSlug()}.$commentId.followed");
 
-        /** @var Comment[]|Collection $commentCollection */
         $commentCollection = $this->mapper->findByColumn('blog_id', $blog->getId());
 
         /** @var User[]|Collection $userCollection */

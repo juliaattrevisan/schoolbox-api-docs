@@ -15,24 +15,42 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use function array_merge;
 
+/**
+ * Class Component
+ *
+ * @package Schoolbox\Filter\Filters\Assessment\RubricUsage
+ */
 class Component extends Filter\BaseComponent
 {
-    /** @var Codec */
+
+    /**
+     * @var Codec
+     */
     private $codec;
 
-    /** @var GenericCollection|CapabilityModel[] */
+
+    /**
+     * @var GenericCollection|CapabilityModel[]
+     */
     private $capabilities;
 
-    /** @var bool */
+
+    /**
+     * @var bool
+     */
     private $showCapabilities;
 
-    /** @var bool */
+
+    /**
+     * @var bool
+     */
     private $showIndicators;
+
 
     /**
      * Formatted data to be injected into twig template.
      *
-     * @var []
+     * @var array
      */
     private $contextData;
 

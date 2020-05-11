@@ -365,11 +365,13 @@ class Mapper extends BaseMapper
         return $this->hydrateList($statement, 're');
     }
 
+
     /**
      * Gets count for a resource that matches a search term.
      *
-     * @param  string $keyword
+     * @param string $keyword
      * @return int
+     * @throws \PDOException
      */
     public function searchCount($keyword)
     {
@@ -387,12 +389,14 @@ class Mapper extends BaseMapper
         return $statement->fetchColumn();
     }
 
+
     /**
      * Is the user a moderator of this item?
      *
-     * @param  int $itemId
-     * @param  int $userId
+     * @param int $itemId
+     * @param int $userId
      * @return bool
+     * @throws BaseMapper\DefinitionException
      */
     public function isUserModerator($itemId, $userId)
     {
@@ -403,6 +407,7 @@ class Mapper extends BaseMapper
         return count($list) >= 1;
     }
 
+
     /**
      * Finds items for which $moderatorId is a moderator.
      *
@@ -410,8 +415,10 @@ class Mapper extends BaseMapper
      * it will not fetch all items if the user has moderate access to the
      * resource booking service.
      *
-     * @param  int $moderatorId
+     * @param int $moderatorId
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function findForModerator($moderatorId)
     {
@@ -428,7 +435,6 @@ class Mapper extends BaseMapper
 
         // Hydration:
         // progress through each join that was passed.
-        /** @var Model $item */
         return $this->hydrateList($statement, 'r');
     }
 }

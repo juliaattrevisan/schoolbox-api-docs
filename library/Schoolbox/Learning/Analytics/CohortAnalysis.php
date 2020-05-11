@@ -259,23 +259,21 @@ class CohortAnalysis
 
 
         // Calculate student weighted average mark
+        /** @var array $assessmentGradePairs */
         foreach ($involvedAssessments as $userId => $assessmentGradePairs) {
 
             $weightedSum = 0;
             $totalWeight = 0;
 
-            /**
-             * @var array       $pairs
-             * @var IAssessable $assessment
-             */
-            foreach ($assessmentGradePairs as list($assessment, $normMark)) {
+            /** @var IAssessable $assessment */
+            foreach ($assessmentGradePairs as [$assessment, $normMark]) {
                 $weight = $assessment->getWeight();
 
                 $weightedSum += $weight * $normMark;
                 $totalWeight += $weight;
             }
 
-            if(0 !== $totalWeight){
+            if (0 !== $totalWeight) {
                 $this->courseGrades[$userId] = $weightedSum / $totalWeight;
             }
         }
@@ -292,9 +290,11 @@ class CohortAnalysis
         if ($left->getSequence() < $right->getSequence()) {
             return -1;
         }
+
         if ($left->getSequence() > $right->getSequence()) {
             return +1;
         }
+
         return strcasecmp($left->getTitle(), $right->getTitle());
     }
 

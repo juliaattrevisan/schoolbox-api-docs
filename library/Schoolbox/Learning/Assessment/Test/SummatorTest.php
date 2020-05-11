@@ -96,13 +96,12 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
                 $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
             );
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
@@ -134,9 +133,9 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if($currentAssessable instanceof Task){
                     $currentFeedback->getResponse()->setCreatedAt(null);
@@ -146,6 +145,7 @@ class SummatorTest extends TestCase
 
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if($currentAssessable instanceof Task){
@@ -307,13 +307,12 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
                 $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
             );
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
@@ -345,9 +344,9 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if($currentAssessable instanceof Task){
                     $currentFeedback->getResponse()->setCreatedAt(null);
@@ -356,6 +355,7 @@ class SummatorTest extends TestCase
                 }
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if($currentAssessable instanceof Task){
@@ -709,13 +709,12 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
                 $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
             );
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
@@ -747,9 +746,9 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if($currentAssessable instanceof Task){
                     $currentFeedback->getResponse()->setCreatedAt(null);
@@ -758,6 +757,7 @@ class SummatorTest extends TestCase
                 }
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if($currentAssessable instanceof Task){
@@ -970,13 +970,14 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 $currentFeedback->setPublishedAt(null);
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     $currentFeedback->setPublishedAt(null);
@@ -1307,13 +1308,12 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
                 $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
             );
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
             }
@@ -1345,9 +1345,9 @@ class SummatorTest extends TestCase
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if($currentAssessable instanceof Task){
                     $currentFeedback->getResponse()->setCreatedAt(null);
@@ -1356,6 +1356,7 @@ class SummatorTest extends TestCase
                 }
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if($currentAssessable instanceof Task){
@@ -1555,13 +1556,13 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 $currentFeedback->setPublishedAt(null);
             }
-
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     $currentFeedback->setPublishedAt(null);
@@ -1595,13 +1596,14 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
+
+            /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 $currentFeedback->setPublishedAt(null);
             }
 
+            /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     $currentFeedback->setPublishedAt(null);

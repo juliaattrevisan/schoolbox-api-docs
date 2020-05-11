@@ -117,7 +117,6 @@ class DataGenerator
 
 
         // Build threads and comments for each article
-        /** @var News\Model[] $articlesForDiscussion */
         foreach ($articlesForDiscussion as $article) {
             $commentCount = $this->faker->numberBetween(1, 100);
             $this->log->notice(

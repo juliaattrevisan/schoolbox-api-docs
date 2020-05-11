@@ -47,7 +47,6 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
         // TODO revise this assumption when a school has multiple campuses
         $endResult = [];
         foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
-            /** @var \Schoolbox\Campus $campus */
             foreach ($result['terms'] as $term) {
                 $resultTerm = [
                     'Term Campus' => $campus->getExtTimetableCode(),

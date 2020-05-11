@@ -435,7 +435,6 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            /** @var Match $match */
             $matchId = $this->getRequest()->post['matchId'];
             $match   = $this->getMatchMapper()->findById($matchId);
         } catch (MapperException $e) {
@@ -443,7 +442,6 @@ class Controller extends AbstractController
         }
 
         try {
-            /** @var Team $team */
             $teamId = $this->getRequest()->post['teamId'];
             $team   = $this->getTeamMapper()->findById($teamId);
         } catch (MapperException $e) {
@@ -451,7 +449,6 @@ class Controller extends AbstractController
         }
 
         // Save status (optional)
-        /** @var Status $status */
         $statusId = $this->getRequest()->post->get('statusId');
         if ($statusId) {
             try {

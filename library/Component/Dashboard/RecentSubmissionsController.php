@@ -149,7 +149,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         /* Load a hashtable of Assessments. Assessment instances aren't hydrated in each Response
          * for performance reasons, so we'll need to do a manual lookup and assignment
          */
-        /** @var IAssessable[]|GenericCollection $assessables */
+        /** @var IAssessable[]|GenericCollection $allAssessments */
         $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
 
         /* Correlate each Response to its hydrated Assessment instance

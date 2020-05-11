@@ -25,7 +25,6 @@ class InteractionMapperProxy extends TestCase
      */
     public function testCreateModel(Mapper\AbstractMapperProxy $mapperProxy, $modelClass)
     {
-        /** @var Mapper\Traits\Model\Id $model */
         $model = $mapperProxy->createModel();
         $this->assertInstanceOf($modelClass, $model);
         $this->assertNull($model->getId());

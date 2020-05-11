@@ -293,12 +293,6 @@ class Component_InstanceMapper extends BaseMapper
         $configDefinitionCollection = $this->componentConfigDefinitionMapper->createCollection();
 
         // Hydrate rows
-
-        /** @var Component_Instance $instance */
-        /** @var Component_Definition $definition */
-        /** @var Component_Config $configInstance */
-        /** @var Component_ConfigDefinition $configDef */
-
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $instanceId   = $row['id'];
             $definitionId = $row['cd.id'];
@@ -307,7 +301,7 @@ class Component_InstanceMapper extends BaseMapper
 
             // The results will contain multiple rows referencing the same component, we only want to hydrate the
             // component definition once, so we need to test if it already exists in our collection
-
+            /** @var Component_Definition $definition */
             $definition = $definitionCollection->getOffset($definitionId);
 
             if (empty($definition) && $definitionId) {
@@ -325,6 +319,7 @@ class Component_InstanceMapper extends BaseMapper
                 $instanceCollection->setOffset($instanceId, $instance);
             }
 
+            /** @var Component_Instance $instance */
             $instance = $instanceCollection->getOffset($instanceId);
 
             // Hydrate Component Instance Configuration
@@ -340,6 +335,7 @@ class Component_InstanceMapper extends BaseMapper
                 $configInstanceCollection->setOffset($configId, $this->componentConfigMapper->hydrate($row, 'cci'));
             }
 
+            /** @var Component_Config $configInstance */
             $configInstance = $configInstanceCollection->getOffset($configId);
 
             // Multiple Config Definitions In Each Instance

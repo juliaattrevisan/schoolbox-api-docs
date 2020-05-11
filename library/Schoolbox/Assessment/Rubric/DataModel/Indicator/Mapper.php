@@ -88,13 +88,17 @@ class Mapper extends BaseMapper {
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var CapabilityMapper $capabilityMapper */
-        /** @var NodeMapper                    $curriculumNodeMapper */
-        /** @var GenericCollection|Model[] $collection */
-        $capabilityMapper     = $this->getJoinMapper('capability');
         $capabilityIds        = [];
+
+        /** @var CapabilityMapper $capabilityMapper */
+        $capabilityMapper     = $this->getJoinMapper('capability');
+
+        /** @var NodeMapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
+
+        /** @var GenericCollection|Model[] $collection */
         $collection           = $this->createCollection();
+
         foreach ($statement as $row) {
             /** @var Model $crit */
             $crit = $this->hydrate($row);

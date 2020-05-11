@@ -346,8 +346,8 @@ class Controller extends Base
 
         $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
+        /** @var EventBase $event */
         foreach ($events as $event) {
-            /** @var $event EventBase */
             $appointments[] = [
                 'displayDateTime' => $event->getEventSpan(),
                 'title'           => $event->getTitle(),

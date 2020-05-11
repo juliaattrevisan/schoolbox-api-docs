@@ -72,8 +72,10 @@ $app = new class extends CliTool\App
 
         // Load user list, either from toUserId or from roleId
         $role = null;
-        /** @var User[] $destUserList */
+
         if (isset($toUserId)) {
+
+            /** @var User[] $destUserList */
             $destUserList = UserMapper::getInstance()->findByColumn('id', $toUserId);
             if (count($destUserList) === 0) {
                 $this->getLogger()->error(sprintf('user #%d does not exist - aborting.', $toUserId));
@@ -89,6 +91,7 @@ $app = new class extends CliTool\App
             }
 
             // Load user list - abort if there are no users in list
+            /** @var User[] $destUserList */
             $destUserList = UserMapper::getInstance()->findByColumn('group_id', $roleId);
             if (count($destUserList) === 0) {
                 $this->getLogger()->info(sprintf(

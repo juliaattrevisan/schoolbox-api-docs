@@ -576,7 +576,7 @@ class DueWorkTest extends TestCase
      */
     public function testTranslateMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass, $totalMark, $gradeGroupId)
     {
-        /** @var DueWork $project */
+        /** @var DueWork $dueWork */
         $dueWork = $this->translator->translateToDomainModel($dataModel);
 
         // Test type

@@ -3,19 +3,19 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Filter;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
 use \Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Filter\Filters;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\L10n\RosettaStone;
 
-
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Filter
+ */
 class Module extends AlaressModule
 {
 
@@ -31,9 +31,6 @@ class Module extends AlaressModule
 
     /**
      * @inheritdoc
-     * @throws NotFound If invalid roleType
-     * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
      */
     protected function registerRoutes(): void
     {
@@ -48,7 +45,6 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_GRADES:
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
-                    /** @var RosettaStone $rosettaStone */
                     return ['factoryFactory' => $this->getInjector()->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }

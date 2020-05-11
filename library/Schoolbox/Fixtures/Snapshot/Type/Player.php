@@ -1,12 +1,9 @@
 <?php
 /**
- * Player
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Fixtures\Snapshot\Type;
 
 use \Schoolbox\Fixtures\Snapshot\ISnapshot;
@@ -15,8 +12,12 @@ use \Schoolbox\Fixtures\Team\Player\Model as CurrentPlayer;
 use \Schoolbox\Fixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use \Schoolbox\Fixtures\Team\Player\Participant\Mapper as ParticipantPlayerMapper;
 use \Schoolbox\Fixtures\Team\Metadata\Metadata;
-use \Schoolbox\Fixtures\Match\Model as Match;
 
+/**
+ * Class Player
+ *
+ * @package Schoolbox\Fixtures\Snapshot\Type
+ */
 class Player implements ISnapshot
 {
     /**
@@ -49,7 +50,6 @@ class Player implements ISnapshot
      */
     public function snapshot()
     {
-        /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
         /** @var Team $currentTeam */
@@ -74,8 +74,9 @@ class Player implements ISnapshot
                 $allPlayers = $this->getMetadata()->getStrategy()->getAllPlayers($currentTeam);
 
                 /** @var CurrentPlayer $currentPlayer */
-                /** @var ParticipantPlayer $participantPlayer */
                 foreach ($allPlayers as $currentPlayer) {
+
+                    /** @var ParticipantPlayer $participantPlayer */
                     $participantPlayer = $this->getParticipantMapper()->createModel();
                     $participantPlayer->setMatch($match);
                     $participantPlayer->setTeam($currentTeam);

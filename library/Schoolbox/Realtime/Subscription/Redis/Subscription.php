@@ -130,9 +130,10 @@ class Subscription implements ISubscription
         $removed = 0;
 
         do {
-            list($cursor, $messageIds) = $this->syncClient->sscan($this->getSetIdentifier(), $cursor, [ 'match' => $this->getMessageScan($messageId) ]);
 
             /** @var array $messageIds */
+            list($cursor, $messageIds) = $this->syncClient->sscan($this->getSetIdentifier(), $cursor, [ 'match' => $this->getMessageScan($messageId) ]);
+
             foreach ($messageIds as $id) {
                 $removed += $this->syncClient->sRem($this->getSetIdentifier(), $id);
             }

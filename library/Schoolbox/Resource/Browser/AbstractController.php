@@ -421,10 +421,12 @@ abstract class AbstractController extends BaseController
     {
         $folder  = $this->folderMapper->findById($folderId);
         $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
-        $results = $factory->build($this->request->post->get('attachment'))->getAll();
-        $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
 
         /** @var Resource\AbstractFile[] $results */
+        $results = $factory->build($this->request->post->get('attachment'))->getAll();
+
+        $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
+
         foreach ($results as $file) {
             // Do something with the file
             // Different files have different attributes

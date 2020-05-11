@@ -298,8 +298,9 @@ class Generator implements GeneratorInterface
                           ->findAll()
                           ->groupBy('type')
                           ->getAll();
+
+            /** @var Collection|Role[] $roleCollection */
             foreach ($roles as $rType => $roleCollection) {
-                /** @var $roleCollection Collection|Role[] */
                 $this->roleCache[$rType] = $roleCollection->getColumnValues('id');
             }
 
@@ -307,4 +308,4 @@ class Generator implements GeneratorInterface
         return $this->roleCache;
     }
 
-} 
+}

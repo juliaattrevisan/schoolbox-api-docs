@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Curriculum\Source;
 
 use Schoolbox\Collection;
@@ -178,7 +178,6 @@ abstract class BrowserAbstract implements BrowserInterface
      */
     public function getSavedOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
-        /** @var Collection|Node\Model[] $flatList */
         return $this->getNodeMapper()->getCollectionAsTree(
             $this->getNodeMapper()->findByColumnList(
                 array(

@@ -170,11 +170,7 @@ class TimetableStructure extends AbstractImporter
             // Sort the periods by start then end later, then use that to apply a sequence
             $day   = $row['Period Day'];
             $title = $row['Period Title'];
-//            $period = $this->timetablePeriodMapper->findOneByColumnList([
-//                'cycle_id' => $result[$key]['cycle']->getId(),
-//                'day'      => $day,
-//                'title'    => $title,
-//            ]);
+
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
 
@@ -237,8 +233,8 @@ class TimetableStructure extends AbstractImporter
             $dayCount    = \count($keys) ? max($keys) : 0;
             $periodNames = [];
 
+            /** @var Collection|TimetablePeriod[] $periods */
             foreach ($timetable['periods'] as $day => $periods) {
-                /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
                     $periodNames[$period->getTitle()] = true;
                 }
@@ -246,20 +242,6 @@ class TimetableStructure extends AbstractImporter
             $periodCount = count($periodNames);
             $this->log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
             $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
-
-            // The campus start date no longer needs to be set into the past.
-            // (This was added because LGSPK's timetables started in the future
-            //  and I needed to test their timetables.
-            //  Now, their timetable should be guaranteed to start in the past.)
-//            if ($campus->getStart()->isFuture()) {
-//                $this->log->info(sprintf('Timetable cycle is starting in future - offsetting so it starts in past'));
-//                $i = 0;
-//                while ($campus->getStart()->isFuture() && $i++ < 100) {
-//                    // Go back $dayCount weekdays until $start is not in future
-//                    $campus->getStart()->addWeekdays(-$dayCount);
-//                }
-//                $this->log->info(sprintf('Timetable cycle now starts on "%s"', $campus->getStart()->getDatabaseDate()));
-//            }
 
             // Sort periods by day, and then set period sequence that way
             $this->log->info('Setting sequence for periods');
@@ -311,8 +293,7 @@ class TimetableStructure extends AbstractImporter
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
      */
-    public
-    function save()
+    public function save()
     {
         // Eventual override rules:
         // * Term: same title/campus combination
@@ -353,8 +334,8 @@ class TimetableStructure extends AbstractImporter
                 $this->log->info(sprintf('Pretending to save campus cycle for campus "%s"', $code));
             }
 
+            /** @var Collection|TimetablePeriod[] $periods */
             foreach ($row['periods'] as $day => $periods) {
-                /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
                     if ($this->performUpdate) {
                         $this->log->info(sprintf('Saving period "%s" for day %d', $period->getTitle(), $period->getDay()));

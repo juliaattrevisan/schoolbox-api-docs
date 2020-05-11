@@ -321,7 +321,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param string $field The field name to compare against
      * @param mixed $value The value to compare against
      *
-     * @return object
+     * @return object|null
      */
     public function getBy($field, $value)
     {

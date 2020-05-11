@@ -163,20 +163,20 @@ class CommentMapper extends Mapper
         $roleMapper = $commenterMapper->getJoinMapper('role');
 
         $query = "
-			SELECT
-				{$this->getColumnString('com')},
-				{$categoryMapper->getColumnString('cat')},
-				{$studentMapper->getColumnString('su')},
-				{$roleMapper->getColumnString('r')},
-				{$commenterMapper->getColumnString('cu')}
-			FROM {$this->getTable()} as `com`
-			LEFT JOIN {$this->getJoinSql('category','com','cat')}
-			LEFT JOIN {$this->getJoinSql('student','com','su')}
-			LEFT JOIN {$this->getJoinSql('commenter','com','cu')}
-			LEFT JOIN {$commenterMapper->getJoinSql('role','cu','r')}
-			WHERE com.student_id = ?
-			AND com.category_id = ?
-		";
+            SELECT
+                {$this->getColumnString('com')},
+                {$categoryMapper->getColumnString('cat')},
+                {$studentMapper->getColumnString('su')},
+                {$roleMapper->getColumnString('r')},
+                {$commenterMapper->getColumnString('cu')}
+            FROM {$this->getTable()} as `com`
+            LEFT JOIN {$this->getJoinSql('category','com','cat')}
+            LEFT JOIN {$this->getJoinSql('student','com','su')}
+            LEFT JOIN {$this->getJoinSql('commenter','com','cu')}
+            LEFT JOIN {$commenterMapper->getJoinSql('role','cu','r')}
+            WHERE com.student_id = ?
+            AND com.category_id = ?
+        ";
 
         if (!$includeDeletions) {
             $query .= 'AND com.deleted IS NULL';
@@ -190,7 +190,7 @@ class CommentMapper extends Mapper
         $commentCollection = new Collection();
 
         while ($record = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            /** @var $commentObject Comment */
+            /** @var Comment $commentObject */
             $commentObject = $this->hydrate($record, 'com');
             $commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
             $commentObject->setStudent($studentMapper->hydrate($record, 'su'));

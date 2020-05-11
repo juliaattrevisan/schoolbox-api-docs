@@ -1,5 +1,20 @@
 <?php
 /**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+namespace Schoolbox\ResourceBooking\Booking\Auth;
+
+use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Failure;
+use Schoolbox\User;
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\Permission\Access\UserAccess;
+
+/**
+ * Class CanBookItem
+ *
  * Authorization class: verifies that the user can create a booking.
  *
  * If the item has moderationType:
@@ -14,21 +29,8 @@
  * * they're a staff member (may be covered in another auth rule)
  * * they're a moderator for this item
  *
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @package Schoolbox\ResourceBooking\Booking\Auth
  */
-
-namespace Schoolbox\ResourceBooking\Booking\Auth;
-
-use Alaress\Authorizer\Rule;
-use Alaress\Authorizer\Failure;
-use Schoolbox\Role;
-use Schoolbox\User;
-use Schoolbox\ResourceBooking\Item;
-use Schoolbox\Permission\Access\UserAccess;
-
 class CanBookItem implements Rule\IAuthorizationRule
 {
 
@@ -56,10 +58,13 @@ class CanBookItem implements Rule\IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         // TODO simplify this rule, and define it as separate ones
-        /** @var Item\Model $item */
         if ($params['item'] instanceof Item\Model) {
+
+            /** @var Item\Model $item */
             $item = $params['item'];
         } else {
+
+            /** @var Item\Model $item */
             $item = $params['item'] = $this->getMapper()->findById($params['id']);
         }
         $auth = new Rule\Any(

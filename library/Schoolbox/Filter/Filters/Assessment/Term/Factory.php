@@ -104,7 +104,6 @@ abstract class Factory extends AbstractFactory
      */
     protected function getPreviousTerm(GenericCollection $terms): ?Term\Model
     {
-        /** @var GenericCollection|Term\Model[] $sortedTerms */
         $currentTerm = $this->getCurrentTerm($terms);
 
         if (!$currentTerm) {

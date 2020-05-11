@@ -737,7 +737,6 @@ EXAMPLES:
         // Do the child models have a timestamp (not boolean) soft-delete field, and we have dates to filter?
         if ($deletedAfter && $deletedBefore && $childModels->first() && method_exists($childModels->first(), 'getDeletedAt')) {
             $childModels = $childModels->filter(function ($childModel) use ($deletedAfter, $deletedBefore) {
-                /** @var Mapper\Traits\Model\DeletedAtDate $childModel */
                 $deletedAt = $childModel->getDeletedAt();
                 return $deletedAt->between($deletedAfter, $deletedBefore);
             });
@@ -834,7 +833,6 @@ EXAMPLES:
     {
         $deletedAfter = $deletedBefore = null;
         if ($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')) {
-            /** @var Mapper\Traits\Model\DeletedAtDate $model */
             $deletedAt = $this->explicitDeletionDate ?: $model->getDeletedAt();
             $this->logger->info(
                 sprintf("Restoring soft-deleted models deleted within %d seconds before and after '%s'...",
@@ -980,8 +978,9 @@ EXAMPLES:
     {
         $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
 
-        /** @var IMapper $mapperClass */
         $firstLoop = true;
+
+        /** @var IMapper $mapperClass */
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $firstModel = $models->first();
 

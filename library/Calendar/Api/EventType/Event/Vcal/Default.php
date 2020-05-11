@@ -174,7 +174,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                      * as they seem to be the calendar items themselves
                      */
                     if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-                        /** @var $currentEvent \Sabre\VObject\Component\VEvent */
+                        /** @var \Sabre\VObject\Component\VEvent $currentEvent */
                         $isAdded = $currentEvent->isInTimeRange($start, $end);
                         if (is_callable($filterFunction)) {
                             $isAdded = $filterFunction($currentEvent, $decodedConfig);

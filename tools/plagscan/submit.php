@@ -36,7 +36,7 @@ $app = new class extends CliTool\App {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Re-uploads failed documents into plagscan so it can try processing again. 
+Re-uploads failed documents into plagscan so it can try processing again.
 
 Usage: submit.php
 
@@ -57,7 +57,6 @@ HELP;
             exit();
         }
 
-        /** @var Plagscan $currentDocument */
         $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED, [
             'order' => [
                 'student_submission_file_id' => 'ASC',
@@ -68,6 +67,7 @@ HELP;
 
         $numUpdated = 0;
 
+        /** @var Plagscan $currentDocument */
         foreach ($allDocuments as $currentDocument) {
             $prefix = "Plagscan Record {$currentDocument->getId()}";
 
