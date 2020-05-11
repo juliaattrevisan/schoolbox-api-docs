@@ -2581,11 +2581,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
 
 		-
-			message: "#^Variable \\$threadMapper in PHPDoc tag @var does not match assigned variable \\$newsMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Feed/Module.php
