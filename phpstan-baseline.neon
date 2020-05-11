@@ -6,11 +6,6 @@ parameters:
 			path: conf/modules/SportsFixtures.php
 
 		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 3
-			path: library/Alaress/Application/Kernel.php
-
-		-
 			message: "#^Method Alaress\\\\Async\\\\Notification\\\\Cloud\\\\Google\\\\GCM\\:\\:propagate\\(\\) should return bool but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
@@ -39,11 +34,6 @@ parameters:
 			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^Constructor of class Alaress_CleanProbe has an unused parameter \\$_\\.$#"
-			count: 1
-			path: library/Alaress/CleanProbe.php
 
 		-
 			message: "#^Variable \\$rawValue in isset\\(\\) always exists and is not nullable\\.$#"
@@ -2761,11 +2751,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/CourseImports/Component.php
 
 		-
-			message: "#^PHPDoc tag @return with type string is incompatible with native type int\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FolderYearLevel/KeyConverter.php
-
-		-
 			message: "#^PHPDoc tag @return with type iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Project\\\\Model\\|Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\Collection is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
@@ -2799,11 +2784,6 @@ parameters:
 			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\BuilderInterface\\:\\:setNamespace\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(Collection\\|\\)\\: Unexpected token \"\\\\n     \\*\", expected type at offset 164$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Position/Mapper.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -3631,16 +3611,6 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 264$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 299$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$property_map in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
@@ -4226,11 +4196,6 @@ parameters:
 			path: library/Schoolbox/TagCloud/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @return with type string\\|null is not subtype of native type string\\.$#"
-			count: 1
-			path: library/Schoolbox/Test/ISoftDeletableTest.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getName\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Test/SoftDeleteTest.php
@@ -4324,11 +4289,6 @@ parameters:
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/SocialStream/Authenticator.php
-
-		-
-			message: "#^PHPDoc tag @return with type Alaress_Date_Format\\|null is not subtype of native type string\\|null\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Abstract.php
 
 		-
 			message: "#^Cannot call method getTitle\\(\\) on string\\.$#"
@@ -4464,11 +4424,6 @@ parameters:
 			message: "#^Variable \\$hash might not be defined\\.$#"
 			count: 1
 			path: tools/mq/diagnose-pqueue.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$ttl\\)\\: Unexpected token \"\\$ttl\", expected type at offset 63$#"
-			count: 1
-			path: tools/mq/remove-old-triggers.php
 
 		-
 			message: "#^Function interrogate not found\\.$#"

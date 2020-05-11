@@ -156,7 +156,7 @@ class ISoftDeletableTest extends TestCase
 
     /**
      * @param string $className The name of the relevant class
-     * @return null|string The path to the file containing the class or false
+     * @return string The path to the file containing the class or false
      */
     private function getClassFile($className): string
     {

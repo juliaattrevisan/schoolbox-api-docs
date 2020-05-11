@@ -807,7 +807,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param string $parentField
      * @param int    $currentDepth
      *
-     * @return $object
+     * @return mixed
      */
     public function loadAncestors(
         $object,
@@ -867,7 +867,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param string $childField
      * @param int    $currentDepth
      *
-     * @return $object
+     * @return object
      */
     public function loadDescendants(
         $object,
