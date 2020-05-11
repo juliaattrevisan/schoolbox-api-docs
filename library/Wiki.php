@@ -229,8 +229,9 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
         /** @var \Schoolbox\User $user */
-        $keyword  = $this->db->quote($keyword);
         $user     = $_SESSION['user'];
+
+        $keyword  = $this->db->quote($keyword);
         $userId   = $this->db->quote($user->getId());
         $roleId   = $this->db->quote($user->getRole()->getId());
         $offset   = intval($offset);
