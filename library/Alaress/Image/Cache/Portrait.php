@@ -115,7 +115,6 @@ class Portrait extends Storage
 
         // Get all users with a synergy ID, and test them against policy.
 
-        /** @var User[] $userList */
         $users = $this->userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($users as $currentUser) {
