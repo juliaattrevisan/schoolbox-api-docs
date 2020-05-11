@@ -170,7 +170,7 @@ class Mapper extends BaseMapper
             // because this object should always be part of a participant's
             // response or feedback.
 
-            /** @var User $user */
+            /** @var User $reviewer */
             $reviewer = $this->hydrateJoin($row, 'reviewer', 'r');
             // TODO, second part of test should not be required. see https://github.com/alaress/schoolbox/pull/11281
             if($reviewer instanceof User && $reviewer->getId()){

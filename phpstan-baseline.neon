@@ -3721,11 +3721,6 @@ parameters:
 			path: library/Schoolbox/Learning/Module.php
 
 		-
-			message: "#^Variable \\$user in PHPDoc tag @var does not match assigned variable \\$reviewer\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
 			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:finalizeReview\\(\\) has invalid type int\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
