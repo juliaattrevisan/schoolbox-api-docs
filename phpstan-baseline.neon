@@ -3841,23 +3841,8 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
-			message: "#^PHPDoc tag @var for variable \\$childModel has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\DeletedAtDate\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$model has invalid type Schoolbox\\\\Mapper\\\\Traits\\\\Model\\\\DeletedAtDate\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
 			message: "#^Cannot call static method getInstance\\(\\) on \\(int\\|string\\)\\.$#"
 			count: 2
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Variable \\$mapperClass in PHPDoc tag @var does not match assigned variable \\$firstLoop\\.$#"
-			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
 
 		-
