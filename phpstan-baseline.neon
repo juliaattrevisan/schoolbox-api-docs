@@ -561,11 +561,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$currentEvent \\\\Sabre\\\\VObject\\\\Component\\\\VEvent\\)\\: Unexpected token \"\\$currentEvent\", expected type at offset 9$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
 			message: "#^Return typehint of method Calendar_Api_EventType_Event_Vcal_Default\\:\\:buildCalendarEventFromVevent\\(\\) has invalid type Calendar_Event_Type_Day\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
