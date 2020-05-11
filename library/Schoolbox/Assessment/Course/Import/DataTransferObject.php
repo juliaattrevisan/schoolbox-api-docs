@@ -534,9 +534,10 @@ class DataTransferObject
     private function calculateAvailableAssessmentCounts()
     {
         $this->availableAssessmentCounts = [];
+
+        /** @var AssessmentPair[] $assessmentPairs */
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
             $count = 0;
-            /** @var AssessmentPair[] $assessmentPairs */
             foreach ($assessmentPairs as $assessmentPair) {
                 $count += $assessmentPair->getAssessmentCount();
             }
@@ -558,6 +559,7 @@ class DataTransferObject
     private function calculateSelectedAssessmentCounts()
     {
         $this->selectedAssessmentCounts = [];
+
         /** @var AssessmentPair[] $assessmentPairs */
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
 
@@ -581,6 +583,7 @@ class DataTransferObject
     /**
      * @param UnitImplementation $unitImpl
      * @return bool Whether it was added. False if already existed.
+     * @throws \UnexpectedValueException
      */
     private function addUnitImplementation(UnitImplementation $unitImpl)
     {
@@ -601,6 +604,7 @@ class DataTransferObject
      * @param bool        $isNested
      * @return AssessmentPair
      * @throws \DomainException If attempting to register a spec with an impl as a spec only
+     * @throws \UnexpectedValueException
      */
     private function addAssessmentSpec($unitSpecId, IAssessable $assessmentSpec, $isNested = false)
     {
