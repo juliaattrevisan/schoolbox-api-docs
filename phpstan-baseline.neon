@@ -4496,11 +4496,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^Variable \\$video in PHPDoc tag @var does not match assigned variable \\$storage\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Video/Storage.php
-
-		-
 			message: "#^Method SocialStream\\\\PostMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
 			count: 1
 			path: library/SocialStream/PostMapper.php
