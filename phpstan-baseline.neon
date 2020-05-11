@@ -2906,11 +2906,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/CourseImports/Component.php
 
 		-
-			message: "#^PHPDoc tag @return with type string is incompatible with native type int\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FolderYearLevel/KeyConverter.php
-
-		-
 			message: "#^PHPDoc tag @return with type iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Project\\\\Model\\|Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\Collection is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php

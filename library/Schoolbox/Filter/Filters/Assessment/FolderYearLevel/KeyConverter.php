@@ -38,7 +38,7 @@ class KeyConverter extends AbstractKeyConverter
 
     /**
      * @inheritdoc
-     * @return string
+     * @return int|null
      */
     protected function getItem(string $key, User $user, string $page): ?int
     {
