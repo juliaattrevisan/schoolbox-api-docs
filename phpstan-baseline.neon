@@ -4551,11 +4551,6 @@ parameters:
 			path: tools/dev-tools-har-to-url-csv.php
 
 		-
-			message: "#^Variable \\$destUserList in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/eportfolio/import.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: tools/kami/check-status.php
