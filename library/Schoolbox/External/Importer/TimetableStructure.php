@@ -170,11 +170,7 @@ class TimetableStructure extends AbstractImporter
             // Sort the periods by start then end later, then use that to apply a sequence
             $day   = $row['Period Day'];
             $title = $row['Period Title'];
-//            $period = $this->timetablePeriodMapper->findOneByColumnList([
-//                'cycle_id' => $result[$key]['cycle']->getId(),
-//                'day'      => $day,
-//                'title'    => $title,
-//            ]);
+
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
 
