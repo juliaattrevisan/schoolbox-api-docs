@@ -13,7 +13,7 @@ use Schoolbox\Permission\Access\UserAccess;
 class Leave_Controller extends Controller
 {
     /**
-	 * Unused constants which document when morning, day and night occur
+     * Unused constants which document when morning, day and night occur
      * for Leave Reports and Catering Reports respectively
      */
     const LEAVE_THRESHOLD_MORNING    =  '9:59:59';
@@ -38,7 +38,7 @@ class Leave_Controller extends Controller
     ];
 
     /**
-	 * Constants for days
+     * Constants for days
      */
     const FRIDAY   = 5;
     const SATURDAY = 6;
@@ -88,7 +88,7 @@ class Leave_Controller extends Controller
     protected $hostTypes;
 
     /**
-	 * Time map array
+     * Time map array
      * A map of actual time values => presentation information
      * used in the Leave Time/Return Time dropdowns
      */
@@ -294,7 +294,7 @@ class Leave_Controller extends Controller
         $this->getPage()->setBlock(TEMPLATE_content, 'host_type', 'host_type_block');
 
         /* Iterate through each option and preselect
-		 */
+         */
         foreach ($this->getHostTypes() as $currentHostType) {
             if ($request->getHostType() instanceof \Leave\HostType && $request->getHostType()->getId() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
@@ -520,21 +520,21 @@ class Leave_Controller extends Controller
     }
 
     /**
-	 * Determine whether the leave start date is inside or outside the
-	 * creation threshold. If it's outside, you can create it
-	 *
-	 * Thresholds are measured from Friday 12PM of the weekend that
-	 * leave was intended to start
-	 *
-	 * @param string $startDate
-	 * @return bool
-	 */
+     * Determine whether the leave start date is inside or outside the
+     * creation threshold. If it's outside, you can create it
+     *
+     * Thresholds are measured from Friday 12PM of the weekend that
+     * leave was intended to start
+     *
+     * @param string $startDate
+     * @return bool
+     */
     private function isOutsideCreationThreshold($startDate)
     {
         $thresholdHours = \Config::get('boarder_leave_creation_threshold');
 
         /* Use 0 to deactivate this feature
-		 */
+         */
         if (!$thresholdHours) {
             return true;
         }
@@ -543,7 +543,7 @@ class Leave_Controller extends Controller
         $weekdayIndex = $thresholdDateTime->getWeekDayNumber();
 
         /* Get back to nearest Friday, which comes after furthest Thursday
-		 */
+         */
         if ($weekdayIndex == 6) {
             $thresholdDateTime->addDays(-1);
         } elseif ($weekdayIndex == 7) {
@@ -551,12 +551,12 @@ class Leave_Controller extends Controller
         }
 
         /* Subtract number of hours from config to determine outer limits
-		 * Measure it from high noon
-		 */
+         * Measure it from high noon
+         */
         $thresholdDateTime->addHours(12 - $thresholdHours);
 
         /* If you're outside the threshold, you can create it
-		 */
+         */
         if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimeStamp()) {
             return true;
         }
@@ -582,7 +582,7 @@ class Leave_Controller extends Controller
         }
 
         /* Limit leave creation to a threshold
-		 */
+         */
         if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
             $start = Alaress_Date_Format::newLocal($data['request']['start']['date']);
             $finish = Alaress_Date_Format::newLocal($data['request']['finish']['date']);
@@ -593,8 +593,8 @@ class Leave_Controller extends Controller
             $author = $_SESSION["user"];
 
             /* Use the userId field when submitting on someone else's behalf,
-			 * otherwise just your own id
-			 */
+             * otherwise just your own id
+             */
             if(isset($data['userId'])) {
                 try {
                     /** @var \Schoolbox\User $boarder */
@@ -804,7 +804,6 @@ class Leave_Controller extends Controller
 
             $travelTypes = $this->getTravelTypes();
 
-            /** @var Leave_Request_TravelType $travelType */
             if ($request->getTravelType() instanceof Leave_Request_TravelType) {
                 $travelType = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
             } else {
