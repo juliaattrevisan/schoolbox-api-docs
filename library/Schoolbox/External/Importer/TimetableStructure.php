@@ -237,8 +237,8 @@ class TimetableStructure extends AbstractImporter
             $dayCount    = \count($keys) ? max($keys) : 0;
             $periodNames = [];
 
+            /** @var Collection|TimetablePeriod[] $periods */
             foreach ($timetable['periods'] as $day => $periods) {
-                /** @var Collection|TimetablePeriod[] $periods */
                 foreach ($periods as $period) {
                     $periodNames[$period->getTitle()] = true;
                 }

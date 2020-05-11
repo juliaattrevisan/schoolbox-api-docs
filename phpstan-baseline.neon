@@ -2816,11 +2816,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
 
 		-
-			message: "#^Variable \\$periods in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$period$#"
-			count: 2
-			path: library/Schoolbox/External/Importer/TimetableStructure.php
-
-		-
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
