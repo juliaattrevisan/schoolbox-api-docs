@@ -177,7 +177,6 @@ class SubmissionBoxMapper extends BaseMapper
      */
     public function createModel($idValue = null)
     {
-        /** @var SubmissionBox $model */
         return parent::createModel($idValue)->setAssessmentModel($this->getJoinMapper('assessmentModel')->createModel());
     }
 
