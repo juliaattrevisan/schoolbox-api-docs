@@ -3851,11 +3851,6 @@ parameters:
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
 
 		-
-			message: "#^PHPDoc tag @var has invalid value \\(\\$roleCollection Collection\\|Role\\[\\]\\)\\: Unexpected token \"\\$roleCollection\", expected type at offset 9$#"
-			count: 1
-			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
-
-		-
 			message: "#^Method Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:emergency\\(\\) should return null but return statement is missing\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/StoredisLogger.php
