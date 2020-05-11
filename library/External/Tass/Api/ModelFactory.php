@@ -42,7 +42,6 @@ class ModelFactory
         [$udCodes, $udDates, $udFlags] = $this->parseUd($data, $patterns, false);
 
         // Convert all UD dates to ADF
-        /** @var string[] $udDates */
         foreach ($udDates as $idx => $dateString) {
             $udDates[$idx] = $this->hydrateDate($dateString, Alaress_Date_Format::DATABASE_FORMAT_MS);
         }
