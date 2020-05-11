@@ -2956,11 +2956,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Mapper.php
 
 		-
-			message: "#^Variable \\$parent in PHPDoc tag @var does not match assigned variable \\$quotedId\\.$#"
-			count: 1
-			path: library/Schoolbox/Forum/PostNotifier.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/GenericCollection.php
