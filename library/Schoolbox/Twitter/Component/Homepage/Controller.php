@@ -40,7 +40,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         return $this->renderTwigTemplate(
             $templateHandle,
-            Delegate::TEMPLATE,
+            $delegate->determineTemplate(),
             $delegate->buildTemplateParams()
         );
     }

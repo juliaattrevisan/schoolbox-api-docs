@@ -16,7 +16,8 @@ use Component_ControllerAbstract;
  */
 class Delegate
 {
-    public const  TEMPLATE              = '@twitter/component.twig';
+    private const TEMPLATE_TIMELINE     = '@twitter/variant/timeline.twig';
+    private const TEMPLATE_TWEET        = '@twitter/variant/tweet.twig';
     private const HREF_PROFILE_TIMELINE = 'https://twitter.com/%s';
 
 
@@ -34,6 +35,25 @@ class Delegate
     public function __construct(Component_ControllerAbstract $component)
     {
         $this->component = $component;
+    }
+
+
+    /**
+     * Which template should the component render?
+     * * Single tweet: render the tweet variant
+     * * Timeline of any type: render the timeline variant
+     *
+     * (If the URL contains the word "status" in its path, it's a tweet)
+     *
+     * @return string
+     */
+    public function determineTemplate(): string
+    {
+        $url  = $this->component->getConfig('url') ?? '';
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        return stripos($path, '/status/') === false
+            ? self::TEMPLATE_TIMELINE
+            : self::TEMPLATE_TWEET;
     }
 
 
