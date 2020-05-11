@@ -471,8 +471,6 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        /** @var PastoralReport $pastoralReport */
-
         if (empty($post['id'])) {
             $pastoralReport = $this->pastoralReportMapper->createModel();
         } else {
