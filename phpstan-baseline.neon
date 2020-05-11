@@ -36,11 +36,6 @@ parameters:
 			path: library/Alaress/Cache/Abstract.php
 
 		-
-			message: "#^Constructor of class Alaress_CleanProbe has an unused parameter \\$_\\.$#"
-			count: 1
-			path: library/Alaress/CleanProbe.php
-
-		-
 			message: "#^Variable \\$rawValue in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Codec/Integer/Base64.php
