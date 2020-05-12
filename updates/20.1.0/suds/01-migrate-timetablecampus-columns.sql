@@ -22,3 +22,8 @@ SET
 
 ALTER TABLE `sis_timetable_cycle`
     ADD COLUMN `ext_timetable_code` VARCHAR(255) NULL AFTER `title`;
+
+-- Change collation to whatever it was supposed to have been
+
+ALTER TABLE `sis_timetable_cycle`
+    CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
