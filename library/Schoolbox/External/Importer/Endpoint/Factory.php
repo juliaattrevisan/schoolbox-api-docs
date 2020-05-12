@@ -130,7 +130,6 @@ class Factory
                      */
                     CampusMapper::getInstance(),
                     UserMapper::getInstance(),
-                    TimetableCampusMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),

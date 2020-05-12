@@ -108,12 +108,6 @@ class Factory
 
 
     /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -158,7 +152,6 @@ class Factory
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      * @param CampusMapper                    $campusMapper
      * @param UserMapper                      $userMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -184,7 +177,6 @@ class Factory
          */
         CampusMapper $campusMapper,
         UserMapper $userMapper,
-        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -209,7 +201,6 @@ class Factory
          */
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -257,7 +248,6 @@ class Factory
                 $this->perform,
                 $batchxml,
                 $this->campusMapper,
-                $this->timetableCampusMapper,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
