@@ -60,9 +60,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
-if [ "$phpversion" != "7.4" ];
+if [ "$phpversion" != "7.1" ];
 then
-    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
+    /usr/bin/update-alternatives --set php /usr/bin/php7.1;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
@@ -337,7 +337,6 @@ sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on
 sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
-sed -i 's/var\/lib\/schoolbox/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
 sed -i 's/www-data/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
 # disable nginx open file cache since not a production server
 sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
@@ -584,8 +583,7 @@ else
     #cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
 fi
 
-eplver=`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`;
-echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-epl installed: $eplver";
+
 
 ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";

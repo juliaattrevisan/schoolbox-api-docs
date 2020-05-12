@@ -13,3 +13,7 @@ data_source: "https://s3-ap-southeast-2.amazonaws.com/schoolbox-data"
 data_filename: "initial.tar.gz"
 # If multiple network interfaces are available, select this interface automatically. If empty, prompt user.
 bridged_network_interface:
+# You can provide either a relative (from this file) or absolute path to your puppet-alaress repo
+puppet_dir: "../puppet-alaress"
+# Show debug output when provisioning?
+puppet_debug: false
