@@ -17,3 +17,8 @@ SET
     sis_timetable_cycle.start_day = sis_timetable_campus.start_day,
     sis_timetable_cycle.offset = sis_timetable_campus.offset,
     sis_timetable_cycle.reset = sis_timetable_campus.reset;
+
+-- Add ext_timetable_code to cycle
+
+ALTER TABLE `sis_timetable_cycle`
+    ADD COLUMN `ext_timetable_code` VARCHAR(255) NULL AFTER `title`;
