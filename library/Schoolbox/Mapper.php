@@ -2867,16 +2867,13 @@ abstract class Mapper implements IMapper, Serializable
         // Is this an INSERT or UPDATE,
         // or can we not tell because there's no identifier column?
         $insertQuery      = "INSERT INTO `{$tbl}` ({$colString}) VALUES ({$plcString})";
-        $updateQuery      = "UPDATE `{$tbl}` SET {$updString} WHERE `{$tbl}`.`{$id_column}` = :{$id_column}";
         $replaceQuery     = "{$insertQuery} ON DUPLICATE KEY UPDATE {$updString}";
         $insertStatement  = null;
-        $updateStatement  = null;
-        $replaceStatement = null;
+        $replaceStatement = $this->database->prepare($replaceQuery);
         $existingObjects  = [];
 
         if (isset($id_column)) {
             $insertStatement = $this->database->prepare($insertQuery);
-            $updateStatement = $this->database->prepare($updateQuery);
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
             $collectionIds = array_filter(
@@ -2893,8 +2890,6 @@ abstract class Mapper implements IMapper, Serializable
                     $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
                 }
             }
-        } else {
-            $replaceStatement = $this->database->prepare($replaceQuery);
         }
 
         $this->database->beginTransaction();
@@ -2902,20 +2897,12 @@ abstract class Mapper implements IMapper, Serializable
         try {
             foreach ($collection as $i => $model) {
 
-                // Use the insert/update if they exist: otherwise the replace
-                if (isset($insertStatement, $updateStatement)) {
-                    // Does this have an ID? Update, otherwise insert
-                    if ($this->getModelProperty($model, $id_property)) {
-                        $params = $this->dehydrate($model);
-                        if (isset($this->createdMap['column'])) {
-                            unset($params[$this->createdMap['column']]);
-                        }
-                        $result         = $updateStatement->execute($params);
-                        $pdoMethods[$i] = self::METHOD_UPDATE;
-                    } else {
-                        $result         = $insertStatement->execute($this->dehydrate($model));
-                        $pdoMethods[$i] = self::METHOD_CREATE;
-                    }
+                // Use the insert if the record has no ID: otherwise the replace
+                // (Need to use replace rather than update to handle tables with
+                //  a non-auto-incrementing primary key, i.e. storage.hash)
+                if (isset($insertStatement) && !$this->getModelProperty($model, $id_property)) {
+                    $result         = $insertStatement->execute($this->dehydrate($model));
+                    $pdoMethods[$i] = self::METHOD_CREATE;
                 } else {
                     $result = $replaceStatement->execute($this->dehydrate($model));
                     // take note of whether this was an insert or update
