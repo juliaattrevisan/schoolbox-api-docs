@@ -11,7 +11,7 @@ namespace Schoolbox\External;
 
 use Schoolbox\Campus;
 
-class TimetableCampus {
+class TimetableCampusDeprecated {
 
     /**
      * @var TimetableCycle

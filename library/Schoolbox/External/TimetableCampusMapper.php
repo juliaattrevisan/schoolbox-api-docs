@@ -14,7 +14,7 @@ namespace Schoolbox\External;
 use Schoolbox;
 use Schoolbox\Campus;
 
-class TimetableCampusMapper extends Schoolbox\Mapper {
+class TimetableCampusMapperDeprecated extends Schoolbox\Mapper {
 
     /**
      * {@inheritdoc}
