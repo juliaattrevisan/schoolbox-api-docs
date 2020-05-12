@@ -255,7 +255,12 @@ class Classes implements IStrategy
             $cycle = $this->findCurrentCycle($timetable);
 
             if (!$cycle) {
-                $this->log->error('Unknown cycle; check installation steps.');
+                $this->log->error(sprintf(
+                    'Unknown cycle for term %s, week offset %s; check installation steps.',
+                    $this->currentTerm,
+                    $this->currentWeekOffset
+                ));
+
                 return;
             }
 
