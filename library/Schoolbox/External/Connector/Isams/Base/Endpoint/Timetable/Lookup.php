@@ -115,7 +115,7 @@ class Lookup
         $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
             SELECT
                 luCampus.ext_timetable_code,
-                period.day, period.id, period.sequence
+                period.day, period.id, period.title
             FROM luCampus
             LEFT JOIN sis_timetable_cycle cycle ON luCampus.ext_timetable_code = cycle.ext_timetable_code
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
@@ -127,14 +127,14 @@ class Lookup
         foreach ($periodStatement as $row) {
             $ext = $row['ext_timetable_code'];
             $day = $row['day'];
-            $sequence = $row['sequence'];
+            $periodName = $row['title'];
 
             /* Minimum period
              */
             $period = $this->timetablePeriodMapper->createModel()
                 ->setId($row['id']);
 
-            $periods['ext'][$ext]['day'][$day]['period'][$sequence] = $period;
+            $periods['ext'][$ext]['day'][$day]['period'][$periodName] = $period;
         }
 
         return $periods;
