@@ -80,8 +80,8 @@ trait External_Schoolbox_TimetableDefinitionTrait
                     finish,
                     start_day,
                     title,
-                    cycle_length AS dayCount,
-                    day_length AS periodCount,
+                    cycle_length,
+                    day_length,
                     regular
                 FROM sis_timetable_cycle
                 WHERE ext_timetable_code = :campusId
