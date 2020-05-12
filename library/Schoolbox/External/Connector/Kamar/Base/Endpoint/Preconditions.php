@@ -49,7 +49,7 @@ class Preconditions
     /**
      * If nothing arrived within these many seconds, good to go for importing
      */
-    private const ARRIVAL_THRESHOLD = 3600;
+    private const ARRIVAL_THRESHOLD = 900;
 
 
     /**
