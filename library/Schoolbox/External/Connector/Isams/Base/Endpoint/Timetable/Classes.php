@@ -82,6 +82,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var Lookup
+     */
+    private $lookup;
+
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -93,6 +99,7 @@ class Classes implements IStrategy
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml
+     * @param Lookup                 $lookup
      * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -103,6 +110,7 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
+        Lookup $lookup,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -112,76 +120,12 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
+        $this->lookup = $lookup;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
         $this->userMapper = $userMapper;
-    }
-
-
-    /**
-     * Get a list of (user_id, synergy_id) tuples
-     *
-     * @return array
-     */
-    private function initUserLookup(): array
-    {
-        $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, synergy_id
-            FROM {$this->userMapper->getTable()} u
-            INNER JOIN `groups` g ON u.`group_id` = g.id
-            WHERE synergy_id IS NOT NULL
-        ");
-
-        $users = [];
-
-        /* TODO: synergy_id happens to match externalId? Maybe this array key is wrong
-         * TODO: Found while building kamar
-         */
-        foreach ($userStatement as $row) {
-            $users[$row['synergy_id']] = $row['id'];
-        }
-
-        return $users;
-    }
-
-
-    /**
-     * Get a list of (day, period) tuples
-     *
-     * @return array
-     * @throws Exception
-     */
-    private function initPeriodLookup(): array
-    {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
-            SELECT
-                luCampus.ext_timetable_code,
-                period.day, period.id, period.title
-            FROM luCampus
-            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
-            LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-            WHERE luCampus.deleted_at IS NULL
-        ');
-
-        $periods = [];
-
-        foreach ($periodStatement as $row) {
-            $ext = $row['ext_timetable_code'];
-            $day = $row['day'];
-            $periodName = $row['title'];
-
-            /* Minimum period
-             */
-            $period = $this->timetablePeriodMapper->createModel()
-                ->setId($row['id']);
-
-            $periods['ext'][$ext]['day'][$day]['period'][$periodName] = $period;
-        }
-
-        return $periods;
     }
 
 
@@ -225,12 +169,13 @@ class Classes implements IStrategy
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         *
+         * Cache a flat key-value array of (day, period)
          */
-        $users = $this->initUserLookup();
+        $this->lookup->init();
 
-        /* Cache a flat key-value array of (day, period)
-         */
-        $periods = $this->initPeriodLookup();
+        $users = $this->lookup->getUsers();
+        $periods = $this->lookup->getPeriods();
 
         /* Get a list of all the timetables to process
          */

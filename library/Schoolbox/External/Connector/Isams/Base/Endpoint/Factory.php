@@ -227,6 +227,11 @@ class Factory
          */
         $batchxml = new Batchxml($api);
 
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
+
         return (new GenericCollection(IStrategy::class))
             ->add(new Profile(
                 $this->log,
@@ -255,6 +260,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $batchxml,
+                $lookup,
                 $this->timetablePeriodMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
