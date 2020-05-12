@@ -734,18 +734,15 @@ Usage:
                         {% include component.template with data only %}
                     {% endfor %}
 
-                    {% if not countComponents %}
-                        <div class="empty-state">
-                            <i class="icon-info"></i>
-                            <p>No filters are user-configurable on this page.</p>
-                        </div>
+                    {# Hide the buttons completely if there's no user-configurable components #}
+                    {% if countComponents %}
+                        <li class="filter-component btn">
+                            <a class="button" id="defaults_reset" title="Reset to default selections">Reset to defaults</a>
+                        </li>
                     {% endif %}
                     <li class="filter-component btn">
-                        {#<a class="button" id="clear-all" title="Revert to your most recently applied filter">Clear all</a>#}
-                        <a class="button" id="defaults_reset" title="Reset to default selections">Reset to defaults</a>
-                    </li>
-                    <li class="filter-component btn">
                         <input id="submit_button"
+                               class="{% if not countComponents %}hide{% endif %}"
                                type="submit"
                                data-value="Apply filters"
                                value="Apply filters"
