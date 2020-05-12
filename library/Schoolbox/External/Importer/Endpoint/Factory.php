@@ -156,7 +156,9 @@ class Factory
 
                     /* Timetable pieces
                      */
+                    UserMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
                     ClassPeriodMapper::getInstance()

@@ -20,9 +20,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -58,12 +56,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
-
-
-    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -88,44 +80,32 @@ class Classes implements IStrategy
 
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
      * TimetableClass constructor.
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml
      * @param Lookup                 $lookup
-     * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param UserMapper             $userMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
         Lookup $lookup,
-        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        UserMapper $userMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
         $this->lookup = $lookup;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->userMapper = $userMapper;
     }
 
 
