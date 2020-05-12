@@ -519,7 +519,27 @@ class Classes implements IStrategy
      */
     private function createTimetableClassInvolvement(array $person, ClassEntry $timetableClass): ClassInvolvement
     {
-        /** @var ClassInvolvement $timetableClassInvolvement */
+        $involvement = $this->classInvolvementMapper->findByColumnList([
+            'external_id' => $person['externalId'],
+            'class_id' => $timetableClass->getId()
+        ]);
+
+        /* Relation already exists; nothing to change
+         */
+        if ($involvement->count()) {
+            $this->log->info(sprintf(
+                'Reusing class involvement %s %s for %s (user %s)',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                "{$person['firstname']} {$person['surname']}",
+                $person['externalId']
+            ));
+
+            return $involvement->first();
+        }
+
+        /* Create new relation
+         */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
             ->setExternalId($person['externalId'])
             ->setClass($timetableClass);
