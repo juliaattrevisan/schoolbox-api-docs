@@ -77,9 +77,9 @@ class WeekOffset
             if ($this->log) {
                 $this->log->debug(sprintf(
                     'Comparing %s <= %s <= %s',
-                    $currentCycle->getStart()->getDatabase(),
+                    $currentCycle->getStart()->startOfDay()->getDatabase(),
                     $this->date->getDatabase(),
-                    $currentCycle->getFinish()->getDatabase()
+                    $currentCycle->getFinish()->endOfDay()->getDatabase()
                 ));
             }
 
