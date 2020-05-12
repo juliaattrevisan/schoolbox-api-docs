@@ -200,10 +200,14 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
     if ($parentId) {
         $folderList[$parentId] = $folderMapper->findById($parentId);
+        /** @noinspection AdditionOperationOnArraysInspection */
+        $folderList += traverse($parentId, $folderMapper);
+    } else {
+        $folderList = $folderMapper->findByPredicates(
+            $folderMapper->getPredicateBuilder()->notNull('cc.code')
+        );
     }
 
-    /** @noinspection AdditionOperationOnArraysInspection */
-    $folderList += traverse($parentId, $folderMapper);
 
     // Make sure we got a result
 
