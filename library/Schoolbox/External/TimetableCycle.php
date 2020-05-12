@@ -37,6 +37,38 @@ class TimetableCycle {
     protected $regular;
 
     /**
+     * @var \Alaress_Date_Format
+     */
+    protected $start;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $finish;
+
+    /**
+     * The day number on which this timetable starts.
+     *
+     * @var int
+     */
+    protected $startDay = 1;
+
+    /**
+     * The number of days to offset the timetable start day by.
+     * (starts from 1.)
+     *
+     * @deprecated Use $this->startDay
+     *
+     * @var int
+     */
+    protected $offset = 0;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $reset;
+
+    /**
      * @param  int   $cycle_length
      * @return $this
      */
@@ -116,4 +148,89 @@ class TimetableCycle {
         return $this->title;
     }
 
+    /**
+     * @param  \Alaress_Date_Format $finish
+     * @return $this
+     */
+    public function setFinish($finish) {
+        $this->finish = $finish;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getFinish() {
+        return $this->finish;
+    }
+
+    /**
+     * @deprecated Use $this->setStartDay()
+     *
+     * @param  int   $offset
+     * @return $this
+     */
+    public function setOffset($offset) {
+        $this->offset = $offset;
+        return $this;
+    }
+
+    /**
+     * @deprecated Use $this->getStartDay()
+     *
+     * @return int
+     */
+    public function getOffset() {
+        return $this->offset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartDay()
+    {
+        return $this->startDay;
+    }
+
+    /**
+     * @param  int $startDay
+     * @return $this
+     */
+    public function setStartDay($startDay)
+    {
+        $this->startDay = $startDay;
+        return $this;
+    }
+
+    /**
+     * @param  \Alaress_Date_Format $reset
+     * @return $this
+     */
+    public function setReset($reset) {
+        $this->reset = $reset;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getReset() {
+        return $this->reset;
+    }
+
+    /**
+     * @param  \Alaress_Date_Format $start
+     * @return $this
+     */
+    public function setStart($start) {
+        $this->start = $start;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getStart() {
+        return $this->start;
+    }
 }
