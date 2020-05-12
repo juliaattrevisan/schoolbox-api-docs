@@ -161,11 +161,6 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        if ($this->perform) {
-            $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
-            $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
-            $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
-        }
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -266,6 +261,7 @@ class Classes implements IStrategy
      */
     private function createTimetableClass(array $subject): ClassEntry
     {
+
         /* See if one exists already; if so, reuse it
          */
         try {
@@ -314,6 +310,7 @@ class Classes implements IStrategy
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
+
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
          *
