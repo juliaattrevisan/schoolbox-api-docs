@@ -68,6 +68,15 @@ class TimetableCycle {
      */
     protected $reset;
 
+
+    /**
+     * This corresponds to luCampus.ext_timetable_code too (that's how they join up)
+     *
+     * @var string|null
+     */
+    private $externalTimetableCode;
+
+
     /**
      * @param  int   $cycle_length
      * @return $this
@@ -232,5 +241,23 @@ class TimetableCycle {
      */
     public function getStart() {
         return $this->start;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getExternalTimetableCode(): ?string
+    {
+        return $this->externalTimetableCode;
+    }
+
+    /**
+     * @param string|null $externalTimetableCode
+     * @return $this
+     */
+    public function setExternalTimetableCode(?string $externalTimetableCode): self
+    {
+        $this->externalTimetableCode = $externalTimetableCode;
+        return $this;
     }
 }

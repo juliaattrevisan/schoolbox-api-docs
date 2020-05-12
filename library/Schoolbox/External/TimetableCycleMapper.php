@@ -37,6 +37,11 @@ class TimetableCycleMapper extends Schoolbox\Mapper
             'type'     => self::TYPE_STRING,
         ]);
         $this->hasMap([
+            'column'   => 'ext_timetable_code',
+            'property' => 'externalTimetableCode',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
             'column'   => 'cycle_length',
             'property' => 'cycleLength',
             'type'     => self::TYPE_INTEGER,
