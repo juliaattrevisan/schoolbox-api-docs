@@ -12,8 +12,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCampus;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -66,12 +64,6 @@ class Definition implements IStrategy
 
 
     /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -90,7 +82,6 @@ class Definition implements IStrategy
      * @param bool                  $perform
      * @param Batchxml              $batchxml
      * @param CampusMapper          $campusMapper
-     * @param TimetableCampusMapper $timetableCampusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
@@ -99,7 +90,6 @@ class Definition implements IStrategy
         bool $perform,
         Batchxml $batchxml,
         CampusMapper $campusMapper,
-        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
@@ -107,7 +97,6 @@ class Definition implements IStrategy
         $this->perform = $perform;
         $this->batchxml = $batchxml;
         $this->campusMapper = $campusMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -123,6 +112,16 @@ class Definition implements IStrategy
             $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
         }
 
+        /* Find a way to identify this Cycle
+         */
+        $publishedTimetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+
+        if ($publishedTimetables) {
+            $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
+        } else {
+            $ext = '';
+        }
+
         $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         /* MASSIVE CAVEAT
@@ -131,79 +130,58 @@ class Definition implements IStrategy
          * Also, we haven't seen any evidence that they have multiple timetables or multiple
          * timetable definitions; their xml, however, suggests that it possible in theory
          */
-        $campuses = $this->campusMapper->findAll();
+        foreach ($cycles as $cycle) {
+            $dayData = $this->findDays($cycle);
 
-        foreach ($campuses as $campus) {
-            foreach ($cycles as $cycle) {
-                $dayData = $this->findDays($cycle);
+            /** @var TimetableCycle $timetableCycle */
+            $timetableCycle = $this->timetableCycleMapper->createModel()
+                ->setTitle(trim((string)$cycle->Name))
+                ->setExternalTimetableCode($ext)
+                ->setCycleLength(\count($cycle->xpath('Days/Day')))
+                ->setDayLength($dayData['maxPeriods'])
+                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
+                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+                ->setStartDay(1)
 
-                /** @var TimetableCycle $timetableCycle */
-                $timetableCycle = $this->timetableCycleMapper->createModel()
-                    ->setId($campus->getId())
-                    ->setTitle(trim((string)$cycle->Name))
-                    ->setCycleLength(\count($cycle->xpath('Days/Day')))
-                    ->setDayLength($dayData['maxPeriods'])
-
-                    /* What is this?
-                     */
-                    ->setRegular(1);
-
-                /** @var TimetableCampus $timetableCampus */
-                $timetableCampus = $this->timetableCampusMapper->createModel()
-                    ->setCycle($timetableCycle)
-                    ->setCampus($campus)
-                    ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-                    ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
-                    ->setStartDay(1);
-
-                $this->log->info(sprintf(
-                    'Creating timetable cycle %s (%s) with day length %s',
-                    $timetableCycle->getId(),
-                    $timetableCycle->getTitle(),
-                    $timetableCycle->getDayLength()
-                ));
-
-                if ($this->perform) {
-                    $this->timetableCycleMapper->save($timetableCycle);
-                }
-
-                $this->log->info(sprintf(
-                    'Associating timetable cycle %s (%s) with campus %s',
-                    $timetableCycle->getId(),
-                    $timetableCycle->getTitle(),
-                    $campus->getName()
-                ));
-
-                if ($this->perform) {
-                    $this->timetableCampusMapper->save($timetableCampus);
-                }
-
-                /* Save all the periods and associate them with a cycle
+                /* What is this?
                  */
-                /** @var array $days */
-                $days = $dayData['days'];
+                ->setRegular(1);
 
-                foreach ($days as $day => $periods) {
+            $this->log->info(sprintf(
+                'Creating timetable cycle %s (%s) with day length %s',
+                $timetableCycle->getId(),
+                $timetableCycle->getTitle(),
+                $timetableCycle->getDayLength()
+            ));
 
-                    /** @var array $periods */
-                    /** @var TimetablePeriod $period */
-                    foreach ($periods as $period) {
-                        $period->setDay($day);
-                        $period->setCycle($timetableCycle);
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
 
-                        $this->log->info(sprintf(
-                            'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
-                            $period->getTitle(),
-                            $period->getStart(),
-                            $period->getFinish(),
-                            $timetableCycle->getId(),
-                            $timetableCycle->getTitle(),
-                            $campus->getName()
-                        ));
+            /* Save all the periods and associate them with a cycle
+             */
+            /** @var array $days */
+            $days = $dayData['days'];
 
-                        if ($this->perform) {
-                            $this->timetablePeriodMapper->save($period);
-                        }
+            /** @var array $periods */
+            foreach ($days as $day => $periods) {
+
+                /** @var TimetablePeriod $period */
+                foreach ($periods as $period) {
+                    $period->setDay($day);
+                    $period->setCycle($timetableCycle);
+
+                    $this->log->info(sprintf(
+                        'Creating period %s (%s-%s) in timetable cycle %s (%s)',
+                        $period->getTitle(),
+                        $period->getStart(),
+                        $period->getFinish(),
+                        $timetableCycle->getId(),
+                        $timetableCycle->getTitle()
+                    ));
+
+                    if ($this->perform) {
+                        $this->timetablePeriodMapper->save($period);
                     }
                 }
             }
@@ -253,7 +231,6 @@ class Definition implements IStrategy
 
             $struct['days'][$dayIndex] = [];
 
-            /** @var TimetablePeriod $period */
             foreach ($periods as $period) {
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle(trim((string)$period->Name))
