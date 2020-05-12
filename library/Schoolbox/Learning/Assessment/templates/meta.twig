@@ -5,6 +5,7 @@
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
+    <li class="icon-eportfolio">Published to ePortfolio</li>
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/workType.twig' %}
     {% if student.id != USER.id %}

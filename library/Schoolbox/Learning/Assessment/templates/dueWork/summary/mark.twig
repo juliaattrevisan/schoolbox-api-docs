@@ -10,28 +10,7 @@
  #}
 <div class="row">
     <div class="small-12 columns">
-        <div class="actions-small-1">
-            <div class="list-item">
-                <h2 class="subheader">{{ locale.grading.proper }}</h2>
-            </div>
-            <nav>
-
-                {# Students must have ePortfolio enabled, otherwise they can't do this
-                 #}
-                {% if canShowcase %}
-                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio"></a>
-
-                    <script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
-                    <script type="text/javascript">
-                        $(function () {
-                            $('[data-publish-to-eportfolio]').eportfolioPublish({
-                                userId: '{{ student.id }}'
-                            });
-                        });
-                    </script>
-                {% endif %}
-            </nav>
-        </div>
+        <h2 class="subheader">{{ locale.grading.proper }}</h2>
     </div>
 </div>
 

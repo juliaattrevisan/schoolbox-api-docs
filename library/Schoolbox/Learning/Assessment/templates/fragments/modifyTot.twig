@@ -6,6 +6,23 @@
         {% if viewRoute %}
             <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
         {% endif %}
+        {# Students must have ePortfolio enabled, otherwise they can't do this
+        #}
+        {% if canShowcase %}
+            <li>
+                <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
+                <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Remove from ePortfolio">Remove from ePortfolio</a>
+            </li>
+
+            <script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-publish-to-eportfolio]').eportfolioPublish({
+                        userId: '{{ student.id }}'
+                    });
+                });
+            </script>
+        {% endif %}
         {% if modifyRoute %}
             <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
         {% endif %}
