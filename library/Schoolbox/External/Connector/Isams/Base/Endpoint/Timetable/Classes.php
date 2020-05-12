@@ -344,26 +344,45 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Involvement
      *
-     * @param array      $student
+     * @param array      $person
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
+    private function createTimetableClassInvolvement(array $person, ClassEntry $timetableClass): ClassInvolvement
     {
+        $involvement = $this->classInvolvementMapper->findByColumnList([
+            'external_id' => $person['externalId'],
+            'class_id' => $timetableClass->getId()
+        ]);
 
-        /** @var ClassInvolvement $timetableClassInvolvement */
+        /* Relation already exists; nothing to change
+         */
+        if ($involvement->count()) {
+            $this->log->info(sprintf(
+                'Reusing class involvement %s %s for %s (user %s)',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                "{$person['firstname']} {$person['surname']}",
+                $person['externalId']
+            ));
+
+            return $involvement->first();
+        }
+
+        /* Create new relation
+         */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setExternalId($student['externalId'])
-            ->setClass($timetableClass);
+                                                                  ->setExternalId($person['externalId'])
+                                                                  ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for student %s (user %s)',
+            'Creating class involvement %s %s for %s (user %s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
-            $student['firstname'] . ' ' . $student['surname'],
+            "{$person['firstname']} {$person['surname']}",
             $timetableClassInvolvement->getExternalId()
         ));
 
