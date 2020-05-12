@@ -16,7 +16,7 @@
 {% set isEmpty    = (isUserConfigurable and 0 == roleSelections | length) %}
 {% set hasOptions = roleSelections | length > 0 %}
 
-<li class="checklist item filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
+<li class="checklist item filter-component{% if not isUserConfigurable %} hide{% endif %}" data-component="{{ definition.filter.id }}">
     {% block scripts %}{% endblock scripts %}
 
     {% block filterComponent %}
