@@ -9,17 +9,14 @@
 
 namespace Schoolbox;
 
-use Alaress_Date_Format;
 use Alaress\Cache;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
-use function array_key_exists;
-use function array_keys;
-use function array_map;
+use Alaress_Date_Format;
 use Aura\Di;
-use function count;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -44,10 +41,13 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
-use UnderflowException;
 use TypeError;
-use Alaress\Database\Predicate\InvalidColumnException;
+use UnderflowException;
 use UnexpectedValueException;
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function count;
 
 abstract class Mapper implements IMapper, Serializable
 {
@@ -2845,8 +2845,8 @@ abstract class Mapper implements IMapper, Serializable
         $collection  = $this->populateUuids($this->populateSaveTimestamps($collection));
         $plcString   = $this->getPlaceholderString();
         $updString   = $this->getUpdateString();
-        $affectedIDs = array();
-        $pdoMethods  = array();
+        $affectedIds = [];
+        $pdoMethods  = [];
         //
         // Trigger all on collection before attempting to run?
         // Must for now, because otherwise transactions would be nested.
@@ -2861,18 +2861,15 @@ abstract class Mapper implements IMapper, Serializable
         }
 
 
-        $id_property      = $this->getIdentifierProperty();
-        $id_column        = $this->getIdentifierColumn();
-
-        // Is this an INSERT or UPDATE,
-        // or can we not tell because there's no identifier column?
+        $idProperty       = $this->getIdentifierProperty();
+        $idColumn         = $this->getIdentifierColumn();
         $insertQuery      = "INSERT INTO `{$tbl}` ({$colString}) VALUES ({$plcString})";
         $replaceQuery     = "{$insertQuery} ON DUPLICATE KEY UPDATE {$updString}";
         $insertStatement  = null;
         $replaceStatement = $this->database->prepare($replaceQuery);
         $existingObjects  = [];
 
-        if (isset($id_column)) {
+        if (isset($idColumn)) {
             $insertStatement = $this->database->prepare($insertQuery);
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
@@ -2885,9 +2882,12 @@ abstract class Mapper implements IMapper, Serializable
             );
 
             if (count($collectionIds)) {
-                foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
+                foreach ($this->findByColumn($idColumn, $collectionIds, [
+                    'deleted' => true,
+                    'cache'   => false,
+                ]) as $obj) {
                     // index by ID
-                    $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+                    $existingObjects[$this->getModelProperty($obj, $idProperty)] = $obj;
                 }
             }
         }
@@ -2900,7 +2900,7 @@ abstract class Mapper implements IMapper, Serializable
                 // Use the insert if the record has no ID: otherwise the replace
                 // (Need to use replace rather than update to handle tables with
                 //  a non-auto-incrementing primary key, i.e. storage.hash)
-                if (isset($insertStatement) && !$this->getModelProperty($model, $id_property)) {
+                if (isset($insertStatement) && !$this->getModelProperty($model, $idProperty)) {
                     $result         = $insertStatement->execute($this->dehydrate($model));
                     $pdoMethods[$i] = self::METHOD_CREATE;
                 } else {
@@ -2921,12 +2921,12 @@ abstract class Mapper implements IMapper, Serializable
                 }
 
                 if ($result) {
-                    if ($id_property) {
-                        if (!$this->getModelProperty($model, $id_property)) {
+                    if ($idProperty) {
+                        if (!$this->getModelProperty($model, $idProperty)) {
                             $new_id = $this->database->lastInsertId();
-                            $this->setModelProperty($model, $id_property, $new_id);
+                            $this->setModelProperty($model, $idProperty, $new_id);
                         }
-                        $affectedIDs[] = $this->getModelProperty($model, $id_property);
+                        $affectedIds[] = $this->getModelProperty($model, $idProperty);
                     }
 
                     if (!$this->savePolyJoins($model)) {
@@ -2948,9 +2948,9 @@ abstract class Mapper implements IMapper, Serializable
 
             $previous = null;
 
-            if ($id_property) {
+            if ($idProperty) {
                 // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
-                $id = $this->getModelProperty($model, $id_property);
+                $id = $this->getModelProperty($model, $idProperty);
 
                 if ($id) {
                     $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
@@ -2964,7 +2964,7 @@ abstract class Mapper implements IMapper, Serializable
 
             $this->raiseNotification($model, $pdoMethods[$i], $previous);
         }
-        return $affectedIDs;
+        return $affectedIds;
     }
 
     // Despite PHPStorm's warning, the PDOException is thrown during calls to PDO::execute() for SQL errors because
