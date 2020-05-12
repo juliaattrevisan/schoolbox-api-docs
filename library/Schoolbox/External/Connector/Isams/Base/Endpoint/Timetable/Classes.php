@@ -123,11 +123,7 @@ class Classes implements IStrategy
      */
     private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
     {
-        if (isset($periods['ext'][$ext]['day'][$day]['period'][$periodName])) {
-            return $periods['ext'][$ext]['day'][$day]['period'][$periodName];
-        }
-
-        return null;
+        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
     }
 
 
