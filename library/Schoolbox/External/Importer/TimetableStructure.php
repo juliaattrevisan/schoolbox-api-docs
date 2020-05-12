@@ -10,8 +10,6 @@ use Alaress_Date_Format;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\External\TimetableCampus;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -23,7 +21,6 @@ use Schoolbox\External\TimetablePeriodMapper;
  * Importer for timetable structure into the Schoolbox connector.
  * Saves into the following tables:
  * * sis_timetable_cycle
- * * sis_timetable_campus
  * * sis_timetable_period
  *
  * @package Schoolbox\External\Importer
@@ -36,20 +33,18 @@ class TimetableStructure extends AbstractImporter
      */
     protected $campusList;
 
+
     /**
      * @var TimetableCycleMapper
      */
     protected $timetableCycleMapper;
 
-    /**
-     * @var TimetableCampusMapper
-     */
-    protected $timetableCampusMapper;
 
     /**
      * @var TimetablePeriodMapper
      */
     protected $timetablePeriodMapper;
+
 
     /**
      * Documentation function for expected format
@@ -71,6 +66,7 @@ class TimetableStructure extends AbstractImporter
         ];
     }
 
+
     /**
      * Custom setup function
      */
@@ -79,9 +75,9 @@ class TimetableStructure extends AbstractImporter
         $campusMapper                = new CampusMapper();
         $this->campusList            = $campusMapper->findAll();
         $this->timetableCycleMapper  = new TimetableCycleMapper();
-        $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
     }
+
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
@@ -100,7 +96,11 @@ class TimetableStructure extends AbstractImporter
             }
 
             $termTitle  = $row['Term Title'];
+
+            /* Term Campus column in the csv equates to External Timetable Code
+             */
             $termCampus = $row['Term Campus'];
+
             $key        = sprintf('%s-%s', $termCampus, $termTitle);
             if (!isset($result[$key])) {
                 $this->log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
@@ -111,15 +111,12 @@ class TimetableStructure extends AbstractImporter
                 }
 
                 // Timetable cycle - calculate cycle and day length later
-//                $cycle = $this->timetableCycleMapper->findOneByColumn('title', $termTitle);
                 $cycle = new TimetableCycle();
                 $cycle
                     ->setTitle($termTitle)
                     ->setRegular(true);
 
                 // Timetable campus
-//                $campus = $this->timetableCampusMapper->findOneByColumn('cycle_id', $cycle->getId());
-                $campus = new TimetableCampus();
                 if (isset($row['Term Offset']) && strlen($row['Term Offset'])) {
                     $this->log->warning(
                         sprintf(
@@ -128,7 +125,7 @@ class TimetableStructure extends AbstractImporter
                             $row['Term Offset'] + 1
                         )
                     );
-                    $campus->setStartDay($row['Term Offset'] + 1);
+                    $cycle->setStartDay($row['Term Offset'] + 1);
                 }
 
                 $termStart  = null;
@@ -151,16 +148,14 @@ class TimetableStructure extends AbstractImporter
                     continue;
                 }
 
-                $campus
-                    ->setCycle($cycle)
-                    ->setCampus($campusObject)
+                $cycle
                     ->setStart($termStart)
                     ->setFinish($termFinish)
                     ->setStartDay($row['Term Start Day Number']);
 
                 $result[$key] = [
                     'cycle'   => $cycle,
-                    'campus'  => $campus,
+                    'campus'  => $campusObject,
                     'periods' => [],
                 ];
             } else {
@@ -219,13 +214,14 @@ class TimetableStructure extends AbstractImporter
 
         // Sort the period list, and set sequence based on that
         foreach ($result as $key => $timetable) {
-            /** @var TimetableCampus $campus */
+            /** @var Campus $campus */
             $campus = $timetable['campus'];
+
             $this->log->info(
                 sprintf(
                     'Calculating day and period count for term "%s" / campus "%s"',
                     $timetable['cycle']->getTitle(),
-                    $campus->getCampus()->getExtTimetableCode()
+                    $campus->getExtTimetableCode()
                 )
             );
 
@@ -290,6 +286,7 @@ class TimetableStructure extends AbstractImporter
         return $result;
     }
 
+
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
      */
@@ -301,16 +298,25 @@ class TimetableStructure extends AbstractImporter
         if ($this->performUpdate) {
             $this->log->notice('Cleaning up all existing cycles');
             $this->timetableCycleMapper->truncate();
-            $this->log->notice('Cleaning up all existing campus cycles');
-            $this->timetableCampusMapper->truncate();
+
             $this->log->notice('Cleaning up all existing periods');
             $this->timetablePeriodMapper->truncate();
         }
         foreach ($this->parse() as $row) {
+
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];
+
+            /** @var Campus $campus */
+            $campus = $row['campus'];
+
             if ($this->performUpdate) {
-                $this->log->info(sprintf('Saving cycle for term "%s"', $cycle->getTitle()));
+                $this->log->info(sprintf(
+                    'Saving cycle for campus ext_timetable_code %s, term "%s"',
+                    $campus->getExtTimetableCode(),
+                    $cycle->getTitle()
+                ));
+
                 if ($this->timetableCycleMapper->save($cycle)) {
                     $this->log->info(sprintf('Cycle saved (ID: #%d)', $cycle->getId()));
                 } else {
@@ -318,20 +324,6 @@ class TimetableStructure extends AbstractImporter
                 }
             } else {
                 $this->log->info(sprintf('Pretending to save cycle for term "%s"', $cycle->getTitle()));
-            }
-
-            /** @var TimetableCampus $campus */
-            $campus = $row['campus'];
-            $code   = $campus->getCampus()->getExtTimetableCode();
-            if ($this->performUpdate) {
-                $this->log->info(sprintf('Saving campus cycle for campus "%s"', $code));
-                if ($this->timetableCampusMapper->save($campus)) {
-                    $this->log->info(sprintf('Campus cycle saved (Cycle ID: #%d)', $campus->getCycle()->getId()));
-                } else {
-                    $this->log->error('Could not save campus cycle!');
-                }
-            } else {
-                $this->log->info(sprintf('Pretending to save campus cycle for campus "%s"', $code));
             }
 
             /** @var Collection|TimetablePeriod[] $periods */
