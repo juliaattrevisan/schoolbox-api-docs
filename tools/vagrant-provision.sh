@@ -564,11 +564,11 @@ then
     cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
     sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*d.service;
     systemctl daemon-reload;
-    systemctl enable schoolbox-scheduled.service;
-    systemctl enable schoolbox-routed.service;
-    systemctl enable schoolbox-socketd.service;
-    systemctl enable schoolbox-digestd.service;
-    #systemctl enable schoolbox-belld.service;
+    systemctl -q enable schoolbox-scheduled.service;
+    systemctl -q enable schoolbox-routed.service;
+    systemctl -q enable schoolbox-socketd.service;
+    systemctl -q enable schoolbox-digestd.service;
+    #systemctl -q enable schoolbox-belld.service;
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon upstart configurations";
     cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
