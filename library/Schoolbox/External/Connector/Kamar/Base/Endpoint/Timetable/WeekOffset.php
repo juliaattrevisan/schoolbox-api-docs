@@ -10,8 +10,8 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\TimetableCampus;
-use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycle;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -25,9 +25,9 @@ class WeekOffset
 {
 
     /**
-     * @var TimetableCampusMapper
+     * @var TimetableCycleMapper
      */
-    private $timetableCampusMapper;
+    private $timetableCycleMapper;
 
 
     /**
@@ -45,13 +45,13 @@ class WeekOffset
     /**
      * WeekOffset constructor.
      *
-     * @param TimetableCampusMapper $timetableCampusMapper
-     * @param Alaress_Date_Format   $date
-     * @param LoggerInterface|null  $log
+     * @param TimetableCycleMapper $timetableCycleMapper
+     * @param Alaress_Date_Format  $date
+     * @param LoggerInterface|null $log
      */
-    public function __construct(TimetableCampusMapper $timetableCampusMapper, Alaress_Date_Format $date, LoggerInterface $log = null)
+    public function __construct(TimetableCycleMapper $timetableCycleMapper, Alaress_Date_Format $date, LoggerInterface $log = null)
     {
-        $this->timetableCampusMapper = $timetableCampusMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
         $this->date = $date;
         $this->log = $log;
     }
@@ -59,7 +59,7 @@ class WeekOffset
 
     /**
      * Figure out which term we're in
-     * Note that we use timetableCampus start and finish date to decide
+     * Note that we use timetableCycle start and finish date to decide
      *
      * Returns null when it can't be determined
      *
@@ -67,7 +67,7 @@ class WeekOffset
      */
     public function findCurrentTerm(): ?array
     {
-        $cycles = $this->timetableCampusMapper->findAll()->sortBy('start', 'asc')->getAll();
+        $cycles = $this->timetableCycleMapper->findAll()->sortBy('start', 'asc')->getAll();
 
         $n = \count($cycles);
 
@@ -87,13 +87,13 @@ class WeekOffset
                 if ($this->log) {
                     $this->log->debug(sprintf(
                         'Using cycle id %s',
-                        $currentCycle->getCycle()->getId()
+                        $currentCycle->getId()
                     ));
                 }
 
                 return [
                     'termIndex' => $i,
-                    'cycleId' => $currentCycle->getCycle()->getId()
+                    'cycleId' => $currentCycle->getId()
                 ];
             }
         }
@@ -130,13 +130,13 @@ class WeekOffset
          */
         $query = "
             SELECT *
-            FROM {$this->timetableCampusMapper->getTable()}
+            FROM {$this->timetableCycleMapper->getTable()}
             WHERE start <= :currentDate
             AND finish >= :currentDate
             LIMIT 1
         ";
 
-        $statement = $this->timetableCampusMapper->getDatabase()->prepare($query);
+        $statement = $this->timetableCycleMapper->getDatabase()->prepare($query);
         $statement->execute([
             'currentDate' => $this->date->getDatabaseDate()
         ]);
@@ -144,10 +144,10 @@ class WeekOffset
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if ($row) {
-            /** @var TimetableCampus $timetableCampus */
-            $timetableCampus = $this->timetableCampusMapper->hydrate($row);
+            /** @var TimetableCycle $timetableCycle */
+            $timetableCycle = $this->timetableCycleMapper->hydrate($row);
 
-            return $timetableCampus->getStart()->diffInWeeks($this->date);
+            return $timetableCycle->getStart()->diffInWeeks($this->date);
         }
 
         return null;

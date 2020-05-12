@@ -175,22 +175,22 @@ class Cleanup implements IStrategy
 
             /* Move every kamar file into the archive
              */
-            $dirhandle = opendir($this->cacheDir);
-
-            while ($xmlFile = readdir($dirhandle)) {
-                if ($xmlFile !== '.' && $xmlFile !== '..' && $xmlFile !== self::KAMAR_ARCHIVE_DIR) {
-                    $this->log->info(sprintf(
-                        'Archiving kamar xml %s into %s',
-                        $xmlFile,
-                        $this->archiveDir
-                    ));
-
-                    $source = "{$this->cacheDir}/{$xmlFile}";
-                    $destination = "{$this->archiveDir}/" . pathInfo($source, PATHINFO_BASENAME);
-
-                    rename($source, $destination);
-                }
-            }
+//            $dirhandle = opendir($this->cacheDir);
+//
+//            while ($xmlFile = readdir($dirhandle)) {
+//                if ($xmlFile !== '.' && $xmlFile !== '..' && $xmlFile !== self::KAMAR_ARCHIVE_DIR) {
+//                    $this->log->info(sprintf(
+//                        'Archiving kamar xml %s into %s',
+//                        $xmlFile,
+//                        $this->archiveDir
+//                    ));
+//
+//                    $source = "{$this->cacheDir}/{$xmlFile}";
+//                    $destination = "{$this->archiveDir}/" . pathInfo($source, PATHINFO_BASENAME);
+//
+//                    rename($source, $destination);
+//                }
+//            }
 
             /* Remove everything that wasn't touched
              */

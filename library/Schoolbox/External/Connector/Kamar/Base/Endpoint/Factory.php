@@ -16,7 +16,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
@@ -98,9 +98,9 @@ class Factory
 
 
     /**
-     * @var TimetableCampusMapper
+     * @var TimetableCycleMapper
      */
-    private $timetableCampusMapper;
+    private $timetableCycleMapper;
 
 
     /**
@@ -133,7 +133,7 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
+     * @param TimetableCycleMapper            $timetableCycleMapper
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
@@ -154,7 +154,7 @@ class Factory
 
         /* Timetable pieces
          */
-        TimetableCampusMapper $timetableCampusMapper,
+        TimetableCycleMapper $timetableCycleMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -174,7 +174,7 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->timetableCampusMapper = $timetableCampusMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -265,7 +265,7 @@ class Factory
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
         $weekOffsetCalculator = new WeekOffset(
-            $this->timetableCampusMapper,
+            $this->timetableCycleMapper,
             Alaress_Date_Format::now(),
             $this->log
         );

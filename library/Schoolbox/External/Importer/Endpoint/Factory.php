@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint as IsamsEndpoint;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint as SentralEndpoint;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
@@ -158,7 +157,7 @@ class Factory
 
                     /* Timetable pieces
                      */
-                    TimetableCampusMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
                     ClassPeriodMapper::getInstance()
