@@ -167,7 +167,6 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         $file->setId($item['id']);
         $file->setBasename($item['name']);
         $file->setTitle($filename);
-        $file->setSize($item['size']);
 
         // TODO @armatronic why is this exploding?
         /*

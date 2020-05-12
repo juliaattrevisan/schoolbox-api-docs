@@ -267,7 +267,7 @@ abstract class AbstractNode implements NodeInterface
                 'name'   => $currentFile->getTitle(),
                 'mime'   => $mimetype->getMime(),
                 'icon'   => $mimetype->getIconFile(),
-                'size'   => $currentFile->getSize(),
+                //'size'   => $currentFile->getSize(),
             );
 
             $output[] = $record;
