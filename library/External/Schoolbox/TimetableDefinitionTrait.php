@@ -4,19 +4,19 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus as Campus;
 
 trait External_Schoolbox_TimetableDefinitionTrait
 {
+
     /**
-     * {@inheritDoc}
      * @param IConnector $database
      * @param Campus     $campus
      * @param int        $date
-     *
      * @return bool|int
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Exception
      */
     public function getDayNumberFromDatabase(IConnector $database, Campus $campus, $date = 0)
     {
@@ -62,17 +62,17 @@ trait External_Schoolbox_TimetableDefinitionTrait
         return $currentDay;
     }
 
+
     /**
-     * {@inheritDoc}
      * @param IConnector $database
      * @param Campus     $campus
-     *
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     public function getTimetableDefinitionFromDatabase(IConnector $database, \Schoolbox\Campus $campus): array
     {
         $timetableQuery = $database->executeQuery(
-            "
+            '
                 SELECT    tc.start,
                           tc.reset,
                           tc.finish,
@@ -86,7 +86,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
                 WHERE     tc.campus_id = :campusId
                 AND       tc.start <= DATE(NOW())
                 AND       tc.finish >= DATE(NOW())
-            ",
+            ',
             ['campusId' => $campus->getId()]
         );
 
