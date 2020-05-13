@@ -36,6 +36,8 @@ class TimetableCycleMapper extends Schoolbox\Mapper
             'property' => 'title',
             'type'     => self::TYPE_STRING,
         ]);
+        /* TODO: replace with join onto luCampus
+         */
         $this->hasMap([
             'column'   => 'ext_timetable_code',
             'property' => 'externalTimetableCode',
