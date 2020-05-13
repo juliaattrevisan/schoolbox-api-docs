@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\External\Importer;
 
-use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
