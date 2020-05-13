@@ -256,8 +256,8 @@ class Timetable extends AbstractImporter
             }
 
             // Class mapper now has an ID, hence the periods may now be saved
+            /** @var ClassPeriod $period */
             foreach ($row['periods'] as $period) {
-                /** @var ClassPeriod $period */
                 if ($this->performUpdate) {
                     if ($this->classPeriodMapper->save($period)) {
                     } else {

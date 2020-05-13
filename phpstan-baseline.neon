@@ -2586,26 +2586,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/ResultIterator.php
 
 		-
-			message: "#^Access to an undefined property Schoolbox\\\\External\\\\TimetablePeriod\\:\\:\\$Name\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php
-
-		-
-			message: "#^Access to an undefined property Schoolbox\\\\External\\\\TimetablePeriod\\:\\:\\$Ordinal\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php
-
-		-
-			message: "#^Access to an undefined property Schoolbox\\\\External\\\\TimetablePeriod\\:\\:\\$StartTime\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php
-
-		-
-			message: "#^Access to an undefined property Schoolbox\\\\External\\\\TimetablePeriod\\:\\:\\$EndTime\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Definition.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Connector\\\\IConnector\\:\\:executeQueryIterator\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/External/Connector/Maze/Cas/Sync.php
