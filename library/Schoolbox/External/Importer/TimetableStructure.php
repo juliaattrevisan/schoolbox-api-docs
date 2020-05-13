@@ -111,9 +111,9 @@ class TimetableStructure extends AbstractImporter
                 }
 
                 // Timetable cycle - calculate cycle and day length later
-                $cycle = new TimetableCycle();
-                $cycle
+                $cycle = (new TimetableCycle())
                     ->setTitle($termTitle)
+                    ->setExternalTimetableCode($termCampus)
                     ->setRegular(true);
 
                 // Timetable campus
