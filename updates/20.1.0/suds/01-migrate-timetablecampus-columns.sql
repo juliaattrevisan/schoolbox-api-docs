@@ -27,3 +27,7 @@ ALTER TABLE `sis_timetable_cycle`
 
 ALTER TABLE `sis_timetable_cycle`
     CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+
+-- Remove sis_timetable_campus altogether
+
+DROP TABLE `sis_timetable_campus`;
