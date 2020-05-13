@@ -16,7 +16,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
@@ -103,12 +102,6 @@ class Factory
 
 
     /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -152,7 +145,6 @@ class Factory
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      * @param CampusMapper                    $campusMapper
      * @param UserMapper                      $userMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -177,7 +169,6 @@ class Factory
          */
         CampusMapper $campusMapper,
         UserMapper $userMapper,
-        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -201,7 +192,6 @@ class Factory
          */
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -232,7 +222,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper,
-                $this->timetableCampusMapper,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper,
                 $this->classEntryMapper,
@@ -262,7 +251,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->campusMapper,
-                $this->timetableCampusMapper,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
