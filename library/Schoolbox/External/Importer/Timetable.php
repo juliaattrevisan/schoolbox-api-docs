@@ -203,22 +203,25 @@ class Timetable extends AbstractImporter
             }
 
             /* Also maintain a cache of User instances that we previously fetched
-             * But this idea is obsolete now
+             *
+             * But this idea is obsolete now - anyway, warn the user that this external id didn't exist
+             * and proceed normally regardless because they're not mandatory
              */
-//            /** @var \Schoolbox\User $teacher */
-//            if (!isset($teacherCache[$teacherCode])) {
-//                try {
-//                    $teacher = $this->userMapper->findByExternalId($teacherCode);
-//                    $teacherCache[$teacherCode] = $teacher;
-//                } catch (Mapper\Exception $e) {
-//                    $this->log->warning(sprintf('Teacher code "%s" not found', $teacherCode));
-//                }
-//            }
+            $teacherExternalId = trim($row['Teacher Code']);
+
+            /** @var \Schoolbox\User $teacher */
+            if (!isset($teacherCache[$teacherExternalId])) {
+                try {
+                    $teacherCache[$teacherExternalId] = $this->userMapper->findByExternalId($teacherExternalId);
+                } catch (Mapper\Exception $e) {
+                    $this->log->warning(sprintf('Teacher code "%s" not found but assigning anyway', $teacherExternalId));
+                }
+            }
 
             // Add the class period for this item
             $classPeriod = (new ClassPeriod())
                 ->setClass($result[$key]['class'])
-                ->setTeacher(trim($row['Teacher Code']))
+                ->setTeacher($teacherExternalId)
                 ->setRoom(trim($row['Class Room'] ?? ''))
                 ->setPeriod($timetablePeriod);
 
