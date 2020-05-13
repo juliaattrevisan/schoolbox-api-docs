@@ -208,7 +208,6 @@ class Timetable extends AbstractImporter
              */
             $teacherExternalId = trim($row['Teacher Code']);
 
-            /** @var \Schoolbox\User $teacher */
             if (!isset($teacherCache[$teacherExternalId])) {
                 try {
                     $teacherCache[$teacherExternalId] = $this->userMapper->findByExternalId($teacherExternalId);
