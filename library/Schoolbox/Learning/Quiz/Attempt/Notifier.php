@@ -179,7 +179,7 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        $href = "/assess/results/" . $attempt->getQuiz()->getId();
+        $href = "/learning/assessments/{$assess->getAssessmentModel()->getId()}/status";
 
         $bob->setTitle(':student attempted :quiz in :category')
             ->setParams([
@@ -189,7 +189,7 @@ class Notifier extends AbstractModuleNotifier
             ])
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $student->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $student->getId())
             ->setHref($href)
             ->addTopic("assess.$assessId.attempted")
             ->setFilter([
@@ -239,12 +239,12 @@ class Notifier extends AbstractModuleNotifier
 
         $studentId = $attempt->getUser()->getId();
 
-        $href = "/assess/attempts/$assessId/$studentId";
+        $href = "/learning/assessments/{$assess->getAssessmentModel()->getId()}/$studentId";
 
         $bob->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->setHref($href)
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $teacher->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $teacher->getId())
             ->setTitle(":staff has marked your attempt of :quiz in :cat")
             ->setParams([
                 'staff' => new UserParam($teacher),
