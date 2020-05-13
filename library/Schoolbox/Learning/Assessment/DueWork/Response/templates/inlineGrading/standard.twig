@@ -91,8 +91,10 @@ Usage:
 {% block responseFilePreview %}
     {% if response and file %}
         {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {
-            data:        subfragment.data is defined ? subfragment.data : null,
-            participant: participant
+            data:            subfragment.data is defined ? subfragment.data : null,
+            participant:     participant,
+            file:            file,
+            plagscanEnabled: plagscanEnabled,
         } only %}
     {% endif %}
 {% endblock %}
