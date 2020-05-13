@@ -20,7 +20,7 @@ class Create extends Payload\Request
         $this->setID('');
     }
     
-    public function setCategoryTitle(string $title): Create
+    public function setCategoryTitle(string $title): self
     {
         $this->setFormParam('name', $title);
         return $this;
