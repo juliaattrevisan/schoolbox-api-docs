@@ -216,7 +216,6 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
-            $siblingLink = trim((string)$student->siblinglink);
             $externalId = trim((string)$student->xpath('@id')[0]);
             $username = trim((string)$student->username);
             $title = '';
