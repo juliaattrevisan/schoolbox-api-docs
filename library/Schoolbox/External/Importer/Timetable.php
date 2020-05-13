@@ -12,8 +12,7 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\TimetableCampus;
-use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
@@ -32,35 +31,36 @@ use Schoolbox\UserMapper;
  */
 class Timetable extends AbstractImporter
 {
-    /**
-     * @var Collection|Campus[]
-     */
-    protected $campusList;
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    private $userMapper;
+
 
     /**
      * @var ClassEntryMapper
      */
-    protected $classMapper;
+    private $classMapper;
 
     /**
+     *
      * @var ClassPeriodMapper
      */
-    protected $classPeriodMapper;
+    private $classPeriodMapper;
 
-    /**
-     * @var timetableCampusMapper
-     */
-    protected $timetableCampusMapper;
 
     /**
      * @var TimetablePeriodMapper
      */
-    protected $timetablePeriodMapper;
+    private $timetablePeriodMapper;
+
+
+    /**
+     * @var TimetableCycleMapper
+     */
+    private $timetableCycleMapper;
+
 
     /**
      * Documentation function for expected format
@@ -82,6 +82,7 @@ class Timetable extends AbstractImporter
         ];
     }
 
+
     /**
      * Custom setup function
      */
@@ -90,9 +91,10 @@ class Timetable extends AbstractImporter
         $this->userMapper            = new UserMapper();
         $this->classMapper           = new ClassEntryMapper();
         $this->classPeriodMapper     = new ClassPeriodMapper();
-        $this->timetableCampusMapper = new TimetableCampusMapper();
         $this->timetablePeriodMapper = new TimetablePeriodMapper();
+        $this->timetableCycleMapper  = new TimetableCycleMapper();
     }
+
 
     /**
      * Reads all rows from the CSV reader, and loads them into an associative
@@ -103,29 +105,30 @@ class Timetable extends AbstractImporter
     protected function parse()
     {
         $result               = [];
-        $timetableCampusCache = [];
+        $timetableCycleCache  = [];
         $timetablePeriodCache = [];
-        $teacherCache         = [];
-        foreach ($this->reader as $i => $row) {
-            $key = $row['Class Code'];
 
-            if (!isset($key)) {
+        foreach ($this->reader as $i => $row) {
+            $key = trim($row['Class Code']);
+
+            /* The class code must exist, otherwise we can't import it
+             * Purely whitespace class codes aren't valid class codes
+             */
+            if ('' === $key) {
                 $this->log->warning('Mandatory field "Class Code" not defined: skipping!');
                 continue;
             }
 
-            $key = trim($key);
-
+            /* Accumulate a list of unique ClassEntry instances
+             *
+             * Class Codes are expected to be unique across this data set
+             * If it's not already in our ClassEntry cache, $result, add it
+             */
             if (!isset($result[$key])) {
-                // Class
-                $class = new ClassEntry();
-                $class
+                $class = (new ClassEntry())
                     ->setCode($key)
-                    ->setName($row['Class Title']);
-
-                if (isset($row['Class Description'])) {
-                    $class->setDescription($row['Class Description']);
-                }
+                    ->setName(trim($row['Class Title'] ?? ''))
+                    ->setDescription(trim($row['Class Description'] ?? ''));
 
                 $result[$key] = [
                     'class'   => $class,
@@ -133,28 +136,33 @@ class Timetable extends AbstractImporter
                 ];
             }
 
-            // Load timetable campus from DB or cache
+            // Load timetable cycle from DB or cache
             $termTitle  = $row['Term Title'];
             $termCampus = $row['Term Campus'];
-            /** @var TimetableCampus $timetableCampus */
-            if (isset($timetableCampusCache[$termTitle][$termCampus])) {
-                $timetableCampus = $timetableCampusCache[$termTitle][$termCampus];
+
+            /* Reuse an instance of TimetableCycle that we previously fetched
+             */
+            if (isset($timetableCycleCache[$termTitle][$termCampus])) {
+                $timetableCycle = $timetableCycleCache[$termTitle][$termCampus];
             } else {
                 try {
-                    $timetableCampus = $this->timetableCampusMapper->findOneByNameAndCampusCode(
+                    $timetableCycle = $this->timetableCycleMapper->findOneByColumnList([
+                        'title' => $termTitle,
+                        'ext_timetable_code' => $termCampus
+                    ]);
+
+                    $timetableCycleCache[$termTitle][$termCampus] = $timetableCycle;
+                } catch (Mapper\Exception $e) {
+
+                    /* Can't assign ClassEntry instances to Cycles that don't exist
+                     * Cycles need to be created with Timetable Structure first
+                     */
+                    $this->log->warning(sprintf(
+                        'Term "%s" for campus "%s" not found: skipping!',
                         $termTitle,
                         $termCampus
-                    );
-                    $timetableCampusCache[$termTitle][$termCampus] = $timetableCampus;
+                    ));
 
-                } catch (Mapper\Exception $e) {
-                    $this->log->warning(
-                        sprintf(
-                            'Term "%s" for campus "%s" not found: skipping!',
-                            $termTitle,
-                            $termCampus
-                        )
-                    );
                     continue;
                 }
             }
@@ -162,61 +170,64 @@ class Timetable extends AbstractImporter
             // Load timetable period from DB or cache
             $periodTitle = $row['Period Title'];
             $periodDay   = $row['Period Day'];
+
+            /* Also maintain a cache of Timetable Period instances that we previously fetched
+             */
             /** @var TimetablePeriod $timetablePeriod */
-            if (isset($timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay])) {
-                $timetablePeriod = $timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay];
+            if (isset($timetablePeriodCache[$timetableCycle->getId()][$periodTitle][$periodDay])) {
+                $timetablePeriod = $timetablePeriodCache[$timetableCycle->getId()][$periodTitle][$periodDay];
             } else {
                 try {
-                    $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList(
-                        [
-                            'cycle_id' => $timetableCampus->getCycle()->getId(),
-                            'title'    => $periodTitle,
-                            'day'      => $periodDay,
-                        ]
-                    );
+                    $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList([
+                        'cycle_id' => $timetableCycle->getId(),
+                        'title'    => $periodTitle,
+                        'day'      => $periodDay,
+                    ]);
 
-                    $timetablePeriodCache[$timetableCampus->getCycle()->getId()][$periodTitle][$periodDay] = $timetablePeriod;
+                    $timetablePeriodCache[$timetableCycle->getId()][$periodTitle][$periodDay] = $timetablePeriod;
                 } catch (Mapper\Exception $e) {
-                    $this->log->warning(
-                        sprintf(
-                            'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
-                            $periodTitle,
-                            $periodDay,
-                            $termTitle,
-                            $termCampus
-                        )
-                    );
+
+                    /* Can't assign ClassEntry instances to Periods that don't exist
+                     * Periods need to be created with Timetable Structure first
+                     */
+                    $this->log->warning(sprintf(
+                        'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
+                        $periodTitle,
+                        $periodDay,
+                        $termTitle,
+                        $termCampus
+                    ));
+
                     continue;
                 }
             }
 
-            // Load teacher from DB or cache
-            $teacherCode = $row['Teacher Code'];
-            /** @var \Schoolbox\User $teacher */
-            if (!isset($teacherCache[$teacherCode])) {
-                try {
-                    $teacher = $this->userMapper->findByExternalId($teacherCode);
-                    $teacherCache[$teacherCode] = $teacher;
-                } catch (Mapper\Exception $e) {
-                    $this->log->warning(sprintf('Teacher code "%s" not found', $teacherCode));
-                }
-            }
+            /* Also maintain a cache of User instances that we previously fetched
+             * But this idea is obsolete now
+             */
+//            /** @var \Schoolbox\User $teacher */
+//            if (!isset($teacherCache[$teacherCode])) {
+//                try {
+//                    $teacher = $this->userMapper->findByExternalId($teacherCode);
+//                    $teacherCache[$teacherCode] = $teacher;
+//                } catch (Mapper\Exception $e) {
+//                    $this->log->warning(sprintf('Teacher code "%s" not found', $teacherCode));
+//                }
+//            }
 
             // Add the class period for this item
-            $classPeriod = new ClassPeriod();
-            $classPeriod
+            $classPeriod = (new ClassPeriod())
                 ->setClass($result[$key]['class'])
-                ->setTeacher($teacherCode)
+                ->setTeacher(trim($row['Teacher Code']))
+                ->setRoom(trim($row['Class Room'] ?? ''))
                 ->setPeriod($timetablePeriod);
-
-            if (isset($row['Class Room'])) {
-                $classPeriod->setRoom($row['Class Room']);
-            }
 
             $result[$key]['periods']->add($classPeriod);
         }
+
         return $result;
     }
+
 
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
