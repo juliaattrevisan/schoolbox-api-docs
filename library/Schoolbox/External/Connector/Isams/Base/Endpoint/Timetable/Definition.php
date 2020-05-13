@@ -125,11 +125,7 @@ class Definition implements IStrategy
                 ->setDayLength($dayData['maxPeriods'])
                 ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
                 ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
-                ->setStartDay(1)
-
-                /* What is this?
-                 */
-                ->setRegular(1);
+                ->setStartDay(1);
 
             $this->log->info(sprintf(
                 'Creating timetable cycle %s (%s) with day length %s',

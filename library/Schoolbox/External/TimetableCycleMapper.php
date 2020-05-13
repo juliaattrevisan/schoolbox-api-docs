@@ -54,11 +54,6 @@ class TimetableCycleMapper extends Schoolbox\Mapper
             'type'     => self::TYPE_INTEGER,
         ]);
         $this->hasMap([
-            'column'   => 'regular',
-            'property' => 'regular',
-            'type'     => self::TYPE_BOOLEAN,
-        ]);
-        $this->hasMap([
             'column'   => 'start',
             'property' => 'start',
             'type'     => self::TYPE_DATE,
@@ -77,14 +72,6 @@ class TimetableCycleMapper extends Schoolbox\Mapper
             'column'   => 'offset',
             'property' => 'offset',
             'type'     => self::TYPE_INTEGER,
-        ]);
-
-        /* TODO: But is this even used? What is this - we can probably delete it
-         */
-        $this->hasMap([
-            'column'   => 'reset',
-            'property' => 'reset',
-            'type'     => self::TYPE_DATE,
         ]);
     }
 }

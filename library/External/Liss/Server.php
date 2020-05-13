@@ -159,18 +159,13 @@ class External_Liss_Server
                 ->setTitle('Main Timetable')
                 ->setExternalTimetableCode($campus->getExtTimetableCode())
                 ->setStart($now->startOfYear())
-                ->setReset(null)
                 ->setFinish($now->endOfYear())
                 ->setStartDay(1)
 
                 /* TODO: Undo these hardcoded values at some point
                  */
                 ->setCycleLength(10)
-                ->setDayLength(13)
-
-                /* What is this thing?
-                 */
-                ->setRegular(1);
+                ->setDayLength(13);
 
             $cycleMapper->save($cycle);
         }

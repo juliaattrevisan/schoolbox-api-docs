@@ -125,21 +125,6 @@ class TimetableCycle {
         return $this->id;
     }
 
-    /**
-     * @param  boolean $regular
-     * @return $this
-     */
-    public function setRegular($regular) {
-        $this->regular = $regular;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getRegular() {
-        return $this->regular;
-    }
 
     /**
      * @param  string $title
@@ -211,21 +196,6 @@ class TimetableCycle {
         return $this;
     }
 
-    /**
-     * @param  \Alaress_Date_Format $reset
-     * @return $this
-     */
-    public function setReset($reset) {
-        $this->reset = $reset;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getReset() {
-        return $this->reset;
-    }
 
     /**
      * @param  \Alaress_Date_Format $start

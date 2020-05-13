@@ -31,3 +31,9 @@ ALTER TABLE `sis_timetable_cycle`
 -- Remove sis_timetable_campus altogether
 
 DROP TABLE `sis_timetable_campus`;
+
+-- Who knows what these two fields did...I certainly have no clue
+
+ALTER TABLE `sis_timetable_cycle`
+    DROP COLUMN `reset`,
+    DROP COLUMN `regular`;
