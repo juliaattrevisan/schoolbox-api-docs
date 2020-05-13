@@ -128,7 +128,6 @@ class Factory
 
                     /* Timetable pieces
                      */
-                    CampusMapper::getInstance(),
                     UserMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),

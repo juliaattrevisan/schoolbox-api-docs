@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycle;
@@ -58,12 +57,6 @@ class Definition implements IStrategy
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -81,7 +74,6 @@ class Definition implements IStrategy
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Batchxml              $batchxml
-     * @param CampusMapper          $campusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
@@ -89,14 +81,12 @@ class Definition implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
-        CampusMapper $campusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
-        $this->campusMapper = $campusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -114,8 +104,6 @@ class Definition implements IStrategy
 
         if ($publishedTimetables) {
             $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
-        } else {
-            $ext = '';
         }
 
         $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
@@ -132,7 +120,7 @@ class Definition implements IStrategy
             /** @var TimetableCycle $timetableCycle */
             $timetableCycle = $this->timetableCycleMapper->createModel()
                 ->setTitle(trim((string)$cycle->Name))
-                ->setExternalTimetableCode($ext)
+                ->setExternalTimetableCode($ext ?? null)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))
                 ->setDayLength($dayData['maxPeriods'])
                 ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
