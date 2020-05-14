@@ -360,7 +360,7 @@ class Scrub
             // Need to add InlinesOnly, as adding only Autolink causes an error
             $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
             $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
-            self::$markdownConverter = new CommonMark\CommonMarkConverter([], $environment);
+            self::$markdownConverter = new CommonMark\CommonMarkConverter(['html_input' => CommonMark\Environment::HTML_INPUT_STRIP, 'allow_unsafe_links'=>false, 'max_nesting_level'=>10 ], $environment);
         }
         return self::$markdownConverter;
     }
