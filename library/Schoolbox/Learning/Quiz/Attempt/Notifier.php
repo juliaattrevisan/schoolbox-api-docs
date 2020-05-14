@@ -294,7 +294,6 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        /** @var Quiz $test */
         $term      = $this->termMapper->findForDate($assess->getFinish());
         $hrefGrade = "/learning/grades/{$student->getId()}/{$term->getCode()}/{$assess->getCategory()->getId()}";
         $href      = $this->conf->get('restrict_student_submissions') ? $hrefGrade : "/learning/assessments/{$assess->getAssessmentModel()->getId()}/$studentId";
