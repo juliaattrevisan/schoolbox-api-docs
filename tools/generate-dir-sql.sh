@@ -19,10 +19,8 @@ then
 	datadir=$1;
 fi
 
-#echo "UPDATE config SET value='$tpldir/templates' WHERE name='template_dir';"
 #echo "UPDATE config SET value='$datadir/files' WHERE name='file_dir';"
 echo "UPDATE config SET value='$datadir/cache/zip' WHERE name='zip_dir';"
-#echo "UPDATE config SET value='$datadir/cache/xml' WHERE name='xml_dir';"
 echo "UPDATE config SET value='$datadir/purifier' WHERE name='purifier_cache_dir';"
 echo "UPDATE config SET value='$datadir/twig' WHERE name='twig_cache_dir';"
 echo "UPDATE config SET value='$datadir/cache/stream' WHERE name='stream_dir';"
