@@ -72,7 +72,9 @@
             assessment: assessment,
             submissionsBlocked: submissionsBlocked,
             student: student,
-            icon: 'icon-due-work'
+            icon: 'icon-due-work',
+            canShowcase: canShowcase,
+            isShowcased: isShowcased
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
