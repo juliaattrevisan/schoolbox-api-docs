@@ -37,3 +37,8 @@ DROP TABLE `sis_timetable_campus`;
 ALTER TABLE `sis_timetable_cycle`
     DROP COLUMN `reset`,
     DROP COLUMN `regular`;
+
+-- Remove this column too, it's not used anymore.
+
+ALTER TABLE `sis_timetable_cycle`
+    DROP COLUMN `offset`;
