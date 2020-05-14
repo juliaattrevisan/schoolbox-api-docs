@@ -32,11 +32,6 @@ class TimetableCycle {
     protected $day_length;
 
     /**
-     * @var bool
-     */
-    protected $regular;
-
-    /**
      * @var \Alaress_Date_Format
      */
     protected $start;
@@ -52,21 +47,6 @@ class TimetableCycle {
      * @var int
      */
     protected $startDay = 1;
-
-    /**
-     * The number of days to offset the timetable start day by.
-     * (starts from 1.)
-     *
-     * @deprecated Use $this->startDay
-     *
-     * @var int
-     */
-    protected $offset = 0;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $reset;
 
 
     /**
@@ -156,26 +136,6 @@ class TimetableCycle {
      */
     public function getFinish() {
         return $this->finish;
-    }
-
-    /**
-     * @deprecated Use $this->setStartDay()
-     *
-     * @param  int   $offset
-     * @return $this
-     */
-    public function setOffset($offset) {
-        $this->offset = $offset;
-        return $this;
-    }
-
-    /**
-     * @deprecated Use $this->getStartDay()
-     *
-     * @return int
-     */
-    public function getOffset() {
-        return $this->offset;
     }
 
     /**
