@@ -154,31 +154,31 @@ class UsageMapper
          */
         $collection = new \Schoolbox\Collection();
         $collection->add(new \Schoolbox\Usage\Item('Cache'));
-        $collection->add(new \Schoolbox\Usage\Item('Dropbox'));
+//        $collection->add(new \Schoolbox\Usage\Item('Dropbox'));
 //        $collection->add(new \Schoolbox\Usage\Item('My Files'));
 //        $collection->add(new \Schoolbox\Usage\Item('Resources'));
-        $collection->add(new \Schoolbox\Usage\Item('Returns'));
+//        $collection->add(new \Schoolbox\Usage\Item('Returns'));
         $collection->add(new \Schoolbox\Usage\Item('Storage'));
-        $collection->add(new \Schoolbox\Usage\Item('Submissions'));
-        $collection->add(new \Schoolbox\Usage\Item('Videos'));
+//        $collection->add(new \Schoolbox\Usage\Item('Submissions'));
+//        $collection->add(new \Schoolbox\Usage\Item('Videos'));
         $collection->add(new \Schoolbox\Usage\Item('Other'));
 
         /* Map keys to locks
          */
         $mapping = array(
-            'dropbox_dir' => 'Dropbox',
+//            'dropbox_dir' => 'Dropbox',
 //            'file_dir' => 'Resources',
             'logs_dir' => 'Cache',
-            'minify_dir' => 'Cache',
-            'myfiles_cache_dir' => 'Cache',
+//            'minify_dir' => 'Cache',
+//            'myfiles_cache_dir' => 'Cache',
 //            'myfile_dir' => 'My Files',
             'portrait_dir' => 'Cache',
-            'returns_dir' => 'Returns',
+//            'returns_dir' => 'Returns',
             'stream_dir' => 'Cache',
-            'submission_dir' => 'Submissions',
-            'thumbnail_dir' => 'Cache',
-            'video_dir' => 'Videos',
-            'weather_dir' => 'Cache',
+//            'submission_dir' => 'Submissions',
+//            'thumbnail_dir' => 'Cache',
+//            'video_dir' => 'Videos',
+//            'weather_dir' => 'Cache',
             'xml_dir' => 'Cache',
             'zip_dir' => 'Cache',
         );

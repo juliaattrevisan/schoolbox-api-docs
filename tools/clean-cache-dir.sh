@@ -30,16 +30,16 @@ sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
 sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # Collect minify cache dir location
-minifydir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='minify_dir' \G;" | grep 'value' | cut -d' ' -f2`
+#minifydir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='minify_dir' \G;" | grep 'value' | cut -d' ' -f2`
 zipdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='zip_dir' \G;" | grep 'value' | cut -d' ' -f2`
 xmldir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='xml_dir' \G;" | grep 'value' | cut -d' ' -f2`
 streamdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='stream_dir' \G;" | grep 'value' | cut -d' ' -f2`
 
-if [ -z $minifydir ];
-then
-	echo "Unable to find minify cache directory in config table. Please check your database credentials.";
-	exit;
-fi
+#if [ -z $minifydir ];
+#then
+#	echo "Unable to find minify cache directory in config table. Please check your database credentials.";
+#	exit;
+#fi
 
 if [ -z $zipdir ];
 then
@@ -67,13 +67,13 @@ then
 fi
 
 
-if [ -d $minifydir ];
-then
-	rm -f $minifydir/minify*;
-	echo "Minify cache directory cleaned ($minifydir)";
-else
-	echo "No minify cache directories cleaned";
-fi
+#if [ -d $minifydir ];
+#then
+#	rm -f $minifydir/minify*;
+#	echo "Minify cache directory cleaned ($minifydir)";
+#else
+#	echo "No minify cache directories cleaned";
+#fi
 
 if [ -d $zipdir ];
 then
