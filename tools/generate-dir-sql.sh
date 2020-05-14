@@ -5,7 +5,7 @@
 #	the locations of the template and data directories.
 #	Used by the packaging scripts, the result is sent to stdout
 # Usage:
-#	generate-data-dir-sql.sh [base data dir] [base template dir] (optional)
+#	generate-data-dir-sql.sh [base data dir]
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd

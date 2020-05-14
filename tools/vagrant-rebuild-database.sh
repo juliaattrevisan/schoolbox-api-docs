@@ -33,7 +33,7 @@ mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COL
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
 
 echo "$vag Generating data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
 
 echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-vagrant-v6.1.sql

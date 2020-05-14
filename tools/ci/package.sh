@@ -82,7 +82,7 @@ do
   fi
 
 	echo "[$i] Create package specfic directory sql";
-	tools/generate-dir-sql.sh /var/lib/$i /usr/share/$i > sql/$i-package-config.sql;
+	tools/generate-dir-sql.sh /var/lib/$i > sql/$i-package-config.sql;
 	if [ $? -ne 0 ];
 	then
 		echo "Error creating package specific directory sql";
