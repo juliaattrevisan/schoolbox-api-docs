@@ -155,7 +155,7 @@ class UsageMapper
         $collection = new \Schoolbox\Collection();
         $collection->add(new \Schoolbox\Usage\Item('Cache'));
         $collection->add(new \Schoolbox\Usage\Item('Dropbox'));
-        $collection->add(new \Schoolbox\Usage\Item('My Files'));
+//        $collection->add(new \Schoolbox\Usage\Item('My Files'));
 //        $collection->add(new \Schoolbox\Usage\Item('Resources'));
         $collection->add(new \Schoolbox\Usage\Item('Returns'));
         $collection->add(new \Schoolbox\Usage\Item('Storage'));
@@ -171,7 +171,7 @@ class UsageMapper
             'logs_dir' => 'Cache',
             'minify_dir' => 'Cache',
             'myfiles_cache_dir' => 'Cache',
-            'myfile_dir' => 'My Files',
+//            'myfile_dir' => 'My Files',
             'portrait_dir' => 'Cache',
             'returns_dir' => 'Returns',
             'stream_dir' => 'Cache',
