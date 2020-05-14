@@ -46,18 +46,16 @@
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
 
-<div class="sigPad row" data-signature>
+<div class="sigPad" data-signature>
     <!-- BEGIN answerOption -->
-    <div class="sigPadWrapper small-12 columns no-pad">
+    <div class="sigPadWrapper">
         <!--<div class="typed"></div>-->
         <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
 
         <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
         <input type="text" name="answer" class="signaturePadAnswer" data-role="signatureInput">
     </div>
-
-    <div class="small-12 columns">
-        <a class="button" href="#" data-role="signatureClear">Clear Signature</a>
-    </div>
+    
+    <a class="button expand" href="#" data-role="signatureClear">Clear Signature</a>
     <!-- END answerOption -->
 </div>
