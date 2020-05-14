@@ -19,13 +19,13 @@ then
 	datadir=$1;
 fi
 
-#echo "UPDATE config SET value='$datadir/files' WHERE name='file_dir';"
-echo "UPDATE config SET value='$datadir/cache/zip' WHERE name='zip_dir';"
+# Instance-agnostic configs
 echo "UPDATE config SET value='$datadir/purifier' WHERE name='purifier_cache_dir';"
-echo "UPDATE config SET value='$datadir/twig' WHERE name='twig_cache_dir';"
-echo "UPDATE config SET value='$datadir/cache/stream' WHERE name='stream_dir';"
-echo "UPDATE config SET value='$datadir/cache/portrait' WHERE name='portrait_dir';"
-echo "UPDATE config SET value='$datadir/cache/logs' WHERE name='logs_dir';"
-echo "UPDATE config SET value='$datadir/storage' WHERE name='storage_dir';"
+echo "UPDATE config SET value='$datadir/twig'     WHERE name='twig_cache_dir';"
 
-# End of script
+# Instance-specific configs
+echo "UPDATE config SET value='$datadir/cache/zip'      WHERE name='zip_dir';"
+echo "UPDATE config SET value='$datadir/cache/stream'   WHERE name='stream_dir';"
+echo "UPDATE config SET value='$datadir/cache/portrait' WHERE name='portrait_dir';"
+echo "UPDATE config SET value='$datadir/cache/logs'     WHERE name='logs_dir';"
+echo "UPDATE config SET value='$datadir/storage'        WHERE name='storage_dir';"
