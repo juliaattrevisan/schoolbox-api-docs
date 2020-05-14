@@ -62,8 +62,8 @@ class UsageMapper
      */
     public function findTotalUsage()
     {
-        $total = disk_total_space(\Config::get('file_dir'));
-        $free = disk_free_space(\Config::get('file_dir'));
+        $total = disk_total_space(\Config::get('storage_dir'));
+        $free = disk_free_space(\Config::get('storage_dir'));
         $used = $total - $free;
 
         return array(
@@ -167,7 +167,7 @@ class UsageMapper
          */
         $mapping = array(
             'dropbox_dir' => 'Dropbox',
-            'file_dir' => 'Resources',
+//            'file_dir' => 'Resources',
             'logs_dir' => 'Cache',
             'minify_dir' => 'Cache',
             'myfiles_cache_dir' => 'Cache',

@@ -50,8 +50,8 @@ class Controller extends Base
     {
         // Disk usage
 
-        $disk_total = disk_total_space($this->getConfigLoader()->get('file_dir'));
-        $disk_free = disk_free_space($this->getConfigLoader()->get('file_dir'));
+        $disk_total = disk_total_space($this->getConfigLoader()->get('storage_dir'));
+        $disk_free = disk_free_space($this->getConfigLoader()->get('storage_dir'));
         $disk_used = $disk_total - $disk_free;
         $disk_percentage = round(($disk_used / $disk_total) * 100);;
 
