@@ -10,9 +10,9 @@ namespace Alaress\Mail;
 
 
 use Alaress\Html\ToText as Html2Text;
-use Twig_Environment;
-use Twig_SimpleFilter;
 use Scrub;
+use Twig\TwigFilter;
+use Twig_Environment;
 
 class TwigMailer extends AbstractMailer {
 
@@ -52,40 +52,49 @@ class TwigMailer extends AbstractMailer {
         //TODO: Refactor to use the Twig Environment from the bootstrap
         // HTML Purifier filter - known to output safe HTML
         $this->twig->addFilter(
-            new Twig_SimpleFilter(
+            new TwigFilter(
                 'purify',
-                array('Scrub', 'html'),
-                array('is_safe' => array('html'))
+                [Scrub::class, 'html'],
+                ['is_safe' => ['html']]
             )
         );
         $this->twig->addFilter(
-            new Twig_SimpleFilter(
+            new TwigFilter(
                 'purifyAbsoluteUri',
-                array('Scrub', 'htmlAbsoluteUri'),
-                array('is_safe' => array('html'))
+                [Scrub::class, 'htmlAbsoluteUri'],
+                ['is_safe' => ['html']]
+            )
+        );
+
+        // Linkify filter
+        $this->twig->addFilter(
+            new TwigFilter(
+                'linkify',
+                [Scrub::class, 'linkifyText'],
+                ['is_safe' => ['html']]
             )
         );
 
         // HTML2Text filter
         $this->twig->addFilter(
-            new Twig_SimpleFilter(
+            new TwigFilter(
                 'html2text',
-                array('Scrub', 'html2text')
+                [Scrub::class, 'html2text']
             )
         );
 
         // Cut sentence filter
         $this->twig->addFilter(
-            new Twig_SimpleFilter(
+            new TwigFilter(
                 'cutSentence',
-                array('TextFormatter', 'cutSentence')
+                ['TextFormatter', 'cutSentence']
             )
         );
-	}
+    }
 
-	/**
-	 * @param array $context
-	 * @return self
+    /**
+     * @param array $context
+     * @return self
 	 */
 	public function setContext($context) {
 		if($context) {

@@ -6,96 +6,61 @@
  */
 namespace Alaress\Application;
 
-use Aura\Di;
-use Config\Modules\ModuleConfigInterface;
-use External_Markbook;
-use Predis;
-use Schoolbox\Filter;
-use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
-use Schoolbox\Pastoral\AccessLevelCensor;
-use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
-use Throwable;
-use RuntimeException;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
+use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Filter as AlaressFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
+use Alaress\Web\Output;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Alaress\Web\Router\RouterFactory;
+use Alaress_Date_Format;
+use Alaress_Date_Locale_Config;
+use Aura\Di;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
-use Alaress\Session\Factory;
-use Alaress\Web\Output;
-use Alaress\Web\Router\RouterFactory;
-use Alaress_Date_Locale_Config;
+use Config\Modules\ModuleConfigInterface;
+use External_Class;
 use External_ClassInterface;
+use External_Markbook;
+use External_Timetable;
+use External_User;
 use External_UserInterface;
 use GuzzleHttp;
+use Predis;
+use RuntimeException;
+use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
+use Schoolbox\Error;
 use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\Filter;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Error;
-use Schoolbox\Mapper;
-use Schoolbox\MapperFactory;
-use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
-use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
-use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Notifactory;
-use Schoolbox\Pastoral\DataSource as PastoralDataSource;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
-use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
-use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
-use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
-use Schoolbox\Tour\Mapper as TourMapper;
-use Schoolbox\Tour\Step\Mapper as StepMapper;
-use Schoolbox\Role;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use SitePage;
-use Twig\Extension\DebugExtension;
-use Twig_Extensions_Extension_Text;
-use Twig\Loader\FilesystemLoader;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
-use Twig\Environment;
-use Alaress_Date_Format;
-use Alaress\Database\Connector\IConnector;
-use External_Class;
-use External_Timetable;
-use External_User;
-use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
-use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
@@ -107,8 +72,10 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataS
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
@@ -116,19 +83,53 @@ use Schoolbox\Learning\Assessment\Response\SubSource\Task as ResponseSubSourceTa
 use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy as TaskFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Transactor as LearningAssessmentTransactor;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
+use Schoolbox\Mapper;
+use Schoolbox\MapperFactory;
+use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
+use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
+use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
 use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
 use Schoolbox\Sync\Provisioner\Provisioner;
 use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
-use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Tour\Mapper as TourMapper;
+use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Scrub;
+use SitePage;
+use Throwable;
+use Twig\Environment;
+use Twig\Extension\DebugExtension;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig_Extensions_Extension_Text;
 
 /**
  * Class Kernel
@@ -843,8 +844,8 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'purify',
-                            array('Scrub', 'html'),
-                            array('is_safe' => array('html'))
+                            [Scrub::class, 'html'],
+                            ['is_safe' => ['html']]
                         )
                     );
 
@@ -852,7 +853,16 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'html2text',
-                            array('Scrub', 'html2text')
+                            [Scrub::class, 'html2text']
+                        )
+                    );
+
+                    // Linkify filter
+                    $twig->addFilter(
+                        new TwigFilter(
+                            'linkify',
+                            [Scrub::class, 'linkifyText'],
+                            ['is_safe' => ['html']]
                         )
                     );
 
@@ -860,7 +870,7 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'cutSentence',
-                            array('TextFormatter', 'cutSentence')
+                            [\TextFormatter::class, 'cutSentence']
                         )
                     );
 
@@ -868,14 +878,14 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'bytes',
-                            array('Alaress_Byte_Format', 'bytesToString')
+                            [\Alaress_Byte_Format::class, 'bytesToString']
                         )
                     );
 
                     $twig->addFilter(
                         new TwigFilter(
                             'column',
-                            [ Collection::class, 'array_column' ]
+                            [Collection::class, 'array_column']
                         )
                     );
 
@@ -883,7 +893,7 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'momentJsFormat',
-                            [ \Alaress_Date_Format_Converter::class, 'toMomentJs' ]
+                            [\Alaress_Date_Format_Converter::class, 'toMomentJs']
                         )
                     );
 
@@ -891,7 +901,7 @@ abstract class Kernel
                     $twig->addFilter(
                         new TwigFilter(
                             'ireplace',
-                            function($string, array $tokens = []) {
+                            function ($string, array $tokens = []) {
                                 return str_ireplace(array_keys($tokens), array_values($tokens), $string);
                             }
                         )

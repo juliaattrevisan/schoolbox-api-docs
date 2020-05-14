@@ -1,5 +1,7 @@
 <?php
 
+use League\CommonMark;
+
 /**
  * Scrub
  *
@@ -25,6 +27,14 @@ class Scrub
      * @var HTMLPurifier
      */
     protected static $htmlpurifier_instance;
+
+
+    /**
+     * Singleton CommonMark instance used by this class in `linkifyText`.
+     *
+     * @var CommonMark\MarkdownConverterInterface
+     */
+    private static $markdownConverter;
 
 
     /**
@@ -335,6 +345,39 @@ class Scrub
         }
         return self::$htmlpurifier_instance;
     }
+
+
+    /**
+     * Create a cut-down Markdown converter which does little more than parse
+     * links out of text.
+     *
+     * @return CommonMark\MarkdownConverterInterface
+     */
+    private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    {
+        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+            $environment = new CommonMark\Environment();
+            // Need to add InlinesOnly, as adding only Autolink causes an error
+            $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
+            $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
+            self::$markdownConverter = new CommonMark\CommonMarkConverter(['html_input' => CommonMark\Environment::HTML_INPUT_STRIP, 'allow_unsafe_links'=>false, 'max_nesting_level'=>10 ], $environment);
+        }
+        return self::$markdownConverter;
+    }
+
+
+    /**
+     * Escapes and then linkifies (adds anchor tags to text that looks like a
+     * link) to text.
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function linkifyText(string $text): string
+    {
+        return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
+    }
+
 
 
     /**
