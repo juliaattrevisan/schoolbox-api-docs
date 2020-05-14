@@ -226,16 +226,17 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $requestResubmission = $returnedWork->getResubmissionRequired();
         if (!$assessment
             || $this->conf->get('restrict_parent_duework_access')  // hide due work
-            || $this->conf->get('restrict_student_submissions')    // hide due work detail
             || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT) || $requestResubmission)) {
             return $envelope;
         }
 
         /** @var Folder $cat */
         $cat  = $assessment->getBaseContext()->getFolder();
-        $href = "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
 
-        $term = $this->termMapper->findForDate($assessment->getDueAt());
+        $term      = $this->termMapper->findForDate($assessment->getDueAt());
+        $hrefGrade = "/learning/grades/{$student->getId()}/{$term->getCode()}/{$cat->getId()}";
+        $href      = $this->conf->get('restrict_student_submissions') ? $hrefGrade : "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
+
         $bob  = new Builder();
         $bob->setIcon($this->getUserIcon($effector))
             ->setNamespace($this->getSlug())
@@ -250,7 +251,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             $bob->setTitle(self::PATTERN_RESUBMIT_PARENT_TITLE);
         } else {
             $bob->setTitle(self::PATTERN_MARKED_PARENT_TITLE)
-                ->setParam('catname', new Param($cat->getName(), "/learning/grades/{$student->getId()}/{$term->getCode()}/{$cat->getId()}"));
+                ->setParam('catname', new Param($cat->getName(), $hrefGrade));
         }
         $envelope->targetToParent($student->getId(), $bob->build());
 
