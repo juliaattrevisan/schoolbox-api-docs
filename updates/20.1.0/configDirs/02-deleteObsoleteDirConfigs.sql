@@ -1,7 +1,7 @@
 -- These configs are no longer needed, so they can be removed
 DELETE FROM config WHERE name IN (
     'template_dir',
-#     'file_dir', -- can't remove just yet
+    'file_dir',
     'myfile_dir',
     'submission_dir',
     'returns_dir',
