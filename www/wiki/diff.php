@@ -39,7 +39,7 @@ if (is_numeric($this->arg[0])) {
 
 	// perfom diff
     $htmldiffConfig = new Caxy\HtmlDiff\HtmlDiffConfig();
-    $htmldiffConfig->setPurifierCacheLocation(Config::get('xml_dir') . '/../purifier/');
+    $htmldiffConfig->setPurifierCacheLocation(Config::get('purifier_cache_dir'));
     $htmldiffConfig->setEncoding('UTF-8');
     $diff = new Caxy\HtmlDiff\HtmlDiff($from['body'], $to['body']);
     $diff->setConfig($htmldiffConfig);
