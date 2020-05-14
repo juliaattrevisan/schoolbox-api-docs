@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Timetable Colour Data Mapper
  *
@@ -15,29 +14,52 @@ use Schoolbox\GenericCollection;
 /**
  * @method GenericCollection|Timetable_Colour[] findAll($options = [])
  */
-class Timetable_ColourMapper extends Schoolbox\Mapper {
+class Timetable_ColourMapper extends Schoolbox\Mapper
+{
 
-	protected $table = 'lu_timetable_colour';
+    /**
+     * @var string
+     */
+    protected $table = 'lu_timetable_colour';
 
-	protected function mapping() {
-		$this->hasTable('lu_timetable_colour');
-		$this->hasModel('Timetable_Colour');
-		$this->hasMap(
-			array(
-				'column' => 'timetable_colour_id',
-				'property' => 'timetableColourId',
-				'type' => self::TYPE_INTEGER,
-				'identifier' => true
-			)
-		);
+    /**
+     * @inheritDoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('lu_timetable_colour');
+        $this->hasModel('Timetable_Colour');
+        $this->hasMap(
+            [
+                'column'     => 'timetable_colour_id',
+                'property'   => 'timetableColourId',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true,
+            ]
+        );
 
-		$this->hasMap(
-			array(
-				'column' => 'hex_colour',
-				'property' => 'hexColour',
-				'type' => self::TYPE_STRING,
-			)
-		);
-	}
+        $this->hasMap(
+            [
+                'column'   => 'hex_colour',
+                'property' => 'hexColour',
+                'type'     => self::TYPE_STRING,
+            ]
+        );
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function getSetMethodName($property)
+    {
+        return 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGetMethodName($property)
+    {
+        return 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
+    }
 }
