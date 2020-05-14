@@ -102,6 +102,8 @@ class Definition implements IStrategy
          */
         $publishedTimetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
+        $ext = null;
+
         if ($publishedTimetables) {
             $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
         }
@@ -117,10 +119,25 @@ class Definition implements IStrategy
         foreach ($cycles as $cycle) {
             $dayData = $this->findDays($cycle);
 
+            /* Show the cycle identifier in the title
+             *
+             * This id was something buried in the xml, and you just had to know what it was
+             * and configure a campus' external timetable code manually. It'd change on timetable
+             * rollovers or whenever a new timetable version was manufactured.
+             *
+             * This should make it more apparent and easier to access than digging into the
+             * Status report where I tried to expose it
+             */
+            $cycleName = sprintf(
+                '%s (%s)',
+                trim((string)$cycle->Name),
+                $ext
+            );
+
             /** @var TimetableCycle $timetableCycle */
             $timetableCycle = $this->timetableCycleMapper->createModel()
-                ->setTitle(trim((string)$cycle->Name))
-                ->setExternalTimetableCode($ext ?? null)
+                ->setTitle($cycleName)
+                ->setExternalTimetableCode($ext)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))
                 ->setDayLength($dayData['maxPeriods'])
                 ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
