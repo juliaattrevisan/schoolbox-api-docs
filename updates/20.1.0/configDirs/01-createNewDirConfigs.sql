@@ -51,6 +51,3 @@ SELECT
     c2.module
 FROM config c2
 WHERE c2.name = 'xml_dir';
-
--- No longer need xml_dir
-DELETE FROM config WHERE `name` = 'xml_dir';

@@ -7,6 +7,7 @@ DELETE FROM config WHERE name IN (
     'returns_dir',
     'dropbox_dir',
     'thumbnail_dir',
+    'xml_dir,',
     'weather_dir',
     'minify_dir',
     'myfiles_cache_dir',
