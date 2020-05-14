@@ -156,7 +156,7 @@ class UsageMapper
         $collection->add(new \Schoolbox\Usage\Item('Cache'));
         $collection->add(new \Schoolbox\Usage\Item('Dropbox'));
         $collection->add(new \Schoolbox\Usage\Item('My Files'));
-        $collection->add(new \Schoolbox\Usage\Item('Resources'));
+//        $collection->add(new \Schoolbox\Usage\Item('Resources'));
         $collection->add(new \Schoolbox\Usage\Item('Returns'));
         $collection->add(new \Schoolbox\Usage\Item('Storage'));
         $collection->add(new \Schoolbox\Usage\Item('Submissions'));
