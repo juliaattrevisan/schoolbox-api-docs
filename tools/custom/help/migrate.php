@@ -99,7 +99,7 @@ HELP;
             $source    = "{$stockDir}/{$stockFile}";
 
             if ($this->perform()) {
-                $portrait = $storageMapper->accept($stockFile, $source, false);
+                $portrait = $storageMapper->acceptStream($stockFile, $source, false);
                 $updateQuery->execute([
                     'id'   => $user['id'],
                     'hash' => $portrait->getHash(),
