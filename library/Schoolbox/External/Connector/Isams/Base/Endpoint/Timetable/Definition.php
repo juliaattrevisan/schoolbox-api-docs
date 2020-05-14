@@ -251,8 +251,8 @@ class Definition implements IStrategy
                     ->setTitle(trim((string)$period->Name))
                     ->setDay($dayIndex)
                     ->setSequence(trim((string)$period->Ordinal))
-                    ->setStart(trim((string)$period->StartTime . ':00'))
-                    ->setFinish(trim((string)$period->EndTime . ':00'));
+                    ->setStart(trim($period->StartTime . ':00'))
+                    ->setFinish(trim($period->EndTime . ':00'));
 
                 $struct['days'][$dayIndex][] = $timetablePeriod;
             }
