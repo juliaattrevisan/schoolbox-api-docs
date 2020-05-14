@@ -26,8 +26,8 @@ then
 fi
 
 echo "UPDATE config SET value='$tpldir/templates' WHERE name='template_dir';"
-echo "UPDATE config SET value='$datadir/files' WHERE name='file_dir';"
-echo "UPDATE config SET value='$datadir/myFiles' WHERE name='myfile_dir';"
+#echo "UPDATE config SET value='$datadir/files' WHERE name='file_dir';"
+#echo "UPDATE config SET value='$datadir/myFiles' WHERE name='myfile_dir';"
 echo "UPDATE config SET value='$datadir/submissions' WHERE name='submission_dir';"
 echo "UPDATE config SET value='$datadir/returns' WHERE name='returns_dir';"
 echo "UPDATE config SET value='$datadir/dropbox' WHERE name='dropbox_dir';"
