@@ -26,7 +26,7 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         parent::__construct($template, $subject, $to, $host);
 
         //setup HTML template
-        $this->template = new Template(Config::get('template_dir'));
+        $this->template = new Template(SITE_root . '/templates');
         $this->loadTemplate($template);
 
         //setup defaults
@@ -107,7 +107,7 @@ class Mailer extends \Alaress\Mail\AbstractMailer
     {
         $schoolTemplate  = strtolower(Config::get('site_location')) . '/' . $template;
         $genericTemplate = 'core/' . $template;
-        if (file_exists(Config::get('template_dir') . '/' . $schoolTemplate)) {
+        if (file_exists(SITE_root . '/templates/' . $schoolTemplate)) {
             return '../../' . $schoolTemplate;
         }
         return '../../' . $genericTemplate;

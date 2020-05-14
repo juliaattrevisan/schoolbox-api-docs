@@ -175,7 +175,7 @@ class UsageMapper
             SELECT `name`,`value`
             FROM `config`
             WHERE `name` LIKE '%dir'
-            AND `name` NOT IN ('template_dir', 'storage_dir')
+            AND `name` NOT IN ('storage_dir')
             ORDER BY `name`
         ";
 

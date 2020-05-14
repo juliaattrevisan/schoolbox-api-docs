@@ -13,19 +13,13 @@
 #
 
 datadir='/var/lib/schoolbox';
-tpldir='/usr/share/schoolbox';
 
 if [ ! -z $1 ];
 then
 	datadir=$1;
 fi
 
-if [ ! -z $2 ];
-then
-	tpldir=$2;
-fi
-
-echo "UPDATE config SET value='$tpldir/templates' WHERE name='template_dir';"
+#echo "UPDATE config SET value='$tpldir/templates' WHERE name='template_dir';"
 #echo "UPDATE config SET value='$datadir/files' WHERE name='file_dir';"
 echo "UPDATE config SET value='$datadir/cache/zip' WHERE name='zip_dir';"
 #echo "UPDATE config SET value='$datadir/cache/xml' WHERE name='xml_dir';"

@@ -175,24 +175,27 @@ echo "Using db credentials from: "`readlink -f $conffile`;
 echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
-thistemplatedir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='template_dir'"`;
-if [ -z $thistemplatedir ];
-then
-	errmsg="Unable to detect current template directory";
-	error;
-else
-	if [ -z $thistemplatedir ];
-	then
-		errmsg="Unable to locate template directory in database";
-		error;
-	fi
-	thistemplatedir=`readlink -f $thistemplatedir`
-	if [ ! -d $thistemplatedir ];
-	then
-		errmsg="Template directory '$thistemplatedir' is not a directory";
-		error;
-	fi
-fi
+
+# Template dir is always going to be $instdir/templates, and doesn't even need to be passed anymore
+#thistemplatedir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='template_dir'"`;
+#if [ -z $thistemplatedir ];
+#then
+#	errmsg="Unable to detect current template directory";
+#	error;
+#else
+#	if [ -z $thistemplatedir ];
+#	then
+#		errmsg="Unable to locate template directory in database";
+#		error;
+#	fi
+#	thistemplatedir=`readlink -f $thistemplatedir`
+#	if [ ! -d $thistemplatedir ];
+#	then
+#		errmsg="Template directory '$thistemplatedir' is not a directory";
+#		error;
+#	fi
+#fi
+
 thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='file_dir'"`;
 if [ -z $thisfiledir ];
 then
@@ -590,7 +593,7 @@ then
 fi
 
 ## Fix SQL config paths to data directory
-$instdir/tools/generate-dir-sql.sh $thisdatadir `readlink -f $thistemplatedir/../` > /tmp/schoolbox-restore-sql-paths;
+$instdir/tools/generate-dir-sql.sh $thisdatadir > /tmp/schoolbox-restore-sql-paths;
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/schoolbox-restore-sql-paths;
 
 ## Build SQL updates if required
