@@ -36,15 +36,15 @@ $app = new class extends CliTool\App {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Migrate portraits from filesystem portrait_dir into Storage and associate them
-with schoolbox user accounts. Each profile picture is assumed to be a jpg and
-you can dump as many as you want into the stock_portrait folder.
+Randomly associates images in the `stock_portrait` folder to Schoolbox user
+accounts.
 
-Profile pictures are only assigned to users who don't have a portrait already.
+Profile pictures are only assigned to users who don't have a portrait already,
+and who have a `synergy_id` value.
 
 Usage: migrate.php [-v] [-p]
-        -p Actually migrate portraits (otherwise, this will only show what would
-           happen)
+        -p Actually associates portraits (otherwise, this will only show what
+           would happen)
         -v Verbose mode (may be provided up to 3 times for increasing verbosity)
 
 HELP;
