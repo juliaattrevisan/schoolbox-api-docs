@@ -27,10 +27,6 @@
                  */
                 element: element,
 
-                /* For the backend
-                 */
-                action: 'publish',
-
                 /* Processing endpoint
                  */
                 url: '/eportfolio/showcase/modifyForm.php',
@@ -43,10 +39,17 @@
                  */
                 label: '#publish-to-eportfolio-label',
 
-                /* Text strings
+                /* Text strings and backend action string
                  */
-                publishText: 'Publish to ePortfolio',
-                unpublishText: 'Remove from ePortfolio'
+                publish: {
+                    text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
+                    action: 'publish'
+                },
+
+                unpublish: {
+                    text: 'Are you sure you want to remove this work from your ePortfolio showcase?',
+                    action: 'unpublish'
+                }
             };
 
             return $.extend(defaults, options);
@@ -68,11 +71,24 @@
                      */
                     if (activator.attr('data-publish-status') == 0) {
 
+                        /* Decide which text to show
+                         */
+                        var text;
+                        var action;
+
+                        if (activator.attr('data-publish-state') == 1) {
+                            text = config.publish.text;
+                            action = config.publish.action;
+                        } else {
+                            text = config.unpublish.text;
+                            action = config.unpublish.action;
+                        }
+
                         /* Provide confirmation dialog
                          */
                         activator.confirmDialog({
-                            header: "Publish to ePortfolio Showcase",
-                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
+                            header: "Update ePortfolio Showcase",
+                            text: text,
                             confirmEvent: function() {
 
                                 /* Update button status to prevent mass apm spam
@@ -82,16 +98,16 @@
                                 /* Spawn toaster
                                  */
                                 $(config.label).toastActivate({
-                                    text: 'Sending to ePortfolio'
+                                    text: 'Updating ePortfolio'
                                 });
 
                                 /* Send it to backend
                                  */
                                 $.ajax({
-                                    type: "POST",
+                                    type: 'POST',
                                     url: config.url,
                                     data: {
-                                        action: config.action,
+                                        action: action,
                                         assessmentId: assessmentId,
                                         userId: config.userId
                                     },

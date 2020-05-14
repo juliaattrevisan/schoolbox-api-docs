@@ -24,9 +24,9 @@
         {% if canShowcase %}
             <li>
                 {% if isShowcased %}
-                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Remove from ePortfolio">Remove from ePortfolio</a>
+                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio">Remove from ePortfolio</a>
                 {% else %}
-                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
+                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio">Publish to ePortfolio</a>
                 {% endif %}
             </li>
 
