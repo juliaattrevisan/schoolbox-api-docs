@@ -1,4 +1,15 @@
-{% if viewRoute or modifyRoute %}
+{##
+ # modifyTot
+ #
+ # A shared tot menu that became available when an instructor could either view the assessment's Status screen
+ # or modify the assessment details itself. It's since expanded to also become available for students when they
+ # can showcase assessments to their eportfolio.
+ #
+ # @param string viewRoute    the route to the Status screen, for instructors
+ # @param string modifyRoute  the route to the Modify Assessment screen, for instructors
+ # @param bool   canShowcase  a boolean for students' ability to Showcase to their eportfolio
+ #}
+{% if viewRoute or modifyRoute or canShowcase %}
     <nav>
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
@@ -6,8 +17,9 @@
         {% if viewRoute %}
             <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
         {% endif %}
+
         {# Students must have ePortfolio enabled, otherwise they can't do this
-        #}
+         #}
         {% if canShowcase %}
             <li>
                 <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
