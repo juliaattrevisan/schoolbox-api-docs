@@ -8,6 +8,7 @@
  # @param string viewRoute    the route to the Status screen, for instructors
  # @param string modifyRoute  the route to the Modify Assessment screen, for instructors
  # @param bool   canShowcase  a boolean for students' ability to Showcase to their eportfolio
+ # @param bool   isShowcased  whether this assessment is already showcased on a user's eportfolio
  #}
 {% if viewRoute or modifyRoute or canShowcase %}
     <nav>
@@ -22,8 +23,11 @@
          #}
         {% if canShowcase %}
             <li>
-                <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
-                <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Remove from ePortfolio">Remove from ePortfolio</a>
+                {% if isShowcased %}
+                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Remove from ePortfolio">Remove from ePortfolio</a>
+                {% else %}
+                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" title="Publish to ePortfolio">Publish to ePortfolio</a>
+                {% endif %}
             </li>
 
             <script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>

@@ -41,7 +41,12 @@
 
                 /* The label to hide/show when publishing
                  */
-                label: '#publish-to-eportfolio-label'
+                label: '#publish-to-eportfolio-label',
+
+                /* Text strings
+                 */
+                publishText: 'Publish to ePortfolio',
+                unpublishText: 'Remove from ePortfolio'
             };
 
             return $.extend(defaults, options);
@@ -91,13 +96,10 @@
                                         userId: config.userId
                                     },
                                     success: function (data) {
-                                        $(config.label).toastTimeout({
-                                            text: 'Work published to ePortfolio'
-                                        });
 
-                                        /* Re-enable button
+                                        /* Reload upon publish
                                          */
-                                        activator.attr('data-publish-status', 0);
+                                        location.reload();
                                     }
                                 });
                             }

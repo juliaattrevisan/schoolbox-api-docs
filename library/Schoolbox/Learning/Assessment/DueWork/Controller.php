@@ -238,7 +238,11 @@ class Controller extends Assessment\Controller
             /* Eportfolio Showcase
              * Only show the "send to showcase" trophy button to teachers and students, not parents
              */
-            'canShowcase' => $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $this->getUser()->getEportfolioEnable())
+            'canShowcase' => $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $this->getUser()->getEportfolioEnable()),
+
+            /* Whether or not this assessment is showcased on the user's eportfolio
+             */
+            'isShowcased' => true
         ];
 
         $routeArgs = [
