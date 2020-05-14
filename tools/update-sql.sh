@@ -60,7 +60,7 @@ then
     exit;
 fi
 
-backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
 if [ "$backupdir" == "" ];
 then

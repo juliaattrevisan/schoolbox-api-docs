@@ -51,3 +51,31 @@ SELECT
     c2.module
 FROM config c2
 WHERE c2.name = 'xml_dir';
+
+
+-- Backup dir: the same as file_dir for now
+INSERT INTO `config` (
+    `name`,
+    `value`,
+    `title`,
+    `description`,
+    `field_id`,
+    `options`,
+    `editable`,
+    `hidden`,
+    `required`,
+    `module`
+)
+SELECT
+    'backup_dir',
+    c2.value,
+    'Backup Location',
+    'Location of Schoolbox database backups.',
+    c2.field_id,
+    c2.options,
+    c2.editable,
+    c2.hidden,
+    c2.required,
+    c2.module
+FROM config c2
+WHERE c2.name = 'file_dir';

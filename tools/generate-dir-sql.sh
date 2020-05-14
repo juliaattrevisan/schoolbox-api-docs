@@ -24,6 +24,7 @@ echo "UPDATE config SET value='$datadir/purifier' WHERE name='purifier_cache_dir
 echo "UPDATE config SET value='$datadir/twig'     WHERE name='twig_cache_dir';"
 
 # Instance-specific configs
+echo "UPDATE config SET value='$datadir/files'          WHERE name='backup_dir';"
 echo "UPDATE config SET value='$datadir/cache/zip'      WHERE name='zip_dir';"
 echo "UPDATE config SET value='$datadir/cache/stream'   WHERE name='stream_dir';"
 echo "UPDATE config SET value='$datadir/cache/portrait' WHERE name='portrait_dir';"
