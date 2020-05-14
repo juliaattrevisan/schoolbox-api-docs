@@ -24,10 +24,6 @@ class FolderTest extends TestCase
      */
     protected $object;
 
-    protected $config_vars = [
-        ['file_dir', '/tmp'],
-    ];
-
 
     public function setUp()
     {
