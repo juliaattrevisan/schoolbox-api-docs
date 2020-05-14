@@ -134,8 +134,26 @@ class Definition implements IStrategy
                 $ext
             );
 
+            /* Update the existing Timetable Cycle if it already exists
+             * Otherwise delete any old cycles and create a new one
+             *
+             * This is intended to prevent the accumulation of obsolete cycles
+             */
             /** @var TimetableCycle $timetableCycle */
-            $timetableCycle = $this->timetableCycleMapper->createModel()
+            try {
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('title', $cycleName);
+            } catch (Exception $e) {
+                $this->log->debug(sprintf(
+                    'Purging all previous cycles and creating a new cycle, %s.',
+                    $cycleName
+                ));
+
+                $this->timetableCycleMapper->truncate();
+
+                $timetableCycle = $this->timetableCycleMapper->createModel();
+            }
+
+            $timetableCycle
                 ->setTitle($cycleName)
                 ->setExternalTimetableCode($ext)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))

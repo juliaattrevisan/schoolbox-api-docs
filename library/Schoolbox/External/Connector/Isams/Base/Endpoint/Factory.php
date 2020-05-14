@@ -233,7 +233,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper,
-                $this->timetableCycleMapper,
                 $this->timetablePeriodMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
