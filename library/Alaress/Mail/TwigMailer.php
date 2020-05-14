@@ -40,14 +40,26 @@ class TwigMailer extends AbstractMailer {
 		$this->templateFilename = $template;
 
 		// load up paths in order of preference (start with school-specific)
-		$paths = array();
-		if (is_dir(($custom = SITE_root . '/templates/' . self::getConfig()->get('site_location') . '/email'))) {
+        $config = self::getConfig();
+		$paths  = array();
+		if (is_dir(($custom = SITE_root . '/templates/' . $config->get('site_location') . '/email'))) {
 			$paths[] = $custom;
 		}
 		$paths[] = SITE_root . '/templates/core/email';
 
+		// Add options to Twig mailer too
+        $options = [
+            'debug'            => $config->get('debug_templates'),
+            'strict_variables' => $config->get('strict_templates'),
+        ];
+
+        // do not cache when in debug mode
+        if (!$config->get('debug_mode')) {
+            $options['cache'] = $config->get('twig_cache_dir');
+        }
+
 		// load up a twig environment that will search for school-specific templates if the directory exists
-		$this->twig = new Twig_Environment(new \Twig_Loader_Filesystem($paths));
+		$this->twig = new Twig_Environment(new \Twig_Loader_Filesystem($paths), $options);
 
         //TODO: Refactor to use the Twig Environment from the bootstrap
         // HTML Purifier filter - known to output safe HTML
