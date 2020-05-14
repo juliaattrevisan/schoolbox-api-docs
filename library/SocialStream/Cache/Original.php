@@ -94,18 +94,7 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected function generateCachedFilename(): string
     {
-        $urlDetection = new \SocialStream\UrlDetection($this->url);
-
-        /* Find what the file was called
-         *
-         * Resource files would normally be copied into the socialstream cache location
-         * but to save space maybe we can redirect generateCachedFilename() instead,
-         * so it reads directly from the original's location.
-         */
-        if ($urlDetection->isResourceUrl()) {
-            return \Config::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
-        }
-
+        // This once used file_dir: that setting no longer exists
         return \Config::get('stream_dir') . '/socialstream/' . $this->cacheFilePrefix . '_' . $this->encode($this->url);
     }
 
