@@ -45,11 +45,8 @@ trait External_Schoolbox_TimetableDefinitionTrait
             return 0;
         }
 
-        if (empty($definition['reset']) || $definition['reset'] === '0000-00-00') {
-            $startObject = new Alaress_Date_Format($definition['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        } else {
-            $startObject = new Alaress_Date_Format($definition['reset'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        }
+
+        $startObject = new Alaress_Date_Format($definition['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
         $startObject = $startObject->startOfDay();
         $weekdays    = $startObject->diffInWeekdays($dateObject);
@@ -76,13 +73,11 @@ trait External_Schoolbox_TimetableDefinitionTrait
         $timetableQuery = $database->executeQuery('
                 SELECT
                     start,
-                    reset,
                     finish,
                     start_day,
                     title,
                     cycle_length,
-                    day_length,
-                    regular
+                    day_length
                 FROM sis_timetable_cycle
                 WHERE ext_timetable_code = :campusId
             ',
