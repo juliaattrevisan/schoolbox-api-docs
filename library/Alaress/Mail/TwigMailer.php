@@ -11,43 +11,47 @@ namespace Alaress\Mail;
 
 use Alaress\Html\ToText as Html2Text;
 use Scrub;
+use TextFormatter;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
-use Twig_Environment;
 
-class TwigMailer extends AbstractMailer {
+class TwigMailer extends AbstractMailer
+{
 
-	/** @var Twig_Environment */
-	protected $twig;
+    /** @var Environment */
+    protected $twig;
 
-	/** @var array  */
-	protected $context = array();
+    /** @var array */
+    protected $context = [];
 
-	/** @var string */
-	protected $templateFilename;
+    /** @var string */
+    protected $templateFilename;
 
-	/** @var string */
-	protected $rendercache = '';
+    /** @var string */
+    protected $rendercache = '';
 
-	/**
-	 * @param string $template
-	 * @param string $subject
-	 * @param string $to
-	 * @param string $host
-	 */
-	public function __construct($template, $subject = "", $to = "", $host = "") {
-		parent::__construct($template, $subject, $to, $host);
+    /**
+     * @param string $template
+     * @param string $subject
+     * @param string $to
+     * @param string $host
+     */
+    public function __construct($template, $subject = "", $to = "", $host = "")
+    {
+        parent::__construct($template, $subject, $to, $host);
 
-		$this->templateFilename = $template;
+        $this->templateFilename = $template;
 
-		// load up paths in order of preference (start with school-specific)
+        // load up paths in order of preference (start with school-specific)
         $config = self::getConfig();
-		$paths  = array();
-		if (is_dir(($custom = SITE_root . '/templates/' . $config->get('site_location') . '/email'))) {
-			$paths[] = $custom;
-		}
-		$paths[] = SITE_root . '/templates/core/email';
+        $paths  = [];
+        if (is_dir(($custom = SITE_root . '/templates/' . $config->get('site_location') . '/email'))) {
+            $paths[] = $custom;
+        }
+        $paths[] = SITE_root . '/templates/core/email';
 
-		// Add options to Twig mailer too
+        // Add options to Twig mailer too
         $options = [
             'debug'            => $config->get('debug_templates'),
             'strict_variables' => $config->get('strict_templates'),
@@ -58,8 +62,8 @@ class TwigMailer extends AbstractMailer {
             $options['cache'] = $config->get('twig_cache_dir');
         }
 
-		// load up a twig environment that will search for school-specific templates if the directory exists
-		$this->twig = new Twig_Environment(new \Twig_Loader_Filesystem($paths), $options);
+        // load up a twig environment that will search for school-specific templates if the directory exists
+        $this->twig = new Environment(new FilesystemLoader($paths), $options);
 
         //TODO: Refactor to use the Twig Environment from the bootstrap
         // HTML Purifier filter - known to output safe HTML
@@ -99,7 +103,7 @@ class TwigMailer extends AbstractMailer {
         $this->twig->addFilter(
             new TwigFilter(
                 'cutSentence',
-                ['TextFormatter', 'cutSentence']
+                [TextFormatter::class, 'cutSentence']
             )
         );
     }
@@ -107,47 +111,50 @@ class TwigMailer extends AbstractMailer {
     /**
      * @param array $context
      * @return self
-	 */
-	public function setContext($context) {
-		if($context) {
-			$this->context = array_merge_recursive($this->context, $context);
-		}
-		else {
-			$this->context = array();
-		}
-		return $this;
-	}
+     */
+    public function setContext($context)
+    {
+        if ($context) {
+            $this->context = array_merge_recursive($this->context, $context);
+        } else {
+            $this->context = [];
+        }
+        return $this;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getContext() {
-		return $this->context;
-	}
+    /**
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
 
-	/**
-	 * Returns the HTML rendering of the templated email constructed by this object.
-	 *
-	 * @return string
-	 */
-	protected function composeHTML() {
-		return $this->rendercache = $this->twig->render($this->templateFilename, $this->context);
-	}
+    /**
+     * Returns the HTML rendering of the templated email constructed by this object.
+     *
+     * @return string
+     */
+    protected function composeHTML()
+    {
+        return $this->rendercache = $this->twig->render($this->templateFilename, $this->context);
+    }
 
 
-	/**
-	 * Returns the plaintext rendering of the templated email constructed by this object.
-	 *
-	 * @return string
-	 */
-	protected function composePlain() {
-		if($this->rendercache) {
-			$converter = new Html2Text($this->rendercache);
-			return $converter->getText();
-		}
-		$converter = new Html2Text($this->composeHTML());
-		return $converter->getText();
-	}
+    /**
+     * Returns the plaintext rendering of the templated email constructed by this object.
+     *
+     * @return string
+     */
+    protected function composePlain()
+    {
+        if ($this->rendercache) {
+            $converter = new Html2Text($this->rendercache);
+            return $converter->getText();
+        }
+        $converter = new Html2Text($this->composeHTML());
+        return $converter->getText();
+    }
 
 
 }
