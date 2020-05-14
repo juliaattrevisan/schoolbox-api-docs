@@ -816,13 +816,13 @@ abstract class Kernel
                     $config = $di->get('config');
 
                     $options = [
-                        'debug' => $config->get('debug_templates'),
+                        'debug'            => $config->get('debug_templates'),
                         'strict_variables' => $config->get('strict_templates'),
                     ];
 
                     // do not cache when in debug mode
                     if (!$config->get('debug_mode')) {
-                        $options['cache'] = $config->get('stream_dir') . '/templates/';
+                        $options['cache'] = $config->get('twig_cache_dir');
                     } else {
                         if (class_exists('\Alaress\Web\Template\DebugTwig')) {
                             $twigClass = '\Alaress\Web\Template\DebugTwig';

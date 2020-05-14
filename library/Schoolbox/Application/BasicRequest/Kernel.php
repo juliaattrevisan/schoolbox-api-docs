@@ -250,7 +250,7 @@ class Kernel extends WebKernelAbstract
 
                     // do not cache when in debug mode
                     if (!$config->get('debug_mode')) {
-                        $options['cache'] = $config->get('stream_dir') . '/templates/';
+                        $options['cache'] = $config->get('twig_cache_dir');
                     }
 
                     /** @var FilesystemLoader $loader */
