@@ -18,16 +18,10 @@ $pageId = 'showcase';
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
-	if ($action == 'unpublish') {
-		$showcaseItemId = $_POST['showcaseItemId'];
-
-		$showcasedItem = \Eportfolio\ShowcaseMapper::getInstance()->findById($showcaseItemId);
-
-		\Eportfolio\ShowcaseMapper::getInstance()->delete($showcasedItem);
-	}
-	else if ($action == 'publish') {
-
-        if(isset($_POST['boxId'])) {
+    if ($action == 'unpublish') {
+        \Eportfolio\ShowcaseMapper::getInstance()->unpublish((int)$_POST['assessmentId'], (int)$ownerId);
+    } elseif ($action == 'publish') {
+        if (isset($_POST['boxId'])) {
             $boxId = $_POST['boxId'];
 
             // Find the submission box
@@ -38,8 +32,7 @@ if ($authenticator->canModify()) {
                 error(17);
                 exit;
             }
-        }
-        else if(isset($_POST['assessmentId'])) {
+        } elseif(isset($_POST['assessmentId'])) {
             try {
                 $box = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -52,31 +45,31 @@ if ($authenticator->canModify()) {
             error(2);
         }
 
-		$now = \Alaress_Date_Format::now();
+        $now = \Alaress_Date_Format::now();
 
 
 
-		/* Check if the submission box is already being showcased; if so, ignore request
-		 */
-		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumnList(
-			array(
-				'uid'               => $ownerId,
-				'submission_box_id' => $boxId,
-			)
-		);
+        /* Check if the submission box is already being showcased; if so, ignore request
+         */
+        $existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumnList(
+            array(
+                'uid'               => $ownerId,
+                'submission_box_id' => $boxId,
+            )
+        );
 
-		if (!$existing->count()) {
-			$showcasedItem = new \Eportfolio\Showcase();
-			$showcasedItem->setSubmissionBox($box);
-			$showcasedItem->setUid($ownerId);
-			$showcasedItem->setCreatedAt($now);
-			$showcasedItem->setUpdatedAt($now);
+        if (!$existing->count()) {
+            $showcasedItem = new \Eportfolio\Showcase();
+            $showcasedItem->setSubmissionBox($box);
+            $showcasedItem->setUid($ownerId);
+            $showcasedItem->setCreatedAt($now);
+            $showcasedItem->setUpdatedAt($now);
 
-			\Eportfolio\ShowcaseMapper::getInstance()->create($showcasedItem);
-		}
-	}
+            \Eportfolio\ShowcaseMapper::getInstance()->create($showcasedItem);
+        }
+    }
 
-	$page->backToTheFuture(1);
+    $page->backToTheFuture(1);
 }
 else {
     error(19);

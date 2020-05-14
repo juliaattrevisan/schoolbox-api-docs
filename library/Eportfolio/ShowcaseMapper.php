@@ -155,6 +155,31 @@ class ShowcaseMapper extends Schoolbox\Mapper
 
 
     /**
+     * Remoe an assessment from a user's eportfolio showcase
+     *
+     * @param int $assessmentId
+     * @param int $userId
+     * @throws \PDOException
+     */
+    public function unpublish(int $assessmentId, int $userId): void
+    {
+        $query = "
+            DELETE esi
+            FROM {$this->getTable()} esi
+            INNER JOIN submission_box sb ON esi.submission_box_id = sb.id
+            AND sb.assessment_id = :assessmentId
+            AND uid = :userId
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessmentId,
+            'userId' => $userId
+        ]);
+    }
+
+
+    /**
      * Get all the showcased submission boxes for a particular user,
      * ordered alphabetically by the time they were showcased.
      *
