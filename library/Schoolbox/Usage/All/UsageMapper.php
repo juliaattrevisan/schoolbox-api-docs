@@ -162,7 +162,6 @@ class UsageMapper
          */
         $mapping = [
             'logs_dir'           => 'Cache',
-            'portrait_dir'       => 'Cache',
             'stream_dir'         => 'Cache',
             'purifier_cache_dir' => 'Cache',
             'twig_cache_dir'     => 'Cache',
