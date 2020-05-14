@@ -58,18 +58,12 @@ class Handler
      */
     private $passwordMailService;
 
-    /**
-     * @var string
-     */
-    private $portraitDir;
-
 
     /**
      * @param UserAccessMapper               $userAccessMapper
      * @param SiteAccess\Mapper              $tokenMapper
      * @param Folder\Mapper                  $folderMapper
      * @param User\Password\MailService      $mailService
-     * @param string                         $portraitDir
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      */
@@ -77,22 +71,13 @@ class Handler
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
-        User\Password\MailService $mailService,
-        string $portraitDir
+        User\Password\MailService $mailService
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper = $tokenMapper;
         $this->folderMapper = $folderMapper;
         $this->codeMapper = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
-
-        $portraitDir = realpath($portraitDir);
-
-        if (!$portraitDir) {
-            throw new InvalidArgumentException('Invalid portrait directly given; is it readable?');
-        }
-
-        $this->portraitDir = $portraitDir;
     }
 
 
@@ -318,20 +303,6 @@ class Handler
                     $this->passwordMailService->sendWelcomeEmailToUser($user);
                 }
 
-                if ($oldExternalId !== $externalId) {
-                    // the external ID has changed, so we need to change the filename of the profile pic (if it exists)
-                    if (is_readable($this->getPortraitPath($oldExternalId))) {
-                        $renameSuccess = rename(
-                            $this->getPortraitPath($oldExternalId),
-                            $this->getPortraitPath($externalId)
-                        );
-
-                        if (!$renameSuccess) {
-                            // ... where do I log this failure? :|
-                        }
-                    }
-                }
-
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
                 $failedUsers[] = [
@@ -362,16 +333,6 @@ class Handler
     public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken) : string
     {
         return (new Digest($schoolCode, $accessToken))->generate($timestamp);
-    }
-
-
-    /**
-     * @param string|int $externalId
-     * @return string
-     */
-    private function getPortraitPath($externalId) : string
-    {
-        return "{$this->portraitDir}/{$externalId}.jpg";
     }
 
 
