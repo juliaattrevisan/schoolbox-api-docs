@@ -43,8 +43,8 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
                 exit;
             }
             // Ensure the file is available locally
-            $file = tempnam(Config::get('xml_dir'), 'cal');
-            $fp       = fopen($file, 'wb');
+            $file = sb_tempnam('cal');
+            $fp   = fopen($file, 'wb');
             stream_copy_to_stream($result->readStream(), $fp);
             fclose($fp);
 
