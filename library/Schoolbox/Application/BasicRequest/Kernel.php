@@ -245,7 +245,8 @@ class Kernel extends WebKernelAbstract
                     $config = $di->get('config');
 
                     $options = [
-                        'debug' => $config->get('debug_templates'),
+                        'debug'            => $config->get('debug_templates'),
+                        'strict_variables' => $config->get('strict_templates'),
                     ];
 
                     // do not cache when in debug mode
