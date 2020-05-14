@@ -130,61 +130,6 @@ HELP;
             }
         }
 
-//        /* Copy it to portrait_dir
-//         */
-//        $portraitDir = $this->getConfig()->get('portrait_dir');
-
-//        foreach ($assignation as $id => $stockFile) {
-//            $source = "{$stockDir}/{$stockFile}";
-////            $destination = "{$portraitDir}/{$externalId}.jpg";
-//
-//            // Create a new storage file and save
-//
-//            if ($this->perform()) {
-//                $storageFile = $storageMapper->accept($stockFile, $source, false);
-//                $updateQuery->execute([
-//                    'id'   => $id,
-//                    'hash' => $storageFile->getHash(),
-//                ]);
-//            } else {
-////                $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
-//            }
-//
-////            /* Rename it after their synergetic_id
-////             * Note that this preserves the original assumption that everything is a jpg
-////             */
-////            $success = copy($source, $destination);
-////
-////            if ($success) {
-////                $this->getLogger()->info("Copied {$source} to {$destination}");
-////            } else {
-////                $this->getLogger()->warning("Could not copy {$source} to {$destination}; skipped");
-////            }
-//        }
-
-//        /* Migrate all images
-//         *
-//         * This should avoid a race condition where a user is manually assigned a picture
-//         * while this script is running
-//         */
-//        (new MigrateToStorage(
-//            $portraitDir,
-//            $db,
-//            StorageMapper::getInstance(),
-//            $this->getLogger(),
-//            $this->perform()
-//        ))->migrate();
-//
-//        /* Clean up any remainder files
-//         */
-//        foreach ($assignation as $externalId => $stockFile) {
-//            $destination = "{$portraitDir}/{$externalId}.jpg";
-//
-//            if (file_exists($destination)) {
-//                unlink($destination);
-//            }
-//        }
-
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
