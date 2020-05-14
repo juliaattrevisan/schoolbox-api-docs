@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 use Schoolbox\Admin\Import\Photos\MigrateToStorage;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Resource\Storage\Mapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -73,19 +73,24 @@ HELP;
         $db = Database::getInstance();
         $assignation = [];
 
+        $updateQuery = $db->prepare('
+            UPDATE  `user`
+            SET portrait_hash = :hash
+            WHERE id = :id
+        ');
         $statement = $db->query('
-            SELECT DISTINCT synergy_id
+            SELECT id
             FROM `user`
             WHERE portrait_hash IS NULL
             AND LENGTH(synergy_id) > 0
         ');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $externalId = $row['synergy_id'];
+            $id = $row['id'];
 
             /* Select a random image
              */
-            $assignation[$externalId] = $files[random_int(0, \count($files)-1)];
+            $assignation[$id] = $files[random_int(0, \count($files)-1)];
         }
 
         /* If there's nothing to do, say so and leave
@@ -95,48 +100,57 @@ HELP;
             return;
         }
 
-        /* Copy it to portrait_dir
-         */
-        $portraitDir = $this->getConfig()->get('portrait_dir');
+        $storageMapper = StorageMapper::getInstance();
 
-        foreach ($assignation as $externalId => $stockFile) {
+//        /* Copy it to portrait_dir
+//         */
+//        $portraitDir = $this->getConfig()->get('portrait_dir');
+
+        foreach ($assignation as $id => $stockFile) {
             $source = "{$stockDir}/{$stockFile}";
-            $destination = "{$portraitDir}/{$externalId}.jpg";
+//            $destination = "{$portraitDir}/{$externalId}.jpg";
 
-            /* Rename it after their synergetic_id
-             * Note that this preserves the original assumption that everything is a jpg
-             */
-            $success = copy($source, $destination);
+            // Create a new storage file and save
+            $storageFile = $storageMapper->accept($stockFile, $source, false);
+            $updateQuery->execute([
+                'id'   => $id,
+                'hash' => $storageFile->getHash(),
+            ]);
 
-            if ($success) {
-                $this->getLogger()->info("Copied {$source} to {$destination}");
-            } else {
-                $this->getLogger()->warning("Could not copy {$source} to {$destination}; skipped");
-            }
+//            /* Rename it after their synergetic_id
+//             * Note that this preserves the original assumption that everything is a jpg
+//             */
+//            $success = copy($source, $destination);
+//
+//            if ($success) {
+//                $this->getLogger()->info("Copied {$source} to {$destination}");
+//            } else {
+//                $this->getLogger()->warning("Could not copy {$source} to {$destination}; skipped");
+//            }
         }
 
-        /* Migrate all images
-         *
-         * This should avoid a race condition where a user is manually assigned a picture
-         * while this script is running
-         */
-        (new MigrateToStorage(
-            $portraitDir,
-            $db,
-            Mapper::getInstance(),
-            $this->getLogger(),
-            $this->perform()
-        ))->migrate();
-
-        /* Clean up any remainder files
-         */
-        foreach ($assignation as $externalId => $stockFile) {
-            $destination = "{$portraitDir}/{$externalId}.jpg";
-
-            if (file_exists($destination)) {
-                unlink($destination);
-            }
-        }
+//        /* Migrate all images
+//         *
+//         * This should avoid a race condition where a user is manually assigned a picture
+//         * while this script is running
+//         */
+//        (new MigrateToStorage(
+//            $portraitDir,
+//            $db,
+//            StorageMapper::getInstance(),
+//            $this->getLogger(),
+//            $this->perform()
+//        ))->migrate();
+//
+//        /* Clean up any remainder files
+//         */
+//        foreach ($assignation as $externalId => $stockFile) {
+//            $destination = "{$portraitDir}/{$externalId}.jpg";
+//
+//            if (file_exists($destination)) {
+//                unlink($destination);
+//            }
+//        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
