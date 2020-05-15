@@ -46,20 +46,4 @@ class Timetable_ColourMapper extends Schoolbox\Mapper
             ]
         );
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSetMethodName($property)
-    {
-        return 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getGetMethodName($property)
-    {
-        return 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $property)));
-    }
 }

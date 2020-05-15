@@ -578,7 +578,7 @@ class Controller extends Base
                         'getter'    => 'getTimetableColourId',
                         'hidden'    => true,
                     ],
-                    'hex_colour'    => [
+                    'hexColour'    => [
                         'caption'   => 'Event Colours',
                         'colour'    => true,
                         'width'     => 12
