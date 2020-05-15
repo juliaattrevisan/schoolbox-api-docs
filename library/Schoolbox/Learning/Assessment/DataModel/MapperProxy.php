@@ -424,9 +424,12 @@ class MapperProxy
      */
     public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
+        // User's participation cannot be assumed: they cannot be assumed to be in the folder
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->findAllByUnitImplementationIds($unitImplIds, $options),
-            $student
+            $student,
+            false,
+            false
         );
     }
 
@@ -466,7 +469,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation cannot be assumed: they cannot be assumed to be in the folder
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            false
+        );
     }
 
     /**
@@ -564,7 +573,14 @@ class MapperProxy
     public function findAllByProjectIdForReview($projectId, User $student = null, array $options = [])
     {
         $assessments = $this->findAllByProjectId($projectId, $options);
-        return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
+
+        // User's participation cannot be assumed: they cannot be assumed to be in the project
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $assessments,
+            $student,
+            false,
+            false
+        );
     }
 
 
@@ -695,7 +711,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation can be assumed: we've fetched based on the student's folders
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            true
+        );
     }
 
 
@@ -762,7 +784,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation can be assumed: we've fetched based on the student's folders
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            true
+        );
     }
 
 

@@ -90,7 +90,13 @@ class Api implements Calendar_Api_EventType_Interface
         );
 
         if ($this->visibility) {
-            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $this->user, true);
+            // User's participation can be assumed if they exist
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
+                $assessments,
+                $this->user,
+                true,
+                true
+            );
         }
 
         $stack = new Collection();

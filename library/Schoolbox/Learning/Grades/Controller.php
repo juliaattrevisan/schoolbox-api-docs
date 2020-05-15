@@ -548,7 +548,14 @@ class Controller extends Base
                 if ($context instanceof Project) {
                     $contexts = new GenericCollection(IAssessable::class);
                     $contexts->add($context);
-                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($contexts, $viewee);
+
+                    // User's participation cannot be assumed: they cannot be assumed to be in the folder
+                    $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
+                        $contexts,
+                        $viewee,
+                        false,
+                        false
+                    );
                     $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
                 }
                 $tree[$baseContextId]['assessments'][$contextId]['context']          = $context;
@@ -725,11 +732,14 @@ class Controller extends Base
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
 
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
-                                                   ->filter(function (IAssessable $a) use ($viewee) {
-                                                       // Note that we the assessment list is already filtered to published assessments due to filters
-                                                       return $a->isParticipant($viewee);
-                                                   });
+
+        // User's participation cannot be assumed: they cannot be assumed to be in the folder
+        $assessments = $this->assessmentMapperProxy
+            ->loadParticipantsIntoAssessmentCollection($assessments, $user, false, false)
+            ->filter(static function (IAssessable $a) use ($viewee) {
+                // Note that we the assessment list is already filtered to published assessments due to filters
+                return $a->isParticipant($viewee);
+            });
         return $assessments;
     }
 
