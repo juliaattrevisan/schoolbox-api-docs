@@ -247,23 +247,27 @@ class DataSource
             $assessment = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
 
-            if ($user instanceof User) {
-                // For efficiency reasons:
-                // bypass findAllStudentsForAssessment and assume that $user is
-                // a participant of this plan
-                if (!$explicitParticipants->keyExists($user->getId())) {
-                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
-                }
-            } else {
+//            if ($user instanceof User) {
+//                // For efficiency reasons:
+//                // bypass findAllStudentsForAssessment and assume that $user is
+//                // a participant of this plan
+//                if (!$explicitParticipants->keyExists($user->getId())) {
+//                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+//                }
+//            } else {
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
                 foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
                     // Is this user already an explicit participant? (Either an inclusion or exclusion)
                     if ($explicitParticipants->keyExists($student->getId())) {
                         continue;
                     }
-                    $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan);
+
+                    // If a user was provided: only load their participation
+                    if (!$user || $user->getId() === $student->getId()) {
+                        $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan);
+                    }
                 }
-            }
+//            }
         }
     }
 
