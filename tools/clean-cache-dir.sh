@@ -70,7 +70,7 @@ fi
 
 if [ -d $purifierdir ];
 then
-    rm -rf $purifierdir/*;
+    rm -rf "${purifierdir:?}"/*;
     echo "Purifier cache directory cleaned ($purifierdir)";
 else
     echo "No purifier cache directories cleaned";
@@ -86,7 +86,7 @@ fi
 
 if [ -d $twigdir ];
 then
-    rm -fR $twigdir/*;
+    rm -rf "${twigdir:?}"/*;
     echo "Twig templates cache cleaned ($twigdir)";
 else
     echo "No purifier cache directories cleaned";
