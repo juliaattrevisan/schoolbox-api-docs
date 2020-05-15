@@ -796,16 +796,6 @@ class User extends Base implements IUser
 
         $student->setPubliclyVisible($studentRow['visible']);
 
-        // Portrait
-
-        $portraitPath = realpath($this->config->get('portrait_dir')) . "/{$studentRow['externalId']}.jpg";
-
-        if (is_readable($portraitPath)) {
-            $student->setPortrait($portraitPath);
-        } else {
-            $student->setPortrait(null);
-        }
-
         // The following fields are currently unsupported by the Schoolbox database
 
         $student->setAlert(null);
@@ -891,16 +881,6 @@ class User extends Base implements IUser
         $positions->add((new Staff\Position())->setDescription($staffRow['positionTitle']));
         $meta->setPosition($positions);
         $staff->setMeta($meta);
-
-        // Portrait
-
-        $portraitPath = realpath($this->config->get('portrait_dir')) . "/{$staffRow['externalId']}.jpg";
-
-        if (is_readable($portraitPath)) {
-            $staff->setPortrait($portraitPath);
-        } else {
-            $staff->setPortrait(null);
-        }
 
         // The following fields are currently unsupported by the Schoolbox database
 
@@ -988,16 +968,6 @@ class User extends Base implements IUser
             }
 
             $guardian->setStudents($studentCollection);
-        }
-
-        // Portrait
-
-        $portraitPath = realpath($this->config->get('portrait_dir')) . "/{$guardianRow['externalId']}.jpg";
-
-        if (is_readable($portraitPath)) {
-            $guardian->setPortrait($portraitPath);
-        } else {
-            $guardian->setPortrait(null);
         }
 
         // The following fields are currently supported properly by the Schoolbox database. Some of

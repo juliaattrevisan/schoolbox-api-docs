@@ -175,25 +175,7 @@ echo "Using db credentials from: "`readlink -f $conffile`;
 echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
-thistemplatedir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='template_dir'"`;
-if [ -z $thistemplatedir ];
-then
-	errmsg="Unable to detect current template directory";
-	error;
-else
-	if [ -z $thistemplatedir ];
-	then
-		errmsg="Unable to locate template directory in database";
-		error;
-	fi
-	thistemplatedir=`readlink -f $thistemplatedir`
-	if [ ! -d $thistemplatedir ];
-	then
-		errmsg="Template directory '$thistemplatedir' is not a directory";
-		error;
-	fi
-fi
-thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='file_dir'"`;
+thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
 if [ -z $thisfiledir ];
 then
 	errmsg="Unable to detect current data file directory";
@@ -280,7 +262,7 @@ do
 			tempconffile=`readlink -f $localinstall`;
 			readconf;
 			readsqlver;
-			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='file_dir'"`;
+			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
 			if [ ! -z $tempfiledir ];
 			then
 				tempdatadirlist=`ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
@@ -310,7 +292,7 @@ do
 			then
 				tempconffile="/tmp/conf.php"
 				readconf;
-				tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='file_dir'\""; 2>/dev/null`
+				tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='backup_dir'\""; 2>/dev/null`
 				if [ ! -z $tempfiledir ];
 				then
 					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
@@ -576,7 +558,7 @@ cat $sourcedb | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DE
 if [ "$sourceloc" = '[B]' ];
 then
 	echo -e "\nMoving data files to the correct location";
-	sourcefiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='file_dir'" | cut -d'/' -f2-100`;
+	sourcefiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'" | cut -d'/' -f2-100`;
 	sourcefiledir=${sourcefiledir%/*};
 	mv -f $thisdatadir/restoredata/$sourcefiledir/* $thisdatadir/;
 	$instdir/tools/create-data-dirs.sh $thisdatadir;
@@ -590,7 +572,7 @@ then
 fi
 
 ## Fix SQL config paths to data directory
-$instdir/tools/generate-dir-sql.sh $thisdatadir `readlink -f $thistemplatedir/../` > /tmp/schoolbox-restore-sql-paths;
+$instdir/tools/generate-dir-sql.sh $thisdatadir > /tmp/schoolbox-restore-sql-paths;
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/schoolbox-restore-sql-paths;
 
 ## Build SQL updates if required

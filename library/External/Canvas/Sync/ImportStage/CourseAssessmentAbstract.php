@@ -68,7 +68,7 @@ abstract class CourseAssessmentAbstract
 
         $htmlPurifierConfig = \HTMLPurifier_Config::createDefault();
         // See Scrub.php
-        $htmlPurifierConfig->set('Cache.SerializerPath', $config->get('xml_dir') . '/../purifier/');
+        $htmlPurifierConfig->set('Cache.SerializerPath', $config->get('purifier_cache_dir'));
         $htmlPurifierConfig->set('URI.Base', $config->get(ConfigMapper::_CANVAS_URL));
         $htmlPurifierConfig->set('URI.MakeAbsolute', true);
         $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);

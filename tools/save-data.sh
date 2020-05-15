@@ -39,7 +39,7 @@ localiseVagrant() {
     echo "Re-localising vagrant"
     mysql schoolbox < /vagrant/sql/vagrant.sql;
     mysql schoolbox < "${cachedir}"/vagrant-secrets.sql;
-    /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+    /vagrant/tools/generate-dir-sql.sh /vagrant/data | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
 cleanupVagrant() {
@@ -48,7 +48,7 @@ cleanupVagrant() {
     mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup-secrets.sql;
 
     logMessage "Applying data dir sql fixes";
-    /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+    /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
 if [ -z $1 ];

@@ -50,7 +50,7 @@ $app = new class extends CliTool\App{
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
 
-        $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.transcode_'.INSTANCE_ID.'.lock');
+        $lock = new Alaress_Lock($configLoader->get('stream_dir') . '/.video_transcode_'.INSTANCE_ID.'.lock');
 
         if (!$lock->acquire()) {
             $log->warning("Video processor is already running, checking timeout...");

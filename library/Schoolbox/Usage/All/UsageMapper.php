@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Usage\All;
 
 use Alaress_Date_Format;
@@ -62,14 +63,14 @@ class UsageMapper
      */
     public function findTotalUsage()
     {
-        $total = disk_total_space(\Config::get('file_dir'));
-        $free = disk_free_space(\Config::get('file_dir'));
-        $used = $total - $free;
+        $total = disk_total_space(\Config::get('storage_dir'));
+        $free  = disk_free_space(\Config::get('storage_dir'));
+        $used  = $total - $free;
 
-        return array(
-            'Used' => $used,
+        return [
+            'Used'      => $used,
             'Available' => $free,
-        );
+        ];
     }
 
 
@@ -128,7 +129,7 @@ class UsageMapper
         $statement = $this->database->prepare($query);
         $statement->execute();
 
-        $result = array();
+        $result = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $result[] = $row;
@@ -154,34 +155,18 @@ class UsageMapper
          */
         $collection = new \Schoolbox\Collection();
         $collection->add(new \Schoolbox\Usage\Item('Cache'));
-        $collection->add(new \Schoolbox\Usage\Item('Dropbox'));
-        $collection->add(new \Schoolbox\Usage\Item('My Files'));
-        $collection->add(new \Schoolbox\Usage\Item('Resources'));
-        $collection->add(new \Schoolbox\Usage\Item('Returns'));
         $collection->add(new \Schoolbox\Usage\Item('Storage'));
-        $collection->add(new \Schoolbox\Usage\Item('Submissions'));
-        $collection->add(new \Schoolbox\Usage\Item('Videos'));
         $collection->add(new \Schoolbox\Usage\Item('Other'));
 
         /* Map keys to locks
          */
-        $mapping = array(
-            'dropbox_dir' => 'Dropbox',
-            'file_dir' => 'Resources',
-            'logs_dir' => 'Cache',
-            'minify_dir' => 'Cache',
-            'myfiles_cache_dir' => 'Cache',
-            'myfile_dir' => 'My Files',
-            'portrait_dir' => 'Cache',
-            'returns_dir' => 'Returns',
-            'stream_dir' => 'Cache',
-            'submission_dir' => 'Submissions',
-            'thumbnail_dir' => 'Cache',
-            'video_dir' => 'Videos',
-            'weather_dir' => 'Cache',
-            'xml_dir' => 'Cache',
-            'zip_dir' => 'Cache',
-        );
+        $mapping = [
+            'logs_dir'           => 'Cache',
+            'stream_dir'         => 'Cache',
+            'purifier_cache_dir' => 'Cache',
+            'twig_cache_dir'     => 'Cache',
+            'zip_dir'            => 'Cache',
+        ];
 
         /* Quizzle it
          */
@@ -189,7 +174,7 @@ class UsageMapper
             SELECT `name`,`value`
             FROM `config`
             WHERE `name` LIKE '%dir'
-            AND `name` NOT IN ('template_dir', 'storage_dir')
+            AND `name` NOT IN ('storage_dir')
             ORDER BY `name`
         ";
 
@@ -300,17 +285,17 @@ class UsageMapper
 
         /* Select order by
          */
-        if (!in_array($orderBy, array('firstname', 'lastname', 'name', 'bytes'))) {
+        if (!in_array($orderBy, ['firstname', 'lastname', 'name', 'bytes'])) {
             $orderBy = 'lastname';
         }
 
-        if (!in_array($order, array('DESC', 'ASC'))) {
+        if (!in_array($order, ['DESC', 'ASC'])) {
             $order = 'ASC';
         }
 
         /* Cast Away
          */
-        $index = (int)$index;
+        $index        = (int)$index;
         $usersPerPage = (int)$usersPerPage;
 
         /* Pagination
@@ -327,7 +312,7 @@ class UsageMapper
         $statement = $this->database->prepare($query);
         $statement->execute();
 
-        $result = array();
+        $result = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $result[] = $row;

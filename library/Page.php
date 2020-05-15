@@ -17,7 +17,7 @@ class Page
 
     public function __construct($error = false)
     {
-        $this->templateRoot = Config::get('template_dir');
+        $this->templateRoot = SITE_root . '/templates';
         $this->template     = new Template($this->templateRoot);
     }
 

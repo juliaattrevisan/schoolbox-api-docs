@@ -122,7 +122,7 @@ class Scrub
     {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
 
-            $serializerPath = Config::get('xml_dir') . '/../purifier/';
+            $serializerPath = Config::get('purifier_cache_dir');
             if (!is_dir($serializerPath)) {
                 // Don't need to care if this failed,
                 // because HTMLPurifier will fail later if it did.
