@@ -402,8 +402,6 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Returns a local path to the user's portrait
      *
-     * This indicates that Cedar needs to upload the pics manually to portrait_dir
-     *
      * @param User $user
      * @return Storage\Model|null
      * @throws InvalidArgumentException

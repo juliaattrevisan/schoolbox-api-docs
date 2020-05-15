@@ -330,8 +330,9 @@ interface External_UserInterface extends External\IConnector
      * Get the portrait for a particular user
      * Returns a Storage object for the user's portrait
      *
-     * @importance low - most schools manually uploaded portraits to `config.portrait_dir`
-     *             but now will be saved into Storage to facilitate cloud
+     * @importance low - this simply calls `$user->getPortrait()` for most SIS.
+     *             It may attempt to load the user's portrait from SIS before
+     *             saving it into Schoolbox.
      *
      * @param User $user
      * @return Storage\Model|null
