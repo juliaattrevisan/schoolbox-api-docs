@@ -117,7 +117,7 @@ class Api implements IApi
      */
     private function initCurl(string $filter = ''): \Alaress_Curl_Url
     {
-        $curl = new Alaress_Curl_Url($this->getUrl());
+        $curl = new Alaress_Curl_Url($this->getUrl()->toString());
 
         if ('' !== $filter) {
             $curl->addOptions([

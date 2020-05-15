@@ -20,9 +20,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -58,12 +56,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var TimetablePeriodMapper
-     */
-    private $timetablePeriodMapper;
-
-
-    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -82,9 +74,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var UserMapper
+     * @var Lookup
      */
-    private $userMapper;
+    private $lookup;
 
 
     /**
@@ -93,95 +85,27 @@ class Classes implements IStrategy
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml
-     * @param TimetablePeriodMapper  $timetablePeriodMapper
+     * @param Lookup                 $lookup
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
-     * @param UserMapper             $userMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
-        TimetablePeriodMapper $timetablePeriodMapper,
+        Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        UserMapper $userMapper
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->lookup = $lookup;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->userMapper = $userMapper;
-    }
-
-
-    /**
-     * Get a list of (user_id, synergy_id) tuples
-     *
-     * @return array
-     */
-    private function initUserLookup(): array
-    {
-        $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, synergy_id
-            FROM {$this->userMapper->getTable()} u
-            INNER JOIN `groups` g ON u.`group_id` = g.id
-            WHERE synergy_id IS NOT NULL
-        ");
-
-        $users = [];
-
-        /* TODO: synergy_id happens to match externalId? Maybe this array key is wrong
-         * TODO: Found while building kamar
-         */
-        foreach ($userStatement as $row) {
-            $users[$row['synergy_id']] = $row['id'];
-        }
-
-        return $users;
-    }
-
-
-    /**
-     * Get a list of (day, period) tuples
-     *
-     * @return array
-     * @throws Exception
-     */
-    private function initPeriodLookup(): array
-    {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
-            SELECT
-                luCampus.ext_timetable_code,
-                period.day, period.id, period.title
-            FROM luCampus
-            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
-            LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-            WHERE luCampus.deleted_at IS NULL
-        ');
-
-        $periods = [];
-
-        foreach ($periodStatement as $row) {
-            $ext = $row['ext_timetable_code'];
-            $day = $row['day'];
-            $periodName = $row['title'];
-
-            /* Minimum period
-             */
-            $period = $this->timetablePeriodMapper->createModel()
-                ->setId($row['id']);
-
-            $periods['ext'][$ext]['day'][$day]['period'][$periodName] = $period;
-        }
-
-        return $periods;
     }
 
 
@@ -199,11 +123,7 @@ class Classes implements IStrategy
      */
     private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
     {
-        if (isset($periods['ext'][$ext]['day'][$day]['period'][$periodName])) {
-            return $periods['ext'][$ext]['day'][$day]['period'][$periodName];
-        }
-
-        return null;
+        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
     }
 
 
@@ -217,20 +137,16 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        if ($this->perform) {
-            $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
-            $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
-            $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
-        }
 
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         *
+         * Cache a flat key-value array of (day, period)
          */
-        $users = $this->initUserLookup();
+        $this->lookup->init();
 
-        /* Cache a flat key-value array of (day, period)
-         */
-        $periods = $this->initPeriodLookup();
+        $users = $this->lookup->getUsers();
+        $periods = $this->lookup->getPeriods();
 
         /* Get a list of all the timetables to process
          */
@@ -321,6 +237,7 @@ class Classes implements IStrategy
      */
     private function createTimetableClass(array $subject): ClassEntry
     {
+
         /* See if one exists already; if so, reuse it
          */
         try {
@@ -369,6 +286,7 @@ class Classes implements IStrategy
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
+
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
          *
@@ -426,26 +344,45 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Involvement
      *
-     * @param array      $student
+     * @param array      $person
      * @param ClassEntry $timetableClass
      * @return ClassInvolvement
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassInvolvement(array $student, ClassEntry $timetableClass): ClassInvolvement
+    private function createTimetableClassInvolvement(array $person, ClassEntry $timetableClass): ClassInvolvement
     {
+        $involvement = $this->classInvolvementMapper->findByColumnList([
+            'external_id' => $person['externalId'],
+            'class_id' => $timetableClass->getId()
+        ]);
 
-        /** @var ClassInvolvement $timetableClassInvolvement */
+        /* Relation already exists; nothing to change
+         */
+        if ($involvement->count()) {
+            $this->log->info(sprintf(
+                'Reusing class involvement %s %s for %s (user %s)',
+                $timetableClass->getName(),
+                $timetableClass->getCode(),
+                "{$person['firstname']} {$person['surname']}",
+                $person['externalId']
+            ));
+
+            return $involvement->first();
+        }
+
+        /* Create new relation
+         */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-            ->setExternalId($student['externalId'])
-            ->setClass($timetableClass);
+                                                                  ->setExternalId($person['externalId'])
+                                                                  ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for student %s (user %s)',
+            'Creating class involvement %s %s for %s (user %s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
-            $student['firstname'] . ' ' . $student['surname'],
+            "{$person['firstname']} {$person['surname']}",
             $timetableClassInvolvement->getExternalId()
         ));
 

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -25,7 +24,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *   sis_class
  *   sis_class_period
  *   sis_class_user
- *   sis_timetable_campus
  *   sis_timetable_cycle
  *   sis_timetable_period
  */

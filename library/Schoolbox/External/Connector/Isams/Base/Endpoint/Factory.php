@@ -15,7 +15,6 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
@@ -96,21 +95,9 @@ class Factory
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var UserMapper
      */
     private $userMapper;
-
-
-    /**
-     * @var TimetableCampusMapper
-     */
-    private $timetableCampusMapper;
 
 
     /**
@@ -156,9 +143,7 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param CampusMapper                    $campusMapper
      * @param UserMapper                      $userMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -182,9 +167,7 @@ class Factory
 
         /* Timetable pieces
          */
-        CampusMapper $campusMapper,
         UserMapper $userMapper,
-        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -207,9 +190,7 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
-        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -236,7 +217,27 @@ class Factory
          */
         $batchxml = new Batchxml($api);
 
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+
+        /* Purge previously-imported profile relationships and classes
+         */
         return (new GenericCollection(IStrategy::class))
+            ->add(new Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
             ->add(new Profile(
                 $this->log,
                 $this->perform,
@@ -256,8 +257,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $batchxml,
-                $this->campusMapper,
-                $this->timetableCampusMapper,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
@@ -265,11 +264,10 @@ class Factory
                 $this->log,
                 $this->perform,
                 $batchxml,
-                $this->timetablePeriodMapper,
+                $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->userMapper
+                $this->classPeriodMapper
             ));
     }
 }

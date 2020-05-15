@@ -16,7 +16,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
@@ -98,9 +98,21 @@ class Factory
 
 
     /**
-     * @var TimetableCampusMapper
+     * @var UserMapper
      */
-    private $timetableCampusMapper;
+    private $userMapper;
+
+
+    /**
+     * @var TimetableCycleMapper
+     */
+    private $timetableCycleMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    private $timetablePeriodMapper;
 
 
     /**
@@ -133,7 +145,9 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetableCampusMapper           $timetableCampusMapper
+     * @param UserMapper                      $userMapper
+     * @param TimetableCycleMapper            $timetableCycleMapper
+     * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
@@ -154,7 +168,9 @@ class Factory
 
         /* Timetable pieces
          */
-        TimetableCampusMapper $timetableCampusMapper,
+        UserMapper $userMapper,
+        TimetableCycleMapper $timetableCycleMapper,
+        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -174,7 +190,9 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->timetableCampusMapper = $timetableCampusMapper;
+        $this->userMapper = $userMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
+        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -256,7 +274,7 @@ class Factory
          * Every student timetable processing uses info stored there
          * Recycle this instance in every iteration
          */
-        $lookup = new Timetable\Lookup(TimetablePeriodMapper::getInstance(), UserMapper::getInstance());
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
         /* Week Offset, Term selection
 
@@ -265,7 +283,7 @@ class Factory
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
         $weekOffsetCalculator = new WeekOffset(
-            $this->timetableCampusMapper,
+            $this->timetableCycleMapper,
             Alaress_Date_Format::now(),
             $this->log
         );

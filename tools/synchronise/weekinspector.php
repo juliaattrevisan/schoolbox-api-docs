@@ -10,7 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
-use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -127,7 +127,7 @@ HELP;
         $classCode = $this->getOpt(self::OPT_LONG_CODE);
 
         $weekOffsetCalculator = new WeekOffset(
-            TimetableCampusMapper::getInstance(),
+            TimetableCycleMapper::getInstance(),
             \Alaress_Date_Format::now(),
             $this->getLogger()
         );

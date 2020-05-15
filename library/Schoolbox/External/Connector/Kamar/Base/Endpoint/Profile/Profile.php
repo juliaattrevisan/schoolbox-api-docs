@@ -216,7 +216,6 @@ class Profile implements IStrategy
         $students = $this->batchxml->fetchXml('/SMSDirectoryData/students/user');
 
         foreach ($students as $student) {
-            $siblingLink = trim((string)$student->siblinglink);
             $externalId = trim((string)$student->xpath('@id')[0]);
             $username = trim((string)$student->username);
             $title = '';
@@ -593,17 +592,6 @@ class Profile implements IStrategy
             $email = trim((string)$staff->email);
             $phone = trim((string)$staff->mobile);
             $position = trim((string)$staff->position);
-
-            /* Staff without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for staff %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it

@@ -13,9 +13,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCampusMapper;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
+
 
 /**
  * Class Prepare

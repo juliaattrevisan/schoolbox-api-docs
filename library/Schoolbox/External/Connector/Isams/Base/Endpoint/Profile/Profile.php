@@ -16,12 +16,9 @@ use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
-use Schoolbox\External\Normalise\User\Staff;
-use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use SimpleXMLElement;
 use UnexpectedValueException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -261,7 +258,6 @@ class Profile implements IStrategy
 
             /* Smoosh it all together
              */
-            /** @var UserProfile\Student\Model $studentProfile */
             $studentProfile
                 ->setUsername($username)
                 ->setAlertComment($this->findComments($studentId))
