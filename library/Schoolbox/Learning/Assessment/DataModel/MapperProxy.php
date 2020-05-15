@@ -1234,8 +1234,15 @@ class MapperProxy
      * Loads participants into a collection of assessables.
      *
      * @param Collection $collection
-     * @param User       $user           If specified, only load this user's interactions
-     * @param bool       $removeExcluded Set to true to exclude excluded non-member participants
+     * @param User       $user                If specified, only load this user's interactions
+     * @param bool       $removeExcluded      Set to true to exclude excluded non-member participants
+     * @param bool       $assumeParticipation if true, assume $user is a participant in the assessment without checking
+     *                                        the assessment's folder.
+     *                                        Some places which may have called this may have already loaded a student's
+     *                                        folders, so they already know $user is a participant: this avoids a call
+     *                                        to the SIS to determine if $user is actually a participant in the
+     *                                        assessment's folder.
+     *                                        Only has an effect if $user is set.
      * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -1244,12 +1251,14 @@ class MapperProxy
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
         User $user = null,
-        bool $removeExcluded = false
+        bool $removeExcluded = false,
+        bool $assumeParticipation = false
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
             $user,
-            $removeExcluded
+            $removeExcluded,
+            $assumeParticipation
         );
     }
 
