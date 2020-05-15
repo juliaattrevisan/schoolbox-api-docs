@@ -11,11 +11,9 @@
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
-use Schoolbox\Video\QueueMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 $type = $_GET['type'];
 $id   = $_GET['id'];
@@ -31,7 +29,6 @@ if (strlen($_GET['size']) === 0) {
 
 // Handle old-school brown-hole videos- this is anything with the "hash" get parameter set (believe this is
 // only used in social stream now)
-
 if (isset($_GET['hash'])) {
     $params         = $_GET;
     $params['type'] = 'storage';
@@ -39,74 +36,65 @@ if (isset($_GET['hash'])) {
 
     unset($params['hash']);
 
+    $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
     SitePage::localRedir('/cms/videoThumb.php?' . http_build_query($params), false, 301);
     exit;
 }
 
-if (isset($type) && isset($id)) {
+if (isset($type, $id)) {
     $page          = new SitePage;
     $storageMapper = StorageMapper::getInstance();
-
+    $videoQueue    = null;
     try {
         $thumbnailFactory = new VideoThumbnailFactory($id, $type);
         $videoQueue       = $thumbnailFactory->produce();
+    } catch (Exception $e) {
+        // If anything goes wrong, fall through to sad mountain
+    }
 
+    if ($videoQueue) {
         // If it has failed transcoding, display sad mountain
-
-        if ($videoQueue->getStatus() == QueueMapper::STATUS_FAILED) {
+        // (Do not cache, because the video should be re-encoded soon)
+        if ($videoQueue->isFailed()) {
             SitePage::localRedir("/images/core/video-failed-thumb.png");
             exit;
         }
 
         // If it hasn't finished processing, display please wait image
-
-        if ($videoQueue->getStatus() != QueueMapper::STATUS_COMPLETED) {
+        // (Do not cache, because the video should be done processing soon)
+        if (!$videoQueue->isComplete()) {
             SitePage::localRedir("/images/core/video-processing-thumb.png");
             exit;
         }
-    } catch (Exception $e) {
-        // If anything goes wrong, display sad mountain
-        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-        // Stop storm complaining
-        exit;
-    }
 
-    try {
-        // Try to find a video record with associated poster and thumbnail links
+        try {
+            // Try to find a video record with associated poster and thumbnail links
 
-        if ($size == 'poster') {
-            $imageFilename = $videoQueue->getPosterPath();
-        } else {
-            $imageFilename = $videoQueue->getThumbnailPath();
+            if ($size == 'poster') {
+                $imageFilename = $videoQueue->getPosterPath();
+            } else {
+                $imageFilename = $videoQueue->getThumbnailPath();
+            }
+
+            /** @var \League\Flysystem\FilesystemInterface $filesystem */
+            $filesystem = $videoQueue->getStorage()->getFilesystem();
+
+            if ($filesystem->has($imageFilename)) {
+                $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+                $image = $filesystem->get($imageFilename);
+                header('Content-Type: image/jpeg');
+                header("Content-Length: {$image->getSize()}");
+                fpassthru($image->readStream());
+                exit;
+            }
+
+            // No thumbnail found in storage: fall through to sad mountain
+        } catch (Exception $e) {
+            // If anything else goes wrong, fall through to sad mountain
         }
-
-        /** @var \League\Flysystem\FilesystemInterface $filesystem */
-        $filesystem = $videoQueue->getStorage()->getFilesystem();
-
-        if ($filesystem->has($imageFilename)) {
-            /** \League\Flysystem\File $image */
-            $image = $filesystem->get($imageFilename);
-            header('Content-Type: image/jpeg');
-            /** @noinspection PhpUndefinedMethodInspection */
-            header("Content-Length: {$image->getSize()}");
-            /** @noinspection PhpUndefinedMethodInspection */
-            fpassthru($image->readStream());
-            exit;
-        }
-
-        // No thumbnail found in storage
-
-        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-        exit;
-
-    } catch (Exception $e) {
-        // If anything else goes wrong, fall through to sad mountain
-
-        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-        exit;
     }
 }
 
-// If goes wrong, head over to sad mountain
-
+// Fallthrough for if something went wrong
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 SitePage::redirectToBrokenImageOfSize(64, 64, 500);
