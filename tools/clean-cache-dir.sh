@@ -31,60 +31,63 @@ sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # Collect minify cache dir location
 zipdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='zip_dir' \G;" | grep 'value' | cut -d' ' -f2`
-xmldir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='xml_dir' \G;" | grep 'value' | cut -d' ' -f2`
+purifierdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='purifier_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
 streamdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='stream_dir' \G;" | grep 'value' | cut -d' ' -f2`
+twigdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='twig_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
 
 if [ -z $zipdir ];
 then
-	echo "Unable to find zip cache directory in config table. Please check your database credentials.";
-	exit;
+    echo "Unable to find zip cache directory in config table. Please check your database credentials.";
+    exit;
 fi
 
-if [ -z $xmldir ];
+if [ -z $purifierdir ];
 then
-	echo "Unable to find xml cache directory in config table. Please check your database credentials.";
-	exit;
-else
-	purifierdir="$xmldir/../purifier/";
-	if [ -z $purifierdir ];
-	then
-		echo "Unable to find purifier cache directory in config table. Please check your database credentials.";
-		exit;
-	fi
+    echo "Unable to find purifier cache directory in config table. Please check your database credentials.";
+    exit;
 fi
 
 if [ -z $streamdir ];
 then
-	echo "Unable to find cache file directory in config table. Please check your database credentials.";
-	exit;
+    echo "Unable to find cache file directory in config table. Please check your database credentials.";
+    exit;
+fi
+
+if [ -z $twigdir ];
+then
+    echo "Unable to find twig cache directory in config table. Please check your database credentials.";
+    exit;
 fi
 
 
 if [ -d $zipdir ];
 then
-	rm -rf $zipdir/zip*;
-	echo "Zip cache directory cleaned ($zipdir)";
+    rm -rf $zipdir/zip*;
+    echo "Zip cache directory cleaned ($zipdir)";
 else
-	echo "No zip cache directories cleaned";
+    echo "No zip cache directories cleaned";
 fi
 
 if [ -d $purifierdir ];
 then
-	rm -rf $purifierdir/*;
-	echo "Purifier cache directory cleaned ($purifierdir)";
+    rm -rf $purifierdir/*;
+    echo "Purifier cache directory cleaned ($purifierdir)";
 else
-	echo "No purifier cache directories cleaned";
+    echo "No purifier cache directories cleaned";
 fi
 
 if [ -d $streamdir ];
 then
-	rm -f $streamdir/*;
-	echo "File cache directory cleaned ($streamdir)";
-	rm -fR $streamdir/templates/*;
-	echo "Twig templates cache cleaned ($streamdir/templates)";
+    rm -f $streamdir/*;
+    echo "File cache directory cleaned ($streamdir)";
 else
-	echo "No stream cache directories cleaned";
+    echo "No stream cache directories cleaned";
 fi
 
-
-
+if [ -d $twigdir ];
+then
+    rm -fR $twigdir/*;
+    echo "Twig templates cache cleaned ($twigdir)";
+else
+    echo "No purifier cache directories cleaned";
+fi
