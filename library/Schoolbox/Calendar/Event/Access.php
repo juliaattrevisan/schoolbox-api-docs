@@ -39,8 +39,8 @@ class Access
     public function checkExisting(User $effector, Event $event)
     {
         // Split groups into an array of ints, if there are any
-        if ($event->getCategoryCollection()) {
-            $groups = $event->getCategoryCollection()->getColumnValues('categoryId');
+        if ($event->getFolderCollection()) {
+            $groups = $event->getFolderCollection()->getColumnValues('id');
         } else {
             $groups = [];
         }

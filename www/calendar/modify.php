@@ -265,14 +265,14 @@ $calendarUserFolderList = $folderMapper->findForUser($selectedUser, true, UserAc
 
 /* Ones that it's already in, from previous selections
  */
-$alreadyInFolderList = $event->getCategoryCollection();
+$alreadyInFolderList = $event->getFolderCollection();
 
 /* Get data about the Folders
  */
 $tempFolderIds = [];
 
 foreach ($alreadyInFolderList as $current) {
-    $tempFolderIds[] = $current->getCategoryId();
+    $tempFolderIds[] = $current->getId();
 }
 
 /* If user has write access to, or is a group manager,
@@ -331,7 +331,7 @@ if (\count($allFolderList)) {
 
     foreach ($allFolderList as $currentFolder) {
         $folderId          = $currentFolder->getId();
-        $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $folderId) || in_array($folderId, $previousInvolvement);
+        $alreadyInCategory = $event->getFolderCollection()->getBy('categoryId', $folderId) || in_array($folderId, $previousInvolvement);
         $fromHomepage      = (($_GET['level'] == Event::ACCESS_GROUP) && ($_GET['homepageId'] == $folderId));
 
         /* If you have already chosen these categories, or if it's specified

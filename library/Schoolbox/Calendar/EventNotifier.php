@@ -16,6 +16,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -99,7 +100,6 @@ class EventNotifier extends AbstractModuleNotifier
     /**
      * @param \Schoolbox\Realtime\Schedule\Event $event
      * @return int
-     * @throws Mapper\Exception
      */
     public function getNextSeriesTime($event)
     {
@@ -108,7 +108,7 @@ class EventNotifier extends AbstractModuleNotifier
 
         try {
             $next = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // this event is not part of a series, don't try to reschedule
             return -1;
         }
@@ -171,7 +171,11 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         /** @var Event $event */
-        $event = $this->mapper->findById($event->getId());
+        try {
+            $event = $this->mapper->findById($event->getId());
+        } catch (MapperException $e) {
+            return new Envelope();
+        }
 
         $bob = $this->newBuilder(self::TRIGGER_UPCOMING, $roleType, $event)
                     ->setTitle(':name is about to start')
@@ -204,7 +208,11 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         /** @var Event $event */
-        $event     = $this->mapper->findById($event->getId());
+        try {
+            $event = $this->mapper->findById($event->getId());
+        } catch (MapperException $e) {
+            return new Envelope();
+        }
         $bob       = $this->newBuilder(self::TRIGGER_UPDATED, $roleType, $event);
         $instances = [];
 
@@ -295,10 +303,10 @@ class EventNotifier extends AbstractModuleNotifier
                     if ($cat = $event->getCategory()) {
                         $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $instance);
                     }
-                    if ($cats = $event->getCategoryCollection()) {
-                        if ($cats->count()) {
-                            foreach ($cats as $cat) {
-                                $envelope->broadcastToCategory($cat->getCategoryId(), UserAccess::ACCESS_READ, $instance);
+                    if ($folders = $event->getFolderCollection()) {
+                        if ($folders->count()) {
+                            foreach ($folders as $folder) {
+                                $envelope->broadcastToCategory($folder->getId(), UserAccess::ACCESS_READ, $instance);
                             }
                         }
                     }
