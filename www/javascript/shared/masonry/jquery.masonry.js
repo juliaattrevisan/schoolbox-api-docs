@@ -626,7 +626,18 @@
                 collapser.collapsable();
             }
 
-            replacement.empty().replaceWith(response.removeAttr('style'));
+            /* Clear styles from the response
+             * (I guess? Author didn't describe intent anywhere so I have to guess)
+             */
+            if (response.attr('style') !== undefined) {
+                response.removeAttr('style');
+            }
+
+            /* replacement.empty() causes a getAttribute exception but that seems
+             * overkill anyway given you're replacing entire dom via replaceWith()
+             */
+            replacement.replaceWith(response);
+
             if (saveSorting) {
                 masonry.saveSorting();
             }
