@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
@@ -48,11 +49,17 @@ $configLoader = $this->getDi()->get('config');
 /* Parse individual template in the accordion
  * This is the inner shell of each accordion which loads when you expand an accordion
  */
-(new Schoolbox\Resource\Attachment\Factory())
+$factory = new Schoolbox\Resource\Attachment\Factory();
+$factory
     ->setMimeFilter($mimeFilter)
     ->allowMulti($multi)
     ->setConfig($configLoader)
     ->setUseFolder($useFolder)
-    ->setDefaultFolderId($defaultFolderId)
+    ->setDefaultFolderId($defaultFolderId);
+if ($_SESSION['user'] instanceof User) {
+    $factory->setUser($_SESSION['user']);
+}
+
+$factory
     ->build($source)
     ->parse($this);

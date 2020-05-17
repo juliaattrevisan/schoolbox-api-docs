@@ -8,6 +8,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
 use Schoolbox\Resource\Attachment\Context\Factory as ResourceContextFactory;
+use Schoolbox\User;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
@@ -65,6 +66,9 @@ $factory->allowMulti($multi)
         ->setRosetta($rosettaStone)
         ->setUseFolder($useFolder)
         ->setDefaultFolderId($defaultFolderId);
+if ($_SESSION['user'] instanceof User) {
+    $factory->setUser($_SESSION['user']);
+}
 
 foreach ($factory->getMappedControllers() as $controller) {
 
