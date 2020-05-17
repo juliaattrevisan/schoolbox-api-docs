@@ -9,6 +9,7 @@ namespace Schoolbox\Resource\Attachment;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\User;
 
 /**
  * Class Factory
@@ -64,6 +65,12 @@ class Factory
      * @var int
      */
     protected $defaultFolderId = 0;
+
+
+    /**
+     * @var User
+     */
+    private $user;
 
 
     /**
@@ -141,6 +148,17 @@ class Factory
     public function setRosetta(RosettaStone $rosetta): self
     {
         $this->rosetta = $rosetta;
+        return $this;
+    }
+
+
+    /**
+     * @param User $user
+     * @return self
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
         return $this;
     }
 
