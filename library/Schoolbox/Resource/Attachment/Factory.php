@@ -176,7 +176,15 @@ class Factory
             throw new OutOfRangeException("No controller found: {$source}");
         }
 
-        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta, $this->useFolder, $this->defaultFolderId);
+        $controller = new $classname(
+            $this->multi,
+            $this->mime,
+            $this->conf,
+            $this->rosetta,
+            $this->useFolder,
+            $this->defaultFolderId,
+            $this->user
+        );
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException('Controller does not implement ControllerInterface');
