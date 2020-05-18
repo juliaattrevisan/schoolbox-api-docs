@@ -306,6 +306,19 @@ class Controller extends Base
             ];
         }
 
+        /* Available Timetable Cycles
+         */
+        $cycles = \Schoolbox\External\TimetableCycleMapper::getInstance()->findAll();
+
+        $luCycles = [];
+
+        foreach ($cycles as $cycle) {
+            $luCycles[] = [
+                'key' => $cycle->getId(),
+                'value' => $cycle->getTitle()
+            ];
+        }
+
         $return = [
             'roles' => [
                 'title'             => 'Roles',                                 // Title of the tab
@@ -377,7 +390,7 @@ class Controller extends Base
                         'width'     => 3,
                         'mandatory' => true,
                     ],
-                    'path'           => [
+                    'path'          => [
                         'caption'   => 'Path',
                         'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
@@ -410,7 +423,7 @@ class Controller extends Base
                         'width'     => 1,
                         'lookup'    => $luRoleType,
                     ],
-                    'role'        => [
+                    'role'          => [
                         'caption'   => 'Role',
                         'tooltip'   => 'Drive will only display to users of this type, can be left blank',
                         'mandatory' => true,
@@ -424,14 +437,14 @@ class Controller extends Base
                         'width'     => 1,
                         'mandatory' => true,
                         'nullable_label' => 'N/A',
-                        'lookup'    => [
+                        'lookup' => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
                         ],
                     ],
                 ]
             ],
-            'campus'    => [
+            'campus' => [
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'delete'            => true,
@@ -445,15 +458,23 @@ class Controller extends Base
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
-                        'width'     => 3,
+                        'width'     => 2,
+                    ],
+                    'cycle' => [
+                        'caption'   => 'Cycle',
+                        'mandatory' => true,
+                        'nullable'  => true,
+                        'nullable_label' => 'N/A',
+                        'width'     => 2,
+                        'lookup'    => $luCycles,
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 3,
+                        'width'     => 2,
                     ]
                 ]
             ],
-            'event-type'           => [
+            'event-type'            => [
                 'title'             => 'Event Types',
                 'delete'            => true,
                 'mapper'            => EventTypeMapper::class,
@@ -471,7 +492,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'news-topic'             => [
+            'news-topic'            => [
                 'title'             => 'News Topics',
                 'delete'            => true,
                 'mapper'            => Topic\Mapper::class,
@@ -484,7 +505,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'submission-type'    => [
+            'submission-type'       => [
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'delete'            => true,
