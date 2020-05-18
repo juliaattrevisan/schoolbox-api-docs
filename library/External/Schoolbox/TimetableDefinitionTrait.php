@@ -78,10 +78,11 @@ trait External_Schoolbox_TimetableDefinitionTrait
                     title,
                     cycle_length,
                     day_length
-                FROM sis_timetable_cycle
-                WHERE ext_timetable_code = :campusId
+                FROM sis_timetable_cycle cycle
+                INNER JOIN luCampus ON cycle.id = luCampus.cycle_id
+                WHERE luCampus.id = :campusId
             ',
-            ['campusId' => $campus->getExtTimetableCode()]
+            ['campusId' => $campus->getId()]
         );
 
         if ($definition = $timetableQuery->fetch()) {

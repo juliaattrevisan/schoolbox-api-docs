@@ -83,7 +83,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.usable
             FROM          sis_timetable_cycle ty
             LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
-            WHERE         ty.ext_timetable_code = :campusId
+            INNER JOIN    luCampus ON ty.id = luCampus.cycle_id
+            WHERE         luCampus.id = :campusId
 
         ';
 
@@ -97,7 +98,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             return $this->internalDatabase->executeQuery(
                 $query,
                 [
-                    'campusId' => $campus->getExtTimetableCode(),
+                    'campusId' => $campus->getId(),
                     'day'      => $day,
                 ]
             )->fetchAll();
@@ -106,7 +107,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $this->internalDatabase->executeQuery(
             $query,
             [
-                'campusId' => $campus->getExtTimetableCode(),
+                'campusId' => $campus->getId(),
             ]
         )->fetchAll();
     }
@@ -250,7 +251,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
 
     /**
-     * {@inheritDoc}
      * @param string $externalId
      *
      * @return array
