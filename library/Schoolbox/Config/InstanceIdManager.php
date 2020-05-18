@@ -7,19 +7,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Config;
 
+use Alaress\Async\Test\TestCase;
 use Aura\Di\Exception\ServiceNotFound;
 use Etherpad\PadMapper;
 use LogicException;
 use PDOException;
 use Predis;
+use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Notif\MQ;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
 use function array_merge;
 use function defined;
-use function dir;
 use function exec;
 use function implode;
 use function opendir;
@@ -29,7 +31,6 @@ use function preg_replace;
 use function realpath;
 use function rename;
 use function sprintf;
-use const DIRECTORY_SEPARATOR;
 use const INSTANCE_ID;
 
 /**
@@ -79,27 +80,43 @@ class InstanceIdManager extends CliTool\App
     {
         $this->redis = $this->getDi()->get('redis');
 
+        $newInstanceId = $this->getValidNewInstanceIdOrExit();
+        $oldInstanceId = defined('INSTANCE_ID') ? INSTANCE_ID : '';
+        if ($oldInstanceId === $newInstanceId) {
+            $this->getLogger()->notice("New instance id == Old instance id ('{$newInstanceId}'), nothing to do.");
+        }
+
+        $this->updateConfFile($oldInstanceId, $newInstanceId);
+        $this->updateRedisKeys($oldInstanceId, $newInstanceId);
+        $this->updateEtherpadEnvironments($oldInstanceId, $newInstanceId);
+        $this->renameLockFiles($oldInstanceId, $newInstanceId);
+        $this->renameMessageQueues($oldInstanceId, $newInstanceId);
+        $this->rebuildSubscriptionCache($newInstanceId);
+        $this->restartDaemons();
+        $this->rebuildSkin();
+
+        $this->getLogger()->notice('INSTANCE_ID update successful');
+    }
+
+    /**
+     * Returns a new valid instance id or exits
+     *
+     * @return string
+     */
+    private function getValidNewInstanceIdOrExit(): string
+    {
         $newInstanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID_NEW);
         if (($newInstanceId ?? '') === '') {
             $this->getLogger()->error(sprintf("You must specify a new instance id using the --%s flag", self::OPT_LONG_INSTANCE_ID_NEW));
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
+        if (!preg_match('/^[0-9a-z]{8,16}$/', $newInstanceId ?? '')) {
+            $this->getLogger()->error("Invalid new instance id '$newInstanceId'. Instance id must be 8-16 char alphanumeric");
+            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+        }
         $this->getLogger()->notice("New INSTANCE_ID = '$newInstanceId'");
 
-        $oldInstanceId = defined('INSTANCE_ID') ? INSTANCE_ID : '';
-        if ($oldInstanceId === $newInstanceId) {
-            $this->getLogger()->notice("New instance id == Old instance id ('{$newInstanceId}'), nothing to do.");
-//            return;
-        }
-
-        $this->updateConfFile($oldInstanceId, $newInstanceId);
-//        $this->updateRedisKeys($oldInstanceId, $newInstanceId);
-//        $this->updateEtherpadEnvironments($oldInstanceId, $newInstanceId);
-//        $this->renameLockFiles($oldInstanceId, $newInstanceId);
-//        $this->renameMessageQueues($oldInstanceId, $newInstanceId);
-//        $this->rebuildSkin();
-        $this->rebuildSubscriptionCache($newInstanceId);
-//        $this->restartDaemons();
+        return $newInstanceId;
     }
 
 
@@ -112,6 +129,7 @@ class InstanceIdManager extends CliTool\App
      */
     private function updateConfFile(string $oldInstanceId, string $newInstanceId): void
     {
+        $this->getLogger()->notice('Updating conf file');
         $confFile = __DIR__ . '/../../../www/conf/conf.php';
         $confFile = realpath($confFile);
 
@@ -148,11 +166,9 @@ class InstanceIdManager extends CliTool\App
         //  External_Synergetic_User.getPortrait:24d3025b:4bb5c1ab01f8388f344cd858f4eec5d9d1512a56498f14298619f10d21c6b8d3
         //  m:24d3025b:routes
         //  scrub.html:24d3025b:f5b376f03db472410fa1494bb0c8a253ee4723208bda85110a3e05958e89051b
-
+        $this->getLogger()->notice('Updating redis keys');
         $this->getLogger()->info("Fetching redis keys containing ':$oldInstanceId:' ...");
-        $oldKeys = $this->redis->keys("*:$oldInstanceId:*");
-
-        $this->getLogger()->notice(sprintf("Renaming %d redis keys", count($oldKeys)));
+        $oldKeys = new Keyspace($this->redis, "*:$oldInstanceId:*");
         foreach ($oldKeys as $oldKey) {
             $newKey = preg_replace("/:$oldInstanceId:/", ":$newInstanceId:", $oldKey);
             $this->getLogger()->debug("Renaming '$oldKey' to '$newKey'");
@@ -172,8 +188,8 @@ class InstanceIdManager extends CliTool\App
      */
     private function updateEtherpadEnvironments(string $oldInstanceId, string $newInstanceId): void
     {
+        $this->getLogger()->notice('Updating etherpad environment');
         $padMapper = PadMapper::getInstance();
-
         $pads = $padMapper->findByColumn('environment', $oldInstanceId, ['deleted' => true]);
         $this->getLogger()->info($pads->count() . " ether pads require update");
         foreach ($pads as $pad) {
@@ -192,8 +208,8 @@ class InstanceIdManager extends CliTool\App
      */
     private function renameLockFiles(string $oldInstanceId, string $newInstanceId): void
     {
+        $this->getLogger()->notice('Renaming lock files');
         $streamDir = rtrim($this->getConfig()->get('stream_dir'), '/') . '/';
-
         $handle = opendir($streamDir);
         while (false !== ($file = readdir($handle))) {
             if ('.' === $file || '..' === $file){
@@ -216,10 +232,21 @@ class InstanceIdManager extends CliTool\App
      */
     private function renameMessageQueues(string $oldInstanceId, string $newInstanceId): void
     {
+        $this->getLogger()->notice('Renaming message queues');
         // https://stackoverflow.com/questions/57768315/how-to-rename-queue-in-rabbitmq
-        $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
-        // TODO
+        $amqpConn = MQ\Connector::getInstance();
 
+        $queues = [
+            "%s.route",
+            "%s.sb.reviewsched",
+            "%s.sb.sched",
+        ];
+        foreach($queues as $queue){
+            $oldQueue = sprintf($queue, $oldInstanceId);
+            $newQueue = sprintf($queue, $newInstanceId);
+            $this->getLogger()->debug("TODO - rename MQ '$oldQueue' to '$newQueue'");
+            // TODO - For now, just manually run `rabbitmqadmin list queues` and check no messages exist.
+        }
     }
 
 
@@ -228,6 +255,7 @@ class InstanceIdManager extends CliTool\App
      */
     private function rebuildSkin(): void
     {
+        $this->getLogger()->notice('Rebuilding skin');
         $skinBuilder = __DIR__ . '/../../../tools/skin/builder.php';
         $skinBuilder = realpath($skinBuilder);
         $this->getLogger()->info("Invoking skin builder at: '$skinBuilder'");
@@ -246,6 +274,7 @@ class InstanceIdManager extends CliTool\App
      */
     private function rebuildSubscriptionCache(string $newInstanceId): void
     {
+        $this->getLogger()->notice('Rebuilding subscription cache');
         /** @var WritableCache $cache */
         $cache = $this->getDi()->get('subscriptionCache');
         $cache->cacheAllUsers($newInstanceId);
@@ -257,14 +286,15 @@ class InstanceIdManager extends CliTool\App
      */
     private function restartDaemons(): void
     {
+        $this->getLogger()->notice('Restarting daemons');
         // TODO, this is the only definition of these constants I could find, they should be defined
         // somewhere more appropriate, but still better than using magic strings.
         $daemons = [
-            \Alaress\Async\Test\TestCase::DAEMON_BELL,
-            \Alaress\Async\Test\TestCase::DAEMON_DIGEST,
-            \Alaress\Async\Test\TestCase::DAEMON_ROUTE,
-            \Alaress\Async\Test\TestCase::DAEMON_SCHEDULE,
-            \Alaress\Async\Test\TestCase::DAEMON_SOCKET,
+            TestCase::DAEMON_BELL,
+            TestCase::DAEMON_DIGEST,
+            TestCase::DAEMON_ROUTE,
+            TestCase::DAEMON_SCHEDULE,
+            TestCase::DAEMON_SOCKET,
         ];
 
         foreach ($daemons as $daemon) {
