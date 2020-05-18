@@ -392,7 +392,5 @@ EOL;
             $conf = $di->get('config');
             return new AsyncRedisClient($conf->get('redis_url'), $this->loop);
         }));
-
-        $di->values['logger'] = $this->logger();
     }
 }
