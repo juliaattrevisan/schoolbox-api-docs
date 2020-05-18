@@ -48,3 +48,8 @@ ALTER TABLE `sis_timetable_cycle`
 ALTER TABLE `luCampus`
     ADD COLUMN `cycle_id` INT(11) NULL AFTER `name`,
     CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+
+-- Biggen the Timetable Cycle name to accommodate more info
+
+ALTER TABLE `sis_timetable_cycle`
+    CHANGE COLUMN `title` `title` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;

@@ -118,6 +118,8 @@ class Definition implements IStrategy
          */
         foreach ($cycles as $cycle) {
             $dayData = $this->findDays($cycle);
+            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+            $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
 
             /* Show the cycle identifier in the title
              *
@@ -129,9 +131,10 @@ class Definition implements IStrategy
              * Status report where I tried to expose it
              */
             $cycleName = sprintf(
-                '%s (%s)',
+                '%s (%s-%s)',
                 trim((string)$cycle->Name),
-                $ext
+                $cycleStart->getShortDateOnly(),
+                $cycleEnd->getShortDateOnly()
             );
 
             /* Update the existing Timetable Cycle if it already exists
@@ -141,7 +144,7 @@ class Definition implements IStrategy
              */
             /** @var TimetableCycle $timetableCycle */
             try {
-                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('title', $cycleName);
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('ext_timetable_code', $ext);
             } catch (Exception $e) {
                 $this->log->debug(sprintf(
                     'Purging all previous cycles and creating a new cycle, %s.',
@@ -158,8 +161,8 @@ class Definition implements IStrategy
                 ->setExternalTimetableCode($ext)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))
                 ->setDayLength($dayData['maxPeriods'])
-                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+                ->setStart($cycleStart)
+                ->setFinish($cycleEnd)
                 ->setStartDay(1);
 
             $this->log->info(sprintf(
