@@ -42,3 +42,9 @@ ALTER TABLE `sis_timetable_cycle`
 
 ALTER TABLE `sis_timetable_cycle`
     DROP COLUMN `offset`;
+
+-- Associate cycles with campuses
+
+ALTER TABLE `luCampus`
+    ADD COLUMN `cycle_id` INT(11) NULL AFTER `name`,
+    CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;

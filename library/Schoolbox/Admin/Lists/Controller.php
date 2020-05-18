@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -308,7 +309,7 @@ class Controller extends Base
 
         /* Available Timetable Cycles
          */
-        $cycles = \Schoolbox\External\TimetableCycleMapper::getInstance()->findAll();
+        $cycles = TimetableCycleMapper::getInstance()->findAll();
 
         $luCycles = [];
 

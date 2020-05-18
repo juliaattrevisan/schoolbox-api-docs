@@ -1,26 +1,31 @@
 <?php
 /**
- * Description of the file and what its purpose is
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use \PDO;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
-use UnexpectedValueException;
 
 /**
+ * Class CampusMapper
+ *
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Campus[] findAll($options = array())
  * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
  */
-class CampusMapper extends Mapper {
+class CampusMapper extends Mapper
+{
 
+    /**
+     * @inheritDoc
+     *
+     * @throws \InvalidArgumentException
+     */
     protected function mapping ()
     {
         $this->hasTable('luCampus');
@@ -28,6 +33,7 @@ class CampusMapper extends Mapper {
 
         $this->uses('id', Mapper::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', Mapper::TYPE_STRING);
+        $this->joins('cycle_id', TimetableCycleMapper::class, 'id', self::TYPE_INTEGER, null, 'cycle', 'cycle');
         $this->uses('ext_timetable_code', Mapper::TYPE_STRING);
         $this->uses('timetable_day', Mapper::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
