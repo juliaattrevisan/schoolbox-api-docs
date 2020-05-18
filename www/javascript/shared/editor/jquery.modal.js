@@ -93,7 +93,6 @@
                  */
                 useFolder: true,
 
-<<<<<<< HEAD
                 /* Whether the singleton modal should allow detachment
                  *
                  * Set to false when the picker is spawned from within some other modal
@@ -106,16 +105,21 @@
                  */
                 allowDetachment: true,
 
-                /* Selector to get the default folder to start browsing resources from
-                 */
-                defaultFolderSelector: 0,
-=======
+
                 /* If specified, try to restore the modal designated by this identifier
                  * You only need to do this if the M3 picker starts from within another modal
                  * There were only two places at the time of writing: My Links and Socialstream
                  */
                 restoreModal: null,
->>>>>>> 51d54403abb... Add a special restoreModal config [SA-10216]
+
+                /* Selector to get the default folder to start browsing resources from
+                 */
+                defaultFolderSelector: 0,
+
+                /* Executes before picker modal opens
+                 */
+                onBeforeOpen: function() {
+                },
 
                 /* Executes after picker modal shuts
                  */
@@ -249,6 +253,8 @@
 
                 body.append(singletonModal);
             }
+
+            config.onBeforeOpen();
 
             singletonModal
                 .html(singletonModal.data('content'))
@@ -497,6 +503,7 @@
             /* Other elements of this object literal as a result of merging with defaults:
              *
              * url: (string)
+             * onBeforeOpen: function() ...
              * onSelect: function() ...
              * onAfterClose: function() ...
              * restoreModal: (string)
@@ -513,14 +520,11 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
-<<<<<<< HEAD
                 allowDetachment: config.allowDetachment,
                 defaultFolderSelector: config.defaultFolderSelector,
-                onAfterClose: config.onAfterClose
-=======
+                onBeforeOpen: config.onBeforeOpen,
                 onAfterClose: config.onAfterClose,
                 restoreModal: config.restoreModal,
->>>>>>> 51d54403abb... Add a special restoreModal config [SA-10216]
             });
 
             /* Send the message up and deal with the dialog, if one was specified
