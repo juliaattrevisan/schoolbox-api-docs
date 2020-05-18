@@ -63,6 +63,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /** @var int|null */
     private $fileSemesterOverride;
 
+    /**
+     * A cache of markbook result types.
+     *
+     * @var array key:   the assessment's work type ID
+     *            value: the corresponding result type in Synergetic
+     */
+    private $resultTypeCache = [];
 
     /**
      * Constructor
@@ -798,8 +805,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $defaultType = 'OGRaw';
 
         // Does this assessment have a work type with an external result type?
-        if (null !== $assessment->getWorkType()) {
-            $resultType = $assessment->getWorkType()->getExternalResultType();
+        $resultType = null;
+        $workType   = $assessment->getWorkType();
+        if ($workType) {
+            $resultType = $workType->getExternalResultType();
         }
 
         // We know OGRaw is in the DB, and if it's not there's bigger problems
@@ -807,17 +816,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return $defaultType;
         }
 
-        // Validate the result type is actually in the DB
+        // Use the cache if we can
+        $workTypeId = $workType->getId();
+        if (array_key_exists($workTypeId, $this->resultTypeCache)) {
+            return $this->resultTypeCache[$workTypeId];
+        }
+
+        // Validate the result type is in the DB: if not use the default
         $sql   = "
             SELECT COUNT(*)
             FROM   luReportResultType
             WHERE  Code = :resultType
         ";
         $count = $this->getConnector()->executeQuery($sql, ['resultType' => $resultType,])->fetchColumn();
-        if ($count > 0) {
-            return $resultType;
+        if ((int)$count === 0) {
+            $resultType = $defaultType;
         }
-        return $defaultType;
+        $this->resultTypeCache[$workTypeId] = $resultType;
+        return $resultType;
     }
 
 
