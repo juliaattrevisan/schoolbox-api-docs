@@ -129,39 +129,40 @@
                         <label>
                             <textarea rows="2" cols="50" name="body" placeholder="Share something"></textarea>
                         </label>
-
                         <div class="row post-attachment attach">
-                            <script>
-                                $(function() {
-                                    $('#modalLink-replybtn-{COMPONENT_INSTANCE_ID}').schoolboxLink({
-                                        restoreModal: '#socialstream-reply-{COMPONENT_INSTANCE_ID}',
-                                        onBeforeOpen: function() {
-                                            const preview = $('#reply-preview-{COMPONENT_INSTANCE_ID}');
+                            <div class="small-12 columns">
+                                <script>
+                                    $(function() {
+                                        $('#modalLink-replybtn-{COMPONENT_INSTANCE_ID}').schoolboxLink({
+                                            allowedFilesystems: 'all',
+                                            restoreModal: '#socialstream-reply-{COMPONENT_INSTANCE_ID}',
+                                            onBeforeOpen: function() {
+                                                const preview = $('#reply-preview-{COMPONENT_INSTANCE_ID}');
 
-                                            preview.find('img').attr('src', '');
-                                            preview.find('span').html('');
-                                            preview.hide();
-                                        },
-                                        onSelect: function(url, name, mime, dialog) {
-                                            const preview = $('#reply-preview-{COMPONENT_INSTANCE_ID}');
+                                                preview.find('img').attr('src', '');
+                                                preview.find('span').html('');
+                                                preview.hide();
+                                            },
+                                            onSelect: function(url, name, mime, dialog) {
+                                                const preview = $('#reply-preview-{COMPONENT_INSTANCE_ID}');
 
-                                            preview.find('img').attr('src', '/ajax/mime/' + mime);
-                                            preview.find('span').html(name);
-                                            preview.show();
+                                                preview.find('img').attr('src', '/ajax/mime/' + mime);
+                                                preview.find('span').html(name);
+                                                preview.show();
 
-                                            $('#modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}').val(url);
-                                        }
+                                                $('#modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}').val(url);
+                                            }
+                                        });
                                     });
-                                });
-                            </script>
-                            <div class="input-group">
-                                <input id="modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}" type="text" name="url" placeholder="http://" data-ss-url />
-                                <a id="modalLink-replybtn-{COMPONENT_INSTANCE_ID}" class="button icon-link">Browse</a>
-                            </div>
-
-                            <div id="reply-preview-{COMPONENT_INSTANCE_ID}" class='socialstream-preview' style="display:none">
-                                <img />
-                                <span></span>
+                                </script>
+                                <div class="input-group">
+                                    <input id="modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}" type="text" name="url" placeholder="http://" data-ss-url />
+                                    <a id="modalLink-replybtn-{COMPONENT_INSTANCE_ID}" class="button icon-link">Browse</a>
+                                </div>
+                                <div id="reply-preview-{COMPONENT_INSTANCE_ID}" class='socialstream-preview' style="display:none">
+                                    <img />
+                                    <span></span>
+                                </div>
                             </div>
                         </div>
                         <input type='submit' class="expand" value='Post' />
