@@ -453,7 +453,7 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 6,
+                        'width'     => 5,
                         'maxLength' => 255,
                         'mandatory' => true,
                     ],
@@ -466,12 +466,12 @@ class Controller extends Base
                         'mandatory' => true,
                         'nullable'  => true,
                         'nullable_label' => 'N/A',
-                        'width'     => 2,
+                        'width'     => 4,
                         'lookup'    => $luCycles,
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 2,
+                        'width'     => 1,
                     ]
                 ]
             ],
