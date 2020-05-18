@@ -1,5 +1,4 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
     <script type="text/javascript">
         $(function() {
 
@@ -118,31 +117,50 @@
                     <li>
                         <script type='text/javascript'>
                             $(function() {
-                                $('#component-poll{POLL_ID}-graph').highcharts({
-                                    chart: {
-                                        height: 300,
-                                        type: 'column'
-                                    },
-                                    title: {
-                                        text: ''
-                                    },
-                                    xAxis: {
-                                        labels: {
-                                            enabled: false
-                                        }
-                                    },
-                                    yAxis: {
-                                        allowDecimals: false,
-                                        min: 0,
+
+                                /**
+                                 * Build a graph for the pol
+                                 *
+                                 * @param identifier
+                                 * @param data
+                                 */
+                                function componentPollGraph(identifier, data) {
+                                    $(identifier).highcharts({
+                                        chart: {
+                                            height: 300,
+                                            type: 'column'
+                                        },
                                         title: {
                                             text: ''
-                                        }
-                                    },
-                                    credits: {
-                                        enabled: false
-                                    },
-                                    series: {POLL_DATA}
-                                });
+                                        },
+                                        xAxis: {
+                                            labels: {
+                                                enabled: false
+                                            }
+                                        },
+                                        yAxis: {
+                                            allowDecimals: false,
+                                            min: 0,
+                                            title: {
+                                                text: ''
+                                            }
+                                        },
+                                        credits: {
+                                            enabled: false
+                                        },
+                                        series: data
+                                    });
+                                }
+
+                                /* Only load highcharts once otherwise error 16
+                                 */
+                                if (typeof Highcharts == 'undefined') {
+                                    $.getScript("/javascript/components/highcharts-release/highcharts.js", function() {
+                                        componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
+                                    });
+                                } else {
+                                    componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
+                                }
                             });
                         </script>
                         <div id='component-poll{POLL_ID}-graph'></div>
