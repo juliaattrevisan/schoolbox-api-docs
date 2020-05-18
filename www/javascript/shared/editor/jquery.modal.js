@@ -74,7 +74,12 @@
 
                 /* Selector to get the default folder to start browsing resources from
                  */
-                defaultFolderSelector: 0
+                defaultFolderSelector: 0,
+
+                /* Executes after picker modal shuts
+                 */
+                onAfterClose: function() {
+                }
             };
 
             return $.extend(defaults, options);
@@ -247,6 +252,8 @@
                 e.preventDefault();
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
                 singletonModal.foundation('reveal', 'close');
+
+                config.onAfterClose();
             });
         }
     };
@@ -307,6 +314,8 @@
                         /* Shut modal, go back to Dialog
                          */
                         $('#file-picker').foundation('reveal', 'close');
+
+                        config.onAfterClose();
                     });
                 } else if ('meetingUrl' in message.data) {
 
@@ -317,6 +326,8 @@
                     /* Shut modal, go back to Dialog
                      */
                     $('#file-picker').foundation('reveal', 'close');
+
+                    config.onAfterClose();
                 } else {
 
                     // The file was rejected, probably cause it was the wrong mimetype.
@@ -364,7 +375,20 @@
 
                 /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
                  */
-                meetingUrl: ''
+                meetingUrl: '',
+
+                /* Whether the singleton modal should allow detachment
+                 * (meaning, allow modal to destroy itself when any modal shuts)
+                 *
+                 * Set to false when the picker is spawned from within some other modal
+                 * because that modal will shut, causing a reinit and this singleton detachment.
+                 *
+                 * That causes your file picker modal to inexplicably vanish, as it destroys itself
+                 * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
+                 * could only exist once, and in a modal; any time it shut, it must reinit - but the
+                 * selector applies to all modals, not just the picker one. Maybe that's the next change.
+                 */
+                allowDetachment: true
             },
 
             /**
@@ -377,6 +401,13 @@
              */
             onSelect: function(url, name, dialog) {
                 return url;
+            },
+
+            /**
+             * Executes after the M3 picker shuts its own modal
+             */
+            onAfterClose: function() {
+                console.log('fox');
             }
         }, options);
     };
@@ -404,7 +435,6 @@
                 element: $(this),
                 allowedFiles: null,
                 allowedFilesystems: 'link',
-                allowDetachment: true,
                 defaultFolderSelector: null
             },
 
@@ -416,6 +446,7 @@
              *
              * url: ...
              * onSelect: function() ...
+             * onAfterClose: function() ...
              */
         );
 
@@ -430,7 +461,8 @@
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
                 allowDetachment: config.allowDetachment,
-                defaultFolderSelector: config.defaultFolderSelector
+                defaultFolderSelector: config.defaultFolderSelector,
+                onAfterClose: config.onAfterClose
             });
 
             /* Send the message up and deal with the dialog, if one was specified
