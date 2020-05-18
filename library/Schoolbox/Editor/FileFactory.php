@@ -98,6 +98,7 @@ class FileFactory
                             'type'       => $type,
                             'hash'       => '',
                             'name'       => $folder->getName(),
+                            'mime'       => 'folder',
                             'id'         => $folder->getId()
                         ];
                     }
@@ -115,6 +116,7 @@ class FileFactory
                     'type'       => $collector->getMimetype()->getType(),
                     'hash'       => $collector->getHash(),
                     'name'       => $collector->getFilename(),
+                    'mime'       => $collector->getMime(),
 
                     /* Used for video/audio, sadly
                      */

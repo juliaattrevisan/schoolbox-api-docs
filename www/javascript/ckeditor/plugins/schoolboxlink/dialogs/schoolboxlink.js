@@ -8,9 +8,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
          *
          * @param url     string  the url to which you linked
          * @param name    string  user-facing name of the thing you linked
+         * @param mime    string  the mime type of the thing you linked
          * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
          */
-        onSelect: function(url, name, dialog) {
+        onSelect: function(url, name, mime, dialog) {
 
             /* Manufacture link url based on whether it was
              * a file or a folder
