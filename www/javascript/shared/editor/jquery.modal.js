@@ -60,6 +60,18 @@
                  */
                 useFolder: true,
 
+                /* Whether the singleton modal should allow detachment
+                 *
+                 * Set to false when the picker is spawned from within some other modal
+                 * because that modal will shut, causing a reinit and this singleton detachment.
+                 *
+                 * That causes your file picker modal to inexplicably vanish, as it destroys itself
+                 * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
+                 * could only exist once, and in a modal; any time it shut, it must reinit - but the
+                 * selector applies to all modals, not just the picker one. Maybe that's the next change.
+                 */
+                allowDetachment: true,
+
                 /* Selector to get the default folder to start browsing resources from
                  */
                 defaultFolderSelector: 0
@@ -167,7 +179,7 @@
         function build(data) {
             var body = $('body');
 
-            if (singletonModal) {
+            if (singletonModal && config.allowDetachment) {
                 // you've got a modal; don't try to make another one
                 return;
             }
@@ -219,7 +231,7 @@
             $(document)
                 //.foundation('reveal', 'reflow')
                 .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal) {
+                    if (singletonModal && config.allowDetachment) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
@@ -392,6 +404,7 @@
                 element: $(this),
                 allowedFiles: null,
                 allowedFilesystems: 'link',
+                allowDetachment: true,
                 defaultFolderSelector: null
             },
 
@@ -416,6 +429,7 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
+                allowDetachment: config.allowDetachment,
                 defaultFolderSelector: config.defaultFolderSelector
             });
 

@@ -116,8 +116,10 @@
                             <script>
                                 $(function() {
                                     $('#modalLink-replybtn-{COMPONENT_INSTANCE_ID}').schoolboxLink({
+                                        allowDetachment: false,
                                         onSelect: function(url, name, dialog) {
                                             $('#modalLinkTarget-reply-{COMPONENT_INSTANCE_ID}').val(url);
+                                            $('#socialstream-reply-{COMPONENT_INSTANCE_ID}').foundation('reveal', 'open');
                                         }
                                     });
                                 });
