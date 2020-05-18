@@ -81,7 +81,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.start,
                           tp.finish,
                           tp.usable
-            FROm          sis_timetable_cycle ty
+            FROM          sis_timetable_cycle ty
             LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
             WHERE         ty.ext_timetable_code = :campusId
 
