@@ -60,6 +60,7 @@
                  */
                 useFolder: true,
 
+<<<<<<< HEAD
                 /* Whether the singleton modal should allow detachment
                  *
                  * Set to false when the picker is spawned from within some other modal
@@ -75,6 +76,11 @@
                 /* Selector to get the default folder to start browsing resources from
                  */
                 defaultFolderSelector: 0,
+=======
+                /* If specified, try to restore the modal designated by this identifier
+                 */
+                restoreModal: null,
+>>>>>>> 51d54403abb... Add a special restoreModal config [SA-10216]
 
                 /* Executes after picker modal shuts
                  */
@@ -187,11 +193,9 @@
             if (singletonModal && config.allowDetachment) {
                 // you've got a modal; don't try to make another one
                 return;
-            }
-            else if($('#attachment-browser').length) {
+            } else if($('#attachment-browser').length) {
                 singletonModal = $('#attachment-browser').parent();
-            }
-            else {
+            } else {
                 singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
                     .data('content', data);
 
@@ -240,7 +244,8 @@
                         singletonModal.detach();
                         singletonModal = null;
                     }
-                    if(undefined !== config.previousModal) {
+
+                    if (undefined !== config.previousModal) {
                         config.previousModal.removeClass('hide');
                     }
 
@@ -254,9 +259,44 @@
                 singletonModal.foundation('reveal', 'close');
 
                 config.onAfterClose();
+
+                $.fn.schoolboxRestorePreviousModal(config.restoreModal);
             });
         }
     };
+
+
+    /**
+     * Attempt to restore the previous modal with the identifier $id
+     * Reopens its ui and reanimates its overlay
+     *
+     * @param id
+     */
+    $.fn.schoolboxRestorePreviousModal = function(id)
+    {
+
+        /* Not specified? Do nothing
+         */
+        if (null === id) {
+            return;
+        }
+
+        /* Select it, in case it was provided as just an id string
+         */
+        $(id).foundation('reveal', 'open');
+
+        /* M3 picker shut this overlay so I have to manually restore it after
+         * foundation finishes its animation
+         */
+        setTimeout(function() {
+            $('.reveal-modal-bg')
+                .css('opacity', 0)
+                .css('display', 'block')
+                .animate({
+                    opacity: 1
+                }, 250);
+        }, 275);
+    }
 
 
     /**
@@ -316,6 +356,8 @@
                         $('#file-picker').foundation('reveal', 'close');
 
                         config.onAfterClose();
+
+                        $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                     });
                 } else if ('meetingUrl' in message.data) {
 
@@ -328,6 +370,8 @@
                     $('#file-picker').foundation('reveal', 'close');
 
                     config.onAfterClose();
+
+                    $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                 } else {
 
                     // The file was rejected, probably cause it was the wrong mimetype.
@@ -407,7 +451,6 @@
              * Executes after the M3 picker shuts its own modal
              */
             onAfterClose: function() {
-                console.log('fox');
             }
         }, options);
     };
@@ -444,9 +487,10 @@
 
             /* Other elements of this object literal as a result of merging with defaults:
              *
-             * url: ...
+             * url: (string)
              * onSelect: function() ...
              * onAfterClose: function() ...
+             * restoreModal: (string)
              */
         );
 
@@ -458,11 +502,17 @@
             /* Select something from the Resource Browser
              */
             $.fn.schoolboxResource({
+                allowDetachment: config.allowDetachment,
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
+<<<<<<< HEAD
                 allowDetachment: config.allowDetachment,
                 defaultFolderSelector: config.defaultFolderSelector,
                 onAfterClose: config.onAfterClose
+=======
+                onAfterClose: config.onAfterClose,
+                restoreModal: config.restoreModal,
+>>>>>>> 51d54403abb... Add a special restoreModal config [SA-10216]
             });
 
             /* Send the message up and deal with the dialog, if one was specified
