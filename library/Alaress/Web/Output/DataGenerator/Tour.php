@@ -11,6 +11,7 @@ namespace Alaress\Web\Output\DataGenerator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Tour\Lists as TourLists;
 use Schoolbox\User;
+use function array_key_exists;
 
 /**
  * Generate data for rendering a feature tour.
@@ -67,7 +68,7 @@ class Tour implements IDataGenerator
         if ($this->currentUser && $this->config->get('tours_enabled')) {
             // parse_url fails when REQUEST_URI contains a colon. Don't tour when failed to parse_url.
             $request    = parse_url($this->serverVars['REQUEST_URI']);
-            if ($request) {
+            if ($request && array_key_exists('path', $request)) {
                 $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path']);
             }
         }
