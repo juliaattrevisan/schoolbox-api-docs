@@ -4056,11 +4056,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Item/Module.php
 
 		-
-			message: "#^Cannot call method getId\\(\\) on resource\\.$#"
-			count: 4
-			path: library/Schoolbox/ResourceBooking/Item/RelatedResource/Mapper.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Report/Module.php
