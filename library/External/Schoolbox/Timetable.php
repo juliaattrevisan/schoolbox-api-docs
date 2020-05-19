@@ -457,10 +457,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $luCycles = [];
 
         foreach ($cycles as $cycle) {
-            $luCycles[] = [
-                'key' => $cycle->getExternalTimetableCode(),
-                'value' => $cycle->getTitle()
-            ];
+            if ('' !== (string)$cycle->getExternalTimetableCode()) {
+                $luCycles[] = [
+                    'key'   => $cycle->getExternalTimetableCode(),
+                    'value' => $cycle->getTitle()
+                ];
+            }
         }
 
         return $luCycles;
