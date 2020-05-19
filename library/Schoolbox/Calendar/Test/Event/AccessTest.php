@@ -560,7 +560,7 @@ class AccessTest extends TestCase
     public function testCheckExisting($expected, User $effector, Event $event)
     {
         $access = new EventAccess(
-            $this->getMockFolderAccess($effector, $event->getFolderCollection()->getColumnValues('categoryId'))
+            $this->getMockFolderAccess($effector, $event->getFolderCollection()->getPropertyValues('id'))
         );
         $actual = $access->checkExisting($effector, $event);
         $this->assertEquals($expected, $actual);
