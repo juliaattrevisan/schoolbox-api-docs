@@ -1,29 +1,18 @@
 <?php
 /**
- * Isams Timetable Class
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- *
- * Uncle iSam?
- *    _..._
- *   |||||||
- *   |||||||
- *  _|*****|_
- * ( '-...-' )
- * {`;-----;`}
- * {(| a  a|)}
- *  \|  _\ |/
- *   \  -  /
- *    '{_}`
  */
-
 use Schoolbox\Campus as CampusModel;
 
+/**
+ * Class External_Isams_Timetable
+ */
 class External_Isams_Timetable implements External_TimetableInterface
 {
     use External_MssqlConnector;
+
 
     /**
      * External_Doublefirst_Timetable constructor.
@@ -33,6 +22,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         $this->setupDatabase();
     }
 
+
     /**
      * @inheritDoc
      */
@@ -41,7 +31,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         $dayId = $this->getDayId($campus, $date);
 
         $query =
-            "
+            '
             SELECT
               V_Periods.intOrder as PeriodNumber,
               1 AS PeriodNumberSeq,
@@ -54,7 +44,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             WHERE CampusCode = :campus_code AND DayID = :day_id
             ORDER BY DayID, CAST(StartTime AS TIME)
-	    ";
+        ';
         $periods = $this->getConnector()->getQueryIterator($query, [
             'campus_code'   => $campus->getExtTimetableCode(),
             'day_id'        => $dayId
@@ -75,11 +65,11 @@ class External_Isams_Timetable implements External_TimetableInterface
             }
         }
 
-        $queryPeriodCount = "
+        $queryPeriodCount = '
             SELECT      COUNT(*) As PeriodCount
             FROM        V_TimetableStructure
             WHERE       DayID = :day_id
-        ";
+        ';
 
         $periods = $this->getConnector()->executeQuery($queryPeriodCount,[
             'day_id' => $dayId
@@ -87,10 +77,10 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $definitionArray['periodCount'] = $periods['PeriodCount'];
 
-        $queryDayCount = "
+        $queryDayCount = '
            SELECT     COUNT(*) AS DayCount
            FROM       (SELECT DISTINCT DayID from V_TimetableStructure WHERE CampusCode = :campus_code) AS d
-        ";
+        ';
 
         $days = $this->getConnector()->executeQuery($queryDayCount, [
             'campus_code' => $campus->getExtTimetableCode()
@@ -100,6 +90,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         return $definitionArray;
     }
+
 
     /**
      * Retrieve current day number
@@ -117,6 +108,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         return date('w', strtotime($date));
     }
 
+
     /** The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
      *  (Monday - Friday) and a week number (of which there is a single week set up for each campus).
      *
@@ -128,24 +120,22 @@ class External_Isams_Timetable implements External_TimetableInterface
      *    day of the week number (where 2 = Monday, 6 = Friday) which is stored in the 'intDay' field.
      *
      * @param CampusModel $campus Campus of the date we are looking at
-     * @param int $date UNIX timestamp of the date we are looking at
+     * @param int         $date   UNIX timestamp of the date we are looking at
      * @return int              Day ID
+     * @throws \Alaress\Database\Exception
      */
     private function getDayId(CampusModel $campus, $date = 0)
     {
 
-
         // Add one because ISAMS starts days at 1 and PHP starts at 0
 
-        if($date) {
+        if ($date) {
             $dayOfWeek = date("w",strtotime($date)) + 1;
-        }
-        else {
+        } else {
             $dayOfWeek = date("w") + 1;
         }
 
-
-        $queryDay = "
+        $queryDay = '
            SELECT   TblTimetableManagerDaysID as DayID
            FROM     V_Days
            WHERE    intWeek = (
@@ -155,7 +145,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                       intActive = 1
            ) AND
            intDay = :day_of_week
-        ";
+        ';
 
         $day = $this->getConnector()->executeQuery($queryDay, [
             'txt_short_name'    => $campus->getExtTimetableCode(),
@@ -169,6 +159,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             return (int)$this->config->get('external_isams_default_day_id');
         }
     }
+
 
     /**
      * Returns the day name
@@ -201,7 +192,7 @@ class External_Isams_Timetable implements External_TimetableInterface
     {
         $time = date("U");
 
-        $queryPeriod = "
+        $queryPeriod = '
            SELECT     StartTime as TimeFrom,
                       EndTime as TimeTo,
                       PeriodID AS PeriodNumber,
@@ -209,7 +200,7 @@ class External_Isams_Timetable implements External_TimetableInterface
            FROM       V_TimetableStructure
            WHERE      CAST(:time_val AS TIME) BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME) AND
                       DayID = :day_id
-        ";
+        ';
 
         $period = $this->getConnector()->executeQuery($queryPeriod, [
             'time_val'  => $time,
@@ -228,6 +219,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * @inheritDoc
      */
@@ -236,6 +228,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         $day = $this->getDayNumber($campus, $date);
         return $this->getDayTimetable($externalUserId, $userId, $campus, $day, $date);
     }
+
 
     /**
      * @inheritDoc
@@ -270,7 +263,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         // Add classes into it
 
-        $queryTimetable = "
+        $queryTimetable = '
             SELECT  V_TimetableSchedule.venue AS Room,
                     V_TimetableSchedule.ClassName AS Description,
                     V_Days.intOrder AS DayNumber,
@@ -289,7 +282,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                         V_Class.Tutor2ID = :external_user_id OR
                         V_Class.StudentID = :external_user_id
                     )
-        ";
+        ';
 
         $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'day_id'            => $dayId,
@@ -321,6 +314,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -339,7 +333,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $queryTimetable = "
+        $queryTimetable = '
             SELECT
                         V_TimetableSchedule.venue AS Room,
                         V_TimetableSchedule.ClassName AS Description,
@@ -363,7 +357,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                         )
                         AND CampusCode = :campus_code
             ORDER BY V_Days.intOrder, V_Periods.intOrder
-        ";
+        ';
 
         $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'external_user_id'  => $externalUserId,
@@ -371,7 +365,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         ]);
 
 
-	// Create the timetable framework
+    // Create the timetable framework
 
         $timetable = [];
 
@@ -417,6 +411,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * Sort timetable in chronological order
      *
@@ -436,10 +431,20 @@ class External_Isams_Timetable implements External_TimetableInterface
         return ($aTime > $bTime) ? +1 : -1;
     }
 
+
     /**
      * @inheritDoc
      */
     public function getRoomTimetable(array $roomCodes): array
+    {
+        return [];
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
     {
         return [];
     }
