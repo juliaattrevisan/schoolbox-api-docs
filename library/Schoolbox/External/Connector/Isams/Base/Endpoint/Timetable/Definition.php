@@ -144,7 +144,7 @@ class Definition implements IStrategy
              */
             /** @var TimetableCycle $timetableCycle */
             try {
-                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('ext_timetable_code', $ext);
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
             } catch (Exception $e) {
                 $this->log->debug(sprintf(
                     'Purging all previous cycles and creating a new cycle, %s.',
@@ -158,7 +158,7 @@ class Definition implements IStrategy
 
             $timetableCycle
                 ->setTitle($cycleName)
-                ->setExternalTimetableCode($ext)
+                ->setCycleIdentifier($ext)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))
                 ->setDayLength($dayData['maxPeriods'])
                 ->setStart($cycleStart)

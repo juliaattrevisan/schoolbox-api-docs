@@ -86,7 +86,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.usable
             FROM          sis_timetable_cycle ty
             LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
-            WHERE         ty.ext_timetable_code = :campusId
+            WHERE         ty.cycle_identifier = :campusId
         ';
 
         if ($day > 0) {
@@ -148,12 +148,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             tp.usable
                 FROM        sis_timetable_cycle ty
                 LEFT JOIN   sis_timetable_period tp ON tp.cycle_id = ty.id
-                WHERE       ty.ext_timetable_code = :campusId
+                WHERE       ty.cycle_identifier = :campusId
                 AND         :now BETWEEN tp.start AND tp.finish
                 AND         tp.day = :dayNumber
             ',
             [
-                'campusId'  => $campus->getExtTimetableCode(),
+                'campusId'  => $campus->getCycleIdentifier(),
                 'now'       => $time->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT),
                 'dayNumber' => $dayNumber,
             ]
@@ -457,9 +457,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $luCycles = [];
 
         foreach ($cycles as $cycle) {
-            if ('' !== (string)$cycle->getExternalTimetableCode()) {
+            if ('' !== (string)$cycle->getCycleIdentifier()) {
                 $luCycles[] = [
-                    'key'   => $cycle->getExternalTimetableCode(),
+                    'key'   => $cycle->getCycleIdentifier(),
                     'value' => $cycle->getTitle()
                 ];
             }

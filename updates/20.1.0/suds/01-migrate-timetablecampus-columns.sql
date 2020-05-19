@@ -21,12 +21,12 @@ SET
 -- Add ext_timetable_code to cycle
 
 ALTER TABLE `sis_timetable_cycle`
-    ADD COLUMN `ext_timetable_code` VARCHAR(255) NULL AFTER `title`;
+    ADD COLUMN `cycle_identifier` VARCHAR(255) NULL AFTER `title`;
 
 -- Change collation to whatever it was supposed to have been
 
 ALTER TABLE `sis_timetable_cycle`
-    CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+    CHANGE COLUMN `cycle_identifier` `cycle_identifier` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
 
 -- Remove sis_timetable_campus altogether
 

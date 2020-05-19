@@ -70,7 +70,7 @@ class TimetableCycle
      *
      * @var string|null
      */
-    private $externalTimetableCode;
+    private $cycleIdentifier;
 
 
     /**
@@ -204,19 +204,19 @@ class TimetableCycle
     /**
      * @return string|null
      */
-    public function getExternalTimetableCode(): ?string
+    public function getCycleIdentifier(): ?string
     {
-        return $this->externalTimetableCode;
+        return $this->cycleIdentifier;
     }
 
 
     /**
-     * @param string|null $externalTimetableCode
+     * @param string|null $cycleIdentifier
      * @return $this
      */
-    public function setExternalTimetableCode(?string $externalTimetableCode): self
+    public function setCycleIdentifier(?string $cycleIdentifier): self
     {
-        $this->externalTimetableCode = $externalTimetableCode;
+        $this->cycleIdentifier = $cycleIdentifier;
         return $this;
     }
 }

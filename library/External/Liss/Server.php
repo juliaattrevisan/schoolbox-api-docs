@@ -157,7 +157,7 @@ class External_Liss_Server
 
             $cycle = $cycleMapper->createModel()
                 ->setTitle('Main Timetable')
-                ->setExternalTimetableCode($campus->getExtTimetableCode())
+                ->setCycleIdentifier($campus->getExtTimetableCode())
                 ->setStart($now->startOfYear())
                 ->setFinish($now->endOfYear())
                 ->setStartDay(1)

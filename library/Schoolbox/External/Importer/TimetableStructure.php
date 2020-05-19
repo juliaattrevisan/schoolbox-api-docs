@@ -113,7 +113,7 @@ class TimetableStructure extends AbstractImporter
                 // Timetable cycle - calculate cycle and day length later
                 $cycle = (new TimetableCycle())
                     ->setTitle($termTitle)
-                    ->setExternalTimetableCode($termCampus);
+                    ->setCycleIdentifier($termCampus);
 
                 // Timetable campus
                 if (isset($row['Term Offset']) && strlen($row['Term Offset'])) {

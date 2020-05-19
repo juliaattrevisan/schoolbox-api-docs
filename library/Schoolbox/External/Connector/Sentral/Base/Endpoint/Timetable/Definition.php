@@ -120,7 +120,7 @@ class Definition implements IStrategy
 
             /** @var TimetableCycle $timetableCycle */
             $timetableCycle = $this->timetableCycleMapper->createModel()
-                ->setExternalTimetableCode($campus->getExtTimetableCode())
+                ->setCycleIdentifier($campus->getExtTimetableCode())
                 ->setTitle($cycleName)
                 ->setCycleLength($cycleLength)
                 ->setDayLength($dayLength)

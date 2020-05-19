@@ -79,7 +79,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
                     cycle_length,
                     day_length
                 FROM sis_timetable_cycle
-                WHERE ext_timetable_code = :campusId
+                WHERE cycle_identifier = :campusId
             ',
             ['campusId' => $campus->getCycleIdentifier()]
         );
