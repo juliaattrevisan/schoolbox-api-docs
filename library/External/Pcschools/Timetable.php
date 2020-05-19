@@ -1,18 +1,17 @@
 <?php
-
 /**
- * PCSchools timetable connector
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
+/**
+ * Class External_Pcschools_Timetable
+ */
 class External_Pcschools_Timetable implements External_TimetableInterface
 {
 
@@ -23,15 +22,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     protected $timetableStoredProc = 'spSelTimeTable';
 
+
     /**
      * @var MSSQL
      */
     private $database;
 
+
     /**
      * @var UserMapper
      */
     private $userMapper;
+
 
     /**
      * Constructor
@@ -41,6 +43,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $this->setDatabase(MSSQL::getInstance());
         $this->userMapper = UserMapper::getInstance();
     }
+
 
     /**
      * The headings of the timetable, going horizontally from left to right containing all the times and day numbers
@@ -102,6 +105,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         return $result;
     }
 
+
     /**
      * Gets the number of days in this timetable.
      *
@@ -110,8 +114,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     protected function getDayCount()
     {
         return $this->getDatabase()
-                    ->getOne("SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD FROM sysfile)");
+                    ->getOne('SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD FROM sysfile)');
     }
+
 
     /**
      * Gets the maximum number of periods for a day from the database. This is again a kluge and it is not a one-size
@@ -123,8 +128,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     protected function getPeriodCount()
     {
         return $this->getDatabase()
-                    ->getOne("SELECT MAX(SUBQUERY.PERIODS) FROM (SELECT COUNT(*) AS PERIODS FROM TIMEPDHD GROUP BY TIMEPDHD.DAY) AS SUBQUERY");
+                    ->getOne('SELECT MAX(SUBQUERY.PERIODS) FROM (SELECT COUNT(*) AS PERIODS FROM TIMEPDHD GROUP BY TIMEPDHD.DAY) AS SUBQUERY');
     }
+
 
     /**
      * Get the current day number for a given campus
@@ -149,6 +155,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         return intval($result) ?: 0;
     }
 
+
     /**
      * Returns the name of the current day
      *
@@ -160,6 +167,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         return 'Day ' . $dayNumber;
     }
+
 
     /**
      * @inheritDoc
@@ -192,6 +200,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         return [];
     }
+
 
     /**
      * {@inheritdoc}
@@ -288,6 +297,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         return $timetable;
     }
+
 
     /**
      * @inheritDoc
@@ -400,6 +410,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -495,6 +506,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         return $timetable;
     }
+
 
     /**
      * @inheritDoc
@@ -622,6 +634,16 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         return $result;
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
+    }
+
+
     /**
      * @return MSSQL
      */
@@ -629,6 +651,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         return $this->database;
     }
+
 
     /**
      * @param  MSSQL $database
