@@ -2,14 +2,20 @@
  # Participant's mark for submission history page.
  #
  # Currently displays the authoritative feedback.
-Data:
-    feedback      DueWork\Feedback\Model
-    participant
+ #
+ # @param DueWork\Feedback\Model feedback
+ # @param Participant            participant
+ # @param bool                   selfAssess
+ # @param bool                   canShowcase
  #}
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h2 class="subheader">{{ locale.grading.proper }}</h2>
+    </div>
+</div>
 
+<div class="row">
+    <div class="small-12 island">
         <section>
             {% include '@learningAssessment/dueWork/summary/interaction/card.twig' with {
                 currentFeedback: feedback,

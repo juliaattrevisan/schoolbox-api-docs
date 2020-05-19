@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
+use Eportfolio\ShowcaseMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -216,7 +217,6 @@ class Controller extends Assessment\Controller
          *
          * Order them by submitted time to find the most recent, and use that
          */
-
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
@@ -236,6 +236,14 @@ class Controller extends Assessment\Controller
              */
             'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
+            /* Eportfolio Showcase
+             * Only show the "send to showcase" trophy button to teachers and students, not parents
+             */
+            'canShowcase' => $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $this->getUser()->getEportfolioEnable()),
+
+            /* Whether or not this assessment is showcased on the user's eportfolio
+             */
+            'isShowcased' => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$this->getUser()->getId())
         ];
 
         $routeArgs = [

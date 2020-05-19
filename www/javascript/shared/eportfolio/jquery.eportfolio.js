@@ -6,12 +6,12 @@
      * Ajax a form which publishes an item to one's eportfolio
      * Show and hide a label indicating status
      */
-    $.fn.eportfolio_publish = function(options) {
+    $.fn.eportfolioPublish = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
 
-        publishToEportfolio();
+        setupListeners();
 
         /**
          * Init
@@ -23,64 +23,106 @@
         function init(options, element) {
             var defaults = {
 
-                /* The eportfolio publish form
+                /* The eportfolio publish button
                  */
                 element: element,
 
-                /* The button which activates the Publishing
+                /* Processing endpoint
                  */
-                activator: '#publish-to-eportfolio',
+                url: '/eportfolio/showcase/modifyForm.php',
+
+                /* Student id
+                 */
+                userId: null,
 
                 /* The label to hide/show when publishing
                  */
-                label: '#publish-to-eportfolio-label'
+                label: '#publish-to-eportfolio-label',
+
+                /* Text strings and backend action string
+                 */
+                publish: {
+                    text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
+                    action: 'publish'
+                },
+
+                unpublish: {
+                    text: 'Are you sure you want to remove this work from your ePortfolio showcase?',
+                    action: 'unpublish'
+                }
             };
 
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
+            return $.extend(defaults, options);
         }
 
+
         /**
-         * Change visibility value for a particular Due Work/Quiz
+         * Change visibility value for a particular Assessment
          * Ajaxes the new value silently
          */
-        function publishToEportfolio() {
+        function setupListeners() {
+            $.each(config.element, function(index, element) {
 
-            /* If it's not already publishing, allow transaction
-             * Otherwise just ignore the click
-             *
-             * This prevents mass apm spam
-             */
-            if ($(config.activator).attr('data-publish-status') == 0) {
+                $(element).on('click', function() {
+                    var activator = $(this);
+                    var assessmentId = activator.attr('data-publish-to-eportfolio');
 
-                /* Indicate that we're currently publishing this
-                 */
-                $(config.activator).attr('data-publish-status', 1);
+                    /* Only publish items that haven't been published before
+                     */
+                    if (activator.attr('data-publish-status') == 0) {
 
-                $(config.label).toastActivate({
-                    text: 'Sending to ePortfolio'
-                });
-
-                /* Ajax the Publish action
-                 */
-                $.ajax({
-                    type: "POST",
-                    url: config.element.attr('action'),
-                    data: config.element.serialize(), // serializes the form's elements.
-                    success: function (data) {
-                        $(config.label).toastTimeout({
-                            text: 'Work published to ePortfolio'
-                        });
-
-                        /* Re-enable button
+                        /* Decide which text to show
                          */
-                        $(config.activator).attr('data-publish-status', 0);
+                        var text;
+                        var action;
+
+                        if (activator.attr('data-publish-state') == 1) {
+                            text = config.publish.text;
+                            action = config.publish.action;
+                        } else {
+                            text = config.unpublish.text;
+                            action = config.unpublish.action;
+                        }
+
+                        /* Provide confirmation dialog
+                         */
+                        activator.confirmDialog({
+                            header: "Update ePortfolio Showcase",
+                            text: text,
+                            confirmEvent: function() {
+
+                                /* Update button status to prevent mass apm spam
+                                 */
+                                activator.attr('data-publish-status', 1);
+
+                                /* Spawn toaster
+                                 */
+                                $(config.label).toastActivate({
+                                    text: 'Updating ePortfolio'
+                                });
+
+                                /* Send it to backend
+                                 */
+                                $.ajax({
+                                    type: 'POST',
+                                    url: config.url,
+                                    data: {
+                                        action: action,
+                                        assessmentId: assessmentId,
+                                        userId: config.userId
+                                    },
+                                    success: function (data) {
+
+                                        /* Reload upon publish
+                                         */
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        });
                     }
                 });
-            }
-
+            });
         }
     }
 }(jQuery));

@@ -1,10 +1,16 @@
 {##
- # assessment   an IAssesssable instance
- # student      the student currently being viewed
- # icon         a css class representing the assessable
+ # @param IAssessable assessment          an IAssesssable instance
+ # @param bool        submissionsBlocked  whether you can submit to this assessment, I guess
+ # @param User        student             the student currently being viewed
+ # @param string      icon                a css class representing the assessable
+ # @param bool        canShowcase         a boolean for students' ability to Showcase to their eportfolio
+ # @param bool        isShowcased         whether this assessment is already showcased on a user's eportfolio
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
+    {% if isShowcased %}
+    <li class="icon-eportfolio">Published to ePortfolio</li>
+    {% endif %}
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/workType.twig' %}
     {% if student.id != USER.id %}

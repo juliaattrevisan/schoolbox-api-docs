@@ -1,14 +1,13 @@
-{#
-Data:
-    assessment            DueWork\Model
-    student               User
-    participant           null|Participant\Model
-    breadcrumbs
-    submissionsBlocked    false|string  A string message if blocked, false if not blocked
-    acknowlegementBlocked false|string  A string message if blocked, false if not blocked
-    authoritativeFeedback null|DueWork\Feedback\Model
-    emptyRubricContext
-    timeline
+{##
+# @param DueWork\Model                assessment
+# @param User                         student
+# @param null|Participant\Model       participant
+# @param Collection                   breadcrumbs
+# @param false|string                 submissionsBlocked      A string message if blocked, false if not blocked
+# @param false|string                 acknowlegementBlocked   A string message if blocked, false if not blocked
+# @param null|DueWork\Feedback\Model  authoritativeFeedback
+# @param null|FullTimeline            timeline
+# @param bool                         canShowcase
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -73,12 +72,19 @@ Data:
             assessment: assessment,
             submissionsBlocked: submissionsBlocked,
             student: student,
-            icon: 'icon-due-work'
+            icon: 'icon-due-work',
+            canShowcase: canShowcase,
+            isShowcased: isShowcased
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% include '@learningAssessment/fragments/modifyTot.twig' %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        viewRoute: viewRoute,
+        modifyRoute: modifyRoute,
+        canShowcase: canShowcase,
+        isShowcased: isShowcased
+    } %}
 </div>
 
 <div class="row">
@@ -94,6 +100,9 @@ Data:
         selfAssessmentFeedback: selfAssessmentFeedback,
         participant: participant,
         selfAssess: selfAssess,
+        assessment: assessment,
+        student: student,
+        canShowcase: canShowcase
     } %}
 {% else %}
     {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
@@ -101,6 +110,7 @@ Data:
         selfAssessmentFeedback: selfAssessmentFeedback,
     } %}
 {% endif %}
+
 {% if (currentFeedback.isSelfAssessment or participant.assessable.isFeedbackVisibleToUser(USER)) and selfAssessmentFeedback.comment|length %}
     <div class="row">
         <div class="small-12 island">
@@ -123,6 +133,8 @@ Data:
         </div>
     </div>
 {% endif %}
+
+<div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
 
 {# Submit button: goes underneath history if it's empty, above history if not #}
 {% if timeline is not empty %}
