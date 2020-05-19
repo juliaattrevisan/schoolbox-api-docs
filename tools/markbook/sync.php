@@ -27,13 +27,13 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel(
     'Schoolbox Markbook Sync Script',
     [
-        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'vp::h::',
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'vp:h',
         Daemon\Kernel::OPTION_APP_LONG_OPTS  => [
             'help',
-            'start::',
-            'end::',
-            'year::',
-            'semester::',
+            'start:',
+            'end:',
+            'year:',
+            'semester:',
             'update-only',
             'dry-run',
         ],
@@ -200,10 +200,14 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
     if ($parentId) {
         $folderList[$parentId] = $folderMapper->findById($parentId);
+        /** @noinspection AdditionOperationOnArraysInspection */
+        $folderList += traverse($parentId, $folderMapper);
+    } else {
+        $folderList = $folderMapper->findByPredicates(
+            $folderMapper->getPredicateBuilder()->notNull('cc.code')
+        );
     }
 
-    /** @noinspection AdditionOperationOnArraysInspection */
-    $folderList += traverse($parentId, $folderMapper);
 
     // Make sure we got a result
 
