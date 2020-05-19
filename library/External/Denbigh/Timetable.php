@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus as Campus;
@@ -14,28 +13,49 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
-/** @noinspection PhpUndefinedClassInspection */
+/**
+ * Class External_Denbigh_Timetable
+ */
 class External_Denbigh_Timetable implements External_TimetableInterface
 {
     use External_Schoolbox_TimetableDefinitionTrait;
 
-    /** @var IConnector $internalDatabase */
+
+    /**
+     * @var IConnector $internalDatabase
+     */
     private $internalDatabase;
 
-    /** @var IConnector $externalDatabase */
+
+    /**
+     * @var IConnector $externalDatabase
+     */
     private $externalDatabase;
 
-    /** @var IConfigLoader $config */
+
+    /**
+     * @var IConfigLoader $config
+     */
     private $config;
 
-    /** @var UserMapper $userMapper */
+
+    /**
+     * @var UserMapper $userMapper
+     */
     private $userMapper;
 
-    /** @var array|bool[] $userCache */
+
+    /**
+     * @var array|bool[] $userCache
+     */
     private $userCache = [];
 
-    /** @var array|bool[] $userStaffCache */
+
+    /**
+     * @var array|bool[] $userStaffCache
+     */
     private $userStaffCache = [];
+
 
     /**
      * External_Denbigh_Class constructor.
@@ -52,6 +72,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $this->externalDatabase = DatabaseFactory::getInstanceExternal();
     }
 
+
     /**
      * {@inheritDoc}
      * @param int $dayNumber
@@ -63,6 +84,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return "Day {$dayNumber}";
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -70,6 +92,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     {
         return [];
     }
+
 
     /**
      * {@inheritDoc}
@@ -88,7 +111,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if ($this->isStaff($userId)) {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
-                "
+                '
                     SELECT      l.day,
                                 l.period,
                                 startTime,
@@ -103,12 +126,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId
-                "
+                '
             );
         } else {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
-                "
+                '
                     SELECT      l.day,
                                 l.period,
                                 startTime,
@@ -123,7 +146,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId
-                "
+                '
             );
         }
 
@@ -158,6 +181,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $periodList;
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -165,6 +189,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     {
         return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
     }
+
 
     /**
      * Check if specified user ID belongs to a staff member, cache result for repeat calls
@@ -187,6 +212,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $this->userStaffCache[$userId];
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -202,6 +228,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             )
         );
     }
+
 
     /**
      * {@inheritDoc}
@@ -220,7 +247,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if ($this->isStaff($userId)) {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
-                "
+                '
                     SELECT      l.day,
                                 l.period,
                                 startTime,
@@ -236,12 +263,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId AND
                                 l.day = :dayNumber
-                "
+                '
             );
         } else {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
-                "
+                '
                     SELECT      l.day,
                                 l.period,
                                 startTime,
@@ -257,7 +284,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
                     WHERE       p.denbighID = :externalUserId AND
                                 l.day = :dayNumber
-                "
+                '
             );
         }
 
@@ -295,17 +322,21 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $periodList;
     }
 
+
     /**
      * {@inheritDoc}
      * @param Campus     $campus
      * @param int|string $date
      *
      * @return bool|int
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
         return $this->getDayNumberFromDatabase($this->internalDatabase, $campus, $date);
     }
+
 
     /**
      * {@inheritDoc}
@@ -318,12 +349,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
         /** @noinspection SqlDialectInspection */
         $queryCampus = $this->internalDatabase->executeQuery(
-            "
+            '
               SELECT    ext_timetable_code
               FROM      luCampus
               WHERE deleted_at IS NULL
               LIMIT     1
-            "
+            '
         );
 
         if ($queryCampus->rowCount() == 0) {
@@ -365,6 +396,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      * @param string|null $externalUserId
      * @param Campus      $campus
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     private function retrieveBasicPeriodList(?string $externalUserId, Campus $campus): array
     {
@@ -392,5 +424,14 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             ];
         }
         return $periodList;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }
