@@ -133,31 +133,27 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @param User       $user
-     * @return bool
+     * @return void
      * @throws BaseMapper\Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function addArticleToUserSavedList(News\Model $article, User $user): bool
+    private function addArticleToUserSavedList(News\Model $article, User $user): void
     {
         $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
 
         try {
-            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, ['deleted' => true]);
+            $this->saveForLaterMapper->findOneByColumnList($columnList);
+        } catch (BaseMapper\Exception\Deleted $e) {
+            // Was in list, but was removed. Treated as an update action, not a restore action.
+            $savedForLater = $e->getDeletedObject();
+            $savedForLater->setDeletedAt(null);
+            $this->saveForLaterMapper->save($savedForLater);
         } catch (BaseMapper\Exception $e) {
             // No record? Create one.
             $savedForLater = $this->saveForLaterMapper->createModel()->setUser($user)->setArticle($article);
             $this->saveForLaterMapper->save($savedForLater);
-            return true;
         }
-
-        // Was in list, but was removed. Treated as an update action, not a restore action.
-        if ($savedForLater->isDeleted()) {
-            $savedForLater->setDeletedAt(null);
-            $this->saveForLaterMapper->save($savedForLater);
-            return true;
-        }
-        return false;
     }
 
 
@@ -168,22 +164,17 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @param User       $user
-     * @return bool
-     * @throws BaseMapper\Exception
+     * @return void
      */
-    private function removeArticleFromUserSavedList(News\Model $article, User $user): bool
+    private function removeArticleFromUserSavedList(News\Model $article, User $user): void
     {
         $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
 
         try {
-            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, ['deleted' => true]);
+            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList);
+            $this->saveForLaterMapper->delete($savedForLater);
         } catch (BaseMapper\Exception $e) {
-            return false;
+            // noop: the article isn't in the user's saved list
         }
-
-        if ($savedForLater->isDeleted()) {
-            return false;
-        }
-        return $this->saveForLaterMapper->delete($savedForLater);
     }
 }
