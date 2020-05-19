@@ -55,6 +55,7 @@ class TimetableStructure extends AbstractImporter
     {
         return [
             'Term Campus'           => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
+            'Term Identifier'       => 'A unique identifier for this term',
             'Term Title'            => 'The name of the term',
             'Term Start'            => 'The date on which the term starts',
             'Term Finish'           => 'The date on which the term finishes',
@@ -101,6 +102,10 @@ class TimetableStructure extends AbstractImporter
              */
             $termCampus = $row['Term Campus'];
 
+            /* Cycle Identifier
+             */
+            $cycleIdentifier = $row['Term Identifier'];
+
             $key        = sprintf('%s-%s', $termCampus, $termTitle);
             if (!isset($result[$key])) {
                 $this->log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
@@ -113,7 +118,7 @@ class TimetableStructure extends AbstractImporter
                 // Timetable cycle - calculate cycle and day length later
                 $cycle = (new TimetableCycle())
                     ->setTitle($termTitle)
-                    ->setCycleIdentifier($termCampus);
+                    ->setCycleIdentifier($cycleIdentifier);
 
                 // Timetable campus
                 if (isset($row['Term Offset']) && strlen($row['Term Offset'])) {
