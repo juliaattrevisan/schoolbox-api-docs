@@ -20,6 +20,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use SimpleXMLElement;
@@ -151,16 +152,15 @@ class Classes implements IStrategy
      * The timetable data in the feed may try to reference periods
      * that don't exist in Timetable Structure for some reason
      *
-     * @param string $ext
      * @param int    $cycleId
      * @param array  $periods
      * @param string $day
      * @param int    $sequence
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $ext, int $cycleId, array $periods, string $day, int $sequence): ?TimetablePeriod
+    private function findPeriod(int $cycleId, array $periods, string $day, int $sequence): ?TimetablePeriod
     {
-        return $periods['ext'][$ext]['cycle'][$cycleId]['day'][$day]['period'][$sequence] ?? null;
+        return $periods['cycleId'][$cycleId]['day'][$day]['period'][$sequence] ?? null;
     }
 
 
@@ -231,11 +231,6 @@ class Classes implements IStrategy
          */
         $timetables = $this->timetableBatchXml->fetchXml('/SMSDirectoryData/timetables/timetable');
 
-        /* Remember the one and only campus identifier
-         * TODO: Unify this with usage in Profile.php
-         */
-        $ext = (string)$this->timetableBatchXml->fetchXml('/SMSDirectoryData/schools/school')[0]->xpath('@index')[0];
-
         /* If there aren't any timetables, log it and exit
          */
         if (!\count($timetables)) {
@@ -282,15 +277,22 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $this->currentCycleId, $periods, $dayNum, $subject['sequence']);
+                    $timetablePeriod = $this->findPeriod($this->currentCycleId, $periods, $dayNum, $subject['sequence']);
 
                     if (null === $timetablePeriod) {
+                        $this->log->debug(sprintf(
+                            'Unknown timetable period: sis_timetable_cycle.id %s, day %s, sequence %s',
+                            $this->currentCycleId,
+                            $dayNum,
+                            $subject['sequence']
+                        ));
+
                         continue;
                     }
 
                     $this->log->debug(sprintf(
-                        'Looking for cycle_identifier %s, Week Offset %s, Day %s, period with sequence %s',
-                        $ext,
+                        'Looking for sis_timetable_cycle.id %s, Week Offset %s, Day %s, period with sequence %s',
+                        $this->currentCycleId,
                         $this->currentWeekOffset,
                         $dayNum,
                         $subject['sequence']

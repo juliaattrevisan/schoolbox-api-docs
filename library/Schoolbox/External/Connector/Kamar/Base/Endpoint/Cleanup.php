@@ -188,7 +188,7 @@ class Cleanup implements IStrategy
                     $source = "{$this->cacheDir}/{$xmlFile}";
                     $destination = "{$this->archiveDir}/" . pathInfo($source, PATHINFO_BASENAME);
 
-                    rename($source, $destination);
+//                    rename($source, $destination);
                 }
             }
 

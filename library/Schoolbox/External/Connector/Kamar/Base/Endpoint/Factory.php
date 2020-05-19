@@ -277,14 +277,14 @@ class Factory
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
         /* Week Offset, Term selection
-
+         *
          * TODO: Potentially configurable
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
          */
         $weekOffsetCalculator = new WeekOffset(
             $this->timetableCycleMapper,
-            Alaress_Date_Format::now(),
+            Alaress_Date_Format::newFromTimestamp(strtotime('2020-01-29 00:00:00')),
             $this->log
         );
 
