@@ -6,7 +6,6 @@
  *
  */
 use Schoolbox\Campus as CampusModel;
-use Schoolbox\CampusMapper;
 
 /**
  * Class External_Doublefirst_Timetable
@@ -27,18 +26,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var External_Doublefirst_Helper
      */
     private $helper;
@@ -51,8 +38,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('doublefirst');
-        $this->groupHandler = new Group();
-        $this->campusMapper = new CampusMapper();
         $this->helper = new External_Doublefirst_Helper();
     }
 
