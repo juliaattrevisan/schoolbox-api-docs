@@ -284,7 +284,7 @@ class Factory
          */
         $weekOffsetCalculator = new WeekOffset(
             $this->timetableCycleMapper,
-            Alaress_Date_Format::newFromTimestamp(strtotime('2020-01-29 00:00:00')),
+            Alaress_Date_Format::now(),
             $this->log
         );
 
