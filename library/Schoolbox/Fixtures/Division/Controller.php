@@ -247,14 +247,19 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Division $division)
     {
-        $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                ->setDivision($division)
-                ->setUser($user)
-                ->setSequence(0);
+            // Don't re-add any players already in the division
+            try {
+                $this->divisionUserMapper->save(
+                    $this->divisionUserMapper->createModel()
+                                             ->setDivision($division)
+                                             ->setUser($user)
+                                             ->setSequence(0)
+                );
+            } catch (MapperException $e) {
+                // Probably a duplicate key. That is fine
+            }
         }
-        $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
     }
 
@@ -297,15 +302,18 @@ class Controller extends AbstractController
             }
 
             if ($user instanceof User) {
-                $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                    ->setDivision($division)
-                    ->setUser($user)
-                    ->setSequence(0);
+                try {
+                    $this->divisionUserMapper->save(
+                        $this->divisionUserMapper->createModel()
+                                                 ->setDivision($division)
+                                                 ->setUser($user)
+                                                 ->setSequence(0)
+                    );
+                } catch (MapperException $e) {
+                    // Probably a duplicate key. That is fine
+                }
             }
         }
-
-        // and save
-        $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
 
     }
@@ -580,7 +588,7 @@ class Controller extends AbstractController
     {
         $this->positionMapper = $positionMapper;
         return $this;
-    }    
+    }
 
     /**
      * @return DivisionUserMapper
