@@ -1,8 +1,5 @@
 <?php
-
 /**
- * External Timetable Connection Interface.  Interface for timetable data to be fetched from external database systems
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,8 +9,15 @@ use Alaress\Redis;
 use External\CachingConnectorAbstract;
 use Schoolbox\Campus;
 
+/**
+ * Class External_Timetable
+ *
+ * External Timetable Connection Interface.
+ * Interface for timetable data to be fetched from external database systems
+ */
 class External_Timetable extends CachingConnectorAbstract implements External_TimetableInterface
 {
+
     /**
      * Constructor
      *
@@ -32,6 +36,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         );
     }
 
+
     /**
      * @inheritDoc
      */
@@ -39,6 +44,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
+
 
     /**
      * @inheritDoc
@@ -48,6 +54,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
+
     /**
      * @inheritDoc
      */
@@ -55,6 +62,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
+
 
     /**
      * @inheritDoc
@@ -70,6 +78,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $timeout);
     }
 
+
     /**
      * Gets the next (including today) or previous (not including today) date
      * that a timetable day number occurs on.
@@ -78,10 +87,8 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
      *
      * @param Campus $campus The campus ID to get the date for.
      * @param int $day The day number to get the date for.
-     * @param int $date A Unix timestamp representing the date to get, or
-     *                       today if not set.
-     * @param bool $previous True if previous date is to be found, instead of
-     *                       next date.
+     * @param int $date A Unix timestamp representing the date to get, or today if not set.
+     * @param bool $previous True if previous date is to be found, instead of next date.
      *
      * @throws InvalidArgumentException if $date or $campusId are invalid
      * @throws RangeException           if $day isn't found in ±365 days of $date
@@ -126,21 +133,36 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         return $thisDate;
     }
 
+
     /**
      * @see $this->getDateForDayNumber
+     * @param Campus $campus
+     * @param int $day
+     * @param null $date
+     * @return DateTime
+     * @throws InvalidArgumentException
+     * @throws RangeException
      */
     public function getPreviousDateForDayNumber($campus, $day, $date = null)
     {
         return $this->getDateForDayNumber($campus, $day, $date, true);
     }
 
+
     /**
      * @see $this->getDateForDayNumber
+     * @param Campus $campus
+     * @param int $day
+     * @param null $date
+     * @return DateTime
+     * @throws InvalidArgumentException
+     * @throws RangeException
      */
     public function getNextDateForDayNumber($campus, $day, $date = null)
     {
         return $this->getDateForDayNumber($campus, $day, $date, false);
     }
+
 
     /**
      * @inheritDoc
@@ -159,6 +181,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
+
     /**
      * @inheritdoc
      */
@@ -172,6 +195,15 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
      * @inheritDoc
      */
     public function getRoomTimetable(array $roomCodes): array
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

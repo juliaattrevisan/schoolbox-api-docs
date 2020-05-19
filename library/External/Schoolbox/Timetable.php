@@ -8,6 +8,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\User;
 
 /**
@@ -18,7 +19,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     use External_Schoolbox_TimetableDefinitionTrait;
 
 
-    /** @var IConnector $internalDatabase */
+    /**
+     * @var IConnector $internalDatabase
+     */
     private $internalDatabase;
 
 
@@ -173,10 +176,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param Campus $campus
-     * @param int|string    $date
+     * @param Campus     $campus
+     * @param int|string $date
      *
      * @return bool|int
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
@@ -441,5 +446,25 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         );
 
         return $statement->fetchAll();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        $cycles = TimetableCycleMapper::getInstance()->findAll();
+
+        $luCycles = [];
+
+        foreach ($cycles as $cycle) {
+            $luCycles[] = [
+                'key' => $cycle->getId(),
+                'value' => $cycle->getTitle()
+            ];
+        }
+
+        return $luCycles;
     }
 }

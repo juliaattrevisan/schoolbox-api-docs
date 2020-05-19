@@ -307,18 +307,9 @@ class Controller extends Base
             ];
         }
 
-        /* Available Timetable Cycles
+        /* Available Timetable Cycles from your current connector
          */
-        $cycles = TimetableCycleMapper::getInstance()->findAll();
-
-        $luCycles = [];
-
-        foreach ($cycles as $cycle) {
-            $luCycles[] = [
-                'key' => $cycle->getId(),
-                'value' => $cycle->getTitle()
-            ];
-        }
+        $luCycles = (new \External_Timetable())->findCycleLookup();
 
         $return = [
             'roles' => [
