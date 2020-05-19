@@ -1,32 +1,43 @@
 <?php
 /**
- * This file provides access to TASS timetable info
- *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 use Schoolbox\Campus;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 
+/**
+ * Class External_Tass_Timetable
+ *
+ * This file provides access to TASS timetable info
+ */
 class External_Tass_Timetable implements External_TimetableInterface
 {
     use External_MssqlConnector;
+
 
     /**
      * Keeps track of calendar day events
      */
     private $tassDay;
 
+
     /**
      * @var Group
      */
     private $groupHandler;
 
+
     /**
      * @var External_UserInterface
      */
     private $externalUser;
-    function __construct()
+
+
+    /**
+     * External_Tass_Timetable constructor.
+     */
+    public function __construct()
     {
         $this->setupDatabase();
         $this->groupHandler = new Group;
@@ -37,13 +48,13 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     private function getCampusCode(Campus $campus)
     {
-        list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
+        [$campusCode, $timetableCode] = explode('-', $campus->getExtTimetableCode());
         return $campusCode;
     }
 
     private function getTimetableCode(Campus $campus)
     {
-        list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
+        [$campusCode, $timetableCode] = explode('-', $campus->getExtTimetableCode());
         return $timetableCode;
     }
 
@@ -85,15 +96,17 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $timetableDef;
     }
 
+
     /**
      * Retrieve day number from TASS database
      *
      * @param Campus $campus
-     * @param int               $date
+     * @param int    $date
      *
      * @return int|string
+     * @throws \Alaress\Database\Exception
      */
-    function getDayNumber(Campus $campus, $date = 0)
+    public function getDayNumber(Campus $campus, $date = 0)
     {
         if (!$date) {
             $date = time();
@@ -105,13 +118,13 @@ class External_Tass_Timetable implements External_TimetableInterface
             'ttId'     => $this->getTimetableCode($campus),
         ];
 
-        $query = "
+        $query = '
             SELECT  day_code
             FROM    ttcalendar
             WHERE   cmpy_code = :cmpyCode AND
                     ttdate = :ttDate AND
                     tt_id = :ttId
-        ";
+        ';
 
         $result = $this->getConnector()->executeQuery($query, $params)->fetchColumn();
 
@@ -121,6 +134,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         return $result;
     }
+
 
     /**
      * Returns the day name
@@ -243,6 +257,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     }
 
+
     /**
      * @inheritDoc
      */
@@ -332,6 +347,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -390,5 +406,14 @@ class External_Tass_Timetable implements External_TimetableInterface
         $params = array_merge($params, $predicate['bindings']);
 
         return $this->getConnector()->executeQuery($query, $params)->fetchAll();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }
