@@ -610,7 +610,12 @@ class DataTransferObject
     {
         // Ensure this AssessmentSpec is being added correctly
         if (array_key_exists($assessmentSpec->getId(), $this->assessmentSpecToImplMap)) {
-            throw new \DomainException("AssessmentSpec has an Impl. Must be added as a Pair: {$assessmentSpec->getId()}");
+            throw new \DomainException(
+                sprintf(
+                    'Unable to import assessment #%d, as it has already been imported',
+                    $assessmentSpec->getId()
+                )
+            );
         }
         $this->checkUnitSpecCollection($unitSpecId);
 
@@ -644,7 +649,12 @@ class DataTransferObject
         $implId = $assessmentImpl->getId();
         // Ensure this AssessmentImpl does not have a Spec
         if (array_key_exists($implId, $this->assessmentImplToSpecMap) && null !== $this->assessmentImplToSpecMap[$implId]) {
-            throw new \DomainException("AssessmentImpl has a Spec. Must be added as a Pair: {$assessmentImpl->getId()}");
+            throw new \DomainException(
+                sprintf(
+                    'Unable to save implementation-only assessment #%d, as it has a specification',
+                    $assessmentImpl->getId()
+                )
+            );
         }
         $this->checkUnitSpecCollection($unitSpecId);
 
