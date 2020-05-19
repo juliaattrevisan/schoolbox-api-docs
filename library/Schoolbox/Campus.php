@@ -16,7 +16,6 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
  */
 class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 {
-
     use ModelTrait\HasSequence;
     use ModelTrait\UpdatedBy;
     use ModelTrait\CreatedAtDate;
@@ -49,9 +48,9 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 
 
     /**
-     * @var int
+     * @var string|null
      */
-    private $cycle;
+    private $cycleIdentifier;
 
 
     /**
@@ -155,21 +154,21 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getCycle(): ?int
+    public function getCycleIdentifier(): ?string
     {
-        return $this->cycle;
+        return $this->cycleIdentifier;
     }
 
 
     /**
-     * @param int|null $cycle
+     * @param string|null $cycleIdentifier
      * @return $this
      */
-    public function setCycle(?int $cycle): self
+    public function setCycleIdentifier(?string $cycleIdentifier): self
     {
-        $this->cycle = $cycle;
+        $this->cycleIdentifier = $cycleIdentifier;
         return $this;
     }
 }

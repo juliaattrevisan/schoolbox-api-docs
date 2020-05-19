@@ -46,8 +46,7 @@ ALTER TABLE `sis_timetable_cycle`
 -- Associate cycles with campuses
 
 ALTER TABLE `luCampus`
-    ADD COLUMN `cycle_id` INT(11) NULL AFTER `name`,
-    CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+    ADD COLUMN `cycle_identifier` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL AFTER `name`;
 
 -- Biggen the Timetable Cycle name to accommodate more info
 
