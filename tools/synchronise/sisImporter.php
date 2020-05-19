@@ -85,6 +85,19 @@ HELP;
         $type = $this->getConfig()->get('schooldata_import_data_source');
         $file = $this->getOpt(self::OPT_LONG_FILE);
 
+        /* You haven't specified a SUDS Data Source in Admin.
+         */
+        if (null === $type) {
+            echo <<<NULLTYPE
+
+You haven't specified a SUDS Data Source in Admin.
+
+
+NULLTYPE;
+            exit;
+
+        }
+
         /* Accept perform param from opts
          */
         $perform = $this->perform();
