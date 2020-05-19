@@ -146,6 +146,7 @@ class Controller extends Base
             $this->saveForLaterMapper->findOneByColumnList($columnList);
         } catch (BaseMapper\Exception\Deleted $e) {
             // Was in list, but was removed. Treated as an update action, not a restore action.
+            /** @var Model $savedForLater */
             $savedForLater = $e->getDeletedObject();
             $savedForLater->setDeletedAt(null);
             $this->saveForLaterMapper->save($savedForLater);
