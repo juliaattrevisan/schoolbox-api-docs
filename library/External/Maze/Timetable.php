@@ -1,20 +1,24 @@
 <?php
-
 /**
- * External_Maze_Timetable
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+use Schoolbox\Campus;
+
+/**
+ * Class External_Maze_Timetable
+ */
 class External_Maze_Timetable implements External_TimetableInterface
 {
+
     /**
      * An instance of MSSQL
      *
      * @var MSSQL
      */
     private $db;
+
 
     /**
      * Helper
@@ -23,12 +27,14 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     private $helper = null;
 
+
     /**
      * An instance of Group
      *
      * @var Group
      */
     private $groupHandler = null;
+
 
     /**
      * A user mapper, used within the timetable to fetch the period's teacher
@@ -37,12 +43,14 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     private $userMapper = null;
 
+
     /**
      * A cache of users retrieved from $this->userMapper.
      *
      * @var array|\Schoolbox\User[]
      */
     private $userCache = [];
+
 
     /**
      * Array key
@@ -51,12 +59,14 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     private $timetablePeriodLabel = 'TH_RLABEL';
 
+
     /**
      * Array key
      *
      * @var string
      */
     private $timetableDayLabel = 'TH_CLABEL';
+
 
     /**
      * Constructor
@@ -68,6 +78,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $this->setGroupHandler(new Group());
         $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
     }
+
 
     /**
      * Test method for experimentation
@@ -102,10 +113,11 @@ class External_Maze_Timetable implements External_TimetableInterface
 //		new \Alaress_ThreeProbe(null, $result1, null);
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $periodQuery = "
             SELECT TOP 1 *
@@ -149,6 +161,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $timetableDef;
     }
 
+
     /**
      * Get timetable period label
      *
@@ -160,36 +173,37 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
     }
 
+
     /**
      * Get the day number for the date specified
      *
-     * @param \Schoolbox\Campus $campus
-     * @param int $date
+     * @param Campus $campus
+     * @param int    $date
      * @return bool
+     * @throws InvalidArgumentException
      */
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    public function getDayNumber(Campus $campus, $date = 0)
     {
-	if ($date == 0) {
-		$tempDate = $this->getHelper()->currentDate();
-	}
-	else {
-		$temp = new \Alaress_Date_Format($date, 'U');
-		$tempDate = $temp->getDatabaseDate();
-	}
-
-
+        if ($date == 0) {
+            $tempDate = $this->getHelper()->currentDate();
+        }
+        else {
+            $temp = new Alaress_Date_Format($date, 'U');
+            $tempDate = $temp->getDatabaseDate();
+        }
 
         $query = "
-			SELECT TOP 1 QCOL
-			FROM TCTQ
-			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY AND TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-			WHERE TCTQKEY = CAST('{$tempDate}' AS DATE)
-		";
+            SELECT TOP 1 QCOL
+            FROM TCTQ
+            INNER JOIN TH ON TCTQ.QKEY = TH.THKEY AND TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+            WHERE TCTQKEY = CAST('{$tempDate}' AS DATE)
+        ";
 
         $result = $this->getDb()->getRow($query);
 
         return $result['QCOL'];
     }
+
 
     /**
      * Returns the day name
@@ -202,13 +216,14 @@ class External_Maze_Timetable implements External_TimetableInterface
         return 'Day ' . $dayNumber;
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         if ($now) {
-            $now = new \Alaress_Date_Format($now, 'U');
+            $now = new Alaress_Date_Format($now, 'U');
         } else {
             $now = Alaress_Date_Format::now();
         }
@@ -221,8 +236,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 
             foreach ($allTimes as $currentTime) {
 
-                /** @var \Alaress_Date_Format $startTime */
-                /** @var \Alaress_Date_Format $endTime */
+                /** @var Alaress_Date_Format $startTime */
+                /** @var Alaress_Date_Format $endTime */
                 $startTime = $currentTime['startTime'];
                 $endTime = $currentTime['endTime'];
 
@@ -243,10 +258,11 @@ class External_Maze_Timetable implements External_TimetableInterface
         );
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -263,10 +279,11 @@ class External_Maze_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -283,27 +300,31 @@ class External_Maze_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * Determine whether you're in a weekend
      *
      * @param string $date
      * @return bool
+     * @throws InvalidArgumentException
      */
     private function isWeekend($date)
     {
-        $object = new \Alaress_Date_Format(strtotime($date), 'U');
+        $object = new Alaress_Date_Format(strtotime($date), 'U');
         return $object->isWeekend();
     }
+
 
     /**
      * Find next Monday
      *
      * @param string $date
      * @return string
+     * @throws InvalidArgumentException
      */
     private function nextMonday($date)
     {
-        $object = new \Alaress_Date_Format(strtotime($date), 'U');
+        $object = new Alaress_Date_Format(strtotime($date), 'U');
 
         $dayIndex = $object->getWeekDayNumber();
 
@@ -318,18 +339,19 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $object->getUsingFormat('M j Y');
     }
 
+
     /**
      * Spawn a staff timetable for a particular user and day number
      *
-     * @param string $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param int $dayNumber
-     * @param \Alaress_Date_Format $date
+     * @param string              $externalUserId
+     * @param Campus              $campus
+     * @param int                 $dayNumber
+     * @param Alaress_Date_Format $date
      * @return array
      */
-    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null): array
+    public function getStaffTimetable($externalUserId, Campus $campus, $dayNumber, Alaress_Date_Format $date = null): array
     {
-        if ($date instanceof \Alaress_Date_Format) {
+        if ($date instanceof Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
         }
         else {
@@ -364,18 +386,18 @@ class External_Maze_Timetable implements External_TimetableInterface
          * specified date)
          */
         $query = "
-			SELECT *
-			FROM TH
-			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
-			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
-			AND THTQ.QCOL = '{$dayNumber}'
-			AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
-			ORDER BY QCOL, QROW
-		";
+            SELECT *
+            FROM TH
+            INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+            INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+            INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+            WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+            AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+            AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
+            AND THTQ.QCOL = '{$dayNumber}'
+            AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
+            ORDER BY QCOL, QROW
+        ";
 
         $allRows = $this->getDb()->getAll($query);
 
@@ -420,12 +442,17 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $finalTimetable;
     }
 
+
     /**
-     * @inheritDoc
+     * @param string                   $externalUserId
+     * @param Campus        $campus
+     * @param int                      $dayNumber
+     * @param Alaress_Date_Format|null $date
+     * @return array
      */
-    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null): array
+    public function getStudentTimetable($externalUserId, Campus $campus, $dayNumber, Alaress_Date_Format $date = null): array
     {
-        if ($date instanceof \Alaress_Date_Format) {
+        if ($date instanceof Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
         }
         else {
@@ -455,22 +482,22 @@ class External_Maze_Timetable implements External_TimetableInterface
         /* Proceed "normally"
          */
         $query = "
-			SELECT
-				THTQ.QROW, THTQ.QCOL, THTQ.SUBJ, THTQ.CLASS, THTQ.R1ROOM, THTQ.R2ROOM,
-				SU.FULLNAME,
-				TTTG.T1TEACH, TTTG.T2TEACH
-			FROM TH
-			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
-			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
-			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-			INNER JOIN TTTG ON THTQ.IDENT = TTTG.IDENT
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
-			AND THTQ.QCOL = '{$dayNumber}'
-			AND STMA.SKEY = '{$externalUserId}'
-		";
+            SELECT
+                THTQ.QROW, THTQ.QCOL, THTQ.SUBJ, THTQ.CLASS, THTQ.R1ROOM, THTQ.R2ROOM,
+                SU.FULLNAME,
+                TTTG.T1TEACH, TTTG.T2TEACH
+            FROM TH
+            INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+            INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+            INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+            INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+            INNER JOIN TTTG ON THTQ.IDENT = TTTG.IDENT
+            WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+            AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+            AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
+            AND THTQ.QCOL = '{$dayNumber}'
+            AND STMA.SKEY = '{$externalUserId}'
+        ";
 
         $allRows = $this->getDb()->getAll($query);
 
@@ -518,10 +545,12 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $finalTimetable;
     }
 
+
     /**
      * Get times for when periods begin and end
      *
      * @return array|bool
+     * @throws InvalidArgumentException
      */
     private function getPeriodTimes()
     {
@@ -529,12 +558,12 @@ class External_Maze_Timetable implements External_TimetableInterface
         /* TODO: Some serious assumption about 14 here
          */
         $query = "
-			SELECT TOP 14
-				CONVERT(VARCHAR, TIME_START, 120) AS startTime,
-				CONVERT(VARCHAR, TIME_END, 120) AS endTime
-			FROM TCTD
-			WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-		";
+            SELECT TOP 14
+                CONVERT(VARCHAR, TIME_START, 120) AS startTime,
+                CONVERT(VARCHAR, TIME_END, 120) AS endTime
+            FROM TCTD
+            WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+        ";
 
         $result = $this->getDb()->getAll($query);
 
@@ -543,8 +572,8 @@ class External_Maze_Timetable implements External_TimetableInterface
         if (is_array($result) && count($result)) {
             foreach ($result as $currentResult) {
                 $processed[] = array(
-                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'Y-m-d H:i:s'),
-                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'Y-m-d H:i:s'),
+                    'startTime' => new Alaress_Date_Format($currentResult['startTime'], 'Y-m-d H:i:s'),
+                    'endTime'   => new Alaress_Date_Format($currentResult['endTime'], 'Y-m-d H:i:s'),
                 );
             }
         }
@@ -552,10 +581,11 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $processed;
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -609,6 +639,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -618,13 +649,16 @@ class External_Maze_Timetable implements External_TimetableInterface
         return array();
     }
 
+
     /**
      * Finds a user by their MAZE ID.
      *
      * @param mixed $mazeId
      * @return \Schoolbox\User
-     * @throws RuntimeException if $mazeId isn't set.
-     *                          This will be interpreted as no user found.
+     * @throws RuntimeException if $mazeId isn't set. This will be interpreted as no user found.
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\NotFound
      */
     private function findUserByMazeId($mazeId)
     {
@@ -651,6 +685,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $this->db = $db;
     }
 
+
     /**
      * Get db
      *
@@ -660,6 +695,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         return $this->db;
     }
+
 
     /**
      * Set helper
@@ -671,6 +707,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $this->helper = $helper;
     }
 
+
     /**
      * Get helper
      *
@@ -680,6 +717,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         return $this->helper;
     }
+
 
     /**
      * Set group handler
@@ -691,6 +729,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $this->groupHandler = $groupHandler;
     }
 
+
     /**
      * Get group handler
      *
@@ -701,6 +740,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         return $this->groupHandler;
     }
 
+
     /**
      * @return \Schoolbox\UserMapper
      */
@@ -708,6 +748,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         return $this->userMapper;
     }
+
 
     /**
      * @param \Schoolbox\UserMapper $userMapper
@@ -717,5 +758,14 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         $this->userMapper = $userMapper;
         return $this;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }
