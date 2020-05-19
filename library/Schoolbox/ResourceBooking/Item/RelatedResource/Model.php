@@ -6,11 +6,13 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
-namespace Schoolbox\ResourceBooking\Item\RelatedResource;
-use Schoolbox\ResourceBooking\Item\Model as Resource;
 
-class Model {
+namespace Schoolbox\ResourceBooking\Item\RelatedResource;
+
+use Schoolbox\ResourceBooking\Item\Model as ResourceModel;
+
+class Model
+{
 
     /**
      * @var int
@@ -18,20 +20,21 @@ class Model {
     protected $id;
 
     /**
-     * @var Resource
+     * @var ResourceModel
      */
     protected $resource;
 
     /**
-     * @var Resource
+     * @var ResourceModel
      */
     protected $relatedResource;
 
     /**
-     * @param  int   $id
+     * @param int $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -39,39 +42,44 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * @param  Resource $relatedResource
+     * @param ResourceModel $relatedResource
      * @return $this
      */
-    public function setRelatedResource($relatedResource) {
+    public function setRelatedResource($relatedResource)
+    {
         $this->relatedResource = $relatedResource;
         return $this;
     }
 
     /**
-     * @return Resource
+     * @return ResourceModel
      */
-    public function getRelatedResource() {
+    public function getRelatedResource()
+    {
         return $this->relatedResource;
     }
 
     /**
-     * @param  Resource $resource
+     * @param ResourceModel $resource
      * @return $this
      */
-    public function setResource($resource) {
+    public function setResource($resource)
+    {
         $this->resource = $resource;
         return $this;
     }
 
     /**
-     * @return Resource
+     * @return ResourceModel
      */
-    public function getResource() {
+    public function getResource()
+    {
         return $this->resource;
     }
 
