@@ -331,7 +331,7 @@ if (\count($allFolderList)) {
 
     foreach ($allFolderList as $currentFolder) {
         $folderId          = $currentFolder->getId();
-        $alreadyInCategory = $event->getFolderCollection()->getBy('categoryId', $folderId) || in_array($folderId, $previousInvolvement);
+        $alreadyInCategory = $event->getFolderCollection()->getBy('id', $folderId) || in_array($folderId, $previousInvolvement);
         $fromHomepage      = (($_GET['level'] == Event::ACCESS_GROUP) && ($_GET['homepageId'] == $folderId));
 
         /* If you have already chosen these categories, or if it's specified
