@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timetable Colour Model
  *
@@ -8,49 +9,53 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Timetable_Colour {
-	/**
-	 * @var int
-	 */
-	protected $timetable_colour_id;
+class Timetable_Colour
+{
+    /**
+     * @var int
+     */
+    protected $timetableColourId;
 
-	/**
-	 * @var string
-	 */
-	protected $hex_colour;
+    /**
+     * @var string
+     */
+    protected $hexColour;
 
-	/**
-	 * @param  string $hex_colour
-	 *
-	 * @return $this
-	 */
-	public function setHexColour($hex_colour) {
-		$this->hex_colour = $hex_colour;
-		return $this;
-	}
+    /**
+     * @param string $hexColour
+     *
+     * @return $this
+     */
+    public function setHexColour($hexColour): self
+    {
+        $this->hexColour = $hexColour;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getHexColour() {
-		return $this->hex_colour;
-	}
+    /**
+     * @return null|string
+     */
+    public function getHexColour(): ?string
+    {
+        return $this->hexColour;
+    }
 
-	/**
-	 * @param  int $timetable_colour_id
-	 *
-	 * @return $this
-	 */
-	public function setTimetableColourId($timetable_colour_id) {
-		$this->timetable_colour_id = $timetable_colour_id;
-		return $this;
-	}
+    /**
+     * @param int $timetableColourId
+     *
+     * @return $this
+     */
+    public function setTimetableColourId($timetableColourId): self
+    {
+        $this->timetableColourId = $timetableColourId;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getTimetableColourId() {
-		return $this->timetable_colour_id;
-	}
-
+    /**
+     * @return null|int
+     */
+    public function getTimetableColourId(): ?int
+    {
+        return $this->timetableColourId;
+    }
 }
