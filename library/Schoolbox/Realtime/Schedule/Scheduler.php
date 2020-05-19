@@ -164,7 +164,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $this->onHangup();
         }
 
-        if ($action === 'dropCache') {
+        if ($action === 'refreshConfiguration') {
             $this->log->debug('Dropping config cache');
             $this->conf->dropCache();
         }

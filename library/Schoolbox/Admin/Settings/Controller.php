@@ -122,7 +122,7 @@ class Controller extends ConfigController
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
             }
             if ($redisClient && $dropNotifierConfigCache) {
-                $redisClient->publish('scheduled.' . INSTANCE_ID . '.dropCache', '');
+                $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
         }
 
