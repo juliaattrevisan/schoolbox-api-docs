@@ -1,7 +1,5 @@
 <?php
 /**
- * Schooledge implementation of timetable.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,6 +7,9 @@
 use Schoolbox\Campus;
 use Schoolbox\UserMapper;
 
+/**
+ * Class External_Schooledge_Timetable
+ */
 class External_Schooledge_Timetable implements External_TimetableInterface
 {
 
@@ -19,12 +20,14 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     private const TIMETABLE_DATE_TYPE_NON_DAY = 10000;
 
+
     /**
      * Timetable date type constant - this day is forced to a particular day in the sequence.
      *
      * @var int
      */
     private const TIMETABLE_DATE_TYPE_FIXED_DAY = 10003;
+
 
     /**
      * Timetable date type constant - the timetable restarts on this day.
@@ -33,12 +36,14 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     private const TIMETABLE_DATE_TYPE_RESTART_DAY = 10002;
 
+
     /**
      * Timetable date type constant - this day is in the sequence, but is skipped?
      *
      * @var int
      */
     private const TIMETABLE_DATE_TYPE_SKIP_DAY = 10001;
+
 
     // Common timetable query parts
     private $classSelect = '
@@ -538,6 +543,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                     $dayIndex = $keepIndex;
                     break;
 
+                case self::TIMETABLE_DATE_TYPE_FIXED_DAY:
                 case self::TIMETABLE_DATE_TYPE_SKIP_DAY:
                     break;
 
@@ -548,9 +554,6 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                             break;
                         }
                     }
-                    break;
-
-                case self::TIMETABLE_DATE_TYPE_FIXED_DAY:
                     break;
 
                 default:
@@ -883,5 +886,14 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             AND   t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }
