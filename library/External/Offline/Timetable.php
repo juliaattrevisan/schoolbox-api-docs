@@ -30,6 +30,7 @@ class External_Offline_Timetable implements External_TimetableInterface, IOfflin
         return 0;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -56,6 +57,7 @@ class External_Offline_Timetable implements External_TimetableInterface, IOfflin
         return [];
     }
 
+
     /**
      * @inheritDoc
      */
@@ -75,7 +77,7 @@ class External_Offline_Timetable implements External_TimetableInterface, IOfflin
     public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         // Throw exception to let the user know we cannot fetch it for them
-        throw new Schoolbox\External\Exception("Timetable is unavailable.");
+        throw new Schoolbox\External\Exception('Timetable is unavailable.');
     }
 
 
