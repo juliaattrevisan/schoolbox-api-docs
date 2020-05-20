@@ -9,7 +9,7 @@
                     eventName = $(this).attr('data-event-type'),
                     text      = 'Are you sure you wish to delete this '+eventName+'?';
                 if (eventName === 'booking') {
-                    text      = 'Are you sure you wish to delete this '+eventName+' and any related bookings?';
+                    text      += ' (All bookings for related resources will also be deleted.)';
                 }
                 $(this).confirmDialog({
                     text: text,
@@ -99,7 +99,7 @@
         <h2>This booking is part of a series</h2>
         <p class="icon-alert">
             Would you like to delete only this booking, or all in the series?
-            (All bookings related to any deleted bookings will be deleted as well.)
+            (All bookings for related resources for any deleted bookings will also be deleted.)
         </p>
         <ul class="flex-list buttons">
             <li><a href="#" class="button" data-action="self">Only this booking</a></li>
