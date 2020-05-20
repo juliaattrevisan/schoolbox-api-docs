@@ -1,5 +1,11 @@
 # Testing this thing
 
+You'll need a set of Kamar xml files. You can download a bunch from a dev server in /mnt/data/cache/stream/kamar, or if they've already been processed, in a subfolder there called `archive`.
+
+The Kamar importer absorbs a set of xml files that the Kamar software randomly vomits into the directory, so when we process them, we push them into an airlock system so if something breaks, we can analyse the data set that caused the breakage. When the next import runs, the archive is emptied into the void, then newly-processed xmls are pushed into the archive; thus, the lifecycle begins anew.
+
+It's pretty convenient to keep a bunch on standby in a safe location so you can inspect contents and structure on-demand without having to do the rigmarole of shanking down files somewhere.
+
 ## 1. Purge Legacy Data
 You'll have to purge legacy data's profile first. It contains broken data which is now strictly disallowed from existing. In isams, there's a user with external id 71 which clashes with someone in legacy data who is broken. Base Profiles can't exist on their own.
 

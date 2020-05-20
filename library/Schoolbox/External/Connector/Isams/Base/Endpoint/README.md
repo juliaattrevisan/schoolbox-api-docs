@@ -1,5 +1,9 @@
 # Testing this thing
 
+The iSAMS importer shanks down an xml file from the endpoint. You'll need one of those if you want to be speedy, otherwise it'll go and download one every time you run the importer. You can specify a source file using the `sisImporter.php` tool; `sisImporter.php --help` tells you more.
+
+That xml file will contain everything from Profiles to Timetable data. We use `xpath` to roam around the xml and eat everything we need. The xml files are generally quite girthy so it's convenient to have one on standby in a safe place.
+
 ## 1. Purge Legacy Data
 You'll have to purge legacy data's profile first. It contains broken data which is now strictly disallowed from existing. In isams, there's a user with external id 71 which clashes with someone in legacy data who is broken. Base Profiles can't exist on their own.
 
