@@ -151,25 +151,5 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
             'label' => $this->getName(),
         ];
     }
-
-
-    /**
-     * @return string|null
-     */
-    public function getCycleIdentifier(): ?string
-    {
-        return $this->cycleIdentifier;
-    }
-
-
-    /**
-     * @param string|null $cycleIdentifier
-     * @return $this
-     */
-    public function setCycleIdentifier(?string $cycleIdentifier): self
-    {
-        $this->cycleIdentifier = $cycleIdentifier;
-        return $this;
-    }
 }
 

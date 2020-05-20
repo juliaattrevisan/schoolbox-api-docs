@@ -449,14 +449,10 @@ class Controller extends Base
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
-                        'width'     => 2,
-                    ],
-                    'cycleIdentifier' => [
-                        'caption'   => 'Cycle',
                         'mandatory' => true,
                         'nullable'  => true,
                         'nullable_label' => 'N/A',
-                        'width'     => 4,
+                        'width'     => 6,
                         'lookup'    => $luCycles,
                     ],
                     'timetableDay'  => [

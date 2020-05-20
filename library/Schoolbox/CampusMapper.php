@@ -32,7 +32,6 @@ class CampusMapper extends Mapper
 
         $this->uses('id', Mapper::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', Mapper::TYPE_STRING);
-        $this->uses('cycle_identifier', Mapper::TYPE_STRING);
         $this->uses('ext_timetable_code', Mapper::TYPE_STRING);
         $this->uses('timetable_day', Mapper::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
