@@ -419,6 +419,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 );
             }
 
+            // Trim time and format strings, in order to be tolerant of misinput
+            if (is_string($dateTime)) {
+                $dateTime = trim($dateTime);
+            }
+            if (is_string($inputDateFormat)) {
+                $inputDateFormat = trim($inputDateFormat);
+            }
+
             $newTimezone = $timezone ?: $this->getDefaultTimezone();
             if ($inputDateFormat === 'U') {
                 // Timestamp special case handling - make it work with negative datetimes
