@@ -222,7 +222,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     /** @var Router $router */
                     $router   = $this->getSitePage()->getDi()->get('router');
                     $deepLink = urlencode(http_build_query($deepLinkParams));
-                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
+                    $prodMenu = $this->getConfigLoader()->get('external_tass_attendance_show_prod_menu') ? 'Y' : 'N';
+                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}&prod_menu={$prodMenu}";
                 } catch (\Throwable $e) {
                     \trigger_error($e->getMessage(), E_USER_WARNING);
                     return '';
