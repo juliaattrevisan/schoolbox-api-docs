@@ -248,7 +248,7 @@ foreach ($typeList as $type) {
 
             /** @var \Schoolbox\Resource\Folder\Model $currentFolder */
             foreach ($currentEvent->getFolderCollection() as $currentFolder) {
-                $allFolders[] = $currentFolder->getName();
+                $allFolders[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByIdWithFallback($currentFolder->getId())->getTitle();
             }
 
             $allCampuses = [];
