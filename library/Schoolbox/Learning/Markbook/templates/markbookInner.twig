@@ -86,10 +86,10 @@
                     {% for assessment in markbook.assessments %}
                         {% set stats = markbook.assessmentStatistics[assessment.id] %}
                         <th data-assessment="{{ assessment.id }}">
-                            <span {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
+                            <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                                 {{ stats.mean | default('–') }}
                             </span>
-                            {% if stats.draftMean and (markbook.hasDraft[assessment.id] is defined) %}
+                            {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
                                 <span data-draft-mark class="meta" style="display:none;">
                                     {{ stats.draftMean | default('–') }}
                                 </span>
@@ -125,6 +125,7 @@
                                 <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
                                     {% for currentOption, label in allOptions %}
                                         <option value="{{ currentOption }}"
+                                                {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
                                                 {% if currentOption == selected %}selected="selected"{% endif %}> {{ label|raw }} </option>
                                     {% endfor %}
                                 </select>
@@ -207,11 +208,11 @@
                                     {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
                                      <a class="{{ urgency.marks(normalisedMark) }}"
                                         href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
-                                        title="{{ participant.authoritativeFeedback(true).comment }}">{{ decorator.label(participant, true) }}</a>
+                                        title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment : '' }}">{{ decorator.label(participant, true) }}</a>
                                     {% if draftMark %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none"
                                            class="meta"
-                                           title="{{ participant.authoritativeFeedback(false).comment }}">{{ decorator.label(participant, false) }}</a>
+                                           title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</a>
                                     {% endif %}
                                     <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                     {% if not participant.plan.isDynamic %}

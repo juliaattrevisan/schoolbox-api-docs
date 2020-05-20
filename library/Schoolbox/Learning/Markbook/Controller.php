@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\Codec;
+use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use function func_get_args;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -222,6 +223,7 @@ class Controller extends Base
                     'viewee'       => $viewee,
                     'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getAsString(),
             ]));
 
