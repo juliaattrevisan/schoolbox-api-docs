@@ -57,3 +57,5 @@ Repeat step 3 to simulate what a crontab might do. The cycle assignation and tim
 ### 6.1 A Note About Cycles
 
  If a cycle already exists for the given `PublishedTimetable` identifier (an integer) then that cycle gets reused. Otherwise, it'll truncate `sis_timetable_cycle` and create a new cycle, to prevent the accumulation of empty cycles that have since been obsoleted. If I didn't do that, someone would have to manually assign cycles every time the importer ran (nightly) which is, of course, an absurd requirement. Now you only need to manually assign it if the timetable changes, typically at school rollover times like when a term ends; that's when a new `PublishedTimetable` integer is defined and it's stored in `sis_timetable_cycle.cycle_identifier`.
+
+Cycles are associated with Campuses via `luCampus.ext_timetable_code`. This field is synonymous with `sis_timetable_cycle.cycle_identifier` and both can be used to join data to each other.

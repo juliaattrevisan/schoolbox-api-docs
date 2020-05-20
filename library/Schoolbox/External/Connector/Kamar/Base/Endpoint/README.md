@@ -74,3 +74,7 @@ All his stuff should display.
 ## 6. Reimport
 
 Repeat step 3 to simulate what a crontab might do. The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
+
+### 6.1 A Note About Cycles
+
+Cycles are associated with Campuses via `luCampus.ext_timetable_code`. This field is synonymous with `sis_timetable_cycle.cycle_identifier` and both can be used to join data to each other.

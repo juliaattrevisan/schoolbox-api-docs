@@ -81,7 +81,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
                 FROM sis_timetable_cycle
                 WHERE cycle_identifier = :campusId
             ',
-            ['campusId' => $campus->getCycleIdentifier()]
+            ['campusId' => $campus->getExtTimetableCode()]
         );
 
         if ($definition = $timetableQuery->fetch()) {

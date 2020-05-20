@@ -99,7 +99,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             return $this->internalDatabase->executeQuery(
                 $query,
                 [
-                    'campusId' => $campus->getCycleIdentifier(),
+                    'campusId' => $campus->getExtTimetableCode(),
                     'day'      => $day,
                 ]
             )->fetchAll();
@@ -108,7 +108,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $this->internalDatabase->executeQuery(
             $query,
             [
-                'campusId' => $campus->getCycleIdentifier(),
+                'campusId' => $campus->getExtTimetableCode(),
             ]
         )->fetchAll();
     }
@@ -153,7 +153,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 AND         tp.day = :dayNumber
             ',
             [
-                'campusId'  => $campus->getCycleIdentifier(),
+                'campusId'  => $campus->getExtTimetableCode(),
                 'now'       => $time->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT),
                 'dayNumber' => $dayNumber,
             ]
