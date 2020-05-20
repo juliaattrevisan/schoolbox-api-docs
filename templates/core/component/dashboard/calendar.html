@@ -5,10 +5,14 @@
             $('form[data-rsvp-form]').calendarAttendance();
             $('a[data-delete-single]').on('click', function () {
                 $('[data-reveal]').hide();
-                var eventId = $(this).attr('data-event-id');
-                var eventName = $(this).attr('data-event-type');
+                var eventId   = $(this).attr('data-event-id'),
+                    eventName = $(this).attr('data-event-type'),
+                    text      = 'Are you sure you wish to delete this '+eventName+'?';
+                if (eventName === 'booking') {
+                    text      = 'Are you sure you wish to delete this '+eventName+' and any related bookings?';
+                }
                 $(this).confirmDialog({
-                    text: 'Are you sure you wish to delete this '+eventName+'?',
+                    text: text,
                     confirmEvent: function() {
                         $.post($('#delete-single-'+eventId).val(), {
                             action: 'Delete',
@@ -95,6 +99,7 @@
         <h2>This booking is part of a series</h2>
         <p class="icon-alert">
             Would you like to delete only this booking, or all in the series?
+            (All bookings related to any deleted bookings will be deleted as well.)
         </p>
         <ul class="flex-list buttons">
             <li><a href="#" class="button" data-action="self">Only this booking</a></li>

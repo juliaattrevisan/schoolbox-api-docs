@@ -638,8 +638,13 @@
 
         <reveal-modal ref="bookingDeleteModal">
             <template v-if="eventExtendedProps.seriesId">
-                <h2>This booking is part of a series</h2>
-                <p>Would you like to delete only this booking, or all in the series?</p>
+                <h2>This booking is part of a recurring series</h2>
+                <p>
+                    Would you like to delete only this booking, or all recurrences in the series?
+                    <template v-if="eventExtendedProps.booking.related.length">
+                        (All bookings related to any deleted bookings will be deleted as well.)
+                    </template>
+                </p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSelf">Only this booking</a></li>
                     <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSeries">All bookings in the series</a></li>
@@ -648,7 +653,8 @@
             </template>
             <template v-else>
                 <h2>Please confirm</h2>
-                <p>Are you sure you wish to delete this booking?</p>
+                <p v-if="eventExtendedProps.booking.related.length">Are you sure you wish to delete this booking and any related bookings?</p>
+                <p v-else>Are you sure you wish to delete this booking?</p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Yes</a></li>
                     <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">No</a></li>
