@@ -104,8 +104,13 @@ class Definition implements IStrategy
 
         $ext = null;
 
+        /* Exit if you can't identify the cycle
+         */
         if ($publishedTimetables) {
             $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
+        } else {
+            $this->log->debug('Cannot identify cycle identifier for PublishedTimetables in this xml.');
+            exit;
         }
 
         $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
@@ -131,7 +136,8 @@ class Definition implements IStrategy
              * Status report where I tried to expose it
              */
             $cycleName = sprintf(
-                '%s (%s-%s)',
+                '%s: %s (%s-%s)',
+                $ext,
                 trim((string)$cycle->Name),
                 $cycleStart->getShortDateOnly(),
                 $cycleEnd->getShortDateOnly()
