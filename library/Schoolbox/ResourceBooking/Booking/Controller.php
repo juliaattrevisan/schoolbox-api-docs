@@ -840,11 +840,29 @@ class Controller extends Base
      */
     public function cancel(Model $item)
     {
-        $this->getBookingMapper()->delete($item);
-        $series = $this->getSeriesBookings($item);
+        // Delete:
+        // * the booking itself
+        // * any related bookings
+        // * maybe the booking's event?
+        $idProperty    = $this->bookingMapper->getIdentifierProperty();
+        $itemsToDelete = $this->bookingMapper->createCollection();
+        $itemsToDelete->add($item);
+        $itemsToDelete = $itemsToDelete->mergeUnique(
+            $this->bookingMapper->findRelatedBookings($item->getId()),
+            $idProperty
+        );
+        $series        = $this->getSeriesBookings($item);
         if (count($series)) {
-            $this->getBookingMapper()->delete($series);
+            $itemsToDelete = $itemsToDelete->mergeUnique($series, $idProperty);
+            foreach ($series as $seriesBooking) {
+                $itemsToDelete = $itemsToDelete->mergeUnique(
+                    $this->bookingMapper->findRelatedBookings($seriesBooking->getId()),
+                    $idProperty
+                );
+            }
         }
+        $this->bookingMapper->delete($itemsToDelete);
+
         $callbackUrl = $this->getStatusChangeCallbackUrl();
 
         // The callback URL might point to the edit page for this booking.
