@@ -4535,3 +4535,7 @@ parameters:
 			count: 2
 			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
 
+		-
+			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
