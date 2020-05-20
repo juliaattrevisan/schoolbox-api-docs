@@ -223,7 +223,7 @@ class Controller extends Base
                     'viewee'       => $viewee,
                     'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'availableVisibilities' => Visibility::getAvailableVisibilities(),
+                    'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getAsString(),
             ]));
 

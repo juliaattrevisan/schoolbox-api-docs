@@ -372,7 +372,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'folder'                => $context->getFolder(),
             'assessmentType'        => AssessmentType::objectToString($assessment),
             'markVisibility'        => $assessment->getMarkVisibility(),
-            'availableVisibilities' => FeedbackVisibility::getAvailableVisibilities(),
+            'availableVisibilities' => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
             'allWorkTypes'          => $this->workTypeMapper->findAll(),
         ];
 

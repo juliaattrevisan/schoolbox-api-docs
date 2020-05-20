@@ -13,14 +13,15 @@ class Visibility
 {
     /**
      * Available visibilities for assessments
+     * @param int $visibilityMax
      * @return array
      */
-    public static function getAvailableVisibilities(): array
+    public static function getAvailableVisibilities(int $visibilityMax): array
     {
         $availableVisibilities = [
             IAssessable::MARK_VISIBILITY_PRIVATE,
         ];
-        switch (\Config::get('submission_visibility_max')) {
+        switch ($visibilityMax) {
             case IAssessable::MARK_VISIBILITY_PRIVATE:
                 break;
 
