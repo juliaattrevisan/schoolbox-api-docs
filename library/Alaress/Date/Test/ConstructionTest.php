@@ -139,4 +139,31 @@ class ConstructionTest extends TestCase
     {
         $this->buildDateObject('2015-03-25', ['d/m/Y', 'Ymd']);
     }
+
+    /**
+     * Test trim of date input
+     */
+    public function testTrimDateTime()
+    {
+        $date = $this->buildDateObject(' 2015-03-25 ', 'Y-m-d');
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+    }
+
+    /**
+     * Test trim of a single date format
+     */
+    public function testTrimDateFormat()
+    {
+        $date = $this->buildDateObject('2015-03-25', ' Y-m-d ');
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+    }
+
+    /**
+     * Test trim of multiple date formats
+     */
+    public function testTrimMultipleDateFormats()
+    {
+        $date = $this->buildDateObject('25/03/2015', [' d/m/Y ', ' Y-m-d ']);
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+    }
 }
