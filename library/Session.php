@@ -292,7 +292,7 @@ class Session
     /**
      * @param string    $username
      * @param string    $password
-     * @param string    $ds
+     * @param resource  $ds
      * @param string    $ldap_user
      * @param string    $ldap_base
      * @param int       $version
@@ -324,8 +324,8 @@ class Session
 
                 // failed to bind. find out why.
                 if (!$bind) {
-                    // get LDAP response: 0x0032 correlates to LDAP_OPT_DIAGNOSTIC_MESSAGE (but PHP doesn't map it by default)
-                    if (ldap_get_option($ds, 0x0032, $ldap_error)) {
+                    // get LDAP response
+                    if (ldap_get_option($ds, LDAP_OPT_DIAGNOSTIC_MESSAGE, $ldap_error)) {
                         // extract error code
                         preg_match('/(data [0-9a-z]*)/', $ldap_error, $matches);
                         // if the preg_match finds an error formatted as expected
