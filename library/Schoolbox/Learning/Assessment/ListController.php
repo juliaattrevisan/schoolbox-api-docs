@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -18,6 +19,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -300,16 +302,15 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @throws Deleted
      * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws InvalidStatusCode
      */
     public function updateWeight(IAssessable $assessment): void
     {
         $weight = (int) $this->getRequest()->post['weight'];
         if ($weight < 0) {
-            throw new InvalidArgumentException("Invalid value!");
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
+            return;
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment);
@@ -327,13 +328,20 @@ class ListController extends Web\Controller\Base
      * @throws LogicException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws InvalidStatusCode
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility = $this->getRequest()->post['visibility'];
+        $visibility            = $this->getRequest()->post['visibility'];
+        $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
+        if (!in_array($visibility, $availableVisibilities)) {
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid visibility']));
+            return;
+        }
         $assessment->setMarkVisibility($visibility);
         $this->getAssessmentMapper()->save($assessment);
-        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Success!']));
+        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Success!']));
     }
 
     /**

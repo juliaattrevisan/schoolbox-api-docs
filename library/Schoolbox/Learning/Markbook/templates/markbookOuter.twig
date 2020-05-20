@@ -57,8 +57,9 @@
                 if (typeof $weightInput !== 'undefined') {
                     $weightInput.focus().addClass('invalid-data');
                 }
+                var temp = $.parseJSON(response.responseText);
                 $toast.toastTimeout({
-                    text: 'Failed to save weight',
+                    text: 'Failed : ' + temp.error,
                     css: 'alert'
                 });
             });
