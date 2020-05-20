@@ -452,12 +452,12 @@ class Controller extends Base
                         'mandatory' => true,
                         'nullable'  => true,
                         'nullable_label' => 'N/A',
-                        'width'     => 6,
+                        'width'     => 5,
                         'lookup'    => $luCycles,
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 1,
+                        'width'     => 2,
                     ]
                 ]
             ],
@@ -678,6 +678,17 @@ class Controller extends Base
                 ]
             ],
         ];
+
+        /* Revert back to a freeform input field if $luCycles is empty and
+         * you can't choose anything (dropdown field is kind of useless)
+         */
+        if (!count($luCycles)) {
+            unset(
+                $return['campus']['fields']['extTimetableCode']['nullable'],
+                $return['campus']['fields']['extTimetableCode']['nullable_label'],
+                $return['campus']['fields']['extTimetableCode']['lookup']
+            );
+        }
 
         // If pastoral severities are disabled by policy, don't display item on the list screen
 
