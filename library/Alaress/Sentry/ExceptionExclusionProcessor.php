@@ -54,7 +54,7 @@ class ExceptionExclusionProcessor extends Raven_Processor
                 continue;
             }
             foreach ($this->excludedClasses as $excludedClass) {
-                if (is_a($type, $excludedClass) || is_subclass_of($type, $excludedClass)) {
+                if (is_a($type, $excludedClass, true)) {
                     unset($data['exception']['values'][$i]);
                     break;
                 }
