@@ -440,8 +440,17 @@ class Session
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
         $ldapCaCertPath    = null;
         if ($ldapCaCertHash) {
+            // Copy this file to local cache somewhere (stream_dir I guess)
             $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
-            $ldapCaCertPath = '';
+            $ldapCaCertPath = sprintf(
+                '%s/ldap-ca-cert-%s-%s',
+                Config::get('stream_dir'),
+                INSTANCE_ID,
+                $ldapCaCert->getHash()
+            );
+            if (!file_exists($ldapCaCertPath)) {
+                file_put_contents($ldapCaCertPath, $ldapCaCert->read());
+            }
         }
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword, $ldapCaCertPath);
