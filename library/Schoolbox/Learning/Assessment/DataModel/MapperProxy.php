@@ -424,9 +424,12 @@ class MapperProxy
      */
     public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
+        // User's participation cannot be assumed: they cannot be assumed to be in the folder
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->findAllByUnitImplementationIds($unitImplIds, $options),
-            $student
+            $student,
+            false,
+            false
         );
     }
 
@@ -466,7 +469,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation cannot be assumed: they cannot be assumed to be in the folder
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            false
+        );
     }
 
     /**
@@ -564,7 +573,14 @@ class MapperProxy
     public function findAllByProjectIdForReview($projectId, User $student = null, array $options = [])
     {
         $assessments = $this->findAllByProjectId($projectId, $options);
-        return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
+
+        // User's participation cannot be assumed: they cannot be assumed to be in the project
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $assessments,
+            $student,
+            false,
+            false
+        );
     }
 
 
@@ -695,7 +711,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation can be assumed: we've fetched based on the student's folders
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            true
+        );
     }
 
 
@@ -762,7 +784,13 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        // User's participation can be assumed: we've fetched based on the student's folders
+        return $this->loadParticipantsIntoAssessmentCollection(
+            $this->translateToDomainModelCollection($assessments),
+            $student,
+            false,
+            true
+        );
     }
 
 
@@ -1234,8 +1262,15 @@ class MapperProxy
      * Loads participants into a collection of assessables.
      *
      * @param Collection $collection
-     * @param User       $user           If specified, only load this user's interactions
-     * @param bool       $removeExcluded Set to true to exclude excluded non-member participants
+     * @param User       $user                If specified, only load this user's interactions
+     * @param bool       $removeExcluded      Set to true to exclude excluded non-member participants
+     * @param bool       $assumeParticipation if true, assume $user is a participant in the assessment without checking
+     *                                        the assessment's folder.
+     *                                        Some places which may have called this may have already loaded a student's
+     *                                        folders, so they already know $user is a participant: this avoids a call
+     *                                        to the SIS to determine if $user is actually a participant in the
+     *                                        assessment's folder.
+     *                                        Only has an effect if $user is set.
      * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -1244,12 +1279,14 @@ class MapperProxy
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
         User $user = null,
-        bool $removeExcluded = false
+        bool $removeExcluded = false,
+        bool $assumeParticipation = false
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
             $user,
-            $removeExcluded
+            $removeExcluded,
+            $assumeParticipation
         );
     }
 
