@@ -369,16 +369,25 @@ class Controller extends Base
     {
         $records  = $this->getReportData($report);
         $exporter = new \Report_Exporter($report->getName());
-        $exporter->setHeadings([
+        $headings = [
             'Pastoral ID'  => 'Pastoral ID',
             'Student Name' => 'Student Name',
             'Student ID'   => 'Student ID',
             'Title'        => 'Title',
             'Type'         => 'Type',
             'Sub-Type'     => 'Sub-Type',
+        ];
+        if ($this->getConfigLoader()->get('pastoral_severity')) {
+            $headings['Severity'] = 'Severity';
+        }
+        $headings = array_merge($headings, [
             'Tags'         => 'Tags',
             'Body'         => 'Body',
+            'Created Date' => 'Created Date',
+            'Created By'   => 'Created By',
         ]);
+
+        $exporter->setHeadings($headings);
 
         // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
         $exporter->setData($records, [$this, 'dataManipulator']);
@@ -400,7 +409,10 @@ class Controller extends Base
             'Type'         => $record->getType() ? $record->getType()->getName() : '',
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
+            'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
             'Body'         => $record->getBodyPublic(),
+            'Created Date' => $record->getCreatedAt()->getShort(),
+            'Created By'   => $record->getOwner()->getFullName(),
         ];
     }
 
