@@ -64,6 +64,10 @@ class Guardian extends IteratorIterator
             ->setGender($currentResult['student_gender'])
         ;
 
+        if (array_key_exists('student_contact_type', $currentResult)) {
+            $guardian->setType($currentResult['student_contact_type']);
+        }
+
         /* Email - one for every item in stack
          */
 
