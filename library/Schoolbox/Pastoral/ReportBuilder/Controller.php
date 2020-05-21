@@ -411,7 +411,7 @@ class Controller extends Base
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
             'Body'         => $record->getBodyPublic(),
-            'Created Date' => $record->getCreatedAt()->getShort(),
+            'Created Date' => $record->getCreatedAt()->getDatabase(),
             'Created By'   => $record->getOwner()->getFullName(),
         ];
     }
