@@ -347,6 +347,10 @@ ul.tileList {
             @media #{$small-only}  { right: 1rem; }
             @media #{$medium-only} { right: 2.5rem; }
             @media #{$large-up}    { right: 2rem; }
+
+            .dzone:before {
+                top: 0;
+            }
         }
     }
     .card {
