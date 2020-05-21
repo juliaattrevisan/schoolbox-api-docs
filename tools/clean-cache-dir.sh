@@ -78,8 +78,8 @@ fi
 
 if [ -d $streamdir ];
 then
-    rm -f $streamdir/*;
-    echo "File cache directory cleaned ($streamdir)";
+    rm -rf "${streamdir:?}"/*;
+    echo "Stream cache directory cleaned ($streamdir)";
 else
     echo "No stream cache directories cleaned";
 fi
@@ -89,5 +89,5 @@ then
     rm -rf "${twigdir:?}"/*;
     echo "Twig templates cache cleaned ($twigdir)";
 else
-    echo "No purifier cache directories cleaned";
+    echo "No twig templates cache directories cleaned";
 fi
