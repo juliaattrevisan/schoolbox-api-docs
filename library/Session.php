@@ -296,19 +296,28 @@ class Session
      * @param string   $ldapUsername
      * @param string   $ldapPassword
      * @param string   $ldapSearchBase
+     * @param string   $ldapUsernameField
      * @param string   $ldapSearchFilter
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      * @return bool
      *
      */
-    private function _authLDAP($username, $password, $ds, $ldapUsername, $ldapPassword, $ldapSearchBase, $ldapSearchFilter)
-    {
+    private function _authLDAP(
+        $username,
+        $password,
+        $ds,
+        $ldapUsername,
+        $ldapPassword,
+        $ldapSearchBase,
+        $ldapUsernameField,
+        $ldapSearchFilter
+    ) {
         // perform search for user in ldap server specified
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         @ldap_bind($ds, $this->ldap_escape($ldapUsername), utf8_encode($ldapPassword));
-        $searchString = "(" . Config::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
+        $searchString = "(" . $ldapUsernameField . "=" . $this->ldap_escape($username) . ")";
         if (strlen($ldapSearchFilter)) {
             $searchString = sprintf('(&(%s)%s)', $ldapSearchFilter, $searchString);
         }
@@ -377,6 +386,7 @@ class Session
             Config::get('ldap_user'),
             Config::get('ldap_pass'),
             Config::get('ldap_base'),
+            Config::get('ldap_username'),
             Config::get('ldap_search_filter')
         )) {
             return true;
@@ -392,6 +402,7 @@ class Session
                 Config::get('ldap_user_alt'),
                 Config::get('ldap_pass'),
                 Config::get('ldap_base_alt'),
+                Config::get('ldap_username'),
                 Config::get('ldap_search_filter')
             )) {
                 return true;
@@ -408,6 +419,7 @@ class Session
                 Config::get('ldap_user_ter'),
                 Config::get('ldap_pass'),
                 Config::get('ldap_base_ter'),
+                Config::get('ldap_username'),
                 Config::get('ldap_search_filter')
             )) {
                 return true;
