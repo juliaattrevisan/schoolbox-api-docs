@@ -105,7 +105,8 @@ class Helper
         $result = [];
 
         /** @var Model $folder */
-        foreach ($event->getFolderCollection()->getAll() as $folder) {
+        $folders = $this->folderMapper->hydrateCollection($event->getFolderCollection());
+        foreach ($folders as $folder) {
             $result[] = [
                 'name' => $folder->getNameWithCodes(),
                 'id'   => $folder->getId(),
