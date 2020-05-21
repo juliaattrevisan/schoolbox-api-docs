@@ -460,7 +460,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             if ('' !== (string)$cycle->getCycleIdentifier()) {
                 $luCycles[] = [
                     'key'   => $cycle->getCycleIdentifier(),
-                    'value' => $cycle->getTitle()
+                    'value' => $cycle->getTitle() .' ('.$cycle->getCycleIdentifier().')'
                 ];
             }
         }
