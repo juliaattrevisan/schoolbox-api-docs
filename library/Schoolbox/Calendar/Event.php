@@ -184,11 +184,11 @@ class Event implements ISoftDeletable
     protected $userCollection = null;
 
     /**
-     * Any associated categories (Type 2)
+     * Any associated folders (Type 2)
      *
      * @var null
      */
-    protected $categoryCollection = null;
+    protected $folderCollection = null;
 
     /**
      * Any associated campuses (Type 3)
@@ -240,7 +240,7 @@ class Event implements ISoftDeletable
     public function __construct()
     {
         $this->setUserCollection(new Collection());
-        $this->setCategoryCollection(new Collection());
+        $this->setFolderCollection(new Collection());
         $this->setRoleCollection(new Collection());
         $this->setType(new EventType());
         $this->setup();
@@ -939,25 +939,25 @@ class Event implements ISoftDeletable
     }
 
     /**
-     * Set category collection
+     * Set folder collection
      *
-     * @param Collection|Relation\Category[] $categoryCollection
+     * @param Collection $folderCollection
      * @return $this
      */
-    public function setCategoryCollection($categoryCollection)
+    public function setFolderCollection($folderCollection): self
     {
-        $this->categoryCollection = $categoryCollection;
+        $this->folderCollection = $folderCollection;
         return $this;
     }
 
     /**
-     * Get category collection
+     * Get folder collection
      *
-     * @return Collection|Relation\Category[]
+     * @return Collection
      */
-    public function getCategoryCollection()
+    public function getFolderCollection(): Collection
     {
-        return $this->categoryCollection;
+        return $this->folderCollection;
     }
 
     /**

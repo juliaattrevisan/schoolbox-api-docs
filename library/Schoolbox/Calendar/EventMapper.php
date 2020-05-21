@@ -90,11 +90,18 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             'this_key'  => 'id',
             'other_key' => 'event_id',
         ));
-        $this->hasJoin('category', array(
-            'mapper'    => Relation\CategoryMapper::class,
-            'this_key'  => 'id',
-            'other_key' => 'event_id',
-        ));
+
+        $this->joinsVia(
+            'event_folder',
+            Schoolbox\Resource\Folder\Mapper::class,
+            'id',
+            'folder_id',
+            'event_id',
+            'id',
+            null,
+            null,
+            'folderCollection'
+        );
 
         $this->joinsVia(
             'event_campus',
@@ -135,7 +142,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $authorMapper = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
-        $categoryMapper = $this->getJoinMapper('category');
+        $folderMapper = $this->getJoinMapper('event_folder');
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
         $userRoleMapper = $this->getJoinMapper('owner.role');
@@ -149,7 +156,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 				{$userRoleMapper->getColumnString('ra')},
 				{$eventTypeMapper->getColumnString('t')},
 				{$personalMapper->getColumnString('p')},
-				{$categoryMapper->getColumnString('c')},
+				{$folderMapper->getColumnString('f')},
 				{$campusMapper->getColumnString('ca')},
 				{$roleMapper->getColumnString('r')}
         ";
@@ -165,7 +172,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 			LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
 			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
-			LEFT JOIN {$this->getJoinSql('category', '', 'c')}
+			LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
 			LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
 			LEFT JOIN {$this->getJoinSql('role', '', 'r')}
         ";
@@ -182,7 +189,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $authorMapper = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
-        $categoryMapper = $this->getJoinMapper('category');
+        $folderMapper = $this->getJoinMapper('event_folder');
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
         $userRoleMapper = $this->getJoinMapper('owner.role');
@@ -199,7 +206,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 $allEvents[$row['id']] = $this->hydrate($row);
 
                 $allEvents[$row['id']]->setUserCollection(new Collection());
-                $allEvents[$row['id']]->setCategoryCollection(new Collection());
+                $allEvents[$row['id']]->setFolderCollection(new Collection());
                 $allEvents[$row['id']]->setCampusCollection(new Collection());
                 $allEvents[$row['id']]->setRoleCollection(new Collection());
             }
@@ -236,10 +243,10 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
             /* Category de-dupe
              */
-            $category = $categoryMapper->hydrate($row, 'c');
+            $folder = $folderMapper->hydrate($row, 'f');
 
-            if ($category instanceof Relation\Category && $category->getCategoryId()) {
-                $eventItem->getCategoryCollection()->setOffset($category->getCategoryId(), $category);
+            if ($folder instanceof Schoolbox\Resource\Folder\Model && $folder->getId()) {
+                $eventItem->getFolderCollection()->setOffset($folder->getId(), $folder);
             }
 
             /* Campus de-dupe

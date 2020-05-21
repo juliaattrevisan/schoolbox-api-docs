@@ -1,8 +1,8 @@
 {% set augmentedId = random(10000000000) %}
 
-<li data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}" style="background-color:{{ event.colour }}">
+<li data-reveal-id="modal{{ event.getEventId() }}{{ augmentedId }}" class="row {{ event.getEventClasses() }} {% if renderer.isTranslucent is defined and renderer.isTranslucent() %}translucent{% endif %}" style="background-color:{{ event.colour }}">
     {% block eventSpan %}
-    <div class="small-4 column {% if event.periodCancelled %}strike{% endif %}" >
+    <div class="small-4 column {% if event.periodCancelled is defined and event.periodCancelled %}strike{% endif %}" >
         {# raw HTML reluctantly sanctioned - getEventSpan() should be updated to not output htmlentities #}
         {{ event.getEventSpan()|raw }}&nbsp;
     </div>
@@ -10,7 +10,7 @@
 
     {% block eventTitle %}
 
-    <div class="small-8 column {% if event.periodCancelled %}strike{% endif %}">
+    <div class="small-8 column {% if event.periodCancelled is defined and event.periodCancelled %}strike{% endif %}">
         {{ event.title }}
         <span class="right" style="background-color:{{ event.colour }}">
             {% if event.attendance %}
@@ -92,7 +92,7 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
     {% block deleteUrls %}
-        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}">
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr ?? '' }}">
         {% if event.seriesId() %}
             <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=self">
             <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=series">

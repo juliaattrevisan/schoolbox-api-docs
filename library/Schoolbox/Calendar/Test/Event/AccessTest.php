@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -19,7 +20,6 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
-use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 
 /**
  * @codeCoverageIgnore
@@ -122,8 +122,8 @@ class AccessTest extends TestCase
     private function getEvent($key)
     {
         if (empty($this->events)) {
-            $categoryCollection = new Collection([
-                (new CategoryRelation())->setCategoryId(1)->setEventId(2)
+            $folderCollection = new Collection([
+                (new Folder())->setId(1)
             ]);
 
             $campusCollection = new Collection([
@@ -138,7 +138,7 @@ class AccessTest extends TestCase
                 'group' => (new Event)
                     ->setId(2)
                     ->setAccess(Event::ACCESS_GROUP)
-                    ->setCategoryCollection($categoryCollection),
+                    ->setFolderCollection($folderCollection),
 
                 'campus' => (new Event)
                     ->setId(3)
@@ -560,7 +560,7 @@ class AccessTest extends TestCase
     public function testCheckExisting($expected, User $effector, Event $event)
     {
         $access = new EventAccess(
-            $this->getMockFolderAccess($effector, $event->getCategoryCollection()->getColumnValues('categoryId'))
+            $this->getMockFolderAccess($effector, $event->getFolderCollection()->getPropertyValues('id'))
         );
         $actual = $access->checkExisting($effector, $event);
         $this->assertEquals($expected, $actual);

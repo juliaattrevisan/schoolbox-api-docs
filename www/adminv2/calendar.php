@@ -244,11 +244,12 @@ foreach ($typeList as $type) {
                 }
             }
 
-            $allCategories = [];
+            $allFolders = [];
 
-            /** @var \Schoolbox\Calendar\Relation\Category $currentCategory */
-            foreach ($currentEvent->getCategoryCollection() as $currentCategory) {
-                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByIdWithFallback($currentCategory->getCategoryId())->getTitle();
+            /** @var \Schoolbox\Resource\Folder\Model $currentFolder */
+            $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->hydrateCollection($currentEvent->getFolderCollection());
+            foreach ($folders as $currentFolder) {
+                $allFolders[] = $currentFolder->getTitle();
             }
 
             $allCampuses = [];
@@ -261,7 +262,7 @@ foreach ($typeList as $type) {
             /* Combine all three of the auxiliary collections
              */
             $appliesTo = [];
-            $appliesTo = array_merge($allUsers, $allCategories, $allCampuses);
+            $appliesTo = array_merge($allUsers, $allFolders, $allCampuses);
             $appliesTo = implode('<br />', $appliesTo);
 
             /* Special selection modifiers for javascript control

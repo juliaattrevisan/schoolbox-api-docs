@@ -223,7 +223,7 @@ class Calendar extends DeprecatedModel
                 if (is_array($event['categoryList'])) {
                     $categoryList = $event['categoryList'];
                 } else {
-                    $categoryList = $this->getEventCategory($event['id']);
+                    $categoryList = $this->getEventCategory((int)$event['id']);
                 }
 
                 $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
@@ -641,7 +641,7 @@ class Calendar extends DeprecatedModel
             LEFT JOIN resource_booking ON event.id = resource_booking.event_id
             LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = " . EventModel::ACCESS_PERSONAL . "
             LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = " . EventModel::ACCESS_GROUP . "
-            LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL
+            LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
             LEFT JOIN event_group      ON event.id = event_group.event_id    AND access = " . EventModel::ACCESS_CAMPUS . "
             LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = " . EventModel::ACCESS_CAMPUS . "
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
@@ -783,14 +783,17 @@ class Calendar extends DeprecatedModel
     /**
      * Gets all event categories for the given event ID.
      *
-     * @param int $eventID
+     * @param int $eventId
      *
      * @return array
      */
-    public function getEventCategory($eventID)
+    public function getEventCategory(int $eventId): array
     {
-        $output = array();
-        $query  = "SELECT folder_id FROM event_folder WHERE event_id = ".intval($eventID);
+        $output = [];
+        $query  = "SELECT folder_id
+                    FROM event_folder JOIN folder ON event_folder.folder_id = folder.id
+                    WHERE event_id = {$eventId}
+                    AND folder.deleted_at IS NULL";
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['folder_id'];

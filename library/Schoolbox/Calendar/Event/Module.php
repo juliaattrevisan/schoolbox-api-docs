@@ -19,13 +19,13 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\Relation\Campus;
-use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\Campus;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
@@ -69,9 +69,9 @@ class Module extends BaseModule
                                 return true;
                             }
                         } elseif ($event->isGroupLevel()) {
-                            /** @var Category $item */
-                            foreach ($event->getCategoryCollection()->getAll() as $item) {
-                                if (Access::getInstance()->getFolderAccess($loggedInUser, $item->getCategoryId()) >= UserAccess::ACCESS_READ) {
+                            /** @var Folder $folder */
+                            foreach ($event->getFolderCollection()->getAll() as $folder) {
+                                if (Access::getInstance()->getFolderAccess($loggedInUser, $folder->getId()) >= UserAccess::ACCESS_READ) {
                                     return true;
                                 }
                             }
@@ -81,7 +81,7 @@ class Module extends BaseModule
 
                             foreach ($loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR) as $access) {
                                 if ($access->getAccessLevel() >= UserAccess::ACCESS_READ) {
-                                    /** @var \Schoolbox\Campus $campus */
+                                    /** @var Campus $campus */
                                     foreach ($event->getCampusCollection()->getAll() as $campus) {
                                         if ($campus->getId() === $access->getServiceIdentifier()) {
                                             return true;

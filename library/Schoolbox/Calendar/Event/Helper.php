@@ -9,6 +9,7 @@ namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\RoleMapper;
 use Schoolbox\Campus;
 use Schoolbox\Mapper\Exception;
@@ -103,18 +104,13 @@ class Helper
     {
         $result = [];
 
-        /** @var \Schoolbox\Calendar\Relation\Category $category */
-        foreach ($event->getCategoryCollection()->getAll() as $category) {
-            try {
-                $folder = $this->folderMapper->findById($category->getCategoryId());
-
-                $result[] = [
-                    'name' => $folder->getNameWithCodes(),
-                    'id'   => $folder->getId(),
-                ];
-            } catch (Exception $e) {
-                // noop
-            }
+        $folders = $this->folderMapper->hydrateCollection($event->getFolderCollection());
+        /** @var Model $folder */
+        foreach ($folders as $folder) {
+            $result[] = [
+                'name' => $folder->getNameWithCodes(),
+                'id'   => $folder->getId(),
+            ];
         }
 
         return $result;
