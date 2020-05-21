@@ -19,7 +19,7 @@ class ExceptionExclusionProcessor extends Raven_Processor
     /**
      * Do not raise exceptions for these classes.
      *
-     * @var array
+     * @var array|string[]
      */
     private $excludedExceptions;
 
@@ -28,12 +28,12 @@ class ExceptionExclusionProcessor extends Raven_Processor
      * Constructor
      *
      * @param Raven_Client $client
-     * @param array        ...$excludedExceptions
+     * @param string       ...$excludedExceptions
      */
-    public function __construct(Raven_Client $client, array ...$excludedExceptions)
+    public function __construct(Raven_Client $client, string ...$excludedExceptions)
     {
+        $this->excludedExceptions = array_map([$this, 'normalizeClassName'], $excludedExceptions);
         parent::__construct($client);
-        $this->excludedExceptions = $excludedExceptions;
     }
 
 
@@ -45,6 +45,30 @@ class ExceptionExclusionProcessor extends Raven_Processor
      */
     public function process(&$data)
     {
-        $data;
+        foreach (($data['exception']['values'] ?? []) as $i => $value) {
+            $type = $this->normalizeClassName($value['type'] ?? '');
+            if (in_array($type, $this->excludedExceptions, true)) {
+                unset($data['exception']['values'][$i]);
+            }
+        }
+
+        // Are no exceptions at all left?
+        // Empty out data, thus causing Sentry to (hopefully) bin this message.
+        if (empty($data['exception']['values'])) {
+            $data = [];
+        }
+    }
+
+
+    /**
+     * Raven passes class names with no trailing backslash: PHP ::class
+     * constants do. Normalize for comparison.
+     *
+     * @param string $className
+     * @return string
+     */
+    private function normalizeClassName(string $className): string
+    {
+        return ltrim($className, '\\');
     }
 }
