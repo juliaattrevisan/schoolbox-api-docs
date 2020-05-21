@@ -439,56 +439,6 @@ class Session
             }
         }
 
-//        $ds = ldap_connect(Config::get('ldap_host'));
-//
-//        // test authentication in primary server
-//        if ($this->_authLDAP(
-//            $username,
-//            $password,
-//            $ds,
-//            Config::get('ldap_user'),
-//            Config::get('ldap_pass'),
-//            Config::get('ldap_base'),
-//            Config::get('ldap_username'),
-//            Config::get('ldap_search_filter')
-//        )) {
-//            return true;
-//        }
-//
-//        // test authentication in secondary server
-//        if (Config::get('ldap_host_alt')) {
-//            $ds = ldap_connect(Config::get('ldap_host_alt'));
-//            if ($this->_authLDAP(
-//                $username,
-//                $password,
-//                $ds,
-//                Config::get('ldap_user_alt'),
-//                Config::get('ldap_pass'),
-//                Config::get('ldap_base_alt'),
-//                Config::get('ldap_username'),
-//                Config::get('ldap_search_filter')
-//            )) {
-//                return true;
-//            }
-//        }
-//
-//        // test authentication in tertiary server
-//        if (Config::get('ldap_host_ter')) {
-//            $ds = ldap_connect(Config::get('ldap_host_ter'));
-//            if ($this->_authLDAP(
-//                $username,
-//                $password,
-//                $ds,
-//                Config::get('ldap_user_ter'),
-//                Config::get('ldap_pass'),
-//                Config::get('ldap_base_ter'),
-//                Config::get('ldap_username'),
-//                Config::get('ldap_search_filter')
-//            )) {
-//                return true;
-//            }
-//        }
-
         // failed authentication
         return false;
     }
