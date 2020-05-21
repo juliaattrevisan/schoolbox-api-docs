@@ -78,10 +78,19 @@ fi
 
 if [ -d $streamdir ];
 then
-    rm -rf "${streamdir:?}"/*;
-    echo "Stream cache directory cleaned ($streamdir)";
+    for sub in $streamdir/*;
+    do
+        if [ -d $sub ];
+        then
+            rm -rf $sub/*
+            echo "Stream cache directory cleaned ($sub)"
+        else
+            rm -f $sub
+        fi
+    done
+    echo "Stream cache directory cleaned ($streamdir)"
 else
-    echo "No stream cache directories cleaned";
+    echo "No stream cache directories cleaned"
 fi
 
 if [ -d $twigdir ];
