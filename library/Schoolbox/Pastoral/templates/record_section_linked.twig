@@ -1,6 +1,6 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-{% if record.relatedRecords | length %}
+{% if record.relatedRecords | length > 1 %}
     <div class="row">
         <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
             <h2 class="subheader">Linked Student Records</h2>

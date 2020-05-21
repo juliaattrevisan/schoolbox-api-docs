@@ -1,6 +1,6 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-{% if moderator and (record.revisions | length) %}
+{% if moderator and (record.revisions | length > 1) %}
 
     {# If you're a moderator and there's revisions to investigate #}
 
