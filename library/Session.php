@@ -314,20 +314,20 @@ class Session
 
 
     /**
+     * @param resource $ds
      * @param string   $username
      * @param string   $password
-     * @param resource $ds
      * @param string   $ldapSearchBase
      * @param string   $ldapUsernameField
      * @param string   $ldapSearchFilter
+     * @return bool
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
-     * @return bool
      */
     private function ldapAuth(
+        $ds,
         $username,
         $password,
-        $ds,
         $ldapSearchBase,
         $ldapUsernameField,
         $ldapSearchFilter
@@ -418,9 +418,9 @@ class Session
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword);
             if ($ds && $this->ldapAuth(
+                $ds,
                 $username,
                 $password,
-                $ds,
                 $ldapConfig['searchBase'],
                 $ldapUsernameField,
                 $ldapSearchFilter
