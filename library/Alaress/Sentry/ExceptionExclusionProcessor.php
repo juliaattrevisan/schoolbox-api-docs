@@ -12,27 +12,29 @@ use Raven_Client;
 use Raven_Processor;
 
 /**
- * Excludes particular exception classes.
+ * Processor for the Sentry client, used for preventing particular classes of
+ * exception from being reported to Sentry.
  */
 class ExceptionExclusionProcessor extends Raven_Processor
 {
     /**
-     * Do not raise exceptions for these classes.
+     * Do not report to Sentry for exceptions that are of these classes or their
+     * subclasses.
      *
      * @var array|string[]
      */
-    private $excludedExceptions;
+    private $excludedClasses;
 
 
     /**
      * Constructor
      *
      * @param Raven_Client $client
-     * @param string       ...$excludedExceptions
+     * @param string       ...$excludedClasses
      */
-    public function __construct(Raven_Client $client, string ...$excludedExceptions)
+    public function __construct(Raven_Client $client, string ...$excludedClasses)
     {
-        $this->excludedExceptions = array_map([$this, 'normalizeClassName'], $excludedExceptions);
+        $this->excludedClasses = array_map([$this, 'normalizeClassName'], $excludedClasses);
         parent::__construct($client);
     }
 
@@ -47,8 +49,12 @@ class ExceptionExclusionProcessor extends Raven_Processor
     {
         foreach (($data['exception']['values'] ?? []) as $i => $value) {
             $type = $this->normalizeClassName($value['type'] ?? '');
-            foreach ($this->excludedExceptions as $excludedExceptionClass) {
-                if (is_a($type, $excludedExceptionClass) || is_subclass_of($type, $excludedExceptionClass)) {
+            if (in_array($type, $this->excludedClasses, true)) {
+                unset($data['exception']['values'][$i]);
+                continue;
+            }
+            foreach ($this->excludedClasses as $excludedClass) {
+                if (is_a($type, $excludedClass) || is_subclass_of($type, $excludedClass)) {
                     unset($data['exception']['values'][$i]);
                     break;
                 }
