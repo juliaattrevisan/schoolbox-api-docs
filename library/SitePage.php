@@ -623,7 +623,10 @@ class SitePage extends Page
 
 
     /**
-     * Render a login page
+     * Forces a redirect to the login page, by throwing an unauthenticated
+     * exception.
+     *
+     * @throws Unauthenticated
      */
     public function goLoginPage()
     {
@@ -631,7 +634,9 @@ class SitePage extends Page
     }
 
     /**
-     * Render a 404 Page Not Found
+     * Forces a render of the 404 page, by throwing a not found exception.
+     *
+     * @throws NotFound
      */
     public function pageNotFound()
     {

@@ -122,8 +122,9 @@ class Kernel extends WebKernelAbstract
                 $this->outputSitepageContent($_GET['page'] ?? null);
             }
         } catch (Unauthenticated $e) {
-            // Really basic unauthenticated response - redirect to a login page.
-            // Preserve GET params that aren't "page" (or "samlAuth"?)
+            // Unauthenticated response - redirect to a login page.
+            // Preserve GET params that aren't "page" or "samlAuth", so the user
+            // can get redirected back to what they requested when they log in.
             $request  = $this->di->get('webFactory')->newRequest();
             $uri      = new Uri($path);
             $query    = [];
@@ -150,7 +151,8 @@ class Kernel extends WebKernelAbstract
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
             }
         } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
-            // Mapper exceptions: output something plain
+            // Mapper exception: something was either deleted or never existed.
+            // Output something plain
             $request  = $this->di->get('webFactory')->newRequest();
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;
