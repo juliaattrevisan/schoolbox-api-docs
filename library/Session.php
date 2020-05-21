@@ -453,7 +453,7 @@ class Session
             }
         }
         foreach ($ldapConfigs as $ldapConfig) {
-            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword, $ldapCaCertPath);
+            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertPath);
             if ($ds && $this->ldapAuth(
                 $ds,
                 $username,
