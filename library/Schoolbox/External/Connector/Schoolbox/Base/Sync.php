@@ -63,6 +63,7 @@ class Sync extends Base implements ISync
                 supp.email          AS student_contact_home_email,
                 supp.email          AS student_contact_default_email,
                 supp.email          AS student_contact_work_email,
+                supr.type           AS student_contact_type,
                 child.external_id   AS student_id,
                 sups.year_level     AS student_year_level,
                 sups.campus_name    AS student_campus,
