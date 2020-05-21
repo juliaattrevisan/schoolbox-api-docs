@@ -109,6 +109,7 @@ class ConfigMapper extends Mapper
     public const _CANVAS_URL                        = 'canvas_url';
 
     public const NAME_OTFS_ADAPTER = 'otfs_adapter';
+    public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';

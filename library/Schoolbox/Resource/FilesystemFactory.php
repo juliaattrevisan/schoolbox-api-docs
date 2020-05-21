@@ -53,10 +53,12 @@ class FilesystemFactory
         $config = new \Schoolbox\Config\Loader();
 
         $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+        $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
+        $fsConfig = $enableReUpload ? ['disable_asserts' => true] : null;
         switch ($adapter) {
             case self::FILE_SYSTEM_ADAPTER_LOCAL:
                 // Use local storage
-                $fs_storage = new Filesystem(new Local($storageDir));
+                $fs_storage = new Filesystem(new Local($storageDir), $fsConfig);
                 break;
             case self::FILE_SYSTEM_ADAPTER_AWS_S3:
                 // Use AWS S3 for storage
@@ -75,7 +77,7 @@ class FilesystemFactory
                     'version'     => $otfs_s3_version,
                 ]);
 
-                $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket));
+                $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket), $fsConfig);
                 break;
             default:
                 throw new UnexpectedValueException("Unrecognised filesystem adapter: '$adapter'");
