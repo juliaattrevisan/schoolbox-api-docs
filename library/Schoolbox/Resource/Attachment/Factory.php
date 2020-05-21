@@ -9,6 +9,7 @@ namespace Schoolbox\Resource\Attachment;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\User;
 
 /**
  * Class Factory
@@ -64,6 +65,12 @@ class Factory
      * @var int
      */
     protected $defaultFolderId = 0;
+
+
+    /**
+     * @var User
+     */
+    private $user;
 
 
     /**
@@ -146,6 +153,17 @@ class Factory
 
 
     /**
+     * @param User $user
+     * @return self
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+
+    /**
      * @param string $source
      * @return ControllerInterface
      * @throws OutOfRangeException
@@ -158,7 +176,15 @@ class Factory
             throw new OutOfRangeException("No controller found: {$source}");
         }
 
-        $controller = new $classname($this->multi, $this->mime, $this->conf, $this->rosetta, $this->useFolder, $this->defaultFolderId);
+        $controller = new $classname(
+            $this->multi,
+            $this->mime,
+            $this->conf,
+            $this->rosetta,
+            $this->useFolder,
+            $this->defaultFolderId,
+            $this->user
+        );
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException('Controller does not implement ControllerInterface');

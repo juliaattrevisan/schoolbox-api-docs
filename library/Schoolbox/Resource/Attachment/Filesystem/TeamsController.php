@@ -9,7 +9,9 @@ namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\AbstractController;
+use Schoolbox\User;
 use SitePage;
 
 /**
@@ -35,6 +37,14 @@ class TeamsController extends AbstractController
 
 
     /**
+     * Enums for the different teams_enabled values
+     */
+    private const TEAMS_ENABLED_NONE = 0;
+    private const TEAMS_ENABLED_STAFF = 1;
+    private const TEAMS_ENABLED_STAFF_STUDENT = 2;
+
+
+    /**
      * Url to load the Microsoft Teams React App
      *
      * @var string
@@ -53,23 +63,50 @@ class TeamsController extends AbstractController
 
 
     /**
-     * @param bool          $multi
-     * @param string        $mimeFilter
-     * @param IConfigLoader $conf
-     * @throws OutOfRangeException
+     * Constructor
+     *
+     * @param bool               $multi
+     * @param string             $mimeFilter
+     * @param IConfigLoader|null $conf
+     * @param RosettaStone|null  $rosetta
+     * @param bool               $useFolder
+     * @param int                $defaultFolderId
+     * @param User|null          $user
      */
-    public function __construct($multi, $mimeFilter = null, $conf = null)
-    {
+    public function __construct(
+        $multi,
+        $mimeFilter = null,
+        $conf = null,
+        $rosetta = null,
+        $useFolder = true,
+        $defaultFolderId = 0,
+        User $user = null
+    ) {
         parent::__construct($multi, $mimeFilter);
 
         if (!$conf) {
             throw new OutOfRangeException('Config not supplied.');
         }
 
-        /* Decide if  Microsoft Teams is enabled
+        /* Decide if Microsoft Teams is enabled for the given user
          */
-        if (!(bool)$conf->get('teams_enabled')) {
-            throw new OutOfRangeException('Microsoft Teams not enabled');
+        if (!$user) {
+            throw new OutOfRangeException('Microsoft Teams may only be used by logged-in users');
+        }
+        switch ((int)$conf->get('teams_enabled')) {
+            case self::TEAMS_ENABLED_STAFF:
+                $teamsEnabled = $user->getRole()->isStaff();
+                break;
+            case self::TEAMS_ENABLED_STAFF_STUDENT:
+                $teamsEnabled = $user->getRole()->isStaff() || $user->getRole()->isStudent();
+                break;
+            case self::TEAMS_ENABLED_NONE:
+            default:
+                $teamsEnabled = false;
+                break;
+        }
+        if (!$teamsEnabled) {
+            throw new OutOfRangeException('Microsoft Teams not enabled for users of this type');
         }
 
         /* Must supply a url
