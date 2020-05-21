@@ -67,6 +67,50 @@ class CollectorFactory
 
 
     /**
+     * Build method for the default Collector used most places
+     *
+     * @param string[] $attachments
+     * @return Collector
+     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
+     * @throws UnexpectedValueException If you attempt to build a WebDav attachment and no user is logged in
+     */
+    public function build(array $attachments): Collector
+    {
+        $handlers = [];
+
+        $map = [
+            NodeFactory::STORE  => Collector::TYPE_STORAGE,
+            NodeFactory::SBFS   => Collector::TYPE_SBFS,
+            NodeFactory::MYFILE => Collector::TYPE_MYFILE,
+            NodeFactory::WEBDAV => Collector::TYPE_WEBDAV,
+            NodeFactory::OFFICE => Collector::TYPE_OFFICE,
+        ];
+
+        $indexedAttachments = [];
+
+        // detect which handlers we are going to need and lazy them in
+        foreach ($attachments as $attachment) {
+            $xpl = explode(':', $attachment, 2);
+
+            // check valid count
+            if (\count($xpl) !== 2) {
+                continue;
+            }
+
+            $mapped = $map[$xpl[0]];
+
+            if (empty($handlers[$xpl[0]])) {
+                $handlers[$mapped] = $this->get($xpl[0]);
+            }
+
+            $indexedAttachments[$mapped][] = $xpl[1];
+        }
+
+        return new Collector($indexedAttachments, $handlers);
+    }
+
+
+    /**
      * @param string $type
      * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
      * @throws UnexpectedValueException If you call this when no user is logged on for the webDav loader
@@ -114,49 +158,5 @@ class CollectorFactory
         }
 
         return $this->loaders[$type];
-    }
-
-
-    /**
-     * Build method for the default Collector used most places
-     *
-     * @param string[] $attachments
-     * @return Collector
-     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
-     * @throws UnexpectedValueException If you attempt to build a WebDav attachment and no user is logged in
-     */
-    public function build(array $attachments): Collector
-    {
-        $handlers = [];
-
-        $map = [
-            NodeFactory::STORE  => Collector::TYPE_STORAGE,
-            NodeFactory::SBFS   => Collector::TYPE_SBFS,
-            NodeFactory::MYFILE => Collector::TYPE_MYFILE,
-            NodeFactory::WEBDAV => Collector::TYPE_WEBDAV,
-            NodeFactory::OFFICE => Collector::TYPE_OFFICE,
-        ];
-
-        $indexedAttachments = [];
-
-        // detect which handlers we are going to need and lazy them in
-        foreach ($attachments as $attachment) {
-            $xpl = explode(':', $attachment, 2);
-
-            // check valid count
-            if (\count($xpl) !== 2) {
-                continue;
-            }
-
-            $mapped = $map[$xpl[0]];
-
-            if (empty($handlers[$xpl[0]])) {
-                $handlers[$mapped] = $this->get($xpl[0]);
-            }
-
-            $indexedAttachments[$mapped][] = $xpl[1];
-        }
-
-        return new Collector($indexedAttachments, $handlers);
     }
 }

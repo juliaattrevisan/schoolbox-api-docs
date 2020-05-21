@@ -105,7 +105,6 @@
                  */
                 allowDetachment: true,
 
-
                 /* If specified, try to restore the modal designated by this identifier
                  * You only need to do this if the M3 picker starts from within another modal
                  * There were only two places at the time of writing: My Links and Socialstream
@@ -339,15 +338,17 @@
 
         /**
          * Construct a url from the pieces provided
+         *
          * Depending on what you chose, the url is constructed a bit specially
          * sorry
          *
          * @param type        string  data type [folder, myfolder, file, meetingUrl]
          * @param filesystem  string  typically 'store' as a special case usage
-         * @param val         string  a file id or a meeting url
+         * @param hash        string  a hashed string for a storage object
+         * @param val         string  a file id, myFile id, or a meeting url
          * @return url        string  the url to which you are linking
          */
-        function processSelection(type, filesystem, val) {
+        function processSelection(type, filesystem, hash, val) {
             var url;
 
             if (type == 'folder') {
@@ -358,6 +359,8 @@
                 url = config.url.storage + val;
             } else if (type =='meetingUrl') {
                 url = config.url.meetingUrl + val;
+            } else if (filesystem == 'myfile') {
+                url = config.url.storage + hash;
             } else {
                 url = config.url.file + val;
             }
@@ -379,7 +382,7 @@
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
                     $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id), responseText.name, responseText.mime, dialog);
+                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id), responseText.name, responseText.mime, dialog);
 
                         /* Shut modal, go back to Dialog
                          */
@@ -393,7 +396,7 @@
 
                     /* Microsoft Teams meetings url format
                      */
-                    config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), 'Microsoft Teams Meeting', null, dialog);
+                    config.onSelect(processSelection('meetingUrl', '', '', message.data.meetingUrl), 'Microsoft Teams Meeting', null, dialog);
 
                     /* Shut modal, go back to Dialog
                      */
@@ -438,6 +441,10 @@
                 /* Prefix for linking to MyFolders
                  */
                 myfolder: '/my-files/',
+
+                /* Prefix for linking to MyFiles
+                 */
+                myfile: '/storage/fetch.php?hash=',
 
                 /* Prefix for link to Storage hash
                  */
