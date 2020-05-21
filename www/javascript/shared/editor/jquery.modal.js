@@ -351,17 +351,39 @@
         function processSelection(type, filesystem, hash, val) {
             var url;
 
-            if (type == 'folder') {
+            /* The args to this method come from an async request to nodeinfo
+             * Urls can be generated contextually based on some combination of these args
+             * Here, I've consolidated known outcomes as best I could
+             */
+            if (type === 'folder') {
+
+                /* When you select Use This Folder which is available in special circumstances
+                 */
                 url = config.url.folder + val;
-            } else if (type == 'myfolder') {
-                url = config.url.myfolder + val;
-            } else if (filesystem == 'store') {
-                url = config.url.storage + val;
-            } else if (type =='meetingUrl') {
-                url = config.url.meetingUrl + val;
-            } else if (filesystem == 'myfile') {
+            } else if (filesystem === 'store') {
+
+                /* When you Upload A File via the modal's dropzone
+                 */
                 url = config.url.storage + hash;
+            } else if (filesystem === 'browse') {
+
+                /* When you select a file via Resource Browser
+                 */
+                url = config.url.storage + hash;
+            } else if (filesystem === 'myfile') {
+
+                /* When you select a My File
+                 */
+                url = config.url.storage + hash;
+            } else if (type === 'meetingUrl') {
+
+                /* When you select a Microsoft Teams meeting url
+                 */
+                url = config.url.meetingUrl + val;
             } else {
+
+                /* Default assumption (not sure where this manifests anymore, sorry)
+                 */
                 url = config.url.file + val;
             }
 
