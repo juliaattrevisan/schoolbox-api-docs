@@ -18,6 +18,8 @@ use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
+use Aura\Web\Request;
+use Aura\Web\Response;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -115,12 +117,11 @@ class Kernel extends WebKernelAbstract
         }
 
 
-        $route    = $this->di->get('router')->match($path, $server);
-        $response = null;
+        $route = $this->di->get('router')->match($path, $server);
 
         try {
             if ($route instanceof Route) {
-                $this->outputAuraContent($route, $path);
+                $this->outputAuraContent($route);
             } else {
                 $this->outputSitepageContent($_GET['page'] ?? null);
             }
@@ -128,6 +129,7 @@ class Kernel extends WebKernelAbstract
             // Unauthenticated response - redirect to a login page.
             // Preserve GET params that aren't "page" or "samlAuth", so the user
             // can get redirected back to what they requested when they log in.
+            /** @var Request $request */
             $request  = $this->di->get('webFactory')->newRequest();
             $uri      = new Uri($path);
             $query    = [];
@@ -139,6 +141,7 @@ class Kernel extends WebKernelAbstract
             $uri->setQuery($query);
 
             // Start constructing a response
+            /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
@@ -148,6 +151,8 @@ class Kernel extends WebKernelAbstract
                     'format' => 'json',
                     'data'   => ['error' => 'Unauthenticated'],
                 ]);
+                $output = $this->di->get("webOutput:json");
+                $output->output($response);
             } else {
                 /** @var \Alaress\Session\Session $session */
                 $session = $this->di->get('session');
@@ -160,7 +165,9 @@ class Kernel extends WebKernelAbstract
         } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
+            /** @var Request $request */
             $request  = $this->di->get('webFactory')->newRequest();
+            /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;
             if ((new IsXhr())->isSatisfiedBy($request)) {
@@ -171,6 +178,8 @@ class Kernel extends WebKernelAbstract
                     'format' => 'json',
                     'data'   => ['error' => $e->getMessage()],
                 ]);
+                $output = $this->di->get("webOutput:json");
+                $output->output($response);
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
             }
@@ -208,7 +217,6 @@ class Kernel extends WebKernelAbstract
      *
      * @param Route  $route the route to render: the controller and action are
      *                      extracted from its name.
-     * @param string $path  the base path that was requested
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
@@ -216,7 +224,7 @@ class Kernel extends WebKernelAbstract
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Throwable
      */
-    private function outputAuraContent(Route $route, string $path): void
+    private function outputAuraContent(Route $route): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
