@@ -11,7 +11,6 @@ use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredE
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
