@@ -8,14 +8,13 @@ declare(strict_types=1);
 
 namespace Alaress\Sentry;
 
-use Raven_Client;
-use Raven_Processor;
+use Sentry\Event;
 
 /**
- * Processor for the Sentry client, used for preventing particular classes of
+ * Filter for the Sentry client, used for preventing particular classes of
  * exception from being reported to Sentry.
  */
-class ExceptionExclusionProcessor extends Raven_Processor
+class ExceptionFilter
 {
     /**
      * Do not report to Sentry for exceptions that are of these classes or their
@@ -29,13 +28,11 @@ class ExceptionExclusionProcessor extends Raven_Processor
     /**
      * Constructor
      *
-     * @param Raven_Client $client
-     * @param string       ...$excludedClasses
+     * @param string ...$excludedClasses
      */
-    public function __construct(Raven_Client $client, string ...$excludedClasses)
+    public function __construct(string ...$excludedClasses)
     {
         $this->excludedClasses = array_map([$this, 'normalizeClassName'], $excludedClasses);
-        parent::__construct($client);
     }
 
 
@@ -43,29 +40,24 @@ class ExceptionExclusionProcessor extends Raven_Processor
      * If the exception in $data matches a an excluded exception, don't send to
      * Sentry.
      *
-     * @param array &$data
+     * @param Event $event
+     * @return Event|null
      */
-    public function process(&$data)
+    public function __invoke(Event $event): ?Event
     {
-        foreach (($data['exception']['values'] ?? []) as $i => $value) {
-            $type = $this->normalizeClassName($value['type'] ?? '');
+        foreach ($event->getExceptions() as $exception) {
+            $type = $this->normalizeClassName($exception['type'] ?? '');
             if (in_array($type, $this->excludedClasses, true)) {
-                unset($data['exception']['values'][$i]);
-                continue;
+                return null;
             }
             foreach ($this->excludedClasses as $excludedClass) {
                 if (is_a($type, $excludedClass, true)) {
-                    unset($data['exception']['values'][$i]);
-                    break;
+                    return null;
                 }
             }
         }
 
-        // Are no exceptions at all left?
-        // Empty out data, thus causing Sentry to (hopefully) bin this message.
-        if (empty($data['exception']['values'])) {
-            $data = [];
-        }
+        return $event;
     }
 
 

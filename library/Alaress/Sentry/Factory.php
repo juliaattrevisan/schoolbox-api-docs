@@ -8,7 +8,11 @@ declare(strict_types=1);
 
 namespace Alaress\Sentry;
 
+use Alaress\Authorizer\Failure\Base as BaseAuthorizationFailure;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Instance;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Sentry;
 
 /**
@@ -38,6 +42,12 @@ class Factory
                 'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
                 'environment' => $instance->getType(),
                 'release'     => $applicationName . '@' . $instance->getVersion(),
+                'before_send' => new ExceptionFilter(
+                    Deleted::class,
+                    NotFound::class,
+                    BaseAuthorizationFailure::class,
+                    SchoolboxException::class
+                ),
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set
