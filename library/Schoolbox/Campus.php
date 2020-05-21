@@ -1,20 +1,21 @@
 <?php
 /**
- * Description of the file and what its purpose is
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
+/**
+ * Class Campus
+ *
+ * @package Schoolbox
+ */
 class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 {
-
     use ModelTrait\HasSequence;
     use ModelTrait\UpdatedBy;
     use ModelTrait\CreatedAtDate;
@@ -22,17 +23,34 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
     use ModelTrait\DeletedAtDate;
     use CreateCollection;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $name;
 
-    /** @var int */
+
+    /**
+     * @var int
+     */
     private $id;
 
-    /** @var string */
+
+    /**
+     * @var string
+     */
     private $extTimetableCode;
 
-    /** @var int */
+
+    /**
+     * @var int
+     */
     private $timetableDay;
+
+
+    /**
+     * @var string|null
+     */
+    private $cycleIdentifier;
 
 
     /**

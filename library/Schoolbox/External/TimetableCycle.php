@@ -61,11 +61,16 @@ class TimetableCycle
 
 
     /**
-     * This corresponds to luCampus.ext_timetable_code too (that's how they join up)
+     * This is an identifier for a third-party data set so you can manage your suds imports' data sets
+     * You can use it to identify data sets from third party vendors like isams, kamar, etc.
+     *
+     * It used to correspond to luCampus.ext_timetable_code (that's how they joined up before)
+     * but luCampus now directly associates with a cycle via luCampus.cycle_id, thus freeing up
+     * this particular external timetable code's usage.
      *
      * @var string|null
      */
-    private $externalTimetableCode;
+    private $cycleIdentifier;
 
 
     /**
@@ -199,19 +204,19 @@ class TimetableCycle
     /**
      * @return string|null
      */
-    public function getExternalTimetableCode(): ?string
+    public function getCycleIdentifier(): ?string
     {
-        return $this->externalTimetableCode;
+        return $this->cycleIdentifier;
     }
 
 
     /**
-     * @param string|null $externalTimetableCode
+     * @param string|null $cycleIdentifier
      * @return $this
      */
-    public function setExternalTimetableCode(?string $externalTimetableCode): self
+    public function setCycleIdentifier(?string $cycleIdentifier): self
     {
-        $this->externalTimetableCode = $externalTimetableCode;
+        $this->cycleIdentifier = $cycleIdentifier;
         return $this;
     }
 }

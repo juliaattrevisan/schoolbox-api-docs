@@ -1,32 +1,35 @@
 <?php
 /**
- * DoubleFirst Timetable Class
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
  */
-
 use Schoolbox\Campus as CampusModel;
-use Schoolbox\CampusMapper;
 
+/**
+ * Class External_Doublefirst_Timetable
+ */
 class External_Doublefirst_Timetable implements External_TimetableInterface
 {
-    /** @var MSSQL $database */
+
+    /**
+     * @var MSSQL $database
+     */
     private $database;
 
-    /** @var External_UserInterface */
+
+    /**
+     * @var External_UserInterface
+     */
     private $externalUser;
 
-    /** @var Group */
-    private $groupHandler;
 
-    /** @var CampusMapper */
-    private $campusMapper;
-
-    /** @var External_Doublefirst_Helper */
+    /**
+     * @var External_Doublefirst_Helper
+     */
     private $helper;
+
 
     /**
      * External_Doublefirst_Timetable constructor.
@@ -35,10 +38,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('doublefirst');
-        $this->groupHandler = new Group();
-        $this->campusMapper = new CampusMapper();
         $this->helper = new External_Doublefirst_Helper();
     }
+
 
     /**
      * @inheritDoc
@@ -100,15 +102,15 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             b.DayOfWeek = p.DayOfWeek AND
             b.BreakPeriodID = p.PeriodID AND
             b.YearGroup = p.yeargroup
-	    ";
+        ";
 
         if ($type == 'student') {
             $query .= "
-	            WHERE
-	            p.AcademicYear = '{$fileYear}' AND
-	            p.YearGroup = '{$studentDetails['YearGroupID']}' AND
+                WHERE
+                p.AcademicYear = '{$fileYear}' AND
+                p.YearGroup = '{$studentDetails['YearGroupID']}' AND
                 p.DayOfWeek = 1
-	        ";
+            ";
             $yearGroupQuery = "YearGroup = '{$studentDetails['YearGroupID']}'";
         } else {
 
@@ -118,11 +120,11 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
             $query .=
                 "
-		        WHERE
+                WHERE
                     p.AcademicYear = '{$fileYear}' AND
                     p.YearGroup IN ({$yearGroups}) AND
                     p.DayOfWeek = 1
-    		";
+            ";
             $yearGroupQuery = "YearGroup IN ({$yearGroups})";
         }
 
@@ -207,6 +209,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return $definitionArray;
     }
 
+
     /**
      * Retrieve current day number
      *
@@ -225,6 +228,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return $this->helper->getDayNumber($date);
     }
 
+
     /**
      * Returns the day name
      *
@@ -237,6 +241,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         return "Day {$dayNumber}";
     }
+
 
     /**
      * Returns the period number for the current time.
@@ -375,6 +380,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return [];
     }
 
+
     /**
      * @inheritDoc
      */
@@ -383,6 +389,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $day = $this->helper->getDayNumber($date);
         return $this->getDayTimetable($externalUserId, $userId, $campus, $day, $date);
     }
+
 
     /**
      * @inheritDoc
@@ -594,6 +601,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         return $timetable;
     }
+
 
     /**
      * @inheritDoc
@@ -821,6 +829,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+
     /**
      * Sort timetable in chronological order
      *
@@ -840,6 +849,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return ($aTime > $bTime) ? +1 : -1;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -847,6 +857,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     {
         return [];
     }
+
 
     /**
      * @var MSSQL $database
@@ -856,12 +867,22 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $this->database = $database;
     }
 
+
     /**
      * @return MSSQL
      */
     private function getDatabase()
     {
         return $this->database;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }
 

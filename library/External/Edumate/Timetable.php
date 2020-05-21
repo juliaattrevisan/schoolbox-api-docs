@@ -1,34 +1,40 @@
 <?php
-
 /**
- * Implementation of Edumate Timetable connector
- * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
+ */
+use Schoolbox\Campus;
 
+/**
+ * Class External_Edumate_Timetable
+ *
+ * Implementation of Edumate Timetable connector
+ * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
  */
 class External_Edumate_Timetable extends External_Edumate_Connection implements External_TimetableInterface
 {
 
-    /** @var array */
-    protected $campusCache;
-
-    /** @var Group $groupHandler */
+    /**
+     * @var Group $groupHandler
+     */
     private $groupHandler;
 
+
+    /**
+     * External_Edumate_Timetable constructor.
+     */
     public function __construct()
     {
         $this->groupHandler = new Group();
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-
         $definition = array();
         $periodCount = 0;
 
@@ -72,6 +78,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * @param string $time
      * @return string
+     * @throws Exception
      */
     protected function parseTime($time)
     {
@@ -79,12 +86,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $timeObject->format('g:ia');
     }
 
+
     /**
      * Helper function to retrieve the length of the timetable cycle in edumate
-     * @param \Schoolbox\Campus $campus
+     * @param Campus $campus
      * @return int
+     * @throws \Alaress\Database\Exception
      */
-    protected function getCycleLength(\Schoolbox\Campus $campus)
+    protected function getCycleLength(Campus $campus)
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT DAYS_IN_CYCLE
@@ -108,11 +117,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
 
     /**
-     * @param \Schoolbox\Campus $campus
-     * @param int $date
+     * @param Campus $campus
+     * @param int               $date
      * @return bool|string
+     * @throws \Alaress\Database\Exception
      */
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    public function getDayNumber(Campus $campus, $date = 0)
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT START_DATE, CYCLE_START_DAY, DAYS_IN_CYCLE
@@ -166,6 +176,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return false;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -179,7 +190,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @inheritDoc
      * @throws Exception
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $now = date('g:ia', $now ?: time());
 
@@ -198,10 +209,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $period;
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -212,25 +224,25 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         if ($this->groupHandler->isStudent($userId)) {
             $type = 'STUDENT';
-            $join = "
+            $join = '
                 LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
-            ";
+            ';
         } elseif ($this->groupHandler->isStaff($userId)) {
             $type = 'STAFF';
-            $join = "
+            $join = '
                 LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STAFF_NUMBER = :sn
-            ";
+            ';
         } else {
             return [];
         }
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
         if (count($campusCode) > 1) {
-            $campus = "( CAMPUS = :campus OR CAMPUS = :campus2 )";
+            $campus = '( CAMPUS = :campus OR CAMPUS = :campus2 )';
         } else {
-            $campus = "CAMPUS = :campus";
+            $campus = 'CAMPUS = :campus';
         }
 
         $stmt = $this->getConnection()->prepareQuery(
@@ -284,19 +296,21 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $timetable;
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus,
             $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
+
     /**
      * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -309,15 +323,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         if ($this->groupHandler->isStudent($userId)) {
-            $join = "
+            $join = '
                 LEFT JOIN SCHOOLBOX_STUDENTCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STUDENT_NUMBER = :sn
-            ";
+            ';
         } elseif ($this->groupHandler->isStaff($userId)) {
-            $join = "
+            $join = '
                 LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
                 WHERE C.STAFF_NUMBER = :sn
-            ";
+            ';
         } else {
             return [];
         }
@@ -382,6 +396,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $timetable;
     }
 
+
     /**
      * Gets the timetable for this room code.
      *
@@ -391,8 +406,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * * Edumate appears to have no concept of campuses
      * * getTimetableDefinition() returns DateTime objects
      *
-     * @param  string[] $roomCodes
+     * @param string[] $roomCodes
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     public function getRoomTimetable(array $roomCodes): array
     {
@@ -437,7 +453,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
-        $campus = new \Schoolbox\Campus;
+        $campus = new Campus;
         $campusTimetable = $this->getTimetableDefinition(null, $campus);
         $result = array();
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -457,5 +473,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             }
         }
         return $result;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        return [];
     }
 }

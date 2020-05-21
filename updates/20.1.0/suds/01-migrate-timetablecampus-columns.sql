@@ -7,6 +7,21 @@ ALTER TABLE `sis_timetable_cycle`
     ADD COLUMN `offset` INT NULL AFTER `start_day`,
     ADD COLUMN `reset` INT NULL AFTER `offset`;
 
+-- Biggen the Timetable Cycle name to accommodate more info
+
+ALTER TABLE `sis_timetable_cycle`
+    CHANGE COLUMN `title` `title` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+
+-- Add cycle_identifier to cycle
+
+ALTER TABLE `sis_timetable_cycle`
+    ADD COLUMN `cycle_identifier` VARCHAR(255) NULL AFTER `title`;
+
+-- Change collation to whatever it was supposed to have been
+
+ALTER TABLE `sis_timetable_cycle`
+    CHANGE COLUMN `cycle_identifier` `cycle_identifier` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+
 -- Copy the timetable_campus values across
 
 UPDATE sis_timetable_cycle
@@ -18,27 +33,20 @@ SET
     sis_timetable_cycle.offset = sis_timetable_campus.offset,
     sis_timetable_cycle.reset = sis_timetable_campus.reset;
 
--- Add ext_timetable_code to cycle
+-- Assign luCampus.ext_timetable_code values to known cycles
+
+UPDATE sis_timetable_cycle
+    INNER JOIN sis_timetable_campus ON sis_timetable_cycle.id = sis_timetable_campus.cycle_id
+    INNER JOIN luCampus ON sis_timetable_campus.campus_id = luCampus.id
+SET sis_timetable_cycle.cycle_identifier = luCampus.ext_timetable_code;
+
+-- Who knows what these three fields did...I certainly have no clue
 
 ALTER TABLE `sis_timetable_cycle`
-    ADD COLUMN `ext_timetable_code` VARCHAR(255) NULL AFTER `title`;
-
--- Change collation to whatever it was supposed to have been
-
-ALTER TABLE `sis_timetable_cycle`
-    CHANGE COLUMN `ext_timetable_code` `ext_timetable_code` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
+    DROP COLUMN `reset`,
+    DROP COLUMN `regular`,
+    DROP COLUMN `offset`;
 
 -- Remove sis_timetable_campus altogether
 
 DROP TABLE `sis_timetable_campus`;
-
--- Who knows what these two fields did...I certainly have no clue
-
-ALTER TABLE `sis_timetable_cycle`
-    DROP COLUMN `reset`,
-    DROP COLUMN `regular`;
-
--- Remove this column too, it's not used anymore.
-
-ALTER TABLE `sis_timetable_cycle`
-    DROP COLUMN `offset`;

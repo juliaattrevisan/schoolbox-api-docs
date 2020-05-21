@@ -104,8 +104,13 @@ class Definition implements IStrategy
 
         $ext = null;
 
+        /* Exit if you can't identify the cycle
+         */
         if ($publishedTimetables) {
             $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
+        } else {
+            $this->log->debug('Cannot identify cycle identifier for PublishedTimetables in this xml.');
+            exit;
         }
 
         $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
@@ -118,6 +123,8 @@ class Definition implements IStrategy
          */
         foreach ($cycles as $cycle) {
             $dayData = $this->findDays($cycle);
+            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+            $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
 
             /* Show the cycle identifier in the title
              *
@@ -129,9 +136,11 @@ class Definition implements IStrategy
              * Status report where I tried to expose it
              */
             $cycleName = sprintf(
-                '%s (%s)',
+                '%s: %s (%s-%s)',
+                $ext,
                 trim((string)$cycle->Name),
-                $ext
+                $cycleStart->getShortDateOnly(),
+                $cycleEnd->getShortDateOnly()
             );
 
             /* Update the existing Timetable Cycle if it already exists
@@ -141,7 +150,7 @@ class Definition implements IStrategy
              */
             /** @var TimetableCycle $timetableCycle */
             try {
-                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('title', $cycleName);
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
             } catch (Exception $e) {
                 $this->log->debug(sprintf(
                     'Purging all previous cycles and creating a new cycle, %s.',
@@ -155,11 +164,11 @@ class Definition implements IStrategy
 
             $timetableCycle
                 ->setTitle($cycleName)
-                ->setExternalTimetableCode($ext)
+                ->setCycleIdentifier($ext)
                 ->setCycleLength(\count($cycle->xpath('Days/Day')))
                 ->setDayLength($dayData['maxPeriods'])
-                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+                ->setStart($cycleStart)
+                ->setFinish($cycleEnd)
                 ->setStartDay(1);
 
             $this->log->info(sprintf(

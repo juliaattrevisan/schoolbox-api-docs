@@ -8,6 +8,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\User;
 
 /**
@@ -18,7 +19,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     use External_Schoolbox_TimetableDefinitionTrait;
 
 
-    /** @var IConnector $internalDatabase */
+    /**
+     * @var IConnector $internalDatabase
+     */
     private $internalDatabase;
 
 
@@ -81,10 +84,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                           tp.start,
                           tp.finish,
                           tp.usable
-            FROm          sis_timetable_cycle ty
+            FROM          sis_timetable_cycle ty
             LEFT JOIN     sis_timetable_period tp ON tp.cycle_id = ty.id
-            WHERE         ty.ext_timetable_code = :campusId
-
+            WHERE         ty.cycle_identifier = :campusId
         ';
 
         if ($day > 0) {
@@ -146,7 +148,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             tp.usable
                 FROM        sis_timetable_cycle ty
                 LEFT JOIN   sis_timetable_period tp ON tp.cycle_id = ty.id
-                WHERE       ty.ext_timetable_code = :campusId
+                WHERE       ty.cycle_identifier = :campusId
                 AND         :now BETWEEN tp.start AND tp.finish
                 AND         tp.day = :dayNumber
             ',
@@ -172,10 +174,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param Campus $campus
-     * @param int|string    $date
+     * @param Campus     $campus
+     * @param int|string $date
      *
      * @return bool|int
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
@@ -250,7 +254,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
 
     /**
-     * {@inheritDoc}
      * @param string $externalId
      *
      * @return array
@@ -441,5 +444,27 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         );
 
         return $statement->fetchAll();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findCycleLookup(): array
+    {
+        $cycles = TimetableCycleMapper::getInstance()->findAll();
+
+        $luCycles = [];
+
+        foreach ($cycles as $cycle) {
+            if ('' !== (string)$cycle->getCycleIdentifier()) {
+                $luCycles[] = [
+                    'key'   => $cycle->getCycleIdentifier(),
+                    'value' => $cycle->getTitle() .' ('.$cycle->getCycleIdentifier().')'
+                ];
+            }
+        }
+
+        return $luCycles;
     }
 }

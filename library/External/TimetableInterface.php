@@ -1,7 +1,4 @@
 <?php
-
-use Schoolbox\Campus;
-
 /**
  * Created by JetBrains PhpStorm.
  * User: aetworowsky
@@ -9,8 +6,24 @@ use Schoolbox\Campus;
  * Time: 4:45 PM
  * To change this template use File | Settings | File Templates.
  */
+use Schoolbox\Campus;
+
+/**
+ * Interface External_TimetableInterface
+ */
 interface External_TimetableInterface extends External\IConnector
 {
+
+    /**
+     * Find a list of all the cycles that a user could choose from
+     * and return it in a set of key-value pairs; use can choose
+     * when they're in the Admin > List > Campus screen
+     *
+     * @return array
+     */
+    public function findCycleLookup(): array;
+
+
     /**
      * The headings of the timetable, going horizontally
      * from left to right containing all the times and day numbers

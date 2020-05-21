@@ -114,7 +114,7 @@ class Lookup
     {
         $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
             SELECT
-                cycle.ext_timetable_code,
+                cycle.cycle_identifier,
                 period.day, period.id, period.title
             FROM sis_timetable_cycle cycle
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
@@ -123,7 +123,7 @@ class Lookup
         $periods = [];
 
         foreach ($periodStatement as $row) {
-            $ext = $row['ext_timetable_code'];
+            $ext = $row['cycle_identifier'];
             $day = $row['day'];
             $periodName = $row['title'];
 

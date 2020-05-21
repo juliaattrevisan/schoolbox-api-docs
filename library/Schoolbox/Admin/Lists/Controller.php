@@ -249,9 +249,6 @@ class Controller extends Base
      */
     private function getTableData()
     {
-        $luEmpty = [
-            ['key' => '', 'value' => ''],
-        ];
         $luRoleType = [
             ['key' => Role::GUEST,   'value' => 'Guest'],
             ['key' => Role::STAFF,   'value' => 'Staff'],
@@ -305,6 +302,10 @@ class Controller extends Base
                 'value' => $classification->getName()
             ];
         }
+
+        /* Available Timetable Cycles from your current connector
+         */
+        $luCycles = (new \External_Timetable())->findCycleLookup();
 
         $return = [
             'roles' => [
@@ -377,7 +378,7 @@ class Controller extends Base
                         'width'     => 3,
                         'mandatory' => true,
                     ],
-                    'path'           => [
+                    'path'          => [
                         'caption'   => 'Path',
                         'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
@@ -410,7 +411,7 @@ class Controller extends Base
                         'width'     => 1,
                         'lookup'    => $luRoleType,
                     ],
-                    'role'        => [
+                    'role'          => [
                         'caption'   => 'Role',
                         'tooltip'   => 'Drive will only display to users of this type, can be left blank',
                         'mandatory' => true,
@@ -424,14 +425,14 @@ class Controller extends Base
                         'width'     => 1,
                         'mandatory' => true,
                         'nullable_label' => 'N/A',
-                        'lookup'    => [
+                        'lookup' => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
                         ],
                     ],
                 ]
             ],
-            'campus'    => [
+            'campus' => [
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'delete'            => true,
@@ -439,21 +440,25 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 6,
+                        'width'     => 5,
                         'maxLength' => 255,
                         'mandatory' => true,
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
-                        'width'     => 3,
+                        'mandatory' => false,
+                        'nullable'  => true,
+                        'nullable_label' => 'N/A',
+                        'width'     => 5,
+                        'lookup'    => $luCycles,
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 3,
+                        'width'     => 2,
                     ]
                 ]
             ],
-            'event-type'           => [
+            'event-type'            => [
                 'title'             => 'Event Types',
                 'delete'            => true,
                 'mapper'            => EventTypeMapper::class,
@@ -471,7 +476,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'news-topic'             => [
+            'news-topic'            => [
                 'title'             => 'News Topics',
                 'delete'            => true,
                 'mapper'            => Topic\Mapper::class,
@@ -484,7 +489,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'submission-type'    => [
+            'submission-type'       => [
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'delete'            => true,
@@ -670,6 +675,17 @@ class Controller extends Base
                 ]
             ],
         ];
+
+        /* Revert back to a freeform input field if $luCycles is empty and
+         * you can't choose anything (dropdown field is kind of useless)
+         */
+        if (!count($luCycles)) {
+            unset(
+                $return['campus']['fields']['extTimetableCode']['nullable'],
+                $return['campus']['fields']['extTimetableCode']['nullable_label'],
+                $return['campus']['fields']['extTimetableCode']['lookup']
+            );
+        }
 
         // If pastoral severities are disabled by policy, don't display item on the list screen
 

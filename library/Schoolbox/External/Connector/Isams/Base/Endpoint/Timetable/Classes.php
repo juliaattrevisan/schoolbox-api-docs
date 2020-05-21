@@ -182,7 +182,7 @@ class Classes implements IStrategy
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
                 $this->log->debug(sprintf(
-                    'Looking for ext_timetable_code %s, day %s, period %s',
+                    'Looking for cycle_identifier %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],
                     $class['period']['name']
@@ -190,7 +190,7 @@ class Classes implements IStrategy
 
                 if (null === $timetablePeriod) {
                     $this->log->warning(sprintf(
-                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+                        'The period named %s on day %s does not exist in timetable structure for cycle_identifier %s',
                         $class['period']['name'],
                         $class['period']['day'],
                         $ext
@@ -316,7 +316,7 @@ class Classes implements IStrategy
         $timetableClassPeriod->setTeacher($class['teachers']['username']);
 
         $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
+            'Creating class period relation for teacher %s %s in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
             $class['period']['room']['name'],

@@ -277,7 +277,7 @@ class Factory
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
         /* Week Offset, Term selection
-
+         *
          * TODO: Potentially configurable
          * You could potentially make this configurable, giving the school an opportunity
          * to view an arbitrary weekOffset's data (maybe repurpose a config field?)

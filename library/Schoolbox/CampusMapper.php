@@ -1,26 +1,30 @@
 <?php
 /**
- * Description of the file and what its purpose is
- *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox;
 
 use \PDO;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
-use UnexpectedValueException;
 
 /**
+ * Class CampusMapper
+ *
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Campus[] findAll($options = array())
  * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
  */
-class CampusMapper extends Mapper {
+class CampusMapper extends Mapper
+{
 
+    /**
+     * @inheritDoc
+     *
+     * @throws \InvalidArgumentException
+     */
     protected function mapping ()
     {
         $this->hasTable('luCampus');
