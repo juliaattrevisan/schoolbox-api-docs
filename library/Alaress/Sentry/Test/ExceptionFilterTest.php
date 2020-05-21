@@ -194,6 +194,14 @@ class ExceptionFilterTest extends TestCase
         unset($event, $filter);
 
         $event  = new Event();
+        $filter = new ExceptionFilter($nonExistentClassName1, $className);
+        $event->setExceptions([
+            ['type' => $className],
+        ]);
+        yield 'one filter class does not exist, but another matches' => [$event, $filter, true];
+        unset($event, $filter);
+
+        $event  = new Event();
         $filter = new ExceptionFilter($className);
         $event->setExceptions([
             ['type' => $nonExistentClassName1],
