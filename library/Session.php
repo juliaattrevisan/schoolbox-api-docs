@@ -317,32 +317,27 @@ class Session
      * @param string   $username
      * @param string   $password
      * @param resource $ds
-     * @param string   $ldapUsername
-     * @param string   $ldapPassword
      * @param string   $ldapSearchBase
      * @param string   $ldapUsernameField
      * @param string   $ldapSearchFilter
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      * @return bool
-     *
      */
-    private function _authLDAP(
+    private function ldapAuth(
         $username,
         $password,
         $ds,
-        $ldapUsername,
-        $ldapPassword,
         $ldapSearchBase,
         $ldapUsernameField,
         $ldapSearchFilter
     ) {
         // perform search for user in ldap server specified
-        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        @ldap_bind($ds, $this->ldap_escape($ldapUsername), utf8_encode($ldapPassword));
+        if (!$ds) {
+            return false;
+        }
         $searchString = "(" . $ldapUsernameField . "=" . $this->ldap_escape($username) . ")";
-        if (strlen($ldapSearchFilter)) {
+        if ($ldapSearchFilter !== '') {
             $searchString = sprintf('(&(%s)%s)', $ldapSearchFilter, $searchString);
         }
         $result = ldap_search($ds, $ldapSearchBase, $searchString, array('dn'));
@@ -422,12 +417,10 @@ class Session
         $ldapSearchFilter  = Config::get('ldap_search_filter');
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword);
-            if ($ds && $this->_authLDAP(
+            if ($ds && $this->ldapAuth(
                 $username,
                 $password,
                 $ds,
-                $ldapConfig['user'],
-                $ldapPassword,
                 $ldapConfig['searchBase'],
                 $ldapUsernameField,
                 $ldapSearchFilter
