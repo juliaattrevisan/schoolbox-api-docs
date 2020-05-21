@@ -622,12 +622,11 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      * @param {jQuery}       staller if given, the element to attach the AJAX promise to
      */
     function massageDateValue(e, staller) {
-        var t = e.target;
-
-        if (
-            $.trim($(t).val()) != "" &&
-            $.trim($(t).val()) !== $(t).data("originalValue")
-        ) {
+        var t           = e.target,
+            $t          = $(t),
+            val         = $t.val(),
+            originalVal = $t.data('originalValue');
+        if (val !== "" && val !== originalVal) {
             // set up params to guide parsing
             var opts = adtp.getOptions($(t));
             var $fieldError = $("#" + $(t).attr("id") + "-error"); // A possible validation error for this field

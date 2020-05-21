@@ -6,19 +6,23 @@
  */
 namespace Schoolbox\Learning\Assessment\DataModel;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Alaress_Date_Format;
+use PDO;
 use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -26,11 +30,7 @@ use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use PDO;
-use Schoolbox\Assessment\Participant\Plan;
 use UnderflowException;
-use Alaress\Database\Predicate\InvalidColumnException;
 
 /**
  * Class Mapper
@@ -159,13 +159,14 @@ class Mapper extends BaseMapper
         );
 
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
-        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateOpenSpan'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequence']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteProject'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteQuiz']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteProject']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
     }
 
@@ -1177,6 +1178,43 @@ class Mapper extends BaseMapper
             throw new \DomainException("Activity Duration cannot be less than zero");
         }
     }
+
+
+    /**
+     * Validation for whether this assessment has dates.
+     *
+     * Any type of spec assessment must not have any date: any type of
+     * implementation assessment must have all dates.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    protected function validateDatePresence(Model $assessment): bool
+    {
+        $context = $assessment->getAssessmentContext();
+        if (!$context) {
+            throw new \InvalidArgumentException('Unknown assessment context: cannot determine if spec or impl');
+        }
+        $isSpec = $context->isSpecificationContext();
+        $isImpl = $context->isImplementationContext();
+        $dates  = [
+            'publish' => $assessment->getPublishDate(),
+            'open'    => $assessment->getOpenDate(),
+            'due'     => $assessment->getDueDate(),
+            'close'   => $assessment->getCloseDate(),
+        ];
+        foreach ($dates as $type => $date) {
+            $isDate = $date instanceof Alaress_Date_Format && !$date->isNull();
+            if ($isSpec && $isDate) {
+                throw new \InvalidArgumentException(sprintf('Spec assessments may not have a %s date', $type));
+            }
+            if ($isImpl && !$isDate) {
+                throw new \InvalidArgumentException(sprintf('Implementation assessments must have a %s date', $type));
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Any notifications related to assessments must be deferred until all
