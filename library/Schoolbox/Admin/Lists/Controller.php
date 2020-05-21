@@ -249,9 +249,6 @@ class Controller extends Base
      */
     private function getTableData()
     {
-        $luEmpty = [
-            ['key' => '', 'value' => ''],
-        ];
         $luRoleType = [
             ['key' => Role::GUEST,   'value' => 'Guest'],
             ['key' => Role::STAFF,   'value' => 'Staff'],
@@ -449,7 +446,7 @@ class Controller extends Base
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
-                        'mandatory' => true,
+                        'mandatory' => false,
                         'nullable'  => true,
                         'nullable_label' => 'N/A',
                         'width'     => 5,
