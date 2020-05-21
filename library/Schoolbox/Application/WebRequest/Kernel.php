@@ -115,10 +115,37 @@ class Kernel extends WebKernelAbstract
 
         $route = $this->di->get('router')->match($path, $server);
 
-        if ($route instanceof Route) {
-            $this->outputAuraContent($route, $path);
-        } else {
-            $this->outputSitepageContent($_GET['page'] ?? null);
+        try {
+            if ($route instanceof Route) {
+                $this->outputAuraContent($route, $path);
+            } else {
+                $this->outputSitepageContent($_GET['page'] ?? null);
+            }
+        } catch (Forbidden $e) {
+            // Not allowed
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 403);
+            return;
+        } catch (NotFound $e) {
+            // "That which you are looking for cannot be found"
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 404);
+            return;
+        } catch (Unauthorized $e) {
+            // This seems to be the most appropriate error code for unauthorized calls.
+            // TODO set headers on $response instead of calling header()
+            header('WWW-Authenticate: FormBased');
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 401);
+            return;
+        } catch (SchoolboxException $e) {
+            /* Generic Schoolbox Exception spawned by ErrorMapper,
+             * thrown by Controllers. ErrorMapper already did the
+             * db call to retrieve the content, so error() doesn't
+             * need to do it itself. It just renders the content.
+             */
+            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
+            return;
         }
     }
 
@@ -277,31 +304,8 @@ class Kernel extends WebKernelAbstract
                 $this->outputError($e, $e->getMessage(), '', [], $code);
                 return;
             }
-        } catch (Forbidden $e) {
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 403);
-            return;
-        } catch (NotFound $e) {
-            // "That which you are looking for cannot be found"
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 404);
-            return;
-        } catch (Unauthorized $e) {
-            // This seems to be the most appropriate error code for unauthorized calls.
-            // TODO set headers on $response instead of calling header()
-            header('WWW-Authenticate: FormBased');
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 401);
-            return;
-        } /* Generic Schoolbox Exception spawned by ErrorMapper,
-             * thrown by Controllers. ErrorMapper already did the
-             * db call to retrieve the content, so error() doesn't
-             * need to do it itself. It just renders the content.
-             */
-        catch (SchoolboxException $e) {
-            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
-            return;
         }
+
         /** @var OutputInterface $output */
         $output = $response->content->get();
         if (!$output instanceof OutputInterface) {
