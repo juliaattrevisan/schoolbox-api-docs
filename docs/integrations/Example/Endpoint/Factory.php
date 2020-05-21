@@ -204,6 +204,11 @@ class Factory
      */
     public function produce(): GenericCollection
     {
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+
         return (new GenericCollection(IStrategy::class))
 
             /* Purge previously-imported profile relationships and classes
@@ -216,7 +221,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper,
-                $this->timetableCycleMapper,
                 $this->timetablePeriodMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
@@ -241,11 +245,10 @@ class Factory
             ->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $this->timetablePeriodMapper,
+                $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->userMapper
+                $this->classPeriodMapper
             ))
             ->add(new Cleanup(
                 $this->log,
