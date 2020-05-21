@@ -16,10 +16,12 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
+use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
@@ -113,7 +115,8 @@ class Kernel extends WebKernelAbstract
         }
 
 
-        $route = $this->di->get('router')->match($path, $server);
+        $route    = $this->di->get('router')->match($path, $server);
+        $response = null;
 
         try {
             if ($route instanceof Route) {
@@ -134,9 +137,12 @@ class Kernel extends WebKernelAbstract
                 }
             }
             $uri->setQuery($query);
+
+            // Start constructing a response
             $response = $this->di->get('webFactory')->newResponse();
-            if ($request->isXhr()) {
+            if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
+                // TODO replace this with standard outputError (ApiProblem style payload)
                 $response->status->setCode(401);
                 $response->content->set([
                     'format' => 'json',
@@ -146,19 +152,20 @@ class Kernel extends WebKernelAbstract
                 /** @var \Alaress\Session\Session $session */
                 $session = $this->di->get('session');
                 $session
-                    ->getSegment(\Schoolbox\Application\Login\Controller::class)
-                    ->setFlash(\Schoolbox\Application\Login\Controller::LOGIN_ERROR_FLASH, get_class($e));
+                    ->getSegment(LoginController::class)
+                    ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
             }
+
         } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
             $request  = $this->di->get('webFactory')->newRequest();
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;
-            if ($request->isXhr()) {
-                // TODO replace this with standard outputError (ApiProblem style payload)
+            if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
+                // TODO replace this with standard outputError (ApiProblem style payload)
                 $response->status->setCode($code);
                 $response->content->set([
                     'format' => 'json',
@@ -166,22 +173,25 @@ class Kernel extends WebKernelAbstract
                 ]);
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
-                return;
             }
+
         } catch (Forbidden $e) {
             // Not allowed
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 403);
+
         } catch (NotFound $e) {
             // "That which you are looking for cannot be found"
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 404);
+
         } catch (Unauthorized $e) {
             // This seems to be the most appropriate error code for unauthorized calls.
             // TODO set headers on $response instead of calling header()
             header('WWW-Authenticate: FormBased');
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 401);
+
         } catch (SchoolboxException $e) {
             /* Generic Schoolbox Exception spawned by ErrorMapper,
              * thrown by Controllers. ErrorMapper already did the
