@@ -32,7 +32,7 @@ class ExceptionFilter
      */
     public function __construct(string ...$excludedClasses)
     {
-        $this->excludedClasses = array_map([$this, 'normalizeClassName'], $excludedClasses);
+        $this->excludedClasses = $excludedClasses;
     }
 
 
@@ -46,30 +46,13 @@ class ExceptionFilter
     public function __invoke(Event $event): ?Event
     {
         foreach ($event->getExceptions() as $exception) {
-            $type = $this->normalizeClassName($exception['type'] ?? '');
-            if (in_array($type, $this->excludedClasses, true)) {
-                return null;
-            }
             foreach ($this->excludedClasses as $excludedClass) {
-                if (is_a($type, $excludedClass, true)) {
+                if (is_a($exception['type'], $excludedClass, true)) {
                     return null;
                 }
             }
         }
 
         return $event;
-    }
-
-
-    /**
-     * Raven passes class names with no trailing backslash: PHP ::class
-     * constants do. Normalize for comparison.
-     *
-     * @param string $className
-     * @return string
-     */
-    private function normalizeClassName(string $className): string
-    {
-        return ltrim($className, '\\');
     }
 }
