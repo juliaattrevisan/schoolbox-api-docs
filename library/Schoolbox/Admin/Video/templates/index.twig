@@ -81,6 +81,7 @@
                                             <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
                                                 <input type="hidden" value="{{ video.id }}" name="videoId">
                                                 <input type="hidden" value="" name="videoAction">
+                                                <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
                                                 <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
                                                 <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
                                                 <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
