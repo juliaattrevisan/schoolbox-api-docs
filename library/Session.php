@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -9,6 +10,8 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -293,22 +296,31 @@ class Session
     /**
      * Connect to the provided LDAP host.
      *
-     * @param string $host     The LDAP host's URL
-     * @param string $username A username required for auth to the LDAP host.
-     *                         This is distinct from the username that is being
-     *                         searched for within LDAP.
-     * @param string $password A password required for auth to the LDAP host.
-     *                         This is distinct from the password for the
-     *                         username that is being searched for.
+     * @param string      $host       The LDAP host's URL
+     * @param string      $username   A username for auth to the LDAP host.
+     *                                This is distinct from the username that is
+     *                                being searched for within LDAP.
+     * @param string      $password   A password for auth to the LDAP host.
+     *                                This is distinct from the password for the
+     *                                username that is being searched for.
+     * @param string|null $caCertPath If provided, a local path to a cert.
+     *                                This must be a local file, because the
+     *                                LDAP extension needs to access this file.
      * @return bool|resource The connection, or false if none could be created.
      */
-    private function ldapConnect(string $host, string $username, string $password)
+    private function ldapConnect(string $host, string $username, string $password, ?string $caCertPath)
     {
         if ($host) {
             $ds = ldap_connect($host);
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+                if ($caCertPath) {
+                    // https://bugs.php.net/bug.php?id=73558
+                    // suggests that both CA cert dir and file need to be set.
+                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTDIR, dirname($caCertPath));
+                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTFILE, $caCertPath);
+                }
                 @ldap_bind($ds, $this->ldap_escape($username), utf8_encode($password));
                 return $ds;
             }
@@ -425,8 +437,14 @@ class Session
         $ldapPassword      = Config::get('ldap_pass');
         $ldapUsernameField = Config::get('ldap_username');
         $ldapSearchFilter  = Config::get('ldap_search_filter');
+        $ldapCaCertHash    = Config::get('ldap_ca_certificate');
+        $ldapCaCertPath    = null;
+        if ($ldapCaCertHash) {
+            $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
+            $ldapCaCertPath = '';
+        }
         foreach ($ldapConfigs as $ldapConfig) {
-            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword);
+            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['user'], $ldapPassword, $ldapCaCertPath);
             if ($ds && $this->ldapAuth(
                 $ds,
                 $username,
@@ -530,7 +548,7 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
-                        } catch (\Schoolbox\Mapper\Exception $e) {
+                        } catch (MapperException $e) {
                             continue;
                         }
                         $childObject->setParents(new GenericCollection(User::class));
