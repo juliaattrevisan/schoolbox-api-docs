@@ -293,9 +293,13 @@ class Session
     /**
      * Connect to the provided LDAP host.
      *
-     * @param string $host
-     * @param string $username
-     * @param string $password
+     * @param string $host     The LDAP host's URL
+     * @param string $username A username required for auth to the LDAP host.
+     *                         This is distinct from the username that is being
+     *                         searched for within LDAP.
+     * @param string $password A password required for auth to the LDAP host.
+     *                         This is distinct from the password for the
+     *                         username that is being searched for.
      * @return bool|resource The connection, or false if none could be created.
      */
     private function ldapConnect(string $host, string $username, string $password)
@@ -314,33 +318,39 @@ class Session
 
 
     /**
-     * @param resource $ds
-     * @param string   $username
-     * @param string   $password
-     * @param string   $ldapSearchBase
-     * @param string   $ldapUsernameField
-     * @param string   $ldapSearchFilter
+     * Authenticates a username/password against the provided LDAP connection.
+     *
+     * @param bool|resource $ds            An LDAP connection
+     * @param string        $username      The username to authenticate in the
+     *                                     LDAP connection
+     * @param string        $password      The password for user $username
+     * @param string        $userDn        What is the distinguished name of the
+     *                                     directory which contains usernames?
+     * @param string        $usernameField Which field in $userDn contains the
+     *                                     username?
+     * @param string        $searchFilter  What other filters should be applied
+     *                                     to the username field search?
      * @return bool
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      */
     private function ldapAuth(
         $ds,
-        $username,
-        $password,
-        $ldapSearchBase,
-        $ldapUsernameField,
-        $ldapSearchFilter
+        string $username,
+        string $password,
+        string $userDn,
+        string $usernameField,
+        string $searchFilter
     ) {
         // perform search for user in ldap server specified
         if (!$ds) {
             return false;
         }
-        $searchString = "(" . $ldapUsernameField . "=" . $this->ldap_escape($username) . ")";
-        if ($ldapSearchFilter !== '') {
-            $searchString = sprintf('(&(%s)%s)', $ldapSearchFilter, $searchString);
+        $searchString = "(" . $usernameField . "=" . $this->ldap_escape($username) . ")";
+        if ($searchFilter !== '') {
+            $searchString = sprintf('(&(%s)%s)', $searchFilter, $searchString);
         }
-        $result = ldap_search($ds, $ldapSearchBase, $searchString, array('dn'));
+        $result = ldap_search($ds, $userDn, $searchString, array('dn'));
         // user exists
         if ($result) {
             $entries = ldap_get_entries($ds, $result);
