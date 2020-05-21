@@ -296,21 +296,21 @@ class Session
      * @param string   $ldapUsername
      * @param string   $ldapPassword
      * @param string   $ldapSearchBase
+     * @param string   $ldapSearchFilter
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      * @return bool
      *
      */
-    private function _authLDAP($username, $password, $ds, $ldapUsername, $ldapPassword, $ldapSearchBase)
+    private function _authLDAP($username, $password, $ds, $ldapUsername, $ldapPassword, $ldapSearchBase, $ldapSearchFilter)
     {
         // perform search for user in ldap server specified
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         @ldap_bind($ds, $this->ldap_escape($ldapUsername), utf8_encode($ldapPassword));
         $searchString = "(" . Config::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
-        $ldap_search_filter = Config::get('ldap_search_filter');
-        if (strlen($ldap_search_filter)) {
-            $searchString = sprintf('(&(%s)%s)', $ldap_search_filter, $searchString);
+        if (strlen($ldapSearchFilter)) {
+            $searchString = sprintf('(&(%s)%s)', $ldapSearchFilter, $searchString);
         }
         $result = ldap_search($ds, $ldapSearchBase, $searchString, array('dn'));
         // user exists
@@ -376,7 +376,8 @@ class Session
             $ds,
             Config::get('ldap_user'),
             Config::get('ldap_pass'),
-            Config::get('ldap_base')
+            Config::get('ldap_base'),
+            Config::get('ldap_search_filter')
         )) {
             return true;
         }
@@ -390,7 +391,8 @@ class Session
                 $ds,
                 Config::get('ldap_user_alt'),
                 Config::get('ldap_pass'),
-                Config::get('ldap_base_alt')
+                Config::get('ldap_base_alt'),
+                Config::get('ldap_search_filter')
             )) {
                 return true;
             }
@@ -405,7 +407,8 @@ class Session
                 $ds,
                 Config::get('ldap_user_ter'),
                 Config::get('ldap_pass'),
-                Config::get('ldap_base_ter')
+                Config::get('ldap_base_ter'),
+                Config::get('ldap_search_filter')
             )) {
                 return true;
             }
