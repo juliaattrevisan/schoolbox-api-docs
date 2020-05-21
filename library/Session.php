@@ -290,30 +290,28 @@ class Session
     }
 
     /**
-     * @param string    $username
-     * @param string    $password
-     * @param resource  $ds
-     * @param string    $ldap_user
-     * @param string    $ldap_base
-     * @param int       $version
-     * @param int       $referrals
+     * @param string   $username
+     * @param string   $password
+     * @param resource $ds
+     * @param string   $ldapUsername
+     * @param string   $ldapSearchBase
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
      * @return bool
      *
      */
-    private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0)
+    private function _authLDAP($username, $password, $ds, $ldapUsername, $ldapSearchBase)
     {
         // perform search for user in ldap server specified
-        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, $version);
-        ldap_set_option($ds, LDAP_OPT_REFERRALS, $referrals);
-        @ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Config::get('ldap_pass')));
+        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+        @ldap_bind($ds, $this->ldap_escape($ldapUsername), utf8_encode(Config::get('ldap_pass')));
         $searchString = "(" . Config::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
         $ldap_search_filter = Config::get('ldap_search_filter');
         if (strlen($ldap_search_filter)) {
             $searchString = sprintf('(&(%s)%s)', $ldap_search_filter, $searchString);
         }
-        $result = ldap_search($ds, $ldap_base, $searchString, array('dn'));
+        $result = ldap_search($ds, $ldapSearchBase, $searchString, array('dn'));
         // user exists
         if ($result) {
             $entries = ldap_get_entries($ds, $result);
@@ -371,14 +369,26 @@ class Session
         $ds = ldap_connect(Config::get('ldap_host'));
 
         // test authentication in primary server
-        if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user'), Config::get('ldap_base'))) {
+        if ($this->_authLDAP(
+            $username,
+            $password,
+            $ds,
+            Config::get('ldap_user'),
+            Config::get('ldap_base')
+        )) {
             return true;
         }
 
         // test authentication in secondary server
         if (Config::get('ldap_host_alt')) {
             $ds = ldap_connect(Config::get('ldap_host_alt'));
-            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_alt'), Config::get('ldap_base_alt'))) {
+            if ($this->_authLDAP(
+                $username,
+                $password,
+                $ds,
+                Config::get('ldap_user_alt'),
+                Config::get('ldap_base_alt')
+            )) {
                 return true;
             }
         }
@@ -386,7 +396,13 @@ class Session
         // test authentication in tertiary server
         if (Config::get('ldap_host_ter')) {
             $ds = ldap_connect(Config::get('ldap_host_ter'));
-            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_ter'), Config::get('ldap_base_ter'))) {
+            if ($this->_authLDAP(
+                $username,
+                $password,
+                $ds,
+                Config::get('ldap_user_ter'),
+                Config::get('ldap_base_ter')
+            )) {
                 return true;
             }
         }
