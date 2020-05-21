@@ -103,6 +103,7 @@ class Mapper extends BaseMapper
      */
     public function postSave(Model $object)
     {
+        // Save moderators
         $mapper  = $this->getJoinMapper('moderator');
         $oldList = $mapper->findByColumn('resource_id', $object->getId());
         $newList = new Collection();
@@ -114,13 +115,14 @@ class Mapper extends BaseMapper
 
         // Save all newList items that aren't in oldList
         // Delete all vice versa
-        $diffMethod = function ($a, $b) {
+        $diffMethod = static function (Moderator\Model $a, Moderator\Model $b) {
             return $a->getModerator()->getId() == $b->getModerator()->getId();
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
 
-        // Add save of related items
+
+        // Save related items
         // TODO either implement Dr's M2M join or have some better way of defining this
         $mapper  = $this->getJoinMapper('related_resource');
         $oldList = $mapper->findByColumn('resource_id', $object->getId());
@@ -133,19 +135,33 @@ class Mapper extends BaseMapper
 
         // Save all newList items that aren't in oldList
         // Delete all vice versa
-        $diffMethod = function ($a, $b) {
+        $diffMethod = static function (RelatedResource\Model $a, RelatedResource\Model $b) {
             return $a->getRelatedResource()->getId() == $b->getRelatedResource()->getId();
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
 
-        // Add save of roles too
-        // If saving a new set of roles, this item's ID has to be attached
-        $roleList = $object->getRoleList();
-        foreach ($roleList as $role) {
-            $role->setResource($object);
+
+        // Save roles
+        // This is different to the two methods above, because resource-role
+        // isn't a 1-M join: there is an intermediate which stores if the role
+        // is enabled.
+        $mapper  = $this->getJoinMapper('role');
+        $oldList = $mapper
+            ->findByColumn('resource_id', $object->getId())
+            ->indexByCallback(static function (RolePermission\Model $m) {
+                return $m->getRole()->getId();
+            });
+        $newList = $mapper->createCollection();
+        foreach ($object->getRoleList() as $related) {
+            $roleId     = $related->getRole()->getId();
+            $joinObject = $oldList[$roleId] ?? new RolePermission\Model();
+            $joinObject
+                ->setAllowed($related->getAllowed())
+                ->setResource($object);
+            $newList->add($joinObject);
         }
-        $this->getJoinMapper('role')->save($roleList);
+        $mapper->save($newList);
     }
 
     /**

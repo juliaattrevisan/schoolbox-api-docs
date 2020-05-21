@@ -100,7 +100,7 @@ class Controller extends AbstractController
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setPositionMapper(PositionMapper::getInstance());
-        $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
+        $this->divisionUserMapper = DivisionUserMapper::getInstance();
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
@@ -247,14 +247,19 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Division $division)
     {
-        $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                ->setDivision($division)
-                ->setUser($user)
-                ->setSequence(0);
+            // Don't re-add any players already in the division
+            try {
+                $this->divisionUserMapper->save(
+                    $this->divisionUserMapper->createModel()
+                                             ->setDivision($division)
+                                             ->setUser($user)
+                                             ->setSequence(0)
+                );
+            } catch (MapperException $e) {
+                // Probably a duplicate key. That is fine
+            }
         }
-        $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
     }
 
@@ -297,15 +302,18 @@ class Controller extends AbstractController
             }
 
             if ($user instanceof User) {
-                $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                    ->setDivision($division)
-                    ->setUser($user)
-                    ->setSequence(0);
+                try {
+                    $this->divisionUserMapper->save(
+                        $this->divisionUserMapper->createModel()
+                                                 ->setDivision($division)
+                                                 ->setUser($user)
+                                                 ->setSequence(0)
+                    );
+                } catch (MapperException $e) {
+                    // Probably a duplicate key. That is fine
+                }
             }
         }
-
-        // and save
-        $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
 
     }
@@ -317,8 +325,8 @@ class Controller extends AbstractController
      */
     public function postRemovePlayers(Division $division)
     {
-        $this->getDivisionUserMapper()->delete(
-            $this->getDivisionUserMapper()->findByColumnList([
+        $this->divisionUserMapper->delete(
+            $this->divisionUserMapper->findByColumnList([
                 'user_id'     => $this->getRequest()->post->get('userId'),
                 'division_id' => $division->getId(),
             ])
@@ -343,7 +351,7 @@ class Controller extends AbstractController
         foreach ($userIds as $userId) {
             try {
                 /** @var DivisionUser $divisionUser */
-                $divisionUser = $this->getDivisionUserMapper()->findOneByColumnList([
+                $divisionUser = $this->divisionUserMapper->findOneByColumnList([
                     'user_id'     => $userId,
                     'division_id' => $division->getId(),
                 ]);
@@ -353,7 +361,7 @@ class Controller extends AbstractController
                 continue;
             }
         }
-        $this->getDivisionUserMapper()->save($divisionUsers);
+        $this->divisionUserMapper->save($divisionUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
@@ -579,24 +587,6 @@ class Controller extends AbstractController
     protected function setPositionMapper(PositionMapper $positionMapper)
     {
         $this->positionMapper = $positionMapper;
-        return $this;
-    }    
-
-    /**
-     * @return DivisionUserMapper
-     */
-    protected function getDivisionUserMapper()
-    {
-        return $this->divisionUserMapper;
-    }
-
-    /**
-     * @param DivisionUserMapper $divisionUserMapper
-     * @return static
-     */
-    protected function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
-    {
-        $this->divisionUserMapper = $divisionUserMapper;
         return $this;
     }
 
