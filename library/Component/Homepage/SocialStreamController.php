@@ -73,16 +73,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                     }
                 }
 
-                $zone = new Zone('sstream-attachment-' . $this->getInstance()->getId());
-                $zone->setMimeFilter(null)
-                    ->setAttachPrompt('Share a file')
-                    ->setAttachmentsLabel('')
-                    ->setModalTitle('Select a file or folder')
-                    ->setMulti(false)
-                    ->setThumbnailSize(32);
-
-                $zone->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
-
                 $this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
             }
 

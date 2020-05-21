@@ -14,9 +14,9 @@
         /* Schoolbox Link Modal
          */
         $('#modalLinkButton').schoolboxLink({
-            onSelect: function(url, name, dialog) {
+            onSelect: function(url, name, mime, dialog) {
                 $('#modalLinkTarget').val(url);
-                $('#modalLinkName').text(name);
+                $('#modalLinkName').text(name + ' ' + mime);
             }
         });
 

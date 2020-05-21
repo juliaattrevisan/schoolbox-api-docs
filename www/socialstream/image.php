@@ -16,6 +16,7 @@ use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -48,8 +49,19 @@ $urlDetect = new UrlDetection($post->getUrl());
 if ($urlDetect->isStorageUrl()) {
     $hash    = $urlDetect->getHash();
     $storage = Storage\Mapper::getInstance()->findByHash($hash);
+} elseif ($urlDetect->isResourceUrl()) {
+    try {
+        $file    = File\Mapper::getInstance()->findById($urlDetect->getId());
+        $hash    = $file->getHash();
+        $storage = Storage\Mapper::getInstance()->findByHash($hash);
+    } catch (\Schoolbox\Mapper\Exception $e) {
 
-} else {
+        /* Unknown file
+         */
+        \SitePage::redirectToBrokenImageWithTransform('storage', $size);
+    }
+}
+else {
     $storage = $cache->getFile();
 }
 

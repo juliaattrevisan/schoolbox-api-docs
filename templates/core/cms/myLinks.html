@@ -73,8 +73,21 @@ $(function() {
                             <input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
                             <div class="row">
                                 <div class="small-12 medium-6 columns">
+                                    <script>
+                                        $(function() {
+                                            $('#modifyLinkButton-{MYLINK_ID}').schoolboxLink({
+                                                restoreModal: '#modify-link-{MYLINK_ID}',
+                                                onSelect: function(url, name, mime, dialog) {
+                                                    $('#url-{MYLINK_ID}').val(url);
+                                                }
+                                            });
+                                        });
+                                    </script>
                                     <label for="url-{MYLINK_ID}" class="required">Link</label>
-                                    <input id="url-{MYLINK_ID}" name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
+                                    <div class="input-group">
+                                        <input id="url-{MYLINK_ID}" name="url" type="text" class="required" value="{MYLINK_URL}" />
+                                        <a id="modifyLinkButton-{MYLINK_ID}" class="button icon-link">Browse</a>
+                                    </div>
                                 </div>
                                 <div class="small-12 medium-6 columns">
                                     <label for="description-{MYLINK_ID}" class="required">Title</label>
@@ -97,8 +110,21 @@ $(function() {
             <form method="post" action="/cms/myLinksForm.php" data-role="link-form">
                 <div class="row">
                     <div class="small-12 medium-6 columns">
+                        <script>
+                            $(function() {
+                                $('#addLinkButton').schoolboxLink({
+                                    restoreModal: '#add-link',
+                                    onSelect: function(url, name, mime, dialog) {
+                                        $('#url-new').val(url);
+                                    }
+                                });
+                            });
+                        </script>
                         <label for="url-new" class="required">Link</label>
-                        <input id="url-new" name="url" type="text" class="required" />
+                        <div class="input-group">
+                            <input id="url-new" name="url" type="text" class="required" />
+                            <a id="addLinkButton" class="button icon-link">Browse</a>
+                        </div>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label for="description-new" class="required">Title</label>

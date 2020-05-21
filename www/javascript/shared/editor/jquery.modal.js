@@ -1,3 +1,5 @@
+
+
 /**
  * Mr Matt's Modal
  *
@@ -16,6 +18,37 @@
 (function() {
     var modalCache = {};
     var singletonModal = null;
+
+
+    /**
+     * Attempt to restore the previous modal with the identifier $id
+     * Reopens its ui and reanimates its overlay
+     *
+     * @param id
+     */
+    $.fn.schoolboxRestorePreviousModal = function(id)
+    {
+        if (null === id || undefined === id) {
+            return;
+        }
+
+        /* Select it, in case it was provided as just an id string
+         */
+        $(id).foundation('reveal', 'open');
+
+        /* M3 picker shut this overlay so I have to manually restore it after
+         * foundation finishes its animation
+         */
+        setTimeout(function() {
+            $('.reveal-modal-bg')
+                .css('opacity', 0)
+                .css('display', 'block')
+                .animate({
+                    opacity: 1
+                }, 250);
+        }, 275);
+    }
+
 
     /**
      * Spawns a Schoolbox Resource Browser which allows you
@@ -60,9 +93,37 @@
                  */
                 useFolder: true,
 
+                /* Whether the singleton modal should allow detachment
+                 *
+                 * Set to false when the picker is spawned from within some other modal
+                 * because that modal will shut, causing a reinit and this singleton detachment.
+                 *
+                 * That causes your file picker modal to inexplicably vanish, as it destroys itself
+                 * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
+                 * could only exist once, and in a modal; any time it shut, it must reinit - but the
+                 * selector applies to all modals, not just the picker one. Maybe that's the next change.
+                 */
+                allowDetachment: true,
+
+                /* If specified, try to restore the modal designated by this identifier
+                 * You only need to do this if the M3 picker starts from within another modal
+                 * There were only two places at the time of writing: My Links and Socialstream
+                 */
+                restoreModal: null,
+
                 /* Selector to get the default folder to start browsing resources from
                  */
-                defaultFolderSelector: 0
+                defaultFolderSelector: 0,
+
+                /* Executes before picker modal opens
+                 */
+                onBeforeOpen: function() {
+                },
+
+                /* Executes after picker modal shuts
+                 */
+                onAfterClose: function() {
+                }
             };
 
             return $.extend(defaults, options);
@@ -167,19 +228,41 @@
         function build(data) {
             var body = $('body');
 
-            if (singletonModal) {
-                // you've got a modal; don't try to make another one
+            /* null !== config.restoreModal was previously known as allowDetachment
+             *
+             * Whether the singleton modal should allow detachment
+             * (meaning, allow modal to destroy itself when any modal shuts)
+             *
+             * Set this when the picker is spawned from within some other modal
+             * because that modal will shut, causing a reinit and this singleton detachment.
+             *
+             * That causes your file picker modal to inexplicably vanish, as it destroys itself
+             * when another modal shuts. It's pretty weird. The original idea was that the singletonModal
+             * could only exist once, and in a modal; any time it shut, it must reinit - but the
+             * selector applies to all modals, not just the picker one. Maybe that's the next change.
+             */
+            if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
+
+                /* Forcibly reopen it anyway. You can enter this code path by opening a socialstream reply
+                 * M3 picker, then cancel it, then try to open a socialstream post M3 where
+                 * restoreModal is empty and singletonModal existed, but was shut (so reopen it)
+                 */
+                singletonModal
+                    .html(singletonModal.data('content'))
+                    .foundation('reveal', 'open')
+                    .off('closed.fndtn.reveal.attach');
+
                 return;
-            }
-            else if($('#attachment-browser').length) {
+            } else if($('#attachment-browser').length) {
                 singletonModal = $('#attachment-browser').parent();
-            }
-            else {
+            } else {
                 singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
                     .data('content', data);
 
                 body.append(singletonModal);
             }
+
+            config.onBeforeOpen();
 
             singletonModal
                 .html(singletonModal.data('content'))
@@ -219,11 +302,12 @@
             $(document)
                 //.foundation('reveal', 'reflow')
                 .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal) {
+                    if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
-                    if(undefined !== config.previousModal) {
+
+                    if (undefined !== config.previousModal) {
                         config.previousModal.removeClass('hide');
                     }
 
@@ -235,6 +319,10 @@
                 e.preventDefault();
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
                 singletonModal.foundation('reveal', 'close');
+
+                config.onAfterClose();
+
+                $.fn.schoolboxRestorePreviousModal(config.restoreModal);
             });
         }
     };
@@ -250,26 +338,52 @@
 
         /**
          * Construct a url from the pieces provided
+         *
          * Depending on what you chose, the url is constructed a bit specially
          * sorry
          *
          * @param type        string  data type [folder, myfolder, file, meetingUrl]
          * @param filesystem  string  typically 'store' as a special case usage
-         * @param val         string  a file id or a meeting url
+         * @param hash        string  a hashed string for a storage object
+         * @param val         string  a file id, myFile id, or a meeting url
          * @return url        string  the url to which you are linking
          */
-        function processSelection(type, filesystem, val) {
+        function processSelection(type, filesystem, hash, val) {
             var url;
 
-            if (type == 'folder') {
+            /* The args to this method come from an async request to nodeinfo
+             * Urls can be generated contextually based on some combination of these args
+             * Here, I've consolidated known outcomes as best I could
+             */
+            if (type === 'folder') {
+
+                /* When you select Use This Folder which is available in special circumstances
+                 */
                 url = config.url.folder + val;
-            } else if (type == 'myfolder') {
-                url = config.url.myfolder + val;
-            } else if (filesystem == 'store') {
-                url = config.url.storage + val;
-            } else if (type =='meetingUrl') {
+            } else if (filesystem === 'store') {
+
+                /* When you Upload A File via the modal's dropzone
+                 */
+                url = config.url.storage + hash;
+            } else if (filesystem === 'browse') {
+
+                /* When you select a file via Resource Browser
+                 */
+                url = config.url.storage + hash;
+            } else if (filesystem === 'myfile') {
+
+                /* When you select a My File
+                 */
+                url = config.url.storage + hash;
+            } else if (type === 'meetingUrl') {
+
+                /* When you select a Microsoft Teams meeting url
+                 */
                 url = config.url.meetingUrl + val;
             } else {
+
+                /* Default assumption (not sure where this manifests anymore, sorry)
+                 */
                 url = config.url.file + val;
             }
 
@@ -290,21 +404,29 @@
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
                     $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.id), responseText.name, dialog);
+                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id), responseText.name, responseText.mime, dialog);
 
                         /* Shut modal, go back to Dialog
                          */
                         $('#file-picker').foundation('reveal', 'close');
+
+                        config.onAfterClose();
+
+                        $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                     });
                 } else if ('meetingUrl' in message.data) {
 
                     /* Microsoft Teams meetings url format
                      */
-                    config.onSelect(processSelection('meetingUrl', '', message.data.meetingUrl), 'Microsoft Teams Meeting', dialog);
+                    config.onSelect(processSelection('meetingUrl', '', '', message.data.meetingUrl), 'Microsoft Teams Meeting', null, dialog);
 
                     /* Shut modal, go back to Dialog
                      */
                     $('#file-picker').foundation('reveal', 'close');
+
+                    config.onAfterClose();
+
+                    $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                 } else {
 
                     // The file was rejected, probably cause it was the wrong mimetype.
@@ -342,6 +464,10 @@
                  */
                 myfolder: '/my-files/',
 
+                /* Prefix for linking to MyFiles
+                 */
+                myfile: '/storage/fetch.php?hash=',
+
                 /* Prefix for link to Storage hash
                  */
                 storage: '/storage/fetch.php?hash=',
@@ -352,7 +478,13 @@
 
                 /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
                  */
-                meetingUrl: ''
+                meetingUrl: '',
+
+                /* restoreModal specifies whether there's a modal that should be restored once the M3 shuts
+                 * This is in the form of an id string for the modal but you can use a jquery selector too
+                 *
+                 */
+                restoreModal: null
             },
 
             /**
@@ -361,10 +493,17 @@
              *
              * @param url     string  the url to which you linked
              * @param name    string  user-facing name of the thing you linked
+             * @param mime    string  the mime type of the thing you linked
              * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
              */
-            onSelect: function(url, name, dialog) {
+            onSelect: function(url, name, mime, dialog) {
                 return url;
+            },
+
+            /**
+             * Executes after the M3 picker shuts its own modal
+             */
+            onAfterClose: function() {
             }
         }, options);
     };
@@ -401,8 +540,11 @@
 
             /* Other elements of this object literal as a result of merging with defaults:
              *
-             * url: ...
+             * url: (string)
+             * onBeforeOpen: function() ...
              * onSelect: function() ...
+             * onAfterClose: function() ...
+             * restoreModal: (string)
              */
         );
 
@@ -416,7 +558,11 @@
             $.fn.schoolboxResource({
                 allowedFiles: config.allowedFiles,
                 allowedFilesystems: config.allowedFilesystems,
-                defaultFolderSelector: config.defaultFolderSelector
+                allowDetachment: config.allowDetachment,
+                defaultFolderSelector: config.defaultFolderSelector,
+                onBeforeOpen: config.onBeforeOpen,
+                onAfterClose: config.onAfterClose,
+                restoreModal: config.restoreModal,
             });
 
             /* Send the message up and deal with the dialog, if one was specified

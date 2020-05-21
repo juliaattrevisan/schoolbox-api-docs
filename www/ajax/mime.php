@@ -1,81 +1,92 @@
 <?php
-use Schoolbox\File\MimetypeMapper;
-
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
+
+define('MIME_URL_PREFIX', __DIR__ . '/../images/mime');
+define('DEFAULT_FOLDER_ICON', MIME_URL_PREFIX . '/application-document.svg');
+define('DEFAULT_NONE_ICON', MIME_URL_PREFIX . '/none.svg');
+define('MAX_AGE', 2419200); // 28 days
+
+/* Enforce sitepage context
+ */
 if (empty($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/mime');
 }
 
-/** @var SitePage $this */
 $this->setAjax();
 
-$filenames = array();
+$filenames = [];
 
 try {
 
-    $size = empty($_GET['size']) ? 128 : (int)$_GET['size'];
-
-    $root = __DIR__ . "/../images/mime";
-    $base = "$root/";
-
-    // special case -_-
-    if ($this->arg == array('folder')) {
-        $filenames[] = __DIR__ . "/../images/icons/128x128/folder.png";
+    /* Folders have a specific icon
+     */
+    if ($this->arg === ['folder']) {
+        $filenames[] = DEFAULT_FOLDER_ICON;
     } else {
-        $filenames[] = "$root/128x128/mime.png";
-        $filenames[] = "$base/mime.png";
+
+        /* Always need two args for the mime
+         */
+        if (\count($this->arg) !== 2) {
+            throw new Schoolbox\Mapper\Exception('No mime specified');
+        }
+
+        /* Fall back to something that was specified in Allowed Files
+         */
+        /** @var Mimetype $mime */
+        $mime = MimetypeMapper::getInstance()->findOneByColumnList([
+            'mime' => strtolower(implode('/', $this->arg)),
+            'enable' => 'true'
+        ]);
+
+        $filenames[] = MIME_URL_PREFIX . '/' . $mime->getIconFile();
     }
+} catch (Schoolbox\Mapper\Exception $e) {
 
-    if(count($this->arg) != 2) {
-        throw new Schoolbox\Mapper\Exception("No mime specified");
-    }
-
-    $mimetype = strtolower(implode('/', $this->arg));
-
-    $mtm = MimetypeMapper::getInstance();
-
-    /** @var \Schoolbox\File\Mimetype $mime */
-    $mime = $mtm->findOneByColumnList(array(
-        'mime' => $mimetype,
-        'enable' => 'true'
-    ));
-
-    $icon = $mime->getIconFile();
-
-    $filenames[] = "$base/$icon";
-
-
-} catch(Schoolbox\Mapper\Exception $e) {
-    // Show an empty icon
-    $filenames[] = "$base/none.svg";
+    /* Something died in MimetypeMapper, probably
+     * noop
+     */
 }
 
-foreach(array_reverse($filenames) as $filename) {
-    if(!file_exists($filename)) {
+/* A default icon, in case none were found elsewhere
+ * Hopefully this always exists
+ */
+$filenames[] = DEFAULT_NONE_ICON;
+
+/* Check each of the possible filenames for what we chose
+ *
+ * Start with the one associated by MimetypeMapper which is synonymous for Allowed Files configuration
+ * then gradually fall back to other files
+ */
+foreach ($filenames as $filename) {
+
+    /* Progressively degrade icon choice until we find the first available
+     */
+    if (!file_exists($filename)) {
         continue;
     }
 
     $fp = fopen($filename, 'rb');
 
-    $maxAge = 2419200; // 28 days
-
     // send the right headers
     header('Content-Type: image/svg+xml');
     header('Content-Length: ' . filesize($filename));
     header('Pragma: public');
-    header("Cache-Control: public, max-age=$maxAge");
-    header('Expires: ' . date('r', $_SERVER['REQUEST_TIME'] + $maxAge));
+    header('Cache-Control: public, max-age=' . MAX_AGE);
+    header('Expires: ' . date('r', $_SERVER['REQUEST_TIME'] + MAX_AGE));
 
     // dump the picture and stop the script
     fpassthru($fp);
+
     exit;
 }
+
 error(41);

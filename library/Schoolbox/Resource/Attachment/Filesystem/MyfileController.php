@@ -19,15 +19,17 @@ class MyfileController extends NavigatorController
     /**
      * @param bool   $multi
      * @param string $mimeFilter
+     * @param null   $conf
+     * @param null   $rosetta
      * @param bool   $useFolder
      */
-    public function __construct($multi, $mimeFilter = null, $useFolder = true)
+    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null, $useFolder = true)
     {
         // disallow null: cast to '*/*'
 
         /* TODO: his is probably the wrong usage of mimeFilter now
          */
-        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter, $useFolder);
+        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter, $conf = null, $rosetta = null, false);
     }
 
 

@@ -26,10 +26,24 @@ class Factory
 
     /**
      * Default configuration of resource picker filesystems
+     * These are chosen via the javascript allowedFilesystems config var
      *
      * @var array
      */
     private const OPTIONS = [
+
+        /* Enable every accordion
+         */
+        'all' => [
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'teams'     => Filesystem\TeamsController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'webdav'    => Filesystem\WebdavController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ],
 
         /* Controllers for the Link modal
          */
