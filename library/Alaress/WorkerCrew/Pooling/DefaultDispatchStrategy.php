@@ -34,8 +34,8 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
 
     const IDLE_TIMEOUT = 60000; // 1 minute
 
-    const WORKER_SOFT_TIMEOUT = 90000; // 1.5 minutes
-    const WORKER_HARD_TIMEOUT = 180000; // 2.5 minutes
+    const WORKER_SOFT_TIMEOUT = 300000; // 5 minutes
+    const WORKER_HARD_TIMEOUT = 1200000; // 20 minutes
 
     const TASK_FETCH     = 'fetch';
     const TASK_PUBLISH   = 'publish';
