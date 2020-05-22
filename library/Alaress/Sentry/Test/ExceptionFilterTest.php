@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Alaress\Sentry\Test;
 
 use Alaress\Sentry\ExceptionFilter;
-use Imagine\Exception\OutOfBoundsException;
+use OutOfBoundsException;
 use InvalidArgumentException;
 use LogicException;
 use OverflowException;
 use PHPUnit\Framework\TestCase;
-use React\Promise\Exception\LengthException;
+use LengthException;
 use Sentry\Event;
 
 /**
