@@ -207,6 +207,6 @@ class ExceptionFilterTest extends TestCase
      */
     private function buildFilter(string... $exceptionClasses): ExceptionFilter
     {
-        return new ExceptionFilter(,..$exceptionClasses);
+        return new ExceptionFilter(...$exceptionClasses);
     }
 }
