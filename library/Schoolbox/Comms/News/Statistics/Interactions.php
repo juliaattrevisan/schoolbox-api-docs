@@ -130,7 +130,8 @@ class Interactions
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Open was made
          */
-        /** @var News\Statistics\Model $existingOpen */
+        /** @var News\Statistics\Model|null $existingOpen */
+        $existingOpen = null;
         try {
             $existingOpen = $this->statisticsMapper->findOneByColumnList([
                 'article_id' => $article->getId(),
@@ -141,7 +142,7 @@ class Interactions
                 'role_id'    => $roleId,
             ]);
         } catch (NotFound $e) {
-            $existingOpen = false;
+            // noop
         }
 
         /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
@@ -156,7 +157,7 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        return $this->statisticsMapper->save($model);
+        return $this->statisticsMapper->save($existingOpen ?? $model);
     }
 
 
@@ -265,9 +266,9 @@ class Interactions
         $breakdown = $this->generateDefaultBreakdown(Role::getRoleTypes());
 
         $statement = $this->database->prepareQuery("
-            SELECT 
+            SELECT
                 SUM(num) AS num,
-                `type`, 
+                `type`,
                 role_type
             FROM {$this->statisticsCumulativeMapper->getTable()}
             WHERE article_id = :articleId
