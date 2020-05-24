@@ -177,6 +177,12 @@ class Scrub
                 'widgets.itunes.apple.com/',
                 'embed-ssl.ted.com/',
                 'giphy.com/embed/',
+                'web.microsoftstream.com/embed/',
+                'onedrive.live.com/embed/',
+                'sway.com/',
+                'flipgrid.com/',
+                'spark.adobe.com/',
+
             );
 
             // Add any additional iframe sources as configured
