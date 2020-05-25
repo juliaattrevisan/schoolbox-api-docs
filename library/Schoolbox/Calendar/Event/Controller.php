@@ -118,7 +118,12 @@ class Controller extends Base
      * Modify an event's settings
      *
      * @param Event $event
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function getEventModify(Event $event): void
     {
