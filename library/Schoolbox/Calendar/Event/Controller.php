@@ -308,22 +308,18 @@ class Controller extends Base
 
         /* Figure out which ones should be checked
          */
-        $items = [];
+        $items = [
+            'folders' => $allFolderList,
+            'selected' => [],
+        ];
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
             $fromHomepage      = (($this->getRequest()->query['level'] == Event::ACCESS_GROUP) && ($this->getRequest()->query['homepageId'] == $currentFolder->getId()));
 
-            $selected = false;
-
             if ($alreadyInCategory || $fromHomepage) {
-                $selected = true;
+                $items['selected'][] = $currentFolder->getId();
             }
-
-            $items[] = [
-                'folder' => $currentFolder,
-                'selected' => $selected
-            ];
         }
 
         return $items;
