@@ -78,7 +78,7 @@
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
-    const URL_EVENT_MODIFY = '/calendar/modify.php?eventID=';
+    const URL_EVENT_MODIFY = '/calendar/';
     const URL_ATTENDEES = '/calendar/attendance/list/';
     const ATTENDANCE_NEXT_ACTION_ADD = 'add';
     const ATTENDANCE_NEXT_ACTION_REMOVE = 'remove';
@@ -188,7 +188,7 @@
             },
 
             modifyPath: function() {
-                return URL_EVENT_MODIFY + this.event.id + '&returnTo=' + window.location.pathname
+                return URL_EVENT_MODIFY + this.event.id + '/modify?returnTo=' + window.location.pathname
             }
         }
     }

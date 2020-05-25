@@ -17,6 +17,7 @@ use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\Role;
@@ -113,7 +114,87 @@ class Module extends BaseModule
             );
         });
 
+
+        /* Permissions for modifying an event
+         */
+        $modifyPerms = new LazyCallback(function () {
+            return new All(
+                new IsLoggedIn(),
+                new Any(
+                    new IsSuperuser(),
+                    new Callback(function (array $params) {
+                        /** @var Event $event */
+                        $event = $params['event'];
+
+                        $loggedInUser = $this->getAuthorizer()->getUser();
+                        $owner = $event->getOwner();
+                        $author = $event->getAuthor();
+
+                        /* Supers can edit any event
+                         */
+                        if ($loggedInUser->isSuperuser()) {
+                            return true;
+                        }
+
+                        /* Figure out perms from the level setting
+                         */
+                        if ($event->isPersonalLevel()) {
+
+                            /* If event is on a personal level:
+                             * Users may edit events of which they are the owner *and* author
+                             * Staff may edit events of which they they are the owner *or* author
+                             * Parents may edit events of their child, of which they are the author
+                             */
+                            if ($owner->getRole()->isStudent() && $loggedInUser->getRole()->isParent()) {
+                                $isParentOfOwner = $owner->loadParents()->isChildOf($loggedInUser);
+                            } else {
+                                $isParentOfOwner = false;
+                            }
+
+                            $isStaff = $loggedInUser->getRole()->isStaff();
+                            $isOwner = $loggedInUser->getId() == $owner->getId();
+                            $isAuthor = $loggedInUser->getId() == $author->getId();
+
+                            if (($isOwner && $isAuthor) || ($isAuthor && $isParentOfOwner) || ($isStaff && ($isOwner || $isAuthor))) {
+                                return true;
+                            }
+                        } elseif ($event->isGroupLevel()) {
+
+                            /* If the event is on a group level:
+                             * check if the user is a group manager (write access to the folder)
+                             */
+                            foreach ($event->getFolderCollection()->getAll() as $folder) {
+                                if (Access::getInstance()->getFolderAccess($loggedInUser, $folder->getId()) >= UserAccess::ACCESS_WRITE) {
+                                    return true;
+                                }
+                            }
+                        } elseif ($event->isCampusLevel()) {
+
+                            /* If the event is on a campus level:
+                             * check if this user is a calendar moderator for one of the campuses selected
+                             */
+                            $accessList = $loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
+
+                            foreach ($accessList as $currentAccess) {
+                                if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                                    // Loop through campuses for the event and check if one matches with this access
+                                    foreach ($event->getCampusCollection() as $campusId) {
+                                        if ($campusId == $currentAccess->getServiceIdentifier()) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        throw new Unauthorized();
+                    })
+                )
+            );
+        });
+
         $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms, $preloadEvent);
+        $this->register('GET', '/{eventId:\d+}/modify', 'getEventModify', $modifyPerms, $preloadEvent);
     }
 
     /**
@@ -137,6 +218,7 @@ class Module extends BaseModule
      * @return array|null
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
+     * @throws InvalidArgumentException
      */
     private function preloadEvent(array $params): ?array
     {
@@ -145,7 +227,7 @@ class Module extends BaseModule
 
     /**
      * @return EventMapper
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function getEventMapper(): EventMapper
     {
@@ -158,8 +240,10 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
+            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
         ];
     }
 }

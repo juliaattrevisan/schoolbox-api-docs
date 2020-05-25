@@ -45,54 +45,54 @@ if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
-    $mapper = new \Schoolbox\Calendar\EventMapper();
-
-    try {
-        $event = $mapper->findById($_GET['eventID']);
-    } catch (\Exception $e) {
-        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
-        exit;
-    }
-
-    /* Check user has permission to modify this event
-     */
-    $eventAccess = new Access(FolderAccess::getInstance());
-
-    if ($eventAccess->checkExisting($currentUser, $event) == false) {
-        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
-    }
-
-    /* Default values
-     */
-    $defaultTypeId      = $event->getType()->getId();
-    $defaultAccessLevel = $event->getAccess();
-
-    /* Preselected campuses
-     */
-    $selectedCampuses = [];
-    $allCampuses      = $event->getCampusCollection();
-
-    foreach ($allCampuses as $currentCampus) {
-        $selectedCampuses[] = $currentCampus->getId();
-    }
-
-    /* Preselected roles
-     */
-    $selectedRoles = [];
-    $allRoles      = $event->getRoleCollection();
-
-    foreach ($allRoles as $currentRole) {
-        $selectedRoles[] = $currentRole->getRoleId();
-    }
-
-    /* Only provide publish date if one was provided and if it
-     * wasn't useless somehow
-     */
-    if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-        $publishDate = $event->getPublishDateTime()->getLocal();
-    } else {
-        $publishDate = '';
-    }
+//    $mapper = new \Schoolbox\Calendar\EventMapper();
+//
+//    try {
+//        $event = $mapper->findById($_GET['eventID']);
+//    } catch (\Exception $e) {
+//        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+//        exit;
+//    }
+//
+//    /* Check user has permission to modify this event
+//     */
+//    $eventAccess = new Access(FolderAccess::getInstance());
+//
+//    if ($eventAccess->checkExisting($currentUser, $event) == false) {
+//        error(ErrorMapper::ERROR_PERM_EVENT_MODIFY);
+//    }
+//
+//    /* Default values
+//     */
+//    $defaultTypeId      = $event->getType()->getId();
+//    $defaultAccessLevel = $event->getAccess();
+//
+//    /* Preselected campuses
+//     */
+//    $selectedCampuses = [];
+//    $allCampuses      = $event->getCampusCollection();
+//
+//    foreach ($allCampuses as $currentCampus) {
+//        $selectedCampuses[] = $currentCampus->getId();
+//    }
+//
+//    /* Preselected roles
+//     */
+//    $selectedRoles = [];
+//    $allRoles      = $event->getRoleCollection();
+//
+//    foreach ($allRoles as $currentRole) {
+//        $selectedRoles[] = $currentRole->getRoleId();
+//    }
+//
+//    /* Only provide publish date if one was provided and if it
+//     * wasn't useless somehow
+//     */
+//    if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
+//        $publishDate = $event->getPublishDateTime()->getLocal();
+//    } else {
+//        $publishDate = '';
+//    }
 
     /* Miscellaneous setvarring
      * Hide advanced options by default
