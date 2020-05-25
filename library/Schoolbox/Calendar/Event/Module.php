@@ -196,7 +196,7 @@ class Module extends BaseModule
         });
 
         $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms, $preloadEvent);
-        $this->register('GET', '/{eventId:\d+}/modify', 'getEventModify', $modifyPerms, $preloadEvent);
+        $this->register('GET', '/{eventId:\d+}/modify', 'getModify', $modifyPerms, $preloadEvent);
     }
 
     /**

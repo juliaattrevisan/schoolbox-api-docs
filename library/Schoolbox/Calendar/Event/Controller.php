@@ -125,7 +125,7 @@ class Controller extends Base
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
-    public function getEventModify(Event $event): void
+    public function getModify(Event $event): void
     {
 
         /* Preselected campuses
