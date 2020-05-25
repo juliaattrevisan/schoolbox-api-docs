@@ -172,7 +172,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
-            'action' => 'Create',
+            'action' => 'Add',
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'roles' => [
                 'all' => $this->roleMapper->findAll(),
