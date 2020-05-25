@@ -136,8 +136,7 @@ class Definition implements IStrategy
              * Status report where I tried to expose it
              */
             $cycleName = sprintf(
-                '%s: %s (%s-%s)',
-                $ext,
+                '%s (%s-%s)',
                 trim((string)$cycle->Name),
                 $cycleStart->getShortDateOnly(),
                 $cycleEnd->getShortDateOnly()
