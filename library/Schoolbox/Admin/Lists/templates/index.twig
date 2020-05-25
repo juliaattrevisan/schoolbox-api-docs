@@ -81,7 +81,7 @@
             var listItem = $('[data-record-id="' + deleteId + '"]');
 
             $(this).confirmDialog({
-                text: '{{ tables[table].deleteWarning }}',
+                text: '{{ tables[table].deleteWarning ?? '' }}',
                 confirmEvent: function () {
 
                     var $toast = $('#toast');
@@ -131,9 +131,9 @@
 {{ renderAdminNavigation(pageCurrent) }}
 
 {# some vars we'll need throughout the page #}
-{% set deletable = tables[table].delete %}
-{% set sortable  = tables[table].sortable %}
-{% set canSpawn  = not tables[table].noNewRecords %}
+{% set deletable = tables[table].delete ?? false %}
+{% set sortable  = tables[table].sortable ?? false %}
+{% set canSpawn  = tables[table].noNewRecords is not defined or not tables[table].noNewRecords %}
 
 <div class="row">
     <div class="small-12 island">
@@ -149,7 +149,7 @@
             {% set listClass = 'hide' %}
         {% endif %}
 
-        <div id="listEmptyState" class="empty-state {{ emptyStateClass }}">
+        <div id="listEmptyState" class="empty-state {{ emptyStateClass ?? '' }}">
             <i class="icon-list"></i>
             <p>The {{ tables[table].title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
         </div>
@@ -160,20 +160,22 @@
 
             {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}
 
+            {% if tables[table].fixed is defined %}
             {% for field_key, value in tables[table].fixed %}
                 <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}" />
             {% endfor %}
+            {% endif %}
 
-            <section id="listEditor" class="{{ listClass }}">
+            <section id="listEditor" class="{{ listClass ?? '' }}">
                 <div{% if sortable %} class="sortable"{% endif %}>
                     <header class="list-header actions-small-{{ deletable ? 1 : 0 }}">
                         <div class="list-item">
                             {% for field_key, field in tables[table].fields %}
-                                {% if field.hidden is empty %}
+                                {% if field.hidden is not defined or field.hidden is empty %}
                                     <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
                                         {{ field.caption }}
-                                        {% if field.tooltip %}
-                                            {% if field.tooltipPosition %}
+                                        {% if field.tooltip is defined %}
+                                            {% if field.tooltipPosition is defined %}
                                                 <span class="hint has-tip tip-{{ field.tooltipPosition }}" data-tooltip title="{{ field.tooltip }}">?</span>
                                             {% else %}
                                                 <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>

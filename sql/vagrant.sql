@@ -26,5 +26,5 @@ UPDATE config SET value='schoolbox' WHERE name='external_db_user';
 UPDATE config SET value='https://portal.synergetic.dev.schoolbox.cloud' WHERE name='external_portal';
 UPDATE config SET value='vagrant' WHERE name='site_type';
 UPDATE config SET value='1' WHERE name='debug_show_stack_trace';
-
-
+UPDATE config SET value='1' WHERE name = 'strict_templates';
+UPDATE config SET value='1' WHERE name = 'debug_templates';

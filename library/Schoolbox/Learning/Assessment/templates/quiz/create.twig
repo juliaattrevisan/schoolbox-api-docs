@@ -37,7 +37,7 @@
         <select name="workType">
             <option value="" selected>None</option>
             {% for workType in allWorkTypes %}
-                <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+                <option value="{{ workType.id }}" {% if assessment.workType and assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
             {% endfor %}
         </select>
     </label>
@@ -115,12 +115,12 @@
         <div class="small-7 medium-10 columns no-pad {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
             <div class="small-6 columns">
                 <label>Hours
-                    <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.hours }}{% endif %}" />
+                    <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.hours is defined ? assessment.durationComponents.hours : '' }}{% endif %}" />
                 </label>
             </div>
             <div class="small-6 columns">
                 <label>Minutes
-                    <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.minutes }}{% endif %}" />
+                    <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.minutes is defined ? assessment.durationComponents.minutes : '' }}{% endif %}" />
                 </label>
             </div>
         </div>
@@ -169,7 +169,7 @@
 {# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
-{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+{{ mage.submitRow(actionLabel is defined ? actionLabel : 'Create', 'part-2', 'end') }}
 
 
 {# ----------------------------------------------------------- #}

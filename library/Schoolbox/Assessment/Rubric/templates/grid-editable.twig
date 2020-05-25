@@ -1,9 +1,9 @@
-{% set formField = formField ?: 'rb' %}
+{% set formField = formField is defined ? formField : 'rb' %}
 {# Doesn't exist? #}
 {#{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}#}
 {# Use assessment ID I suppose #}
 {% set rubricId  = 'rb-' ~ rubricGrid.id %}
-{% set levelLimit = levelLimit ?: config.rubric_max_levels %}
+{% set levelLimit = levelLimit is defined ? levelLimit : config.rubric_max_levels %}
 
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
@@ -23,7 +23,7 @@
         </thead>
         <tbody>
         {% for groupIndex, group in rubricGrid.iterateCapabilities -%}
-            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?: group.indicators|length + 2 } -%}
+            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan is defined ? rowspan : group.indicators|length + 2 } -%}
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
             <th colspan="{{ rubricGrid.levels|length + 3 }}">

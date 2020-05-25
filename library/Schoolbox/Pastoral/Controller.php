@@ -294,9 +294,11 @@ class Controller extends Base
             'data'     => [
                 'user'           => $user,
                 'recordCount'    => $recordCount,
+                'resultsPerPage' => $resultsPerPage,
                 'records'        => $pageRecords,
                 'student'        => $student,
                 'pageCurrent'    => $pageCurrent,
+                'pagesToDisplay' => $maxPage,
                 'types'          => $this->pastoralTypeMapper->findAll(),
                 // TODO: This count is causing a performance issue SA-9641
                 // 'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),

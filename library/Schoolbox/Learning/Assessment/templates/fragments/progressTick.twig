@@ -20,7 +20,7 @@
 
 {% set participant = assessment.participantIfExtant(student) %}
 
-{% if postRoute %}
+{% if postRoute is defined %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"

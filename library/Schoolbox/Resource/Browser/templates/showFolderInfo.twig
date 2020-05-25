@@ -10,7 +10,7 @@
 <ul class="breadcrumb">
     {% for node in tree %}
         <li>
-        {%- if node.disabled -%}
+        {%- if node.disabled is defined and node.disabled -%}
             <a class="disabled" data-selectnode="{{ node.categoryId }}">{{ node.name }}</a>
         {%- else -%}
             <a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a>
@@ -39,7 +39,7 @@
                 {% if folder.hasHomepage %}</a>{% endif %}
             <span class="hint has-tip" data-reveal-id="modal-folder-{{ folder.id }}" title="View folder permissions">?</span>
         </h3>
-        {% if folder.group.category %}
+        {% if folder.group %}
 
             {% if folder.codeString and folder.teachers|length > 0 %}
                 {% set type = 'class' %}
@@ -135,8 +135,8 @@
     <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
         <h2>{{ folder.name }}</h2>
         <dl class="inline-dl">
-        {% if (folder.codeString and folder.teachers|length > 0) or folder.group.category %}
-            {% if folder.group.category %}
+        {% if (folder.codeString and folder.teachers|length > 0) or folder.group %}
+            {% if folder.group %}
                 <dt class="small-12 medium-4">Group Administrator</dt>
                 <dd class="small-12 medium-8">
                     <div class="card tiny">

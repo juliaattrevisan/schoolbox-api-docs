@@ -3,7 +3,7 @@
 {%- set groupId   = rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
-{%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}
+{%- set groupInput = groupInput is defined ? groupInput : formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}
 
 {# Don't show the max value if there are no selected criteria in the group #}
 {% set hasSelectedDescriptor = false %}
@@ -62,7 +62,7 @@
            Number inputs also do not consistently restrict entry to numeric values across browsers: https://bugzilla.mozilla.org/show_bug.cgi?id=1398528
            #}
         <input type="tel"
-               value="{{ rubricGrid.retrieveCapabilityUsage(group).maxValue }}"
+               value="{{ rubricGrid.retrieveCapabilityUsage(group) ? rubricGrid.retrieveCapabilityUsage(group).maxValue : '' }}"
                name="{{ groupInput }}[maxValue]"
                data-group-max-value
                {% if not showGroupMaxValue %}disabled class="hide"{% endif %}

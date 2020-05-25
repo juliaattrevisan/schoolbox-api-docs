@@ -112,7 +112,7 @@
                 },
                 name: 'gradingScheme',
                 options: allGradeSchemes,
-                preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
+                preselected: assessment.gradeGroup ? assessment.gradeGroup.id : null,
                 pairs: {
                     value: 'id',
                     label: 'name'

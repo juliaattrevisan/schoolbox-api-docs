@@ -115,12 +115,12 @@
                 {% for assessment in collapsedAssessments %}
                     {% if assessment.isSpecification %}
                         <td class="course-row">
-                            {% if assessment is task %}
+                            {% if assessment is task or assessmentSpecMarks[assessment.id] is not defined %}
                                 <span>–</span>
                             {% else %}
                                 {% set marks         = assessmentSpecMarks[assessment.id] %}
                                 {% set publishedMark = marks.published %}
-                                {% set draftMark     = marks.any %}
+                                {% set draftMark     = marks.any is defined ? marks.any : null %}
                                 <span {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</span>
                                 {% if marks.any is defined %}
                                     <span data-draft-mark class="meta" style="display: none;">{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</span>
@@ -136,16 +136,16 @@
                 <tr>
                     <td colspan="2" class="class-row class-row-heading"><a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a></td>
                     {% for assessment in collapsedAssessments %}
-                        {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
-                        {% if assessmentImpl %}
+                        {% if courseImportAssessments[courseImpl.id][assessment.id] is defined %}
+                            {% set assessmentImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
                             {% set statusRoute = routeLookup('learningAssessment.getStatus', {assessmentId: assessmentImpl.id}) %}
                             <td class="class-row">
-                                {% if assessment is task %}
+                                {% if assessment is task or assessmentImplMarks[assessmentImpl.id] is not defined %}
                                     <a href="{{ statusRoute }}">–</a>
                                 {% else %}
                                     {% set marks         = assessmentImplMarks[assessmentImpl.id] %}
                                     {% set publishedMark = marks.published %}
-                                    {% set draftMark     = marks.any %}
+                                    {% set draftMark     = marks.any is defined ? marks.any : null %}
                                     <a href="{{ statusRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %}>{% if publishedMark is null %}–{% else %}{{ publishedMark | round(2) }} %{% endif %}</a>
                                     {% if marks.any is defined %}
                                         <a href="{{ statusRoute }}" class="meta" style="display: none;" data-draft-mark>{% if draftMark is null %}–{% else %}{{ draftMark | round(2) }} %{% endif %}</a>
@@ -169,11 +169,11 @@
                         </th>
 
                         {#studentAverageMarks      float[][][]         Indexed by [courseImport.id][student.id]['any'|'published']#}
-                        {% set marks             = studentAverageMarks[courseImpl.id][student.id] %}
-                        {% set publishedNormMark = marks.published.norm %}
-                        {% set draftNormMark     = marks.any.norm %}
-                        {% set publishedHrMark   = marks.published.hr | default('–') %}
-                        {% set draftHrMark       = marks.any.hr | default('–') %}
+                        {% set marks             = studentAverageMarks[courseImpl.id][student.id] is defined ? studentAverageMarks[courseImpl.id][student.id] : null %}
+                        {% set publishedNormMark = marks and marks.published.norm ? marks.published.norm : null %}
+                        {% set draftNormMark     = marks and marks.any is defined and marks.any.norm ? marks.any.norm : null %}
+                        {% set publishedHrMark   = marks and marks.published.hr ? marks.published.hr : '–' %}
+                        {% set draftHrMark       = marks and marks.any is defined and marks.any.hr ? marks.any.hr : '–' %}
 
                         {% set draftsOffClass = marks.published is defined and marks.published.hr ? urgency.marks(publishedNormMark) ~ '-bg' : 'gradient-off-bg' %}
                         {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
@@ -187,8 +187,8 @@
                         </td>
 
                         {% for assessment in collapsedAssessments %}
-                            {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] %}
-                            {% set participant = aImpl.participantIfExtant(student) %}
+                            {% set aImpl = courseImportAssessments[courseImpl.id][assessment.id] is defined ? courseImportAssessments[courseImpl.id][assessment.id] : null %}
+                            {% set participant = aImpl and aImpl.participantIfExtant(student) ? aImpl.participantIfExtant(student) : null %}
                             {% if participant and not participant.isExcluded %}
                                 <td>
                                 {% if assessment is task %}
@@ -212,10 +212,10 @@
                                         data-progress-tick-status="incomplete"></div>
                                 {% else %}
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
-                                    {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
-                                    {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
-                                    {% set publishedMark      = marks.published %}
-                                    {% set draftMark          = marks.draft %}
+                                    {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] is defined ? studentComments[courseImpl.id][student.id][assessment.id] : '' %}
+                                    {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] is defined ? studentMarks[courseImpl.id][assessment.id][student.id] : null %}
+                                    {% set publishedMark      = marks and marks.published is defined ? marks.published : null %}
+                                    {% set draftMark          = marks and marks.draft is defined ? marks.draft : null %}
 
                                      <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ decorator.label(participant, true) }}</a>
                                     {% if marks.draft is defined %}

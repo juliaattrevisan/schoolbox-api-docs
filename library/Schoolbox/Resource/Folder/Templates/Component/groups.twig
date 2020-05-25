@@ -18,25 +18,28 @@
         <div class="row">
             <div class="card-new small-12">
                 <a href="/homepage/{{ group.id }}">
-                    <div class="card-feature-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage.hash %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                    <div class="card-feature-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                 </a>
                 <div class="card-content actions-small-1">
                     <div class="list-item">
                         <h3><a href="/homepage/{{ group.id }}" title="{{ group.name }}">{{ group.name }}</a></h3>
                     </div>
-                    {% if (not group.group.private or userAccess[group.id].write or userAccess[group.id].admin) %}
+                    {% set isAccessAdmin = userAccess[group.id].admin is defined and userAccess[group.id].admin %}
+                    {% set isAccessWrite = userAccess[group.id].write is defined and userAccess[group.id].write %}
+                    {% set isAccessRead = userAccess[group.id].read is defined and userAccess[group.id].read %}
+                    {% if (not group.group.private or isAccessWrite or isAccessAdmin) %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
-                            {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
+                            {% if isAccessWrite or isAccessAdmin %}
                                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="icon-modify">Modify Folder</a></li>
                                 <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
                             {% endif %}
-                            {% if userAccess[group.id].admin %}
+                            {% if isAccessAdmin %}
                                 <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
                             {% endif %}
-                            {% if (not group.group.private and (userAccess[group.id].write or userAccess[group.id].read)) %}
+                            {% if (not group.group.private and (isAccessWrite or isAccessRead)) %}
                                 <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
                             {% endif %}
                         </ul>
