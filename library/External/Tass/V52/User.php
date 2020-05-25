@@ -156,6 +156,7 @@ class External_Tass_V52_User extends External_Tass_User
                 AND (family.entity_type = 'P' OR family.entity_type = 'E')
             INNER JOIN persondefs pd
                 ON family.person_num = pd.person_num
+                AND pd.cmpy_code = parent.cmpy_code
                 AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code
@@ -200,6 +201,7 @@ class External_Tass_V52_User extends External_Tass_User
                 AND (family.entity_type = 'P' OR family.entity_type = 'E')
             INNER JOIN persondefs pd
                 ON family.person_num = pd.person_num
+                AND pd.cmpy_code = parent.cmpy_code
                 AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
             JOIN paraddress AS pa
                 ON parent.par_code = pa.par_code

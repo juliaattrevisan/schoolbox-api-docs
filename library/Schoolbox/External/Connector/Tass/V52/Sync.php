@@ -123,6 +123,7 @@ class Sync extends BaseSync implements ISync
                     AND (f.entity_type = 'P' OR f.entity_type = 'E')
                 INNER JOIN persondefs pd
                     ON pd.person_num = f.person_num
+                    AND pd.cmpy_code = parent.cmpy_code
                     AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$placeHolders[$i]}
                 AND   p.f_name IS NOT NULL
