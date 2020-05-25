@@ -322,12 +322,12 @@ if (is_numeric($_GET['eventID'])) {
  */
 if (\count($allFolderList)) {
 
-    // Order by title
-    $allFolderList->sortByCallback(
-        function (Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
-            return strnatcasecmp($a->getTitle(), $b->getTitle());
-        }
-    );
+//    // Order by title
+//    $allFolderList->sortByCallback(
+//        function (Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
+//            return strnatcasecmp($a->getTitle(), $b->getTitle());
+//        }
+//    );
 
     foreach ($allFolderList as $currentFolder) {
         $folderId          = $currentFolder->getId();

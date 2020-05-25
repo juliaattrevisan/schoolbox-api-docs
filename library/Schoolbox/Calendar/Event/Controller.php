@@ -16,11 +16,10 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -42,7 +41,7 @@ class Controller extends Base
 
 
     /**
-     * @var FolderMapper
+     * @var Folder\Mapper
      */
     private $folderMapper;
 
@@ -63,11 +62,11 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param RoleMapper      $roleMapper
-     * @param FolderMapper    $folderMapper
+     * @param Folder\Mapper   $folderMapper
      * @param EventMapper     $eventMapper
      * @param EventTypeMapper $eventTypeMapper
      */
-    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper)
+    public function __construct(RoleMapper $roleMapper, Folder\Mapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper)
     {
         $this->roleMapper   = $roleMapper;
         $this->folderMapper = $folderMapper;
@@ -199,7 +198,7 @@ class Controller extends Base
      * the event's Group level option
      *
      * @param Event $event
-     * @return Collection|\Schoolbox\Resource\Folder\Model[]
+     * @return Collection|Folder\Model[]
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
@@ -284,5 +283,11 @@ class Controller extends Base
 
             $previousInvolvement[] = $currentFolder->getId();
         }
+
+        /* Order by title
+         */
+        $allFolderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b) {
+            return strnatcasecmp($a->getTitle(), $b->getTitle());
+        });
     }
 }
