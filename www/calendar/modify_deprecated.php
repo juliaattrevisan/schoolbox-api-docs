@@ -93,18 +93,18 @@ if (is_numeric($_GET['eventID'])) {
 //    } else {
 //        $publishDate = '';
 //    }
-
-    /* Miscellaneous setvarring
-     * Hide advanced options by default
-     */
-    $page->setVar(
-        [
-            'FUNCTION'       => 'Update',
-            'SHOW_ADVANCED'  => 'none',
-            'ADVANCED_SHOW'  => '',
-            'ADVANCED_CLOSE' => 'hidden',
-        ]
-    );
+//
+//    /* Miscellaneous setvarring
+//     * Hide advanced options by default
+//     */
+//    $page->setVar(
+//        [
+//            'FUNCTION'       => 'Update',
+//            'SHOW_ADVANCED'  => 'none',
+//            'ADVANCED_SHOW'  => '',
+//            'ADVANCED_CLOSE' => 'hidden',
+//        ]
+//    );
 
     $page->setVar(
         [
@@ -180,17 +180,17 @@ if (is_numeric($_GET['eventID'])) {
      */
     $selectedRoles = [];
 
-    /* Miscellaneous setvarring
-     * Hide advanced options by default
-     */
-    $page->setVar(
-        [
-            'FUNCTION'       => 'Add',
-            'SHOW_ADVANCED'  => 'none',
-            'ADVANCED_SHOW'  => '',
-            'ADVANCED_CLOSE' => 'hidden',
-        ]
-    );
+//    /* Miscellaneous setvarring
+//     * Hide advanced options by default
+//     */
+//    $page->setVar(
+//        [
+//            'FUNCTION'       => 'Add',
+//            'SHOW_ADVANCED'  => 'none',
+//            'ADVANCED_SHOW'  => '',
+//            'ADVANCED_CLOSE' => 'hidden',
+//        ]
+//    );
 
     $page->setVar(
         [
