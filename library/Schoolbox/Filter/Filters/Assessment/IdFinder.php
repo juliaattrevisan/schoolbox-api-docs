@@ -236,7 +236,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 $subQueries[] = "
                     SELECT a.id, 4 AS 'case' FROM `assessment` a
                     JOIN project_assessment ap                     ON ap.assessment_id                  = a.id
-                    JOIN project p                                 ON ap.project_id                     = p.id 
+                    JOIN project p                                 ON ap.project_id                     = p.id
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin}
@@ -1075,6 +1075,11 @@ class IdFinder extends Filter\AbstractIdFinder
                 default:
                     throw new UnexpectedValueException("Unrecognised temporal state filter key: '{$temporalState}");
             }
+        }
+
+        // If no recognized parts are selected, don't filter
+        if (empty($orParts)) {
+            return ['TRUE', [], ''];
         }
 
         $participantPlanJoin = $joinParticipantPlan ? 'LEFT JOIN participant_plan pp ON pp.assessment_id = a.id' : '';
