@@ -10,9 +10,8 @@ namespace Schoolbox\Calendar\Event;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 
@@ -23,11 +22,6 @@ use Schoolbox\RoleMapper;
  */
 class Controller extends Base
 {
-
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
 
 
     /**
@@ -49,19 +43,25 @@ class Controller extends Base
 
 
     /**
+     * @var EventTypeMapper
+     */
+    private $eventTypeMapper;
+
+
+    /**
      * Controller constructor.
      *
-     * @param ErrorMapper  $errorMapper
-     * @param RoleMapper   $roleMapper
-     * @param FolderMapper $folderMapper
-     * @param EventMapper  $eventMapper
+     * @param RoleMapper      $roleMapper
+     * @param FolderMapper    $folderMapper
+     * @param EventMapper     $eventMapper
+     * @param EventTypeMapper $eventTypeMapper
      */
-    public function __construct(ErrorMapper $errorMapper, RoleMapper $roleMapper, FolderMapper $folderMapper, EventMapper $eventMapper)
+    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper)
     {
-        $this->errorMapper  = $errorMapper;
         $this->roleMapper   = $roleMapper;
         $this->folderMapper = $folderMapper;
         $this->eventMapper  = $eventMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
     }
 
 
@@ -134,15 +134,10 @@ class Controller extends Base
             $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
         }
 
-        /* Event Types
-         */
-        $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-        $eventTypes           = $calendarEventTypeMapper->findAll();
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'action' => 'Update',
-            'eventTypes' => $calendarEventTypeMapper->findAll(),
+            'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
             'redirect' => $event->setupRedirect(

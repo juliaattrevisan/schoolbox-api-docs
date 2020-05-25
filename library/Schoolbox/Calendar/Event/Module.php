@@ -20,6 +20,7 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
 use Schoolbox\Mapper;
@@ -240,10 +241,10 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
         ];
     }
 }
