@@ -61,6 +61,19 @@ class Controller extends Base
      */
     public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year): void
     {
+        /* Check whether the Achievement Reports are enabled
+         */
+        if (!(int)$this->getConfigLoader()->get('dio_achievement_report_enabled')) {
+            $this->getResponse()->content->set([
+                'template' => '@achievementreport/unavailable.twig',
+                'data' => [
+                    'message' => $this->getConfigLoader()->get('dio_achievement_report_unavailable')
+                ]
+            ]);
+
+            return;
+        }
+
         $selector = new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year);
         $selector->determineDefaultReport();
 
