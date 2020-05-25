@@ -297,7 +297,7 @@ class Controller extends Base
         $items = [];
 
         foreach ($allFolderList as $currentFolder) {
-            $alreadyInCategory = $event->getFolderCollection()->getBy('id', $currentFolder->getId()) || in_array($currentFolder->getId(), $previousInvolvement, false);
+            $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
         }
     }
 }
