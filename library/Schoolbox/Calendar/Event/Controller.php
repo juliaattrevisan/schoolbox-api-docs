@@ -123,11 +123,6 @@ class Controller extends Base
     public function getEventModify(Event $event): void
     {
 
-        /* Default values
-         */
-        $defaultTypeId      = $event->getType()->getId();
-        $defaultAccessLevel = $event->getAccess();
-
         /* Preselected campuses
          */
         $selectedCampuses = [];
@@ -175,7 +170,7 @@ class Controller extends Base
             'personalLevel' => Event::ACCESS_PERSONAL,
             'levels' => [
                 'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
-                'selected' => $defaultAccessLevel
+                'selected' => $event->getAccess()
             ],
             'groupFolders' => $groupFolders,
             'redirect' => $event->setupRedirect(
