@@ -223,10 +223,10 @@
                             <input type="checkbox" data-select-all id="campusSelectAll" />
                             <label for="campusSelectAll">Select all</label>
 
-                            <!-- BEGIN event_campus_list -->
-                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-                            <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
-                            <!-- END event_campus_list -->
+                            {% for campus in campuses.all %}
+                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
+                            <label for="campus{{ campus.id }}">{{ campus.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
 

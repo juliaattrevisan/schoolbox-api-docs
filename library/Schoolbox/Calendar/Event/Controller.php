@@ -178,6 +178,10 @@ class Controller extends Base
                 'selected' => $event->getAccess()
             ],
             'groupFolders' => $groupFolders,
+            'campuses' => [
+                'all' => $campusList,
+                'selected' => $selectedCampuses,
+            ],
             'redirect' => $event->setupRedirect(
                 urldecode($this->getRequest()->query['returnTo']),
                 $event->getStartDateTime()->getURLDate(),

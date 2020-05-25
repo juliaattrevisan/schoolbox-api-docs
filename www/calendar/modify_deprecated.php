@@ -1,33 +1,33 @@
 <?php
-
-use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\Event\Access;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Permission\Access\Access as FolderAccess;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
-
-if (isset($this)) {
-    $this->pageNotFound();
-} else {
-    /* Direct access to modify.php -_-
-     */
-
-    require_once __DIR__ . '/../../conf/core/require.php';
-    $kernel = new Schoolbox\Application\WebRequest\Kernel();
-
-    /** @var SitePage $page */
-    $page = $kernel->getDependencyInjector()->get('sitePage');
-}
-
-$page->setFile(TEMPLATE_content, 'calendar/modify.html');
-$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
-$page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
-$page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
-$page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
-
+//
+//use Schoolbox\Calendar\Event;
+//use Schoolbox\Calendar\Event\Access;
+//use Schoolbox\Error\Mapper as ErrorMapper;
+//use Schoolbox\Permission\Access\Access as FolderAccess;
+//use Schoolbox\Permission\Access\UserAccess;
+//use Schoolbox\UserMapper;
+//
+//if (isset($this)) {
+//    $this->pageNotFound();
+//} else {
+//    /* Direct access to modify.php -_-
+//     */
+//
+//    require_once __DIR__ . '/../../conf/core/require.php';
+//    $kernel = new Schoolbox\Application\WebRequest\Kernel();
+//
+//    /** @var SitePage $page */
+//    $page = $kernel->getDependencyInjector()->get('sitePage');
+//}
+//
+//$page->setFile(TEMPLATE_content, 'calendar/modify.html');
+//$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+//$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+//$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+//$page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
+//$page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
+//$page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
+//
 ///** @var Schoolbox\User $currentUser */
 //$currentUser = $_SESSION['user'];
 //
@@ -41,10 +41,10 @@ $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 //} else {
 //    $selectedUser = $currentUser;
 //}
-
-/* Modify existing event
- */
-if (is_numeric($_GET['eventID'])) {
+//
+///* Modify existing event
+// */
+//if (is_numeric($_GET['eventID'])) {
 //    $mapper = new \Schoolbox\Calendar\EventMapper();
 //
 //    try {
@@ -157,8 +157,9 @@ if (is_numeric($_GET['eventID'])) {
 //        $page->setVar('recurring_reminder_block', '');
 //        $page->parse('recurring_dates_block', 'recurring_dates');
 //    }
-
-} else {
+//
+//}
+else {
     /* Create new event
      */
     /* Set up default dates
@@ -246,10 +247,10 @@ if (is_numeric($_GET['eventID'])) {
 //    ]
 //);
 //$page->parse('type_select_block', 'type_select');
-
-/**
- * Group (Folder) selection
- */
+//
+///**
+// * Group (Folder) selection
+// */
 //
 ///* Only provide Group option if groups have been defined
 // */
@@ -317,9 +318,9 @@ if (is_numeric($_GET['eventID'])) {
 //
 //    $previousInvolvement[] = $currentFolder->getId();
 //}
-
-/* Group checkbox array when using Group Event Level
- */
+//
+///* Group checkbox array when using Group Event Level
+// */
 //if (\count($allFolderList)) {
 //
 //    // Order by title
@@ -379,34 +380,34 @@ if (is_numeric($_GET['eventID'])) {
 //        'name' => 'EVENT_EVENTLEVEL_NAME',
 //    ]
 //);
-
-/* Campus Checkbox Array when using Campus Event Level
- */
-if ($campusList->count()) {
-    $allCampuses = [];
-
-    foreach ($campusList as $current) {
-        $allCampuses[] = [
-            'id'   => $current->getId(),
-            'name' => $current->getName(),
-        ];
-    }
-
-    $page->checkList(
-        'event_campus_list',
-        $allCampuses,
-        $selectedCampuses,
-        TEMPLATE_content,
-        [
-            'id'   => 'EVENT_CAMPUS_ID',
-            'name' => 'EVENT_CAMPUS_NAME',
-        ]
-    );
-} else {
-    $page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
-    $page->setVar('event_campus_list_block', '');
-}
-
+//
+///* Campus Checkbox Array when using Campus Event Level
+// */
+//if ($campusList->count()) {
+//    $allCampuses = [];
+//
+//    foreach ($campusList as $current) {
+//        $allCampuses[] = [
+//            'id'   => $current->getId(),
+//            'name' => $current->getName(),
+//        ];
+//    }
+//
+//    $page->checkList(
+//        'event_campus_list',
+//        $allCampuses,
+//        $selectedCampuses,
+//        TEMPLATE_content,
+//        [
+//            'id'   => 'EVENT_CAMPUS_ID',
+//            'name' => 'EVENT_CAMPUS_NAME',
+//        ]
+//    );
+//} else {
+//    $page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+//    $page->setVar('event_campus_list_block', '');
+//}
+//
 ///* Roles, when Campus Event Level is used
 // */
 //$roleMapper = new \Schoolbox\RoleMapper();
@@ -441,5 +442,5 @@ if ($campusList->count()) {
 //$page->setVar([
 //    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL,
 //]);
-
-$page->outputPage();
+//
+//$page->outputPage();
