@@ -209,7 +209,7 @@
                             <label for="roleSelectAll">Select all</label>
 
                             {% for role in roles.all %}
-                            <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'selected="selected"' : '' }} />
+                            <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
                             <label for="role{{ role.id }}">{{ role.name }}</label>
                             {% endfor %}
                         </fieldset>
