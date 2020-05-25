@@ -269,7 +269,7 @@ class Controller extends Base
                 'selected' => $selectedCampuses,
             ],
             'redirect' => $event->setupRedirect(
-                urldecode($this->getRequest()->query['returnTo']),
+                urldecode($this->getRequest()->query['returnTo'] ?? '/'),
                 $event->getStartDateTime()->getURLDate(),
                 $this->getRequest()->query['homepageId'],
                 $this->getRequest()->query['userId']
