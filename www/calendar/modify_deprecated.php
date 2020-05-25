@@ -108,30 +108,30 @@ if (is_numeric($_GET['eventID'])) {
 
     $page->setVar(
         [
-            'EVENT_ID'                        => $event->getId(),
-            'EVENT_USER_ID'                   => $event->getOwner()->getId(),
-            'EVENT_AUTHOR_ID'                 => $event->getAuthor()->getId(),
-            'EVENT_TITLE'                     => Scrub::text($event->getTitle()),
-            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
-            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
-            'EVENT_ATTENDANCE'                => $event->getAttendance() ? 'checked="checked"' : '',
-            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
-            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
-            'EVENT_PUBLISH_DATE'              => Scrub::text($publishDate),
-            'EVENT_LOCATION'                  => Scrub::text($event->getLocation()),
-            'EVENT_DETAIL'                    => Scrub::text($event->getDetail()),
-            'EVENT_REDIRECT'                  => $event->setupRedirect(
-                urldecode($_GET['returnTo']),
-                $event->getStartDateTime()->getURLDate(),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
+//            'EVENT_ID'                        => $event->getId(),
+//            'EVENT_USER_ID'                   => $event->getOwner()->getId(),
+//            'EVENT_AUTHOR_ID'                 => $event->getAuthor()->getId(),
+//            'EVENT_TITLE'                     => Scrub::text($event->getTitle()),
+//            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
+//            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
+//            'EVENT_ATTENDANCE'                => $event->getAttendance() ? 'checked="checked"' : '',
+//            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
+//            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
+//            'EVENT_PUBLISH_DATE'              => Scrub::text($publishDate),
+//            'EVENT_LOCATION'                  => Scrub::text($event->getLocation()),
+//            'EVENT_DETAIL'                    => Scrub::text($event->getDetail()),
+//            'EVENT_REDIRECT'                  => $event->setupRedirect(
+//                urldecode($_GET['returnTo']),
+//                $event->getStartDateTime()->getURLDate(),
+//                $_GET['homepageId'],
+//                $_GET['userId']
+//            ),
             'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
             'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-            'RETURN_STR'                      => '&returnTo=' . $_GET['returnTo'] .
-                ($_GET['userId'] ? "&userId=" . $_GET['userId'] : "") .
-                ($_GET['homepageId'] ? "&homepageId=" . $_GET['homepageId'] : "") .
-                ($_GET['returnDate'] ? "&returnDate=" . $_GET['returnDate'] : ""),
+//            'RETURN_STR'                      => '&returnTo=' . $_GET['returnTo'] .
+//                ($_GET['userId'] ? "&userId=" . $_GET['userId'] : "") .
+//                ($_GET['homepageId'] ? "&homepageId=" . $_GET['homepageId'] : "") .
+//                ($_GET['returnDate'] ? "&returnDate=" . $_GET['returnDate'] : ""),
         ]
     );
 

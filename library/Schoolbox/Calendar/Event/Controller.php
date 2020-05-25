@@ -125,13 +125,19 @@ class Controller extends Base
             $selectedRoles[] = $currentRole->getRoleId();
         }
 
-        /* Only provide publish date if one was provided and if it
-         * wasn't useless somehow
-         */
-        if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-            $publishDate = $event->getPublishDateTime()->getLocal();
-        } else {
-            $publishDate = '';
-        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
+            'event' => $event,
+            'action' => 'Update',
+            'redirect' => $event->setupRedirect(
+                urldecode($this->getRequest()->query['returnTo']),
+                $event->getStartDateTime()->getURLDate(),
+                $this->getRequest()->query['homepageId'],
+                $this->getRequest()->query['userId']
+            ),
+            'returnStr' => '&returnTo=' . $this->getRequest()->query['returnTo'] .
+                ($this->getRequest()->query['userId'] ? '&userId=' . $this->getRequest()->query['userId'] : '') .
+                ($this->getRequest()->query['homepageId'] ? '&homepageId=' . $this->getRequest()->query['homepageId'] : '') .
+                ($this->getRequest()->query['returnDate'] ? '&returnDate=' . $this->getRequest()->query['returnDate'] : ''),
+        ])->setTitle("Modify {$event->getTitle()}"));
     }
 }
