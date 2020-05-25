@@ -136,8 +136,11 @@ class Controller extends Base
         $event = (new Event())
             ->setTitle($this->getRequest()->query['title'])
             ->setAuthor($this->getUser())
+            ->setAccess((int)$this->getRequest()->query['level'])
             ->setPublishDateTime(Alaress_Date_Format::now())
         ;
+
+        $event->getType()->setId((int)$this->getRequest()->query['type'] ?: '');
 
         $event->setupDates($this->getRequest()->query['date']);
 
