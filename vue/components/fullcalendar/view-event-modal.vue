@@ -69,7 +69,7 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                        modifyLink = this.generateModifyLink(metadata?.eventId, this.returnTo)
                         deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
                     }
                 }
@@ -132,6 +132,22 @@
             }
         },
         methods: {
+
+            /**
+             * Route to the Event Modify screen with optional returnTo redirect
+             *
+             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             */
+            generateModifyLink(eventId, returnTo) {
+                var url = '/calendar/event/' + eventId + '/modify';
+
+                if (returnTo.length) {
+                    url += '?returnTo=' + returnTo;
+                }
+
+                return url;
+            },
+
             /**
              * Update whether the form can be submitted.
              *
