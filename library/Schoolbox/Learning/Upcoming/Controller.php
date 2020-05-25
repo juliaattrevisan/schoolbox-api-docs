@@ -318,9 +318,6 @@ class Controller extends Base
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 
-        // Only fetch assessments that haven't closed
-        $filters[Filters\Assessment\TemporalState\Definition::class]->offsetUnset(Filters\Assessment\TemporalState\Definition::KEY_CUSTOM_CLOSED);
-
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
         $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
