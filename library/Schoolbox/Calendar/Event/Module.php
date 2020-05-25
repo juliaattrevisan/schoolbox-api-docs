@@ -117,6 +117,15 @@ class Module extends BaseModule
         });
 
 
+        /* Permissions for creating an event
+         */
+        $createPerms = new LazyCallback(function () {
+            return new All(
+                new IsLoggedIn()
+            );
+        });
+
+
         /* Permissions for modifying an event
          */
         $modifyPerms = new LazyCallback(function () {
@@ -197,6 +206,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms, $preloadEvent);
         $this->register('GET', '/{eventId:\d+}/modify', 'getModify', $modifyPerms, $preloadEvent);
+        $this->register('GET', '/create', 'getCreate', $createPerms);
     }
 
     /**

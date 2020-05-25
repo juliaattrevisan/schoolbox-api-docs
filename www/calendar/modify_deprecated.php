@@ -159,28 +159,28 @@
 //    }
 //
 //}
-else {
-    /* Create new event
-     */
-    /* Set up default dates
-     */
-    $event = new \Schoolbox\Calendar\Event();
-    $event->setupDates($_GET['date']);
-    if (!$event->getAllDay()) {
-        $event->getEndDateTime()->addHours(1);
-    }
-
+//else {
+//    /* Create new event
+//     */
+//    /* Set up default dates
+//     */
+//    $event = new \Schoolbox\Calendar\Event();
+//    $event->setupDates($_GET['date']);
+//    if (!$event->getAllDay()) {
+//        $event->getEndDateTime()->addHours(1);
+//    }
+//
     $defaultTypeId      = isset($_GET['type']) && is_numeric($_GET['type']) ? $_GET['type'] : '';
     $defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
-
-    /* Preselected campus
-     */
-    $selectedCampuses = [$_SESSION['campus'][0]];
-
-    /* Preselected roles
-     */
-    $selectedRoles = [];
-
+//
+//    /* Preselected campus
+//     */
+//    $selectedCampuses = [$_SESSION['campus'][0]];
+//
+//    /* Preselected roles
+//     */
+//    $selectedRoles = [];
+//
 //    /* Miscellaneous setvarring
 //     * Hide advanced options by default
 //     */
@@ -192,44 +192,44 @@ else {
 //            'ADVANCED_CLOSE' => 'hidden',
 //        ]
 //    );
-
+//
     $page->setVar(
         [
-            'EVENT_ID'                        => '',
+//            'EVENT_ID'                        => '',
             'EVENT_USER_ID'                   => $selectedUser->getId(),
             'EVENT_AUTHOR_ID'                 => $currentUser->getId(),
-            'EVENT_TITLE'                     => isset($_GET['title']) ? $_GET['title'] : '',
-            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
-            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
-            'EVENT_ATTENDANCE'                => '',
-            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
-            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
-            'EVENT_PUBLISH_DATE'              => Alaress_Date_Format::now()->getLocal(),
-            'EVENT_LOCATION'                  => '',
-            'EVENT_DETAIL'                    => '',
-            'EVENT_REDIRECT'                  => $event->setupRedirect(
-                $_GET['returnTo'],
-                ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
-            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
-            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
+//            'EVENT_TITLE'                     => isset($_GET['title']) ? $_GET['title'] : '',
+//            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
+//            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
+//            'EVENT_ATTENDANCE'                => '',
+//            'EVENT_START_DATE'                => Scrub::text($event->getAllDay() ? $event->getStartDateTime()->getLocalShort() : $event->getStartDateTime()->getLocal()),
+//            'EVENT_END_DATE'                  => Scrub::text($event->getAllDay() ? $event->getEndDateTime()->getLocalShort() : $event->getEndDateTime()->getLocal()),
+//            'EVENT_PUBLISH_DATE'              => Alaress_Date_Format::now()->getLocal(),
+//            'EVENT_LOCATION'                  => '',
+//            'EVENT_DETAIL'                    => '',
+//            'EVENT_REDIRECT'                  => $event->setupRedirect(
+//                $_GET['returnTo'],
+//                ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
+//                $_GET['homepageId'],
+//                $_GET['userId']
+//            ),
+//            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+//            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         ]
     );
-
-    /* Recurrence
-     */
-    $page->setVar(
-        [
-            'recurring_reminder_block' => '',
-            'delete_button_block'      => '',
-        ]
-    );
-
-    $page->parse('recurring_dates_block', 'recurring_dates');
-}
-
+//
+//    /* Recurrence
+//     */
+//    $page->setVar(
+//        [
+//            'recurring_reminder_block' => '',
+//            'delete_button_block'      => '',
+//        ]
+//    );
+//
+//    $page->parse('recurring_dates_block', 'recurring_dates');
+//}
+//
 ///* Event Types
 // */
 //$calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();

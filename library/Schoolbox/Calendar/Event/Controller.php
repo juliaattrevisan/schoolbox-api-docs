@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
@@ -114,6 +115,72 @@ class Controller extends Base
     }
 
 
+    public function getCreate(): void
+    {
+
+        /* Set up default values
+         */
+        $event = (new Event())
+            ->setTitle($this->getRequest()->query['title'])
+            ->setAuthor($this->getUser())
+            ->setPublishDateTime(Alaress_Date_Format::now())
+        ;
+
+        $event->setupDates($this->getRequest()->query['date']);
+
+        if (!$event->getAllDay()) {
+            $event->getEndDateTime()->addHours(1);
+        }
+
+        /* Roles
+         */
+        $selectedRoles = [];
+
+        /* Recurrence
+         */
+        $recurrence = [];
+
+        /* Campuses
+         */
+        $selectedCampuses = [];
+
+        /* Group Folders that you can choose, plus their current selection states
+         */
+        $groupFolders = $this->getSelectableFolders($event);
+
+        /* Only provide Campus options in Level dropdown if campuses have been defined
+         */
+        $campusList = $this->campusMapper->getAvailableCampusesForUser($this->getSelectedUser(), UserAccess::ACCESS_WRITE);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
+            'event' => $event,
+            'action' => 'Create',
+            'eventTypes' => $this->eventTypeMapper->findAll(),
+            'roles' => [
+                'all' => $this->roleMapper->findAll(),
+                'selected' => $selectedRoles
+            ],
+            'recurrence' => $recurrence,
+            'personalLevel' => Event::ACCESS_PERSONAL,
+            'levels' => [
+                'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
+                'selected' => $event->getAccess()
+            ],
+            'groupFolders' => $groupFolders,
+            'campuses' => [
+                'all' => $campusList,
+                'selected' => $selectedCampuses,
+            ],
+            'redirect' => $event->setupRedirect(
+                $this->getRequest()->query['returnTo'], // TODO: Why wasn't this urlencoded too?
+                ($this->getRequest()->query['returnDate'] ? $this->getRequest()->query['returnDate'] : $event->getStartDateTime()->getURLDate()),
+                $this->getRequest()->query['homepageId'],
+                $this->getRequest()->query['userId']
+            ),
+        ])->setTitle('Create event'));
+    }
+
+
     /**
      * Modify an event's settings
      *
@@ -160,8 +227,7 @@ class Controller extends Base
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
-        $selectedUser = $this->getSelectedUser();
-        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
+        $campusList = $this->campusMapper->getAvailableCampusesForUser($this->getSelectedUser(), UserAccess::ACCESS_WRITE);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
