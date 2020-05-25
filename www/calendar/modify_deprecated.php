@@ -193,11 +193,11 @@
 //        ]
 //    );
 //
-    $page->setVar(
-        [
+//    $page->setVar(
+//        [
 //            'EVENT_ID'                        => '',
-            'EVENT_USER_ID'                   => $selectedUser->getId(),
-            'EVENT_AUTHOR_ID'                 => $currentUser->getId(),
+//            'EVENT_USER_ID'                   => $selectedUser->getId(),
+//            'EVENT_AUTHOR_ID'                 => $currentUser->getId(),
 //            'EVENT_TITLE'                     => isset($_GET['title']) ? $_GET['title'] : '',
 //            'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
 //            'EVENT_TIMEINPUTS'                => $event->getAllDay() ? 'hide' : '',
@@ -215,8 +215,8 @@
 //            ),
 //            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
 //            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
-        ]
-    );
+//        ]
+//    );
 //
 //    /* Recurrence
 //     */

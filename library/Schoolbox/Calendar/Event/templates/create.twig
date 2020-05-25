@@ -66,7 +66,7 @@
         <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
 
             <input name="id" type="hidden" value="{{ event.id }}" />
-            <input name="userId" type="hidden" value="{{ event.owner.id }}" />
+            <input name="userId" type="hidden" value="{{ user.id }}" />
             <input name="authorId" type="hidden" value="{{ event.author.id }}" />
             <input id="allday" name="allday" type="hidden" value="{{ event.allDay }}">
             <input name="return" type="hidden" value="{{ redirect }}" />

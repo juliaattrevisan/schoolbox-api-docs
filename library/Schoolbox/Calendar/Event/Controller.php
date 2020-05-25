@@ -115,6 +115,19 @@ class Controller extends Base
     }
 
 
+    /**
+     * Create a new Event for $selectedUser
+     *
+     * You can create events on behalf of others; parents can do it to their own students
+     * and staff can do it to others as well, via $selectedUser
+     *
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     */
     public function getCreate(): void
     {
 
@@ -150,10 +163,12 @@ class Controller extends Base
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
-        $campusList = $this->campusMapper->getAvailableCampusesForUser($this->getSelectedUser(), UserAccess::ACCESS_WRITE);
+        $selectedUser = $this->getSelectedUser();
+        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
+            'user' => $selectedUser,
             'action' => 'Create',
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'roles' => [
@@ -227,10 +242,12 @@ class Controller extends Base
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
-        $campusList = $this->campusMapper->getAvailableCampusesForUser($this->getSelectedUser(), UserAccess::ACCESS_WRITE);
+        $selectedUser = $this->getSelectedUser();
+        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
+            'user' => $selectedUser,
             'action' => 'Update',
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'roles' => [
