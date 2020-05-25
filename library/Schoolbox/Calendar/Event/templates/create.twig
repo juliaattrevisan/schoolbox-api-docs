@@ -207,10 +207,10 @@
                             <input type="checkbox" data-select-all id="roleSelectAll"/>
                             <label for="roleSelectAll">Select all</label>
 
-                            <!-- BEGIN event_role_list -->
-                            <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
-                            <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
-                            <!-- END event_role_list -->
+                            {% for role in roles.all %}
+                            <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'selected="selected"' : '' }} />
+                            <label for="role{{ role.id }}">{{ role.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">

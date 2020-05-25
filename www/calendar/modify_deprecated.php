@@ -407,39 +407,39 @@ if ($campusList->count()) {
     $page->setVar('event_campus_list_block', '');
 }
 
-/* Roles, when Campus Event Level is used
- */
-$roleMapper = new \Schoolbox\RoleMapper();
-$roleList   = $roleMapper->findAll();
-
-/* Roles checkbox array when using Campus Event Level
- * This really needs to be updated - why is checkList behaviour different to
- * the dropDown one when it comes to collections?
- */
-$allRoles = [];
-
-foreach ($roleList as $current) {
-    $allRoles[] = [
-        'id'   => $current->getId(),
-        'name' => $current->getName(),
-    ];
-}
-
-$page->checkList(
-    'event_role_list',
-    $allRoles,
-    $selectedRoles,
-    TEMPLATE_content,
-    [
-        'id'   => 'EVENT_ROLE_ID',
-        'name' => 'EVENT_ROLE_NAME',
-    ]
-);
-
-/* Pass Personal const for ui elements
- */
-$page->setVar([
-    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL,
-]);
+///* Roles, when Campus Event Level is used
+// */
+//$roleMapper = new \Schoolbox\RoleMapper();
+//$roleList   = $roleMapper->findAll();
+//
+///* Roles checkbox array when using Campus Event Level
+// * This really needs to be updated - why is checkList behaviour different to
+// * the dropDown one when it comes to collections?
+// */
+//$allRoles = [];
+//
+//foreach ($roleList as $current) {
+//    $allRoles[] = [
+//        'id'   => $current->getId(),
+//        'name' => $current->getName(),
+//    ];
+//}
+//
+//$page->checkList(
+//    'event_role_list',
+//    $allRoles,
+//    $selectedRoles,
+//    TEMPLATE_content,
+//    [
+//        'id'   => 'EVENT_ROLE_ID',
+//        'name' => 'EVENT_ROLE_NAME',
+//    ]
+//);
+//
+///* Pass Personal const for ui elements
+// */
+//$page->setVar([
+//    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL,
+//]);
 
 $page->outputPage();

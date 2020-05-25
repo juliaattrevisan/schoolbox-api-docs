@@ -138,6 +138,10 @@ class Controller extends Base
             'event' => $event,
             'action' => 'Update',
             'eventTypes' => $this->eventTypeMapper->findAll(),
+            'roles' => [
+                'all' => $this->roleMapper->findAll(),
+                'selected' => $selectedRoles
+            ],
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
             'redirect' => $event->setupRedirect(
