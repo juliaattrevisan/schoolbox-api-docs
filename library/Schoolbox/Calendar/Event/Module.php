@@ -23,6 +23,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -245,6 +246,7 @@ class Module extends BaseModule
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
             'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
+            'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
         ];
     }
 }

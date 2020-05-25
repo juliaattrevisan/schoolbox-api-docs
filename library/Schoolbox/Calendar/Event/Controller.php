@@ -15,6 +15,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -60,19 +61,27 @@ class Controller extends Base
 
 
     /**
+     * @var CampusMapper
+     */
+    private $campusMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param RoleMapper      $roleMapper
      * @param Folder\Mapper   $folderMapper
      * @param EventMapper     $eventMapper
      * @param EventTypeMapper $eventTypeMapper
+     * @param CampusMapper    $campusMapper
      */
-    public function __construct(RoleMapper $roleMapper, Folder\Mapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper)
+    public function __construct(RoleMapper $roleMapper, Folder\Mapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper, CampusMapper $campusMapper)
     {
-        $this->roleMapper   = $roleMapper;
+        $this->roleMapper = $roleMapper;
         $this->folderMapper = $folderMapper;
-        $this->eventMapper  = $eventMapper;
+        $this->eventMapper = $eventMapper;
         $this->eventTypeMapper = $eventTypeMapper;
+        $this->campusMapper = $campusMapper;
     }
 
 
@@ -144,6 +153,19 @@ class Controller extends Base
             $recurrence = (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event);
         }
 
+        /* Group Folders that you can choose, plus their current selection states
+         */
+        $groupFolders = $this->getSelectableFolders($event);
+
+        /* Only provide Campus options if campuses have been defined
+         */
+        $selectedUser = $this->getSelectedUser();
+        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
+
+        /* Levels
+         */
+        $levels = new \Schoolbox\Calendar\EventLevelCollection($groupFolders['folders'], $campusList);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'action' => 'Update',
@@ -154,7 +176,11 @@ class Controller extends Base
             ],
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
-            'groupFolders' => $this->getSelectableFolders($event),
+            'levels' => [
+                'all' => $levels,
+                'selected' => $defaultAccessLevel
+            ],
+            'groupFolders' => $groupFolders,
             'redirect' => $event->setupRedirect(
                 urldecode($this->getRequest()->query['returnTo']),
                 $event->getStartDateTime()->getURLDate(),

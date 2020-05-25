@@ -356,29 +356,29 @@ if (is_numeric($_GET['eventID'])) {
 //} else {
 //    $page->setVar('event_group_drop_block', '');
 //}
-
-
-/* Render all the dropdowns
- */
-
-/* Only provide Campus options if campuses have been defined
- */
-$campusMapper = \Schoolbox\CampusMapper::getInstance();
-$campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
-
-/* Event Access Levels
- * Requires both $possibleFolderList and $campusList for optional values
- */
-$page->dropDown(
-    'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($allFolderList->getAll(), $campusList),
-    $defaultAccessLevel,
-    TEMPLATE_content,
-    [
-        'id'   => 'EVENT_EVENTLEVEL_ID',
-        'name' => 'EVENT_EVENTLEVEL_NAME',
-    ]
-);
+//
+//
+///* Render all the dropdowns
+// */
+//
+///* Only provide Campus options if campuses have been defined
+// */
+//$campusMapper = \Schoolbox\CampusMapper::getInstance();
+//$campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
+//
+///* Event Access Levels
+// * Requires both $possibleFolderList and $campusList for optional values
+// */
+//$page->dropDown(
+//    'event_level_drop',
+//    new \Schoolbox\Calendar\EventLevelCollection($allFolderList->getAll(), $campusList),
+//    $defaultAccessLevel,
+//    TEMPLATE_content,
+//    [
+//        'id'   => 'EVENT_EVENTLEVEL_ID',
+//        'name' => 'EVENT_EVENTLEVEL_NAME',
+//    ]
+//);
 
 /* Campus Checkbox Array when using Campus Event Level
  */

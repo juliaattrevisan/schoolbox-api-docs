@@ -180,9 +180,9 @@
                             Level
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
                             <select name="level" id="level" data-interaction="select-level">
-                                <!-- BEGIN event_level_drop -->
-                                <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
-                                <!-- END event_level_drop -->
+                                {% for level in levels.all %}
+                                <option value="{{ level.id }}" {{ level.id == levels.selected ? 'selected="selected"' : '' }}>{{ level.name }}</option>
+                                {% endfor %}
                             </select>
                         </label>
                     </div>
