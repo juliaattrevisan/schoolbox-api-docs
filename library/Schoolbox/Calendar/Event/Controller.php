@@ -291,5 +291,13 @@ class Controller extends Base
         $allFolderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b) {
             return strnatcasecmp($a->getTitle(), $b->getTitle());
         });
+
+        /* Figure out which ones should be checked
+         */
+        $items = [];
+
+        foreach ($allFolderList as $currentFolder) {
+            $alreadyInCategory = $event->getFolderCollection()->getBy('id', $currentFolder->getId()) || in_array($currentFolder->getId(), $previousInvolvement, false);
+        }
     }
 }
