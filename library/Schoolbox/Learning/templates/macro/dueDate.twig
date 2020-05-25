@@ -19,7 +19,7 @@
         {% set childParticipant = null %}
         {% for child in user.children if not childParticipant %}
             {% if assessable.isParticipant(child) %}
-                {% set childParticipant = assessable.forParticipant(child) %}
+                {% set childParticipant = assessable.getParticipantIfExtant(child) %}
             {% endif %}
         {% endfor %}
 
