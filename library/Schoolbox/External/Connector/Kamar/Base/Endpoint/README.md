@@ -28,6 +28,8 @@ delete from sis_timetable_cycle;
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import and set the `Data Source` to `CSV Files`. Import the `Wang` timetable definition in Jira; it contains a sample setup.
 
+> The timetable definition may currently be found attached to Jira ticket [SA-8090](https://schoolbox.atlassian.net/browse/SA-8090).
+
 Import it via `Timetable Structure`. This sets up the Cycles for you.
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `Kamar`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly:
@@ -39,11 +41,19 @@ The Key isn't used yet, so you can just dump any text string in there for now.
 
 ## 3. Importing
 
-Then run the sisImporter. The easiest way is to shank down a set of xml, pop it into the Endpoint Host directory, then run this:
+Then run the sisImporter. The easiest way is to shank down a set of xml:
+
+> TODO figure out where this XML comes from. I tested this with a data set Steve provided me, but AFAIK it's not available anywhere.
+
+Then, pop it into the Endpoint Host directory, then run this:
 
 ```
 vagrant ssh
 cd /vagrant/tools/synchronise
+# To protect against import of a partial data set, the Kamar sync won't run if
+# any file is less than 15 minutes old.
+# Set every file to have been modified yesterday to work around this.
+touch -d "yesterday" /vagrant/data/cache/stream/kamar/*
 php sisImporter.php --perform -vvv
 ```
 
@@ -71,7 +81,7 @@ The two campuses `Senior` and `Junior` have a `Cycle` column currently set to `N
 
 ## 5. Assimilate Profile
 
-Have a look in `sis_user_profile` and find a student's external identifier.
+Have a look in `sis_class_user` to find the external identifier for a student that is in at least one class.
 
 Assign that external identifier to David Rhodes' user, then visit his Timetable via his Profile page; or, you can visit it directly https://vagrant.dev.schoolbox.cloud/timetable/230
 
@@ -79,7 +89,7 @@ All his stuff should display.
 
 ## 6. Reimport
 
-Repeat step 3 to simulate what a crontab might do. The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
+Repeat step 3 to simulate what a crontab might do: The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
 
 ### 6.1 A Note About Cycles
 
