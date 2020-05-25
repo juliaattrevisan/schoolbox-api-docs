@@ -971,11 +971,6 @@ parameters:
 			path: library/DeprecatedModel.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\:\\:getId\\(\\)\\.$#"
-			count: 1
-			path: library/EOTC/Authenticator.php
-
-		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:setAuthor\\(\\)\\.$#"
 			count: 1
 			path: library/EOTC/EventConnector.php
@@ -1033,11 +1028,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:getMetadata\\(\\)\\.$#"
 			count: 3
-			path: library/EOTC/EventConnector.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\:\\:getId\\(\\)\\.$#"
-			count: 1
 			path: library/EOTC/EventConnector.php
 
 		-
