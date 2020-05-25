@@ -28,19 +28,19 @@ $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 $page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
 $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
-/** @var Schoolbox\User $currentUser */
-$currentUser = $_SESSION['user'];
-
-if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
-    try {
-        $userMapper   = new UserMapper();
-        $selectedUser = $userMapper->findById($_GET['userId']);
-    } catch (\Exception $e) {
-        error(ErrorMapper::ERROR_USER_NOT_FOUND);
-    }
-} else {
-    $selectedUser = $currentUser;
-}
+///** @var Schoolbox\User $currentUser */
+//$currentUser = $_SESSION['user'];
+//
+//if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
+//    try {
+//        $userMapper   = new UserMapper();
+//        $selectedUser = $userMapper->findById($_GET['userId']);
+//    } catch (\Exception $e) {
+//        error(ErrorMapper::ERROR_USER_NOT_FOUND);
+//    }
+//} else {
+//    $selectedUser = $currentUser;
+//}
 
 /* Modify existing event
  */
@@ -250,73 +250,73 @@ if (is_numeric($_GET['eventID'])) {
 /**
  * Group (Folder) selection
  */
+//
+///* Only provide Group option if groups have been defined
+// */
+//$folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
-/* Only provide Group option if groups have been defined
- */
-$folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-
-/* Possible options, based on current user's involvement.
- */
-$currentUserFolderIds = $folderMapper->findFolderIdsForUser($currentUser, true, UserAccess::ACCESS_WRITE);
-
-/* Possible options, based on calendar user's involvement. Will intersect with current user
- */
-$calendarUserFolderList = $folderMapper->findForUser($selectedUser, true, UserAccess::ACCESS_READ);
-
-/* Ones that it's already in, from previous selections
- */
-$alreadyInFolderList = $event->getFolderCollection();
-
-/* Get data about the Folders
- */
-$tempFolderIds = [];
-
-foreach ($alreadyInFolderList as $current) {
-    $tempFolderIds[] = $current->getId();
-}
-
-/* If user has write access to, or is a group manager,
- * but isn't involved in the homepage used to get here:
- * force the homepage into the checkbox list
- */
-if (isset($_GET['homepageId']) && !in_array($_GET['homepageId'], $tempFolderIds)) {
-    if (FolderAccess::getInstance()->getFolderAccess($_SESSION['user'], (int)$_GET['homepageId']) >= UserAccess::ACCESS_WRITE) {
-        $tempFolderIds[] = $_GET['homepageId'];
-    }
-}
-
-$allFolders = $folderMapper->findByColumnList(['id' => $tempFolderIds]);
-
-/**
- * Dedupe and make synonymous
- */
-
-/* All the checkbox options, deduped, are here
- */
-$allFolderList = $folderMapper->createCollection();
-
-/* A simple stack of ids for checkboxes which should already be ticked
- */
-$previousInvolvement = [];
-
-/* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
- */
-foreach ($calendarUserFolderList as $current) {
-    $currentId = $current->getId();
-    if (in_array($currentId, $currentUserFolderIds, false) || $currentUser->isSuperuser()) {
-        $allFolderList[$currentId] = $current;
-    }
-}
-
-/* Ones that have been ticked in the past
- */
-foreach ($allFolders as $currentFolder) {
-    if (!isset($allFolderList[$currentFolder->getId()])) {
-        $allFolderList[$currentFolder->getId()] = $currentFolder;
-    }
-
-    $previousInvolvement[] = $currentFolder->getId();
-}
+///* Possible options, based on current user's involvement.
+// */
+//$currentUserFolderIds = $folderMapper->findFolderIdsForUser($currentUser, true, UserAccess::ACCESS_WRITE);
+//
+///* Possible options, based on calendar user's involvement. Will intersect with current user
+// */
+//$calendarUserFolderList = $folderMapper->findForUser($selectedUser, true, UserAccess::ACCESS_READ);
+//
+///* Ones that it's already in, from previous selections
+// */
+//$alreadyInFolderList = $event->getFolderCollection();
+//
+///* Get data about the Folders
+// */
+//$tempFolderIds = [];
+//
+//foreach ($alreadyInFolderList as $current) {
+//    $tempFolderIds[] = $current->getId();
+//}
+//
+///* If user has write access to, or is a group manager,
+// * but isn't involved in the homepage used to get here:
+// * force the homepage into the checkbox list
+// */
+//if (isset($_GET['homepageId']) && !in_array($_GET['homepageId'], $tempFolderIds)) {
+//    if (FolderAccess::getInstance()->getFolderAccess($_SESSION['user'], (int)$_GET['homepageId']) >= UserAccess::ACCESS_WRITE) {
+//        $tempFolderIds[] = $_GET['homepageId'];
+//    }
+//}
+//
+//$allFolders = $folderMapper->findByColumnList(['id' => $tempFolderIds]);
+//
+///**
+// * Dedupe and make synonymous
+// */
+//
+///* All the checkbox options, deduped, are here
+// */
+//$allFolderList = $folderMapper->createCollection();
+//
+///* A simple stack of ids for checkboxes which should already be ticked
+// */
+//$previousInvolvement = [];
+//
+///* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
+// */
+//foreach ($calendarUserFolderList as $current) {
+//    $currentId = $current->getId();
+//    if (in_array($currentId, $currentUserFolderIds, false) || $currentUser->isSuperuser()) {
+//        $allFolderList[$currentId] = $current;
+//    }
+//}
+//
+///* Ones that have been ticked in the past
+// */
+//foreach ($allFolders as $currentFolder) {
+//    if (!isset($allFolderList[$currentFolder->getId()])) {
+//        $allFolderList[$currentFolder->getId()] = $currentFolder;
+//    }
+//
+//    $previousInvolvement[] = $currentFolder->getId();
+//}
 
 /* Group checkbox array when using Group Event Level
  */

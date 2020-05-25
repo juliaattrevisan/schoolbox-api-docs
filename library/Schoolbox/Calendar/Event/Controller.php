@@ -8,12 +8,23 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
+use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use UnexpectedValueException;
+
 
 /**
  * Class Controller
@@ -69,7 +80,7 @@ class Controller extends Base
      * View an event's detail screen
      *
      * @param Event $event
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     public function getEvent(Event $event): void
     {
@@ -97,7 +108,7 @@ class Controller extends Base
      * Modify an event's settings
      *
      * @param Event $event
-     * @throws \Exception
+     * @throws ServiceNotFound
      */
     public function getEventModify(Event $event): void
     {
@@ -130,8 +141,7 @@ class Controller extends Base
         $recurrence = [];
 
         if ($event->getSeriesId()) {
-            $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($this->eventMapper);
-            $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
+            $recurrence = (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
@@ -155,5 +165,123 @@ class Controller extends Base
                 ($this->getRequest()->query['homepageId'] ? '&homepageId=' . $this->getRequest()->query['homepageId'] : '') .
                 ($this->getRequest()->query['returnDate'] ? '&returnDate=' . $this->getRequest()->query['returnDate'] : ''),
         ])->setTitle("Modify {$event->getTitle()}"));
+    }
+
+
+    /**
+     * Get the user specified by the querystring params
+     * Defaults to current user if one wasn't specified
+     *
+     * @return User
+     */
+    private function getSelectedUser(): User
+    {
+        /* A user might have been optionally passed on the url
+         * Otherwise default to the current user
+         */
+        $selectedUser = $this->getUser();
+
+        if (isset($this->getRequest()->query['userId']) && is_numeric($this->getRequest()->query['userId'])) {
+            try {
+                $selectedUser = (new \Schoolbox\UserMapper())->findById($this->getRequest()->query['userId']);
+            } catch (Exception $e) {
+
+                /* TODO: User not found
+                 */
+            }
+        }
+
+        return $selectedUser;
+    }
+
+    /**
+     * A list of groups to choose, as a checkbox array
+     *
+     * @param Event $event
+     * @return Collection|\Schoolbox\Resource\Folder\Model[]
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     */
+    private function getFolders(Event $event)
+    {
+
+        /* Ones that it's already in, from previous selections
+         */
+        $alreadyInFolderList = $event->getFolderCollection();
+
+        /* Get data about the Folders
+         */
+        $tempFolderIds = [];
+
+        foreach ($alreadyInFolderList as $current) {
+            $tempFolderIds[] = $current->getId();
+        }
+
+        /* If user has write access to, or is a group manager,
+         * but isn't involved in the homepage used to get here:
+         * force the homepage into the checkbox list
+         */
+        $homepageId = (int)$this->getRequest()->query['homepageId'];
+
+        if ($homepageId && !in_array($homepageId, $tempFolderIds, false) && FolderAccess::getInstance()->getFolderAccess($this->getUser(), $homepageId) >= UserAccess::ACCESS_WRITE) {
+            $tempFolderIds[] = $homepageId;
+        }
+
+        return $this->folderMapper->findByColumnList(['id' => $tempFolderIds]);
+    }
+
+    /* TODO: what is this heresy here???
+     */
+    private function getSelectableFolders(Event $event)
+    {
+        $selectedUser = $this->getSelectedUser();
+
+        /* Folders to which $selectedUser has WRITE access
+         */
+        $currentUserFolderIds = $this->folderMapper->findFolderIdsForUser($selectedUser, true, UserAccess::ACCESS_WRITE);
+
+        /* Possible options, based on calendar user's involvement. Will intersect with current user
+         * This is to allow you to choose options when adding an event on someone else's behalf;
+         *
+         * Your WRITE folders intersected with their READ+ folders gives you common ground
+         * (These are the places where you can alter content that your $selectedUser can read)
+         * SA-4396
+         */
+        $calendarUserFolderList = $this->folderMapper->findForUser($selectedUser, true, UserAccess::ACCESS_READ);
+
+        /* All the checkbox options, deduped, are here
+         */
+        $allFolderList = $this->folderMapper->createCollection();
+
+        /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
+         * TODO: Replace with array_intersect and $collection->indexBy('id');
+         */
+        foreach ($calendarUserFolderList as $current) {
+            $currentId = $current->getId();
+
+            if (in_array($currentId, $currentUserFolderIds, false) || $this->getUser()->isSuperuser()) {
+                $allFolderList[$currentId] = $current;
+            }
+        }
+
+        /* Ones that have been ticked in the past
+         * A simple stack of ids for checkboxes which should already be ticked
+         */
+        $previousInvolvement = [];
+
+        /* A list of groups to choose. If the event was associatd with a folder outside of the intersect
+         * just ram it in so it's a union of: what was previously there + (folders you can WRITE ^ folders $selectedUser can READ)
+         */
+        $allFolders = $this->getFolders($event);
+
+        foreach ($allFolders as $currentFolder) {
+            if (!isset($allFolderList[$currentFolder->getId()])) {
+                $allFolderList[$currentFolder->getId()] = $currentFolder;
+            }
+
+            $previousInvolvement[] = $currentFolder->getId();
+        }
     }
 }
