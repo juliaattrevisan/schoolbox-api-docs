@@ -12,6 +12,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -157,14 +158,10 @@ class Controller extends Base
          */
         $groupFolders = $this->getSelectableFolders($event);
 
-        /* Only provide Campus options if campuses have been defined
+        /* Only provide Campus options in Level dropdown if campuses have been defined
          */
         $selectedUser = $this->getSelectedUser();
         $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
-
-        /* Levels
-         */
-        $levels = new \Schoolbox\Calendar\EventLevelCollection($groupFolders['folders'], $campusList);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
@@ -177,7 +174,7 @@ class Controller extends Base
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
             'levels' => [
-                'all' => $levels,
+                'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
                 'selected' => $defaultAccessLevel
             ],
             'groupFolders' => $groupFolders,
