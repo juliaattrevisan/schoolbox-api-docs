@@ -320,42 +320,42 @@ if (is_numeric($_GET['eventID'])) {
 
 /* Group checkbox array when using Group Event Level
  */
-if (\count($allFolderList)) {
-
+//if (\count($allFolderList)) {
+//
 //    // Order by title
 //    $allFolderList->sortByCallback(
 //        function (Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
 //            return strnatcasecmp($a->getTitle(), $b->getTitle());
 //        }
 //    );
-
-    foreach ($allFolderList as $currentFolder) {
-        $folderId          = $currentFolder->getId();
-        $alreadyInCategory = $event->getFolderCollection()->getBy('id', $folderId) || in_array($folderId, $previousInvolvement);
-        $fromHomepage      = (($_GET['level'] == Event::ACCESS_GROUP) && ($_GET['homepageId'] == $folderId));
-
-        /* If you have already chosen these categories, or if it's specified
-         * from a homepage via Group Calendar > Add Event
-         */
-        if ($alreadyInCategory || $fromHomepage) {
-            $selected = 'checked="checked"';
-        } else {
-            $selected = '';
-        }
-
-        $page->setVar(
-            [
-                'EVENT_GROUP_ID'          => $folderId,
-                'EVENT_GROUP_NAME'        => Scrub::text($currentFolder->getTitle()),
-                'EVENT_GROUP_ID_SELECTED' => $selected,
-            ]
-        );
-
-        $page->parse('event_group_drop_block', 'event_group_drop', true);
-    }
-} else {
-    $page->setVar('event_group_drop_block', '');
-}
+//
+//    foreach ($allFolderList as $currentFolder) {
+//        $folderId          = $currentFolder->getId();
+//        $alreadyInCategory = $event->getFolderCollection()->getBy('id', $folderId) || in_array($folderId, $previousInvolvement);
+//        $fromHomepage      = (($_GET['level'] == Event::ACCESS_GROUP) && ($_GET['homepageId'] == $folderId));
+//
+//        /* If you have already chosen these categories, or if it's specified
+//         * from a homepage via Group Calendar > Add Event
+//         */
+//        if ($alreadyInCategory || $fromHomepage) {
+//            $selected = 'checked="checked"';
+//        } else {
+//            $selected = '';
+//        }
+//
+//        $page->setVar(
+//            [
+//                'EVENT_GROUP_ID'          => $folderId,
+//                'EVENT_GROUP_NAME'        => Scrub::text($currentFolder->getTitle()),
+//                'EVENT_GROUP_ID_SELECTED' => $selected,
+//            ]
+//        );
+//
+//        $page->parse('event_group_drop_block', 'event_group_drop', true);
+//    }
+//} else {
+//    $page->setVar('event_group_drop_block', '');
+//}
 
 
 /* Render all the dropdowns

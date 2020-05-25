@@ -16,6 +16,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
@@ -153,6 +154,7 @@ class Controller extends Base
             ],
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
+            'groupFolders' => $this->getSelectableFolders($event),
             'redirect' => $event->setupRedirect(
                 urldecode($this->getRequest()->query['returnTo']),
                 $event->getStartDateTime()->getURLDate(),
@@ -232,9 +234,21 @@ class Controller extends Base
         return $this->folderMapper->findByColumnList(['id' => $tempFolderIds]);
     }
 
-    /* TODO: what is this heresy here???
+
+    /**
+     * Get a list of checkboxes which you can select and also include their current selection state
+     *
+     * For some reason this is extremely lengthy; probably try to slim it down somewhat
+     *
+     * @param Event $event
+     * @return array
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
-    private function getSelectableFolders(Event $event)
+    private function getSelectableFolders(Event $event): array
     {
         $selectedUser = $this->getSelectedUser();
 
@@ -298,6 +312,20 @@ class Controller extends Base
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
+            $fromHomepage      = (($this->getRequest()->query['level'] == Event::ACCESS_GROUP) && ($this->getRequest()->query['homepageId'] == $currentFolder->getId()));
+
+            $selected = false;
+
+            if ($alreadyInCategory || $fromHomepage) {
+                $selected = true;
+            }
+
+            $items[] = [
+                'folder' => $currentFolder,
+                'selected' => $selected
+            ];
         }
+
+        return $items;
     }
 }

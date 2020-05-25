@@ -192,10 +192,11 @@
                                 Groups
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
                             </legend>
-                            <!-- BEGIN event_group_drop -->
-                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />
-                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>
-                            <!-- END event_group_drop -->
+
+                            {% for groupFolder in groupFolders %}
+                                <input type="checkbox" name="group[]" value="{{ groupFolder.folder.id }}" id="group{{ groupFolder.folder.id }}" {{ groupFolder.selected ? 'selected="selected"' : '' }} />
+                                <label for="group{{ groupFolder.folder.id }}" class="checkbox">{{ groupFolder.folder.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
