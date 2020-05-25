@@ -15,9 +15,11 @@
  # showPrompt: a boolean to determine whether to show the "Please Select" option
  #}
 <select {{ disabled is defined ? defined : '' }} name="{{ name }}"
+    {% if selectData is defined %}
     {% for dataVar, dataValue in selectData %}
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
+    {% endif %}
 >
     {% if showPrompt is defined and showPrompt %}
     <option disabled selected="selected" value="">Please Select</option>
@@ -25,7 +27,7 @@
 
 {% for index, option in options %}
 
-    {% if (pairs == null)  %}
+    {% if pairs is not defined or (pairs == null)  %}
 
         {# If (value, label) was not specified, assume backwards-compatible defaults
          #}
