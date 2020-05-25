@@ -118,12 +118,18 @@ $(function () {
             });
 
             this.on('error', function (file, msg, xhr) {
+                console.log(file);
+                console.log(msg);
+                console.log(xhr);
+
                 if (xhr) {
                     try {
                         msg = JSON.parse(msg);
                     } catch (err) {
                         // noop
                     }
+
+                    console.log('message', msg.hash.split(':')[1]);
 
                     file.hash = msg.hash;
 
