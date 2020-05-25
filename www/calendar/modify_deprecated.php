@@ -105,9 +105,9 @@ if (is_numeric($_GET['eventID'])) {
 //            'ADVANCED_CLOSE' => 'hidden',
 //        ]
 //    );
-
-    $page->setVar(
-        [
+//
+//    $page->setVar(
+//        [
 //            'EVENT_ID'                        => $event->getId(),
 //            'EVENT_USER_ID'                   => $event->getOwner()->getId(),
 //            'EVENT_AUTHOR_ID'                 => $event->getAuthor()->getId(),
@@ -126,37 +126,37 @@ if (is_numeric($_GET['eventID'])) {
 //                $_GET['homepageId'],
 //                $_GET['userId']
 //            ),
-            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
-            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
+//            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+//            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
 //            'RETURN_STR'                      => '&returnTo=' . $_GET['returnTo'] .
 //                ($_GET['userId'] ? "&userId=" . $_GET['userId'] : "") .
 //                ($_GET['homepageId'] ? "&homepageId=" . $_GET['homepageId'] : "") .
 //                ($_GET['returnDate'] ? "&returnDate=" . $_GET['returnDate'] : ""),
-        ]
-    );
-
-    $page->parse('delete_button_block', 'delete_button');
-
-    /* Recurrence
-     */
-    // Is there a recurrence? If so don't show the repeat selector.
-    $recurrence = [];
-    if ($event->getSeriesId()) {
-        $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
-        $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
-    }
-    if (!empty($recurrence)) {
-        $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
-        $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
-        $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
-        $page->setVar('EVENT_RECURRENCE_COLLAPSE_STATE', 'uncollapsed');
-        $page->setVar('EVENT_RECURRENCE_COLLAPSE_CLASS', '');
-        $page->parse('recurring_reminder_block', 'recurring_reminder');
-        $page->setVar('recurring_dates_block', '');
-    } else {
-        $page->setVar('recurring_reminder_block', '');
-        $page->parse('recurring_dates_block', 'recurring_dates');
-    }
+//        ]
+//    );
+//
+//    $page->parse('delete_button_block', 'delete_button');
+//
+//    /* Recurrence
+//     */
+//    // Is there a recurrence? If so don't show the repeat selector.
+//    $recurrence = [];
+//    if ($event->getSeriesId()) {
+//        $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
+//        $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
+//    }
+//    if (!empty($recurrence)) {
+//        $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
+//        $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
+//        $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+//        $page->setVar('EVENT_RECURRENCE_COLLAPSE_STATE', 'uncollapsed');
+//        $page->setVar('EVENT_RECURRENCE_COLLAPSE_CLASS', '');
+//        $page->parse('recurring_reminder_block', 'recurring_reminder');
+//        $page->setVar('recurring_dates_block', '');
+//    } else {
+//        $page->setVar('recurring_reminder_block', '');
+//        $page->parse('recurring_dates_block', 'recurring_dates');
+//    }
 
 } else {
     /* Create new event
@@ -229,23 +229,23 @@ if (is_numeric($_GET['eventID'])) {
     $page->parse('recurring_dates_block', 'recurring_dates');
 }
 
-/* Event Types
- */
-$calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-$allEventTypes           = $calendarEventTypeMapper->findAll();
-$page->setVar('type_select_block', '');
-$page->setVar('type_no_select_block', '');
-$page->dropDown(
-    'type_drop',
-    $allEventTypes,
-    $defaultTypeId,
-    'type_select',
-    [
-        'id'   => 'EVENT_EVENTTYPE_ID',
-        'type' => 'EVENT_EVENTTYPE_NAME',
-    ]
-);
-$page->parse('type_select_block', 'type_select');
+///* Event Types
+// */
+//$calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
+//$allEventTypes           = $calendarEventTypeMapper->findAll();
+//$page->setVar('type_select_block', '');
+//$page->setVar('type_no_select_block', '');
+//$page->dropDown(
+//    'type_drop',
+//    $allEventTypes,
+//    $defaultTypeId,
+//    'type_select',
+//    [
+//        'id'   => 'EVENT_EVENTTYPE_ID',
+//        'type' => 'EVENT_EVENTTYPE_NAME',
+//    ]
+//);
+//$page->parse('type_select_block', 'type_select');
 
 /**
  * Group (Folder) selection

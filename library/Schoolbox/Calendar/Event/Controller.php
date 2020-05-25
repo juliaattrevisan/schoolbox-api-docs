@@ -125,9 +125,26 @@ class Controller extends Base
             $selectedRoles[] = $currentRole->getRoleId();
         }
 
+        /* Recurrence
+         */
+        $recurrence = [];
+
+        if ($event->getSeriesId()) {
+            $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($this->eventMapper);
+            $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
+        }
+
+        /* Event Types
+         */
+        $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
+        $eventTypes           = $calendarEventTypeMapper->findAll();
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'action' => 'Update',
+            'eventTypes' => $calendarEventTypeMapper->findAll(),
+            'recurrence' => $recurrence,
+            'personalLevel' => Event::ACCESS_PERSONAL,
             'redirect' => $event->setupRedirect(
                 urldecode($this->getRequest()->query['returnTo']),
                 $event->getStartDateTime()->getURLDate(),

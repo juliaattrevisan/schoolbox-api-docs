@@ -24,7 +24,7 @@
             container: '[data-collapsable-container]'
         });
 
-        var personalLevel = "{PERSONAL_LEVEL}";
+        var personalLevel = "{{ personalLevel }}";
         var calendarEvent = $("#level");
 
         if (calendarEvent.val()=== personalLevel) {
@@ -53,25 +53,25 @@
             <h1>{{ action }} Event</h1>
         </div>
     </div>
-    <!-- BEGIN delete_button -->
+    {% if event.id %}
     <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
     <ul class="f-dropdown" data-dropdown-content id="overflow">
         <li><a data-action="delete" href="/calendar/modifyForm.php?id={{ event.id }}{{ returnStr }}" class="icon-delete">Delete Event</a></li>
     </ul>
-    <!-- END delete_button -->
+    {% endif %}
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
 
-        	<input name="id" type="hidden" value="{{ event.id }}" />
-        	<input name="userId" type="hidden" value="{{ event.owner.id }}" />
-        	<input name="authorId" type="hidden" value="{{ event.author.id }}" />
+            <input name="id" type="hidden" value="{{ event.id }}" />
+            <input name="userId" type="hidden" value="{{ event.owner.id }}" />
+            <input name="authorId" type="hidden" value="{{ event.author.id }}" />
             <input id="allday" name="allday" type="hidden" value="{{ event.allDay }}">
-        	<input name="return" type="hidden" value="{{ redirect }}" />
-        	<input id="efficacy" name="efficacy" type="hidden" value="self" />
-        	<input id="action" name="action" type="hidden" value="{{ action }}" />
+            <input name="return" type="hidden" value="{{ redirect }}" />
+            <input id="efficacy" name="efficacy" type="hidden" value="self" />
+            <input id="action" name="action" type="hidden" value="{{ action }}" />
 
             <section>
                 <fieldset class="content">
@@ -101,37 +101,36 @@
                         </span>
 
                     </legend>
-                    <div class="small-12 columns {EVENT_RECURRENCE_COLLAPSE_CLASS}" data-collapsable="true" data-collapse-state="{EVENT_RECURRENCE_COLLAPSE_STATE}">
+                    <div class="small-12 columns {{ recurrence|length ? '' : 'hide' }}" data-collapsable="true" data-collapse-state="{{ recurrence|length ? 'uncollapsed' : 'collapsed' }}">
                         <div class="row">
-                            <!-- BEGIN recurring_dates -->
-                            <div class="small-6 columns">
-                                <label>Repeat
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
-                                    <select name="repeat">
-                                        <option value="">Single Event</option>
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="fortnightly">Fortnightly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div id="repeatUntil" class="small-6 columns" data-repeat-until>
-                                <label>
-                                    Repeat Until
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
-                                    <input name="repeat_until" id="repeat-until" data-datepicker type="text" size="15" maxlength="30" value="" />
-                                </label>
-                            </div>
-                            <!-- END recurring_dates -->
-                            <!-- BEGIN recurring_reminder -->
-                            <div id="repeat-reminder" class="small-12 columns">
-                                <div class="alert-box">
-                                    <h5>This event is part of a recurring series</h5>
-                                    <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
+                            {% if recurrence|length %}
+                                <div id="repeat-reminder" class="small-12 columns">
+                                    <div class="alert-box">
+                                        <h5>This event is part of a recurring series</h5>
+                                        <p>{{ recurrence.freq|capitalize }}, beginning <strong>{{ recurrence.start.longDateOnly }}</strong> and ending <strong>{{ recurrence.end.longDateOnly }}</strong></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- END recurring_reminder -->
+                            {% else %}
+                                <div class="small-6 columns">
+                                    <label>Repeat
+                                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
+                                        <select name="repeat">
+                                            <option value="">Single Event</option>
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="fortnightly">Fortnightly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div id="repeatUntil" class="small-6 columns" data-repeat-until>
+                                    <label>
+                                        Repeat Until
+                                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
+                                        <input name="repeat_until" id="repeat-until" data-datepicker type="text" size="15" maxlength="30" value="" />
+                                    </label>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </fieldset>
@@ -142,17 +141,15 @@
                         <label>
                             Type
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
-                            <!-- BEGIN type_select -->
+                            {% if eventTypes|length %}
                             <select name="type">
-                                <!-- BEGIN type_drop -->
-                                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-                                <!-- END type_drop -->
+                                {% for eventType in eventTypes %}
+                                <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
+                                {% endfor %}
                             </select>
-                            <!-- END type_select -->
-                            <!-- BEGIN type_no_select -->
-                            <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />
-                            {EVENT_EVENTTYPE_NAME}
-                            <!-- END type_no_select -->
+                            {% else %}
+                                <input type="hidden" name="type" value="{{ event.type.id }}" />
+                            {% endif %}
                         </label>
                     </div>
                     <div class="small-12 column">
