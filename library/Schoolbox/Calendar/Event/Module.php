@@ -189,9 +189,20 @@ class Module extends BaseModule
                             foreach ($accessList as $currentAccess) {
                                 if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
                                     // Loop through campuses for the event and check if one matches with this access
-                                    foreach ($event->getCampusCollection() as $campusId) {
-                                        if ($campusId == $currentAccess->getServiceIdentifier()) {
-                                            return true;
+                                    foreach ($event->getCampusCollection() as $campus) {
+                                        if ($campus instanceof Campus) {
+                                            if ($campus->getId() == $currentAccess->getServiceIdentifier()) {
+                                                return true;
+                                            }
+
+                                        } elseif ($campus instanceof \Schoolbox\Calendar\Relation\Campus) {
+                                            if ($campus->getCampusId() == $currentAccess->getServiceIdentifier()) {
+                                                return true;
+                                            }
+                                        } else {
+                                            if ($campus == $currentAccess->getServiceIdentifier()) {
+                                                return true;
+                                            }
                                         }
                                     }
                                 }

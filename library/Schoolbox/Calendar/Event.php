@@ -6,9 +6,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar;
-
 
 use Alaress_Date_Format;
 use DateTime;
@@ -887,7 +885,7 @@ class Event implements ISoftDeletable
     /**
      * Get campus collection
      *
-     * @return Collection|Relation\Campus[]
+     * @return Collection|int[]|Campus[]|Relation\Campus[]
      */
     public function getCampusCollection()
     {
