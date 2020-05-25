@@ -195,7 +195,8 @@ class Controller extends Base
     }
 
     /**
-     * A list of groups to choose, as a checkbox array
+     * You have WRITE access to this list of groups (folders) from which to choose when using
+     * the event's Group level option
      *
      * @param Event $event
      * @return Collection|\Schoolbox\Resource\Folder\Model[]
