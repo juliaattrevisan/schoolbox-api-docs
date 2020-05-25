@@ -81,6 +81,7 @@ class Sync extends Base implements ISync
                             s.StudentContactEmail                         AS student_contact_home_email,
                             s.StudentContactDefaultEmail                  AS student_contact_default_email,
                             s.StudentContactOccupEmail                    AS student_contact_work_email,
+                            s.StudentContactType                          AS student_contact_type,
                             s.StudentId                                   AS student_id,
                             s.StudentYearLevel                            AS student_year_level,
                             s.StudentCampus                               AS student_campus,
