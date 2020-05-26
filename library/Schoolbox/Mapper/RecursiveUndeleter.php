@@ -27,6 +27,7 @@ namespace Schoolbox\Mapper;
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Component\Eportfolio as ComponentEportfolio;
 use Database;
 use Eportfolio;
 use PDOException;
@@ -48,6 +49,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Fixtures;
+use Schoolbox\Forum;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
@@ -68,6 +70,8 @@ use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\My\File as MyFile;
+use Schoolbox\ResourceBooking;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\CliTool;
@@ -303,19 +307,19 @@ class RecursiveUndeleter extends CliTool\App
             Pastoral\UploadQueue\Mapper::class,
         ],
         Pastoral\UploadQueue\Mapper::class              => [],
-        Schoolbox\Resource\My\File\Mapper::class        => [
-            Component\Eportfolio\FileListMapper::class => 'file_id',
+        MyFile\Mapper::class                            => [
+            ComponentEportfolio\FileListMapper::class => 'file_id',
         ],
-        Component\Eportfolio\FileListMapper::class      => [],
-        Schoolbox\ResourceBooking\Item\Mapper::class    => [
-            Schoolbox\ResourceBooking\Booking\Mapper::class,
+        ComponentEportfolio\FileListMapper::class       => [],
+        ResourceBooking\Item\Mapper::class              => [
+            ResourceBooking\Booking\Mapper::class,
         ],
-        Schoolbox\ResourceBooking\Booking\Mapper::class => [],
+        ResourceBooking\Booking\Mapper::class           => [],
         Pastoral\Comment\Mapper::class                  => [],
-        Schoolbox\Forum\ThreadMapper::class                             => [
-            Schoolbox\Forum\PostMapper::class => 'threadID',
+        Forum\ThreadMapper::class                       => [
+            Forum\PostMapper::class => 'threadID',
         ],
-        Schoolbox\Forum\PostMapper::class               => [],
+        Forum\PostMapper::class                         => [],
     ];
 
 
