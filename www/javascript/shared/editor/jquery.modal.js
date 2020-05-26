@@ -403,17 +403,32 @@
              */
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
-                    $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                        config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id), responseText.name, responseText.mime, dialog);
+                    var status = 'error';
+                    if ('status' in message.data[0]) {
+                        status = message.data[0].status;
+                    }
+                    if (status === 'success') {
+                        $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                            config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id), responseText.name, responseText.mime, dialog);
 
-                        /* Shut modal, go back to Dialog
-                         */
+                            /* Shut modal, go back to Dialog
+                             */
+                            $('#file-picker').foundation('reveal', 'close');
+
+                            config.onAfterClose();
+
+                            $.fn.schoolboxRestorePreviousModal(config.restoreModal);
+                        });
+                    } else {
+                        // assume error: do these things
                         $('#file-picker').foundation('reveal', 'close');
-
                         config.onAfterClose();
-
                         $.fn.schoolboxRestorePreviousModal(config.restoreModal);
-                    });
+
+                        // Stick the error in the preview, or however errors get rendered
+                        // Eh. Just put it in an alert box for now
+                        alert(message.data[0].hash.split(':')[1]);
+                    }
                 } else if ('meetingUrl' in message.data) {
 
                     /* Microsoft Teams meetings url format

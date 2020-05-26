@@ -49,6 +49,33 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         defaultFolderSelector: 0
     };
 
+    let schoolboxMessageConfig = $.fn.schoolboxModalConfig({
+
+        /**
+         * A callback which you use to deal with the url produced
+         * by interacting with the modal
+         *
+         * @param url     string  the url to which you linked
+         * @param name    string  user-facing name of the thing you linked
+         * @param mime    string  the mime type of the thing you linked
+         * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+         */
+        onSelect: function(url, name, mime, dialog) {
+
+            /* Manufacture link url based on whether it was
+             * a file or a folder
+             *
+             * Assign link text to be same as url for now
+             * User can change it to whatever they want
+             */
+            var fields = dialogFields(dialog);
+
+            fields.url.setValue(url);
+
+            $('#participant-customise-modal').css('z-index', '10000');
+        }
+    });
+
     /**
      * Populate dialog fields with image data
      *
@@ -570,87 +597,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         defaultFolderSelector: defaultFolderSelector
                                     });
 
-                                    $(window).unbind('message').on('message', function(event) {
-                                        var message;
-
-                                        try {
-                                            message = JSON.parse(event.originalEvent.data);
-                                        } catch (err) {
-                                            message = event.originalEvent.data;
-                                        }
-
-                                        /* Find out how to render this file
-                                         */
-                                        if (message.data != undefined) {
-                                            if (0 in message.data && 'hash' in message.data[0]) {
-
-                                                // Figure out if the uploaded file is an error
-                                                // If so: close the dialog and show the error
-                                                let status = message.data[0].status ?? 'error';
-                                                if (status === 'success') {
-                                                    $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                                                        fields.type.setValue(responseText.type);
-                                                        fields.filesystem.setValue(responseText.filesystem);
-
-                                                        /* Renderer Strategy (I guess)
-                                                         */
-                                                        if (fields.type.getValue() == 'video') {
-                                                            fields.id.setValue(responseText.id);
-                                                            fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
-                                                        }
-                                                        else if (fields.type.getValue() == 'audio') {
-                                                            fields.id.setValue(responseText.id);
-                                                            fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
-                                                        }
-                                                        else if (fields.type.getValue() == 'image') {
-                                                            fields.url.setValue(config.image.source(responseText.hash));
-                                                        }
-
-                                                        /* Prevent rendering attempt for uploaded files that
-                                                         * aren't actually renderable
-                                                         */
-                                                        if (fields.type.getValue().length) {
-                                                            render(fields, fields.url.getValue(), false);
-                                                        }
-
-                                                        /* Enable Constrain Aspect Ratio only if a width
-                                                         * and height are provided (both are now optional)
-                                                         *
-                                                         * If optional, to re-activate Constrain, you must untick
-                                                         * then re-tick the Constrain checkbox. Save some hassle
-                                                         * by leaving it unticked when you don't specify a dimension
-                                                         */
-                                                        if (fields.width.getValue() && fields.height.getValue()) {
-                                                            fields.aspectRatio.setValue(true);
-                                                        }
-
-                                                        /* Shut file picker modal, go back to Dialog
-                                                         */
-                                                        $('#file-picker').foundation('reveal', 'close');
-                                                        $('#participant-customise-modal').css('z-index', '10000');
-
-                                                    });
-                                                } else {
-                                                    // assume error: do these things
-                                                    $('#file-picker').foundation('reveal', 'close');
-                                                    $('#participant-customise-modal').css('z-index', '10000');
-
-                                                    // Stick the error in the preview, or however errors get rendered
-                                                    // Eh. Just put it in an alert box for now
-                                                    alert(message.data[0].hash.split(':')[1]);
-                                                }
-
-                                            } else {
-                                                // The file was rejected, probably cause it was the wrong mimetype.
-                                                // Do nothing
-                                            }
-                                        }
-                                        else {
-
-                                            /* Connecting to your Google Drive
-                                             */
-                                        }
-                                    });
+                                    $.fn.schoolboxMessage(schoolboxMessageConfig, dialog);
                                 }
                             }
                         ]
