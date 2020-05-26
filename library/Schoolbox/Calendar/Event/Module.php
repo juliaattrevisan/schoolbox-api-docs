@@ -147,12 +147,6 @@ class Module extends BaseModule
                         $owner = $event->getOwner();
                         $author = $event->getAuthor();
 
-                        /* Supers can edit any event
-                         */
-                        if ($loggedInUser->isSuperuser()) {
-                            return true;
-                        }
-
                         /* Figure out perms from the level setting
                          */
                         if ($event->isPersonalLevel()) {
