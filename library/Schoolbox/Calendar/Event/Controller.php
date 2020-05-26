@@ -440,7 +440,7 @@ class Controller extends Base
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
-            $fromHomepage      = (($this->getRequest()->query['level'] == Event::ACCESS_GROUP) && ($this->getRequest()->query['homepageId'] == $currentFolder->getId()));
+            $fromHomepage      = ((int)$this->getRequest()->query['level'] === Event::ACCESS_GROUP) && ((int)$this->getRequest()->query['homepageId'] === $currentFolder->getId());
 
             if ($alreadyInCategory || $fromHomepage) {
                 $items['selected'][] = $currentFolder->getId();
