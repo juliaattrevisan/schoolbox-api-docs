@@ -87,11 +87,11 @@ $menu-slide: transform 100ms ease;
 
 // Highlight color: is white if tab background is dark, contrasting if light
 // should use --navigation-background to calc this somehow?
-$icon-nav-highlight-color: hsl(
+$icon-nav-highlight-color: hsla(
   var(--navigation-background-h),
   var(--navigation-background-s),
-  // Try out a quadratic curve on the luminance? that should bring it closer to extremes.
-  calc(var(--navigation-background-l) * 1.1)
+  calc(var(--navigation-background-l) * 1.1),
+  var(--navigation-background-a)
 );
 //$icon-nav-highlight-color: calc-text-color(
 //  $tabbar-bg,
@@ -220,10 +220,11 @@ $allow-sidebar-stash: $large-up;
           //  tint($tabbar-bg, 4%),
           //  darken($tabbar-bg, 4%)
           //);
-          background-color: hsl(
+          background-color: hsla(
             var(--navigation-background-h),
             var(--navigation-background-s),
-            calc(var(--navigation-background-l) * 1.1)
+            calc(var(--navigation-background-l) * 1.1),
+            var(--navigation-background-a)
           );
           &:before,
           span {
