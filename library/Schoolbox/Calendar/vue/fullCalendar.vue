@@ -26,7 +26,11 @@
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
     const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+
+    /* TODO: Events should already know about and come with their own modify link;
+     * we shouldn't be inferring and building it out here
+     */
+    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 

@@ -17,7 +17,11 @@
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
     const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = '/learning/assessment/calendar/events/grouped';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+
+    /* TODO: Events should already know about and come with their own modify link;
+     * we shouldn't be inferring and building it out here
+     */
+    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';

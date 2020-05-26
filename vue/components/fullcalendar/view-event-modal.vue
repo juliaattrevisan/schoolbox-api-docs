@@ -139,7 +139,7 @@
              * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
              */
             generateModifyUrl(eventId, returnTo) {
-                var url = '/calendar/event/' + eventId + '/modify';
+                var url = this.eventModifyFormUrl.replace('{eventId}', eventId);
 
                 if (returnTo.length) {
                     url += '?returnTo=' + returnTo;
