@@ -174,11 +174,11 @@ switch ($_POST['action']) {
 //                exit;
 //            }
 //        }
-
-        /* Set up individual relations for each event in the series
-         * Event object is provided within eventRecurrenceMapper
-         */
-        $eventRelations = new \Schoolbox\Calendar\EventRelations($_POST['level'], $_POST['group'], $_POST['roles']);
+//
+//        /* Set up individual relations for each event in the series
+//         * Event object is provided within eventRecurrenceMapper
+//         */
+//        $eventRelations = new \Schoolbox\Calendar\EventRelations($_POST['level'], $_POST['group'], $_POST['roles']);
 
         /* Save this event and any recurring incidents too
          */

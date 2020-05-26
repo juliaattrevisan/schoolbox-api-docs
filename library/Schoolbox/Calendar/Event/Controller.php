@@ -16,6 +16,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
+use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -501,6 +502,7 @@ class Controller extends Base
         $allDay = (int)$this->getRequest()->post['allday'];
         $groups = $this->getRequest()->post['group'] ?? [];
         $campuses = $this->getRequest()->post['campus'] ?? [];
+        $roles = $this->getRequest()->post['roles'] ?? [];
 
         /* Attendance settings
          */
@@ -577,5 +579,10 @@ class Controller extends Base
         } elseif ($event->isGroupLevel() && !count($groups)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
+
+        /* Set up individual relations for each event in the series
+         * Event object is provided within eventRecurrenceMapper
+         */
+        $eventRelations = new EventRelations($accessLevel, $groups, $roles);
     }
 }
