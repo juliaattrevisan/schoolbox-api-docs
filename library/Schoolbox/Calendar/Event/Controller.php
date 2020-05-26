@@ -215,21 +215,11 @@ class Controller extends Base
 
         /* Preselected campuses
          */
-        $selectedCampuses = [];
-        $allCampuses      = $event->getCampusCollection();
-
-        foreach ($allCampuses as $currentCampus) {
-            $selectedCampuses[] = $currentCampus->getId();
-        }
+        $selectedCampuses = $event->getCampusCollection()->getPropertyValues('id');
 
         /* Preselected roles
          */
-        $selectedRoles = [];
-        $allRoles      = $event->getRoleCollection();
-
-        foreach ($allRoles as $currentRole) {
-            $selectedRoles[] = $currentRole->getRoleId();
-        }
+        $selectedRoles = $event->getRoleCollection()->getPropertyValues('roleId');
 
         /* Recurrence
          */
@@ -325,17 +315,9 @@ class Controller extends Base
     private function getFolders(Event $event)
     {
 
-        /* Ones that it's already in, from previous selections
+        /* Groups that were chosen for this even, from previous selections
          */
-        $alreadyInFolderList = $event->getFolderCollection();
-
-        /* Get data about the Folders
-         */
-        $tempFolderIds = [];
-
-        foreach ($alreadyInFolderList as $current) {
-            $tempFolderIds[] = $current->getId();
-        }
+        $tempFolderIds = $event->getFolderCollection()->getPropertyValues('id');
 
         /* If user has write access to, or is a group manager,
          * but isn't involved in the homepage used to get here:
