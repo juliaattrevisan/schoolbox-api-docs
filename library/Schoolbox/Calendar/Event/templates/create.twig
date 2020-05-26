@@ -63,7 +63,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
+        <form id="eventForm" method="post" action="/calendar/event/{{ event.id }}/modify" class="top">
 
             <input name="id" type="hidden" value="{{ event.id }}" />
             <input name="userId" type="hidden" value="{{ user.id }}" />

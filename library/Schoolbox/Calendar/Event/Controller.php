@@ -467,7 +467,7 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postUpdate(Event $event): void
+    public function postModify(Event $event): void
     {
         $publishDate = null;
         $until       = null;
@@ -616,14 +616,24 @@ class Controller extends Base
          */
         $youAreAuthor = ($author->getId() != $owner->getId()) && ($author->getId() == $this->getUser()->getId());
 
+        /* Back to the Future was used in some contexts which may return to either someone's fullcalendar view
+         * or alternatively, homepage or dashboard components where event listings are available
+         */
         if (!$youAreAuthorOrOwner) {
-            $page->backToTheFuture(3);
+            $this->response->redirect->to($this->router->generate('calendar.getCalendar', [
+                'selectedDate' => $event->getStartDateTime()->getURLDate(),
+                'userId' => $owner->getId()
+            ]));
         } elseif ($youAreAuthor) {
-            $page->backToTheFuture(3);
+            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
+                'selectedDate' => $event->getStartDateTime()->getURLDate()
+            ]));
         } elseif ('' !== $return) {
             $this->response->redirect->to($return);
         } else {
-            $page->backToTheFuture(2);
+            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
+                'selectedDate' => $event->getStartDateTime()->getURLDate()
+            ]));
         }
     }
 }
