@@ -16,7 +16,7 @@
 {% block breadCrumbs %}
     {% import 'sub/breadcrumbs.twig' as bread %}
 
-    {% if folderId %}
+    {% if folderId is defined %}
         {% set componentParam = (componentId) ? '#component' ~ componentId : '' %}
 
         {{ bread.crumbs(
@@ -50,7 +50,7 @@
         <nav>
             <ul class="news-archive-filter side-nav">
                 {% set folderParam = '' %}
-                {% if folderId %}
+                {% if folderId is defined %}
                     {% set folderParam = [
                         'f=' ~ folderId,
                     ] %}
@@ -118,8 +118,8 @@
                     compactMode: false,
                     limit: limit is defined ? limit : null,
                     referrer: referrer,
-                    folderId: folderId,
-                    componentId: componentId,
+                    folderId: folderId is defined ? folderId : null,
+                    componentId: componentId is defined ? componentId : null,
                 } %}
 
                 <div id="news-container">
