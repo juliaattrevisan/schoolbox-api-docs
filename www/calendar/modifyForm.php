@@ -25,50 +25,50 @@ $eventAccess     = new Access(FolderAccess::getInstance());
 switch ($_POST['action']) {
     case 'Add':
     case 'Update':
-        $publishDate = null;
-        $until       = null;
+//        $publishDate = null;
+//        $until       = null;
 
         /* Spawn an existing event if id provided
          * Otherwise spawn a new one
          */
         if (is_numeric($_POST['id'])) {
 
-            /* Check event exists
-             */
-            try {
-                $event = $eventMapper->findById($_POST['id']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                error(160);
-                exit;
-            }
-
-            /* Check user has permission to modify this event
-             */
-            if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
-                error(34);
-            }
-
-            /* Check owner still exists
-             * If not - pass ownership to the editor
-             */
-            try {
-                $owner = $userMapper->findById($event->getOwner()->getId());
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $owner = $_SESSION['user'];
-            }
+//            /* Check event exists
+//             */
+//            try {
+//                $event = $eventMapper->findById($_POST['id']);
+//            } catch (\Schoolbox\Mapper\Exception $e) {
+//                error(160);
+//                exit;
+//            }
+//
+//            /* Check user has permission to modify this event
+//             */
+//            if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
+//                error(34);
+//            }
+//
+//            /* Check owner still exists
+//             * If not - pass ownership to the editor
+//             */
+//            try {
+//                $owner = $userMapper->findById($event->getOwner()->getId());
+//            } catch (\Schoolbox\Mapper\Exception $e) {
+//                $owner = $_SESSION['user'];
+//            }
 
         } else {
             $event = new Event();
             $owner = $userMapper->findById($_POST['userId']);
         }
 
-        // Check if author still exists
-        // If not - pass author to the editor
-        try {
-            $author = $userMapper->findById($_POST['authorId']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $author = $_SESSION['user'];
-        }
+//        // Check if author still exists
+//        // If not - pass author to the editor
+//        try {
+//            $author = $userMapper->findById($_POST['authorId']);
+//        } catch (\Schoolbox\Mapper\Exception $e) {
+//            $author = $_SESSION['user'];
+//        }
 
         /* Check user has permission to write the event with posted settings
          */

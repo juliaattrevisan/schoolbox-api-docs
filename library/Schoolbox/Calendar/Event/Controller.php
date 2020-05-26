@@ -452,4 +452,31 @@ class Controller extends Base
 
         return $items;
     }
+
+
+    public function postUpdate(Event $event)
+    {
+        $publishDate = null;
+        $until       = null;
+
+        /* Check owner still exists
+         * If not - pass ownership to the editor
+         */
+        try {
+            $owner = $this->userMapper->findById($event->getOwner()->getId());
+        } catch (Exception $e) {
+            $owner = $this->getUser();
+        }
+
+        /* Check if author still exists
+         * If not - pass author to the editor
+         */
+        try {
+            $author = $this->userMapper->findById($this->getRequest()->post['authorId']);
+        } catch (Exception $e) {
+            $author = $this->getUser();
+        }
+
+
+    }
 }
