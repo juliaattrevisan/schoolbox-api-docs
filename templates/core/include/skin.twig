@@ -3,6 +3,8 @@
 <style type="text/css">
     :root {
         /* Translate config colors to HSL values */
+        {# TODO consider moving this to a PHP-generated CSS file #}
+        {# can use \ImagickPixel for HSL conversion, as that is guaranteed to exist with Imagine existing #}
         {#--navigation-foreground:        {{ config.skin_colour_navigation_foreground }};#}
         --navigation-foreground-h: 205;
         --navigation-foreground-s: 53%;
