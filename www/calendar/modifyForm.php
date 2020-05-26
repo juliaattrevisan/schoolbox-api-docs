@@ -179,15 +179,15 @@ switch ($_POST['action']) {
 //         * Event object is provided within eventRecurrenceMapper
 //         */
 //        $eventRelations = new \Schoolbox\Calendar\EventRelations($_POST['level'], $_POST['group'], $_POST['roles']);
-
-        /* Save this event and any recurring incidents too
-         */
-        try {
-            $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
-            $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $_POST['level'], $eventRelations);
-        } catch (InvalidArgumentException $e) {
-            error($e->getCode());
-        }
+//
+//        /* Save this event and any recurring incidents too
+//         */
+//        try {
+//            $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
+//            $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $_POST['level'], $eventRelations);
+//        } catch (InvalidArgumentException $e) {
+//            error($e->getCode());
+//        }
 
         /* If you were editing an event on someone else's calendar, don't
          * get stuffed around by time travel's one-index-offset rip in

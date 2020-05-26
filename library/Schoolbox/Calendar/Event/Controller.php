@@ -509,6 +509,11 @@ class Controller extends Base
         $attendanceChanged = $event->getAttendance() != $this->getRequest()->post['attendance'];
         $attendance = (int)$this->getRequest()->post['attendance'];
 
+        /* Recurrence settings
+         */
+        $efficacy = $this->getRequest()->post['efficacy'];
+        $repeat = $this->getRequest()->post['repeat'];
+
         $folderAccess = FolderAccess::getInstance();
 
         if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $groups, $campuses)) {
@@ -584,5 +589,9 @@ class Controller extends Base
          * Event object is provided within eventRecurrenceMapper
          */
         $eventRelations = new EventRelations($accessLevel, $groups, $roles);
+
+        /* Save this event and any recurring incidents too
+         */
+        (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $until, $startDate, $endDate, $accessLevel, $eventRelations);
     }
 }
