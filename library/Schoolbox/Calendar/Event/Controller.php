@@ -504,8 +504,8 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendanceChanged = $event->getAttendance() != $this->getRequest()->post['attendance'];
         $attendance = (int)$this->getRequest()->post['attendance'];
+        $attendanceChanged = (int)$event->getAttendance() !== $attendance;
 
         /* Recurrence settings
          */
@@ -516,6 +516,8 @@ class Controller extends Base
          */
         $return = $this->getRequest()->post['return'];
 
+        /* Check whether you have permissions to mutate $event into the vars provided
+         */
         $folderAccess = FolderAccess::getInstance();
 
         if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $groups, $campuses)) {
@@ -524,12 +526,16 @@ class Controller extends Base
 
         /* Check the dates
          */
+        $publishDate = null;
+
         if ('' !== $this->getRequest()->post['publishDate']) {
             $publishDate = Alaress_Date_Format::newLocal($this->getRequest()->post['publishDate']);
         }
 
         /* Events recur until this time
          */
+        $untilDate = null;
+
         if ('' !== $this->getRequest()->post['repeat_until']) {
             $untilDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->endOfDay();
         }
@@ -560,9 +566,9 @@ class Controller extends Base
             ->setType($this->eventTypeMapper->createModel()->setId($eventTypeId))
             ->setLocation($location)
             ->setDetail($detail)
-            ->setStartDateTime($startDate ?? null)
-            ->setEndDateTime($endDate ?? null)
-            ->setPublishDateTime($publishDate ?? null)
+            ->setStartDateTime($startDate)
+            ->setEndDateTime($endDate)
+            ->setPublishDateTime($publishDate)
             ->setAllDay($allDay)
             ->setRoleCollection(new Collection($groups))
             ->setCampusCollection(new Collection($campuses));
