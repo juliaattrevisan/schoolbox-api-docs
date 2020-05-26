@@ -621,7 +621,7 @@ class Controller extends Base
         } elseif ($youAreAuthor) {
             $page->backToTheFuture(3);
         } elseif ('' !== $return) {
-            $page->localRedir($return);
+            $this->response->redirect->to($return);
         } else {
             $page->backToTheFuture(2);
         }
