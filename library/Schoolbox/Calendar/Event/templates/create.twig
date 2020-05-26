@@ -63,7 +63,12 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="eventForm" method="post" action="/calendar/event/{{ event.id }}/modify" class="top">
+        {% if event.id %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postModify', {eventId: event.id}) %}
+        {% else %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreate') %}
+        {% endif %}
+        <form id="eventForm" method="post" action="{{ formRoute }}" class="top">
 
             <input name="id" type="hidden" value="{{ event.id }}" />
             <input name="userId" type="hidden" value="{{ user.id }}" />

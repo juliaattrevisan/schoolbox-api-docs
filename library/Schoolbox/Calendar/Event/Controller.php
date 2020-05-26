@@ -456,6 +456,15 @@ class Controller extends Base
 
 
     /**
+     * Create a new event
+     */
+    public function postCreate(): void
+    {
+        // TODO: Obviously
+    }
+
+
+    /**
      * Update $event with $_POST data
      *
      * There's some validation checks to ensure that you can write to the $_POST args specified
@@ -465,6 +474,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postModify(Event $event): void
