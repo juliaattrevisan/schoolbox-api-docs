@@ -71,7 +71,7 @@
                             {% for availableMonth, val in availableMonths %}
                                 {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
 
-                                <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
+                                <li class="{{ archiveDate == selectedDate is defined ? 'active' : '' }}" role="menuitem">
                                     <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) ~ '?' ~folderParam }}">
                                         {{ archiveDate | date('F') }}
                                     </a>
@@ -116,7 +116,7 @@
                     topicAll: topicAll,
                     slug: slug,
                     compactMode: false,
-                    limit: limit,
+                    limit: limit is defined ? limit : null,
                     referrer: referrer,
                     folderId: folderId,
                     componentId: componentId,

@@ -77,8 +77,10 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $userFeed = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
-
-        $this->renderArticlesAsXml($userFeed->find($user), $this->getRequest()->query->get(Querystring::TOPIC_SLUG));
+        $this->renderArticlesAsXml(
+            $userFeed->find($user),
+            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+        );
     }
 
 
@@ -106,7 +108,7 @@ class Controller extends Base
 
         $this->renderArticlesAsXml(
             $folderFeed->find($folder->getId()),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG)
+            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 

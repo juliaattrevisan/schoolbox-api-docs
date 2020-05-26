@@ -19,7 +19,7 @@
                 <div class="list-item">
                     <div class="small-12 card wrap-down">
                         {%  set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
-                        {% if article.featureImage.hash %}
+                        {% if article.featureImage %}
                             <a href="{{ articleURL }}">
                                 <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
                             </a>
@@ -57,7 +57,7 @@
                     {% if config.save_for_later %}
                     {% include '@commsNewsSaveForLater/activator.twig' with {
                         article: article,
-                        isSaved: savedArticleIds[article.id]
+                        isSaved: savedArticleIds[article.id] is defined
                     } only %}
                     {% endif %}
                 </nav>
