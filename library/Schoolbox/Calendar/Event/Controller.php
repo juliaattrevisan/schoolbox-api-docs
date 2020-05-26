@@ -497,11 +497,9 @@ class Controller extends Base
         $accessLevel = (int)$this->getRequest()->post['level'];
         $eventTypeId = (int)$this->getRequest()->post['type'];
         $title = $this->getRequest()->post['title'];
-        $location = $title = $this->getRequest()->post['location'];
-        $detail = $title = $this->getRequest()->post['detail'];
+        $location = $this->getRequest()->post['location'];
+        $detail = $this->getRequest()->post['detail'];
         $allDay = (int)$this->getRequest()->post['allday'];
-        $groups = $this->getRequest()->post['group'] ?? [];
-        $campuses = $this->getRequest()->post['campus'] ?? [];
         $roles = $this->getRequest()->post['roles'] ?? [];
 
         /* Attendance settings
@@ -592,6 +590,6 @@ class Controller extends Base
 
         /* Save this event and any recurring incidents too
          */
-        (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $until, $startDate, $endDate, $accessLevel, $eventRelations);
+        (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
     }
 }
