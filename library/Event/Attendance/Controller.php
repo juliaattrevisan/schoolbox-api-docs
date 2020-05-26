@@ -87,7 +87,7 @@ class Event_Attendance_Controller extends Controller
                 $this->getPage()->parse('event_block', 'event', true);
             }
         } else {
-            $this->getPage()->setVar('event_block', 'event');
+            $this->getPage()->setVar('event_block', '');
         }
     }
 
