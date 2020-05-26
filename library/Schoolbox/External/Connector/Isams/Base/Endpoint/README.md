@@ -26,9 +26,18 @@ delete from sis_timetable_cycle;
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `iSAMS`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly.
 
+For testing, you can use an endpoint host and key from a Schoolbox instance which already uses iSAMS (e.g. GEMS):
+visit the instance's School Data Import admin section and copy the endpoint host and key from there.
+
 ## 3. Importing
 
-Then run the sisImporter. The easiest way is to shank down an xml, pop it into the www directory as test.xml, then run this:
+Then run the sisImporter. The easiest way is to shank down an xml:
+
+```
+wget https://{School Data Endpoint Host}/api/batch/1.0/xml.ashx?apikey={School Data Endpoint Key} -O test.xml
+```
+
+Then, pop it into the www directory as test.xml, then run this:
 
 ```
 vagrant ssh
