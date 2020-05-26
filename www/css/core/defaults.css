@@ -1,0 +1,34 @@
+:root {
+    --navigation-foreground-h: 205;
+    --navigation-foreground-s: 53%;
+    --navigation-foreground-l: 67.5%;
+    --navigation-foreground-a: 100%;
+    --navigation-foreground:   hsla(
+            var(--navigation-foreground-h),
+            var(--navigation-foreground-s),
+            var(--navigation-foreground-l),
+            var(--navigation-foreground-a)
+    );
+
+    --navigation-background-h: 205;
+    --navigation-background-s: 100.0%;
+    --navigation-background-l: 34.5%;
+    --navigation-background-a: 100%;
+    --navigation-background:   hsla(
+            var(--navigation-background-h),
+            var(--navigation-background-s),
+            var(--navigation-background-l),
+            var(--navigation-background-a)
+    );
+
+    --navigation-hover-h: 205;
+    --navigation-hover-s: 70%;
+    --navigation-hover-l: 43%;
+    --navigation-hover-a: 100%;
+    --navigation-hover:   hsla(
+            var(--navigation-hover-h),
+            var(--navigation-hover-s),
+            var(--navigation-hover-l),
+            var(--navigation-hover-a)
+    );
+}
