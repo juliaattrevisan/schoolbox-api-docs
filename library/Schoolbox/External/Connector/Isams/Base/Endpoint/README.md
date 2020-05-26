@@ -26,8 +26,8 @@ delete from sis_timetable_cycle;
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `iSAMS`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly.
 
-> The endpoint host and key may currently be found in the Jira ticket [SA-8279](https://schoolbox.atlassian.net/browse/SA-8279).
-> For testing purposes, the GEMS iSAMS data set is generally the most complete.
+For testing, you can use an endpoint host and key from a Schoolbox instance which already uses iSAMS (e.g. GEMS):
+visit the instance's School Data Import admin section and copy the endpoint host and key from there.
 
 ## 3. Importing
 
