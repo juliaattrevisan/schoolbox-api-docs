@@ -37,6 +37,13 @@ class Event implements ISoftDeletable
     public const ATTENDANCE_INTENTION_PRESENT = 2;
     public const ATTENDANCE_INTENTION_ABSENT = 3;
 
+
+    /**
+     * Int corresponding to All Day setting set to on
+     */
+    public const ALL_DAY = 1;
+
+
     /**
      * Event id
      *

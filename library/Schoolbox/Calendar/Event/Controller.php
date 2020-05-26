@@ -454,7 +454,19 @@ class Controller extends Base
     }
 
 
-    public function postUpdate(Event $event)
+    /**
+     * Update $event with $_POST data
+     *
+     * There's some validation checks to ensure that you can write to the $_POST args specified
+     *
+     * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
+     */
+    public function postUpdate(Event $event): void
     {
         $publishDate = null;
         $until       = null;
@@ -475,6 +487,46 @@ class Controller extends Base
             $author = $this->userMapper->findById($this->getRequest()->post['authorId']);
         } catch (Exception $e) {
             $author = $this->getUser();
+        }
+
+        /* Enforce ints for primary identifiers (yes that's a thing)
+         */
+        $groups = $this->getRequest()->post['group'] ? array_map('intval', $this->getRequest()->post['group']) : [];
+        $campuses = $this->getRequest()->post['campus'] ? array_map('intval', $this->getRequest()->post['campus']) : [];
+        $accessLevel = (int)$this->getRequest()->post['level'];
+
+        $folderAccess = FolderAccess::getInstance();
+
+        if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $groups, $campuses)) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+        }
+
+        /* Check the dates
+         */
+        if ('' !== $this->getRequest()->post['publishDate']) {
+            $publishDate = Alaress_Date_Format::newLocal($this->getRequest()->post['publishDate']);
+        }
+
+        /* Events recur until this time
+         */
+        if ('' !== $this->getRequest()->post['repeat_until']) {
+            $untilDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->endOfDay();
+        }
+
+        /* Start and end dates
+         */
+        if ((int)$this->getRequest()->post['allday'] === Event::ALL_DAY) {
+            $startDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['startDate'])->startOfDay();
+            $endDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['endDate'])->endOfDay();
+        } else {
+            $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate']);
+            $endDate = Alaress_Date_Format::newLocal($this->getRequest()->post['endDate']);
+        }
+
+        /* Don't allow start to be after end
+         */
+        if ($startDate->getUnixTimeStamp() > $endDate->getUnixTimeStamp()) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_START_TIME_GREATER);
         }
 
 

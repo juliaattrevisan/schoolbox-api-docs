@@ -69,57 +69,58 @@ switch ($_POST['action']) {
 //        } catch (\Schoolbox\Mapper\Exception $e) {
 //            $author = $_SESSION['user'];
 //        }
-
-        /* Check user has permission to write the event with posted settings
-         */
-        $groups = isset($_POST['group']) ? array_map('intval', $_POST['group']) : [];
-        $campuses = isset($_POST['campus']) ? $_POST['campus'] : [];
-
-        if (!$eventAccess->checkDestination(
-                $_SESSION['user'],
-                $_POST['level'],
-                $author,
-                $owner,
-                $groups,
-                $campuses
-        )) {
-            error(34);
-        }
-
-        /* Events aren't visible until this date
-         * TODO: Fix validator in Alaress Date Format
-         */
-        // Ghetto validation
-        try {
-            if (strlen($_POST['publishDate'])) {
-                $pubDateObject = Alaress_Date_Format::newLocal($_POST['publishDate']);
-            }
-            /* Events recur until this time
-             */
-            if (strlen($_POST['repeat_until'])) {
-                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
-            }
-            /* Start and end dates
-             */
-            if($_POST['allday'] == 1) {
-                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
-                $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
-            }
-            else {
-                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
-                $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
-            }
-        } catch (RuntimeException $e) {
-            error(15);
-            exit;
-        }
-        // Don't allow start to be after end
-        if ($startDate->getUnixTimeStamp() > $endDate->getUnixTimeStamp()) {
-            error(145);
-            exit;
-        }
-        /* We do this checking later
-         */
+//
+//        /* Check user has permission to write the event with posted settings
+//         */
+//        $groups = isset($_POST['group']) ? array_map('intval', $_POST['group']) : [];
+//        $campuses = isset($_POST['campus']) ? $_POST['campus'] : [];
+//
+//        if (!$eventAccess->checkDestination(
+//                $_SESSION['user'],
+//                $_POST['level'],
+//                $author,
+//                $owner,
+//                $groups,
+//                $campuses
+//        )) {
+//            error(34);
+//        }
+//
+//        /* Events aren't visible until this date
+//         * TODO: Fix validator in Alaress Date Format
+//         */
+//        // Ghetto validation
+//        try {
+//            if (strlen($_POST['publishDate'])) {
+//                $pubDateObject = Alaress_Date_Format::newLocal($_POST['publishDate']);
+//            }
+//            /* Events recur until this time
+//             */
+//            if (strlen($_POST['repeat_until'])) {
+//                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
+//            }
+//            /* Start and end dates
+//             */
+//            if($_POST['allday'] == 1) {
+//                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
+//                $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
+//            }
+//            else {
+//                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
+//                $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
+//            }
+//        } catch (RuntimeException $e) {
+//            error(15);
+//            exit;
+//        }
+//
+//        // Don't allow start to be after end
+//        if ($startDate->getUnixTimeStamp() > $endDate->getUnixTimeStamp()) {
+//            error(145);
+//            exit;
+//        }
+//        /* We do this checking later
+//         */
 //        if ($_POST['level'] == 2) {
 //            if (!(is_array($_POST['group']) && count($_POST['group']))) {
 //                error(2);
