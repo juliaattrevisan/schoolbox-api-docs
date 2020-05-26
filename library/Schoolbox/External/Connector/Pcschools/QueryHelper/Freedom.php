@@ -130,7 +130,7 @@ class Freedom implements IQueryHelper
             ''                                  AS StudentContactTitle,
             CONVERT(varchar(20), I.GIVENNAME)   AS StudentContactPreferred,
             CONVERT(varchar(20), I.SURNAME)     AS StudentContactSurname,
-            I.EMAIL                             AS StudentContactDefaultEmail,
+            I.EMAIL_HOME                        AS StudentContactDefaultEmail,
             I.MOBILE                            AS StudentContactMobilePhone,
             I.BUS_PHONE                         AS StudentContactOccupPhone,
             I.HOME_PHONE                        AS StudentContactPhoneActual,
