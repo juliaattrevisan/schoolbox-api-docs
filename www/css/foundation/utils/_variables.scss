@@ -13,7 +13,12 @@ $charset: "utf-8";
 //var(--navigation-hover):                 rgb(33, 122, 186) !default;
 
 :root {
-  --navigation-foreground: rgb(128, 179, 216);
+  --navigation-foreground-h:   205;
+  --navigation-foreground-s:   53%;
+  --navigation-foreground-l:   67.5%;
+  --navigation-foreground-hsl: var(--navigation-foreground-h), var(--navigation-foreground-s), var(--navigation-foreground-l);
+  --navigation-foreground:     hsl(var(--navigation-foreground-hsl));
+
   --navigation-background: rgb(0, 102, 176);
   --navigation-hover:      rgb(33, 122, 186);
 }
