@@ -193,8 +193,8 @@
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
                             </legend>
 
-                            {% for groupFolder in groupFolders.folders %}
-                                <input type="checkbox" name="group[]" value="{{ groupFolder.id }}" id="group{{ groupFolder.id }}" {{ groupFolder.id in groupFolders.selected ? 'selected="selected"' : '' }} />
+                            {% for groupFolder in groupFolders.all %}
+                                <input type="checkbox" name="group[]" value="{{ groupFolder.id }}" id="group{{ groupFolder.id }}" {{ groupFolder.id in groupFolders.selected ? 'checked="checked"' : '' }} />
                                 <label for="group{{ groupFolder.id }}" class="checkbox">{{ groupFolder.name }}</label>
                             {% endfor %}
                         </fieldset>

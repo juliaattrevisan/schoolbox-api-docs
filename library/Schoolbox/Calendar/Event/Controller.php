@@ -263,7 +263,10 @@ class Controller extends Base
                 'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
                 'selected' => $event->getAccess()
             ],
-            'groupFolders' => $groupFolders,
+            'groupFolders' => [
+                'all' => $groupFolders['folders'],
+                'selected' => $groupFolders['selected'],
+            ],
             'campuses' => [
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
