@@ -119,9 +119,9 @@ $(function () {
             });
 
             this.on('error', function (file, msg, xhr) {
-                console.log(file);
-                console.log(msg);
-                console.log(xhr);
+                // console.log(file);
+                // console.log(msg);
+                // console.log(xhr);
 
                 if (xhr) {
                     try {
@@ -130,7 +130,7 @@ $(function () {
                         // noop
                     }
 
-                    console.log('message', msg.hash.split(':')[1]);
+                    // console.log('message', msg.hash.split(':')[1]);
 
                     file.hash = msg.hash;
 
