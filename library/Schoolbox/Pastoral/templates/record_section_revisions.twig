@@ -1,6 +1,27 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-{% if moderator and (record.revisions | length > 1) %}
+{# Lookahead to see whether the revisions in the record.revisions set is worth showing
+ # This is probably a business logic back end concept to fix, but for now, run with it
+ #}
+{% set hasRevisions = false %}
+
+{# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
+{% set headingPrevious = record.heading %}
+
+{% set bodyPreviousPrivate = record.bodyPrivate %}
+{% set bodyPreviousPublic = record.bodyPublic %}
+
+{% for revision in record.revisions %}
+
+    {# In the set of revisions, the previous revision is somehow different to the current revision
+     # in a meaningful way (heading/body changed). This logic always skips the current record
+     #}
+    {% if ((headingPrevious != revision.heading) or (bodyPreviousPrivate != revision.bodyPrivate) or (bodyPreviousPublic != revision.bodyPublic)) %}
+        {% set hasRevisions = true %}
+    {% endif %}
+{% endfor %}
+
+{% if moderator and hasRevisions %}
 
     {# If you're a moderator and there's revisions to investigate #}
 
