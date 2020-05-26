@@ -19,8 +19,17 @@ $charset: "utf-8";
   --navigation-foreground-hsl: var(--navigation-foreground-h), var(--navigation-foreground-s), var(--navigation-foreground-l);
   --navigation-foreground:     hsl(var(--navigation-foreground-hsl));
 
-  --navigation-background: rgb(0, 102, 176);
-  --navigation-hover:      rgb(33, 122, 186);
+  --navigation-background-h:   205;
+  --navigation-background-s:   100.0%;
+  --navigation-background-l:   34.5%;
+  --navigation-background-hsl: var(--navigation-background-h), var(--navigation-background-s), var(--navigation-background-l);
+  --navigation-background:     hsl(var(--navigation-background-hsl));
+
+  --navigation-hover-h:        205;
+  --navigation-hover-s:        70%;
+  --navigation-hover-l:        43%;
+  --navigation-hover-hsl:      var(--navigation-hover-h), var(--navigation-hover-s), var(--navigation-hover-l);
+  --navigation-hover:          hsl(var(--navigation-hover-hsl));
 }
 
 $off-canvas-foreground:            rgb(0, 102, 176) !default;

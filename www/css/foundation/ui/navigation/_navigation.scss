@@ -85,14 +85,22 @@ $menu-slide: transform 100ms ease;
 @import "../../../../javascript/components/foundation/scss/foundation/components/magellan";
 @import "../../css-only/components/offcanvas";
 
-$icon-nav-highlight-color: calc-text-color(
-  $tabbar-bg,
-  $white,
-  contrast-bg(
-    $background: $tabbar-bg,
-    $opacity: 0.65
-  )
+// Highlight color: is white if tab background is dark, contrasting if light
+// should use --navigation-background to calc this somehow?
+$icon-nav-highlight-color: hsl(
+  var(--navigation-background-h),
+  var(--navigation-background-s),
+  // Try out a quadratic curve on the luminance? that should bring it closer to extremes.
+  calc(var(--navigation-background-l) * 1.1)
 );
+//$icon-nav-highlight-color: calc-text-color(
+//  $tabbar-bg,
+//  $white,
+//  contrast-bg(
+//    $background: $tabbar-bg,
+//    $opacity: 0.65
+//  )
+//);
 
 // The point at which to allow the left sidebar to dock, the account menu to move to the top menu, and the full logo to show
 $allow-sidebar-stash: $large-up;
@@ -207,10 +215,15 @@ $allow-sidebar-stash: $large-up;
         @extend .no-text;
 
         &.navthis {
-          background-color: calc-text-color(
-            $tabbar-bg,
-            tint($tabbar-bg, 4%),
-            darken($tabbar-bg, 4%)
+          //background-color: calc-text-color(
+          //  $tabbar-bg,
+          //  tint($tabbar-bg, 4%),
+          //  darken($tabbar-bg, 4%)
+          //);
+          background-color: hsl(
+            var(--navigation-background-h),
+            var(--navigation-background-s),
+            calc(var(--navigation-background-l) * 1.1)
           );
           &:before,
           span {
