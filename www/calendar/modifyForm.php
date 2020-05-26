@@ -126,12 +126,12 @@ switch ($_POST['action']) {
 //                error(2);
 //            }
 //        }
-
-        /* NO RETREAT
-         * NO SURRENDER
-         */
-
-        // spawned further up
+//
+//        /* NO RETREAT
+//         * NO SURRENDER
+//         */
+//
+//        // spawned further up
 //        $event->setAuthor($author);
 //        $event->setOwner($owner);
 //        $event->setAccess($_POST['level']);
@@ -188,27 +188,27 @@ switch ($_POST['action']) {
 //        } catch (InvalidArgumentException $e) {
 //            error($e->getCode());
 //        }
-
-        /* If you were editing an event on someone else's calendar, don't
-         * get stuffed around by time travel's one-index-offset rip in
-         * the space-time continuum
-         */
-        /* Superuser modifying some arbitrary event
-         */
-        if (!in_array($_SESSION['user']->getId(), array($event->getAuthor()->getId(), $event->getOwner()->getId()))) {
-                $page->backToTheFuture(3);
-            } elseif (
-                ($event->getAuthor()->getId() != $event->getOwner()->getId())
-                && ($event->getAuthor()->getId() == $_SESSION['user']->getId())
-            ) {
-                /* Teacher modifying self-created event for some arbitrary person
-                 */
-                $page->backToTheFuture(3);
-            } elseif (!empty($_POST['return'])) {
-                $page->localRedir($_POST['return']);
-            } else {
-                $page->backToTheFuture(2);
-            }
+//
+//        /* If you were editing an event on someone else's calendar, don't
+//         * get stuffed around by time travel's one-index-offset rip in
+//         * the space-time continuum
+//         */
+//        /* Superuser modifying some arbitrary event
+//         */
+//        if (!in_array($_SESSION['user']->getId(), array($event->getAuthor()->getId(), $event->getOwner()->getId()))) {
+//                $page->backToTheFuture(3);
+//            } elseif (
+//                ($event->getAuthor()->getId() != $event->getOwner()->getId())
+//                && ($event->getAuthor()->getId() == $_SESSION['user']->getId())
+//            ) {
+//                /* Teacher modifying self-created event for some arbitrary person
+//                 */
+//                $page->backToTheFuture(3);
+//            } elseif (!empty($_POST['return'])) {
+//                $page->localRedir($_POST['return']);
+//            } else {
+//                $page->backToTheFuture(2);
+//            }
         break;
 
     case 'Delete':

@@ -512,6 +512,10 @@ class Controller extends Base
         $efficacy = $this->getRequest()->post['efficacy'];
         $repeat = $this->getRequest()->post['repeat'];
 
+        /* Redirects
+         */
+        $return = $this->getRequest()->post['return'];
+
         $folderAccess = FolderAccess::getInstance();
 
         if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $groups, $campuses)) {
@@ -591,5 +595,29 @@ class Controller extends Base
         /* Save this event and any recurring incidents too
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
+
+        /* Apply redirects
+         * Depending on context you'll have to pick a place to go when we're done saving
+         */
+
+        /* Superuser or moderator person modifying some arbitrary event belonging to someone else, for someone else
+         * You're not the author of the event, nor does it appear on your calendar
+         */
+        $youAreAuthorOrOwner = in_array($this->getUser()->getId(), [$event->getAuthor()->getId(), $event->getOwner()->getId()], false);
+
+        /* Teacher modifying self-created event for some arbitrary person
+         * You authored this event for someone else
+         */
+        $youAreAuthor = ($author->getId() != $owner->getId()) && ($author->getId() == $this->getUser()->getId());
+
+        if (!$youAreAuthorOrOwner) {
+            $page->backToTheFuture(3);
+        } elseif ($youAreAuthor) {
+            $page->backToTheFuture(3);
+        } elseif ('' !== $return) {
+            $page->localRedir($return);
+        } else {
+            $page->backToTheFuture(2);
+        }
     }
 }
