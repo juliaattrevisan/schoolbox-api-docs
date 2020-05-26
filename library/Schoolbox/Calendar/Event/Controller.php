@@ -494,6 +494,18 @@ class Controller extends Base
         $groups = $this->getRequest()->post['group'] ? array_map('intval', $this->getRequest()->post['group']) : [];
         $campuses = $this->getRequest()->post['campus'] ? array_map('intval', $this->getRequest()->post['campus']) : [];
         $accessLevel = (int)$this->getRequest()->post['level'];
+        $eventTypeId = (int)$this->getRequest()->post['type'];
+        $title = $this->getRequest()->post['title'];
+        $location = $title = $this->getRequest()->post['location'];
+        $detail = $title = $this->getRequest()->post['detail'];
+        $allDay = (int)$this->getRequest()->post['allday'];
+        $groups = $this->getRequest()->post['group'] ?? [];
+        $campuses = $this->getRequest()->post['campus'] ?? [];
+
+        /* Attendance settings
+         */
+        $attendanceChanged = $event->getAttendance() != $this->getRequest()->post['attendance'];
+        $attendance = (int)$this->getRequest()->post['attendance'];
 
         $folderAccess = FolderAccess::getInstance();
 
@@ -515,7 +527,7 @@ class Controller extends Base
 
         /* Start and end dates
          */
-        if ((int)$this->getRequest()->post['allday'] === Event::ALL_DAY) {
+        if ($allDay === Event::ALL_DAY) {
             $startDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['startDate'])->startOfDay();
             $endDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['endDate'])->endOfDay();
         } else {
@@ -529,6 +541,51 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_START_TIME_GREATER);
         }
 
+        /* Assign values to $event instance
+         */
+        $event
+            ->setTitle($title)
+            ->setOwner($owner)
+            ->setAuthor($author)
+            ->setAccess($accessLevel)
+            ->setType($this->eventTypeMapper->createModel()->setId($eventTypeId))
+            ->setLocation($location)
+            ->setDetail($detail)
+            ->setStartDateTime($startDate ?? null)
+            ->setEndDateTime($endDate ?? null)
+            ->setPublishDateTime($publishDate ?? null)
+            ->setAllDay($allDay)
+            ->setRoleCollection(new Collection($groups))
+            ->setCampusCollection(new Collection($campuses))
+        ;
 
+        /* Attendance dirty bit should be set to true if the attendance
+         * setting now differs from what it previously was
+         */
+        if ($attendanceChanged) {
+            $event
+                ->setAttendance($attendance)
+                ->setAttendanceDirty(true);
+        }
+
+        /* Check minimum requirements for checkbox arrays
+         */
+        if ($event->isCampusLevel()) {
+
+            /* Check at least one campus has been selected
+             */
+            if (!count($campuses)) {
+                error(158);
+                exit;
+            }
+        } elseif ($event->isGroupLevel()) {
+
+            /* Check at least one group has been selected
+             */
+            if (!count($groups)) {
+                error(2);
+                exit;
+            }
+        }
     }
 }
