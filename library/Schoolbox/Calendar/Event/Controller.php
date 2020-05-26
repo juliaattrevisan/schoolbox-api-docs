@@ -556,8 +556,7 @@ class Controller extends Base
             ->setPublishDateTime($publishDate ?? null)
             ->setAllDay($allDay)
             ->setRoleCollection(new Collection($groups))
-            ->setCampusCollection(new Collection($campuses))
-        ;
+            ->setCampusCollection(new Collection($campuses));
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
@@ -569,23 +568,14 @@ class Controller extends Base
         }
 
         /* Check minimum requirements for checkbox arrays
+         *
+         * For campus level events, at least one campus has been selected
+         * For group level events, at least one group has been selected
          */
-        if ($event->isCampusLevel()) {
-
-            /* Check at least one campus has been selected
-             */
-            if (!count($campuses)) {
-                error(158);
-                exit;
-            }
-        } elseif ($event->isGroupLevel()) {
-
-            /* Check at least one group has been selected
-             */
-            if (!count($groups)) {
-                error(2);
-                exit;
-            }
+        if ($event->isCampusLevel() && !count($campuses)) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_SELECT_CAMPUS);
+        } elseif ($event->isGroupLevel() && !count($groups)) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
     }
 }
