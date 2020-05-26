@@ -3606,36 +3606,6 @@ parameters:
 			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
 
 		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Resource\\\\My\\\\File\\\\Mapper not found\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Component\\\\Eportfolio\\\\FileListMapper not found\\.$#"
-			count: 2
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\ResourceBooking\\\\Item\\\\Mapper not found\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\ResourceBooking\\\\Booking\\\\Mapper not found\\.$#"
-			count: 2
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Forum\\\\ThreadMapper not found\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
-			message: "#^Class Schoolbox\\\\Mapper\\\\Schoolbox\\\\Forum\\\\PostMapper not found\\.$#"
-			count: 2
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
-
-		-
 			message: "#^Part \\$mapperClass \\(Schoolbox\\\\IMapper\\) of encapsed string cannot be cast to string\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
