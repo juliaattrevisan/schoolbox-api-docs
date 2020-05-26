@@ -19,6 +19,7 @@ use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Error;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
@@ -37,6 +38,12 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
+
+    /**
+     * @var Error\Mapper
+     */
+    private $errorMapper;
+
 
     /**
      * @var RoleMapper
@@ -77,6 +84,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
+     * @param Error\Mapper    $errorMapper
      * @param RoleMapper      $roleMapper
      * @param Folder\Mapper   $folderMapper
      * @param EventMapper     $eventMapper
@@ -85,6 +93,7 @@ class Controller extends Base
      * @param UserMapper      $userMapper
      */
     public function __construct(
+        Error\Mapper $errorMapper,
         RoleMapper $roleMapper,
         Folder\Mapper $folderMapper,
         EventMapper $eventMapper,
@@ -92,6 +101,7 @@ class Controller extends Base
         CampusMapper $campusMapper,
         UserMapper $userMapper
     ) {
+        $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
         $this->folderMapper = $folderMapper;
         $this->eventMapper = $eventMapper;
@@ -141,6 +151,7 @@ class Controller extends Base
      * @throws LogicException
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getCreate(): void
     {
@@ -151,8 +162,7 @@ class Controller extends Base
             ->setTitle($this->getRequest()->query['title'])
             ->setAuthor($this->getUser())
             ->setAccess((int)$this->getRequest()->query['level'])
-            ->setPublishDateTime(Alaress_Date_Format::now())
-        ;
+            ->setPublishDateTime(Alaress_Date_Format::now());
 
         $event->getType()->setId((int)$this->getRequest()->query['type'] ?: '');
 
@@ -223,6 +233,7 @@ class Controller extends Base
      * @throws LogicException
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getModify(Event $event): void
     {
@@ -294,26 +305,27 @@ class Controller extends Base
      * Defaults to current user if one wasn't specified
      *
      * @return User
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     private function getSelectedUser(): User
     {
-        /* A user might have been optionally passed on the url
+        /* A userId might have been optionally passed on the url
          * Otherwise default to the current user
          */
         $selectedUser = $this->getUser();
+        $userId = (int)$this->getRequest()->query['userId'];
 
-        if (isset($this->getRequest()->query['userId']) && is_numeric($this->getRequest()->query['userId'])) {
+        if ($userId) {
             try {
-                $selectedUser = $this->userMapper->findById($this->getRequest()->query['userId']);
+                $selectedUser = $this->userMapper->findById($userId);
             } catch (Exception $e) {
-
-                /* TODO: User not found
-                 */
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_USER_NOT_FOUND);
             }
         }
 
         return $selectedUser;
     }
+
 
     /**
      * You have WRITE access to this list of groups (folders) from which to choose when using
@@ -354,11 +366,12 @@ class Controller extends Base
      *
      * @param Event $event
      * @return array
+     * @throws DefinitionException
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
-     * @throws DefinitionException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     private function getSelectableFolders(Event $event): array
     {
