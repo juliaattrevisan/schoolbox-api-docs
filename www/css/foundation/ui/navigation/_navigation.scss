@@ -83,7 +83,7 @@ $off-canvas-overlay-background-hover: transparent;
 $menu-slide: transform 100ms ease;
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/magellan";
-@import "../../../../javascript/components/foundation/scss/foundation/components/offcanvas";
+@import "../../css-only/components/offcanvas";
 
 $icon-nav-highlight-color: calc-text-color(
   $tabbar-bg,
