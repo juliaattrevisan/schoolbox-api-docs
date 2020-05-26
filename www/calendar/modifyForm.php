@@ -75,14 +75,14 @@ switch ($_POST['action']) {
         $groups = isset($_POST['group']) ? array_map('intval', $_POST['group']) : [];
         $campuses = isset($_POST['campus']) ? $_POST['campus'] : [];
 
-        if ($eventAccess->checkDestination(
+        if (!$eventAccess->checkDestination(
                 $_SESSION['user'],
                 $_POST['level'],
                 $author,
                 $owner,
                 $groups,
                 $campuses
-            ) == false) {
+        )) {
             error(34);
         }
 

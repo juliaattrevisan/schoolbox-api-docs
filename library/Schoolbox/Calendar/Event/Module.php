@@ -143,70 +143,10 @@ class Module extends BaseModule
                         /** @var Event $event */
                         $event = $params['event'];
 
-                        $loggedInUser = $this->getAuthorizer()->getUser();
-                        $owner = $event->getOwner();
-                        $author = $event->getAuthor();
+                        $folderAccess = Access::getInstance();
 
-                        /* Figure out perms from the level setting
-                         */
-                        if ($event->isPersonalLevel()) {
-
-                            /* If event is on a personal level:
-                             * Users may edit events of which they are the owner *and* author
-                             * Staff may edit events of which they they are the owner *or* author
-                             * Parents may edit events of their child, of which they are the author
-                             */
-                            if ($owner->getRole()->isStudent() && $loggedInUser->getRole()->isParent()) {
-                                $isParentOfOwner = $owner->loadParents()->isChildOf($loggedInUser);
-                            } else {
-                                $isParentOfOwner = false;
-                            }
-
-                            $isStaff = $loggedInUser->getRole()->isStaff();
-                            $isOwner = $loggedInUser->getId() == $owner->getId();
-                            $isAuthor = $loggedInUser->getId() == $author->getId();
-
-                            if (($isOwner && $isAuthor) || ($isAuthor && $isParentOfOwner) || ($isStaff && ($isOwner || $isAuthor))) {
-                                return true;
-                            }
-                        } elseif ($event->isGroupLevel()) {
-
-                            /* If the event is on a group level:
-                             * check if the user is a group manager (write access to the folder)
-                             */
-                            foreach ($event->getFolderCollection()->getAll() as $folder) {
-                                if (Access::getInstance()->getFolderAccess($loggedInUser, $folder->getId()) >= UserAccess::ACCESS_WRITE) {
-                                    return true;
-                                }
-                            }
-                        } elseif ($event->isCampusLevel()) {
-
-                            /* If the event is on a campus level:
-                             * check if this user is a calendar moderator for one of the campuses selected
-                             */
-                            $accessList = $loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
-
-                            foreach ($accessList as $currentAccess) {
-                                if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-                                    // Loop through campuses for the event and check if one matches with this access
-                                    foreach ($event->getCampusCollection() as $campus) {
-                                        if ($campus instanceof Campus) {
-                                            if ($campus->getId() == $currentAccess->getServiceIdentifier()) {
-                                                return true;
-                                            }
-
-                                        } elseif ($campus instanceof \Schoolbox\Calendar\Relation\Campus) {
-                                            if ($campus->getCampusId() == $currentAccess->getServiceIdentifier()) {
-                                                return true;
-                                            }
-                                        } else {
-                                            if ($campus == $currentAccess->getServiceIdentifier()) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        if ((new Event\Access($folderAccess))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                            return true;
                         }
 
                         throw new Unauthorized();
