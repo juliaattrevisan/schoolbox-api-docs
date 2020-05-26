@@ -69,7 +69,7 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateModifyLink(metadata?.eventId, this.returnTo)
+                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnTo)
                         deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
                     }
                 }
@@ -138,7 +138,7 @@
              *
              * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
              */
-            generateModifyLink(eventId, returnTo) {
+            generateModifyUrl(eventId, returnTo) {
                 var url = '/calendar/event/' + eventId + '/modify';
 
                 if (returnTo.length) {
