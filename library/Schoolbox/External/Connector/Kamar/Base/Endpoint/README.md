@@ -34,16 +34,17 @@ Import it via `Timetable Structure`. This sets up the Cycles for you.
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `Kamar`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly:
 
-Endpoint Host: `/vagrant/data/cache/stream/kamar`
-Endpoint Key: `test`
+* Endpoint Host: `/vagrant/data/cache/stream/kamar`
+* Endpoint Key: `test`
 
 The Key isn't used yet, so you can just dump any text string in there for now.
 
 ## 3. Importing
 
-Then run the sisImporter. The easiest way is to shank down a set of xml:
-
-> TODO figure out where this XML comes from. I tested this with a data set Steve provided me, but AFAIK it's not available anywhere.
+Then run the sisImporter. The easiest way is to shank down a set of xml from a Schoolbox instance which already uses Kamar
+(e.g. WCS):
+* check their Endpoint Host value: their Kamar files will be in that folder, or the `archive` sub-folder of that folder.
+  You can then use an FTP client to download all the files to your local host.
 
 Then, pop it into the Endpoint Host directory, then run this:
 
