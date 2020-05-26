@@ -90,7 +90,7 @@ All his stuff should display.
 
 ## 6. Reimport
 
-Repeat step 3 to simulate what a crontab might do: The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
+Repeat step 3 to simulate what a crontab might do. The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
 
 ### 6.1 A Note About Cycles
 
