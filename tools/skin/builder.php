@@ -142,7 +142,7 @@ HELP;
             $infileContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $infileContent);
             file_put_contents($infileInstance, $infileContent);
 
-            $cmd = sprintf('node_modules/.bin/node-sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
+            $cmd = sprintf('node_modules/.bin/node-sass --style compressed %s %s 2>&1', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
             $logger->info("Building SASS...");
             exec($cmd, $output, $outputCode);
 
@@ -180,7 +180,7 @@ HELP;
                 $editorInContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $editorInContent);
                 file_put_contents($editorInInstance, $editorInContent);
 
-                $cmd     = sprintf('node_modules/.bin/node-sass --style compressed --sourcemap=none %s %s', escapeshellarg($editorInInstance), escapeshellarg($editorOut));
+                $cmd     = sprintf('node_modules/.bin/node-sass --style compressed --sourcemap=none %s %s 2>&1', escapeshellarg($editorInInstance), escapeshellarg($editorOut));
                 exec($cmd, $output, $outputCode);
 
                 if ($outputCode !== 0) {
@@ -190,11 +190,9 @@ HELP;
                 // something went wrong
                 $logger->error("Something went wrong during SASS build process! (exit code: {$outputCode})");
                 $logger->info("Command: {$cmd}");
-                $logger->info('Output:');
 
-                foreach ($output as $line) {
-                    $logger->info($line);
-                }
+                $jsonOutput = json_decode(implode($output), true);
+                $logger->info($jsonOutput['formatted']);
             }
 
             if (is_readable($tmpfile)) {
