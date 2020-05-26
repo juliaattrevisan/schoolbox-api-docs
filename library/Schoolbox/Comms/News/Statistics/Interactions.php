@@ -114,14 +114,6 @@ class Interactions
          *  - with a null referrer (which means they accessed the url directly)
          *  - with a non-null referrer (which means they came from some other link we provided)
          */
-        $model = $this->statisticsMapper->createModel()
-            ->setArticleId($article->getId())
-            ->setUserId($userId)
-            ->setReferrer($referrer)
-            ->setRoleType($roleType)
-            ->setRoleId($roleId)
-            ->setType(Mapper::TYPE_OPEN)
-            ->setOccursAt($date);
 
         /* Record uniques only
          * If the current (articleId, userId, referrer) tuple exists in the db
@@ -130,9 +122,9 @@ class Interactions
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Open was made
          */
-        /** @var News\Statistics\Model $existingOpen */
+        /** @var News\Statistics\Model $open */
         try {
-            $existingOpen = $this->statisticsMapper->findOneByColumnList([
+            $open = $this->statisticsMapper->findOneByColumnList([
                 'article_id' => $article->getId(),
                 'type'       => Mapper::TYPE_OPEN,
                 'user_id'    => $userId,
@@ -140,15 +132,21 @@ class Interactions
                 'role_type'  => $roleType,
                 'role_id'    => $roleId,
             ]);
-        } catch (NotFound $e) {
-            $existingOpen = false;
-        }
 
-        /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
-         * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
-         */
-        if ($existingOpen && $existingOpen->getOccursAt()->diffInDays($date) < self::UNIQUE_VISIT_THRESHOLD) {
-            return false;
+            /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
+             * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
+             */
+            if ($open && $open->getOccursAt()->diffInDays($date) < self::UNIQUE_VISIT_THRESHOLD) {
+                return false;
+            }
+        } catch (NotFound $e) {
+            $open = $this->statisticsMapper->createModel()
+                ->setArticleId($article->getId())
+                ->setUserId($userId)
+                ->setReferrer($referrer)
+                ->setRoleType($roleType)
+                ->setRoleId($roleId)
+                ->setType(Mapper::TYPE_OPEN);
         }
 
         /* It's a valid referrer and $user hasn't Opened this period
@@ -156,7 +154,7 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        return $this->statisticsMapper->save($model);
+        return $this->statisticsMapper->save($open->setOccursAt($date));
     }
 
 
@@ -265,9 +263,9 @@ class Interactions
         $breakdown = $this->generateDefaultBreakdown(Role::getRoleTypes());
 
         $statement = $this->database->prepareQuery("
-            SELECT 
+            SELECT
                 SUM(num) AS num,
-                `type`, 
+                `type`,
                 role_type
             FROM {$this->statisticsCumulativeMapper->getTable()}
             WHERE article_id = :articleId
