@@ -142,7 +142,7 @@ HELP;
             $infileContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $infileContent);
             file_put_contents($infileInstance, $infileContent);
 
-            $cmd = sprintf('sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
+            $cmd = sprintf('node_modules/.bin/node-sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
             $logger->info("Building SASS...");
             exec($cmd, $output, $outputCode);
 
@@ -180,7 +180,7 @@ HELP;
                 $editorInContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $editorInContent);
                 file_put_contents($editorInInstance, $editorInContent);
 
-                $cmd     = sprintf('sass --style compressed --sourcemap=none %s %s', escapeshellarg($editorInInstance), escapeshellarg($editorOut));
+                $cmd     = sprintf('node_modules/.bin/node-sass --style compressed --sourcemap=none %s %s', escapeshellarg($editorInInstance), escapeshellarg($editorOut));
                 exec($cmd, $output, $outputCode);
 
                 if ($outputCode !== 0) {
