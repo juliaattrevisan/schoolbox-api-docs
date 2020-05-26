@@ -30,7 +30,13 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Calendar\Event
+ */
 class Module extends BaseModule
 {
     /**
@@ -268,6 +274,7 @@ class Module extends BaseModule
             'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
             'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
         ];
     }
 }

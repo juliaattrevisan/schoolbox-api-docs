@@ -26,6 +26,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 
@@ -36,7 +37,6 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
-
 
     /**
      * @var RoleMapper
@@ -69,6 +69,12 @@ class Controller extends Base
 
 
     /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param RoleMapper      $roleMapper
@@ -76,14 +82,22 @@ class Controller extends Base
      * @param EventMapper     $eventMapper
      * @param EventTypeMapper $eventTypeMapper
      * @param CampusMapper    $campusMapper
+     * @param UserMapper      $userMapper
      */
-    public function __construct(RoleMapper $roleMapper, Folder\Mapper $folderMapper, EventMapper $eventMapper, EventTypeMapper $eventTypeMapper, CampusMapper $campusMapper)
-    {
+    public function __construct(
+        RoleMapper $roleMapper,
+        Folder\Mapper $folderMapper,
+        EventMapper $eventMapper,
+        EventTypeMapper $eventTypeMapper,
+        CampusMapper $campusMapper,
+        UserMapper $userMapper
+    ) {
         $this->roleMapper = $roleMapper;
         $this->folderMapper = $folderMapper;
         $this->eventMapper = $eventMapper;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->campusMapper = $campusMapper;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -290,7 +304,7 @@ class Controller extends Base
 
         if (isset($this->getRequest()->query['userId']) && is_numeric($this->getRequest()->query['userId'])) {
             try {
-                $selectedUser = (new \Schoolbox\UserMapper())->findById($this->getRequest()->query['userId']);
+                $selectedUser = $this->userMapper->findById($this->getRequest()->query['userId']);
             } catch (Exception $e) {
 
                 /* TODO: User not found
