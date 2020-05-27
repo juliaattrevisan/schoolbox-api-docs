@@ -38,8 +38,10 @@ table.rb {
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
-                    background-color: $content-ui-selected;
-                    color: calc-text-color($content-ui-selected);
+                    background-color: var(--content-ui-selected);
+                    // TODO figure out what to do with this. Why not just content-ui-background
+                    color: var(--content-ui-background);
+                    //color: calc-text-color(var(--content-ui-selected));
                 }
             }
             + label {
@@ -51,7 +53,9 @@ table.rb {
                 }
 
                 &:hover {
-                    background-color: lighten($content-ui-selected, 3%);
+                    // TODO figure out what to do with this
+                    background-color: var(--content-ui-selected);
+                    //background-color: lighten(var(--content-ui-selected), 3%);
                     cursor: pointer;
                 }
             }
@@ -258,8 +262,10 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: $content-ui-selected!important;
-    color: calc-text-color($content-ui-selected);
+    background-color: var(--content-ui-selected)!important;
+    // TODO figure out what to do with this. Why not just background color?
+    color: var(--content-ui-background);
+    //color: calc-text-color(var(--content-ui-selected));
 
     .range-selection-value {
         font-weight: bold;

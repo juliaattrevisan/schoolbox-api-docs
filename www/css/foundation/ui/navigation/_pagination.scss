@@ -18,7 +18,7 @@ $pagination-li-margin: rem-calc(0);
 // We use these for the pagination anchor links
 $pagination-link-pad: rem-calc(($base-font-size - 9, $base-font-size - 2));
 $pagination-link-font-color: var(--content-ui-foreground);
-$pagination-link-active-bg: $content-ui-selected;
+$pagination-link-active-bg: var(--content-ui-selected);
 
 // We use these for disabled anchor links
 // $pagination-link-unavailable-cursor: default;
@@ -36,11 +36,11 @@ $pagination-link-unavailable-bg-active: hsla(
 //);
 
 // We use these for currently selected anchor links
-$pagination-link-current-background: $content-ui-selected;
+$pagination-link-current-background: var(--content-ui-selected);
 $pagination-link-current-font-color: var(--content-ui-foreground);
 // $pagination-link-current-font-weight: $font-weight-bold;
 // $pagination-link-current-cursor: default;
-$pagination-link-current-active-bg: $content-ui-selected;
+$pagination-link-current-active-bg: var(--content-ui-selected);
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/pagination";
 

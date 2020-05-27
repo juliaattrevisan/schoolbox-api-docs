@@ -88,7 +88,7 @@
             color: $body-font-color;
         }
         .class-row {
-            background: $content-ui-selected;
+            background: var(--content-ui-selected);
             color: $body-font-color;
         }
         .class-row-heading {

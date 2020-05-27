@@ -419,9 +419,9 @@ input[type=radio] {
 	&:checked + .block {
 		background-color: var(--content-ui-foreground);
 		border: $input-border-width solid var(--content-ui-foreground);
-		color: $content-ui-selected;
+		color: var(--content-ui-selected);
 		i {
-			color: $content-ui-selected;
+			color: var(--content-ui-selected);
 		}
 	}
 	&:disabled + .block {

@@ -3,9 +3,9 @@
 $datepicker-cell-width: (2.125rem, 2.5rem);
 $datepicker-cell-color: var(--content-ui-foreground);
 $datepicker-background: var(--content-ui-background);
-$datepicker-header-background: $content-ui-selected;
+$datepicker-header-background: var(--content-ui-selected);
 $datepicker-hover-background: var(--content-ui-hover);
-$datepicker-selected-background: $content-ui-selected;
+$datepicker-selected-background: var(--content-ui-selected);
 $datepicker-header-color: var(--content-ui-foreground);
 $timepicker-item-visible-count: 5;
 
@@ -61,7 +61,7 @@ $timepicker-item-visible-count: 5;
     text-transform: uppercase;
     background-color: transparent;
     &:hover {
-        background-color: $content-ui-selected;
+        background-color: var(--content-ui-selected);
     }
 }
 

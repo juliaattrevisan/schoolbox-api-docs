@@ -29,7 +29,7 @@ $crumb-slash: "";
 $breadcrumb-color: var(--content-ui-foreground);
 $breadcrumb-bg-color: var(--content-ui-background);
 $breadcrumb-hover-bg-color: var(--content-ui-hover);
-$breadcrumb-active-bg-color: $content-ui-selected;
+$breadcrumb-active-bg-color: var(--content-ui-selected);
 
 // TODO figure out what to do with this color
 $breadcrumb-noclick-bg-color: hsla(

@@ -810,7 +810,7 @@ $rotate-span-width: 11rem;
 .accordion{
     // insane core foundation override
     .accordion-navigation.active > a{
-        background: $content-ui-selected;
+        background: var(--content-ui-selected);
         color: $accordion-navigation-font-color;
     }
     a {

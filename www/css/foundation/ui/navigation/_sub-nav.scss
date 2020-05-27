@@ -31,11 +31,11 @@ $sub-nav-active-font-weight: $font-weight-normal;
         }
         &.active a {
             color: var(--content-ui-foreground);
-            background-color: $content-ui-selected;
+            background-color: var(--content-ui-selected);
 
             &:hover {
                 color: var(--content-ui-foreground);
-                background-color: $content-ui-selected;
+                background-color: var(--content-ui-selected);
             }
         }
 	}
