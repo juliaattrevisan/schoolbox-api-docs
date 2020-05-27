@@ -31,4 +31,37 @@
             var(--navigation-hover-l),
             var(--navigation-hover-a)
     );
+
+    --off-canvas-foreground-h: 205;
+    --off-canvas-foreground-s: 100%;
+    --off-canvas-foreground-l: 34.5%;
+    --off-canvas-foreground-a: 100%;
+    --off-canvas-foreground:   hsla(
+            var(--off-canvas-foreground-h),
+            var(--off-canvas-foreground-s),
+            var(--off-canvas-foreground-l),
+            var(--off-canvas-foreground-a)
+    );
+
+    --off-canvas-background-h: 205;
+    --off-canvas-background-s: 100.0%;
+    --off-canvas-background-l: 94.9%;
+    --off-canvas-background-a: 100%;
+    --off-canvas-background:   hsla(
+            var(--off-canvas-background-h),
+            var(--off-canvas-background-s),
+            var(--off-canvas-background-l),
+            var(--off-canvas-background-a)
+    );
+
+    --off-canvas-hover-h: 206;
+    --off-canvas-hover-s: 100%;
+    --off-canvas-hover-l: 97.3%;
+    --off-canvas-hover-a: 100%;
+    --off-canvas-hover:   hsla(
+            var(--off-canvas-hover-h),
+            var(--off-canvas-hover-s),
+            var(--off-canvas-hover-l),
+            var(--off-canvas-hover-a)
+    );
 }
