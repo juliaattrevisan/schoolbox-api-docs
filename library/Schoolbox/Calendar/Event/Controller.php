@@ -385,7 +385,6 @@ class Controller extends Base
         $allFolderList = $this->folderMapper->createCollection();
 
         /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
-         * TODO: Replace with array_intersect and $collection->indexBy('id');
          */
         foreach ($calendarUserFolderList as $current) {
             $currentId = $current->getId();
