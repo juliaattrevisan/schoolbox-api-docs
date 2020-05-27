@@ -21,6 +21,7 @@
             toMoment: {},
             eventModifyFormUrl: {},
             eventModifyFormActionUrl: {},
+            eventDeleteUrl: {},
             eventUpdateUrl: {},
             attendanceListUrl: {},
             attendanceToggleUrl: {},
@@ -67,8 +68,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnUrl)
-                        deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnUrl=' + this.returnUrl;
+                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnUrl);
+                        deleteLink = this.generateDeleteUrl(metadata?.eventId, this.returnUrl);
                     }
                 }
 
@@ -138,6 +139,21 @@
              */
             generateModifyUrl(eventId, returnUrl) {
                 var url = this.eventModifyFormUrl.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+            /**
+             * Route to the Event Delete screen with optional returnUrl redirect
+             *
+             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             */
+            generateDeleteUrl(eventId, returnUrl) {
+                var url = this.eventDeleteUrl.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;

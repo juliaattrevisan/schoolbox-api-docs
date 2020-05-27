@@ -32,6 +32,7 @@
      */
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
     const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
@@ -82,6 +83,7 @@
                     create: URL_EVENT_CREATE,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+                    delete: URL_EVENT_DELETE,
                     update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
@@ -653,6 +655,7 @@
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
+                          :event-delete-url="urls.delete"
                           :event-update-url="urls.update"
                           :attendance-list-url="urls.attendanceList"
                           :attendance-toggle-url="urls.attendanceToggle"
