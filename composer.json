@@ -78,7 +78,8 @@
         "laravie/predis-async": "^0.3.0",
         "sentry/sdk": "^2.1.0",
         "league/commonmark": "^1.4",
-        "ext-imagick": "*"
+        "ext-imagick": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
