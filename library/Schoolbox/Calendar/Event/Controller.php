@@ -470,8 +470,6 @@ class Controller extends Base
      */
     public function postModify(Event $event): void
     {
-        $publishDate = null;
-        $until       = null;
 
         /* Check owner still exists
          * If not - pass ownership to the author
