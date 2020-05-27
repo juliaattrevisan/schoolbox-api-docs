@@ -11,6 +11,11 @@
             var(--navigation-foreground-l),
             var(--navigation-foreground-a)
         );
+        {#
+            Derived styles:
+            $off-canvas-bg-hover
+            $off-canvas-bg-active
+        #}
     {% endif %}
 
     {% if colors.skin_colour_navigation_background is defined %}
@@ -24,6 +29,12 @@
             var(--navigation-background-l),
             var(--navigation-background-a)
         );
+        {#
+            Derived styles:
+            $icon-nav-highlight-color
+            .top-menu style buried deep within www/css/foundation/ui/navigation/_navigation.scss
+            .right-off-canvas-menu style buried deep within www/css/foundation/ui/navigation/_navigation.scss
+        #}
     {% endif %}
 
     {% if colors.skin_colour_navigation_hover is defined %}
@@ -37,6 +48,10 @@
             var(--navigation-hover-l),
             var(--navigation-hover-a)
         );
+        {#
+            Derived styles:
+            None known
+        #}
     {% endif %}
 
 {#--off-canvas-foreground:        {{ config.skin_colour_offcanvas_foreground }};#}
