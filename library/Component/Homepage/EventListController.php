@@ -6,8 +6,8 @@
  */
 use Calendar\Event\Collection\Lister;
 use Calendar\Event\Type\EventBase;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Redirect;
 
 /**
  * Class Component_Homepage_EventListController
@@ -142,7 +142,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 $returnStr = null;
                 $context   = $this->getContext();
                 if ($context instanceof Schoolbox\Resource\Folder\Model) {
-                    $returnStr = Redirect::encode("/homepage/{$this->getContext()->getId()}");
+                    $returnStr = "/homepage/{$this->getContext()->getId()}";
                 }
                 $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML, $returnStr);
                 if  ($htmlEvent) {

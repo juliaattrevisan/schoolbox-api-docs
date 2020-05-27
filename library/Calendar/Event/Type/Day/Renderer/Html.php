@@ -6,6 +6,7 @@
  */
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Schoolbox\Learning\Assessment\Redirect;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -27,6 +28,7 @@ class Html extends Base
 
     /**
      * Render this event as html using twig
+     *
      * @return string
      * @throws LoaderError
      * @throws RuntimeError
@@ -34,30 +36,10 @@ class Html extends Base
      */
     public function render(): string
     {
-
-        $returnUrl = $_SERVER['REQUEST_URI'];
-
-        $path = explode('/', $returnUrl);
-
-        $returnStr = '?returnTo=';
-
-        if ($returnUrl === '/') {
-            $returnStr .= 'dashboard';
-        } elseif ($path[1] == 'homepage' && (int)$path[2] > 0) {
-            $returnStr .= 'homepage&homepageId=' . $path[2];
-        } elseif ($path[1] === 'calendar') {
-            $returnStr .= 'calendar';
-        } elseif (isset($this->returnStr)) {
-            $returnStr .= $this->returnStr;
-        } else {
-            //Return the URL as is
-            $returnStr .= urlencode($returnUrl);
-        }
-
         return $this->getTemplate()->render('calendar/type/day.twig', [
             'event'     => $this->getEvent(),
             'renderer'  => $this,
-            'returnStr' => $returnStr,
+            'returnStr' => Redirect::queryString($this->returnStr),
         ]);
     }
 }
