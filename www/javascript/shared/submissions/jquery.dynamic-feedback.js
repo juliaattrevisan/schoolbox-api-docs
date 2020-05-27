@@ -134,7 +134,8 @@
             // Listen to Kami events here
             let kamiViewport = document.querySelector('#kami-viewport');
             window.addEventListener('message', function (event) {
-                if (event.source === kamiViewport.contentWindow
+                if (kamiViewport
+                    && event.source === kamiViewport.contentWindow
                     && event.data.type === 'kamiembedding'
                     && (event.data.event_name === 'createdAnnotation' || event.data.event_name === 'deletedAnnotation')
                 ) {
@@ -149,7 +150,7 @@
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
-            $(config.assessmentList).on('mousedown', '[data-draft="publish"]', function (e) {
+            $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
                 var $participant = findParticipantElement($(this)),
