@@ -1,4 +1,5 @@
 :root {
+    /** Nav bar colors **/
     --navigation-foreground-h: 205;
     --navigation-foreground-s: 53%;
     --navigation-foreground-l: 67.5%;
@@ -32,6 +33,8 @@
             var(--navigation-hover-a)
     );
 
+
+    /** Off-canvas colors **/
     --off-canvas-foreground-h: 205;
     --off-canvas-foreground-s: 100%;
     --off-canvas-foreground-l: 34.5%;
@@ -64,4 +67,55 @@
             var(--off-canvas-hover-l),
             var(--off-canvas-hover-a)
     );
+
+
+    /** Content UI colors **/
+    --content-ui-foreground-h: 205;
+    --content-ui-foreground-s: 100%;
+    --content-ui-foreground-l: 34.5%;
+    --content-ui-foreground-a: 100%;
+    --content-ui-foreground:   hsla(
+            var(--content-ui-foreground-h),
+            var(--content-ui-foreground-s),
+            var(--content-ui-foreground-l),
+            var(--content-ui-foreground-a)
+    );
+
+    --content-ui-background-h: 205;
+    --content-ui-background-s: 100.0%;
+    --content-ui-background-l: 87.8%;
+    --content-ui-background-a: 100%;
+    --content-ui-background:   hsla(
+            var(--content-ui-background-h),
+            var(--content-ui-background-s),
+            var(--content-ui-background-l),
+            var(--content-ui-background-a)
+    );
+
+    --content-ui-hover-h: 205;
+    --content-ui-hover-s: 100%;
+    --content-ui-hover-l: 91%;
+    --content-ui-hover-a: 100%;
+    --content-ui-hover:   hsla(
+            var(--content-ui-hover-h),
+            var(--content-ui-hover-s),
+            var(--content-ui-hover-l),
+            var(--content-ui-hover-a)
+    );
+
+    --content-ui-selected-h: 250;
+    --content-ui-selected-s: 100%;
+    --content-ui-selected-l: 93.9%;
+    --content-ui-selected-a: 100%;
+    --content-ui-selected:   hsla(
+            var(--content-ui-selected-h),
+            var(--content-ui-selected-s),
+            var(--content-ui-selected-l),
+            var(--content-ui-selected-a)
+    )
+
+    /*$content-ui-foreground:            rgb(0, 102, 176) !default;*/
+    /*$content-ui-background:            rgb(193, 229, 255) !default;*/
+    /*$content-ui-hover:                 rgb(209, 236, 255) !default;*/
+    /*$content-ui-selected:              rgb(229, 244, 255) !default;*/
 }
