@@ -1,15 +1,17 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Calendar\Event\Collection\Lister;
 use Calendar\Event\Type\EventBase;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class Component_Homepage_EventListController
+ */
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -73,6 +75,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 'event_list_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
+                'RETURN_URL' => Redirect::encode("/homepage/{$this->getContext()->getId()}")
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
