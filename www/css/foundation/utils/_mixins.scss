@@ -291,7 +291,7 @@
 }
 %switch-last-child{
 	text-align: right;
-	color: $content-ui-foreground;
+	color: var(--content-ui-foreground);
 	opacity: 1;
 }
 @mixin switch-label($indent: 0.75rem) {

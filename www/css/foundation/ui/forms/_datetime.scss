@@ -1,12 +1,12 @@
 //  DATEPICKER
 
 $datepicker-cell-width: (2.125rem, 2.5rem);
-$datepicker-cell-color: $content-ui-foreground;
+$datepicker-cell-color: var(--content-ui-foreground);
 $datepicker-background: $content-ui-background;
 $datepicker-header-background: $content-ui-selected;
 $datepicker-hover-background: $content-ui-hover;
 $datepicker-selected-background: $content-ui-selected;
-$datepicker-header-color: $content-ui-foreground;
+$datepicker-header-color: var(--content-ui-foreground);
 $timepicker-item-visible-count: 5;
 
 @mixin datepicker-cell($sizing: $datepicker-cell-width) {
@@ -99,7 +99,7 @@ $timepicker-item-visible-count: 5;
             display: block;
         }
         a {
-            color: $content-ui-foreground;
+            color: var(--content-ui-foreground);
         }
         .ui-datepicker-unselectable {
             opacity: 0.5;
@@ -113,11 +113,11 @@ $timepicker-item-visible-count: 5;
     @include datepicker-header();
 
     .ui-datepicker-prev, .ui-datepicker-next {
-        color: $content-ui-foreground;
+        color: var(--content-ui-foreground);
         display: block;
         padding: 0.5rem;
         &:hover {
-            color: $content-ui-foreground;
+            color: var(--content-ui-foreground);
             background: $datepicker-hover-background;
         }
     }

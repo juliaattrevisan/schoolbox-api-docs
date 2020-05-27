@@ -2,7 +2,7 @@
  * These occur as their own row, they aren't nested inside a
  * column. Typically this will look like .actions-small-12.row
  */
-@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
+@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: var(--content-ui-foreground)) {
 
 	// forms + list items: compensate for input{margin-bottom:1rem}
 	form {

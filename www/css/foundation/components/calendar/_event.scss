@@ -29,7 +29,7 @@
   }
 
   time.icon strong {
-    background-color: $content-ui-foreground;
+    background-color: var(--content-ui-foreground);
     position: absolute;
     top: 0;
     color: #fff;
@@ -37,8 +37,8 @@
   }
 
   time.icon span {
-    border: 1px solid $content-ui-foreground;
-    color: $content-ui-foreground;
+    border: 1px solid var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
     font-size: 1.875rem;
     letter-spacing: -0.05rem;
     padding-top: 1.1rem;

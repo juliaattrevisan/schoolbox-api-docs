@@ -63,8 +63,8 @@ $code-border-color: $accent-foreground;
 // We use these to style anchors
 // $anchor-text-decoration: none;
 // $anchor-text-decoration-hover: none;
-$anchor-font-color: $content-ui-foreground;
-$anchor-font-color-hover: $content-ui-foreground;
+$anchor-font-color: var(--content-ui-foreground);
+$anchor-font-color-hover: var(--content-ui-foreground);
 
 // We use these to style the <hr> element
 // $hr-border-width: 1px;

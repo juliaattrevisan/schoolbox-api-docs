@@ -4,7 +4,7 @@
     @include form-element;
     font-weight: normal;
     min-height: $global-button-input-height;
-    color: $content-ui-foreground;
+    color: var(--content-ui-foreground);
 
     &:hover {
         background-color: $input-hover-bg-color;

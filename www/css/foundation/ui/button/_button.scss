@@ -1,4 +1,4 @@
-$dropdown-button-pip-color: $content-ui-foreground;
+$dropdown-button-pip-color: var(--content-ui-foreground);
 $dropdown-button-padding-med: 2.5rem;
 $dropdown-button-pip-opposite-med: 1rem;
 $alert-close-font-size: rem-calc(($base-font-size + 14));
@@ -28,11 +28,11 @@ a[disabled], a.disabled {
 	@extend .hide-for-print;
 	font-size: rem-calc(($base-font-size - 2));
 	line-height: inherit;
-    color: $content-ui-foreground;
+    color: var(--content-ui-foreground);
     background-color: $content-ui-background;
 
 	&:hover {
-	    color: $content-ui-foreground;
+	    color: var(--content-ui-foreground);
 	    background-color: $content-ui-hover;
 		text-decoration: none !important; // forgive me, for I have sinned.
     }
@@ -81,7 +81,7 @@ a[disabled], a.disabled {
 .splash {
 	display: block;
 	position: absolute;
-	background-color: $content-ui-foreground;
+	background-color: var(--content-ui-foreground);
 	border-radius: 100%;
 	opacity: 0.5;
 	@include transform (scale(0));

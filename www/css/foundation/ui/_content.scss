@@ -175,7 +175,7 @@ $accordion-navigation-padding: rem-calc(($base-font-size - 4));
 $accordion-navigation-bg-color: $content-ui-background;
 $accordion-navigation-hover-bg-color: $content-ui-hover;
 $accordion-navigation-active-bg-color: $content-ui-background;
-$accordion-navigation-font-color: $content-ui-foreground;
+$accordion-navigation-font-color: var(--content-ui-foreground);
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
 
@@ -783,7 +783,7 @@ $rotate-span-width: 11rem;
 
 // Hints
 .hint {
-    color: $content-ui-foreground !important;
+    color: var(--content-ui-foreground) !important;
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -827,7 +827,7 @@ $rotate-span-width: 11rem;
 }
 
 .expander {
-    color: $content-ui-foreground;
+    color: var(--content-ui-foreground);
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
@@ -878,7 +878,7 @@ $selector-width: 2.25rem;
         padding: 0;
     }
 }
-@mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
+@mixin list-interaction($selector, $cursor, $icon: '', $color: var(--content-ui-foreground)) {
     > li{
         > div:first-of-type {
             @extend %interaction-li;
@@ -1314,10 +1314,10 @@ $selector-width: 2.25rem;
     @extend .action-list;
     .card {
         a {
-            color: $content-ui-foreground;
+            color: var(--content-ui-foreground);
         }
         .size-32 {
-            color: $content-ui-foreground;
+            color: var(--content-ui-foreground);
             padding-top: 1rem;
         }
     }
@@ -1791,7 +1791,7 @@ dl {
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: $content-ui-foreground;
+$train-line-visited-color: var(--content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 
@@ -1818,7 +1818,7 @@ $train-line-unvisited-color: $content-ui-background;
             width: 50%;
             position: absolute;
             top: 0;
-            background: $content-ui-foreground;
+            background: var(--content-ui-foreground);
         }
         &:before {
             left: 0;
@@ -1843,7 +1843,7 @@ $train-line-unvisited-color: $content-ui-background;
                 }
             }
             a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
+                box-shadow: 0 0 $train-line-visited-glow-blur var(--content-ui-foreground);
             }
         }
         a {
@@ -1854,9 +1854,9 @@ $train-line-unvisited-color: $content-ui-background;
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
             span {
-                background: $content-ui-foreground;
+                background: var(--content-ui-foreground);
                 border-radius: $train-line-stop-size / 2;
-                color: calc-text-color($content-ui-foreground);
+                color: calc-text-color(var(--content-ui-foreground));
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
                 padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2) (($train-line-stop-size - rem-calc($base-font-size)) / 2);

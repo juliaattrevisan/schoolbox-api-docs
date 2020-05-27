@@ -105,7 +105,7 @@ $switch-font-size-med: 14px;
 // $switch-label-side-padding: 6px;
 
 // We use these to style the switch-paddle
-$switch-active-color: $content-ui-foreground;
+$switch-active-color: var(--content-ui-foreground);
 // $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
@@ -301,7 +301,7 @@ th, td{
 	margin: 0;
 	text-align: center;
 }
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: var(--content-ui-foreground)) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
     $label-selector: "label";
@@ -350,7 +350,7 @@ th, td{
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
-                color: $content-ui-foreground !important;
+                color: var(--content-ui-foreground) !important;
                 background-color: $content-ui-background;
             }
         }
@@ -391,7 +391,7 @@ th, td{
 	display: block;
 	background-color: $white;
 	border: $input-border-width solid $content-ui-background;
-	color: $content-ui-foreground;
+	color: var(--content-ui-foreground);
 	margin: 0 0 1rem 0;
 	padding: ($base-font-size - 4);
 	width: 100%;
@@ -402,14 +402,14 @@ th, td{
 	@include transition(all, 0.1s, ease-in);
 	i {
 		@extend .size-32;
-		color: $content-ui-foreground;
+		color: var(--content-ui-foreground);
 		padding-right: 0.35rem;
 		float: left;
 		line-height: 1;
 	}
 	&:hover {
 		background-color: $content-ui-background;
-		color: $content-ui-foreground;
+		color: var(--content-ui-foreground);
 	}
 }
 input[type=radio] {
@@ -417,8 +417,8 @@ input[type=radio] {
 		@extend .button-block;
 	}
 	&:checked + .block {
-		background-color: $content-ui-foreground;
-		border: $input-border-width solid $content-ui-foreground;
+		background-color: var(--content-ui-foreground);
+		border: $input-border-width solid var(--content-ui-foreground);
 		color: $content-ui-selected;
 		i {
 			color: $content-ui-selected;
@@ -430,7 +430,7 @@ input[type=radio] {
 }
 
 // Toggle Checkbox (VAPORWAVE)
-@mixin vaporwave($label-class: false, $toggle-height: $input-height, $toggle-width: $input-height, $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
+@mixin vaporwave($label-class: false, $toggle-height: $input-height, $toggle-width: $input-height, $background-color: var(--content-ui-foreground), $hover-background-color: $button-bg-hover, $active-color: var(--content-ui-foreground)) {
 
 	$label-selector: "label";
 

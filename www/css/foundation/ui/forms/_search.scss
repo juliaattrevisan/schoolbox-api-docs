@@ -100,7 +100,7 @@
     .result-meta.with-bg {
         @include button-dimensions();
         background-color: $content-ui-background;
-        color: $content-ui-foreground;
+        color: var(--content-ui-foreground);
         font-size: rem-calc(($base-font-size - 2));
         font-style: normal;
         line-height: inherit;
@@ -108,7 +108,7 @@
 
         &:hover {
             background-color: $content-ui-hover;
-            color: $content-ui-foreground;
+            color: var(--content-ui-foreground);
             cursor: pointer;
             text-decoration: none !important; // forgive me, for I have sinned.
         }
