@@ -238,6 +238,7 @@ class Controller extends Base
     {
 
         /* Preselected campuses
+         * Note: this collection could be one of three data types
          */
         $selectedCampuses = $event->getCampusCollection()->getPropertyValues('id');
 
