@@ -79,7 +79,10 @@
 				input:checked + label {
 					a {
 						background-color: $button-color;
-						color: calc-text-color($button-color);
+                        // TODO figure out what to do with this color
+                        // Maybe just $content-ui-selected
+                        color: $content-ui-selected;
+						//color: calc-text-color($button-color);
 					}
 				}
 			}

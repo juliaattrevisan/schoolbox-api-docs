@@ -430,7 +430,15 @@ input[type=radio] {
 }
 
 // Toggle Checkbox (VAPORWAVE)
-@mixin vaporwave($label-class: false, $toggle-height: $input-height, $toggle-width: $input-height, $background-color: var(--content-ui-foreground), $hover-background-color: $button-bg-hover, $active-color: var(--content-ui-foreground)) {
+@mixin vaporwave(
+    $label-class: false,
+    $toggle-height:
+    $input-height,
+    $toggle-width:
+    $input-height,
+    $hover-background-color: $button-bg-hover,
+    $active-color: var(--content-ui-foreground),
+) {
 
 	$label-selector: "label";
 
@@ -465,9 +473,13 @@ input[type=radio] {
 	&:checked {
 		+ #{$label-selector} {
 			background-color: $active-color;
-			color: calc-text-color($active-color);
+            // TODO consider these color vars
+            // Either pass in a checked color, or just use $hover-background-color
+            color: $hover-background-color;
+			//color: calc-text-color($active-color);
 			[class^="icon-"]{
-				color: calc-text-color($active-color);
+                color: $hover-background-color;
+				//color: calc-text-color($active-color);
 			}
 		}
 	}
