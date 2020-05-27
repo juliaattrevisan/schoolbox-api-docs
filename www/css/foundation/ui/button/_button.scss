@@ -33,7 +33,7 @@ a[disabled], a.disabled {
 
 	&:hover {
 	    color: var(--content-ui-foreground);
-	    background-color: $content-ui-hover;
+	    background-color: var(--content-ui-hover);
 		text-decoration: none !important; // forgive me, for I have sinned.
     }
 

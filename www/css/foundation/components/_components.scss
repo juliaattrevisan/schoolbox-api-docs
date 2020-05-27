@@ -61,7 +61,7 @@
         font-weight: $font-weight-semibold;
 
         &:hover{
-            background-color: $content-ui-hover;
+            background-color: var(--content-ui-hover);
         }
         &:disabled, &.disabled {
             &:hover {

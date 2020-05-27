@@ -42,7 +42,7 @@ $border-bottom-width: 2px;
 
       &:hover {
         color: $body-font-color;
-        border-bottom: $border-bottom-width solid $content-ui-hover;
+        border-bottom: $border-bottom-width solid var(--content-ui-hover);
       }
     }
 

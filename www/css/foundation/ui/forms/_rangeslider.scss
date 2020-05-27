@@ -14,7 +14,7 @@ $range-slider-bar-border-width: 0px;
 // $range-slider-radius: $global-radius;
 // $range-slider-round: $global-rounded;
 $range-slider-bar-bg-color: #eee;
-$range-slider-active-segment-bg-color: $content-ui-hover;
+$range-slider-active-segment-bg-color: var(--content-ui-hover);
 
 // Vertical bar styles
 // $range-slider-vertical-bar-width: rem-calc(16);

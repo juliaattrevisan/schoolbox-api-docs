@@ -32,7 +32,14 @@
 		}
 
 		&:hover {
-			background-color: tint($content-ui-hover, 20%);
+            // TODO figure out what to do with this
+            background-color: hsla(
+                var(--content-ui-hover-h),
+                var(--content-ui-hover-s),
+                calc(var(--content-ui-hover-l) * 1.2),
+                var(--content-ui-hover-a),
+            );
+			//background-color: tint(var(--content-ui-hover), 20%);
 		}
 		&[aria-expanded=true] {
 			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));

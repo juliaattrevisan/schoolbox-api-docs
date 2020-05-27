@@ -25,7 +25,7 @@ $sub-nav-active-font-weight: $font-weight-normal;
 
             &:hover {
                 color: var(--content-ui-foreground);
-                background-color: $content-ui-hover;
+                background-color: var(--content-ui-hover);
                 text-decoration: none;
             }
         }

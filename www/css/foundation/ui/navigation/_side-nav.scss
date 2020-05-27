@@ -21,7 +21,7 @@ $border-bottom-width: 2px;
       border-left: $border-bottom-width solid transparent;
 
       &:hover {
-        border-left: $border-bottom-width solid $content-ui-hover;
+        border-left: $border-bottom-width solid var(--content-ui-hover);
         color: $side-nav-link-color-hover;
       }
     }

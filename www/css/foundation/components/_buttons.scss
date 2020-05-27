@@ -56,7 +56,7 @@ $button-font-weight: $font-weight-normal;
 // $button-border-width: 0px;
 // $button-border-style: solid;
 $button-bg-color: var(--content-ui-background);
-$button-bg-hover: $content-ui-hover;
+$button-bg-hover: var(--content-ui-hover);
 
 $submit-button-color: $content-ui-submit-foreground;
 $submit-button-bg-color: $content-ui-submit-background;

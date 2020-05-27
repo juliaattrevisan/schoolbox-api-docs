@@ -159,7 +159,7 @@ $tooltip-padding: 1rem;
   margin: 1rem 0 0;
 
   &:hover {
-    background-color: $content-ui-hover;
+    background-color: var(--content-ui-hover);
     border-color: transparent;
     box-shadow: none;
     color: var(--content-ui-foreground);

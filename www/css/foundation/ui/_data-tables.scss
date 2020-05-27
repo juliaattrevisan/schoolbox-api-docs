@@ -93,7 +93,7 @@ table.dataTable thead {
     }
 
     th.sorting:hover, th.sorting_asc:hover, th.sorting_desc:hover {
-        background-color: $content-ui-hover;
+        background-color: var(--content-ui-hover);
     }
 
     .sorting:after {   }

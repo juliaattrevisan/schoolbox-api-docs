@@ -21,7 +21,7 @@ $charset: "utf-8";
 
 //$content-ui-foreground:            rgb(0, 102, 176) !default;
 //$content-ui-background:            rgb(193, 229, 255) !default;
-$content-ui-hover:                 rgb(209, 236, 255) !default;
+//$content-ui-hover:                 rgb(209, 236, 255) !default;
 $content-ui-selected:              rgb(229, 244, 255) !default;
 
 $content-ui-submit-foreground:     rgb(255, 255, 255) !default;
@@ -58,8 +58,21 @@ $input-border-color:			   $form-border-color;
  * Hover colour for action-list rows
  * Hover colour for the action button in the action-list row
  */
-$row-hover-background:             tint($content-ui-hover, 87%);
-$row-action-hover-background:      darken($content-ui-hover, 7%);
+// TODO figure out what to do with these
+$row-hover-background:             hsla(
+    var(--content-ui-hover-h),
+    var(--content-ui-hover-s),
+    calc(var(--content-ui-hover-l) * 1.13),
+    var(--content-ui-hover-a),
+);
+$row-action-hover-background:      hsla(
+    var(--content-ui-hover-h),
+    var(--content-ui-hover-s),
+    calc(var(--content-ui-hover-l) * .93),
+    var(--content-ui-hover-a),
+);
+//$row-hover-background:             tint(var(--content-ui-hover), 87%);
+//$row-action-hover-background:      darken(var(--content-ui-hover), 7%);
 
 // Colours
 $primary-color:					#f0f !default;

@@ -107,7 +107,7 @@
         text-align: center;
 
         &:hover {
-            background-color: $content-ui-hover;
+            background-color: var(--content-ui-hover);
             color: var(--content-ui-foreground);
             cursor: pointer;
             text-decoration: none !important; // forgive me, for I have sinned.
@@ -115,7 +115,7 @@
     }
 
     .is-active {
-        background-color: $content-ui-hover;
+        background-color: var(--content-ui-hover);
     }
 }
 

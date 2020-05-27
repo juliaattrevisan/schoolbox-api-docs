@@ -8,15 +8,15 @@ $selectize-color-border: $input-border-color;
 $selectize-color-highlight: $highlight-color;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;
-$selectize-color-disabled: $content-ui-hover;
+$selectize-color-disabled: var(--content-ui-hover);
 
 // When you add an element from the dropdown
-$selectize-color-item: $content-ui-hover;
+$selectize-color-item: var(--content-ui-hover);
 $selectize-color-item-text: $selectize-color-text !default;
 $selectize-color-item-border: transparent;
 
 // Occurs when you click and hold over a selectized element
-$selectize-color-item-active: $content-ui-hover;
+$selectize-color-item-active: var(--content-ui-hover);
 $selectize-color-item-active-text: $selectize-color-text !default;
 $selectize-color-item-active-border: $selectize-color-border;
 
@@ -171,6 +171,6 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
         padding: 0;
     }
     .active {
-        background-color: $content-ui-hover;
+        background-color: var(--content-ui-hover);
     }
 }
