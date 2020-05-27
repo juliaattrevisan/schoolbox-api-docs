@@ -514,10 +514,16 @@ $allow-sidebar-stash: $large-up;
 
         /* Use adaptive for separators
          */
-        color: contrast-bg(
-          $background: $off-canvas,
-          $dark: $off-canvas-foreground
+        color: hsla(
+          var(--off-canvas-foreground-h),
+          var(--off-canvas-foreground-s),
+          calc(var(--off-canvas-foreground-l) * 1.1),
+          var(--off-canvas-foreground-a)
         );
+        //color: contrast-bg(
+        //  $background: $off-canvas,
+        //  $dark: $off-canvas-foreground
+        //);
         a {
           color: inherit;
           &:hover {
