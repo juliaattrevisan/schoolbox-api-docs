@@ -56,7 +56,7 @@
     {% if event.id %}
     <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
     <ul class="f-dropdown" data-dropdown-content id="overflow">
-        <li><a data-action="delete" href="/calendar/modifyForm.php?id={{ event.id }}{{ returnStr }}" class="icon-delete">Delete Event</a></li>
+        <li><a data-action="delete" href="/calendar/modifyForm.php?id={{ event.id }}{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
     </ul>
     {% endif %}
 </div>
@@ -69,14 +69,13 @@
             {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreate') %}
         {% endif %}
         <form id="eventForm" method="post" action="{{ formRoute }}" class="top">
-
             <input name="id" type="hidden" value="{{ event.id }}" />
             <input name="userId" type="hidden" value="{{ user.id }}" />
             <input name="authorId" type="hidden" value="{{ event.author.id }}" />
             <input id="allday" name="allday" type="hidden" value="{{ event.allDay }}">
-            <input name="return" type="hidden" value="{{ redirect }}" />
             <input id="efficacy" name="efficacy" type="hidden" value="self" />
             <input id="action" name="action" type="hidden" value="{{ action }}" />
+            <input name="returnUrl" type="hidden" value="{{ returnUrl }}" />
 
             <section>
                 <fieldset class="content">

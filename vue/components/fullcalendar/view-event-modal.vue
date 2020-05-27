@@ -27,9 +27,7 @@
             formatDisplayDate: {},
             formatDisplayTime: {},
             formatDisplayDatetime: {},
-            returnTo: {
-                default: 'calendar',
-            }
+            returnUrl: {}
         },
         components: {
             MetaItem,
@@ -69,8 +67,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnTo)
-                        deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnTo=' + this.returnTo;
+                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnUrl)
+                        deleteLink = this.eventModifyFormActionUrl + '?id=' + metadata?.eventId + '&returnUrl=' + this.returnUrl;
                     }
                 }
 
@@ -134,15 +132,15 @@
         methods: {
 
             /**
-             * Route to the Event Modify screen with optional returnTo redirect
+             * Route to the Event Modify screen with optional returnUrl redirect
              *
              * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
              */
-            generateModifyUrl(eventId, returnTo) {
+            generateModifyUrl(eventId, returnUrl) {
                 var url = this.eventModifyFormUrl.replace('{eventId}', eventId);
 
-                if (returnTo.length) {
-                    url += '?returnTo=' + returnTo;
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
                 }
 
                 return url;

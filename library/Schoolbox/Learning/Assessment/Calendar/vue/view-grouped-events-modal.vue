@@ -17,7 +17,7 @@
             formatDisplayDate: {},
             formatDisplayTime: {},
             formatDisplayDatetime: {},
-            returnTo: {
+            returnUrl: {
                 default: 'calendar',
             }
         },

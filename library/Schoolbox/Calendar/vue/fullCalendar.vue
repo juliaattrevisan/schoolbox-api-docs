@@ -383,6 +383,17 @@
             },
 
             /**
+             * Get the current url; these redirects are used after backend processing
+             * so you can return to your current location afterwards
+             *
+             * Use the base64encoded version of the url's pathname, so it can work in
+             * conjunection with Class Redirect in the back end
+             */
+            returnUrl() {
+                return btoa(window.location.pathname);
+            },
+
+            /**
              * Callback for adding an event to the calendar.
              * @see https://fullcalendar.io/docs/Calendar-addEvent
              *
@@ -648,6 +659,7 @@
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
+                          :return-url="returnUrl()"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />
 

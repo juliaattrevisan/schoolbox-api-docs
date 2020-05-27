@@ -21,6 +21,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
@@ -290,17 +291,20 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'redirect' => $event->setupRedirect(
-                urldecode($this->getRequest()->query['returnTo'] ?? '/'),
-                $event->getStartDateTime()->getURLDate(),
-                $this->getRequest()->query['homepageId'],
-                $this->getRequest()->query['userId']
-            ),
-            'returnStr' => '&returnTo=' . $this->getRequest()->query['returnTo'] .
-                ($this->getRequest()->query['userId'] ? '&userId=' . $this->getRequest()->query['userId'] : '') .
-                ($this->getRequest()->query['homepageId'] ? '&homepageId=' . $this->getRequest()->query['homepageId'] : '') .
-                ($this->getRequest()->query['returnDate'] ? '&returnDate=' . $this->getRequest()->query['returnDate'] : ''),
+            'returnUrl' => $this->getRequest()->query['returnUrl'],
+//            'redirect' => $event->setupRedirect(
+//                urldecode($this->getRequest()->query['returnTo'] ?? '/'),
+//                $event->getStartDateTime()->getURLDate(),
+//                $this->getRequest()->query['homepageId'],
+//                $this->getRequest()->query['userId']
+//            ),
+//            'returnStr' => '&returnTo=' . $this->getRequest()->query['returnTo'] .
+//                ($this->getRequest()->query['userId'] ? '&userId=' . $this->getRequest()->query['userId'] : '') .
+//                ($this->getRequest()->query['homepageId'] ? '&homepageId=' . $this->getRequest()->query['homepageId'] : '') .
+//                ($this->getRequest()->query['returnDate'] ? '&returnDate=' . $this->getRequest()->query['returnDate'] : ''),
         ])->setTitle("Modify {$event->getTitle()}"));
+
+        new \Alaress_Probe(Redirect::decode($this->getRequest()->query['returnUrl']));
     }
 
 
@@ -474,7 +478,6 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postModify(Event $event): void
@@ -524,7 +527,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $return = $this->getRequest()->post['return'];
+        $returnUrl = $this->getRequest()->post['returnUrl'];
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -629,21 +632,21 @@ class Controller extends Base
         /* Back to the Future was used in some contexts which may return to either someone's fullcalendar view
          * or alternatively, homepage or dashboard components where event listings are available
          */
-        if (!$youAreAuthorOrOwner) {
-            $this->response->redirect->to($this->router->generate('calendar.getCalendar', [
-                'selectedDate' => $event->getStartDateTime()->getURLDate(),
-                'userId' => $owner->getId()
-            ]));
-        } elseif ($youAreAuthor) {
-            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
-                'selectedDate' => $event->getStartDateTime()->getURLDate()
-            ]));
-        } elseif ('' !== $return) {
-            $this->response->redirect->to($return);
-        } else {
-            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
-                'selectedDate' => $event->getStartDateTime()->getURLDate()
-            ]));
-        }
+//        if (!$youAreAuthorOrOwner) {
+//            $this->response->redirect->to($this->router->generate('calendar.getCalendar', [
+//                'selectedDate' => $event->getStartDateTime()->getURLDate(),
+//                'userId' => $owner->getId()
+//            ]));
+//        } elseif ($youAreAuthor) {
+//            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
+//                'selectedDate' => $event->getStartDateTime()->getURLDate()
+//            ]));
+//        } elseif ('' !== $return) {
+            $this->response->redirect->to($returnUrl);
+//        } else {
+//            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
+//                'selectedDate' => $event->getStartDateTime()->getURLDate()
+//            ]));
+//        }
     }
 }
