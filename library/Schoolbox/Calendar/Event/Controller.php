@@ -219,6 +219,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'returnUrl' => $this->getRequest()->query['returnUrl'],
         ])->setTitle('Create event'));
     }
 
@@ -514,7 +515,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = '' !== (string)$this->getRequest()->query['returnUrl'] ?: Redirect::encode('/calendar');
+        $returnUrl = '' !== (string)$this->getRequest()->query['returnUrl'] ? $this->getRequest()->query['returnUrl'] : Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */

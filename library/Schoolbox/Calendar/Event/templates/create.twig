@@ -68,6 +68,13 @@
         {% else %}
             {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreate') %}
         {% endif %}
+
+        {# Append returnUrl encoding if supplied
+         # It's used generally from the event modal
+         #}
+        {% if returnUrl|length %}
+            {% set formRoute = formRoute ~ '?returnUrl=' ~ returnUrl %}
+        {% endif %}
         <form id="eventForm" method="post" action="{{ formRoute }}" class="top">
             <input name="id" type="hidden" value="{{ event.id }}" />
             <input name="userId" type="hidden" value="{{ user.id }}" />
