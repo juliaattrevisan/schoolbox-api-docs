@@ -218,12 +218,6 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'redirect' => $event->setupRedirect(
-                $this->getRequest()->query['returnTo'], // TODO: Why wasn't this urlencoded too?
-                ($this->getRequest()->query['returnDate'] ? $this->getRequest()->query['returnDate'] : $event->getStartDateTime()->getURLDate()),
-                $this->getRequest()->query['homepageId'],
-                $this->getRequest()->query['userId']
-            ),
         ])->setTitle('Create event'));
     }
 
@@ -292,19 +286,7 @@ class Controller extends Base
                 'selected' => $selectedCampuses,
             ],
             'returnUrl' => $this->getRequest()->query['returnUrl'],
-//            'redirect' => $event->setupRedirect(
-//                urldecode($this->getRequest()->query['returnTo'] ?? '/'),
-//                $event->getStartDateTime()->getURLDate(),
-//                $this->getRequest()->query['homepageId'],
-//                $this->getRequest()->query['userId']
-//            ),
-//            'returnStr' => '&returnTo=' . $this->getRequest()->query['returnTo'] .
-//                ($this->getRequest()->query['userId'] ? '&userId=' . $this->getRequest()->query['userId'] : '') .
-//                ($this->getRequest()->query['homepageId'] ? '&homepageId=' . $this->getRequest()->query['homepageId'] : '') .
-//                ($this->getRequest()->query['returnDate'] ? '&returnDate=' . $this->getRequest()->query['returnDate'] : ''),
         ])->setTitle("Modify {$event->getTitle()}"));
-
-        new \Alaress_Probe(Redirect::decode($this->getRequest()->query['returnUrl']));
     }
 
 
@@ -527,7 +509,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = $this->getRequest()->post['returnUrl'];
+        $returnUrl = $this->getRequest()->post['returnUrl'] ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -615,38 +597,8 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        /* Apply redirects
-         * Depending on context you'll have to pick a place to go when we're done saving
+        /* Apply redirect - go back to the place from whence you came
          */
-
-        /* Superuser or moderator person modifying some arbitrary event belonging to someone else, for someone else
-         * You're not the author of the event, nor does it appear on your calendar
-         */
-        $youAreAuthorOrOwner = in_array($this->getUser()->getId(), [$event->getAuthor()->getId(), $event->getOwner()->getId()], false);
-
-        /* Teacher modifying self-created event for some arbitrary person
-         * You authored this event for someone else
-         */
-        $youAreAuthor = ($author->getId() != $owner->getId()) && ($author->getId() == $this->getUser()->getId());
-
-        /* Back to the Future was used in some contexts which may return to either someone's fullcalendar view
-         * or alternatively, homepage or dashboard components where event listings are available
-         */
-//        if (!$youAreAuthorOrOwner) {
-//            $this->response->redirect->to($this->router->generate('calendar.getCalendar', [
-//                'selectedDate' => $event->getStartDateTime()->getURLDate(),
-//                'userId' => $owner->getId()
-//            ]));
-//        } elseif ($youAreAuthor) {
-//            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
-//                'selectedDate' => $event->getStartDateTime()->getURLDate()
-//            ]));
-//        } elseif ('' !== $return) {
-            $this->response->redirect->to($returnUrl);
-//        } else {
-//            $this->response->redirect->to($this->router->generate('calendar.getOwnCalendar', [
-//                'selectedDate' => $event->getStartDateTime()->getURLDate()
-//            ]));
-//        }
+        $this->response->redirect->to(Redirect::decode($returnUrl));
     }
 }
