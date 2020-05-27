@@ -1,0 +1,60 @@
+{% autoescape 'css' %}
+:root {
+    --navigation-foreground-h: {{ colors.skin_colour_navigation_foreground.h | round(2) }};
+    --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }};
+    --navigation-foreground-l: {{ colors.skin_colour_navigation_foreground.l | round(2) }};
+    --navigation-foreground-a: {{ colors.skin_colour_navigation_foreground.a | round(2) }}%;
+    --navigation-foreground:   hsla(
+        var(--navigation-foreground-h),
+        var(--navigation-foreground-s),
+        var(--navigation-foreground-l),
+        var(--navigation-foreground-a)
+    );
+
+    --navigation-background-h: {{ colors.skin_colour_navigation_background.h | round(2) }};
+    --navigation-background-s: {{ colors.skin_colour_navigation_background.s | round(2) }};
+    --navigation-background-l: {{ colors.skin_colour_navigation_background.l | round(2) }};
+    --navigation-background-a: {{ colors.skin_colour_navigation_background.a | round(2) }}%;
+    --navigation-background:   hsla(
+        var(--navigation-background-h),
+        var(--navigation-background-s),
+        var(--navigation-background-l),
+        var(--navigation-background-a)
+    );
+
+    --navigation-hover-h: {{ colors.skin_colour_navigation_hover.h | round(2) }};
+    --navigation-hover-s: {{ colors.skin_colour_navigation_hover.s | round(2) }};
+    --navigation-hover-l: {{ colors.skin_colour_navigation_hover.l | round(2) }};
+    --navigation-hover-a: {{ colors.skin_colour_navigation_hover.a | round(2) }}%;
+    --navigation-hover:   hsla(
+        var(--navigation-hover-h),
+        var(--navigation-hover-s),
+        var(--navigation-hover-l),
+        var(--navigation-hover-a)
+    );
+
+{#--off-canvas-foreground:        {{ config.skin_colour_offcanvas_foreground }};#}
+{#--off-canvas-background:        {{ config.skin_colour_offcanvas_background }};#}
+{#--off-canvas-hover:             {{ config.skin_colour_offcanvas_hover }};#}
+{#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
+{#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
+{#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}
+{#--content-ui-foreground:        {{ config.skin_colour_content_ui_foreground }};#}
+{#--content-ui-background:        {{ config.skin_colour_content_ui_background }};#}
+{#--content-ui-hover:             {{ config.skin_colour_content_ui_hover }};#}
+{#--content-ui-selected:          {{ config.skin_colour_content_ui_selected }};#}
+{#--content-ui-submit-foreground: {{ config.skin_colour_content_ui_submit_foreground }};#}
+{#--content-ui-submit-background: {{ config.skin_colour_content_ui_submit_background }};#}
+{#--accent-foreground:            {{ config.skin_colour_accent_foreground }};#}
+{#--accent-background:            {{ config.skin_colour_accent_background }};#}
+{#--accent-hover:                 {{ config.skin_colour_accent_hover }};#}
+{#--logo-background:              {{ config.skin_colour_logo_background }};#}
+{#--body-bg:                      {{ config.skin_colour_body_bg }};#}
+{#--button-input-scale:           {{ config.skin_button_input_scale }};#}
+{#--login-form-background-color:  {{ config.skin_colour_login_background }};#}
+{#--form-border-color:            {{ config.skin_colour_form_input_border_color }};#}
+{#--form-bg-hover-color:          {{ config.skin_colour_form_background_hover_color }};#}
+
+}
+{{ config.skin_custom_css | raw }}
+{% endautoescape %}

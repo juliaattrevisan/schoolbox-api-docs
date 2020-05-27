@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\IConfigLoader;
+use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -8,9 +9,6 @@ $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 // Do stuff
 /** @var IConfigLoader $config */
 $config = $kernel->get('config');
-
-//// This is a CSS file
-//header('Content-Type: text/css');
 
 // Now output stuff
 $colorVars = [
@@ -41,8 +39,21 @@ $colorVars = [
 $twigVars = [];
 foreach ($colorVars as $colorVar) {
     $pixel = new ImagickPixel($config->get($colorVar));
-    $twigVars['colors'][$colorVar]          = $pixel->getHSL();
-    $twigVars['colors'][$colorVar]['alpha'] = $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF;
+    $hsl   = $pixel->getHSL();
+    $twigVars['colors'][$colorVar] = [
+        'h' => $hsl['hue'] * 360,
+        's' => $hsl['saturation'] * 100,
+        'l' => $hsl['luminosity'] * 100,
+        'a' => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
+    ];
+//    $pixel->getHSL();
+//    $twigVars['colors'][$colorVar]['hue']   *= 360;
+//    $twigVars['colors'][$colorVar]['alpha'] = $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF;
 }
 
-new Alaress_Probe($twigVars);
+/** @var Environment $twig */
+$twig = $kernel->get('templateEngine');
+
+// This is a CSS file, cached for a while
+header('Content-Type: text/css');
+echo $twig->render('css/skin.twig', $twigVars);
