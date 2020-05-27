@@ -16,8 +16,8 @@ $charset: "utf-8";
 //$off-canvas-background:            rgb(229, 244, 255) !default;
 //$off-canvas-hover:                 rgb(241, 249, 255) !default;
 
-// This has never been replaced?
-$off-canvas:                       rgb(255, 255, 255) !default;
+// This has never been a var that is able to be overridden?
+//$off-canvas:                       rgb(255, 255, 255) !default;
 
 $content-ui-foreground:            rgb(0, 102, 176) !default;
 $content-ui-background:            rgb(193, 229, 255) !default;
