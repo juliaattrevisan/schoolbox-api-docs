@@ -277,7 +277,9 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
+        if ($this->conf->get('restrict_parent_duework_access')
+            || ($this->conf->get('restrict_parent_grades') && $this->conf->get('restrict_student_submissions'))
+            || !$assess->isMarkShownToParents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));
             return $envelope;
         } else {
@@ -295,14 +297,14 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $term      = $this->termMapper->findForDate($assess->getFinish());
-        $hrefGrade = "/learning/grades/{$student->getId()}/{$term->getCode()}/{$assess->getCategory()->getId()}";
+        $hrefGrade = $this->conf->get('restrict_parent_grades') ? '' : "/learning/grades/{$student->getId()}/{$term->getCode()}/{$assess->getCategory()->getId()}";
         $href      = $this->conf->get('restrict_student_submissions') ? $hrefGrade : "/learning/assessments/{$assess->getAssessmentModel()->getId()}/$studentId";
 
         $bob = new Builder();
         $bob->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->setHref($href)
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $teacher->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $teacher->getId())
             ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
             ->setParams([
                 'staff' => new UserParam($teacher),

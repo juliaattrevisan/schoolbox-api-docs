@@ -88,6 +88,13 @@ class Controller extends ConfigController
         $reRouterSettings = ['messaging_enabled', 'mail_replyto_enabled', 'feedback_url', 'feedback_text'];
         $reloadReRouter   = false;
 
+        $notifierSettings = [
+            'restrict_parent_duework_access',
+            'restrict_student_submissions',
+            'restrict_parent_grades',
+        ];
+        $dropNotifierConfigCache = false;
+
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
             if (!$existingConfig->getEditable()) {
@@ -100,16 +107,22 @@ class Controller extends ConfigController
                 if (\in_array($name, $reRouterSettings, true)) {
                     $reloadReRouter = true;
                 }
+                if (\in_array($name, $notifierSettings, true)) {
+                    $dropNotifierConfigCache = true;
+                }
                 $existingConfig->setValue(trim($newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
-        // Reload message router
-        if ($reloadReRouter) {
+        if ($reloadReRouter || $dropNotifierConfigCache) {
             $redisClient = Alaress\Redis::getClientInstance();
-            if ($redisClient) {
+            if ($redisClient && $reloadReRouter) {
+                // Reload message router
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
+            }
+            if ($redisClient && $dropNotifierConfigCache) {
+                $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
         }
 
