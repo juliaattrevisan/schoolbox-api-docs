@@ -3,7 +3,7 @@
 $f-dropdown-triangle-color: transparent;
 $f-dropdown-max-width: 300px;
 $f-dropdown-margin-top: 0px;
-$f-dropdown-bg: $content-ui-background;
+$f-dropdown-bg: var(--content-ui-background);
 $f-dropdown-border-width: 0px;
 $f-dropdown-border-color: transparent;
 $f-dropdown-font-color: var(--content-ui-foreground);
@@ -47,7 +47,7 @@ $f-dropdown-icon-align: 0.25rem;
           calc(var(--content-ui-foreground-l) * 1.1),
           var(--content-ui-foreground-a),
         );
-		//color: contrast-bg($background: $content-ui-background, $dark: var(--content-ui-foreground));
+		//color: contrast-bg($background: var(--content-ui-background), $dark: var(--content-ui-foreground));
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
@@ -57,7 +57,7 @@ $f-dropdown-icon-align: 0.25rem;
 		cursor: default;
 		font-size: rem-calc($base-font-size - 3);
 		&:hover {
-			background-color: $content-ui-background;
+			background-color: var(--content-ui-background);
 		}
 	}
 	[class*="icon-"]:before {

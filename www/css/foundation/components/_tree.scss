@@ -8,7 +8,7 @@ $tree-node-color: var(--content-ui-foreground);
 $tree-node-hover-background: $content-ui-hover;
 $tree-node-hover-color: var(--content-ui-foreground);
 
-$tree-node-selected-background: $content-ui-background;
+$tree-node-selected-background: var(--content-ui-background);
 $tree-node-selected-color: var(--content-ui-foreground);
 
 $tree-folder-icon-color: var(--content-ui-foreground);

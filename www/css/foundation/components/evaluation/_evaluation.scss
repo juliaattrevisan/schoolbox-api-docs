@@ -76,7 +76,7 @@
 
     .sortable {
         color: var(--content-ui-foreground);
-        background-color: $content-ui-background;
+        background-color: var(--content-ui-background);
         font-weight: $alert-font-weight;
     }
 }

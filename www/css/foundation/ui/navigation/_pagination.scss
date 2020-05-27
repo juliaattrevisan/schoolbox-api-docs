@@ -24,7 +24,7 @@ $pagination-link-active-bg: $content-ui-selected;
 // $pagination-link-unavailable-cursor: default;
 // $pagination-link-unavailable-font-color: $aluminum;
 $pagination-link-unavailable-bg-active: scale-color(
-  $content-ui-background,
+  var(--content-ui-background),
   $lightness: -10%
 );
 
@@ -49,12 +49,12 @@ ul.pagination {
     a,
     button {
       @include button-dimensions();
-      background-color: $content-ui-background;
+      background-color: var(--content-ui-background);
       border-radius: 0px;
     }
 
     a:focus {
-      background: $content-ui-background;
+      background: var(--content-ui-background);
     }
 
     &.active a {

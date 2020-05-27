@@ -286,7 +286,7 @@
 
 %switch-first-child{
 	text-align: left;
-	color: $content-ui-background;
+	color: var(--content-ui-background);
 	opacity: 0;
 }
 %switch-last-child{

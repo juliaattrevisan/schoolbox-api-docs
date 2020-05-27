@@ -145,7 +145,7 @@ $tooltip-padding: 1rem;
 }
 
 .introjs-button {
-  background-color: $content-ui-background;
+  background-color: var(--content-ui-background);
   background-image: none;
   border: 0;
   border-radius: 0;

@@ -99,7 +99,7 @@
 
     .result-meta.with-bg {
         @include button-dimensions();
-        background-color: $content-ui-background;
+        background-color: var(--content-ui-background);
         color: var(--content-ui-foreground);
         font-size: rem-calc(($base-font-size - 2));
         font-style: normal;

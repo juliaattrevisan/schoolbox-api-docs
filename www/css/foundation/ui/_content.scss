@@ -172,9 +172,9 @@ $reveal-border-width: 9;
 // $include-html-accordion-classes: $include-html-classes;
 
 $accordion-navigation-padding: rem-calc(($base-font-size - 4));
-$accordion-navigation-bg-color: $content-ui-background;
+$accordion-navigation-bg-color: var(--content-ui-background);
 $accordion-navigation-hover-bg-color: $content-ui-hover;
-$accordion-navigation-active-bg-color: $content-ui-background;
+$accordion-navigation-active-bg-color: var(--content-ui-background);
 $accordion-navigation-font-color: var(--content-ui-foreground);
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
@@ -796,7 +796,7 @@ $rotate-span-width: 11rem;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: $content-ui-background;
+    background-color: var(--content-ui-background);
     border-radius: 0.5rem;
 
     &.icon-help:before{
@@ -1793,7 +1793,7 @@ $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
 $train-line-visited-color: var(--content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
-$train-line-unvisited-color: $content-ui-background;
+$train-line-unvisited-color: var(--content-ui-background);
 
 .train-line {
     display: flex;
@@ -1832,14 +1832,14 @@ $train-line-unvisited-color: $content-ui-background;
         }
         &.current-stop {
             &:after {
-                background: $content-ui-background;
+                background: var(--content-ui-background);
             }
             ~ li {
                 &:before, &:after {
-                    background: $content-ui-background;
+                    background: var(--content-ui-background);
                 }
                 a span {
-                    background: $content-ui-background;
+                    background: var(--content-ui-background);
                 }
             }
             a span {

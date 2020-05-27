@@ -20,7 +20,7 @@
          * into component-titlebar
          */
         .component-titlebar {
-            background-color: $content-ui-background;
+            background-color: var(--content-ui-background);
             margin-bottom: 0px;
         }
     }

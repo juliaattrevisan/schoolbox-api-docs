@@ -82,7 +82,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // $include-html-form-classes: $include-html-classes;
 
 // Controlling background color for the switch container
-$switch-bg: $content-ui-background;
+$switch-bg: var(--content-ui-background);
 
 // Controlling border styles and background colors for the switch container
 $switch-border-color: transparent;
@@ -351,7 +351,7 @@ th, td{
         + #{$label-selector} {
             &:before, &:after {
                 color: var(--content-ui-foreground) !important;
-                background-color: $content-ui-background;
+                background-color: var(--content-ui-background);
             }
         }
     }
@@ -390,7 +390,7 @@ th, td{
 .button-block {
 	display: block;
 	background-color: $white;
-	border: $input-border-width solid $content-ui-background;
+	border: $input-border-width solid var(--content-ui-background);
 	color: var(--content-ui-foreground);
 	margin: 0 0 1rem 0;
 	padding: ($base-font-size - 4);
@@ -408,7 +408,7 @@ th, td{
 		line-height: 1;
 	}
 	&:hover {
-		background-color: $content-ui-background;
+		background-color: var(--content-ui-background);
 		color: var(--content-ui-foreground);
 	}
 }

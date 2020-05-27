@@ -55,7 +55,7 @@ $button-font-weight: $font-weight-normal;
 // We use these to control button border and hover styles.
 // $button-border-width: 0px;
 // $button-border-style: solid;
-$button-bg-color: $content-ui-background;
+$button-bg-color: var(--content-ui-background);
 $button-bg-hover: $content-ui-hover;
 
 $submit-button-color: $content-ui-submit-foreground;

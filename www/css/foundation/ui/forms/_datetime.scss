@@ -2,7 +2,7 @@
 
 $datepicker-cell-width: (2.125rem, 2.5rem);
 $datepicker-cell-color: var(--content-ui-foreground);
-$datepicker-background: $content-ui-background;
+$datepicker-background: var(--content-ui-background);
 $datepicker-header-background: $content-ui-selected;
 $datepicker-hover-background: $content-ui-hover;
 $datepicker-selected-background: $content-ui-selected;

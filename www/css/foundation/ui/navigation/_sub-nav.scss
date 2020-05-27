@@ -20,7 +20,7 @@ $sub-nav-active-font-weight: $font-weight-normal;
         a {
             @include button-dimensions();
             color: var(--content-ui-foreground);
-            background-color: $content-ui-background;
+            background-color: var(--content-ui-background);
             display: inline-block;
 
             &:hover {

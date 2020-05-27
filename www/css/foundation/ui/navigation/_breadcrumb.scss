@@ -27,7 +27,7 @@ $crumb-border-size: 0;
 $crumb-slash: "";
 
 $breadcrumb-color: var(--content-ui-foreground);
-$breadcrumb-bg-color: $content-ui-background;
+$breadcrumb-bg-color: var(--content-ui-background);
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
 
