@@ -114,10 +114,9 @@
              */
             redirectToEventForm() {
                 // TODO don't use jQuery form serialize
-                this.window.location.href = this.eventCreateFormUrl;
-                    // this.eventModifyFormUrl
-                    // + '?from=inline&returnTo=calendar&'
-                    // + this.window.jQuery(this.$refs.createEventForm).serialize();
+                this.window.location.href = this.eventCreateFormUrl
+                    + '?returnUrl=' + btoa(window.location.pathname)
+                    + '&' + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
         },
     }

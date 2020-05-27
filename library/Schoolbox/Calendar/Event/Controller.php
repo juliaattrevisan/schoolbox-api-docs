@@ -164,6 +164,7 @@ class Controller extends Base
             ->setTitle($this->getRequest()->query['title'])
             ->setAuthor($this->getUser())
             ->setAccess((int)$this->getRequest()->query['level'])
+            ->setAllDay((int)$this->getRequest()->query['allDay'])
             ->setPublishDateTime(Alaress_Date_Format::now());
 
         $event->getType()->setId((int)$this->getRequest()->query['type'] ?: '');
