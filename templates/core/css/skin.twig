@@ -2,8 +2,8 @@
 :root {
     {% if colors.skin_colour_navigation_foreground is defined %}
         --navigation-foreground-h: {{ colors.skin_colour_navigation_foreground.h | round(2) }};
-        --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }};
-        --navigation-foreground-l: {{ colors.skin_colour_navigation_foreground.l | round(2) }};
+        --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }}%;
+        --navigation-foreground-l: {{ colors.skin_colour_navigation_foreground.l | round(2) }}%;
         --navigation-foreground-a: {{ colors.skin_colour_navigation_foreground.a | round(2) }}%;
         --navigation-foreground:   hsla(
             var(--navigation-foreground-h),
@@ -15,8 +15,8 @@
 
     {% if colors.skin_colour_navigation_background is defined %}
         --navigation-background-h: {{ colors.skin_colour_navigation_background.h | round(2) }};
-        --navigation-background-s: {{ colors.skin_colour_navigation_background.s | round(2) }};
-        --navigation-background-l: {{ colors.skin_colour_navigation_background.l | round(2) }};
+        --navigation-background-s: {{ colors.skin_colour_navigation_background.s | round(2) }}%;
+        --navigation-background-l: {{ colors.skin_colour_navigation_background.l | round(2) }}%;
         --navigation-background-a: {{ colors.skin_colour_navigation_background.a | round(2) }}%;
         --navigation-background:   hsla(
             var(--navigation-background-h),
@@ -28,8 +28,8 @@
 
     {% if colors.skin_colour_navigation_hover is defined %}
         --navigation-hover-h: {{ colors.skin_colour_navigation_hover.h | round(2) }};
-        --navigation-hover-s: {{ colors.skin_colour_navigation_hover.s | round(2) }};
-        --navigation-hover-l: {{ colors.skin_colour_navigation_hover.l | round(2) }};
+        --navigation-hover-s: {{ colors.skin_colour_navigation_hover.s | round(2) }}%;
+        --navigation-hover-l: {{ colors.skin_colour_navigation_hover.l | round(2) }}%;
         --navigation-hover-a: {{ colors.skin_colour_navigation_hover.a | round(2) }}%;
         --navigation-hover:   hsla(
             var(--navigation-hover-h),
