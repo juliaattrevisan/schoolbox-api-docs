@@ -54,6 +54,57 @@
         #}
     {% endif %}
 
+    {% if colors.skin_colour_offcanvas_foreground is defined %}
+        --off-canvas-foreground-h: {{ colors.skin_colour_offcanvas_foreground.h | round(2) }};
+        --off-canvas-foreground-s: {{ colors.skin_colour_offcanvas_foreground.s | round(2) }}%;
+        --off-canvas-foreground-l: {{ colors.skin_colour_offcanvas_foreground.l | round(2) }}%;
+        --off-canvas-foreground-a: {{ colors.skin_colour_offcanvas_foreground.a | round(2) }}%;
+        --off-canvas-foreground:   hsla(
+            var(--off-canvas-foreground-h),
+            var(--off-canvas-foreground-s),
+            var(--off-canvas-foreground-l),
+            var(--off-canvas-foreground-a)
+        );
+        {#
+            Derived styles:
+            None known
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_offcanvas_background is defined %}
+        --off-canvas-background-h: {{ colors.skin_colour_offcanvas_background.h | round(2) }};
+        --off-canvas-background-s: {{ colors.skin_colour_offcanvas_background.s | round(2) }}%;
+        --off-canvas-background-l: {{ colors.skin_colour_offcanvas_background.l | round(2) }}%;
+        --off-canvas-background-a: {{ colors.skin_colour_offcanvas_background.a | round(2) }}%;
+        --off-canvas-background:   hsla(
+            var(--off-canvas-background-h),
+            var(--off-canvas-background-s),
+            var(--off-canvas-background-l),
+            var(--off-canvas-background-a)
+        );
+        {#
+            Derived styles:
+            $off-canvas-bg
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_offcanvas_hover is defined %}
+        --off-canvas-hover-h: {{ colors.skin_colour_offcanvas_hover.h | round(2) }};
+        --off-canvas-hover-s: {{ colors.skin_colour_offcanvas_hover.s | round(2) }}%;
+        --off-canvas-hover-l: {{ colors.skin_colour_offcanvas_hover.l | round(2) }}%;
+        --off-canvas-hover-a: {{ colors.skin_colour_offcanvas_hover.a | round(2) }}%;
+        --off-canvas-hover:   hsla(
+            var(--off-canvas-hover-h),
+            var(--off-canvas-hover-s),
+            var(--off-canvas-hover-l),
+            var(--off-canvas-hover-a)
+        );
+        {#
+            Derived styles:
+            None known
+        #}
+    {% endif %}
+
 {#--off-canvas-foreground:        {{ config.skin_colour_offcanvas_foreground }};#}
 {#--off-canvas-background:        {{ config.skin_colour_offcanvas_background }};#}
 {#--off-canvas-hover:             {{ config.skin_colour_offcanvas_hover }};#}

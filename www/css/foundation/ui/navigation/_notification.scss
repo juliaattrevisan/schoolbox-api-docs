@@ -45,7 +45,7 @@ $allow-notification-stash: $xlarge-up;
 }
 
 .right-off-canvas-menu {
-    background-color: $off-canvas-background;
+    background-color: var(--off-canvas-background);
     flex: 0 0 $off-canvas-width;
     z-index: 1002;
 

@@ -45,7 +45,7 @@ $tabbar-hamburger-icon-gap: 4px;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: $off-canvas-background !default;
+$off-canvas-bg: var(--off-canvas-background) !default;
 $off-canvas-bg-hover: false;
 $off-canvas-hover-color: $off-canvas-bg;
 
@@ -436,7 +436,7 @@ $allow-sidebar-stash: $large-up;
     }
 
     .left-menu-dock {
-      color: $off-canvas-foreground;
+      color: var(--off-canvas-foreground);
       display: block;
       height: 2.5rem;
       padding: 0.5rem;
@@ -486,9 +486,9 @@ $allow-sidebar-stash: $large-up;
         float: right;
       }
       a {
-        color: $off-canvas-foreground;
+        color: var(--off-canvas-foreground);
         &:hover {
-          color: $off-canvas-foreground;
+          color: var(--off-canvas-foreground);
           background-color: $off-canvas-hover;
         }
       }
@@ -513,7 +513,7 @@ $allow-sidebar-stash: $large-up;
         font-size: $off-canvas-label-font-size;
 
         /* Use adaptive for separators
-				*/
+         */
         color: contrast-bg(
           $background: $off-canvas,
           $dark: $off-canvas-foreground
@@ -551,9 +551,9 @@ $allow-sidebar-stash: $large-up;
   // 5.5.3 shrinks the submenu for some reason
   .left-submenu {
     min-height: 100%;
-    background-color: $off-canvas-background;
+    background-color: var(--off-canvas-foreground);
     a {
-      color: $off-canvas-foreground;
+      color: var(--off-canvas-foreground);
       &:hover {
         background-color: $off-canvas-hover;
       }
@@ -567,8 +567,8 @@ $allow-sidebar-stash: $large-up;
     line-height: $tabbar-height;
     padding-top: 0;
     padding-bottom: 0;
-    color: $off-canvas-foreground;
-    background-color: $off-canvas-background;
+    color: var(--off-canvas-foreground);
+    background-color: var(--off-canvas-background);
     &:hover {
       background-color: $off-canvas-hover;
     }
