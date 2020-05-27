@@ -90,9 +90,22 @@ $timepicker-item-visible-count: 5;
         @include datepicker-cell();
     }
     td {
-        @include contrast-bg(1, $datepicker-background);
+        // TODO figure out what to do with this
+        color: hsla(
+            var(--content-ui-background-h),
+            var(--content-ui-background-s),
+            calc(var(--content-ui-background-l) * 1.1),
+            var(--content-ui-background-a)
+        );
+        //@include contrast-bg(1, $datepicker-background);
         &.ui-datepicker-other-month {
-            @include contrast-bg(0.4, $datepicker-background);
+          color: hsla(
+              var(--content-ui-background-h),
+              var(--content-ui-background-s),
+              calc(var(--content-ui-background-l) * 1.4),
+              var(--content-ui-background-a)
+          );
+          //@include contrast-bg(0.4, $datepicker-background);
         }
         a, span {
             @include datepicker-cell();
@@ -186,7 +199,14 @@ $timepicker-item-visible-count: 5;
 
             &:hover {
                 background: $datepicker-hover-background;
-                @include contrast-bg(1, $datepicker-background);
+                // TODO figure out what to do with this
+                color: hsla(
+                    var(--content-ui-background-h),
+                    var(--content-ui-background-s),
+                    calc(var(--content-ui-background-l) * 1.1),
+                    var(--content-ui-background-a)
+                );
+                //@include contrast-bg(1, $datepicker-background);
             }
 
             &.ui-timepicker-selected {

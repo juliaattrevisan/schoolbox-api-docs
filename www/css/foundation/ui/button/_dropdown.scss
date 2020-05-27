@@ -92,7 +92,14 @@ $f-dropdown-icon-align: 0.25rem;
         margin: 0 2px 0 0;
     }
     .separator {
-        background-color: darken($f-dropdown-bg, 5%);
+        // TODO figure out what to do with this color
+        background-color: hsla(
+            var(--content-ui-background-h),
+            var(--content-ui-background-s),
+            calc(var(--content-ui-background-l) * .95),
+            var(--content-ui-background-a),
+        );
+        //background-color: darken($f-dropdown-bg, 5%);
         color: $anchor-font-color;
     }
 }

@@ -23,10 +23,17 @@ $pagination-link-active-bg: $content-ui-selected;
 // We use these for disabled anchor links
 // $pagination-link-unavailable-cursor: default;
 // $pagination-link-unavailable-font-color: $aluminum;
-$pagination-link-unavailable-bg-active: scale-color(
-  var(--content-ui-background),
-  $lightness: -10%
+// TODO figure out what to do with this
+$pagination-link-unavailable-bg-active: hsla(
+  var(--content-ui-background-h),
+  var(--content-ui-background-s),
+  calc(var(--content-ui-background-l) * .9),
+  var(--content-ui-background-a),
 );
+//$pagination-link-unavailable-bg-active: scale-color(
+//  var(--content-ui-background),
+//  $lightness: -10%
+//);
 
 // We use these for currently selected anchor links
 $pagination-link-current-background: $content-ui-selected;
