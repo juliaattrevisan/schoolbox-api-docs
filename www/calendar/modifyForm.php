@@ -23,16 +23,16 @@ $eventMapper     = new EventMapper();
 $eventAccess     = new Access(FolderAccess::getInstance());
 
 switch ($_POST['action']) {
-    case 'Add':
-    case 'Update':
+//    case 'Add':
+//    case 'Update':
 //        $publishDate = null;
 //        $until       = null;
-
-        /* Spawn an existing event if id provided
-         * Otherwise spawn a new one
-         */
-        if (is_numeric($_POST['id'])) {
-
+//
+//        /* Spawn an existing event if id provided
+//         * Otherwise spawn a new one
+//         */
+//        if (is_numeric($_POST['id'])) {
+//
 //            /* Check event exists
 //             */
 //            try {
@@ -56,12 +56,12 @@ switch ($_POST['action']) {
 //            } catch (\Schoolbox\Mapper\Exception $e) {
 //                $owner = $_SESSION['user'];
 //            }
-
-        } else {
-            $event = new Event();
-            $owner = $userMapper->findById($_POST['userId']);
-        }
-
+//
+//        } else {
+//            $event = new Event();
+//            $owner = $userMapper->findById($_POST['userId']);
+//        }
+//
 //        // Check if author still exists
 //        // If not - pass author to the editor
 //        try {
@@ -209,8 +209,8 @@ switch ($_POST['action']) {
 //            } else {
 //                $page->backToTheFuture(2);
 //            }
-        break;
-
+//        break;
+//
     case 'Delete':
 
         $eventMapper = new \Schoolbox\Calendar\EventMapper();

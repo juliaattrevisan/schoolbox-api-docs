@@ -442,11 +442,15 @@ class Controller extends Base
 
 
     /**
-     * Create a new event
+     * Create an event for person specified by userId
+     * (remember, you can create events for other people)
      */
     public function postCreate(): void
     {
-        // TODO: Obviously
+        $event = new Event();
+        $event->setOwner($this->userMapper->findById($this->getRequest()->post['userId']));
+
+        $this->postModify($event);
     }
 
 
@@ -468,7 +472,7 @@ class Controller extends Base
         $until       = null;
 
         /* Check owner still exists
-         * If not - pass ownership to the editor
+         * If not - pass ownership to the author
          */
         try {
             $owner = $this->userMapper->findById($event->getOwner()->getId());
@@ -477,7 +481,7 @@ class Controller extends Base
         }
 
         /* Check if author still exists
-         * If not - pass author to the editor
+         * If not - pass author to the author
          */
         try {
             $author = $this->userMapper->findById($this->getRequest()->post['authorId']);
@@ -509,7 +513,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = $this->getRequest()->post['returnUrl'] ?? Redirect::encode('/calendar');
+        $returnUrl = '' !== (string)$this->getRequest()->post['returnUrl'] ?: Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
