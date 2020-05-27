@@ -569,7 +569,8 @@ class Controller extends Base
             ->setEndDateTime($endDate)
             ->setPublishDateTime($publishDate)
             ->setAllDay($allDay)
-            ->setRoleCollection(new Collection($groups))
+            ->setRoleCollection(new Collection($roles))
+            ->setFolderCollection(new Collection($groups))
             ->setCampusCollection(new Collection($campuses));
 
         /* Attendance dirty bit should be set to true if the attendance
