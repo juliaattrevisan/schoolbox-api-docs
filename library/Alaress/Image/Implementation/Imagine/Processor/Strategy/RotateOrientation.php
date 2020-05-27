@@ -53,6 +53,9 @@ class RotateOrientation extends BaseStrategy
             default:
                 break;
         }
+        $profile = $image->palette()->profile();
+        $image->strip();
+        $image->profile($profile);
         return $image;
     }
 }
