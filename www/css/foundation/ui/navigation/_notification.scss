@@ -53,6 +53,7 @@ $allow-notification-stash: $xlarge-up;
         ul.off-canvas-list {
             label {
                 background: $notification-header-background;
+                // TODO consider this calculation
                 color: hsla(
                   var(--navigation-background-h),
                   var(--navigation-background-s),

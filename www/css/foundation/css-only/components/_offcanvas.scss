@@ -30,12 +30,15 @@ $tabbar-header-margin: 0 !default;
 $off-canvas-width: rem-calc(250) !default;
 $off-canvas-height: rem-calc(300) !default;
 $off-canvas-bg: $oil !default;
+
+// TODO consider this calculation
 $off-canvas-bg-hover: hsla(
                 var(--navigation-foreground-h),
                 var(--navigation-foreground-s),
                 calc(var(--navigation-foreground-l) - 30%),
                 var(--navigation-foreground-a)
 );
+// TODO consider this calculation
 $off-canvas-bg-active: hsla(
                 var(--navigation-foreground-h),
                 var(--navigation-foreground-s),
