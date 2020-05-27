@@ -604,4 +604,56 @@ class Controller extends Base
          */
         $this->response->redirect->to(Redirect::decode($returnUrl));
     }
+
+
+    /**
+     * Delete an event, or a set of events from a series
+     *
+     * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
+     */
+    public function postDelete(Event $event)
+    {
+        /* Check whether you have permissions to delete $event
+         */
+        $folderAccess = FolderAccess::getInstance();
+
+        if (!(new Event\Access($folderAccess))->checkExisting($this->getUser(), $event)) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+        }
+
+        /* Delete an entire series, if the seriesId is not null
+         */
+        if ($event->getSeriesId() !== null) {
+            if ($this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
+                $allEvents = $this->eventMapper->getAllInSeries($event);
+
+                foreach ($allEvents as $currentEvent) {
+                    $this->eventMapper->delete($currentEvent);
+                }
+            } elseif ($this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
+                $this->eventMapper->delete($event);
+            }
+        } else {
+            $this->eventMapper->delete($event);
+        }
+
+        /* Redirect
+         */
+        $redirect = Redirect::decode($this->getRequest()->query['returnUrl']);
+
+        /* Calculate redirect for async javascript
+         */
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'callbackUrl' => $redirect
+            ]));
+        } else {
+            $this->response->redirect->to($redirect);
+        }
+    }
 }

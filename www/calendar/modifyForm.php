@@ -4,25 +4,25 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\Event\Access;
-use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\Access as FolderAccess;
-
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
-
-$groupHandler    = new Group();
-$calendarHandler = new Calendar();
-$page            = new SitePage();
-$userMapper      = new UserMapper();
-$eventMapper     = new EventMapper();
-$eventAccess     = new Access(FolderAccess::getInstance());
-
-switch ($_POST['action']) {
+//
+//use Schoolbox\Calendar\Event;
+//use Schoolbox\Calendar\EventTypeMapper;
+//use Schoolbox\Calendar\EventMapper;
+//use Schoolbox\Calendar\Event\Access;
+//use Schoolbox\UserMapper;
+//use Schoolbox\Permission\Access\Access as FolderAccess;
+//
+//require_once __DIR__ . '/../../conf/core/require.php';
+//$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+//
+//$groupHandler    = new Group();
+//$calendarHandler = new Calendar();
+//$page            = new SitePage();
+//$userMapper      = new UserMapper();
+//$eventMapper     = new EventMapper();
+//$eventAccess     = new Access(FolderAccess::getInstance());
+//
+//switch ($_POST['action']) {
 //    case 'Add':
 //    case 'Update':
 //        $publishDate = null;
@@ -211,51 +211,51 @@ switch ($_POST['action']) {
 //            }
 //        break;
 //
-    case 'Delete':
-
-        $eventMapper = new \Schoolbox\Calendar\EventMapper();
-
-        /**
-         * Check event exists
-         */
-        try {
-            $event = $eventMapper->findById($_POST['id']);
-        } catch (\Exception $e) {
-            error(160);
-        }
-
-        /**
-         * Check user has permission to delete this event
-         */
-        if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
-            error(34);
-        }
-
-        /* Delete an entire series, if the seriesId is not null
-         */
-        if ($event->getSeriesId() != null) {
-            if ($_REQUEST['efficacy'] == 'series') {
-                $allEvents = $eventMapper->getAllInSeries($event);
-                foreach ($allEvents as $currentEvent) {
-                    $eventMapper->delete($currentEvent);
-                }
-            } elseif ($_REQUEST['efficacy'] == 'self') {
-                $eventMapper->delete($event);
-            }
-        } else {
-            $eventMapper->delete($event);
-        }
-
-        $redirect = $event->setupRedirect(
-            urldecode($_GET['returnTo']),
-            ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
-            $_GET['homepageId'],
-            $_GET['userId']);
-        header('Content-type: application/json');
-        echo json_encode(['callbackUrl' => $redirect]);
-        break;
-
-    default:
-        error(0);
-        break;
-}
+//    case 'Delete':
+//
+//        $eventMapper = new \Schoolbox\Calendar\EventMapper();
+//
+//        /**
+//         * Check event exists
+//         */
+//        try {
+//            $event = $eventMapper->findById($_POST['id']);
+//        } catch (\Exception $e) {
+//            error(160);
+//        }
+////
+//        /**
+//         * Check user has permission to delete this event
+//         */
+//        if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
+//            error(34);
+//        }
+//
+//        /* Delete an entire series, if the seriesId is not null
+//         */
+//        if ($event->getSeriesId() != null) {
+//            if ($_REQUEST['efficacy'] == 'series') {
+//                $allEvents = $eventMapper->getAllInSeries($event);
+//                foreach ($allEvents as $currentEvent) {
+//                    $eventMapper->delete($currentEvent);
+//                }
+//            } elseif ($_REQUEST['efficacy'] == 'self') {
+//                $eventMapper->delete($event);
+//            }
+//        } else {
+//            $eventMapper->delete($event);
+//        }
+//
+//        $redirect = $event->setupRedirect(
+//            urldecode($_GET['returnTo']),
+//            ($_GET['returnDate'] ? $_GET['returnDate'] : $event->getStartDateTime()->getURLDate()),
+//            $_GET['homepageId'],
+//            $_GET['userId']);
+//        header('Content-type: application/json');
+//        echo json_encode(['callbackUrl' => $redirect]);
+//        break;
+//
+//    default:
+//        error(0);
+//        break;
+//}

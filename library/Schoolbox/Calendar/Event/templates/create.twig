@@ -56,7 +56,7 @@
     {% if event.id %}
     <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
     <ul class="f-dropdown" data-dropdown-content id="overflow">
-        <li><a data-action="delete" href="/calendar/modifyForm.php?id={{ event.id }}{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
+        <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?returnUrl={{ returnUrl }}" class="icon-delete">Delete Event</a></li>
     </ul>
     {% endif %}
 </div>
