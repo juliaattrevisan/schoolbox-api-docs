@@ -14,7 +14,7 @@
 {% endif %}
 
 {% if paginator.pageCount > 1 %}
-    <ul class="pagination {{ class }}">
+    <ul class="pagination {{ class is defined ? class : '' }}">
         {# back/forward page links #}
         <li class="arrow {% if page == 1 %}unavailable{% endif %}">
             <a href="{{ paginator.urlForPage(1) }}"

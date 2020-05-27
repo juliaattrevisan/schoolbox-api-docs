@@ -75,7 +75,7 @@
                                     </template>
                                 </span>
                                 <span v-if="article.metadata && article.metadata.commentCount > 0">
-                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount | formatCommentCountMeta }</a></span>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount | formatCommentCountMeta }</a>
                                 </span>
                             </p>
                         </div>
@@ -216,19 +216,19 @@
             modifyWindowState: {{ modifyWindowState ?: 'false' }},
 
             // Removes the blurb
-            compactMode: {{ compactMode ?: 'false' }},
+            compactMode: {{ compactMode is defined ? compactMode : 'false' }},
 
             // Disables the pagination and shows everything (used for the dashboard component)
-            disablePagination: {{ disablePagination ?: 'false' }},
+            disablePagination: {{ disablePagination is defined ? disablePagination : 'false' }},
 
             // Limits the total number of articles (used for dashboard component)
-            limit: {{ limit ?: 0 }},
+            limit: {{ limit is defined ? limit : 0 }},
 
             // Skips over the 'all' tab and shows the first topic by default (used for the dashboard component)
-            showTopicByDefault: {{ showTopicByDefault ?: 'false' }},
+            showTopicByDefault: {{ showTopicByDefault is defined and showTopicByDefault ? 'true' : 'false' }},
 
             // Controls whether the 'show more' component link is enabled or not
-            showMore: {{ showMore ?: 'false' }}
+            showMore: {{ showMore is defined ? showMore : 'false' }}
         },
         mounted: function () {
             var self = this;
@@ -273,7 +273,7 @@
                 self.topics = topics;
 
                 // Set default selected tab (if not already set via twig above)
-                if (!self.tabSelected) {
+                if (!self.tabSelected.length) {
                     if (self.showTopicByDefault && self.topics[1]) {
                         self.tabSelected = self.topics[1].slug;
                     } else {

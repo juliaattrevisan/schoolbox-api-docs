@@ -77,8 +77,10 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $userFeed = new News\Lists\UserFeed($this->newsMapper, $this->articleResolver);
-
-        $this->renderArticlesAsXml($userFeed->find($user), $this->getRequest()->query->get(Querystring::TOPIC_SLUG));
+        $this->renderArticlesAsXml(
+            $userFeed->find($user),
+            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
+        );
     }
 
 
@@ -106,7 +108,7 @@ class Controller extends Base
 
         $this->renderArticlesAsXml(
             $folderFeed->find($folder->getId()),
-            $this->getRequest()->query->get(Querystring::TOPIC_SLUG)
+            $this->getRequest()->query->get(Querystring::TOPIC_SLUG) ?: News\Mapper::TOPIC_ALL_SLUG
         );
     }
 
@@ -115,7 +117,7 @@ class Controller extends Base
      * Render the set of articles to an XML feed
      *
      * @param int[]             $articleIdFilter
-     * @param string|null       $topicSlug
+     * @param string            $topicSlug
      * @param Folder\Model|null $folder
      * @throws DefinitionException
      * @throws InvalidArgumentException
@@ -126,9 +128,11 @@ class Controller extends Base
      * @throws ServiceNotFound
      * @throws UnderflowException
      */
-    private function renderArticlesAsXml(array $articleIdFilter, ?string $topicSlug, Folder\Model $folder = null): void
+    private function renderArticlesAsXml(array $articleIdFilter, string $topicSlug, Folder\Model $folder = null): void
     {
-        $this->assertValidTopic($topicSlug);
+        if (!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topicSlug)) {
+            throw new NotFound("No topic found with slug '$topicSlug'");
+        }
 
         $availableIds = $this->newsMapper->findArticleIdsByFilters(
             $articleIdFilter,
@@ -153,19 +157,5 @@ class Controller extends Base
             'url'        => $this->getRequest()->url->get(),
             'articles'   => $articles,
         ]));
-    }
-
-
-    /**
-     * Asserts that a topic is valid, throws 404 if not found
-     *
-     * @param string|null $topic
-     * @throws NotFound
-     */
-    private function assertValidTopic(?string $topic): void
-    {
-        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
-            throw new NotFound("No topic found with slug '$topic'");
-        }
     }
 }

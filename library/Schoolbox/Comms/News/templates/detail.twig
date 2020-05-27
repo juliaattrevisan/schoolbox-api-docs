@@ -126,7 +126,7 @@ Data:
          # 'Reject' appears as a button when the article is awaiting moderation, and..
          # anything before awaiting moderation doesn't need a reject/unpublish button
          #}
-        {% if rejectRoute and article.isApproved %}
+        {% if rejectRoute is defined and article.isApproved %}
             <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
         {% endif %}
 
@@ -208,12 +208,8 @@ Data:
 {#} only %}#}
 
 {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
-{% if article.canBeApproved %}
-    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
-{% endif %}
-{% if article.canBeSubmitted %}
-    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-{% endif %}
+{% set approveRoute = article.canBeApproved ? routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) : null %}
+{% set submitRoute  = article.canBeSubmitted ? routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) : null %}
 {% if (approveRoute or submitRoute) and not isPublishable %}
 <div class="small-12 columns" id="unpublishable-box">
     <div id="flash" class="alert-box highlight">
@@ -279,7 +275,7 @@ Data:
 
     /** @var {AudienceOption[]|Object} audienceOptions */
     var audienceOptions = {};
-    {% for entityType in availableEntityTypes %}
+    {% for entityType in availableEntityTypes if entityTypesData[entityType] is defined %}
     {% set data = entityTypesData[entityType] %}
     {% if data %}
     audienceOptions['{{ entityType }}'] = new AudienceOption(

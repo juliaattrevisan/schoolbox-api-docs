@@ -39,7 +39,7 @@
 {# The paginator is enabled by default
  # You can provide a param here to turn it off
  #}
-{% if hidePaginator %}
+{% if hidePaginator is defined and hidePagenator %}
     {% set params = params ~ '&hp=1' %}
 {% endif %}
 

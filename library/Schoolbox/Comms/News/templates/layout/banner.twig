@@ -1,7 +1,7 @@
 {% import '@commsNews/macro/indicator.twig' as indicator %}
 
 <div class="small-12 island">
-    {% if article.featureImage.hash %}
+    {% if article.featureImage %}
         <section class="banner content">
             <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=coverPhoto" alt="" />
         </section>
@@ -168,10 +168,10 @@
         delimiters: ['${', '}'],
         data: {
             articleId: Number({{ article.id }}),
-            threadId: Number({{ article.discussionThread.id }}),
+            threadId: Number({{ article.discussionThread ? article.discussionThread.id : 0 }}),
             threadCheckboxVisible: Boolean({{ modifyRoute or isAuthor }}),
-            threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
-            threadEnabled: Boolean({{ article.discussionThread.open }}),
+            threadCheckboxEnabled: Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }}),
+            threadEnabled: Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }}),
             isPublished: Boolean({{ article.isPublic }}),
             comments: [],
             commentsOriginal: [], // Will contain the unmodified content of comments. In preparation for comment update.
