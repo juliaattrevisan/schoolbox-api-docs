@@ -12,6 +12,7 @@
             // TODO why do I have to pass this method around?
             'toMoment',
             'eventCreateUrl',
+            'eventCreateFormUrl',
             'eventModifyFormUrl',
             'formatFormDate',
             'formatFormDatetime',
@@ -113,10 +114,10 @@
              */
             redirectToEventForm() {
                 // TODO don't use jQuery form serialize
-                this.window.location.href =
-                    this.eventModifyFormUrl
-                    + '?from=inline&returnTo=calendar&'
-                    + this.window.jQuery(this.$refs.createEventForm).serialize();
+                this.window.location.href = this.eventCreateFormUrl;
+                    // this.eventModifyFormUrl
+                    // + '?from=inline&returnTo=calendar&'
+                    // + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
         },
     }

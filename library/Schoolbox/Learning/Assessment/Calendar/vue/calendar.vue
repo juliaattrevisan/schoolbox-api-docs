@@ -21,6 +21,7 @@
     /* TODO: Events should already know about and come with their own modify link;
      * we shouldn't be inferring and building it out here
      */
+    const URL_EVENT_CREATE_FORM = '/calendar/event/create';
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
@@ -90,6 +91,7 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
+                    createForm: URL_EVENT_CREATE_FORM,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
                     delete: URL_EVENT_DELETE,
@@ -806,6 +808,7 @@
         <view-event-modal ref="event"
                           return-to="assessmentCalendar"
                           :to-moment="toMoment"
+                          :event-create-form-url="urls.createForm"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
                           :event-delete-url="urls.delete"

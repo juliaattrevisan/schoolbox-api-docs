@@ -30,6 +30,7 @@
     /* TODO: Events should already know about and come with their own modify link;
      * we shouldn't be inferring and building it out here
      */
+    const URL_EVENT_CREATE_FORM = '/calendar/event/create';
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
@@ -80,11 +81,12 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
-                    create: URL_EVENT_CREATE,
+                    createForm: URL_EVENT_CREATE_FORM,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    delete: URL_EVENT_DELETE,
+                    create: URL_EVENT_CREATE,
                     update: URL_EVENT_UPDATE,
+                    delete: URL_EVENT_DELETE,
                     export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
@@ -644,6 +646,7 @@
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
+                            :event-create-form-url="urls.createForm"
                             :event-modify-form-url="urls.modifyForm"
                             :format-form-date="formats.formDate"
                             :format-form-datetime="formats.formDatetime"
