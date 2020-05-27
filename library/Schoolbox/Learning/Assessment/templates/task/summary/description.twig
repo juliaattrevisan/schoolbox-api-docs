@@ -12,7 +12,9 @@
         </article>
     {% endif %}
 
-    {% if preview.type == 'image' %}
+    {% if preview.type is not defined %}
+        {# noop #}
+    {% elseif preview.type == 'image' %}
         <div class="content">
             <img src="{{ preview.fragment }}">
         </div>

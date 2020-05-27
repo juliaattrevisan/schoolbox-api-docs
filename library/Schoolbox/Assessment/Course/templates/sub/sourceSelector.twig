@@ -61,9 +61,9 @@
 
 <a data-course-parent-selector data-source="parent"
    title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-   class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
+   class="source-select icon-folder {% if not courseSpec %}placeholder{% endif %}"
    href="#" >
-   {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+   {{ courseSpec ? courseSpec.folder.parent.name : '(Click to select)' }}
 </a>
-<input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+<input class="hide" name="parent" id="parent" value="{{ courseSpec ? courseSpec.folder.parent.id : '' }}" />
 

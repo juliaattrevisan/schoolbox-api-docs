@@ -386,6 +386,7 @@ class Controller extends Base\Base
     public function newCourse(string $name = null)
     {
         $this->courseTpl('course', [
+            'courseSpec'        => null,
             'courseName'        => $name,
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
@@ -747,6 +748,7 @@ class Controller extends Base\Base
                 'encodedReturnUrl' => $encodedReturnUrl,
                 '_writable'        => true,
                 '_expanded'        => true,
+                'toastSelector'    => '[data-relation="ajax-response"]',
             ];
             $this->courseTpl('unit', $data);
 

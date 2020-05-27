@@ -10,7 +10,7 @@
  # jquery validator chucks a sad when you have nested forms
  # parent create.twig includes this create.twig which causes nested forms
  #}
-{% if not assessment.id and stage != 2 %}
+{% if not assessment.id and (stage is not defined or stage != 2) %}
 <div class="actions-small-1 row">
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>

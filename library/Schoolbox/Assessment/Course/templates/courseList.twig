@@ -24,10 +24,10 @@ Usage:
 
             courseSelector: {
                 query: {
-                    {% if folder.id %}
+                    {% if folder is defined %}
                         folder:           "{{ folder.id | escape('js') }}",
                     {% endif -%}
-                    {% if component.id %}
+                    {% if component is defined %}
                         component:        "{{ component.id | escape('js') }}",
                     {% endif -%}
                     hasAdd:           {{ hasAdd ? 1 : 0 }},

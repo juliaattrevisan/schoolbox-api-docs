@@ -23,8 +23,8 @@ Usage:
 
 {% set importUrl = routeLookup('courseImport.getImport', {
     courseSpecId: courseSpec.id ?: 0,
-    folderId:     folder.id ?: 0,
-    componentId:  component.id ?: 0
+    folderId:     folder ? folder.id : 0,
+    componentId:  component ? component.id : 0
 }) %}
 
 {% if encodedReturnUrl | length %}
@@ -45,15 +45,17 @@ Usage:
 {% endif %}
     <div class="list-item">
         <div class="card small-12">
-            <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component.id }}">
+            <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
                 <div class="icon-course"></div>
                 <h3>{{ courseSpec.folder.name }}</h3>
             </a>
             <p class="meta">
+                {% if cparents|length %}
                 {{ cparents[0].name }}
                     {% for cparent in cparents | slice(1) %}
                 &gt; {{ cparent.name }}
                     {% endfor %}
+                {% endif %}
             </p>
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ courseSpec.id }}">

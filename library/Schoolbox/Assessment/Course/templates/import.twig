@@ -273,7 +273,7 @@ Usages:
                             </div>
                         </div>
                     {% endif %}
-                    <input type="hidden" name="component_id" value="{{ componentId }}">
+                    <input type="hidden" name="component_id" value="{{ componentId is defined ? componentId : '' }}">
                 </fieldset>
                 <fieldset class='content' data-mage="part-2">
                     <legend>2. {{ locale.unit.properPlural }}</legend>
@@ -287,8 +287,8 @@ Usages:
                                     action:           action,
                                     courseSpecId:     courseSpecId,
                                     folderIds:        folderIds,
-                                    courseImplId:     courseImpl.id,
-                                    componentId:      componentId,
+                                    courseImplId:     courseImpl is defined ? courseImpl.id : null,
+                                    componentId:      componentId is defined ? componentId : null,
                                     unitsImpls:       unitsImpls,
                                     canReadUnitSpecs: canReadUnitSpecs,
                                 } only %}

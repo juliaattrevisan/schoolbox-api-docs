@@ -46,7 +46,7 @@ Usage:
         <ul class="information-list sortable"
             data-sortable
             data-assessment-list
-            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+            data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
             {% for assessment in unitSpec.assessables %}
                 {% include '@course/assessment.twig' with {
                     assessment:       assessment,

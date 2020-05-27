@@ -40,7 +40,7 @@
 
             //The unit date is already validated, so hide error message if there is one
             var error = $(this).prev('.error');
-            
+
             error.remove();
 
             $input.val(date).trigger('change');
@@ -104,7 +104,7 @@
 
             <li data-assessment="{{ assessment.id }}" {% if project %}data-parent-project="{{ project.id }}"{% endif %} {% if depth %}class="child"{% endif %}>
                 <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec.id }}" />
-                <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl.id }}" />
+                <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl ? assessmentImpl.id : '' }}" />
 
                 <div class="compact card small-12">
                     <input type="checkbox"
@@ -190,9 +190,9 @@
                         inputPrefix:     inputPrefix ~ '[' ~ assessment.id ~ '][a]',
                         depth:           depth + 1,
                         unitAction:      unitAction,
-                        startDate:       startDate,
-                        endDate:         endDate,
-                        maximumDate:     maximumDate,
+                        startDate:       startDate is defined ? startDate : null,
+                        endDate:         endDate is defined ? endDate : null,
+                        maximumDate:     maximumDate is defined ? maximumDate : null,
                         project:         assessment,
                         hideRows:        not isChecked,
                         unitSpec:        unitSpec,
