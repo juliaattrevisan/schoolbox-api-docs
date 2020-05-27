@@ -38,17 +38,19 @@ $colorVars = [
 ];
 $twigVars = [];
 foreach ($colorVars as $colorVar) {
-    $pixel = new ImagickPixel($config->get($colorVar));
-    $hsl   = $pixel->getHSL();
+    try {
+        $pixel = new ImagickPixel($config->get($colorVar));
+        $hsl   = $pixel->getHSL();
+    } catch (ImagickPixelException $e) {
+        // Couldn't create it because it wasn't configured: skip
+        continue;
+    }
     $twigVars['colors'][$colorVar] = [
         'h' => $hsl['hue'] * 360,
         's' => $hsl['saturation'] * 100,
         'l' => $hsl['luminosity'] * 100,
         'a' => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
     ];
-//    $pixel->getHSL();
-//    $twigVars['colors'][$colorVar]['hue']   *= 360;
-//    $twigVars['colors'][$colorVar]['alpha'] = $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF;
 }
 
 /** @var Environment $twig */

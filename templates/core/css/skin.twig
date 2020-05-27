@@ -1,37 +1,43 @@
 {% autoescape 'css' %}
 :root {
-    --navigation-foreground-h: {{ colors.skin_colour_navigation_foreground.h | round(2) }};
-    --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }};
-    --navigation-foreground-l: {{ colors.skin_colour_navigation_foreground.l | round(2) }};
-    --navigation-foreground-a: {{ colors.skin_colour_navigation_foreground.a | round(2) }}%;
-    --navigation-foreground:   hsla(
-        var(--navigation-foreground-h),
-        var(--navigation-foreground-s),
-        var(--navigation-foreground-l),
-        var(--navigation-foreground-a)
-    );
+    {% if colors.skin_colour_navigation_foreground is defined %}
+        --navigation-foreground-h: {{ colors.skin_colour_navigation_foreground.h | round(2) }};
+        --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }};
+        --navigation-foreground-l: {{ colors.skin_colour_navigation_foreground.l | round(2) }};
+        --navigation-foreground-a: {{ colors.skin_colour_navigation_foreground.a | round(2) }}%;
+        --navigation-foreground:   hsla(
+            var(--navigation-foreground-h),
+            var(--navigation-foreground-s),
+            var(--navigation-foreground-l),
+            var(--navigation-foreground-a)
+        );
+    {% endif %}
 
-    --navigation-background-h: {{ colors.skin_colour_navigation_background.h | round(2) }};
-    --navigation-background-s: {{ colors.skin_colour_navigation_background.s | round(2) }};
-    --navigation-background-l: {{ colors.skin_colour_navigation_background.l | round(2) }};
-    --navigation-background-a: {{ colors.skin_colour_navigation_background.a | round(2) }}%;
-    --navigation-background:   hsla(
-        var(--navigation-background-h),
-        var(--navigation-background-s),
-        var(--navigation-background-l),
-        var(--navigation-background-a)
-    );
+    {% if colors.skin_colour_navigation_background is defined %}
+        --navigation-background-h: {{ colors.skin_colour_navigation_background.h | round(2) }};
+        --navigation-background-s: {{ colors.skin_colour_navigation_background.s | round(2) }};
+        --navigation-background-l: {{ colors.skin_colour_navigation_background.l | round(2) }};
+        --navigation-background-a: {{ colors.skin_colour_navigation_background.a | round(2) }}%;
+        --navigation-background:   hsla(
+            var(--navigation-background-h),
+            var(--navigation-background-s),
+            var(--navigation-background-l),
+            var(--navigation-background-a)
+        );
+    {% endif %}
 
-    --navigation-hover-h: {{ colors.skin_colour_navigation_hover.h | round(2) }};
-    --navigation-hover-s: {{ colors.skin_colour_navigation_hover.s | round(2) }};
-    --navigation-hover-l: {{ colors.skin_colour_navigation_hover.l | round(2) }};
-    --navigation-hover-a: {{ colors.skin_colour_navigation_hover.a | round(2) }}%;
-    --navigation-hover:   hsla(
-        var(--navigation-hover-h),
-        var(--navigation-hover-s),
-        var(--navigation-hover-l),
-        var(--navigation-hover-a)
-    );
+    {% if colors.skin_colour_navigation_hover is defined %}
+        --navigation-hover-h: {{ colors.skin_colour_navigation_hover.h | round(2) }};
+        --navigation-hover-s: {{ colors.skin_colour_navigation_hover.s | round(2) }};
+        --navigation-hover-l: {{ colors.skin_colour_navigation_hover.l | round(2) }};
+        --navigation-hover-a: {{ colors.skin_colour_navigation_hover.a | round(2) }}%;
+        --navigation-hover:   hsla(
+            var(--navigation-hover-h),
+            var(--navigation-hover-s),
+            var(--navigation-hover-l),
+            var(--navigation-hover-a)
+        );
+    {% endif %}
 
 {#--off-canvas-foreground:        {{ config.skin_colour_offcanvas_foreground }};#}
 {#--off-canvas-background:        {{ config.skin_colour_offcanvas_background }};#}
