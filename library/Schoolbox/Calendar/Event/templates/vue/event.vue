@@ -57,20 +57,20 @@
             </section>
         </div>
 
-        <auidences-modal
+        <audiences-modal
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
                 :role-audiences="this.event.audiences.roles"
                 :group-audiences="this.event.audiences.folders"
                 :is-group="this.isGroupEvent"
-        ></auidences-modal>
+        ></audiences-modal>
 
     </div>
 </template>
 
 <script>
     import moment           from 'moment';
-    import auidencesModal   from './audiencesModal';
+    import audiencesModal   from './audiencesModal';
     import qs               from 'qs';
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
@@ -88,7 +88,7 @@
     export default {
         props: ['event'],
         name: "event-details",
-        components: {auidencesModal},
+        components: {audiencesModal},
         data() {
             return {
                 attendanceNextAction: this.event.attendance.nextAction,
