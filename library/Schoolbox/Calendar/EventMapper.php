@@ -615,9 +615,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
     /**
      * Removes all events from this folder ID
-     * @param int $cid
+     *
+     * @param int $fid
      * @throws Exception
      * @throws Exception\Deleted
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     public function homepageClean($fid)
     {
