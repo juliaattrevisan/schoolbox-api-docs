@@ -222,4 +222,39 @@
             var(--body-background-l),
             var(--body-background-a)
     );
+
+
+    /** Accounts menu colors **/
+    --accounts-menu-foreground-h: 205;
+    --accounts-menu-foreground-s: 100%;
+    --accounts-menu-foreground-l: 34.5%;
+    --accounts-menu-foreground-a: 100%;
+    --accounts-menu-foreground:   hsla(
+            var(--accounts-menu-foreground-h),
+            var(--accounts-menu-foreground-s),
+            var(--accounts-menu-foreground-l),
+            var(--accounts-menu-foreground-a)
+    );
+
+    --accounts-menu-background-h: 206;
+    --accounts-menu-background-s: 100.0%;
+    --accounts-menu-background-l: 87.8%;
+    --accounts-menu-background-a: 97.3%;
+    --accounts-menu-background:   hsla(
+            var(--accounts-menu-background-h),
+            var(--accounts-menu-background-s),
+            var(--accounts-menu-background-l),
+            var(--accounts-menu-background-a)
+    );
+
+    --accounts-menu-hover-h: 205;
+    --accounts-menu-hover-s: 100%;
+    --accounts-menu-hover-l: 100%;
+    --accounts-menu-hover-a: 100%;
+    --accounts-menu-hover:   hsla(
+            var(--accounts-menu-hover-h),
+            var(--accounts-menu-hover-s),
+            var(--accounts-menu-hover-l),
+            var(--accounts-menu-hover-a)
+    );
 }

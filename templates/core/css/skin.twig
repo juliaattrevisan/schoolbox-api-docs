@@ -342,6 +342,52 @@
         );
     {% endif %}
 
+
+    {##
+     # Accounts menu colors
+     #
+     # Derived styles:
+     # www/css/foundation/ui/navigation/_navigation.scss, mainly contrast-bg
+     #}
+    {% if colors.accounts_menu_text_colour is defined %}
+        --accounts-menu-foreground-h: {{ colors.accounts_menu_text_colour.h | round(2) }};
+        --accounts-menu-foreground-s: {{ colors.accounts_menu_text_colour.s | round(2) }}%;
+        --accounts-menu-foreground-l: {{ colors.accounts_menu_text_colour.l | round(2) }}%;
+        --accounts-menu-foreground-a: {{ colors.accounts_menu_text_colour.a | round(2) }}%;
+        --accounts-menu-foreground:   hsla(
+            var(--accounts-menu-foreground-h),
+            var(--accounts-menu-foreground-s),
+            var(--accounts-menu-foreground-l),
+            var(--accounts-menu-foreground-a)
+        );
+    {% endif %}
+
+    {% if colors.accounts_menu_bg_colour is defined %}
+        --accounts-menu-background-h: {{ colors.accounts_menu_bg_colour.h | round(2) }};
+        --accounts-menu-background-s: {{ colors.accounts_menu_bg_colour.s | round(2) }}%;
+        --accounts-menu-background-l: {{ colors.accounts_menu_bg_colour.l | round(2) }}%;
+        --accounts-menu-background-a: {{ colors.accounts_menu_bg_colour.a | round(2) }}%;
+        --accounts-menu-background:   hsla(
+            var(--accounts-menu-background-h),
+            var(--accounts-menu-background-s),
+            var(--accounts-menu-background-l),
+            var(--accounts-menu-background-a)
+        );
+    {% endif %}
+
+    {% if colors.accounts_menu_hover_colour is defined %}
+        --accounts-menu-hover-h: {{ colors.accounts_menu_hover_colour.h | round(2) }};
+        --accounts-menu-hover-s: {{ colors.accounts_menu_hover_colour.s | round(2) }}%;
+        --accounts-menu-hover-l: {{ colors.accounts_menu_hover_colour.l | round(2) }}%;
+        --accounts-menu-hover-a: {{ colors.accounts_menu_hover_colour.a | round(2) }}%;
+        --accounts-menu-hover:   hsla(
+            var(--accounts-menu-hover-h),
+            var(--accounts-menu-hover-s),
+            var(--accounts-menu-hover-l),
+            var(--accounts-menu-hover-a)
+        );
+    {% endif %}
+
 {#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
 {#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
 {#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}

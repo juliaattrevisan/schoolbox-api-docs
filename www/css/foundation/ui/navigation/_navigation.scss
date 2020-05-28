@@ -352,18 +352,18 @@ $allow-sidebar-stash: $large-up;
   z-index: 1002;
 
   .account-menu-mobile {
-    color: $accounts-menu-text-colour;
+    color: var(--accounts-menu-foreground);
     background-color: transparent;
     @include single-transition(all, 0.15s, linear);
 
     &:hover {
-      background-color: $accounts-menu-hover-colour;
+      background-color: var(--accounts-menu-hover);
     }
 
     .accordion-navigation {
       .profile-drop {
         background: transparent;
-        color: $accounts-menu-text-colour;
+        color: var(--accounts-menu-foreground);
         display: table;
         padding: 0;
         font-size: $paragraph-font-size;
@@ -389,18 +389,18 @@ $allow-sidebar-stash: $large-up;
       .profile-drop:after {
         font-family: $font-family-icon;
         content: "\e901";
-        color: $accounts-menu-text-colour;
+        color: var(--accounts-menu-foreground);
         display: table-cell;
         padding: 0px 10px;
         vertical-align: middle;
       }
 
       &:hover .profile-drop {
-        background-color: $accounts-menu-hover-colour;
+        background-color: var(--accounts-menu-hover);
       }
 
       &.active .profile-drop {
-        background-color: $accounts-menu-bg-colour;
+        background-color: var(--accounts-menu-background);
       }
 
       &.active > a:after {
@@ -599,14 +599,14 @@ $allow-sidebar-stash: $large-up;
 .account-menu-mobile,
 .account-drop {
   a {
-    color: $accounts-menu-text-colour;
-    background-color: $accounts-menu-bg-colour;
+    color: var(--accounts-menu-foreground);
+    background-color: var(--accounts-menu-background);
     display: block;
     padding: 0.625rem 0.8125rem;
     font-size: 1rem;
     font-weight: 300;
     &:hover {
-      background-color: $accounts-menu-hover-colour;
+      background-color: var(--accounts-menu-hover);
     }
   }
 
@@ -616,8 +616,11 @@ $allow-sidebar-stash: $large-up;
   }
 
   .separator {
-    color: contrast-bg($background: $accounts-menu-bg-colour, $dark: $accounts-menu-text-colour);
-    background: $accounts-menu-bg-colour;
+    // TODO figure out what to do with this contrast
+    // For now just use accounts-menu-foreground
+    color: var(--accounts-menu-foreground);
+    //color: contrast-bg($background: var(--accounts-menu-background), $dark: var(--accounts-menu-foreground));
+    background: var(--accounts-menu-background);
     padding: 0.625rem 0.8125rem;
     font-weight: 300;
     text-transform: uppercase;
@@ -625,25 +628,28 @@ $allow-sidebar-stash: $large-up;
     font-size: 0.8125rem;
 
     &:hover {
-      background: $accounts-menu-bg-colour;
+      background: var(--accounts-menu-background);
     }
   }
 
   .user {
-    background: $accounts-menu-bg-colour;
+    background: var(--accounts-menu-background);
     overflow: auto;
 
     &:hover {
-      background: $accounts-menu-hover-colour;
+      background: var(--accounts-menu-hover);
     }
 
     .card {
       padding: 0.5rem 0rem 0rem 1rem;
       .meta {
-        color: contrast-bg(
-          $background: $accounts-menu-bg-colour,
-          $dark: $accounts-menu-text-colour
-        );
+        // TODO figure out what to do about this contrast
+        // For now just use accounts-menu-foreground
+        color: var(--accounts-menu-foreground);
+        //color: contrast-bg(
+        //  $background: var(--accounts-menu-background),
+        //  $dark: var(--accounts-menu-foreground)
+        //);
       }
       a {
         background-color: transparent;
