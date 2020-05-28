@@ -1,4 +1,12 @@
 <?php
+/**
+ * Outputs the value of configured skin variables in a CSS file.
+ *
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -12,41 +20,88 @@ $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $config = $kernel->get('config');
 
 // Now output stuff
-$colorVars = [
-    'skin_colour_navigation_foreground',
-    'skin_colour_navigation_background',
-    'skin_colour_navigation_hover',
-    'skin_colour_offcanvas_foreground',
-    'skin_colour_offcanvas_background',
-    'skin_colour_offcanvas_hover',
-    'accounts_menu_bg_colour',
-    'accounts_menu_text_colour',
-    'accounts_menu_hover_colour',
-    'skin_colour_content_ui_foreground',
-    'skin_colour_content_ui_background',
-    'skin_colour_content_ui_hover',
-    'skin_colour_content_ui_selected',
-    'skin_colour_content_ui_submit_foreground',
-    'skin_colour_content_ui_submit_background',
-    'skin_colour_accent_foreground',
-    'skin_colour_accent_background',
-    'skin_colour_accent_hover',
-    'skin_colour_logo_background',
-    'skin_colour_body_bg',
-    'skin_colour_login_background',
-    'skin_colour_form_input_border_color',
-    'skin_colour_form_background_hover_color',
+$colorConfigMapping = [
+    // Nav bar colors.
+    // Derived styles:
+    // * $off-canvas-bg-hover
+    // * $off-canvas-bg-active
+    // * $icon-nav-highlight-color
+    // * .top-menu style buried deep within www/css/foundation/ui/navigation/_navigation.scss
+    // * .right-off-canvas-menu style buried deep within www/css/foundation/ui/navigation/_navigation.scss
+    'skin_colour_navigation_foreground'        => '--navigation-foreground',
+    'skin_colour_navigation_background'        => '--navigation-background',
+    'skin_colour_navigation_hover'             => '--navigation-hover',
+
+    // Off-canvas colors.
+    // Derived styles:
+    // * ul.off-canvas-list in www/css/foundation/ui/navigation/_navigation.scss:
+    // * used to generate a constrasting color to off-canvas
+    // * $off-canvas-bg
+    'skin_colour_offcanvas_foreground'         => '--off-canvas-foreground',
+    'skin_colour_offcanvas_background'         => '--off-canvas-background',
+    'skin_colour_offcanvas_hover'              => '--off-canvas-hover',
+
+    // Accounts menu colors
+    // Derived styles:
+    // * www/css/foundation/ui/navigation/_navigation.scss, mainly contrast-bg
+    'accounts_menu_text_colour'                => '--accounts-menu-foreground',
+    'accounts_menu_bg_colour'                  => '--accounts-menu-background',
+    'accounts_menu_hover_colour'               => '--accounts-menu-hover',
+
+    // Content UI colors.
+    // Derived styles:
+    // * too many
+    'skin_colour_content_ui_foreground'        => '--content-ui-foreground',
+    'skin_colour_content_ui_background'        => '--content-ui-background',
+    'skin_colour_content_ui_hover'             => '--content-ui-hover',
+    'skin_colour_content_ui_selected'          => '--content-ui-selected',
+
+    // Content UI submit colors.
+    // Derived styles:
+    // * www/css/foundation/components/_buttons.scss
+    // * www/css/foundation/ui/selectize.customisation.scss
+    'skin_colour_content_ui_submit_foreground' => '--content-ui-submit-foreground',
+    'skin_colour_content_ui_submit_background' => '--content-ui-submit-background',
+
+     // Accent colors.
+     // Derived styles:
+     // * www/css/foundation/ui/_content.scss, including a select color mixin I don't know what to do with
+     // * www/css/foundation/components/alaress-datetime-picker/alaress-datetime-picker.scss
+    'skin_colour_accent_foreground'            => '--accent-foreground',
+    'skin_colour_accent_background'            => '--accent-background',
+    'skin_colour_accent_hover'                 => '--accent-hover',
+
+     // Logo background.
+     // Derived styles: none known
+    'skin_colour_logo_background'              => '--logo-background',
+
+    // Body background.
+    // Derived styles:
+    // * the contrast-bg rubric
+    'skin_colour_body_bg'                      => '--body-background',
+
+    // Login form background color.
+    // Derived styles:
+    // * www/css/foundation/layout/_login.scss calc-text-color
+    'skin_colour_login_background'             => '--login-form-background',
+
+    // Form colors.
+    // Derived styles:
+    // * www/css/foundation/ui/forms/_forms.scss
+    // * www/css/foundation/components/submissions/rubric.scss
+    'skin_colour_form_input_border_color'      => '--form-border-color',
+    'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
 ];
 $twigVars = [];
-foreach ($colorVars as $colorVar) {
+foreach ($colorConfigMapping as $configKey => $cssVar) {
     try {
-        $pixel = new ImagickPixel($config->get($colorVar));
+        $pixel = new ImagickPixel($config->get($configKey));
         $hsl   = $pixel->getHSL();
     } catch (ImagickPixelException $e) {
         // Couldn't create it because it wasn't configured: skip
         continue;
     }
-    $twigVars['colors'][$colorVar] = [
+    $twigVars['colors'][$configKey] = [
         'h' => $hsl['hue'] * 360,
         's' => $hsl['saturation'] * 100,
         'l' => $hsl['luminosity'] * 100,
