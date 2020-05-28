@@ -166,9 +166,10 @@ $(function () {
     function checkState() {
         var ql, dz;
 
-        if (abUploadSubmitBtn.data('uploading')) {
-            return;
-        }
+        // This prevents the upload button from re-enabling if it the file was rejected.
+        // if (abUploadSubmitBtn.data('uploading')) {
+        //     return;
+        // }
 
         ql = this.getQueuedFiles().length;
 
