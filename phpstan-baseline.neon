@@ -2226,11 +2226,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\SidMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/SidMapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
