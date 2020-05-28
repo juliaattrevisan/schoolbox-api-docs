@@ -1,7 +1,5 @@
-var shell = require('shelljs'),
-    sass  = require('node-sass');
-
-var jsSrc = {
+const sass  = require('node-sass');
+const jsSrc = {
     main: [
         // Modernizr
         'www/javascript/components/modernizr/modernizr.js',
@@ -164,7 +162,7 @@ var jsSrc = {
         'node_modules/axios/dist/axios.js'
     ]
 };
-var jsDest = {
+const jsDest = {
     main: 'www/javascript/components/<%= pkg.name %>.min.js',
     masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
     fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
@@ -270,15 +268,6 @@ module.exports = function(grunt) {
 
     // Build tasks
     grunt.registerTask('build.js', 'uglify');
-    grunt.registerTask('build.sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
-        // Run sass build
-        var result = shell.exec('php ./tools/skin/builder.php --force');
-        if (result.code === 0) {
-            grunt.log.writeln('Skin built successfully');
-        } else {
-            grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
-        }
-    });
-    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass']);
-    grunt.registerTask('default',    'build');
+    grunt.registerTask('build',    ['bower', 'build.js', 'sass']);
+    grunt.registerTask('default',  'build');
 };
