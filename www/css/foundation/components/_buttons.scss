@@ -58,12 +58,26 @@ $button-font-weight: $font-weight-normal;
 $button-bg-color: var(--content-ui-background);
 $button-bg-hover: var(--content-ui-hover);
 
-$submit-button-color: $content-ui-submit-foreground;
-$submit-button-bg-color: $content-ui-submit-background;
-$submit-button-bg-hover: tint($content-ui-submit-background, 20%);
+$submit-button-color: var(--content-ui-submit-foreground);
+$submit-button-bg-color: var(--content-ui-submit-background);
+// TODO figure out what to do with this color
+$submit-button-bg-hover: hsla(
+    var(--content-ui-submit-background-h),
+    var(--content-ui-submit-background-s),
+    calc(var(--content-ui-submit-background-l) + 20%),
+    var(--content-ui-submit-background-a)
+);
+//$submit-button-bg-hover: tint(var(--content-ui-submit-background), 20%);
 
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($submit-button-color, 20%);
+// TODO figure out what to do with this color
+$secondary-button-bg-hover: hsla(
+    var(--content-ui-submit-foreground-h),
+    var(--content-ui-submit-foreground-s),
+    calc(var(--content-ui-submit-foreground-l) + 20%),
+    var(--content-ui-submit-foreground-a)
+);
+//$secondary-button-bg-hover: tint($submit-button-color, 20%);
 $secondary-button-border-color: transparent;
 $success-button-bg-hover: tint($success-color, 20%);
 $success-button-border-color: transparent;

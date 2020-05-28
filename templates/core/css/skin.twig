@@ -1,5 +1,6 @@
 {% autoescape 'css' %}
 :root {
+    {# Nav bar colors #}
     {% if colors.skin_colour_navigation_foreground is defined %}
         --navigation-foreground-h: {{ colors.skin_colour_navigation_foreground.h | round(2) }};
         --navigation-foreground-s: {{ colors.skin_colour_navigation_foreground.s | round(2) }}%;
@@ -54,6 +55,8 @@
         #}
     {% endif %}
 
+
+    {# Off-canvas colors #}
     {% if colors.skin_colour_offcanvas_foreground is defined %}
         --off-canvas-foreground-h: {{ colors.skin_colour_offcanvas_foreground.h | round(2) }};
         --off-canvas-foreground-s: {{ colors.skin_colour_offcanvas_foreground.s | round(2) }}%;
@@ -106,18 +109,113 @@
         #}
     {% endif %}
 
-{#--off-canvas-foreground:        {{ config.skin_colour_offcanvas_foreground }};#}
-{#--off-canvas-background:        {{ config.skin_colour_offcanvas_background }};#}
-{#--off-canvas-hover:             {{ config.skin_colour_offcanvas_hover }};#}
+
+    {# Content UI colors #}
+    {% if colors.skin_colour_content_ui_foreground is defined %}
+        --content-ui-foreground-h: {{ colors.skin_colour_content_ui_foreground.h | round(2) }};
+        --content-ui-foreground-s: {{ colors.skin_colour_content_ui_foreground.s | round(2) }}%;
+        --content-ui-foreground-l: {{ colors.skin_colour_content_ui_foreground.l | round(2) }}%;
+        --content-ui-foreground-a: {{ colors.skin_colour_content_ui_foreground.a | round(2) }}%;
+        --content-ui-foreground:   hsla(
+            var(--content-ui-foreground-h),
+            var(--content-ui-foreground-s),
+            var(--content-ui-foreground-l),
+            var(--content-ui-foreground-a)
+        );
+        {#
+            Derived styles:
+            Too many!
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_content_ui_background is defined %}
+        --content-ui-background-h: {{ colors.skin_colour_content_ui_background.h | round(2) }};
+        --content-ui-background-s: {{ colors.skin_colour_content_ui_background.s | round(2) }}%;
+        --content-ui-background-l: {{ colors.skin_colour_content_ui_background.l | round(2) }}%;
+        --content-ui-background-a: {{ colors.skin_colour_content_ui_background.a | round(2) }}%;
+        --content-ui-background:   hsla(
+            var(--content-ui-background-h),
+            var(--content-ui-background-s),
+            var(--content-ui-background-l),
+            var(--content-ui-background-a)
+        );
+        {#
+            Derived styles:
+            Too many!
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_content_ui_hover is defined %}
+        --content-ui-hover-h: {{ colors.skin_colour_content_ui_hover.h | round(2) }};
+        --content-ui-hover-s: {{ colors.skin_colour_content_ui_hover.s | round(2) }}%;
+        --content-ui-hover-l: {{ colors.skin_colour_content_ui_hover.l | round(2) }}%;
+        --content-ui-hover-a: {{ colors.skin_colour_content_ui_hover.a | round(2) }}%;
+        --content-ui-hover:   hsla(
+            var(--content-ui-hover-h),
+            var(--content-ui-hover-s),
+            var(--content-ui-hover-l),
+            var(--content-ui-hover-a)
+        );
+        {#
+            Derived styles:
+            Too many!
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_content_ui_hover is defined %}
+        --content-ui-selected-h: {{ colors.skin_colour_content_ui_selected.h | round(2) }};
+        --content-ui-selected-s: {{ colors.skin_colour_content_ui_selected.s | round(2) }}%;
+        --content-ui-selected-l: {{ colors.skin_colour_content_ui_selected.l | round(2) }}%;
+        --content-ui-selected-a: {{ colors.skin_colour_content_ui_selected.a | round(2) }}%;
+        --content-ui-selected:   hsla(
+            var(--content-ui-selected-h),
+            var(--content-ui-selected-s),
+            var(--content-ui-selected-l),
+            var(--content-ui-selected-a)
+        );
+        {#
+            Derived styles:
+            Too many!
+        #}
+    {% endif %}
+
+
+    {# Content UI submit colors #}
+    {% if colors.skin_colour_content_ui_foreground is defined %}
+        --content-ui-submit-foreground-h: {{ colors.skin_colour_content_ui_submit_foreground.h | round(2) }};
+        --content-ui-submit-foreground-s: {{ colors.skin_colour_content_ui_submit_foreground.s | round(2) }}%;
+        --content-ui-submit-foreground-l: {{ colors.skin_colour_content_ui_submit_foreground.l | round(2) }}%;
+        --content-ui-submit-foreground-a: {{ colors.skin_colour_content_ui_submit_foreground.a | round(2) }}%;
+        --content-ui-submit-foreground:   hsla(
+            var(--content-ui-submit-foreground-h),
+            var(--content-ui-submit-foreground-s),
+            var(--content-ui-submit-foreground-l),
+            var(--content-ui-submit-foreground-a)
+        );
+        {#
+            Derived styles:
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_content_ui_background is defined %}
+        --content-ui-submit-background-h: {{ colors.skin_colour_content_ui_submit_background.h | round(2) }};
+        --content-ui-submit-background-s: {{ colors.skin_colour_content_ui_submit_background.s | round(2) }}%;
+        --content-ui-submit-background-l: {{ colors.skin_colour_content_ui_submit_background.l | round(2) }}%;
+        --content-ui-submit-background-a: {{ colors.skin_colour_content_ui_submit_background.a | round(2) }}%;
+        --content-ui-submit-background:   hsla(
+            var(--content-ui-submit-background-h),
+            var(--content-ui-submit-background-s),
+            var(--content-ui-submit-background-l),
+            var(--content-ui-submit-background-a)
+        );
+        {#
+            Derived styles:
+        #}
+    {% endif %}
+
 {#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
 {#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
 {#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}
-{#--content-ui-foreground:        {{ config.skin_colour_content_ui_foreground }};#}
-{#--content-ui-background:        {{ config.skin_colour_content_ui_background }};#}
-{#--content-ui-hover:             {{ config.skin_colour_content_ui_hover }};#}
-{#--content-ui-selected:          {{ config.skin_colour_content_ui_selected }};#}
-{#--content-ui-submit-foreground: {{ config.skin_colour_content_ui_submit_foreground }};#}
-{#--content-ui-submit-background: {{ config.skin_colour_content_ui_submit_background }};#}
 {#--accent-foreground:            {{ config.skin_colour_accent_foreground }};#}
 {#--accent-background:            {{ config.skin_colour_accent_background }};#}
 {#--accent-hover:                 {{ config.skin_colour_accent_hover }};#}

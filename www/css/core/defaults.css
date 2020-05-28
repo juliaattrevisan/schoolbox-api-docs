@@ -112,5 +112,29 @@
             var(--content-ui-selected-s),
             var(--content-ui-selected-l),
             var(--content-ui-selected-a)
-    )
+    );
+
+
+    /** Content UI submit colors **/
+    --content-ui-submit-foreground-h: 205;
+    --content-ui-submit-foreground-s: 100%;
+    --content-ui-submit-foreground-l: 100%;
+    --content-ui-submit-foreground-a: 100%;
+    --content-ui-submit-foreground:   hsla(
+            var(--content-ui-submit-foreground-h),
+            var(--content-ui-submit-foreground-s),
+            var(--content-ui-submit-foreground-l),
+            var(--content-ui-submit-foreground-a)
+    );
+
+    --content-ui-submit-background-h: 205;
+    --content-ui-submit-background-s: 34.5%;
+    --content-ui-submit-background-l: 100%;
+    --content-ui-submit-background-a: 100%;
+    --content-ui-submit-background:   hsla(
+            var(--content-ui-submit-background-h),
+            var(--content-ui-submit-background-s),
+            var(--content-ui-submit-background-l),
+            var(--content-ui-submit-background-a)
+    );
 }

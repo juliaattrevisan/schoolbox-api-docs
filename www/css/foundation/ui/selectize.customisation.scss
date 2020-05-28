@@ -116,9 +116,11 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 				top: 0.1875rem;
 				&:hover {
 					text-decoration: none;
-					background: $content-ui-submit-foreground;
+					background: var(--content-ui-submit-foreground);
 					border-radius: 1rem;
-					color: calc-text-color($content-ui-submit-foreground);
+                    // TODO figure out what to do with this color
+                    color: var(--content-ui-submit-background);
+					//color: calc-text-color(var(--content-ui-submit-foreground));
 				}
 			}
 		}
