@@ -2223,48 +2223,6 @@
         }
       }
     },
-    "grunt-contrib-sass": {
-      "version": "0.8.1",
-      "from": "grunt-contrib-sass@https://registry.npmjs.org/grunt-contrib-sass/-/grunt-contrib-sass-0.8.1.tgz",
-      "resolved": "https://registry.npmjs.org/grunt-contrib-sass/-/grunt-contrib-sass-0.8.1.tgz",
-      "dependencies": {
-        "ansi-regex": {
-          "version": "0.2.1",
-          "from": "ansi-regex@https://registry.npmjs.org/ansi-regex/-/ansi-regex-0.2.1.tgz",
-          "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-0.2.1.tgz"
-        },
-        "ansi-styles": {
-          "version": "1.1.0",
-          "from": "ansi-styles@https://registry.npmjs.org/ansi-styles/-/ansi-styles-1.1.0.tgz",
-          "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-1.1.0.tgz"
-        },
-        "async": {
-          "version": "0.9.2",
-          "from": "async@https://registry.npmjs.org/async/-/async-0.9.2.tgz",
-          "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz"
-        },
-        "chalk": {
-          "version": "0.5.1",
-          "from": "chalk@https://registry.npmjs.org/chalk/-/chalk-0.5.1.tgz",
-          "resolved": "https://registry.npmjs.org/chalk/-/chalk-0.5.1.tgz"
-        },
-        "has-ansi": {
-          "version": "0.1.0",
-          "from": "has-ansi@https://registry.npmjs.org/has-ansi/-/has-ansi-0.1.0.tgz",
-          "resolved": "https://registry.npmjs.org/has-ansi/-/has-ansi-0.1.0.tgz"
-        },
-        "strip-ansi": {
-          "version": "0.3.0",
-          "from": "strip-ansi@https://registry.npmjs.org/strip-ansi/-/strip-ansi-0.3.0.tgz",
-          "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-0.3.0.tgz"
-        },
-        "supports-color": {
-          "version": "0.2.0",
-          "from": "supports-color@https://registry.npmjs.org/supports-color/-/supports-color-0.2.0.tgz",
-          "resolved": "https://registry.npmjs.org/supports-color/-/supports-color-0.2.0.tgz"
-        }
-      }
-    },
     "grunt-contrib-uglify": {
       "version": "2.3.0",
       "from": "grunt-contrib-uglify@https://registry.npmjs.org/grunt-contrib-uglify/-/grunt-contrib-uglify-2.3.0.tgz",
