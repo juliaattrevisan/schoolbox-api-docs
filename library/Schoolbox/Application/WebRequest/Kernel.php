@@ -152,15 +152,16 @@ class Kernel extends WebKernelAbstract
                     'data'   => ['error' => 'Unauthenticated'],
                 ]);
                 $output = $this->di->get("webOutput:json");
-                $output->output($response);
             } else {
                 /** @var \Alaress\Session\Session $session */
                 $session = $this->di->get('session');
                 $session
                     ->getSegment(LoginController::class)
                     ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
+                $output = $this->di->get("webOutput:noContent");
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
             }
+            $output->output($response);
 
         } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
