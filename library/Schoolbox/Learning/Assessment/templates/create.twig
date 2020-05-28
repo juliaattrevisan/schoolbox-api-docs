@@ -1,7 +1,9 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
+{% if breadcrumbs is defined %}
 {{ bread.crumbsArray(breadcrumbs) }}
+{% endif %}
 
 <script src="/javascript/shared/jquery.mage.js"></script>
 <script src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
@@ -32,7 +34,7 @@
             });
         }
 
-        {% if assessmentType|length %}
+        {% if assessmentType is defined and assessmentType|length %}
 
             /* Save everything when Part 1 was already chosen in route
              */
@@ -130,7 +132,7 @@
      <div class="list-item">
          <div class="small-12 column">
              <h1>Create
-                 {% if assessment.typeName|length %}
+                 {% if assessment is defined and assessment.typeName|length %}
                      {% if attribute(locale, assessment.typeName|lower) is defined %}
                          {{ attribute(locale, assessment.typeName|lower).proper }}
                      {% else %}
@@ -142,7 +144,7 @@
          </div>
      </div>
      {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
-    {% if assessment is quiz %}
+    {% if assessment is defined and assessment is quiz %}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
@@ -153,7 +155,7 @@
 </div>
 
 
-{% if assessmentType|length %}
+{% if assessmentType is defined and assessmentType|length %}
     {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}
 {% else %}
     {% set formAction = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) %}
@@ -163,7 +165,7 @@
     <div class="small-12 columns island">
         <form action="{{ formAction }}" class="mage" id="assessmentForm" method="post">
             <section>
-                {% if not assessmentType|length %}
+                {% if assessmentType is not defined or not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
                     <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
@@ -184,20 +186,20 @@
                 </fieldset>
                 {% endif %}
 
-                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
-                    {% if returnUrl is defined %}
+                <fieldset class="content" data-mage="part-2" {% if assessmentType is not defined or not assessmentType|length %}disabled="disabled"{% endif %}>
+                    {% if returnUrl is defined and returnUrl|length %}
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="folderId" value="{{ context.folder.id }}" />
 
-                    {% if assessmentType|length %}
+                    {% if assessmentType is defined and assessmentType|length %}
                     <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                     {% endif %}
 
-                    <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
-                        {% if assessmentType|length %}
+                    <div class="small-12 columns {% if assessmentType is not defined or not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
+                        {% if assessmentType is defined and assessmentType|length %}
                             {% include '@learningAssessment/'~assessmentType~'/create.twig' with {stage: 2} %}
                         {% endif %}
                     </div>

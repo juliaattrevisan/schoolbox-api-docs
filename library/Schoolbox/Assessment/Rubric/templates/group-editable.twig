@@ -1,5 +1,5 @@
 {# ensure these are set #}
-{%- set rubricId  = rubricId ?: 'rb-' ~ rubricGrid.id -%}
+{%- set rubricId  = rubricId is defined ? rubricId : 'rb-' ~ rubricGrid.id -%}
 {%- set groupId   = rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
@@ -53,7 +53,7 @@
 </tr>
 
 {# Input for max value #}
-{% set showGroupMaxValue = usingMarkPerCapability and hasSelectedDescriptor %}
+{% set showGroupMaxValue = usingMarkPerCapability is defined and usingMarkPerCapability and hasSelectedDescriptor %}
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubricGrid.levels|length + 3 }}">
         <label for="{{ groupInput }}[maxValue]">Maximum points for {{ locale.translate('rubricGroup') }}</label>

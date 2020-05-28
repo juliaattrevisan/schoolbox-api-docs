@@ -1,5 +1,5 @@
 {# ensure these are set #}
-{%- set rubricId  = rubricId ?: 'rb-' ~ rubricGrid.id -%}
+{%- set rubricId  = rubricId is defined ? rubricId : 'rb-' ~ rubricGrid.id -%}
 {%- set groupId   = groupId ?: rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}

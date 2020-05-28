@@ -9,7 +9,7 @@
         <li><a href="/homepage/{{ layout.folder.id }}">{{ layout.folder.name }}</a></li>
     {% endif %}
 
-    {% if tile is not empty %}
+    {% if tile is defined %}
         <li><a href="{{ routeLookup('tile.layout', {layoutId: layout.id}) }}">{{layout.heading}}</a></li>
         <li class="active"><a href="#">{% if tile.id %}Modify Tile{% else %}Add Tile{% endif %}</a></li>
     {% else %}
