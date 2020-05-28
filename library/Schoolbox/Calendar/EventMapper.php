@@ -1,15 +1,16 @@
 <?php
 /**
- * CalendarEventMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar;
+
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use PDO;
+use PDOException;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
@@ -22,9 +23,16 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
+use UnexpectedValueException;
 
 /**
  * Class EventMapper
+ *
+ * Persist events and their relationships to the db
+ * This should eventually subsume the library/Calendar handler
+ *
+ * Note:
+ * There are Event Attendance methods that should be split out into an Event Attendance mapper.
  *
  * @package Schoolbox\Calendar
  * @method Event hydrate(array $row, $alias = '', $callback = null)
@@ -32,16 +40,18 @@ use Schoolbox\GenericCollection;
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
+
     /**
-    * @return void
-    */
+     * @return void
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws InvalidArgumentException
+     */
     protected function mapping()
     {
         $this->coreMapping();
 
         $this->hasTable('event');
         $this->hasModel(Event::class);
-
 
         $this->uses('access',self::TYPE_INTEGER);
         $this->uses('attendance',self::TYPE_INTEGER);
@@ -149,17 +159,17 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $userRoleMapper = $this->getJoinMapper('owner.role');
 
         return "
-			SELECT
-				{$this->getColumnString()},
-				{$ownerMapper->getColumnString('o')},
-				{$userRoleMapper->getColumnString('ro')},
-				{$authorMapper->getColumnString('a')},
-				{$userRoleMapper->getColumnString('ra')},
-				{$eventTypeMapper->getColumnString('t')},
-				{$personalMapper->getColumnString('p')},
-				{$folderMapper->getColumnString('f')},
-				{$campusMapper->getColumnString('ca')},
-				{$roleMapper->getColumnString('r')}
+            SELECT
+                {$this->getColumnString()},
+                {$ownerMapper->getColumnString('o')},
+                {$userRoleMapper->getColumnString('ro')},
+                {$authorMapper->getColumnString('a')},
+                {$userRoleMapper->getColumnString('ra')},
+                {$eventTypeMapper->getColumnString('t')},
+                {$personalMapper->getColumnString('p')},
+                {$folderMapper->getColumnString('f')},
+                {$campusMapper->getColumnString('ca')},
+                {$roleMapper->getColumnString('r')}
         ";
     }
 
@@ -167,24 +177,26 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         return "
             FROM `{$this->table}`
-			LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
-			LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
-			LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
-			LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
-			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
-			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
-			LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
-			LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
-			LEFT JOIN {$this->getJoinSql('role', '', 'r')}
+            LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
+            LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
+            LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
+            LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
+            LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+            LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
+            LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
+            LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
+            LEFT JOIN {$this->getJoinSql('role', '', 'r')}
         ";
     }
 
 
     /**
-     * @param \PDOStatement $statement
+     * @param PDOStatement $statement
      * @return GenericCollection|Event[]
+     * @throws Exception
+     * @throws Schoolbox\Mapper\DefinitionException
      */
-    protected function hydrateSelect(\PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement)
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
@@ -196,7 +208,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $userRoleMapper = $this->getJoinMapper('owner.role');
 
         /* Hydrate or die
-		 */
+         */
         $allEvents = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -271,19 +283,20 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
-    * Remove all attendance relations for $event
-    *
-    * @param Event $event
-    */
+     * Remove all attendance relations for $event
+     *
+     * @param Event $event
+     * @throws PDOException
+     */
     private function removeAttendanceByEvent($event)
     {
-        $query = "
-			DELETE FROM event_attendance
-			WHERE event_id = :eventId
-		";
+        $query = '
+            DELETE FROM event_attendance
+            WHERE event_id = :eventId
+        ';
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $event->getId());
+        $statement->bindParam(':eventId', $event->getId());
         $statement->execute();
     }
 
@@ -293,22 +306,23 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *
      * @param int $eventId
      * @param int $userId
+     * @throws PDOException
      */
     public function addAttendance($eventId, $userId)
     {
-        $query = "
-			INSERT INTO event_attendance
-			VALUES (null, :eventId, :userId, :status, :intention)
-		";
+        $query = '
+            INSERT INTO event_attendance
+            VALUES (null, :eventId, :userId, :status, :intention)
+        ';
 
         $statusPending = Event::ATTENDANCE_STATUS_PENDING;
         $intentPresent = Event::ATTENDANCE_INTENTION_PRESENT;
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $eventId);
-        $statement->bindParam(":userId", $userId);
-        $statement->bindParam(":status", $statusPending);
-        $statement->bindParam(":intention", $intentPresent);
+        $statement->bindParam(':eventId', $eventId);
+        $statement->bindParam(':userId', $userId);
+        $statement->bindParam(':status', $statusPending);
+        $statement->bindParam(':intention', $intentPresent);
 
         $statement->execute();
     }
@@ -319,13 +333,14 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *
      * @param int $eventId
      * @param int $userId
+     * @throws PDOException
      */
     public function removeAttendance($eventId, $userId)
     {
-        $query = "
-			DELETE FROM event_attendance
-			WHERE event_id = :eventId AND user_id = :userId
-			";
+        $query = '
+            DELETE FROM event_attendance
+            WHERE event_id = :eventId AND user_id = :userId
+            ';
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":eventId", $eventId);
@@ -334,10 +349,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
-    * Post-save hook method
-    *
-    * @param Event $event
-    */
+     * Post-save hook method
+     *
+     * @param Event $event
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
     protected function postSave($event)
     {
         // Clear attendance if it has changed from true to false
@@ -380,26 +398,27 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
-    * Remove all role and campus associations to an event
-    * Note that "eventGroup" means "eventRole"
-    *
-    * @param Event $event
-    */
+     * Remove all role and campus associations to an event
+     * Note that "eventGroup" means "eventRole"
+     *
+     * @param Event $event
+     * @throws PDOException
+     */
     private function deletePermissions($event)
     {
-        $query = "
-			DELETE FROM event_role
-			WHERE event_id = :eventId
-		";
+        $query = '
+            DELETE FROM event_role
+            WHERE event_id = :eventId
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->bindValue(":eventId", $event->getId());
         $statement->execute();
 
-        $query = "
-			DELETE FROM event_campus
-			WHERE event_id = :eventId
-		";
+        $query = '
+            DELETE FROM event_campus
+            WHERE event_id = :eventId
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->bindValue(":eventId", $event->getId());
@@ -411,7 +430,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Assign roles to an event
      *
      * @param Event $event
-     * @throws \PDOException
+     * @throws PDOException
      */
     private function createRoles($event): void
     {
@@ -440,11 +459,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
 
     /**
-    * Assign campuses to an event
-    *
-    * @param Event $event
-    * @throws Exception
-    */
+     * Assign campuses to an event
+     *
+     * @param Event $event
+     * @throws PDOException
+     */
     private function createCampus($event)
     {
         foreach ($event->getCampusCollection() as $campus) {
@@ -465,11 +484,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 $campusId = $campus;
             }
 
-            $query = "
-				INSERT INTO event_campus (event_id, campus_id)
-				VALUES (:eventId, :campusId)
-				ON DUPLICATE KEY UPDATE event_id = :eventId, campus_id = :campusId
-			";
+            $query = '
+                INSERT INTO event_campus (event_id, campus_id)
+                VALUES (:eventId, :campusId)
+                ON DUPLICATE KEY UPDATE event_id = :eventId, campus_id = :campusId
+            ';
 
             $statement = $this->database->prepare($query);
             $statement->bindValue(":eventId", $event->getId());
@@ -483,10 +502,12 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *
      * @param Event $event
      * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function createSource($event)
     {
-        if ($event->getSource() != NULL && $event->getSource() != ""){
+        if ($event->getSource() != null && $event->getSource() != ""){
             $sourceMapper = \Event\Source\Mapper::getInstance();
 
             $source = $sourceMapper->createModel();
@@ -501,16 +522,17 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
 
     /**
-    * Prevent overlap on default event table
-    *
-    * @return int
-    */
+     * Prevent overlap on default event table
+     *
+     * @return int
+     * @throws PDOException
+     */
     public function getUpperSeriesIndex()
     {
         $query = "
-			SELECT COALESCE(MAX(series_id), 0)+1 AS series_id
-			FROM `{$this->table}` e
-		";
+            SELECT COALESCE(MAX(series_id), 0)+1 AS series_id
+            FROM `{$this->table}` e
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute();
@@ -521,13 +543,16 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
-    * Find all the events between two dates, inclusive
-    *
-    * @param string $startDate
-    * @param string $endDate
-    * @param bool $excludeResourceBookings
-    * @return Collection
-    */
+     * Find all the events between two dates, inclusive
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param bool   $excludeResourceBookings
+     * @return Collection
+     * @throws Exception
+     * @throws PDOException
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
     public function findEventsBetween($startDate, $endDate, bool $excludeResourceBookings = false)
     {
         $query = $this->getSelectString();
@@ -559,10 +584,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
 
     /**
-     * @param int $seriesId
+     * @param int                 $seriesId
      * @param Alaress_Date_Format $now
-     * @throws \Schoolbox\Mapper\Exception
      * @return Event
+     * @throws Exception
+     * @throws PDOException
      */
     public function findNextInSeries($seriesId, Alaress_Date_Format $now = null)
     {
@@ -644,6 +670,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *
      * @param int $folderId
      * @return array
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     private function getFolderSpecificEventIds(int $folderId): array
     {
