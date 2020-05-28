@@ -137,7 +137,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             'LIST_DATE' => $this->start->getLongDateOnly(),
             'DATE' => $this->start->getLongDateOnly(),
             'CALENDAR_DATE' => $this->start->getURLDate(),
-            'RETURN_URL' => Redirect::encode('/')
         ));
 
         $hasSeries = false;
@@ -174,7 +173,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $hasSeries = true;
                 }
 
-                $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
+                $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML, '/');
 
                 if ($htmlEvent) {
                     $this->setVar('EVENT_CONTENT', $htmlEvent);
