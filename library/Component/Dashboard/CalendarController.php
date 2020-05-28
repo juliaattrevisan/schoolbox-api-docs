@@ -5,27 +5,51 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Exception as AlaressDatabaseException;
+use Aura\Di\Exception\ServiceNotFound;
 use Calendar\Event\Collection\Lister;
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\ResourceBooking\Event;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\User;
 
+/**
+ * Class Component_Dashboard_CalendarController
+ *
+ * Display a list of events in the dashboard component
+ * The modal is implemented somewhere else
+ */
 class Component_Dashboard_CalendarController extends Component_Dashboard_ControllerAbstract
 {
-    /** @var Calendar $calendar */
+
+    /**
+     * @var Calendar $calendar
+     */
     protected $calendar;
 
-    /** @var Group $group */
+
+    /**
+     * @var Group $group
+     */
     protected $group;
 
-    /** @var Alaress_Date_Format */
+
+    /**
+     * @var Alaress_Date_Format
+     */
     protected $start;
 
-    /** @var Alaress_Date_Format */
+
+    /**
+     * @var Alaress_Date_Format
+     */
     protected $end;
 
-    /** @var Lister */
+
+    /**
+     * @var Lister
+     */
     protected $eventRenderer;
+
 
     /**
      * Component_Dashboard_CalendarController constructor.
@@ -45,6 +69,10 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
      * Get all the events you need to pump into the page
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
+     * @throws ServiceNotFound
      */
     public function execute()
     {
@@ -81,6 +109,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     /**
      * @param String $templateHandle
      * @return bool
+     * @throws Exception
      */
     public function renderTemplate($templateHandle)
     {
@@ -108,6 +137,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             'LIST_DATE' => $this->start->getLongDateOnly(),
             'DATE' => $this->start->getLongDateOnly(),
             'CALENDAR_DATE' => $this->start->getURLDate(),
+            'RETURN_URL' => Redirect::encode('/')
         ));
 
         $hasSeries = false;
@@ -120,6 +150,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 // Current day: will never be before the start time
 
                 $currentDay = $currentEvent->getStartTime();
+
                 if ($this->start->compare($currentDay) > 0) {
                     $currentDay = $this->start;
                 }
@@ -139,16 +170,15 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $this->setVar('event_block', '');
                 }
 
-                if ($currentEvent->getSeriesId()
-                    || ($currentEvent instanceof \Calendar\Event\Type\ResourceBooking\Event
-                        && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
+                if ($currentEvent->getSeriesId() || ($currentEvent instanceof Event && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
                     $hasSeries = true;
                 }
 
                 $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML);
+
                 if ($htmlEvent) {
                     $this->setVar('EVENT_CONTENT', $htmlEvent);
-                    $this->parse("event_block", "event", true);
+                    $this->parse('event_block', 'event', true);
                 }
 
                 $prevDay = $currentDay;
@@ -158,6 +188,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         }
 
         $this->parse('day_block', 'day', true);
+
         if ($hasSeries) {
             $this->parse('has_series_block', 'has_series', true);
         }
