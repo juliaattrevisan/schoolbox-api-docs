@@ -2201,11 +2201,6 @@ parameters:
 			path: library/Schoolbox/Calendar/EventMapper.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$cid$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Module.php
