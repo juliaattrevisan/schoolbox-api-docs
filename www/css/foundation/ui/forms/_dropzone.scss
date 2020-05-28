@@ -455,7 +455,7 @@ ul.az-error-list {
         }
     }
     .dz-error-mark, .dz-success-mark {
-        display: none;
+        //display: none;
         position: absolute;
         top: 23px;
         left: 9px;
@@ -466,25 +466,26 @@ ul.az-error-list {
     .dz-success-mark {
         color: $success-color;
     }
-    .dz-preview {
-        &.dz-error {
-            @extend .dz-error-mark;
-        }
-        &.dz-success {
-            @extend .dz-success-mark;
-        }
-    }
+    //.dz-preview {
+    //    &.dz-error {
+    //        @extend .dz-error-mark;
+    //    }
+    //    &.dz-success {
+    //        @extend .dz-success-mark;
+    //    }
+    //}
     .dz-error .dz-error-message {
-        position: absolute;
-        top: 37px;
-        left: 0;
-        width: 100px;
-        height: 100px;
-        margin: rem-calc(($base-font-size - 8));
-        background: $alert-color;
-        padding: rem-calc(($base-font-size - 6));
-        box-sizing: border-box;
-        text-align: center;
+        display: inherit;
+        //position: absolute;
+        //top: 37px;
+        //left: 0;
+        //width: 100px;
+        //height: 100px;
+        //margin: rem-calc(($base-font-size - 8));
+        //background: $alert-color;
+        //padding: rem-calc(($base-font-size - 6));
+        //box-sizing: border-box;
+        //text-align: center;
     }
     .dz-remove {
         position: relative;
