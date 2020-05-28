@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
 
@@ -58,4 +59,6 @@ $twig = $kernel->get('templateEngine');
 
 // This is a CSS file, cached for a while
 header('Content-Type: text/css');
+$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+
 echo $twig->render('css/skin.twig', $twigVars);
