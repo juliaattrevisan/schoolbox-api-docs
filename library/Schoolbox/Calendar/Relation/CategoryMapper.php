@@ -52,38 +52,6 @@ class CategoryMapper extends Schoolbox\Mapper
         );
     }
 
-    /**
-     * Find all the categories belonging to an event
-     *
-     * @param Schoolbox\Calendar\Event $event
-     * @return Collection
-     * @throws Exception
-     * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     */
-    public function findAllForEvent(Schoolbox\Calendar\Event $event)
-    {
-        $categoryMapper = $this->getJoinMapper('category');
-
-        $query = "
-            SELECT {$categoryMapper->getColumnString('c')}
-            FROM `{$this->table}` ec
-            LEFT JOIN {$this->getJoinSql('category', 'ec', 'c')}
-            WHERE ec.event_id = :eventId
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindValue(':eventId', $event->getId());
-        $statement->execute();
-
-        $allCategories = new Collection();
-
-        while ($row = $statement->fetch()) {
-            $allCategories->add($categoryMapper->hydrate($row, 'c'));
-        }
-
-        return $allCategories;
-    }
 
     /**
      * This mapper doesn't raise notifications - the event mapper handles that.

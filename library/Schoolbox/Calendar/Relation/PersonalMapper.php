@@ -54,39 +54,6 @@ class PersonalMapper extends Schoolbox\Mapper
 
 
     /**
-     * Find all the users belonging to an event
-     *
-     * @param Schoolbox\Calendar\Event $event
-     * @return Collection
-     * @throws Exception
-     * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     */
-    public function findAllForEvent(Schoolbox\Calendar\Event $event)
-    {
-        $personalMapper = $this->getJoinMapper('personal');
-
-        $query = "
-            SELECT {$personalMapper->getColumnString('u')}
-            FROM `{$this->table}` eu
-            LEFT JOIN {$this->getJoinSql('personal', 'eu', 'u')}
-            WHERE eu.event_id = :eventId
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindValue(':eventId', $event->getId());
-        $statement->execute();
-
-        $allUsers = new Collection();
-
-        while ($row = $statement->fetch()) {
-            $allUsers->add($personalMapper->hydrate($row, 'u'));
-        }
-
-        return $allUsers;
-    }
-
-    /**
      * This mapper doesn't raise notifications - the event mapper handles that.
      *
      * @param object $object

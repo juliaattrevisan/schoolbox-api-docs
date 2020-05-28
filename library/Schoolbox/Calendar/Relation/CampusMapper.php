@@ -71,38 +71,6 @@ class CampusMapper extends Schoolbox\Mapper
         $statement->execute();
     }
 
-    /**
-     * Find all the campuses belonging to an event
-     *
-     * @param Schoolbox\Calendar\Event $event
-     * @return Collection
-     * @throws Exception
-     * @throws Mapper\DefinitionException
-     * @throws \PDOException
-     */
-    public function findAllForEvent(Schoolbox\Calendar\Event $event)
-    {
-        $campusMapper = $this->getJoinMapper('campus');
-
-        $query = "
-            SELECT {$campusMapper->getColumnString('c')}
-            FROM `{$this->table}` ec
-            LEFT JOIN {$this->getJoinSql('campus', 'ec', 'c')}
-            WHERE ec.event_id = :eventId
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindValue(':eventId', $event->getId());
-        $statement->execute();
-
-        $allUsers = new Collection();
-
-        while ($row = $statement->fetch()) {
-            $allUsers->add($campusMapper->hydrate($row, 'c'));
-        }
-
-        return $allUsers;
-    }
 
     /**
      * This mapper doesn't raise notifications - the event mapper handles that.
