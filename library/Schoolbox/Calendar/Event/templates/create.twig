@@ -87,7 +87,7 @@
             <input name="id" type="hidden" value="{{ event.id }}" />
             <input name="userId" type="hidden" value="{{ user.id }}" />
             <input name="authorId" type="hidden" value="{{ event.author.id }}" />
-            <input id="allday" name="allday" type="hidden" value="{{ event.allDay }}">
+            <input id="allDay" name="allDay" type="hidden" value="{{ event.allDay }}">
             <input id="efficacy" name="efficacy" type="hidden" value="self" />
 
             <section>
@@ -101,13 +101,13 @@
                         <label class="required" for="startDate">
                             From
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datesync-enddate="#endDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.startDateTime.localShort : event.startDateTime.local }}"/>
+                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allDay" data-datepicker-call="event" data-datesync-enddate="#endDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.startDateTime.localShort : event.startDateTime.local }}"/>
                     </div>
                     <div class="small-6 columns">
                         <label class="required" for="endDate">
                             Until
                         </label>
-                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.endDateTime.localShort : event.endDateTime.local }}"/>
+                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allDay" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.endDateTime.localShort : event.endDateTime.local }}"/>
                     </div>
                 </fieldset>
 

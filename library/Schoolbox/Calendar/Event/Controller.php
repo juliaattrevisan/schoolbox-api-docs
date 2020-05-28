@@ -498,7 +498,7 @@ class Controller extends Base
         $title = $this->getRequest()->post['title'];
         $location = $this->getRequest()->post['location'];
         $detail = $this->getRequest()->post['detail'];
-        $allDay = (int)$this->getRequest()->post['allday'];
+        $allDay = (int)$this->getRequest()->post['allDay'];
         $roles = $this->getRequest()->post['roles'] ?? [];
 
         /* Attendance settings
