@@ -255,12 +255,56 @@
         #}
     {% endif %}
 
+
+    {##
+     # Accent colors
+     #
+     # Derived styles:
+     # www/css/foundation/ui/_content.scss, including a select color mixin I don't know what to do with
+     # www/css/foundation/components/alaress-datetime-picker/alaress-datetime-picker.scss
+     #}
+    {% if colors.skin_colour_accent_foreground is defined %}
+        --accent-foreground-h: {{ colors.skin_colour_accent_foreground.h | round(2) }};
+        --accent-foreground-s: {{ colors.skin_colour_accent_foreground.s | round(2) }}%;
+        --accent-foreground-l: {{ colors.skin_colour_accent_foreground.l | round(2) }}%;
+        --accent-foreground-a: {{ colors.skin_colour_accent_foreground.a | round(2) }}%;
+        --accent-foreground:   hsla(
+            var(--accent-foreground-h),
+            var(--accent-foreground-s),
+            var(--accent-foreground-l),
+            var(--accent-foreground-a)
+        );
+    {% endif %}
+
+    {% if colors.skin_colour_accent_background is defined %}
+        --accent-background-h: {{ colors.skin_colour_accent_background.h | round(2) }};
+        --accent-background-s: {{ colors.skin_colour_accent_background.s | round(2) }}%;
+        --accent-background-l: {{ colors.skin_colour_accent_background.l | round(2) }}%;
+        --accent-background-a: {{ colors.skin_colour_accent_background.a | round(2) }}%;
+        --accent-background:   hsla(
+            var(--accent-background-h),
+            var(--accent-background-s),
+            var(--accent-background-l),
+            var(--accent-background-a)
+        );
+    {% endif %}
+
+    {% if colors.skin_colour_accent_hover is defined %}
+        --accent-hover-h: {{ colors.skin_colour_accent_hover.h | round(2) }};
+        --accent-hover-s: {{ colors.skin_colour_accent_hover.s | round(2) }}%;
+        --accent-hover-l: {{ colors.skin_colour_accent_hover.l | round(2) }}%;
+        --accent-hover-a: {{ colors.skin_colour_accent_hover.a | round(2) }}%;
+        --accent-hover:   hsla(
+            var(--accent-hover-h),
+            var(--accent-hover-s),
+            var(--accent-hover-l),
+            var(--accent-hover-a)
+        );
+    {% endif %}
+
 {#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
 {#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
 {#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}
-{#--accent-foreground:            {{ config.skin_colour_accent_foreground }};#}
-{#--accent-background:            {{ config.skin_colour_accent_background }};#}
-{#--accent-hover:                 {{ config.skin_colour_accent_hover }};#}
 {#--logo-background:              {{ config.skin_colour_logo_background }};#}
 {#--body-bg:                      {{ config.skin_colour_body_bg }};#}
 {#--button-input-scale:           {{ config.skin_button_input_scale }};#}

@@ -29,7 +29,7 @@ $border-bottom-width: 2px;
     &.active {
       > a {
         font-weight: $side-nav-font-weight-active;
-        border-left: $border-bottom-width solid $accent-foreground;
+        border-left: $border-bottom-width solid var(--accent-foreground);
       }
     }
 

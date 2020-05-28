@@ -310,7 +310,7 @@ ul.tileList {
  */
 .countdown-timer{
     text-align: center;
-    color: $accent-foreground;
+    color: var(--accent-foreground);
     li{
         padding-right: 2px !important;
     }
@@ -318,7 +318,7 @@ ul.tileList {
         display: block;
         padding: 0.2rem;
         font-weight: 500;
-        background-color: $accent-background;
+        background-color: var(--accent-background);
     }
     .count{
         font-size: $h2-font-size;

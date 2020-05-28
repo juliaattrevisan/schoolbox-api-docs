@@ -47,7 +47,7 @@ $border-bottom-width: 2px;
     }
 
     &.active a {
-      border-bottom: $border-bottom-width solid $accent-foreground;
+      border-bottom: $border-bottom-width solid var(--accent-foreground);
     }
 
     &.skeleton {

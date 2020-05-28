@@ -636,7 +636,7 @@ ul.filters {
 
 	.selected-item,
 	.more-count {
-	  background-color: $accent-background;
+	  background-color: var(--accent-background);
 	  display: block;
 	  font-size: ($base-font-size - 4);
 	  font-style: italic;

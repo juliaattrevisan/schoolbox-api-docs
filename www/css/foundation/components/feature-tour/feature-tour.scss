@@ -248,7 +248,7 @@ $tooltip-padding: 1rem;
     text-shadow: none;
 
     &:hover {
-      color: $accent-foreground;
+      color: var(--accent-foreground);
     }
   }
 }
@@ -271,7 +271,7 @@ $tooltip-padding: 1rem;
 
       &:hover,
       &.active {
-        background: $accent-foreground;
+        background: var(--accent-foreground);
       }
     }
   }

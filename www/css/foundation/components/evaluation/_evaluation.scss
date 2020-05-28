@@ -50,9 +50,9 @@
  * Formerly a panel (this is now extinct).
  */
 .respondent-indicator {
-    border: 0.0625rem solid $accent-foreground;
-    color: $accent-foreground;
-    background-color: $accent-background;
+    border: 0.0625rem solid var(--accent-foreground);
+    color: var(--accent-foreground);
+    background-color: var(--accent-background);
     padding: 0.375rem;
     display: inline-block;
 }

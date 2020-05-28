@@ -105,7 +105,7 @@ $progress-bar-height: rem-calc(($base-font-size - 2));
 /* This is the track colour for the progress bar.
  * The progress bar expands to cover this colour.
  */
-$progress-bar-color: $accent-background;
+$progress-bar-color: var(--accent-background);
 
 // We use these to control the border styles
 // $progress-bar-border-color: scale-color($white, $lightness: 20%);
@@ -120,7 +120,7 @@ $progress-bar-pad: rem-calc(0);
 /* The actual coloured bar inside that increases
  * as "progress is made"
  */
-$progress-meter-color: $accent-foreground;
+$progress-meter-color: var(--accent-foreground);
 
 // We use these to set the meter colors
 // $progress-meter-secondary-color: $secondary-color;
@@ -330,7 +330,8 @@ $container-bg: white !default;
 // CUSTOM OVERRIDES
 //
 
-@include selection;
+// TODO restore this once I figure out what to do with it
+//@include selection;
 
 .align-bottom {
     vertical-align: bottom;
@@ -444,8 +445,8 @@ table{
 
 // Override calendar default colour with accent colours
 .fc .fc-today {
-    background: $accent-background !important;
-    color: $accent-foreground !important;
+    background: var(--accent-background) !important;
+    color: var(--accent-foreground) !important;
 }
 
 /* .row-header is designed to have the same style as th elements
@@ -690,8 +691,8 @@ $rotate-span-width: 11rem;
      * Used mainly in label-timeout indicators
      */
     &.highlight {
-        color: $accent-foreground;
-        background-color: $accent-background;
+        color: var(--accent-foreground);
+        background-color: var(--accent-background);
     }
     &.filter{
         @extend .highlight;
@@ -1348,7 +1349,7 @@ $selector-width: 2.25rem;
             padding: 0 0.5rem;
         }
         &:hover{
-            background-color: $accent-background;
+            background-color: var(--accent-background);
         }
     }
 }
@@ -1554,7 +1555,7 @@ tr:hover{
 
 // Schoolbox Loader
 .loader{
-    background-color: $accent-foreground;
+    background-color: var(--accent-foreground);
     border-radius: 0.5rem;
     margin: 2rem auto;
     width: 3rem;
@@ -1779,7 +1780,14 @@ dl {
     .pipe-meter{
         width: 0.5rem;
         height: 2rem;
-        background-color: darken($accent-foreground, 5%);
+        // TODO figure out what to do with this
+        background-color: hsla(
+            var(--accent-foreground-h),
+            var(--accent-foreground-s),
+            calc(var(--accent-foreground-l) * .95),
+            var(--accent-foreground-a)
+        );
+        //background-color: darken(var(--accent-foreground), 5%);
         position: absolute;
         top: -9px;
         &.slow{

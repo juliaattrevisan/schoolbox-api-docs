@@ -12,7 +12,7 @@
   li.inline-grader-file {
     background-color: $white;
     &.selected {
-      background-color: $accent-background;
+      background-color: var(--accent-background);
     }
   }
 }

@@ -4,7 +4,15 @@ $pickr-top-month-padding: rem-calc(2);
 
 $pickr-border-color: #e6e6e6;
 $pickr-border: rem-calc(1) solid $pickr-border-color;
-$pickr-hover-background: lighten($accent-foreground, 60%);
+
+// TODO figure out what to do with this
+$pickr-hover-background: hsla(
+    var(--accent-foreground-h),
+    var(--accent-foreground-s),
+    calc(var(--accent-foreground-l) * 1.6),
+    var(--accent-foreground-a)
+);
+//$pickr-hover-background: lighten(var(--accent-foreground), 60%);
 
 /**
  * The input and button
@@ -74,7 +82,7 @@ input.datepicker-input {
 
 .flatpickr-months .flatpickr-prev-month:hover svg,
 .flatpickr-months .flatpickr-next-month:hover svg {
-  fill: $accent-foreground;
+  fill: var(--accent-foreground);
 }
 
 /**
@@ -183,8 +191,8 @@ input.datepicker-input {
         &.selected:hover,
         &.selected.prevMonthDay,
         &.selected.nextMonthDay {
-            background: $accent-foreground;
-            border-color: $accent-foreground;
+            background: var(--accent-foreground);
+            border-color: var(--accent-foreground);
             color: $white;
         }
 
@@ -195,7 +203,7 @@ input.datepicker-input {
             bottom: rem-calc(-1);
             left: rem-calc(-4);
             width: rem-calc(45);
-            border-top: solid 1px rgba($accent-foreground, 0.5);
+            border-top: solid 1px rgba(var(--accent-foreground), 0.5);
             background: rgba($input-border-color, 0.3);
         }
 
@@ -369,7 +377,7 @@ input.datepicker-input {
         }
 
         .icon-previous {
-            color: $accent-foreground;
+            color: var(--accent-foreground);
         }
     }
 

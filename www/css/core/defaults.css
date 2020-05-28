@@ -161,4 +161,39 @@
             var(--form-bg-hover-color-l),
             var(--form-bg-hover-color-a)
     );
+
+
+    /** Accent colors **/
+    --accent-foreground-h: 205;
+    --accent-foreground-s: 100%;
+    --accent-foreground-l: 34.5%;
+    --accent-foreground-a: 100%;
+    --accent-foreground:   hsla(
+            var(--accent-foreground-h),
+            var(--accent-foreground-s),
+            var(--accent-foreground-l),
+            var(--accent-foreground-a)
+    );
+
+    --accent-background-h: 206;
+    --accent-background-s: 100.0%;
+    --accent-background-l: 87.8%;
+    --accent-background-a: 97.3%;
+    --accent-background:   hsla(
+            var(--accent-background-h),
+            var(--accent-background-s),
+            var(--accent-background-l),
+            var(--accent-background-a)
+    );
+
+    --accent-hover-h: 205;
+    --accent-hover-s: 100%;
+    --accent-hover-l: 100%;
+    --accent-hover-a: 100%;
+    --accent-hover:   hsla(
+            var(--accent-hover-h),
+            var(--accent-hover-s),
+            var(--accent-hover-l),
+            var(--accent-hover-a)
+    );
 }

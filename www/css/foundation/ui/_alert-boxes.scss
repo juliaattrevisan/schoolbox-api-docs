@@ -66,8 +66,8 @@ $alert-default-background: darken($body-bg, 10%);
     }
 
     &.highlight {
-        background-color: $accent-background;
-        color: $accent-foreground;
+        background-color: var(--accent-background);
+        color: var(--accent-foreground);
     }
     &.success {
         background-color: $success-color;
@@ -103,7 +103,7 @@ $alert-default-background: darken($body-bg, 10%);
         [class^='icon-'],
         [class*=' icon-'] {
             &:before {
-                color: $accent-foreground;
+                color: var(--accent-foreground);
             }
         }
     }
