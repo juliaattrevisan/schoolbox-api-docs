@@ -147,7 +147,9 @@ Usage:
                 <li class="actions-small-1" data-course-impl="{{ currentCourse.id }}">
                     <div class="list-item">
                         <div class="card small-12">
+                            {% if not currentCourse.specification.folder.isDeleted %}
                             <a href="/homepage/{{ currentCourse.specification.folder.id }}">
+                            {% endif %}
                                 <h3>
                                     {% if not componentNames[currentCourse.id] | length %}
                                         <span class="icon-archive" data-course-impl-icon></span> <span class="del" data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
@@ -155,10 +157,12 @@ Usage:
                                         <span class="icon-course" data-course-impl-icon></span> <span data-course-impl-name>{{ currentCourse.specification.folder.name }}</span>
                                     {% endif %}
                                 </h3>
+                            {% if not currentCourse.specification.folder.isDeleted %}
                             </a>
+                            {% endif %}
                             <p class="meta">
                                 {% for folderCrumb in folderAncestry[currentCourse.id] %}
-                                    {{ folderCrumb.name }}{% if not loop.last and not loop.first %} &raquo;{% endif %}
+                                    {{ folderCrumb ? folderCrumb.name : '' }}{% if not loop.last and not loop.first %} &raquo;{% endif %}
                                 {% endfor %}
                             </p>
                             <p class="meta">Imported on {{ currentCourse.createdAt.long }}</p>
@@ -175,9 +179,10 @@ Usage:
                     <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">
                         {% if not componentNames[currentCourse.id] %}
                             <li>
-                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}">Restore Component</a>
+                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.specification.folder.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId is defined ? courseComponentId : 0 }}">Restore Component</a>
                             </li>
                         {% endif %}
+                        {% if not currentCourse.specification.folder.isDeleted and not currentCourse.specification.isDeleted %}
                         <li>
                             <a
                                 href="{{ routeLookup('courseImport.getModify', {courseImplId: currentCourse.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}"
@@ -185,6 +190,7 @@ Usage:
                                 title="Modify Import"
                             >Modify</a>
                         </li>
+                        {% endif %}
                         <li>
                             <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete>Delete</a>
                         </li>

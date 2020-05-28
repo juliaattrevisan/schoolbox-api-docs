@@ -29,11 +29,23 @@ Data:
 <div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, student: student, icon: 'icon-task'} %}
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: false,
+            student: student,
+            icon: 'icon-task',
+            canShowcase: false,
+            isShowcased: false
+        } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% include '@learningAssessment/fragments/modifyTot.twig' %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        viewRoute: viewRoute,
+        modifyRoute: modifyRoute,
+        canShowcase: false,
+        isShowcased: false
+    } %}
 </div>
 
 <div class="row">
@@ -51,8 +63,8 @@ Data:
 {% set participant         = assessment.getParticipantIfExtant(student) %}
 {% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
 {% set isViewingOwnSummary = student.id == USER.id %}
-{% set reviewer            = mostRecentResponse.submittedBy %}
-{% set reviewerName        = reviewer.id == USER.id ? 'You' : reviewer.fullName %}
+{% set reviewer            = mostRecentResponse ? mostRecentResponse.submittedBy : null %}
+{% set reviewerName        = reviewer ? (reviewer.id == USER.id ? 'You' : reviewer.fullName) : null %}
 {% set COMPLETION_STATUS_INCOMPLETE              = 1 %}
 {% set COMPLETION_STATUS_SELF_MARKED_COMPLETE    = 2 %}
 {% set COMPLETION_STATUS_TEACHER_MARKED_COMPLETE = 3 %}

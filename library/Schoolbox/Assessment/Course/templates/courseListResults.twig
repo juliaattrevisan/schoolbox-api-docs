@@ -15,7 +15,7 @@
 
 <div class="small-12 island">
 
-    {% if suggestions|length %}
+    {% if suggestions is defined and suggestions|length %}
         <section>
             <h3>Suggested Courses</h3>
             <ul class="information-list">
@@ -37,20 +37,21 @@
 
     {% if courses|length %}
         <section>
-            {% if suggestions|length %}
+            {% if suggestions is defined and suggestions|length %}
                 <h3>All Courses</h3>
             {% endif %}
             <ul class="information-list">
                 {% for course in courses %}
                     {% include '@course/courseListResult.twig' with {
                         courseSpec:        course,
-                        folder:            folder,
+                        folder:            folder is defined ? folder : null,
                         linkToUnits:       linkToUnits,
-                        component:         component,
+                        component:         component is defined ? component : null,
                         cparents:          lineage[course.id],
                         hasTot:            hasTot,
-                        linkTitleToModify: linkTitleToModify,
+                        linkTitleToModify: linkTitleToModify ?? null,
                         returnUrlKey:      returnUrlKey,
+                        collapsePrefix:    null,
                         encodedReturnUrl:  encodedReturnUrl
                     } only %}
                 {% endfor %}

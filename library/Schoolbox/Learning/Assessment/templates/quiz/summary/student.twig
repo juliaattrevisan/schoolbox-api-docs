@@ -10,14 +10,18 @@
         <h1>{{ assessment.title }}</h1>
         {% include '@learningAssessment/quiz/meta.twig' with {
             assessment: assessment,
-            submissionsBlocked: submissionsBlocked,
             student: student,
             icon: 'icon-quiz'
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% include '@learningAssessment/fragments/modifyTot.twig' %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        viewRoute: viewRoute,
+        modifyRoute: modifyRoute,
+        canShowcase: false,
+        isShowcased: false
+    } %}
 </div>
 
 <div class="row">
