@@ -208,6 +208,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
+            'year'             => null,
             'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
             'folders'          => $folders,
             'markbooks'        => $markbooks,

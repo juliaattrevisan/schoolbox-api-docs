@@ -20,7 +20,7 @@
             student:      student
         }) %}
         {% if summaryRoute %}
-            <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
+            <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}</p>
             </a>
@@ -47,7 +47,7 @@
         {% set grade = assessment.humanReadableMark(participant, true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
-                assessment: assessable,
+                assessment: assessment,
                 student:    student
             } only %}
         {% elseif grade %}
@@ -59,11 +59,11 @@
 </div>
 {% if assessment.isFeedbackVisibleToUser(USER) %}
     {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-    {% if feedback.comment   %}
+    {% if feedback and feedback.comment   %}
         <div class="content">
             <p class="comment">{{ feedback.comment | nl2br }}</p>
             {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
-                <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
+                <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                     View assessment details</a>
             {% endif %}
         </div>
