@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -622,23 +623,20 @@ class SitePage extends Page
 
 
     /**
+     * Forces a redirect to the login page, by throwing an unauthenticated
+     * exception.
      *
+     * @throws Unauthenticated
      */
     public function goLoginPage()
     {
-        $parts = parse_url($_SERVER['REQUEST_URI']);
-        if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
-            if ($parts['path'] != '/') {
-                $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
-            } else {
-                $this->localRedir('/login/');
-            }
-        }
-        exit;
+        throw new Unauthenticated();
     }
 
     /**
-     * Render a 404 Page Not Found
+     * Forces a render of the 404 page, by throwing a not found exception.
+     *
+     * @throws NotFound
      */
     public function pageNotFound()
     {

@@ -1981,21 +1981,6 @@ parameters:
 			path: library/Schoolbox/Application/Login/Controller.php
 
 		-
-			message: "#^Variable \\$controller might not be defined\\.$#"
-			count: 6
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
-			message: "#^Variable \\$session might not be defined\\.$#"
-			count: 2
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
-			message: "#^Variable \\$params might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
 			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Application/WebRequest/Kernel.php

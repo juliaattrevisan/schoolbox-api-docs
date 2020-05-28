@@ -16,10 +16,14 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
+use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
+use Aura\Web\Request;
+use Aura\Web\Response;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
@@ -115,10 +119,96 @@ class Kernel extends WebKernelAbstract
 
         $route = $this->di->get('router')->match($path, $server);
 
-        if ($route instanceof Route) {
-            $this->outputAuraContent($route, $path);
-        } else {
-            $this->outputSitepageContent($_GET['page'] ?? null);
+        try {
+            if ($route instanceof Route) {
+                $this->outputAuraContent($route);
+            } else {
+                $this->outputSitepageContent($_GET['page'] ?? null);
+            }
+        } catch (Unauthenticated $e) {
+            // Unauthenticated response - redirect to a login page.
+            // Preserve GET params that aren't "page" or "samlAuth", so the user
+            // can get redirected back to what they requested when they log in.
+            /** @var Request $request */
+            $request  = $this->di->get('webFactory')->newRequest();
+            $uri      = new Uri($path);
+            $query    = [];
+            foreach ($request->query as $key => $value) {
+                if (!in_array($key, ['page', 'samlAuth'])) {
+                    $query[$key] = $value;
+                }
+            }
+            $uri->setQuery($query);
+
+            // Start constructing a response
+            /** @var Response $response */
+            $response = $this->di->get('webFactory')->newResponse();
+            if ((new IsXhr())->isSatisfiedBy($request)) {
+                // Fabricate an AJAX response. Don't redirect
+                // TODO replace this with standard outputError (ApiProblem style payload)
+                $response->status->setCode(401);
+                $response->content->set([
+                    'format' => 'json',
+                    'data'   => ['error' => 'Unauthenticated'],
+                ]);
+                $output = $this->di->get("webOutput:json");
+            } else {
+                /** @var \Alaress\Session\Session $session */
+                $session = $this->di->get('session');
+                $session
+                    ->getSegment(LoginController::class)
+                    ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
+                $output = $this->di->get("webOutput:noContent");
+                $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
+            }
+            $output->output($response);
+
+        } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
+            // Mapper exception: something was either deleted or never existed.
+            // Output something plain
+            /** @var Request $request */
+            $request  = $this->di->get('webFactory')->newRequest();
+            /** @var Response $response */
+            $response = $this->di->get('webFactory')->newResponse();
+            $code     = $e instanceof Deleted ? 410 : 404;
+            if ((new IsXhr())->isSatisfiedBy($request)) {
+                // Fabricate an AJAX response. Don't redirect
+                // TODO replace this with standard outputError (ApiProblem style payload)
+                $response->status->setCode($code);
+                $response->content->set([
+                    'format' => 'json',
+                    'data'   => ['error' => $e->getMessage()],
+                ]);
+                $output = $this->di->get("webOutput:json");
+                $output->output($response);
+            } else {
+                $this->outputError($e, $e->getMessage(), '', [], $code);
+            }
+
+        } catch (Forbidden $e) {
+            // Not allowed
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 403);
+
+        } catch (NotFound $e) {
+            // "That which you are looking for cannot be found"
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 404);
+
+        } catch (Unauthorized $e) {
+            // This seems to be the most appropriate error code for unauthorized calls.
+            // TODO set headers on $response instead of calling header()
+            header('WWW-Authenticate: FormBased');
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 401);
+
+        } catch (SchoolboxException $e) {
+            /* Generic Schoolbox Exception spawned by ErrorMapper,
+             * thrown by Controllers. ErrorMapper already did the
+             * db call to retrieve the content, so error() doesn't
+             * need to do it itself. It just renders the content.
+             */
+            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
         }
     }
 
@@ -128,7 +218,6 @@ class Kernel extends WebKernelAbstract
      *
      * @param Route  $route the route to render: the controller and action are
      *                      extracted from its name.
-     * @param string $path  the base path that was requested
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
@@ -136,7 +225,7 @@ class Kernel extends WebKernelAbstract
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Throwable
      */
-    private function outputAuraContent(Route $route, string $path): void
+    private function outputAuraContent(Route $route): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -150,158 +239,94 @@ class Kernel extends WebKernelAbstract
         $module = $this->di->get('module:' . $controllerName);
         $module->initControllerDependencies();
 
+        /** @var \Alaress\Session\Session $session */
+        $session = $this->di->get('session');
+
+        // Do authorization here
+        // TODO Inject user getter into authorizer, and use it to determine:
+        // * if user is there
+        // * if user session is timed out or not
+        /** @var \Schoolbox\User $user */
+        $user = $session->getAuthUser();
+        if ($session->isAuthSessionAlive()) {
+            $session->updateLastTime();
+        }
+
+        /** @var \Aura\Web\Response $response */
+        $response = null;
+
+        // Has session expired? Assume no user here then, but that should probably
+        // be handled in authenticator.
+        $params = [];
+
+        // The preloader may throw an exception.
+        // It should be ignored if the user is not authorized,
+        // because we always want a login screen.
+        /** @var \Alaress\Web\Router\PathMatcher $preloader */
+        $preloader          = $this->di->get('preloader');
+        $preloaderException = null;
+
         try {
-            /** @var \Alaress\Session\Session $session */
-            $session = $this->di->get('session');
+            $params = $preloader->check($route->name, $route->params);
 
-            // Do authorization here
-            // TODO Inject user getter into authorizer, and use it to determine:
-            // * if user is there
-            // * if user session is timed out or not
-            /** @var \Schoolbox\User $user */
-            $user = $session->getAuthUser();
-            if ($session->isAuthSessionAlive()) {
-                $session->updateLastTime();
-            }
+        } catch (\Exception $preloaderException) {
+            // Store the preloader exception for later
+        }
 
-            /** @var \Aura\Web\Response $response */
-            $response = null;
+        // now the preloading is done initialise the controller
+        $module->initControllers($this->di);
+        unset($module);
 
-            // Has session expired? Assume no user here then, but that should probably
-            // be handled in authenticator.
-            $params = [];
+        /** @var \Alaress\Web\Controller\Base $controller */
+        $controller = $this->di->get('controller:' . $controllerName);
 
-            // The preloader may throw an exception.
-            // It should be ignored if the user is not authorized,
-            // because we always want a login screen.
-            /** @var \Alaress\Web\Router\PathMatcher $preloader */
-            $preloader          = $this->di->get('preloader');
-            $preloaderException = null;
+        // Authorize, throwing whatever exceptions might be thrown.
+        /** @var \Alaress\Authorizer\Authorizer $auth */
+        $auth = $this->di->get('authorizer');
 
-            try {
-                $params = $preloader->check($route->name, $route->params);
+        try {
+            $auth->authorizePathForUser($route->name, $params, $user);
 
-            } catch (\Exception $preloaderException) {
-                // Store the preloader exception for later
-            }
+        } catch (Unauthenticated $ue) {
+            // Unauthenticated:
+            // always throw this, even if there was preloader exception
+            throw $ue;
 
-            // now the preloading is done initialise the controller
-            $module->initControllers($this->di);
-            unset($module);
-
-            /** @var \Alaress\Web\Controller\Base $controller */
-            $controller = $this->di->get('controller:' . $controllerName);
-
-            // Authorize, throwing whatever exceptions might be thrown.
-            /** @var \Alaress\Authorizer\Authorizer $auth */
-            $auth = $this->di->get('authorizer');
-
-            try {
-                $auth->authorizePathForUser($route->name, $params, $user);
-
-            } catch (Unauthenticated $ue) {
-                // Unauthenticated:
-                // always throw this, even if there was preloader exception
-                throw $ue;
-
-            } catch (\Throwable $ae) {
-                // Some other exception (including unauthorized):
-                // throw the preloader exception in preference to this
-                if ($preloaderException instanceof \Throwable) {
-                    throw $preloaderException;
-                }
-                throw $ae;
-            }
-
-            // No auth exception:
-            // throw the preloader exception if there was one
+        } catch (\Throwable $ae) {
+            // Some other exception (including unauthorized):
+            // throw the preloader exception in preference to this
             if ($preloaderException instanceof \Throwable) {
                 throw $preloaderException;
             }
-
-            // If authorizePathForUser() threw no exception, authorization passed!
-            // Call the controller method.
-            // Ensure that the parameters match up with the names used.
-            $method = new ReflectionMethod($controller, $action);
-            $args   = [];
-            foreach ($method->getParameters() as $parameter) {
-                $name   = $parameter->getName();
-                $args[] = (array_key_exists($name, $params)) ? $params[$name] : null;
-            }
-
-            // Set the route into the debug bar
-            if (DebugBar::isEnabled()) {
-                DebugBar::getInstance()->addCollector(
-                    new RouteCollector(sprintf('%s::%s', $method->class, $method->name))
-                );
-            }
-
-            $method->invokeArgs($controller, $args);
-            $response = $controller->getResponse();
-        } catch (Unauthenticated $e) {
-            // Really basic unauthenticated response - redirect to a login page.
-            // Preserve GET params that aren't "page" (or "samlAuth"?)
-            $uri   = new Uri($path);
-            $query = [];
-            foreach ($controller->getRequest()->query as $key => $value) {
-                if (!in_array($key, ['page', 'samlAuth'])) {
-                    $query[$key] = $value;
-                }
-            }
-            $uri->setQuery($query);
-            $response = $this->di->get('webFactory')->newResponse();
-            if ($controller->getRequest()->isXhr()) {
-                // Fabricate an AJAX response. Don't redirect
-                $response->status->setCode(401);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => 'Unauthenticated'],
-                ]);
-            } else {
-                $session->getSegment(\Schoolbox\Application\Login\Controller::class)
-                    ->setFlash(\Schoolbox\Application\Login\Controller::LOGIN_ERROR_FLASH, get_class($e));
-                $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
-            }
-        } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
-            $response = $this->di->get('webFactory')->newResponse();
-            $code     = $e instanceof Deleted ? 410 : 404;
-            if ($controller->getRequest()->isXhr()) {
-                // TODO replace this with standard outputError (ApiProblem style payload)
-                // Fabricate an AJAX response. Don't redirect
-                $response->status->setCode($code);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => $e->getMessage()],
-                ]);
-            } else {
-                $this->outputError($e, $e->getMessage(), '', [], $code);
-                return;
-            }
-        } catch (Forbidden $e) {
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 403);
-            return;
-        } catch (NotFound $e) {
-            // "That which you are looking for cannot be found"
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 404);
-            return;
-        } catch (Unauthorized $e) {
-            // This seems to be the most appropriate error code for unauthorized calls.
-            // TODO set headers on $response instead of calling header()
-            header('WWW-Authenticate: FormBased');
-            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
-            $this->outputError($e, $errorMessage, '', [], 401);
-            return;
-        } /* Generic Schoolbox Exception spawned by ErrorMapper,
-             * thrown by Controllers. ErrorMapper already did the
-             * db call to retrieve the content, so error() doesn't
-             * need to do it itself. It just renders the content.
-             */
-        catch (SchoolboxException $e) {
-            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
-            return;
+            throw $ae;
         }
+
+        // No auth exception:
+        // throw the preloader exception if there was one
+        if ($preloaderException instanceof \Throwable) {
+            throw $preloaderException;
+        }
+
+        // If authorizePathForUser() threw no exception, authorization passed!
+        // Call the controller method.
+        // Ensure that the parameters match up with the names used.
+        $method = new ReflectionMethod($controller, $action);
+        $args   = [];
+        foreach ($method->getParameters() as $parameter) {
+            $name   = $parameter->getName();
+            $args[] = (array_key_exists($name, $params)) ? $params[$name] : null;
+        }
+
+        // Set the route into the debug bar
+        if (DebugBar::isEnabled()) {
+            DebugBar::getInstance()->addCollector(
+                new RouteCollector(sprintf('%s::%s', $method->class, $method->name))
+            );
+        }
+
+        $method->invokeArgs($controller, $args);
+        $response = $controller->getResponse();
+
         /** @var OutputInterface $output */
         $output = $response->content->get();
         if (!$output instanceof OutputInterface) {
