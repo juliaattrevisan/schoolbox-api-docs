@@ -1,19 +1,22 @@
 <?php
 /**
- * CampusMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar\Relation;
 
 use Schoolbox;
-use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
+/**
+ * Class CampusMapper
+ *
+ * Maintains relationships between Campuses and Events via event_campus
+ * These are a School level's events
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class CampusMapper extends Schoolbox\Mapper
 {
 
@@ -50,25 +53,6 @@ class CampusMapper extends Schoolbox\Mapper
                 'other_key' => 'id',
             )
         );
-    }
-
-    /**
-     * Purge existing sid assignations
-     *
-     * @param Schoolbox\Calendar\Event $event
-     * @throws \PDOException
-     */
-    public function cleanse(Schoolbox\Calendar\Event $event)
-    {
-        $statement = $this->database->prepare(
-            "
-            DELETE FROM `{$this->table}`
-            WHERE `event_id` = :identifierValue
-        "
-        );
-
-        $statement->bindValue(':identifierValue', $event->getId());
-        $statement->execute();
     }
 
 

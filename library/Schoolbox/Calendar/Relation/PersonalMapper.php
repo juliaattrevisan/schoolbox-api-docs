@@ -1,19 +1,22 @@
 <?php
 /**
- * PersonalMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar\Relation;
 
 use Schoolbox;
-use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
+/**
+ * Class PersonalMapper
+ *
+ * Maintains relationships between Users and Events via event_user
+ * These are a user's personal events
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class PersonalMapper extends Schoolbox\Mapper
 {
 

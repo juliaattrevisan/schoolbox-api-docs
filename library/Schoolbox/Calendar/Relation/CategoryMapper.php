@@ -1,19 +1,22 @@
 <?php
 /**
- * CategoryMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar\Relation;
 
 use Schoolbox;
-use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
+/**
+ * Class CategoryMapper
+ *
+ * Maintains relationships between Folders and Events via event_folder
+ * These are a Group level's events
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class CategoryMapper extends Schoolbox\Mapper
 {
 
