@@ -177,8 +177,8 @@
 
     --accent-background-h: 206;
     --accent-background-s: 100.0%;
-    --accent-background-l: 87.8%;
-    --accent-background-a: 97.3%;
+    --accent-background-l: 94.9%;
+    --accent-background-a: 100%;
     --accent-background:   hsla(
             var(--accent-background-h),
             var(--accent-background-s),
@@ -214,8 +214,8 @@
     /** Body background **/
     --body-background-h: 205;
     --body-background-s: 0%;
-    --body-background-l: 100%;
-    --body-background-a: 92.9%;
+    --body-background-l: 92.9%;
+    --body-background-a: 100%;
     --body-background:   hsla(
             var(--body-background-h),
             var(--body-background-s),
@@ -236,10 +236,10 @@
             var(--accounts-menu-foreground-a)
     );
 
-    --accounts-menu-background-h: 206;
+    --accounts-menu-background-h: 205;
     --accounts-menu-background-s: 100.0%;
-    --accounts-menu-background-l: 87.8%;
-    --accounts-menu-background-a: 97.3%;
+    --accounts-menu-background-l: 94.9%;
+    --accounts-menu-background-a: 100%;
     --accounts-menu-background:   hsla(
             var(--accounts-menu-background-h),
             var(--accounts-menu-background-s),
