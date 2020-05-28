@@ -460,7 +460,7 @@ $allow-sidebar-stash: $large-up;
   }
 
   .logo-wrapper {
-    background-color: $logo-background;
+    background-color: var(--logo-background);
 
     .logo {
       display: none;

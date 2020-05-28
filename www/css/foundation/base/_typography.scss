@@ -30,7 +30,15 @@ $h6-font-reduction: 0;
 
 // These control how subheaders are styled.
 $subheader-line-height: 1.4;
-$subheader-font-color: contrast-bg();
+// TODO figure out what to do instead of this mixin
+// This requires calculation of a contrasting color.
+$subheader-font-color: hsla(
+    var(--body-background-h),
+    var(--body-background-s),
+    calc(var(--body-background-l) * 0.855),
+    var(--body-background-a)
+);
+//$subheader-font-color: contrast-bg();
 $subheader-font-weight: $header-font-weight;
 $subheader-top-margin: .625rem;
 $subheader-bottom-margin: .5rem;
@@ -124,7 +132,15 @@ $blockquote-cite-link-color: $blockquote-cite-font-color;
 
 // Heading 1
 h1{
-    @include contrast-bg(0.855, $body-bg, 0%, $white, $black); // 0.855 = $jet
+    // TODO figure out what to do with this mixin
+    // This requires calculation of a contrasting color.
+    color: hsla(
+        var(--body-background-h),
+        var(--body-background-s),
+        calc(var(--body-background-l) * 0.855),
+        var(--body-background-a)
+    );
+    //@include contrast-bg(0.855, var(--body-background), 0%, $white, $black); // 0.855 = $jet
 }
 
 .subheader{
@@ -156,7 +172,14 @@ a{
 }
 
 .meta{
-	@include contrast-bg();
+    // TODO figure out what to do about this mixin
+    color: hsla(
+        var(--body-background-h),
+        var(--body-background-s),
+        calc(var(--body-background-l) * 0.855),
+        var(--body-background-a)
+    );
+	//@include contrast-bg();
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: $paragraph-font-size;
 	font-style: italic;

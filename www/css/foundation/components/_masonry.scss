@@ -29,7 +29,7 @@ $masonry-drop-background: $input-focus-bg-color;
 /* The drag/drop in Component tab
  */
 .component-palette {
-    border-top: 1px solid $body-bg;
+    border-top: 1px solid var(--body-background);
 
     /* To overcome the !important from .grid, which overcomes
      * the too-powerful Foundation defaults

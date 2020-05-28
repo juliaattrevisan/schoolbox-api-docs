@@ -44,8 +44,8 @@
 .component-action{
     section{
         background-color: rgba(0,0,0,0.02) !important;
-        border-top: 1px solid $body-bg;
-        border-bottom: 3px solid $body-bg;
+        border-top: 1px solid var(--body-background);
+        border-bottom: 3px solid var(--body-background);
         margin: 0;
         text-align: right;
         min-height: 2.5rem;
@@ -393,7 +393,7 @@ ul.tileList {
 
 // Chat message border and padding
 .chat-messages .spaced:nth-of-type(n+2) {
-    border-top: 1px solid $body-bg;
+    border-top: 1px solid var(--body-background);
     padding-top: 0.45rem;
 }
 

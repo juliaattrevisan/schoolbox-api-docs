@@ -217,7 +217,7 @@
   }
 }
 
-@mixin contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
+@mixin contrast-bg($opacity: 0.35, $background: var(--body-background), $saturation: 0%, $light: $white, $dark: $black) {
 	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
 }
 

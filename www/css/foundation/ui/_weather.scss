@@ -17,7 +17,7 @@
     text-align: center;
 
     @media #{$small-only} {
-      border-bottom: 1px solid $body-bg;
+      border-bottom: 1px solid var(--body-background);
     }
   }
 }

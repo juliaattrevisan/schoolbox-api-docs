@@ -105,7 +105,7 @@
             border-right: 1px solid #eee;
         }
         .course-headers th.transparent {
-            background: $body-bg;
+            background: var(--body-background);
         }
         .course-headers th.white {
             background: $white;

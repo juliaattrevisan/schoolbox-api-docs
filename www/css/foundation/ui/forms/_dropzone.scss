@@ -697,7 +697,7 @@ ul.az-error-list {
     left: 6px;
     right: 6px;
     height: 6px;
-    background: $body-bg;
+    background: var(--body-background);
     display: none;
 }
 .dz-preview .dz-progress .dz-upload,

@@ -165,7 +165,7 @@ $boarder-leave-print-pending-border-color: #d0d0d0 !default;
     }
     .summary-tile span,
     .summary-house-tile span{
-        border-bottom: 1px solid $body-bg;
+        border-bottom: 1px solid var(--body-background);
         font-size: rem-calc(($base-font-size * 4));
         line-height: rem-calc(($base-font-size * 6));
         display: block;

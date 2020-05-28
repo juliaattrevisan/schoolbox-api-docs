@@ -302,6 +302,46 @@
         );
     {% endif %}
 
+
+    {##
+     # Logo background
+     #
+     # Derived styles:
+     # None known
+     #}
+    {% if colors.skin_colour_logo_background is defined %}
+        --logo-background-h: {{ colors.skin_colour_logo_background.h | round(2) }};
+        --logo-background-s: {{ colors.skin_colour_logo_background.s | round(2) }}%;
+        --logo-background-l: {{ colors.skin_colour_logo_background.l | round(2) }}%;
+        --logo-background-a: {{ colors.skin_colour_logo_background.a | round(2) }}%;
+        --logo-background:   hsla(
+            var(--logo-background-h),
+            var(--logo-background-s),
+            var(--logo-background-l),
+            var(--logo-background-a)
+        );
+    {% endif %}
+
+
+    {##
+     # Body background
+     #
+     # Derived styles:
+     # the contrast-bg rubric
+     #}
+    {% if colors.skin_colour_body_bg is defined %}
+        --body-background-h: {{ colors.skin_colour_body_bg.h | round(2) }};
+        --body-background-s: {{ colors.skin_colour_body_bg.s | round(2) }}%;
+        --body-background-l: {{ colors.skin_colour_body_bg.l | round(2) }}%;
+        --body-background-a: {{ colors.skin_colour_body_bg.a | round(2) }}%;
+        --body-background:   hsla(
+            var(--body-background-h),
+            var(--body-background-s),
+            var(--body-background-l),
+            var(--body-background-a)
+        );
+    {% endif %}
+
 {#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
 {#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
 {#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}

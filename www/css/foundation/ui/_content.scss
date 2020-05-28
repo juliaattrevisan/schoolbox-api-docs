@@ -439,7 +439,7 @@ table{
     }
 }
 .row-header, .island table.dataTable thead th {
-    border-bottom: 2px solid $body-bg;
+    border-bottom: 2px solid var(--body-background);
     font-weight: $font-weight-semibold;
 }
 
@@ -455,7 +455,7 @@ table{
 .action-list, .information-list {
     li.row-header {
         padding-top: 0.5rem;
-        border-bottom: 2px solid $body-bg;
+        border-bottom: 2px solid var(--body-background);
     }
 }
 
@@ -478,7 +478,7 @@ table:not(.no-hover) tbody tr:hover {
 }
 td, th{
     vertical-align: top;
-    border-bottom: 1px solid $body-bg;
+    border-bottom: 1px solid var(--body-background);
     input[type=radio] +
     label.radio-label,
     input[type=checkbox] +
@@ -545,7 +545,7 @@ $rotate-span-width: 11rem;
 
 .rotate-headers {
 
-    background-color: $body-bg;
+    background-color: var(--body-background);
 
     th {
         &:empty {
@@ -911,7 +911,7 @@ $selector-width: 2.25rem;
 %information-li{
     @include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
     @include responsive-sides(-1, margin);
-    border-bottom: 1px solid $body-bg;
+    border-bottom: 1px solid var(--body-background);
     position: relative;
     overflow: visible;
     list-style: none;
@@ -959,7 +959,7 @@ $selector-width: 2.25rem;
         }
     }
     &.group {
-        border-bottom: .5rem solid $body-bg;
+        border-bottom: .5rem solid var(--body-background);
         &:last-of-type {
             border-bottom: 0;
         }
@@ -1041,7 +1041,7 @@ $selector-width: 2.25rem;
     }
     // Grades expandable layout
     .unit {
-        border-top: 2px solid $body-bg;
+        border-top: 2px solid var(--body-background);
 
         .card {
             padding: 0.5rem 0 .5rem 0;
@@ -1051,7 +1051,7 @@ $selector-width: 2.25rem;
         border-top: 0;
     }
     .assessment {
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid var(--body-background);
 
         .progress-tick.tiny {
             margin-left: 0;
@@ -1065,7 +1065,7 @@ $selector-width: 2.25rem;
     }
     .project .assessment {
         background-color: $vapor;
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid var(--body-background);
         border-left: 3rem solid $white;
 
         @media #{$small-only} {
@@ -1358,8 +1358,8 @@ $selector-width: 2.25rem;
 .grid {
     > li {
         padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
-        border-right: 1px solid $body-bg;
-        border-bottom: 1px solid $body-bg;
+        border-right: 1px solid var(--body-background);
+        border-bottom: 1px solid var(--body-background);
     }
 }
 
@@ -1408,7 +1408,7 @@ $selector-width: 2.25rem;
 
     .reply ~ .reply,
     .child ~ .child {
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid var(--body-background);
     }
 }
 

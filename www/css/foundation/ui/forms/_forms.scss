@@ -45,7 +45,7 @@ $input-box-shadow: none;
 // We use these to style the fieldset border and spacing.
 $fieldset-border-style: solid;
 $fieldset-border-width: 2px;
-$fieldset-border-color: $body-bg;
+$fieldset-border-color: var(--body-background);
 $fieldset-padding: rem-calc(($base-font-size - 8));
 $fieldset-margin: rem-calc(($base-font-size - 8, 0));
 
@@ -950,7 +950,7 @@ section > fieldset {
 
 	// second sibling onwards
 	~ fieldset {
-		border-top: solid $fieldset-border-width $body-bg;
+		border-top: solid $fieldset-border-width var(--body-background);
 	}
 
 	> legend {
@@ -977,7 +977,7 @@ section > fieldset {
 .mage > section > fieldset fieldset {
 	// second sibling onwards
 	~ fieldset, ~ fieldset fieldset {
-		border-top: solid $fieldset-border-width $body-bg;
+		border-top: solid $fieldset-border-width var(--body-background);
 	}
 }
 

@@ -196,4 +196,30 @@
             var(--accent-hover-l),
             var(--accent-hover-a)
     );
+
+
+    /** Logo background **/
+    --logo-background-h: 205;
+    --logo-background-s: 100%;
+    --logo-background-l: 100%;
+    --logo-background-a: 100%;
+    --logo-background:   hsla(
+            var(--logo-background-h),
+            var(--logo-background-s),
+            var(--logo-background-l),
+            var(--logo-background-a)
+    );
+
+
+    /** Body background **/
+    --body-background-h: 205;
+    --body-background-s: 0%;
+    --body-background-l: 100%;
+    --body-background-a: 92.9%;
+    --body-background:   hsla(
+            var(--body-background-h),
+            var(--body-background-s),
+            var(--body-background-l),
+            var(--body-background-a)
+    );
 }
