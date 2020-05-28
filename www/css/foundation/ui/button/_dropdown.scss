@@ -45,7 +45,7 @@ $f-dropdown-icon-align: 0.25rem;
           var(--content-ui-foreground-h),
           var(--content-ui-foreground-s),
           calc(var(--content-ui-foreground-l) * 1.1),
-          var(--content-ui-foreground-a),
+          var(--content-ui-foreground-a)
         );
 		//color: contrast-bg($background: var(--content-ui-background), $dark: var(--content-ui-foreground));
 	}
@@ -97,7 +97,7 @@ $f-dropdown-icon-align: 0.25rem;
             var(--content-ui-background-h),
             var(--content-ui-background-s),
             calc(var(--content-ui-background-l) * .95),
-            var(--content-ui-background-a),
+            var(--content-ui-background-a)
         );
         //background-color: darken($f-dropdown-bg, 5%);
         color: $anchor-font-color;

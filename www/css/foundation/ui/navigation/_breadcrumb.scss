@@ -36,7 +36,7 @@ $breadcrumb-noclick-bg-color: hsla(
     var(--content-ui-background-h),
     var(--content-ui-background-s),
     calc(var(--content-ui-background-l) * .4),
-    var(--content-ui-background-a),
+    var(--content-ui-background-a)
 );
 //$breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%);
 

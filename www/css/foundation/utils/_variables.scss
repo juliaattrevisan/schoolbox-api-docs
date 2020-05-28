@@ -63,13 +63,13 @@ $row-hover-background:             hsla(
     var(--content-ui-hover-h),
     var(--content-ui-hover-s),
     calc(var(--content-ui-hover-l) * 1.13),
-    var(--content-ui-hover-a),
+    var(--content-ui-hover-a)
 );
 $row-action-hover-background:      hsla(
     var(--content-ui-hover-h),
     var(--content-ui-hover-s),
     calc(var(--content-ui-hover-l) * .93),
-    var(--content-ui-hover-a),
+    var(--content-ui-hover-a)
 );
 //$row-hover-background:             tint(var(--content-ui-hover), 87%);
 //$row-action-hover-background:      darken(var(--content-ui-hover), 7%);
