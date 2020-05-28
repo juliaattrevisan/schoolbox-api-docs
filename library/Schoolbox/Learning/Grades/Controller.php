@@ -289,6 +289,10 @@ class Controller extends Base
             }
         }
 
+        $folders->sortByCallback(static function (Folder\Model $a, Folder\Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
+
         $yearUrl = $this->getYearUrl($viewee->getId());
         // Squish this mess out
 
