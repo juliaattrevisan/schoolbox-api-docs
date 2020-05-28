@@ -179,7 +179,7 @@ Usage:
                     <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">
                         {% if not componentNames[currentCourse.id] %}
                             <li>
-                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.folder.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId is defined ? courseComponentId : 0 }}">Restore Component</a>
+                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.specification.folder.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId is defined ? courseComponentId : 0 }}">Restore Component</a>
                             </li>
                         {% endif %}
                         {% if not currentCourse.specification.folder.isDeleted and not currentCourse.specification.isDeleted %}
