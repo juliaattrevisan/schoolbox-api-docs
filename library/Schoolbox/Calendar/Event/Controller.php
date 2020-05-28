@@ -189,7 +189,7 @@ class Controller extends Base
 
         /* Group Folders that you can choose, plus their current selection states
          */
-        $groupFolders = $this->getSelectableFolders($event);
+        $folders = $this->getSelectableFolders($event);
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
@@ -201,19 +201,19 @@ class Controller extends Base
             'user' => $selectedUser,
             'action' => 'Add',
             'eventTypes' => $this->eventTypeMapper->findAll(),
+            'recurrence' => $recurrence,
+            'personalLevel' => Event::ACCESS_PERSONAL,
+            'levels' => [
+                'all' => new EventLevelCollection($folders['folders'], $campusList),
+                'selected' => $event->getAccess()
+            ],
             'roles' => [
                 'all' => $this->roleMapper->findAll(),
                 'selected' => $selectedRoles
             ],
-            'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
-            'levels' => [
-                'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
-                'selected' => $event->getAccess()
-            ],
-            'groupFolders' => [
-                'all' => $groupFolders['folders'],
-                'selected' => $groupFolders['selected'],
+            'folders' => [
+                'all' => $folders['folders'],
+                'selected' => $folders['selected'],
             ],
             'campuses' => [
                 'all' => $campusList,
@@ -258,7 +258,7 @@ class Controller extends Base
 
         /* Group Folders that you can choose, plus their current selection states
          */
-        $groupFolders = $this->getSelectableFolders($event);
+        $folders = $this->getSelectableFolders($event);
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
@@ -270,19 +270,19 @@ class Controller extends Base
             'user' => $selectedUser,
             'action' => 'Update',
             'eventTypes' => $this->eventTypeMapper->findAll(),
+            'recurrence' => $recurrence,
+            'personalLevel' => Event::ACCESS_PERSONAL,
+            'levels' => [
+                'all' => new EventLevelCollection($folders['folders'], $campusList),
+                'selected' => $event->getAccess()
+            ],
             'roles' => [
                 'all' => $this->roleMapper->findAll(),
                 'selected' => $selectedRoles
             ],
-            'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
-            'levels' => [
-                'all' => new EventLevelCollection($groupFolders['folders'], $campusList),
-                'selected' => $event->getAccess()
-            ],
-            'groupFolders' => [
-                'all' => $groupFolders['folders'],
-                'selected' => $groupFolders['selected'],
+            'folders' => [
+                'all' => $folders['folders'],
+                'selected' => $folders['selected'],
             ],
             'campuses' => [
                 'all' => $campusList,

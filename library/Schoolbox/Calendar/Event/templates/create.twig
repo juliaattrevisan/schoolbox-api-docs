@@ -5,11 +5,11 @@
  # @param User       $user          A User instance (this person receives the event on their calendar)
  # @param string     $action        Either "Add" or "Update" contextually
  # @param Collection $eventTypes    A list of Event Types
- # @param array      $roles         A list of available and selected Roles
  # @param array      $recurrence    A list of recurring instances
  # @param int        $personalLevel An int corresponding to the Personal event level
  # @param array      $levels        An array of Event Levels (personal/group/school)
- # @param array      $groupFolders  A list of available and selected Folders
+ # @param array      $roles         A list of available and selected Roles
+ # @param array      $folders       A list of available and selected Folders
  # @param array      $campuses      A list of available and selected Campuses
  # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
  #}
@@ -210,9 +210,9 @@
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
                             </legend>
 
-                            {% for groupFolder in groupFolders.all %}
-                                <input type="checkbox" name="group[]" value="{{ groupFolder.id }}" id="group{{ groupFolder.id }}" {{ groupFolder.id in groupFolders.selected ? 'checked="checked"' : '' }} />
-                                <label for="group{{ groupFolder.id }}" class="checkbox">{{ groupFolder.name }}</label>
+                            {% for folder in folders.all %}
+                                <input type="checkbox" name="group[]" value="{{ folder.id }}" id="group{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
+                                <label for="group{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
                             {% endfor %}
                         </fieldset>
                     </div>
