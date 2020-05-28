@@ -257,4 +257,17 @@
             var(--accounts-menu-hover-l),
             var(--accounts-menu-hover-a)
     );
+
+
+    /** Login form background color **/
+    --login-form-background-h: 206;
+    --login-form-background-s: 0%;
+    --login-form-background-l: 0%;
+    --login-form-background-a: 40%;
+    --login-form-background:   hsla(
+            var(--login-form-background-h),
+            var(--login-form-background-s),
+            var(--login-form-background-l),
+            var(--login-form-background-a)
+    );
 }

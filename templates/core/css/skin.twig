@@ -388,14 +388,25 @@
         );
     {% endif %}
 
-{#--accounts-menu-bg-colour:      {{ config.accounts_menu_bg_colour }};#}
-{#--accounts-menu-text-colour:    {{ config.accounts_menu_text_colour }};#}
-{#--accounts-menu-hover-colour:   {{ config.accounts_menu_hover_colour }};#}
-{#--button-input-scale:           {{ config.skin_button_input_scale }};#}
-{#--login-form-background-color:  {{ config.skin_colour_login_background }};#}
-{#--form-border-color:            {{ config.skin_colour_form_input_border_color }};#}
-{#--form-bg-hover-color:          {{ config.skin_colour_form_background_hover_color }};#}
 
+    {##
+     # Login form background color
+     #
+     # Derived styles:
+     # www/css/foundation/layout/_login.scss calc-text-color
+     #}
+    {% if colors.skin_colour_login_background is defined %}
+        --login-form-background-h: {{ colors.skin_colour_login_background.h | round(2) }};
+        --login-form-background-s: {{ colors.skin_colour_login_background.s | round(2) }}%;
+        --login-form-background-l: {{ colors.skin_colour_login_background.l | round(2) }}%;
+        --login-form-background-a: {{ colors.skin_colour_login_background.a | round(2) }}%;
+        --login-form-background:   hsla(
+            var(--login-form-background-h),
+            var(--login-form-background-s),
+            var(--login-form-background-l),
+            var(--login-form-background-a)
+        );
+    {% endif %}
 }
 {{ config.skin_custom_css | raw }}
 {% endautoescape %}

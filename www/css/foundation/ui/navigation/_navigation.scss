@@ -47,7 +47,7 @@ $tabbar-hamburger-icon-gap: 4px;
 $off-canvas-width: rem-calc(260);
 $off-canvas-bg: var(--off-canvas-background) !default;
 $off-canvas-bg-hover: false;
-$off-canvas-hover-color: $off-canvas-bg;
+$off-canvas-hover-color: var(--off-canvas-background);
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
