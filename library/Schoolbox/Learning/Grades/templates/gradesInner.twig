@@ -77,7 +77,7 @@
                     <div data-collapse-state="" data-collapsable="unit-{{ unit.context.id }}">
                         <ul>
                             {% for assessment in unit.assessments %}
-                                {% if assessment.assessments | length %}
+                                {% if assessment.assessments is defined and assessment.assessments | length %}
                                 <li class="project">
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,

@@ -41,9 +41,9 @@
             <td><b>{{ capability.name | nl2br }}</b></td>
             {% for activity_id, activity in rubricAssessmentList %}
                 {% if activity.rubric_mark_per_capability %}
-                {% set activity = indicator.activities[activity_id] %}
+                {% set activity = indicator is defined and indicator.activities[activity_id] %}
                 <td>
-                    {% if capability.value[activity_id] %}
+                    {% if capability.mark[activity_id] is defined %}
                         {{ capability.mark[activity_id] }}
                     {% else %}
                         &nbsp;

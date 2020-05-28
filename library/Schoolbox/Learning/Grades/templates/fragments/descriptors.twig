@@ -47,10 +47,10 @@
             {% endif %}
             <th class="rb-criterion-name">{{ indicator.name | nl2br }}</th>
             {% for activity_id, activity in rubricAssessmentList %}
-                {% set activity = indicator.activities[activity_id] %}
+                {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
                 <td><div><span class="rb-description">
-                        {% if  activity.level %}<b>{{ activity.level }}</b><br />{% endif %}
-                        {{ activity.descriptor }} {% if activity.value and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                        {% if activity %}<b>{{ activity.level }}</b><br />{% endif %}
+                        {{ activity ? activity.descriptor : '' }} {% if activity and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
                     </span></div>
                 </td>
 
