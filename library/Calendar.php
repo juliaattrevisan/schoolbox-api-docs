@@ -382,7 +382,7 @@ class Calendar extends DeprecatedModel
             if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
-                $groupChunk = "AND event_role.group_id = {$_SESSION['gid']}";
+                $groupChunk = "AND event_role.role_id = {$_SESSION['gid']}";
             }
         }
 
@@ -533,7 +533,7 @@ class Calendar extends DeprecatedModel
             if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
-                $groupChunk = "AND event_role.group_id = {$user->getRole()->getId()}";
+                $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";
             }
         }
 
@@ -735,7 +735,7 @@ class Calendar extends DeprecatedModel
 						AND event.deleted_at IS NULL
 							AND (
 								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
-            . ") AND event_role.group_id IN(" . implode(',', $groupList) . ") )
+            . ") AND event_role.role_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.start_datetime, event.end_datetime";
@@ -754,7 +754,7 @@ class Calendar extends DeprecatedModel
     public function getEventGroup($eventID)
     {
         $output = array();
-        $query  = "SELECT group_id FROM event_role WHERE event_id = ".intval($eventID);
+        $query  = "SELECT role_id FROM event_role WHERE event_id = ".intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['group_id'];
@@ -826,7 +826,7 @@ class Calendar extends DeprecatedModel
             foreach ($groupList as $groupID) {
                 $eventGroup = array(
                     'event_id' => $eventID,
-                    'group_id' => $groupID,
+                    'role_id' => $groupID,
                 );
                 $this->db->insert('event_role', $eventGroup);
             }

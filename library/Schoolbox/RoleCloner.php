@@ -244,7 +244,7 @@ class RoleCloner
      */
     protected function cloneSchoolCalendarPermissions(Role $source, Role $destination)
     {
-        $this->permClone($source, $destination, 'event_role', ['event_id', ':dest'], 'group_id');
+        $this->permClone($source, $destination, 'event_role', ['event_id', ':dest'], 'role_id');
     }
 
     /**

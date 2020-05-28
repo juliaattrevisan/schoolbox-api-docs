@@ -411,8 +411,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Assign roles to an event
      *
      * @param Event $event
+     * @throws \PDOException
      */
-    private function createRoles($event)
+    private function createRoles($event): void
     {
         // getRoleCollection can return ids, Schoolbox/Roles or Calendar Roles
         foreach ($event->getRoleCollection() as $role) {
@@ -424,15 +425,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 $roleId = $role;
             }
 
-            $query = "
-				INSERT INTO event_role (event_id, group_id)
-				VALUES (:eventId, :groupId)
-				ON DUPLICATE KEY UPDATE event_id = :eventId, group_id = :groupId
-			";
+            $query = '
+                INSERT INTO event_role (event_id, role_id)
+                VALUES (:eventId, :roleId)
+                ON DUPLICATE KEY UPDATE event_id = :eventId, role_id = :roleId
+            ';
 
             $statement = $this->database->prepare($query);
-            $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":groupId", $roleId);
+            $statement->bindParam(':eventId', $event->getId());
+            $statement->bindParam(':roleId', $roleId);
             $statement->execute();
         }
     }

@@ -35,7 +35,7 @@ class RoleMapper extends Schoolbox\Mapper
         );
         $this->hasMap(
             array(
-                'column' => 'group_id',
+                'column' => 'role_id',
                 'property' => 'roleId',
                 'type' => self::TYPE_INTEGER,
             )
