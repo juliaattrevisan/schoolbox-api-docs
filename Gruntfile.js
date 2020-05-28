@@ -186,7 +186,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
+                    'www/css/core/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
                 }
             }
         },

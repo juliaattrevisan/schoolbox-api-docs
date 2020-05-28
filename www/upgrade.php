@@ -12,7 +12,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
         //    window.location.href = '/';
         //}
     </script>
-    <link rel="stylesheet" type="text/css" href="/css/<?php echo Scrub::text(Config::get('site_location'));?>/chrome-foundation.css?v=<?php echo Scrub::text(Config::get('site_version'));?>" />
+    <link rel="stylesheet" type="text/css" href="/css/core/chrome-foundation.css?v=<?php echo Scrub::text(Config::get('site_version'));?>" />
 </head>
 <body>
     <div class="row island">
