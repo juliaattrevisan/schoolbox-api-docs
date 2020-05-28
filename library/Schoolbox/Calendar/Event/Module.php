@@ -25,6 +25,7 @@ use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -140,13 +141,19 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
-                        /** @var Event $event */
-                        $event = $params['event'];
+                        $eventId = $params['eventId'];
 
-                        $folderAccess = Access::getInstance();
+                        try {
+                            $event = $this->getEventMapper()->findById($eventId);
 
-                        if ((new Event\Access($folderAccess))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
-                            return true;
+                            $folderAccess = Access::getInstance();
+
+                            if ((new Event\Access($folderAccess))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                                return true;
+                            }
+                        } catch (Exception $e) {
+
+                            // noop; event not found
                         }
 
                         throw new Unauthorized();
@@ -182,7 +189,7 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array|null
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws Mapper\Exception\Deleted
      * @throws InvalidArgumentException
      */

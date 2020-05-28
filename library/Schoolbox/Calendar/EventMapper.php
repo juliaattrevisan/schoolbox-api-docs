@@ -28,6 +28,7 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\Calendar
  * @method Event hydrate(array $row, $alias = '', $callback = null)
+ * @method Event findById($identifierValue)
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
