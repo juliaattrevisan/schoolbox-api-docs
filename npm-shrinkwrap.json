@@ -3808,11 +3808,6 @@
       "from": "shebang-regex@https://registry.npmjs.org/shebang-regex/-/shebang-regex-1.0.0.tgz",
       "resolved": "https://registry.npmjs.org/shebang-regex/-/shebang-regex-1.0.0.tgz"
     },
-    "shelljs": {
-      "version": "0.2.6",
-      "from": "shelljs@https://registry.npmjs.org/shelljs/-/shelljs-0.2.6.tgz",
-      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.2.6.tgz"
-    },
     "signal-exit": {
       "version": "3.0.2",
       "from": "signal-exit@https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.2.tgz",
