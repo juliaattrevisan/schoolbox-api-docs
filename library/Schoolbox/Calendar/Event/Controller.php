@@ -132,7 +132,7 @@ class Controller extends Base
             'canModify'        => $calendar->getPerm($event->getId()) >= UserAccess::ACCESS_WRITE,
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection'   => $helper->getRoleCollection($event),
-            'groupCollection'  => $helper->getGroupCollection($event),
+            'folderCollection'  => $helper->getFolderCollection($event),
             'attendance'       => [
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',

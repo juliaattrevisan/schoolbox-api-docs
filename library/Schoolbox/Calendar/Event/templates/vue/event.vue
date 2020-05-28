@@ -22,7 +22,7 @@
                         <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
                         <span v-else-if="this.isGroupEvent">
                             <span v-html="audiencesMeta"></span>
-                            <span v-if="this.event.audiences.groups.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
+                            <span v-if="this.event.audiences.folders.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
                         </span>
                     </template>
                 </div>
@@ -61,7 +61,7 @@
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
                 :role-audiences="this.event.audiences.roles"
-                :group-audiences="this.event.audiences.groups"
+                :group-audiences="this.event.audiences.folders"
                 :is-group="this.isGroupEvent"
         ></auidences-modal>
 
@@ -166,7 +166,7 @@
                     rolesCount  = this.event.audiences.roles.length;
 
                 if (this.isPersonalEvent) return 'Personal';
-                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.groups[0].id +'">' + this.event.audiences.groups[0].name  + '</a>';
+                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0].id +'">' + this.event.audiences.folders[0].name  + '</a>';
 
                 if (campusCount) {
                     let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
@@ -182,9 +182,9 @@
             },
 
             showMoreGroups: function() {
-                let suffix = (this.event.audiences.groups.length > 2) ? 'groups' : 'group';
+                let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
 
-                return (this.event.audiences.groups.length - 1) + ' more ' + suffix;
+                return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
             },
 
             modifyPath: function() {
