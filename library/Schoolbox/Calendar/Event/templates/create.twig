@@ -1,9 +1,17 @@
 {##
  # Event Create/Update screen
  #
- # @param string $action   Either "Create" or "Update" contextually
- # @param Event  $event    An Event instance
- # @param string $redirect A url to visit when you're done here
+ # @param Event      $event         An Event instance
+ # @param User       $user          A User instance (this person receives the event on their calendar)
+ # @param string     $action        Either "Add" or "Update" contextually
+ # @param Collection $eventTypes    A list of Event Types
+ # @param array      $roles         A list of available and selected Roles
+ # @param array      $recurrence    A list of recurring instances
+ # @param int        $personalLevel An int corresponding to the Personal event level
+ # @param array      $levels        An array of Event Levels (personal/group/school)
+ # @param array      $groupFolders  A list of available and selected Folders
+ # @param array      $campuses      A list of available and selected Campuses
+ # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
  #}
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
