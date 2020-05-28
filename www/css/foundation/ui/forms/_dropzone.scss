@@ -454,31 +454,36 @@ ul.az-error-list {
             }
         }
     }
-    .dz-error-mark, .dz-success-mark {
-        //display: none;
-        position: absolute;
-        top: 23px;
-        left: 9px;
-    }
+    //.dz-error-mark, .dz-success-mark {
+    //    display: none;
+    //    position: absolute;
+    //    top: 23px;
+    //    left: 9px;
+    //}
     .dz-error-mark {
         color: $alert-color;
     }
     .dz-success-mark {
         color: $success-color;
     }
-    //.dz-preview {
-    //    &.dz-error {
-    //        @extend .dz-error-mark;
-    //    }
-    //    &.dz-success {
-    //        @extend .dz-success-mark;
-    //    }
-    //}
+    .dz-preview {
+        &.dz-error {
+            color: $alert-color;
+            //@extend .dz-error-mark;
+        }
+        &.dz-success {
+            color: $success-color;
+            //@extend .dz-success-mark;
+        }
+    }
     .dz-error .dz-error-message {
         display: inherit;
-        //position: absolute;
-        //top: 37px;
-        //left: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        // Massage to fit within the file display block
+        min-width: 100px;
+        max-width: 118px;
         //width: 100px;
         //height: 100px;
         //margin: rem-calc(($base-font-size - 8));
@@ -493,7 +498,8 @@ ul.az-error-list {
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
-        display: block;
+        //display: block;
+        display: none;
     }
     .dz-preview {
         background-color: $white;

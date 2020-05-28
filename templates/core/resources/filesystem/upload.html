@@ -60,10 +60,11 @@ $(function () {
                 checkState.call(this);
             });
 
-            /* When you click the Upload button to begin the transmission
+            /* When you click the Upload button to begin the transmission:
+             * hide but don't detach the remove button
              */
             this.on('sending', function (file, xhr, formData) {
-                $(file.previewElement).find('a[data-dz-remove]').detach()
+                $(file.previewElement).find('a[data-dz-remove]').addClass('hide')
             });
 
             /* When a file was successfully uploaded
@@ -135,6 +136,9 @@ $(function () {
                     file.hash = msg.hash;
 
                     $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
+
+                    // Restore the remove button
+                    $(file.previewElement).find('a[data-dz-remove]').removeClass('hide');
                 }
 
                 checkState.call(this);
