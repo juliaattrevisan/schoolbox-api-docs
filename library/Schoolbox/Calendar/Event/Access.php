@@ -114,7 +114,7 @@ class Access
      * @param int   $accessLevel
      * @param User  $author
      * @param User  $owner
-     * @param int[] $groups
+     * @param int[] $folders
      * @param int[] $campuses
      * @return bool
      * @throws InvalidArgumentException
@@ -127,7 +127,7 @@ class Access
         int $accessLevel,
         User $author,
         User $owner,
-        array $groups = [],
+        array $folders = [],
         array $campuses = []
     ): bool {
 
@@ -161,7 +161,7 @@ class Access
          * check if the user is a group manager (write access to the folder)
          */
         if ($accessLevel === Event::ACCESS_GROUP) {
-            $minFolderAccess = $this->folderAccess->getMinFolderAccess($effector, $groups);
+            $minFolderAccess = $this->folderAccess->getMinFolderAccess($effector, $folders);
 
             if ($minFolderAccess >= UserAccess::ACCESS_WRITE) {
                 return true;
