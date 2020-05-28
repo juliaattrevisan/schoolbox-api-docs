@@ -38,7 +38,7 @@ abstract class Base
     protected $categoryList = [];
 
     /**
-     * A list of selected event_group relations
+     * A list of selected event_role relations
      *
      * @var array
      */

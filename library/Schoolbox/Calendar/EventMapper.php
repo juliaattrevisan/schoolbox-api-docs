@@ -388,7 +388,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     private function deletePermissions($event)
     {
         $query = "
-			DELETE FROM event_group
+			DELETE FROM event_role
 			WHERE event_id = :eventId
 		";
 
@@ -425,7 +425,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             }
 
             $query = "
-				INSERT INTO event_group (event_id, group_id)
+				INSERT INTO event_role (event_id, group_id)
 				VALUES (:eventId, :groupId)
 				ON DUPLICATE KEY UPDATE event_id = :eventId, group_id = :groupId
 			";

@@ -23,7 +23,7 @@ class RoleMapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('event_group');
+        $this->hasTable('event_role');
         $this->hasModel(Role::class);
 
         $this->hasMap(
