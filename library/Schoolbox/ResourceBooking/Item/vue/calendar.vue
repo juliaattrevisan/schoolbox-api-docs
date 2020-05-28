@@ -313,7 +313,6 @@
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
-                          :event-delete-url="urls.delete"
                           :event-update-url="urls.update"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
