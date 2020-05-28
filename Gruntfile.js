@@ -1,4 +1,5 @@
-var shell = require('shelljs');
+var shell = require('shelljs'),
+    sass  = require('node-sass');
 
 var jsSrc = {
     main: [
@@ -181,6 +182,10 @@ module.exports = function(grunt) {
             install: {}
         },
         sass: { // Only used for development, skips the skin build process
+            options: {
+                implementation: sass,
+                sourceMap: true
+            },
             dist: {
                 files: {
                     'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
@@ -256,7 +261,7 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Dev tasks
