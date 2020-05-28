@@ -47,7 +47,6 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^3.1.0",
-    "grunt-shell": "^2.0.0",
     "jit-grunt": "^0.10.0",
     "node-sass": "^4.13.0",
     "sass-loader": "^7.3.1",
