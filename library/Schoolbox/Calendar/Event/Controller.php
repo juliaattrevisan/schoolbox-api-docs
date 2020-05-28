@@ -618,7 +618,7 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postDelete(Event $event)
+    public function postDelete(Event $event): void
     {
         /* Check whether you have permissions to delete $event
          */
