@@ -448,7 +448,7 @@ $allow-sidebar-stash: $large-up;
       z-index: 1; // Safari will not see the icon without this
 
       &:hover {
-        background-color: $off-canvas-hover;
+        background-color: var(--off-canvas-hover);
       }
 
       &::after {
@@ -491,7 +491,7 @@ $allow-sidebar-stash: $large-up;
         color: var(--off-canvas-foreground);
         &:hover {
           color: var(--off-canvas-foreground);
-          background-color: $off-canvas-hover;
+          background-color: var(--off-canvas-hover);
         }
       }
       h3 {
@@ -564,7 +564,7 @@ $allow-sidebar-stash: $large-up;
     a {
       color: var(--off-canvas-foreground);
       &:hover {
-        background-color: $off-canvas-hover;
+        background-color: var(--off-canvas-hover);
       }
     }
   }
@@ -579,7 +579,7 @@ $allow-sidebar-stash: $large-up;
     color: var(--off-canvas-foreground);
     background-color: var(--off-canvas-background);
     &:hover {
-      background-color: $off-canvas-hover;
+      background-color: var(--off-canvas-hover);
     }
   }
 
