@@ -1,0 +1,270 @@
+<!--&lt;!&ndash; BEGIN custom_head &ndash;&gt;-->
+<!--<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>-->
+<!--<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>-->
+<!--<script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>-->
+<!--<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>-->
+<!--<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>-->
+<!--<script type="text/javascript">-->
+<!--    $(function() {-->
+<!--        $.fn.alaressEditor();-->
+
+<!--        $('#eventForm').eventModify({-->
+<!--            functionLabel: "{FUNCTION}",-->
+<!--            deleteButton: $('[data-action="delete"]')-->
+<!--        });-->
+
+<!--        // Collapsables-->
+<!--        $('[data-collapser=true]').collapsable({-->
+<!--            container: '[data-collapsable-container]'-->
+<!--        });-->
+
+<!--        var personalLevel = "{PERSONAL_LEVEL}";-->
+<!--        var calendarEvent = $("#level");-->
+
+<!--        if (calendarEvent.val()=== personalLevel) {-->
+<!--            $("#attendance").hide();-->
+<!--        }-->
+<!--        calendarEvent.change(function() {-->
+<!--            if ($("#level").val() === personalLevel) {-->
+<!--                $("#attendance").hide();-->
+<!--            } else {-->
+<!--                $("#attendance").show();-->
+<!--            }-->
+<!--        });-->
+
+<!--    });-->
+<!--</script>-->
+<!--&lt;!&ndash; END custom_head &ndash;&gt;-->
+
+<!--<ul class="breadcrumb">-->
+<!--    <li><a href="/calendar">Calendar</a></li>-->
+<!--    <li class="active"><a href="#">{FUNCTION} Event</a></li>-->
+<!--</ul>-->
+
+<!--<div class="row actions-small-1">-->
+<!--    <div class="list-item">-->
+<!--        <div class="small-12 column">-->
+<!--            <h1>{FUNCTION} Event</h1>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    &lt;!&ndash; BEGIN delete_button &ndash;&gt;-->
+<!--    <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>-->
+<!--    <ul class="f-dropdown" data-dropdown-content id="overflow">-->
+<!--        <li><a data-action="delete" href="/calendar/modifyForm.php?id={EVENT_ID}{RETURN_STR}" class="icon-delete">Delete Event</a></li>-->
+<!--    </ul>-->
+<!--    &lt;!&ndash; END delete_button &ndash;&gt;-->
+<!--</div>-->
+
+<!--<div class="row">-->
+<!--    <div class="small-12 island">-->
+<!--        <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">-->
+
+<!--        	<input name="id" type="hidden" value="{EVENT_ID}" />-->
+<!--        	<input name="userId" type="hidden" value="{EVENT_USER_ID}" />-->
+<!--        	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />-->
+<!--            <input id="allday" name="allday" type="hidden" value="{EVENT_ALLDAY_CHECKED}">-->
+<!--        	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />-->
+<!--        	<input id="efficacy" name="efficacy" type="hidden" value="self" />-->
+<!--        	<input id="action" name="action" type="hidden" value="{FUNCTION}" />-->
+
+<!--            <section>-->
+<!--                <fieldset class="content">-->
+<!--                    <legend>Overview</legend>-->
+<!--                    <div class="small-12 column">-->
+<!--                        <label class="required" for="title">Title</label>-->
+<!--                        <input name="title" id="title" type="text" maxlength="100" value="{EVENT_TITLE}" required />-->
+<!--                    </div>-->
+<!--                    <div class="small-6 columns">-->
+<!--                        <label class="required" for="startDate">-->
+<!--                            From-->
+<!--                        </label>-->
+<!--                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datesync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>-->
+<!--                    </div>-->
+<!--                    <div class="small-6 columns">-->
+<!--                        <label class="required" for="endDate">-->
+<!--                            Until-->
+<!--                        </label>-->
+<!--                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+
+<!--                <fieldset class="content" data-collapsable-container>-->
+<!--                    <legend>-->
+<!--                        <span data-collapser="true" href="#" class="icon-down-arrow">-->
+<!--                            <a href="#" title="Collapse Content">Recurrence</a>-->
+<!--                        </span>-->
+
+<!--                    </legend>-->
+<!--                    <div class="small-12 columns {EVENT_RECURRENCE_COLLAPSE_CLASS}" data-collapsable="true" data-collapse-state="{EVENT_RECURRENCE_COLLAPSE_STATE}">-->
+<!--                        <div class="row">-->
+<!--                            &lt;!&ndash; BEGIN recurring_dates &ndash;&gt;-->
+<!--                            <div class="small-6 columns">-->
+<!--                                <label>Repeat-->
+<!--                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>-->
+<!--                                    <select name="repeat">-->
+<!--                                        <option value="">Single Event</option>-->
+<!--                                        <option value="daily">Daily</option>-->
+<!--                                        <option value="weekly">Weekly</option>-->
+<!--                                        <option value="fortnightly">Fortnightly</option>-->
+<!--                                        <option value="monthly">Monthly</option>-->
+<!--                                    </select>-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!--                            <div id="repeatUntil" class="small-6 columns" data-repeat-until>-->
+<!--                                <label>-->
+<!--                                    Repeat Until-->
+<!--                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>-->
+<!--                                    <input name="repeat_until" id="repeat-until" data-datepicker type="text" size="15" maxlength="30" value="" />-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; END recurring_dates &ndash;&gt;-->
+<!--                            &lt;!&ndash; BEGIN recurring_reminder &ndash;&gt;-->
+<!--                            <div id="repeat-reminder" class="small-12 columns">-->
+<!--                                <div class="alert-box">-->
+<!--                                    <h5>This event is part of a recurring series</h5>-->
+<!--                                    <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; END recurring_reminder &ndash;&gt;-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+
+<!--                <fieldset class="content">-->
+<!--                    <legend>Event Details</legend>-->
+<!--                    <div class="small-12 column">-->
+<!--                        <label>-->
+<!--                            Type-->
+<!--                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>-->
+<!--                            &lt;!&ndash; BEGIN type_select &ndash;&gt;-->
+<!--                            <select name="type">-->
+<!--                                &lt;!&ndash; BEGIN type_drop &ndash;&gt;-->
+<!--                                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>-->
+<!--                                &lt;!&ndash; END type_drop &ndash;&gt;-->
+<!--                            </select>-->
+<!--                            &lt;!&ndash; END type_select &ndash;&gt;-->
+<!--                            &lt;!&ndash; BEGIN type_no_select &ndash;&gt;-->
+<!--                            <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />-->
+<!--                            {EVENT_EVENTTYPE_NAME}-->
+<!--                            &lt;!&ndash; END type_no_select &ndash;&gt;-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 column">-->
+<!--                        <label>-->
+<!--                            Location-->
+<!--                            <input name="location" type="text" value="{EVENT_LOCATION}"/>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 column">-->
+<!--                        <label>-->
+<!--                            Details-->
+<!--                            <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+
+<!--                <fieldset class="content">-->
+<!--                    <legend>Availability</legend>-->
+<!--                    <div class="small-12 columns">-->
+<!--                        <label>-->
+<!--                            Publish Date-->
+<!--                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>-->
+<!--                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 columns">-->
+<!--                        <label>-->
+<!--                            Level-->
+<!--                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>-->
+<!--                            <select name="level" id="level" data-interaction="select-level">-->
+<!--                                &lt;!&ndash; BEGIN event_level_drop &ndash;&gt;-->
+<!--                                <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>-->
+<!--                                &lt;!&ndash; END event_level_drop &ndash;&gt;-->
+<!--                            </select>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="2">-->
+<!--                        <fieldset class="checklist">-->
+<!--                            <legend>-->
+<!--                                Groups-->
+<!--                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>-->
+<!--                            </legend>-->
+<!--                            &lt;!&ndash; BEGIN event_group_drop &ndash;&gt;-->
+<!--                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />-->
+<!--                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>-->
+<!--                            &lt;!&ndash; END event_group_drop &ndash;&gt;-->
+<!--                        </fieldset>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">-->
+<!--                        <fieldset class="checklist">-->
+<!--                            <legend>-->
+<!--                                Roles-->
+<!--                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>-->
+<!--                            </legend>-->
+<!--                            <input type="checkbox" data-select-all id="roleSelectAll"/>-->
+<!--                            <label for="roleSelectAll">Select all</label>-->
+
+<!--                            &lt;!&ndash; BEGIN event_role_list &ndash;&gt;-->
+<!--                            <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />-->
+<!--                            <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>-->
+<!--                            &lt;!&ndash; END event_role_list &ndash;&gt;-->
+<!--                        </fieldset>-->
+<!--                    </div>-->
+<!--                    <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">-->
+<!--                        <fieldset class="checklist">-->
+<!--                            <legend>-->
+<!--                                Campus-->
+<!--                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the campus' which will be able to view this event">?</span>-->
+<!--                            </legend>-->
+<!--                            <input type="checkbox" data-select-all id="campusSelectAll" />-->
+<!--                            <label for="campusSelectAll">Select all</label>-->
+
+<!--                            &lt;!&ndash; BEGIN event_campus_list &ndash;&gt;-->
+<!--                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />-->
+<!--                            <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>-->
+<!--                            &lt;!&ndash; END event_campus_list &ndash;&gt;-->
+<!--                        </fieldset>-->
+<!--                    </div>-->
+
+<!--                    <div id="attendance" class="small-12 column">-->
+<!--                        <label>-->
+<!--                            Enable attendance?-->
+<!--                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>-->
+<!--                            <div class="switch">-->
+<!--                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {EVENT_ATTENDANCE}>-->
+<!--                                <label for="attendanceCheckbox">-->
+<!--                                    <span>On</span>-->
+<!--                                    <span>Off</span>-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+<!--            </section>-->
+<!--            <input id="calendar-modify-submit" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" />-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="reveal-modal" data-reveal data-dialog="bulk-modify">-->
+<!--    <h2>This event is part of a series</h2>-->
+<!--    <p class="icon-alert">-->
+<!--        Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.-->
+<!--    </p>-->
+<!--    <ul class="flex-list buttons">-->
+<!--        <li><a href="#" class="button" data-action="self">Only this event</a></li>-->
+<!--        <li><a href="#" class="button" data-action="series">All events in the series</a></li>-->
+<!--        <li><a href="#" class="button" data-action="cancel">Cancel</a></li>-->
+<!--    </ul>-->
+<!--</div>-->
+<!--<div class="reveal-modal" data-reveal data-dialog="bulk-delete">-->
+<!--    <h2>This event is part of a series</h2>-->
+<!--    <p class="icon-alert">-->
+<!--        Would you like to delete only this event, or all in the series?-->
+<!--    </p>-->
+<!--    <ul class="flex-list buttons">-->
+<!--        <li><a href="#" class="button" data-action="self">Only this event</a></li>-->
+<!--        <li><a href="#" class="button" data-action="series">All events in the series</a></li>-->
+<!--        <li><a href="#" class="button" data-action="cancel">Cancel</a></li>-->
+<!--    </ul>-->
+<!--</div>-->
