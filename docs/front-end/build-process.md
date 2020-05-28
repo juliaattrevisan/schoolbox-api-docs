@@ -43,10 +43,10 @@ Concatenates all JS files, will not minify or uglify the code.
 
 `grunt sass`
 
-Concatenates all Sass files and compile them to CSS. Will bypass the skin builder process (see `grunt build.sass` below). This means that this requires `grunt build.sass` to have been run once, so that the skin builder variables are already in a compiled file which can be imported in Sass (this will happen on vagrant provision).
+Concatenates all Sass files and compile them to CSS.
 
-> In order to run this locally, Ruby and the SASS gem must be installed. Once Ruby is installed, run `sudo gem install sass` locally.
-For maximum compatibility with Schoolbox's build process, run `sudo gem install sass --no-rdoc --no-ri --version "3.4.13"`.
+> The separate `build.sass` task for compiling Sass with a school's configured skin variables is no longer required,
+> as all skin variables are now included as CSS variables.
 
 `grunt dev`
 
@@ -65,10 +65,6 @@ A continuous process that will watch for changes to Sass and JS files, and run t
 
 Concatenates and compresses (uglify) all JS files.
 
-`grunt build.sass`
-
-Runs `tools/skin/builder.php` - which grabs school configured skin variables and puts them into a file that can be imported into Sass, then compiles all Sass files into CSS.
-
 `grunt`
 
-Full production build. Runs `grunt bower`, `grunt build.js` & `grunt build.sass`.
+Full production build. Runs `grunt bower`, `grunt build.js` & `grunt sass`.

@@ -9,6 +9,6 @@ if [ "$1" == "--sass" ]; then
 fi
 
 if [ $sass = 1 ]; then
-	echo "Build SASS files (Vagrant provision only, not package build)";
-	grunt build.sass;
+	echo "Build SASS files";
+	grunt sass;
 fi
