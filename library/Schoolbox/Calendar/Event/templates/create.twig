@@ -211,8 +211,8 @@
                             </legend>
 
                             {% for folder in folders.all %}
-                                <input type="checkbox" name="group[]" value="{{ folder.id }}" id="group{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
-                                <label for="group{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
+                                <input type="checkbox" name="folder[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
+                                <label for="folder{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
                             {% endfor %}
                         </fieldset>
                     </div>

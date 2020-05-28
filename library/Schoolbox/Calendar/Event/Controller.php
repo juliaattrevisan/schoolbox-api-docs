@@ -187,7 +187,7 @@ class Controller extends Base
          */
         $selectedCampuses = [];
 
-        /* Group Folders that you can choose, plus their current selection states
+        /* Folders that you can choose, plus their current selection states
          */
         $folders = $this->getSelectableFolders($event);
 
@@ -256,7 +256,7 @@ class Controller extends Base
             $recurrence = (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event);
         }
 
-        /* Group Folders that you can choose, plus their current selection states
+        /* Folders that you can choose, plus their current selection states
          */
         $folders = $this->getSelectableFolders($event);
 
@@ -321,7 +321,7 @@ class Controller extends Base
 
 
     /**
-     * You have WRITE access to this list of groups (folders) from which to choose when using
+     * You have WRITE access to this list of (folders) from which to choose when using
      * the event's Group level option
      *
      * @param Event $event
@@ -491,7 +491,7 @@ class Controller extends Base
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $groups = $this->getRequest()->post['group'] ? array_map('intval', $this->getRequest()->post['group']) : [];
+        $folders = $this->getRequest()->post['folder'] ? array_map('intval', $this->getRequest()->post['folder']) : [];
         $campuses = $this->getRequest()->post['campus'] ? array_map('intval', $this->getRequest()->post['campus']) : [];
         $accessLevel = (int)$this->getRequest()->post['level'];
         $eventTypeId = (int)$this->getRequest()->post['type'];
@@ -519,7 +519,7 @@ class Controller extends Base
          */
         $folderAccess = FolderAccess::getInstance();
 
-        if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $groups, $campuses)) {
+        if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
         }
 
@@ -570,7 +570,7 @@ class Controller extends Base
             ->setPublishDateTime($publishDate)
             ->setAllDay($allDay)
             ->setRoleCollection(new Collection($roles))
-            ->setFolderCollection(new Collection($groups))
+            ->setFolderCollection(new Collection($folders))
             ->setCampusCollection(new Collection($campuses));
 
         /* Attendance dirty bit should be set to true if the attendance
@@ -589,14 +589,14 @@ class Controller extends Base
          */
         if ($event->isCampusLevel() && !count($campuses)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_SELECT_CAMPUS);
-        } elseif ($event->isGroupLevel() && !count($groups)) {
+        } elseif ($event->isGroupLevel() && !count($folders)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $groups, $roles);
+        $eventRelations = new EventRelations($accessLevel, $folders, $roles);
 
         /* Save this event and any recurring incidents too
          */
