@@ -160,8 +160,21 @@ table.rb {
     }
 
     .rb-group-summary {
-        background-color: lighten($input-border-color, 10%) !important;
-        color: calc-text-color(lighten($input-border-color, 10%));
+        // TODO figure out what to do with these
+        background-color: hsla(
+            var(--form-border-color-h),
+            var(--form-border-color-s),
+            calc(var(--form-border-color-l) * 1.1),
+            var(--form-border-color-a)
+        ) !important;
+        color: hsla(
+            var(--form-bg-hover-color),
+            var(--form-bg-hover-color),
+            calc(var(--form-bg-hover-color) * 1.1),
+            var(--form-bg-hover-color)
+        );
+        //background-color: lighten($input-border-color, 10%) !important;
+        //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
             font-weight: bold!important;
@@ -286,7 +299,9 @@ table.rb {
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
-    color: calc-text-color($input-border-color);
+    // TODO figure out what to do with this
+    color: var(--form-bg-hover-color);
+    //color: calc-text-color($input-border-color);
 }
 
 .rb-description, .rb-value {

@@ -27,8 +27,8 @@ $charset: "utf-8";
 //$content-ui-submit-foreground:     rgb(255, 255, 255) !default;
 //$content-ui-submit-background:     rgb(0, 102, 176) !default;
 
-$form-border-color:                rgb(204, 204, 204) !default;
-$form-bg-hover-color:              rgb(245, 245, 245) !default;
+//$form-border-color:                rgb(204, 204, 204) !default;
+//$form-bg-hover-color:              rgb(245, 245, 245) !default;
 
 $accent-foreground:                rgb(0, 102, 176) !default;
 $accent-background:                rgb(241, 249, 255) !default;
@@ -52,7 +52,7 @@ $body-bg:                          rgb(237, 237, 237) !default;
  * but if for some reason you need different border colours
  * you can choose that here
  */
-$input-border-color:			   $form-border-color;
+$input-border-color:			   var(--form-border-color);
 
 /* Action-list specific colouring:
  * Hover colour for action-list rows

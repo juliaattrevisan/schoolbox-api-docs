@@ -194,6 +194,8 @@
         );
         {#
             Derived styles:
+            www/css/foundation/components/_buttons.scss
+            www/css/foundation/ui/selectize.customisation.scss
         #}
     {% endif %}
 
@@ -210,6 +212,46 @@
         );
         {#
             Derived styles:
+            www/css/foundation/components/_buttons.scss
+            www/css/foundation/ui/selectize.customisation.scss
+        #}
+    {% endif %}
+
+
+    {# Form colors #}
+    {% if colors.skin_colour_form_input_border_color is defined %}
+        --form-border-color-h: {{ colors.skin_colour_form_input_border_color.h | round(2) }};
+        --form-border-color-s: {{ colors.skin_colour_form_input_border_color.s | round(2) }}%;
+        --form-border-color-l: {{ colors.skin_colour_form_input_border_color.l | round(2) }}%;
+        --form-border-color-a: {{ colors.skin_colour_form_input_border_color.a | round(2) }}%;
+        --form-border-color:   hsla(
+            var(--form-border-color-h),
+            var(--form-border-color-s),
+            var(--form-border-color-l),
+            var(--form-border-color-a)
+        );
+        {#
+            Derived styles:
+            www/css/foundation/ui/forms/_forms.scss
+            www/css/foundation/components/submissions/rubric.scss
+        #}
+    {% endif %}
+
+    {% if colors.skin_colour_form_background_hover_color is defined %}
+        --form-bg-hover-color-h: {{ colors.skin_colour_form_background_hover_color.h | round(2) }};
+        --form-bg-hover-color-s: {{ colors.skin_colour_form_background_hover_color.s | round(2) }}%;
+        --form-bg-hover-color-l: {{ colors.skin_colour_form_background_hover_color.l | round(2) }}%;
+        --form-bg-hover-color-a: {{ colors.skin_colour_form_background_hover_color.a | round(2) }}%;
+        --form-bg-hover-color:   hsla(
+            var(--form-bg-hover-color-h),
+            var(--form-bg-hover-color-s),
+            var(--form-bg-hover-color-l),
+            var(--form-bg-hover-color-a)
+        );
+        {#
+            Derived styles:
+            www/css/foundation/ui/forms/_forms.scss
+            www/css/foundation/components/submissions/rubric.scss
         #}
     {% endif %}
 

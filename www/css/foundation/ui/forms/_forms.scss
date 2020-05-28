@@ -20,11 +20,20 @@ $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 $input-bg-color: $white;
-$input-focus-bg-color: $form-bg-hover-color;
-$input-focus-color: calc-text-color($input-focus-bg-color);
-$input-border-color: $form-border-color !default;
-$input-focus-border-color: darken($form-border-color, 15%);
-$input-hover-bg-color: $form-bg-hover-color;
+$input-focus-bg-color: var(--form-bg-hover-color);
+// TODO figure out what to do with this
+$input-focus-color: var(--form-border-color);
+//$input-focus-color: calc-text-color($input-focus-bg-color);
+$input-border-color: var(--form-border-color) !default;
+// TODO figure out what to do with this
+$input-focus-border-color: hsla(
+    var(--form-border-color-h),
+    var(--form-border-color-s),
+    calc(var(--form-border-color-l) * .85),
+    var(--form-border-color-a)
+);
+//$input-focus-border-color: darken(var(--form-border-color), 15%);
+$input-hover-bg-color: var(--form-bg-hover-color);
 $input-hover-color: $black;
 $input-border-style: solid;
 $input-border-width: .0625rem;
@@ -172,7 +181,7 @@ select {
 		}
 		&:hover {
 			background-color: $input-disabled-bg;
-			border-color: $form-border-color;
+			border-color: var(--form-border-color);
 			color: $aluminum;
 		}
 	}

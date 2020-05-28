@@ -137,4 +137,28 @@
             var(--content-ui-submit-background-l),
             var(--content-ui-submit-background-a)
     );
+
+
+    /** Form colors **/
+    --form-border-color-h: 205;
+    --form-border-color-s: 0%;
+    --form-border-color-l: 80%;
+    --form-border-color-a: 100%;
+    --form-border-color:   hsla(
+            var(--form-border-color-h),
+            var(--form-border-color-s),
+            var(--form-border-color-l),
+            var(--form-border-color-a)
+    );
+
+    --form-bg-hover-color-h: 205;
+    --form-bg-hover-color-s: 0%;
+    --form-bg-hover-color-l: 96.1%;
+    --form-bg-hover-color-a: 100%;
+    --form-bg-hover-color:   hsla(
+            var(--form-bg-hover-color-h),
+            var(--form-bg-hover-color-s),
+            var(--form-bg-hover-color-l),
+            var(--form-bg-hover-color-a)
+    );
 }
