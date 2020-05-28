@@ -20,7 +20,8 @@ class CampusMapper extends Schoolbox\Mapper
     /**
      * Mapping
      *
-     * @return Bool|void
+     * @return void
+     * @throws Mapper\DefinitionException
      */
     protected function mapping()
     {
@@ -55,14 +56,15 @@ class CampusMapper extends Schoolbox\Mapper
      * Purge existing sid assignations
      *
      * @param Schoolbox\Calendar\Event $event
+     * @throws \PDOException
      */
     public function cleanse(Schoolbox\Calendar\Event $event)
     {
         $statement = $this->database->prepare(
             "
-			DELETE FROM `{$this->table}`
-			WHERE `event_id` = :identifierValue
-		"
+            DELETE FROM `{$this->table}`
+            WHERE `event_id` = :identifierValue
+        "
         );
 
         $statement->bindValue(':identifierValue', $event->getId());
@@ -74,6 +76,9 @@ class CampusMapper extends Schoolbox\Mapper
      *
      * @param Schoolbox\Calendar\Event $event
      * @return Collection
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
     public function findAllForEvent(Schoolbox\Calendar\Event $event)
     {

@@ -2206,26 +2206,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Relation\\\\CampusMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Relation/CampusMapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Relation\\\\CategoryMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Relation/CategoryMapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Relation\\\\PersonalMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Relation/PersonalMapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Relation\\\\RoleMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php

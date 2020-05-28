@@ -22,7 +22,7 @@ class RoleMapper extends Mapper
     /**
      * Mapping
      *
-     * @return Bool|void
+     * @return void
      */
     protected function mapping()
     {

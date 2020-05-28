@@ -20,7 +20,8 @@ class CategoryMapper extends Schoolbox\Mapper
     /**
      * Mapping
      *
-     * @return Bool|void
+     * @return void
+     * @throws Mapper\DefinitionException
      */
     protected function mapping()
     {
@@ -56,6 +57,9 @@ class CategoryMapper extends Schoolbox\Mapper
      *
      * @param Schoolbox\Calendar\Event $event
      * @return Collection
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
     public function findAllForEvent(Schoolbox\Calendar\Event $event)
     {
