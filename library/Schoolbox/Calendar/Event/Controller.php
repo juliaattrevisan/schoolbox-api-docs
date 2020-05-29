@@ -199,7 +199,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
-            'action' => 'Add',
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
@@ -268,7 +267,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
-            'action' => 'Update',
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,

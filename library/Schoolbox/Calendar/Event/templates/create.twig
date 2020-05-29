@@ -3,7 +3,6 @@
  #
  # @param Event      $event         An Event instance
  # @param User       $user          A User instance (this person receives the event on their calendar)
- # @param string     $action        Either "Add" or "Update" contextually
  # @param Collection $eventTypes    A list of Event Types
  # @param array      $recurrence    A list of recurring instances
  # @param int        $personalLevel An int corresponding to the Personal event level
@@ -35,7 +34,7 @@
         var personalLevel = "{{ personalLevel }}";
         var calendarEvent = $("#level");
 
-        if (calendarEvent.val()=== personalLevel) {
+        if (calendarEvent.val() === personalLevel) {
             $("#attendance").hide();
         }
 
@@ -46,9 +45,17 @@
                 $("#attendance").show();
             }
         });
-
     });
 </script>
+
+{# Decide context for creating/modifying an event
+ # This is purely cosmetic now
+ #}
+{% set action = 'Add' %}
+
+{% if event.id %}
+    {% set action = 'Update' %}
+{% endif %}
 
 <ul class="breadcrumb">
     <li><a href="/calendar">Calendar</a></li>
