@@ -110,6 +110,9 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
     ];
 }
 
+// Derived colors:
+// --body-background has a contrasting color generated
+
 /** @var Environment $twig */
 $twig = $kernel->get('templateEngine');
 
