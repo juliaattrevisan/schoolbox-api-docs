@@ -24,7 +24,7 @@
         {% block eventBubble %}
             {% block eventBubbleSummary %}
             <h2>
-                <a href="{{ routeLookup('calendarEvent.getEvent', {eventId: event.eventId}) }}" title="Go to event page">{{ event.title }}</a>
+                <a href="{{ routeLookup('calendarEvent.getEvent', {event: event, eventId: event.eventId}) }}" title="Go to event page">{{ event.title }}</a>
             </h2>
 
             <ul class="meta">
@@ -77,7 +77,7 @@
                 {% endif %}
                 {% if event.isEditable %}
                     {% block modifyLink %}
-                    <a class="button" href="{{ routeLookupIfAuthorized('calendarEvent.getModify', {eventId: event.eventId}) }}{{ returnStr }}">Modify</a>
+                    <a class="button" href="{{ routeLookupIfAuthorized('calendarEvent.getModify', {event: event, eventId: event.eventId}) }}{{ returnStr }}">Modify</a>
                     {% endblock %}
                     {% block deleteButton %}
                     <a class="button" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
