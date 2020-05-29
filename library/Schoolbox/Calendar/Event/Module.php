@@ -143,15 +143,8 @@ class Module extends BaseModule
                     new Callback(function (array $params) {
                         $event = $params['event'];
 
-                        try {
-                            $folderAccess = Access::getInstance();
-
-                            if ((new Event\Access($folderAccess))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
-                                return true;
-                            }
-                        } catch (Exception $e) {
-
-                            // noop; event not found
+                        if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                            return true;
                         }
 
                         throw new Unauthorized();
