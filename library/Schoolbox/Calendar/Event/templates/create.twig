@@ -6,6 +6,7 @@
  # @param Collection $eventTypes    A list of Event Types
  # @param array      $recurrence    A list of recurring instances
  # @param int        $personalLevel An int corresponding to the Personal event level
+ # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
  # @param array      $levels        An array of Event Levels (personal/group/school)
  # @param array      $roles         A list of available and selected Roles
  # @param array      $folders       A list of available and selected Folders
@@ -95,7 +96,7 @@
             <input name="userId" type="hidden" value="{{ user.id }}" />
             <input name="authorId" type="hidden" value="{{ event.author.id }}" />
             <input id="allDay" name="allDay" type="hidden" value="{{ event.allDay }}">
-            <input id="efficacy" name="efficacy" type="hidden" value="self" />
+            <input id="efficacy" name="efficacy" type="hidden" value="{{ efficacy.self }}" />
 
             <section>
                 <fieldset class="content">
