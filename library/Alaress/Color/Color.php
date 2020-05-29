@@ -2,12 +2,17 @@
 /**
  * Representation of a color.
  *
+ * This now is just a wrapper around a `\SSNepenthe\ColorUtils\Colors\Color`
+ * object.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 namespace Alaress\Color;
+
+use SSNepenthe\ColorUtils;
 
 class Color implements \Serializable
 {
@@ -46,8 +51,15 @@ class Color implements \Serializable
      */
     protected $isValid = true;
 
+
     /**
-     * Constructor (of course)
+     * @var ColorUtils\Colors\Color
+     */
+    private $colorObject;
+
+
+    /**
+     * Constructor
      *
      * @param int   $red
      * @param int   $green
@@ -58,12 +70,11 @@ class Color implements \Serializable
      */
     public function __construct($red, $green, $blue, $alpha = 1.0)
     {
-        $this
-            ->setRed($red)
-            ->setGreen($green)
-            ->setBlue($blue)
-            ->setAlpha($alpha)
-        ;
+        $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
+        $this->red         = $red;
+        $this->green       = $green;
+        $this->blue        = $blue;
+        $this->alpha       = $alpha;
     }
 
     /**
