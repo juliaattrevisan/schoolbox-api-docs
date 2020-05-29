@@ -402,10 +402,13 @@ class Controller extends Base
          */
         $previousInvolvement = [];
 
-        /* A list of groups to choose. If the event was associatd with a folder outside of the intersect
+        /* A list of groups to choose. If the event was associated with a folder outside of the intersect
          * just ram it in so it's a union of:
          *
          * homepage you came from + what was previously there + (folders you can WRITE ^ folders $selectedUser can READ)
+         *
+         * This is to avoid you losing settings when you could edit the event, but not its involved folders
+         * (I think)
          */
         $allFolders = $this->getFolders($event);
 
