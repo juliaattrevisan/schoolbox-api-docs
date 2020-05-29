@@ -141,11 +141,9 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
-                        $eventId = $params['eventId'];
+                        $event = $params['event'];
 
                         try {
-                            $event = $this->getEventMapper()->findById($eventId);
-
                             $folderAccess = Access::getInstance();
 
                             if ((new Event\Access($folderAccess))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
