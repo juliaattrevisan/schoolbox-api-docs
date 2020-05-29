@@ -111,13 +111,11 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
 }
 
 // Add a derived color for --body-background-contrast
-$bodyBackgroundContrast = ColorUtils\hsla(
-    $twigVars['colors']['skin_colour_body_bg']['h'],
-    $twigVars['colors']['skin_colour_body_bg']['s'],
-    $twigVars['colors']['skin_colour_body_bg']['l'],
-    $twigVars['colors']['skin_colour_body_bg']['a']
-);
-$luminance = ColorUtils\relative_luminance($bodyBackgroundContrast);
+var_dump($twigVars['colors']['skin_colour_body_bg']['colorObject']->buildContrastingColor()->getAsHslArray());
+//$bodyBackgroundContrast = ColorUtils\hsla(
+//    $twigVars['colors']['skin_colour_body_bg']['colorObject']->buildContrastingColor();
+//);
+//$luminance = ColorUtils\relative_luminance($bodyBackgroundContrast);
 //$twigVars['colors']['skin_colour_body_bg_contrast'] = [
 //    'cssVar' => '--body-background-contrast',
 //    'h'      => $hsl['hue'] * 360,

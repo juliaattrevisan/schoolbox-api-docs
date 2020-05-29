@@ -186,6 +186,47 @@ class Color implements \Serializable
 
 
     /**
+     * Port of SASS function contrast-bg.
+     *
+     * @return Color
+     */
+    public function buildContrastingColor(
+        float $opacity = .35,
+        float $saturation = 0.1,
+        Color $light = null,
+        Color $dark = null
+    ): Color {
+        $luminance = ColorUtils\relative_luminance($this->colorObject);
+        if ($luminance > 0.5) {
+            $textColor = $light ?? ColorUtils\color('white');
+        } else {
+            $textColor = $dark ?? ColorUtils\color('black');
+        }
+
+//        $translucency = ColorUtils\color($textColor->getHsl()->toArray() + ['alpha' => $opacity]);
+
+        // flatten opacity onto the background
+        // $flat: flatten-alpha($translucent, $background);
+//        $percent = $opacity;
+        $opaque = ColorUtils\color($textColor->getHsl()->toArray() + ['alpha' => 1]);
+
+        // $solid-color: mix($opaque, $background, $percent);
+        $flat = ColorUtils\mix($opaque, $this->colorObject, $opacity);
+
+//        // boost saturation
+//        $saturated: saturate($flat, $saturation);
+
+        $saturated = ColorUtils\saturate($flat, $saturation);
+        return new self(
+            ColorUtils\red($saturated),
+            ColorUtils\green($saturated),
+            ColorUtils\blue($saturated),
+            ColorUtils\alpha($saturated)
+        );
+    }
+
+
+    /**
      * Outputs as a hex string, no alpha channel.
      *
      * @return string
