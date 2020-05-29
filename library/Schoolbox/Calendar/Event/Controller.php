@@ -161,15 +161,15 @@ class Controller extends Base
         /* Set up default values
          */
         $event = (new Event())
-            ->setTitle($this->getRequest()->query['title'])
+            ->setTitle($this->request->query['title'])
             ->setAuthor($this->getUser())
-            ->setAccess((int)$this->getRequest()->query['level'])
-            ->setAllDay((int)$this->getRequest()->query['allDay'])
+            ->setAccess((int)$this->request->query['level'])
+            ->setAllDay((int)$this->request->query['allDay'])
             ->setPublishDateTime(Alaress_Date_Format::now());
 
-        $event->getType()->setId((int)$this->getRequest()->query['type'] ?: '');
+        $event->getType()->setId((int)$this->request->query['type'] ?: '');
 
-        $event->setupDates($this->getRequest()->query['date']);
+        $event->setupDates($this->request->query['date']);
 
         if (!$event->getAllDay()) {
             $event->getEndDateTime()->addHours(1);
@@ -219,7 +219,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl'] ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
 
@@ -288,7 +288,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl'] ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
 
@@ -306,7 +306,7 @@ class Controller extends Base
          * Otherwise default to the current user
          */
         $selectedUser = $this->getUser();
-        $userId = (int)$this->getRequest()->query['userId'];
+        $userId = (int)$this->request->query['userId'];
 
         if ($userId) {
             try {
@@ -342,7 +342,7 @@ class Controller extends Base
          * but isn't involved in the homepage used to get here:
          * force the homepage into the checkbox list
          */
-        $homepageId = (int)$this->getRequest()->query['homepageId'];
+        $homepageId = (int)$this->request->query['homepageId'];
 
         if ($homepageId && !in_array($homepageId, $tempFolderIds, false) && FolderAccess::getInstance()->getFolderAccess($this->getUser(), $homepageId) >= UserAccess::ACCESS_WRITE) {
             $tempFolderIds[] = $homepageId;
@@ -435,7 +435,7 @@ class Controller extends Base
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
-            $fromHomepage      = ((int)$this->getRequest()->query['level'] === Event::ACCESS_GROUP) && ((int)$this->getRequest()->query['homepageId'] === $currentFolder->getId());
+            $fromHomepage      = ((int)$this->request->query['level'] === Event::ACCESS_GROUP) && ((int)$this->request->query['homepageId'] === $currentFolder->getId());
 
             if ($alreadyInCategory || $fromHomepage) {
                 $items['selected'][] = $currentFolder->getId();
@@ -453,7 +453,7 @@ class Controller extends Base
     public function postCreate(): void
     {
         $event = new Event();
-        $event->setOwner($this->userMapper->createModel()->setId($this->getRequest()->post['userId']));
+        $event->setOwner($this->userMapper->createModel()->setId($this->request->post['userId']));
 
         $this->postModify($event);
     }
@@ -487,36 +487,36 @@ class Controller extends Base
          * If not - pass author to the author
          */
         try {
-            $author = $this->userMapper->findById($this->getRequest()->post['authorId']);
+            $author = $this->userMapper->findById($this->request->post['authorId']);
         } catch (Exception $e) {
             $author = $this->getUser();
         }
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders = $this->getRequest()->post['folder'] ? array_map('intval', $this->getRequest()->post['folder']) : [];
-        $campuses = $this->getRequest()->post['campus'] ? array_map('intval', $this->getRequest()->post['campus']) : [];
-        $accessLevel = (int)$this->getRequest()->post['level'];
-        $eventTypeId = (int)$this->getRequest()->post['type'];
-        $title = $this->getRequest()->post['title'];
-        $location = $this->getRequest()->post['location'];
-        $detail = $this->getRequest()->post['detail'];
-        $allDay = (int)$this->getRequest()->post['allDay'];
-        $roles = $this->getRequest()->post['roles'] ?? [];
+        $folders = $this->request->post['folder'] ? array_map('intval', $this->request->post['folder']) : [];
+        $campuses = $this->request->post['campus'] ? array_map('intval', $this->request->post['campus']) : [];
+        $accessLevel = (int)$this->request->post['level'];
+        $eventTypeId = (int)$this->request->post['type'];
+        $title = $this->request->post['title'];
+        $location = $this->request->post['location'];
+        $detail = $this->request->post['detail'];
+        $allDay = (int)$this->request->post['allDay'];
+        $roles = $this->request->post['roles'] ?? [];
 
         /* Attendance settings
          */
-        $attendance = (int)$this->getRequest()->post['attendance'];
+        $attendance = (int)$this->request->post['attendance'];
         $attendanceChanged = (int)$event->getAttendance() !== $attendance;
 
         /* Recurrence settings
          */
-        $efficacy = $this->getRequest()->post['efficacy'];
-        $repeat = $this->getRequest()->post['repeat'];
+        $efficacy = $this->request->post['efficacy'];
+        $repeat = $this->request->post['repeat'];
 
         /* Redirects
          */
-        $returnUrl = '' !== (string)$this->getRequest()->query['returnUrl'] ? $this->getRequest()->query['returnUrl'] : Redirect::encode('/calendar');
+        $returnUrl = '' !== (string)$this->request->query['returnUrl'] ? $this->request->query['returnUrl'] : Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -530,26 +530,26 @@ class Controller extends Base
          */
         $publishDate = null;
 
-        if ('' !== $this->getRequest()->post['publishDate']) {
-            $publishDate = Alaress_Date_Format::newLocal($this->getRequest()->post['publishDate']);
+        if ('' !== $this->request->post['publishDate']) {
+            $publishDate = Alaress_Date_Format::newLocal($this->request->post['publishDate']);
         }
 
         /* Events recur until this time
          */
         $untilDate = null;
 
-        if ('' !== $this->getRequest()->post['repeat_until']) {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->endOfDay();
+        if ('' !== $this->request->post['repeat_until']) {
+            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
         }
 
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
-            $startDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['startDate'])->startOfDay();
-            $endDate = Alaress_Date_Format::newLocalShort($this->getRequest()->post['endDate'])->endOfDay();
+            $startDate = Alaress_Date_Format::newLocalShort($this->request->post['startDate'])->startOfDay();
+            $endDate = Alaress_Date_Format::newLocalShort($this->request->post['endDate'])->endOfDay();
         } else {
-            $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate']);
-            $endDate = Alaress_Date_Format::newLocal($this->getRequest()->post['endDate']);
+            $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate']);
+            $endDate = Alaress_Date_Format::newLocal($this->request->post['endDate']);
         }
 
         /* Don't allow start to be after end
@@ -634,13 +634,13 @@ class Controller extends Base
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
-            if ($this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
+            if ($this->request->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
                 $allEvents = $this->eventMapper->getAllInSeries($event);
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
                 }
-            } elseif ($this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
+            } elseif ($this->request->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
                 $this->eventMapper->delete($event);
             }
         } else {
@@ -649,11 +649,11 @@ class Controller extends Base
 
         /* Redirect
          */
-        $redirect = Redirect::decode($this->getRequest()->query['returnUrl']);
+        $redirect = Redirect::decode($this->request->query['returnUrl']);
 
         /* Calculate redirect for async javascript
          */
-        if ($this->getRequest()->isXhr()) {
+        if ($this->request->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'callbackUrl' => $redirect
             ]));
