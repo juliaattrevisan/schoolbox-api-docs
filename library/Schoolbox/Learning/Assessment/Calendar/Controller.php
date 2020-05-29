@@ -17,7 +17,10 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec\Definition as CourseImportSpecDefinition;
+use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use UnderflowException;
@@ -46,23 +49,31 @@ class Controller extends Base
     private $eventTypeMapper;
 
     /**
+     * @var FilterMapper
+     */
+    private $filterMapper;
+
+    /**
      * Controller constructor.
      *
      * @param Filter\IFactoryFactory $filterFactoryFactory
      * @param RosettaStone           $rosettaStone
      * @param TermMapper             $termMapper
      * @param EventTypeMapper        $eventTypeMapper
+     * @param FilterMapper           $filterMapper
      */
     public function __construct(
         Filter\IFactoryFactory $filterFactoryFactory,
         RosettaStone $rosettaStone,
         TermMapper $termMapper,
-        EventTypeMapper $eventTypeMapper
+        EventTypeMapper $eventTypeMapper,
+        FilterMapper $filterMapper
     ) {
         $this->filterFactoryFactory = $filterFactoryFactory;
         $this->rosettaStone         = $rosettaStone;
         $this->termMapper           = $termMapper;
         $this->eventTypeMapper      = $eventTypeMapper;
+        $this->filterMapper         = $filterMapper;
     }
 
     /**
@@ -87,6 +98,28 @@ class Controller extends Base
         $queryArgs = $this->request->query->getArrayCopy();
         unset($queryArgs['page']);
 
+        // If course id is provided, filter to the course
+        if (is_numeric($queryArgs['course'])) {
+            /** @var Filter\Model $courseFilter */
+            $courseFilter = $this->filterMapper->findOneByColumnList([
+                'entity' => AssessmentMapper::class,
+                'class'  => CourseImportSpecDefinition::class,
+            ]);
+            $queryArgs[$courseFilter->getId()][(int)$queryArgs['course']] = 1;
+            unset($queryArgs['course']);
+        }
+
+        // If folder id is provided, filter to the class/group
+        if (is_numeric($queryArgs['folder'])) {
+            /** @var Filter\Model $folderFilter */
+            $folderFilter = $this->filterMapper->findOneByColumnList([
+                'entity' => AssessmentMapper::class,
+                'class'  => Filter\Filters\Assessment\Folder\Readable\Definition::class,
+            ]);
+            $queryArgs[$folderFilter->getId()][(int)$queryArgs['folder']] = 1;
+            unset($queryArgs['folder']);
+        }
+
         // This filter panel does not post anywhere when its filters change.
         // Any on-change action is handled by the full calendar component.
         $page        = Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR;
@@ -103,6 +136,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningAssessmentCalendar/index.twig',
                 [
+                    'user'        => $this->getUser(),
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
                     'eventTypes'  => $this->eventTypeMapper

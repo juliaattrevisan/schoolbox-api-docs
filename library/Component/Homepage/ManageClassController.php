@@ -147,6 +147,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $params = [];
 
         if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser()) && $this->getConfigLoader()->get('assessment_calendar_enabled')) {
+            $assessmentCalendarUrl = $this->getRouter()->generate('learningAssessmentCalendar.getReport');
+            if ($isUnitPage) {
+                $assessmentCalendarUrl .= '?course=' . $this->getContext()->getUnitSpecification()->getCourse()->getId();
+            } elseif ($isCoursePage) {
+                $assessmentCalendarUrl .= '?course=' . $this->getContext()->getCourseSpecification()->getId();
+            } elseif ($isClassPage || $isGroupPage) {
+                $assessmentCalendarUrl .= '?folder=' . $this->getContext()->getFolder()->getId();
+            }
+            $this->setVar('ASSESSMENT_CALENDAR_LINK', $assessmentCalendarUrl);
             $this->parse('assessment_calendar_link_block', 'assessment_calendar_link');
         } else {
             $this->setVar([

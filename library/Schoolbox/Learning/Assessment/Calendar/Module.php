@@ -81,6 +81,7 @@ class Module extends BaseModule
             'rosettaStone'         => $injector->lazyGet('l10n'),
             'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
             'eventTypeMapper'      => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
+            'filterMapper'         => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
         ];
     }
 }
