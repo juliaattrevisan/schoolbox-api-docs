@@ -274,6 +274,10 @@ class Controller extends Base
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
             'personalLevel' => Event::ACCESS_PERSONAL,
+            'efficacy' => [
+                'self' => EventRecurrenceMapper::EFFICACY_SELF,
+                'series' => EventRecurrenceMapper::EFFICACY_SERIES,
+            ],
             'levels' => [
                 'all' => new EventLevelCollection($folders['folders'], $campusList),
                 'selected' => $event->getAccess()
