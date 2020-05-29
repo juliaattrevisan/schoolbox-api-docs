@@ -616,20 +616,9 @@ class Controller extends Base
      *
      * @param Event $event
      * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postDelete(Event $event): void
     {
-        /* Check whether you have permissions to delete $event
-         */
-        $folderAccess = FolderAccess::getInstance();
-
-        if (!(new Event\Access($folderAccess))->checkExisting($this->getUser(), $event)) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
-        }
 
         /* Delete an entire series, if the seriesId is not null
          */
