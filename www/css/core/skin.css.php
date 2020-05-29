@@ -8,8 +8,10 @@
 
 declare(strict_types=1);
 
+use Alaress\Color\ColorFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use SSNepenthe\ColorUtils;
 use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -92,23 +94,37 @@ $colorConfigMapping = [
     'skin_colour_form_input_border_color'      => '--form-border-color',
     'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
 ];
-$twigVars = [];
+$colorFactory = new ColorFactory();
+$twigVars     = [];
 foreach ($colorConfigMapping as $configKey => $cssVar) {
-    try {
-        $pixel = new ImagickPixel($config->get($configKey));
-        $hsl   = $pixel->getHSL();
-    } catch (ImagickPixelException $e) {
-        // Couldn't create it because it wasn't configured: skip
-        continue;
-    }
+    $configVal = $config->get($configKey);
+    $color     = $colorFactory->build($configVal);
+    $hsl       = $color->getAsHslArray();
     $twigVars['colors'][$configKey] = [
-        'cssVar' => $cssVar,
-        'h'      => $hsl['hue'] * 360,
-        's'      => $hsl['saturation'] * 100,
-        'l'      => $hsl['luminosity'] * 100,
-        'a'      => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
+        'cssVar'      => $cssVar,
+        'colorObject' => $color,
+        'h'           => $hsl['hue'],
+        's'           => $hsl['saturation'],
+        'l'           => $hsl['lightness'],
+        'a'           => $color->getAlpha() * 100,
     ];
 }
+
+// Add a derived color for --body-background-contrast
+$bodyBackgroundContrast = ColorUtils\hsla(
+    $twigVars['colors']['skin_colour_body_bg']['h'],
+    $twigVars['colors']['skin_colour_body_bg']['s'],
+    $twigVars['colors']['skin_colour_body_bg']['l'],
+    $twigVars['colors']['skin_colour_body_bg']['a']
+);
+$luminance = ColorUtils\relative_luminance($bodyBackgroundContrast);
+//$twigVars['colors']['skin_colour_body_bg_contrast'] = [
+//    'cssVar' => '--body-background-contrast',
+//    'h'      => $hsl['hue'] * 360,
+//    's'      => $hsl['saturation'] * 100,
+//    'l'      => $hsl['luminosity'] * 100,
+//    'a'      => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
+//];
 
 // Derived colors:
 // www/css/foundation/base/_typography.scss:

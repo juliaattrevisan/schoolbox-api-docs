@@ -39,7 +39,7 @@ class Color implements \Serializable
 
 
     /**
-     * @param  float $alpha
+     * @param float $alpha
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
      */
@@ -63,7 +63,7 @@ class Color implements \Serializable
 
 
     /**
-     * @param  int $blue
+     * @param int $blue
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
@@ -87,7 +87,7 @@ class Color implements \Serializable
 
 
     /**
-     * @param  int $green
+     * @param int $green
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
@@ -111,7 +111,7 @@ class Color implements \Serializable
 
 
     /**
-     * @param  int $red
+     * @param int $red
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
@@ -171,6 +171,17 @@ class Color implements \Serializable
         if (floatval($value) > 1) {
             throw new \InvalidArgumentException("Alpha value \"$value\" > 1");
         }
+    }
+
+
+    /**
+     * Retrieves the color's HSL values.
+     *
+     * @return array {hue: float, saturation: float, lightness: float}
+     */
+    public function getAsHslArray(): array
+    {
+        return $this->colorObject->getHsl()->toArray();
     }
 
 
