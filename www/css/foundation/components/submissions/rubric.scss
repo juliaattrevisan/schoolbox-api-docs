@@ -35,6 +35,7 @@ table.rb {
             }
         }
 
+        // Styling for the selected descriptor on the rubric marked grid
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
