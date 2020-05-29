@@ -79,7 +79,8 @@
         "sentry/sdk": "^2.1.0",
         "league/commonmark": "^1.4",
         "ext-imagick": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ssnepenthe/color-utils": "^0.4.2"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
