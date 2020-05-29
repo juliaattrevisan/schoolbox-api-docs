@@ -17,42 +17,6 @@ use SSNepenthe\ColorUtils;
 class Color implements \Serializable
 {
     /**
-     * Red channel
-     *
-     * @var int
-     */
-    protected $red = 0;
-
-    /**
-     * Green channel
-     *
-     * @var int
-     */
-    protected $green = 0;
-
-    /**
-     * Blue channel
-     *
-     * @var int
-     */
-    protected $blue = 0;
-
-    /**
-     * Alpha channel
-     *
-     * @var float
-     */
-    protected $alpha = 1.0;
-
-    /**
-     * Is this a valid color?
-     *
-     * @var bool
-     */
-    protected $isValid = true;
-
-
-    /**
      * @var ColorUtils\Colors\Color
      */
     private $colorObject;
@@ -71,11 +35,8 @@ class Color implements \Serializable
     public function __construct($red, $green, $blue, $alpha = 1.0)
     {
         $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
-        $this->red         = $red;
-        $this->green       = $green;
-        $this->blue        = $blue;
-        $this->alpha       = $alpha;
     }
+
 
     /**
      * @param  float $alpha
@@ -85,17 +46,21 @@ class Color implements \Serializable
     public function setAlpha($alpha)
     {
         $this->assertAlphaChannelValue($alpha);
-        $this->alpha = $alpha;
+//        $this->alpha = $alpha;
+        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $this->getBlue(), $alpha);
         return $this;
     }
+
 
     /**
      * @return float
      */
     public function getAlpha()
     {
-        return $this->alpha;
+        return $this->colorObject->getRgb()->getAlpha();
+//        return $this->alpha;
     }
+
 
     /**
      * @param  int $blue
@@ -105,17 +70,21 @@ class Color implements \Serializable
     public function setBlue($blue)
     {
         $this->assertColorChannelValue($blue);
-        $this->blue = intval($blue);
+//        $this->blue = intval($blue);
+        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $blue, $this->getAlpha());
         return $this;
     }
+
 
     /**
      * @return int
      */
     public function getBlue()
     {
-        return $this->blue;
+        return $this->colorObject->getRgb()->getBlue();
+//        return $this->blue;
     }
+
 
     /**
      * @param  int $green
@@ -125,17 +94,21 @@ class Color implements \Serializable
     public function setGreen($green)
     {
         $this->assertColorChannelValue($green);
-        $this->green = intval($green);
+//        $this->green = intval($green);
+        $this->colorObject = ColorUtils\rgba($this->getRed(), $green, $this->getBlue(), $this->getAlpha());
         return $this;
     }
+
 
     /**
      * @return int
      */
     public function getGreen()
     {
-        return $this->green;
+        return $this->colorObject->getRgb()->getGreen();
+//        return $this->green;
     }
+
 
     /**
      * @param  int $red
@@ -145,17 +118,21 @@ class Color implements \Serializable
     public function setRed($red)
     {
         $this->assertColorChannelValue($red);
-        $this->red = intval($red);
+//        $this->red = intval($red);
+        $this->colorObject = ColorUtils\rgba($red, $this->getGreen(), $this->getBlue(), $this->getAlpha());
         return $this;
     }
+
 
     /**
      * @return int
      */
     public function getRed()
     {
-        return $this->red;
+        return $this->colorObject->getRgb()->getRed();
+//        return $this->red;
     }
+
 
     /**
      * Asserts that the value is an integer, and between 0x00 and 0xFF.
@@ -176,6 +153,7 @@ class Color implements \Serializable
         }
     }
 
+
     /**
      * Asserts that the value is an float between 0 and 1.
      *
@@ -195,6 +173,7 @@ class Color implements \Serializable
         }
     }
 
+
     /**
      * Outputs as a hex string, no alpha channel.
      *
@@ -209,6 +188,7 @@ class Color implements \Serializable
             $this->getBlue()
         );
     }
+
 
     /**
      * Outputs as a hex string with an alpha channel.
@@ -226,6 +206,7 @@ class Color implements \Serializable
         );
     }
 
+
     /**
      * Outputs as a RGB string, no alpha channel.
      *
@@ -240,6 +221,7 @@ class Color implements \Serializable
             $this->getBlue()
         );
     }
+
 
     /**
      * Outputs as a RGB string with alpha channel.
@@ -259,6 +241,7 @@ class Color implements \Serializable
         );
     }
 
+
     /**
      * Outputs this color in RGBA format.
      *
@@ -269,6 +252,7 @@ class Color implements \Serializable
         return $this->getAsRgba();
     }
 
+
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
      * String representation of object
@@ -278,15 +262,14 @@ class Color implements \Serializable
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                'r' => $this->getRed(),
-                'g' => $this->getGreen(),
-                'b' => $this->getBlue(),
-                'a' => $this->getAlpha(),
-            )
-        );
+        return serialize([
+            'r' => $this->getRed(),
+            'g' => $this->getGreen(),
+            'b' => $this->getBlue(),
+            'a' => $this->getAlpha(),
+        ]);
     }
+
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
@@ -303,11 +286,6 @@ class Color implements \Serializable
     public function unserialize($serialized)
     {
         $data = unserialize($serialized);
-        $this
-            ->setRed($data['r'])
-            ->setGreen($data['g'])
-            ->setBlue($data['b'])
-            ->setAlpha($data['a'])
-        ;
+        $this->colorObject = ColorUtils\rgba($data['r'], $data['g'], $data['b'], $data['a']);
     }
 }
