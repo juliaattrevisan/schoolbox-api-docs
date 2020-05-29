@@ -52,7 +52,7 @@ trait UpdateFormTrait
         $this->setFormParam('visibility', $assessable->getMarkVisibility());
         $this->setFormParam('markType', $assessable->getMarkType() ? $assessable->getMarkType()->getId() : '');
         $this->setFormParam('maxMark', $assessable->getMaxMark());
-        $this->setFormParam('gradingScheme', $assessable->getGradeGroup() ? $assessable->getGradeGroup()->getId() : '');
+        $this->setFormParam('gradingScheme', $assessable->getGradeGroup() ? $assessable->getGradeGroup()->getId() : 1);
         $this->setFormParam('resultSet', 1);
 
         foreach ($assessable->getPlans() as $plan) {
