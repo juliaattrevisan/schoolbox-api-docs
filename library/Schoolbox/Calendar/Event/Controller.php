@@ -219,7 +219,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl']),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
 
@@ -288,7 +288,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl']),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->getRequest()->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
 
