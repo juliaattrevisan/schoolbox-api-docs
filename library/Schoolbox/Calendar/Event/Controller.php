@@ -453,7 +453,7 @@ class Controller extends Base
     public function postCreate(): void
     {
         $event = new Event();
-        $event->setOwner($this->userMapper->findById($this->getRequest()->post['userId']));
+        $event->setOwner($this->userMapper->createModel()->setId($this->getRequest()->post['userId']));
 
         $this->postModify($event);
     }
