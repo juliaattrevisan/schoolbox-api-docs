@@ -285,7 +285,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             if (!isset($result[$id])) {
                 $result[$id] = $this->createCollection();
             }
-            $result[$id][$node->getId()] = $node;
+            if ($node) {
+                $result[$id][$node->getId()] = $node;
+            }
         }
         return $result;
     }
