@@ -4,6 +4,7 @@ use Calendar\Api\ApiHierarchyGenerator;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Learning\Assessment\Redirect;
 
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
@@ -228,6 +229,10 @@ foreach ($typeList as $type) {
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
         $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate(), true);
 
+        /* Redirect back to this screen when you're done modifying
+         */
+        $returnUrl = Redirect::queryString('/adminv2/calendar/Cleanup');
+
         /** @var \Schoolbox\Calendar\Event $currentEvent */
         foreach ($allEvents as $currentEvent) {
 
@@ -285,6 +290,7 @@ foreach ($typeList as $type) {
                 'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
                 'CLEANUP_EVENT_APPLIES_TO' => $appliesTo,
                 'CLEANUP_EVENT_MODIFIER' => $modifier,
+                'CLEANUP_EVENT_RETURN_URL' => $returnUrl
             ]);
 
             /* Event author can now return as null when it doesn't exist anymore
