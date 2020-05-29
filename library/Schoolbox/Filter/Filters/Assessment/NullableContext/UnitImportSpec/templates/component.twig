@@ -14,7 +14,7 @@
 {% block filterName %}{{ locale.unit.proper }}{% endblock %}
 
 {% block userOptions %}
-    {% if roleSelections[keyNone] %}
+    {% if roleSelections[keyNone] is defined %}
         {% include '@filters/_selectionCheckbox.twig' with {
             roleSelection:      roleSelections[keyNone],
             userSelection:      userSelections[keyNone],

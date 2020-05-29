@@ -22,13 +22,16 @@
 
                 {% for course in suggestions %}
                     {% include '@course/courseListResult.twig' with {
-                        courseSpec:     course,
-                        folder:         folder,
-                        linkToUnits:    linkToUnits,
-                        component:      component,
-                        cparents:       lineage[course.id],
-                        hasTot:         hasTot,
-                        collapsePrefix: 'suggest'
+                        courseSpec:        course,
+                        folder:            folder is defined ? folder : null,
+                        linkToUnits:       linkToUnits,
+                        component:         component is defined ? component : null,
+                        cparents:          lineage[course.id],
+                        hasTot:            hasTot,
+                        linkTitleToModify: linkTitleToModify ?? null,
+                        returnUrlKey:      returnUrlKey,
+                        collapsePrefix:    'suggest',
+                        encodedReturnUrl:  encodedReturnUrl
                     } only %}
                 {% endfor %}
             </ul>
