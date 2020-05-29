@@ -184,14 +184,16 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
             border: $selectize-width-item-border solid $selectize-color-item-active-border;
         }
     }
+
+    // Rendering for options in a disabled selectize
     .selectize-control.multi &.disabled > div {
         &, &.active {
             color: lighten(desaturate($selectize-color-item-text, 100%), $selectize-lighten-disabled-item-text);
-            // TODO what do I do here?
+            // DONE: Complete desaturation + lighten by 30% is close enough
             background: hsla(
                 var(--content-ui-hover-h),
                 0%,
-                calc(var(--content-ui-hover-l) * 30%),
+                calc(var(--content-ui-hover-l) + 30%),
                 var(--content-ui-hover-a)
             );
             //background: lighten(desaturate($selectize-color-item, 100%), $selectize-lighten-disabled-item);
