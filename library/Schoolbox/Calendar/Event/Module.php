@@ -141,10 +141,15 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
-                        $event = $params['event'];
+                        try {
+                            $event = $this->getEventMapper()->findById($params['eventId']);
 
-                        if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
-                            return true;
+                            if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                                return true;
+                            }
+                        } catch (Exception $e) {
+
+                            // noop
                         }
 
                         throw new Unauthorized();
