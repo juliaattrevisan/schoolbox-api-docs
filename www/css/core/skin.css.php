@@ -102,10 +102,11 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
         continue;
     }
     $twigVars['colors'][$configKey] = [
-        'h' => $hsl['hue'] * 360,
-        's' => $hsl['saturation'] * 100,
-        'l' => $hsl['luminosity'] * 100,
-        'a' => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
+        'cssVar' => $cssVar,
+        'h'      => $hsl['hue'] * 360,
+        's'      => $hsl['saturation'] * 100,
+        'l'      => $hsl['luminosity'] * 100,
+        'a'      => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
     ];
 }
 
