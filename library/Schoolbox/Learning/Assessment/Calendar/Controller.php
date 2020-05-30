@@ -7,24 +7,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Calendar;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Router\Exception\RouteNotFound;
-use DomainException;
-use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Folder\Readable\Definition as FolderReadableDefinition;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec\Definition as CourseImportSpecDefinition;
 use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\DefinitionException;
-use UnderflowException;
-use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -79,15 +74,8 @@ class Controller extends Base
     /**
      * Displays the synchronous portion of the Assessment Calendar page.
      *
-     * @throws DefinitionException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws InvalidColumnException
      * @throws Mapper\Exception
-     * @throws RouteNotFound
      * @throws ServiceNotFound
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
      * @api   GET /learning/assessment/calendar
      * @since 19.1
      */
@@ -100,23 +88,13 @@ class Controller extends Base
 
         // If course id is provided, filter to the course
         if (is_numeric($queryArgs['course'])) {
-            /** @var Filter\Model $courseFilter */
-            $courseFilter = $this->filterMapper->findOneByColumnList([
-                'entity' => AssessmentMapper::class,
-                'class'  => CourseImportSpecDefinition::class,
-            ]);
-            $queryArgs[$courseFilter->getId()][(int)$queryArgs['course']] = 1;
+            $queryArgs = $this->appendFilter($queryArgs, 'course', (int)$queryArgs['course']);
             unset($queryArgs['course']);
         }
 
         // If folder id is provided, filter to the class/group
         if (is_numeric($queryArgs['folder'])) {
-            /** @var Filter\Model $folderFilter */
-            $folderFilter = $this->filterMapper->findOneByColumnList([
-                'entity' => AssessmentMapper::class,
-                'class'  => Filter\Filters\Assessment\Folder\Readable\Definition::class,
-            ]);
-            $queryArgs[$folderFilter->getId()][(int)$queryArgs['folder']] = 1;
+            $queryArgs = $this->appendFilter($queryArgs, 'folder', (int)$queryArgs['folder']);
             unset($queryArgs['folder']);
         }
 
@@ -152,7 +130,40 @@ class Controller extends Base
     }
 
     /**
+     * Appends filterValue of filterType to queryArgs
+     * @param array  $queryArgs
+     * @param string $filterType
+     * @param int    $filterValue
      * @return array
+     */
+    private function appendFilter(array $queryArgs, string $filterType, int $filterValue):array
+    {
+        switch ($filterType) {
+            case 'course':
+                $definitionClass = CourseImportSpecDefinition::class;
+                break;
+            case 'folder':
+                $definitionClass = FolderReadableDefinition::class;
+                break;
+            default:
+                return $queryArgs;
+        }
+        try {
+            /** @var Filter\Model $filter */
+            $filter = $this->filterMapper->findOneByColumnList([
+                'entity' => AssessmentMapper::class,
+                'class'  => $definitionClass,
+            ]);
+        } catch (Mapper\Exception $e) {
+            return $queryArgs;
+        }
+        $queryArgs[$filter->getId()][$filterValue] = 1;
+        return $queryArgs;
+    }
+
+    /**
+     * @return array
+     * @throws Mapper\Exception
      */
     private function getAvailableTermDates(): array
     {
@@ -163,7 +174,7 @@ class Controller extends Base
 
         $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getDatabaseDate();
 
-        /** @var TermMapper $term */
+        /** @var Term $term */
         foreach ($terms as $term) {
 
             if ($term->getStart()->getDatabaseDate() < $currentTermStartDate) {
@@ -196,9 +207,10 @@ class Controller extends Base
     }
 
     /**
-     * @return \Schoolbox\Assessment\Term\Model
+     * @return Term
+     * @throws Mapper\Exception
      */
-    private function getCurrentTermDates(): \Schoolbox\Assessment\Term\Model
+    private function getCurrentTermDates(): Term
     {
         return $this->termMapper->findForDate(\Alaress_Date_Format::now());
     }
