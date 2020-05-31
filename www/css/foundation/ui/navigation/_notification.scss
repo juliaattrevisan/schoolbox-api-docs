@@ -53,14 +53,8 @@ $allow-notification-stash: $xlarge-up;
         ul.off-canvas-list {
             label {
                 background: $notification-header-background;
-                // TODO consider this calculation
-                color: hsla(
-                  var(--navigation-background-h),
-                  var(--navigation-background-s),
-                  calc(var(--navigation-background-l) * 1.1),
-                  var(--navigation-background-a)
-                );
-                //color: contrast-bg(0.4, $notification-header-background);
+                // DONE just use --navigation-foreground instead of contrast-bg
+                color: var(--navigation-foreground);
             }
 
             /* Hide gap from ".island section" definition

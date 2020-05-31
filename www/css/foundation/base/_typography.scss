@@ -127,7 +127,6 @@ $blockquote-cite-link-color: $blockquote-cite-font-color;
 h1{
     // DONE figure out what to do with this mixin
     color: var(--body-foreground-h1);
-    //@include contrast-bg(0.855, var(--body-background), 0%, $white, $black); // 0.855 = $jet
 }
 
 .subheader{
