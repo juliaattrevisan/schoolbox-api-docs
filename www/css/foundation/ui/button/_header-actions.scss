@@ -27,7 +27,8 @@
 
 		// no text? be subtle
 		&.no-text {
-			//@include contrast-bg();
+            // DONE figure out what to do about this mixin
+            color: var(--body-foreground);
 			background: transparent;
 		}
 

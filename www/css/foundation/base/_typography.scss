@@ -30,15 +30,8 @@ $h6-font-reduction: 0;
 
 // These control how subheaders are styled.
 $subheader-line-height: 1.4;
-// TODO figure out what to do instead of this mixin
-// This requires calculation of a contrasting color.
-$subheader-font-color: hsla(
-    var(--body-background-h),
-    var(--body-background-s),
-    calc(var(--body-background-l) * 0.855),
-    var(--body-background-a)
-);
-//$subheader-font-color: contrast-bg();
+// DONE figure out what to do instead of this mixin
+$subheader-font-color: var(--body-foreground);
 $subheader-font-weight: $header-font-weight;
 $subheader-top-margin: .625rem;
 $subheader-bottom-margin: .5rem;
@@ -172,14 +165,8 @@ a{
 }
 
 .meta{
-    // TODO figure out what to do about this mixin
-    color: hsla(
-        var(--body-background-h),
-        var(--body-background-s),
-        calc(var(--body-background-l) * 0.855),
-        var(--body-background-a)
-    );
-	//@include contrast-bg();
+    // DONE figure out what to do about this mixin
+    color: var(--body-foreground);
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: $paragraph-font-size;
 	font-style: italic;

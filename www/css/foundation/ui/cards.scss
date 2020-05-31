@@ -239,14 +239,8 @@
   &.removed {
     h3 {
       text-decoration: line-through;
-      // TODO figure out what to do about this mixin
-      color: hsla(
-        var(--body-background-h),
-        var(--body-background-s),
-        calc(var(--body-background-l) * 0.855),
-        var(--body-background-a)
-      );
-      //@include contrast-bg();
+      // DONE figure out what to do about this mixin
+      color: var(--body-foreground);
     }
   }
   /*
