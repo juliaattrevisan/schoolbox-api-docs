@@ -16,7 +16,7 @@ use SSNepenthe\ColorUtils;
 class Transformer
 {
     /**
-     * Port of Schoolbox-written SASS function contrast-bg.
+     * Port of Schoolbox-written SASS function `contrast-bg`.
      *
      * This function appears to build a color that is guaranteed to contrast
      * with a background, with some parameters given for tweaking.
@@ -36,38 +36,48 @@ class Transformer
         Color $dark = null
     ): Color {
         $colorUtilsBackground = $this->convertToColorUtilsColor($background);
+
+        // Is this color light or dark? Choose a contrasting color for text
         $luminance            = ColorUtils\relative_luminance($colorUtilsBackground);
         if ($luminance > 0.5) {
-            $textColor = $light
-                ? $this->convertToColorUtilsColor($light)
-                : ColorUtils\color('white');
+            $textColor = $light ?? Color::white();
         } else {
-            $textColor = $dark
-                ? $this->convertToColorUtilsColor($dark)
-                : ColorUtils\color('black');
+            $textColor = $dark ?? Color::black();
         }
 
-//        $translucency = ColorUtils\color($textColor->getHsl()->toArray() + ['alpha' => $opacity]);
+        // apply the opacity given
+        $translucent = $textColor->setAlpha($opacity);
 
         // flatten opacity onto the background
-        // $flat: flatten-alpha($translucent, $background);
-//        $percent = $opacity;
-        $opaque = ColorUtils\color($textColor->getHsl()->toArray() + ['alpha' => 1]);
+        // This uses another SASS function flatten-alpha
+        $flat = $this->flattenAlpha($translucent, $background);
 
-        // $solid-color: mix($opaque, $background, $percent);
-        $flat = ColorUtils\mix($opaque, $colorUtilsBackground, $opacity);
-
-//        // boost saturation
-//        $saturated: saturate($flat, $saturation);
-
+        // boost saturation
         $saturated = ColorUtils\saturate($flat, $saturation);
         return $this->convertToAlaressColor($saturated);
-//        return new Color(
-//            ColorUtils\red($saturated),
-//            ColorUtils\green($saturated),
-//            ColorUtils\blue($saturated),
-//            ColorUtils\alpha($saturated)
-//        );
+    }
+
+
+    /**
+     * Port of Schoolbox-written SASS function `flatten-alpha`.
+     *
+     * Flattens partially transparent `$color` onto `$background`.
+     *
+     * @param Color $color
+     * @param Color $background
+     * @return Color
+     */
+    public function flattenAlpha(Color $color, Color $background): Color
+    {
+        $percent = $color->getAlpha() * 100;
+        $opaque  = ColorUtils\color($this->convertToColorUtilsColor($color)->getHsl()->toArray() + ['alpha' => 1]);
+        return $this->convertToAlaressColor(
+            ColorUtils\mix(
+                $opaque,
+                $this->convertToColorUtilsColor($background),
+                $percent
+            )
+        );
     }
 
 
