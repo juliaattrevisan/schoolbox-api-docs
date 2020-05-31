@@ -144,7 +144,7 @@ class EventNotifier extends AbstractModuleNotifier
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=" . NSMapper::NS_CALENDAR)
             // we need to stack based on series if that's possible
-            ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId())
+            ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId()))
             ->setBody($event->getDetail())
             ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
             ->addFilter('roletype', [$roleType])
