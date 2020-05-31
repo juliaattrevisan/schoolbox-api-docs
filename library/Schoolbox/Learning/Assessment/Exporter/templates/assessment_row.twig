@@ -107,7 +107,7 @@
     </div>
 
     {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
-        {% set dates = ['publish', 'open', 'due', 'close'] %}
+        {% set dates = ['publish', 'open', 'due', 'late'] %}
         {% set fullSetOfDates = true %}
     {% else %}
         {% set dates = ['publish', 'due'] %}
