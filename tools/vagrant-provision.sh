@@ -198,17 +198,19 @@ tar -xzf $cachedir/$data_filename_short;
 rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/data/schoolbox.sql;
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_school_code'";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
