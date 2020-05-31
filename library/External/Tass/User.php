@@ -430,6 +430,8 @@ class External_Tass_User implements External_UserInterface
                     WHERE studsub.stud_code = '{$this->database->quote($externalId)}'
                     AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
                     AND yr_study = '{$this->database->quote($this->getCurrentYear($externalId))}'
+                    AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
+                    AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
             ";
         } else if ($user->getRole()->isStaff()) {
