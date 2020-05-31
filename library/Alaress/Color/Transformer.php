@@ -45,8 +45,8 @@ class Transformer
         $colorUtilsBackground = $this->convertToColorUtilsColor($background);
 
         // Is this color light or dark? Choose a contrasting color for text
-        $luminance            = ColorUtils\relative_luminance($colorUtilsBackground);
-        if ($luminance > 0.5) {
+        $luminance = ColorUtils\relative_luminance($colorUtilsBackground);
+        if ($luminance < 0.5) {
             $textColor = $light ?? Color::white();
         } else {
             $textColor = $dark ?? Color::black();
