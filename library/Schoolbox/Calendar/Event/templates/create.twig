@@ -1,4 +1,18 @@
-<!-- BEGIN custom_head -->
+{##
+ # Event Create/Update screen
+ #
+ # @param Event      $event         An Event instance
+ # @param User       $user          A User instance (this person receives the event on their calendar)
+ # @param Collection $eventTypes    A list of Event Types
+ # @param array      $recurrence    A list of recurring instances
+ # @param int        $personalLevel An int corresponding to the Personal event level
+ # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
+ # @param array      $levels        An array of Event Levels (personal/group/school)
+ # @param array      $roles         A list of available and selected Roles
+ # @param array      $folders       A list of available and selected Folders
+ # @param array      $campuses      A list of available and selected Campuses
+ # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
+ #}
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
@@ -9,7 +23,7 @@
         $.fn.alaressEditor();
 
         $('#eventForm').eventModify({
-            functionLabel: "{FUNCTION}",
+            functionLabel: "{{ action }}",
             deleteButton: $('[data-action="delete"]')
         });
 
@@ -18,12 +32,13 @@
             container: '[data-collapsable-container]'
         });
 
-        var personalLevel = "{PERSONAL_LEVEL}";
+        var personalLevel = "{{ personalLevel }}";
         var calendarEvent = $("#level");
 
-        if (calendarEvent.val()=== personalLevel) {
+        if (calendarEvent.val() === personalLevel) {
             $("#attendance").hide();
         }
+
         calendarEvent.change(function() {
             if ($("#level").val() === personalLevel) {
                 $("#attendance").hide();
@@ -31,60 +46,76 @@
                 $("#attendance").show();
             }
         });
-
     });
 </script>
-<!-- END custom_head -->
+
+{# Decide context for creating/modifying an event
+ # This is purely cosmetic now
+ #}
+{% set action = 'Add' %}
+
+{% if event.id %}
+    {% set action = 'Update' %}
+{% endif %}
 
 <ul class="breadcrumb">
     <li><a href="/calendar">Calendar</a></li>
-    <li class="active"><a href="#">{FUNCTION} Event</a></li>
+    <li class="active"><a href="#">{{ action }} Event</a></li>
 </ul>
 
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{FUNCTION} Event</h1>
+            <h1>{{ action }} Event</h1>
         </div>
     </div>
-    <!-- BEGIN delete_button -->
+    {% if event.id %}
     <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
     <ul class="f-dropdown" data-dropdown-content id="overflow">
-        <li><a data-action="delete" href="/calendar/modifyForm.php?id={EVENT_ID}{RETURN_STR}" class="icon-delete">Delete Event</a></li>
+        <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
     </ul>
-    <!-- END delete_button -->
+    {% endif %}
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        <form id="eventForm" method="post" action="/calendar/modifyForm.php" class="top">
+        {% if event.id %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postModify', {eventId: event.id}) %}
+        {% else %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreate') %}
+        {% endif %}
 
-        	<input name="id" type="hidden" value="{EVENT_ID}" />
-        	<input name="userId" type="hidden" value="{EVENT_USER_ID}" />
-        	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
-            <input id="allday" name="allday" type="hidden" value="{EVENT_ALLDAY_CHECKED}">
-        	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
-        	<input id="efficacy" name="efficacy" type="hidden" value="self" />
-        	<input id="action" name="action" type="hidden" value="{FUNCTION}" />
+        {# Append returnUrl encoding if supplied
+         # It's used generally from the event modal
+         #}
+        {% if returnUrl|length %}
+            {% set formRoute = formRoute ~ '?' ~ returnUrl %}
+        {% endif %}
+        <form id="eventForm" method="post" action="{{ formRoute }}" class="top">
+            <input name="id" type="hidden" value="{{ event.id }}" />
+            <input name="userId" type="hidden" value="{{ user.id }}" />
+            <input name="authorId" type="hidden" value="{{ event.author.id }}" />
+            <input id="allDay" name="allDay" type="hidden" value="{{ event.allDay }}">
+            <input id="efficacy" name="efficacy" type="hidden" value="{{ efficacy.self }}" />
 
             <section>
                 <fieldset class="content">
                     <legend>Overview</legend>
                     <div class="small-12 column">
                         <label class="required" for="title">Title</label>
-                        <input name="title" id="title" type="text" maxlength="100" value="{EVENT_TITLE}" required />
+                        <input name="title" id="title" type="text" maxlength="100" value="{{ event.title }}" required />
                     </div>
                     <div class="small-6 columns">
                         <label class="required" for="startDate">
                             From
                         </label>
-                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datesync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                        <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allDay" data-datepicker-call="event" data-datesync-enddate="#endDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.startDateTime.localShort : event.startDateTime.local }}"/>
                     </div>
                     <div class="small-6 columns">
                         <label class="required" for="endDate">
                             Until
                         </label>
-                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                        <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allDay" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.endDateTime.localShort : event.endDateTime.local }}"/>
                     </div>
                 </fieldset>
 
@@ -95,37 +126,36 @@
                         </span>
 
                     </legend>
-                    <div class="small-12 columns {EVENT_RECURRENCE_COLLAPSE_CLASS}" data-collapsable="true" data-collapse-state="{EVENT_RECURRENCE_COLLAPSE_STATE}">
+                    <div class="small-12 columns {{ recurrence|length ? '' : 'hide' }}" data-collapsable="true" data-collapse-state="{{ recurrence|length ? 'uncollapsed' : 'collapsed' }}">
                         <div class="row">
-                            <!-- BEGIN recurring_dates -->
-                            <div class="small-6 columns">
-                                <label>Repeat
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
-                                    <select name="repeat">
-                                        <option value="">Single Event</option>
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="fortnightly">Fortnightly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div id="repeatUntil" class="small-6 columns" data-repeat-until>
-                                <label>
-                                    Repeat Until
-                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
-                                    <input name="repeat_until" id="repeat-until" data-datepicker type="text" size="15" maxlength="30" value="" />
-                                </label>
-                            </div>
-                            <!-- END recurring_dates -->
-                            <!-- BEGIN recurring_reminder -->
-                            <div id="repeat-reminder" class="small-12 columns">
-                                <div class="alert-box">
-                                    <h5>This event is part of a recurring series</h5>
-                                    <p>{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong></p>
+                            {% if recurrence|length %}
+                                <div id="repeat-reminder" class="small-12 columns">
+                                    <div class="alert-box">
+                                        <h5>This event is part of a recurring series</h5>
+                                        <p>{{ recurrence.freq|capitalize }}, beginning <strong>{{ recurrence.start.longDateOnly }}</strong> and ending <strong>{{ recurrence.end.longDateOnly }}</strong></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- END recurring_reminder -->
+                            {% else %}
+                                <div class="small-6 columns">
+                                    <label>Repeat
+                                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The frequency with which this event recurs, if at all">?</span>
+                                        <select name="repeat">
+                                            <option value="">Single Event</option>
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="fortnightly">Fortnightly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div id="repeatUntil" class="small-6 columns" data-repeat-until>
+                                    <label>
+                                        Repeat Until
+                                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The date at which recurrence should cease">?</span>
+                                        <input name="repeat_until" id="repeat-until" data-datepicker type="text" size="15" maxlength="30" value="" />
+                                    </label>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </fieldset>
@@ -136,29 +166,27 @@
                         <label>
                             Type
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
-                            <!-- BEGIN type_select -->
+                            {% if eventTypes|length %}
                             <select name="type">
-                                <!-- BEGIN type_drop -->
-                                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-                                <!-- END type_drop -->
+                                {% for eventType in eventTypes %}
+                                <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
+                                {% endfor %}
                             </select>
-                            <!-- END type_select -->
-                            <!-- BEGIN type_no_select -->
-                            <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />
-                            {EVENT_EVENTTYPE_NAME}
-                            <!-- END type_no_select -->
+                            {% else %}
+                                <input type="hidden" name="type" value="{{ event.type.id }}" />
+                            {% endif %}
                         </label>
                     </div>
                     <div class="small-12 column">
                         <label>
                             Location
-                            <input name="location" type="text" value="{EVENT_LOCATION}"/>
+                            <input name="location" type="text" value="{{ event.location }}"/>
                         </label>
                     </div>
                     <div class="small-12 column">
                         <label>
                             Details
-                            <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+                            <textarea class='event-detail' name="detail">{{ event.detail }}</textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -169,7 +197,7 @@
                         <label>
                             Publish Date
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{{ event.publishDateTime.local }}"/>
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -177,9 +205,9 @@
                             Level
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
                             <select name="level" id="level" data-interaction="select-level">
-                                <!-- BEGIN event_level_drop -->
-                                <option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
-                                <!-- END event_level_drop -->
+                                {% for level in levels.all %}
+                                <option value="{{ level.id }}" {{ level.id == levels.selected ? 'selected="selected"' : '' }}>{{ level.name }}</option>
+                                {% endfor %}
                             </select>
                         </label>
                     </div>
@@ -189,10 +217,11 @@
                                 Groups
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
                             </legend>
-                            <!-- BEGIN event_group_drop -->
-                            <input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" id="group{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />
-                            <label for="group{EVENT_GROUP_ID}" class="checkbox">{EVENT_GROUP_NAME}</label>
-                            <!-- END event_group_drop -->
+
+                            {% for folder in folders.all %}
+                                <input type="checkbox" name="folder[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
+                                <label for="folder{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
@@ -204,10 +233,10 @@
                             <input type="checkbox" data-select-all id="roleSelectAll"/>
                             <label for="roleSelectAll">Select all</label>
 
-                            <!-- BEGIN event_role_list -->
-                            <input type="checkbox" name="roles[]" id="role{EVENT_ROLE_ID}" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
-                            <label for="role{EVENT_ROLE_ID}">{EVENT_ROLE_NAME}</label>
-                            <!-- END event_role_list -->
+                            {% for role in roles.all %}
+                            <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
+                            <label for="role{{ role.id }}">{{ role.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
@@ -219,10 +248,10 @@
                             <input type="checkbox" data-select-all id="campusSelectAll" />
                             <label for="campusSelectAll">Select all</label>
 
-                            <!-- BEGIN event_campus_list -->
-                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{EVENT_CAMPUS_ID}" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-                            <label for="campus{EVENT_CAMPUS_ID}">{EVENT_CAMPUS_NAME}</label>
-                            <!-- END event_campus_list -->
+                            {% for campus in campuses.all %}
+                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
+                            <label for="campus{{ campus.id }}">{{ campus.name }}</label>
+                            {% endfor %}
                         </fieldset>
                     </div>
 
@@ -231,7 +260,7 @@
                             Enable attendance?
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>
                             <div class="switch">
-                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {EVENT_ATTENDANCE}>
+                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {{ event.attendance ? 'checked="checked"' : '' }}>
                                 <label for="attendanceCheckbox">
                                     <span>On</span>
                                     <span>Off</span>
@@ -241,7 +270,7 @@
                     </div>
                 </fieldset>
             </section>
-            <input id="calendar-modify-submit" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" />
+            <input id="calendar-modify-submit" type="submit" name="{{ action }}" value="{{ action }} Event" />
         </form>
     </div>
 </div>

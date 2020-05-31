@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\RoleMapper;
@@ -28,7 +29,9 @@ class Helper
 
     /**
      * Helper constructor.
-     * @param RoleMapper $roleMapper
+     *
+     * @param RoleMapper   $roleMapper
+     * @param FolderMapper $folderMapper
      */
     public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper)
     {
@@ -65,7 +68,7 @@ class Helper
     {
         $result = [];
 
-        /** @var \Schoolbox\Calendar\Relation\Role $role */
+        /** @var Role $role */
         foreach ($event->getRoleCollection()->getAll() as $role) {
             try {
                 $result[] = $this->roleMapper->findById($role->getRoleId());
@@ -100,7 +103,7 @@ class Helper
      * @param Event $event
      * @return array
      */
-    public function getGroupCollection(Event $event): array
+    public function getFolderCollection(Event $event): array
     {
         $result = [];
 

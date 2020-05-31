@@ -55,4 +55,17 @@ class Redirect
     {
         return '?' . self::RETURN_URL . '=' . self::encode($url);
     }
+
+
+    /**
+     * Fabricate a querystring param representation where the key/value pair is arbitrary
+     * It's not prefixed with ? so you can use it anywhere in a querystring
+     *
+     * @param string $encodedUrl
+     * @return string
+     */
+    public static function queryStringEncodedParam(string $encodedUrl): string
+    {
+        return self::RETURN_URL . '=' . $encodedUrl;
+    }
 }

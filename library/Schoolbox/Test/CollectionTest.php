@@ -87,7 +87,7 @@ class CollectionTest extends TestCase
     public function provider_ICollection()
     {
         return [
-            [new \Schoolbox\Calendar\EventLevelCollection([], new Collection())],
+            [new \Schoolbox\Calendar\EventLevelCollection(new Collection(), new Collection())],
             [new \EOTC\ListGroup\Collection()],
             [\Schoolbox\CampusMapper::getInstance()->createCollection()],
             [new \Schoolbox\MappingCollection()],

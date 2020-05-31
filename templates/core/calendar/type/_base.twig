@@ -77,7 +77,7 @@
                 {% endif %}
                 {% if event.isEditable %}
                     {% block modifyLink %}
-                    <a class="button" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                    <a class="button" href="{{ routeLookupIfAuthorized('calendarEvent.getModify', {eventId: event.eventId}) }}{{ returnStr }}">Modify</a>
                     {% endblock %}
                     {% block deleteButton %}
                     <a class="button" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
@@ -92,10 +92,10 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
     {% block deleteUrls %}
-        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr ?? '' }}">
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}">
         {% if event.seriesId() %}
-            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=self">
-            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?id={{ event.eventId }}{{ returnStr }}&efficacy=series">
+            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}&efficacy=self">
+            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}&efficacy=series">
         {% endif %}
     {% endblock deleteUrls %}
 </li>

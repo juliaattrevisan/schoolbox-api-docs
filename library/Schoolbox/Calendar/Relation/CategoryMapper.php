@@ -1,26 +1,30 @@
 <?php
 /**
- * CategoryMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar\Relation;
 
 use Schoolbox;
-use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
+/**
+ * Class CategoryMapper
+ *
+ * Maintains relationships between Folders and Events via event_folder
+ * These are a Group level's events
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class CategoryMapper extends Schoolbox\Mapper
 {
 
     /**
      * Mapping
      *
-     * @return Bool|void
+     * @return void
+     * @throws Mapper\DefinitionException
      */
     protected function mapping()
     {
@@ -51,35 +55,6 @@ class CategoryMapper extends Schoolbox\Mapper
         );
     }
 
-    /**
-     * Find all the categories belonging to an event
-     *
-     * @param Schoolbox\Calendar\Event $event
-     * @return Collection
-     */
-    public function findAllForEvent(Schoolbox\Calendar\Event $event)
-    {
-        $categoryMapper = $this->getJoinMapper('category');
-
-        $query = "
-            SELECT {$categoryMapper->getColumnString('c')}
-            FROM `{$this->table}` ec
-            LEFT JOIN {$this->getJoinSql('category', 'ec', 'c')}
-            WHERE ec.event_id = :eventId
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindValue(':eventId', $event->getId());
-        $statement->execute();
-
-        $allCategories = new Collection();
-
-        while ($row = $statement->fetch()) {
-            $allCategories->add($categoryMapper->hydrate($row, 'c'));
-        }
-
-        return $allCategories;
-    }
 
     /**
      * This mapper doesn't raise notifications - the event mapper handles that.

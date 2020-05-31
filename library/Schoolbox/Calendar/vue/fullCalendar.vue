@@ -26,8 +26,14 @@
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
     const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+
+    /* TODO: Events should already know about and come with their own modify link;
+     * we shouldn't be inferring and building it out here
+     */
+    const URL_EVENT_CREATE_FORM = '/calendar/event/create';
+    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
     const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
@@ -75,10 +81,12 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
-                    create: URL_EVENT_CREATE,
+                    createForm: URL_EVENT_CREATE_FORM,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+                    create: URL_EVENT_CREATE,
                     update: URL_EVENT_UPDATE,
+                    delete: URL_EVENT_DELETE,
                     export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
@@ -379,6 +387,17 @@
             },
 
             /**
+             * Get the current url; these redirects are used after backend processing
+             * so you can return to your current location afterwards
+             *
+             * Use the base64encoded version of the url's pathname, so it can work in
+             * conjunection with Class Redirect in the back end
+             */
+            returnUrl() {
+                return btoa(window.location.pathname);
+            },
+
+            /**
              * Callback for adding an event to the calendar.
              * @see https://fullcalendar.io/docs/Calendar-addEvent
              *
@@ -627,6 +646,7 @@
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
+                            :event-create-form-url="urls.createForm"
                             :event-modify-form-url="urls.modifyForm"
                             :format-form-date="formats.formDate"
                             :format-form-datetime="formats.formDatetime"
@@ -638,12 +658,14 @@
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
+                          :event-delete-url="urls.delete"
                           :event-update-url="urls.update"
                           :attendance-list-url="urls.attendanceList"
                           :attendance-toggle-url="urls.attendanceToggle"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
+                          :return-url="returnUrl()"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />
 

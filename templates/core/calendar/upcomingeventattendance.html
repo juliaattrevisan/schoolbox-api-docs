@@ -1,7 +1,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Upcoming Event Attendance</h1>
-        
+
         <div class="scrollable">
             <table>
                 <tr>
@@ -21,7 +21,7 @@
                     <td><a href='/user/{EVENT_USER_ID}'>{EVENT_USER_FIRSTNAME} {EVENT_USER_SURNAME}</a></td>
                     <td>{EVENT_PENDING}</td>
                     <td>{EVENT_APPROVED}</td>
-                    <td><a href='/calendar/modify.php?eventID={EVENT_ID}&returnTo=upcomingEventAttendance' class="icon-modify" title="Modify"></a></td>
+                    <td><a href='/calendar/event/{EVENT_ID}/modify?returnTo=upcomingEventAttendance' class="icon-modify" title="Modify"></a></td>
                 </tr>
                 <!-- END event -->
             </table>

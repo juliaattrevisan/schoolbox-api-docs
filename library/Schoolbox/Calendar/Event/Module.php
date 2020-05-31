@@ -17,17 +17,27 @@ use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Calendar\Event
+ */
 class Module extends BaseModule
 {
     /**
@@ -113,7 +123,47 @@ class Module extends BaseModule
             );
         });
 
+
+        /* Permissions for creating an event
+         */
+        $createPerms = new LazyCallback(function () {
+            return new All(
+                new IsLoggedIn()
+            );
+        });
+
+
+        /* Permissions for modifying an event
+         */
+        $modifyPerms = new LazyCallback(function () {
+            return new All(
+                new IsLoggedIn(),
+                new Any(
+                    new IsSuperuser(),
+                    new Callback(function (array $params) {
+                        try {
+                            $event = $this->getEventMapper()->findById($params['eventId']);
+
+                            if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
+                                return true;
+                            }
+                        } catch (Exception $e) {
+
+                            // noop
+                        }
+
+                        throw new Unauthorized();
+                    })
+                )
+            );
+        });
+
         $this->register('GET', '/{eventId:\d+}', 'getEvent', $perms, $preloadEvent);
+        $this->register('GET', '/{eventId:\d+}/modify', 'getModify', $modifyPerms, $preloadEvent);
+        $this->register('POST', '/{eventId:\d+}/modify', 'postModify', $modifyPerms, $preloadEvent);
+        $this->register('GET', '/create', 'getCreate', $createPerms);
+        $this->register('POST', '/create', 'postCreate', $createPerms);
+        $this->register('POST', '/{eventId:\d+}/delete', 'postDelete', $modifyPerms, $preloadEvent);
     }
 
     /**
@@ -135,8 +185,9 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array|null
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws Mapper\Exception\Deleted
+     * @throws InvalidArgumentException
      */
     private function preloadEvent(array $params): ?array
     {
@@ -145,7 +196,7 @@ class Module extends BaseModule
 
     /**
      * @return EventMapper
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function getEventMapper(): EventMapper
     {
@@ -160,6 +211,10 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
+            'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
         ];
     }
 }

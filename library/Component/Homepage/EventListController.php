@@ -1,15 +1,18 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Calendar\Event\Collection\Lister;
 use Calendar\Event\Type\EventBase;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 
+/**
+ * Class Component_Homepage_EventListController
+ */
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -73,6 +76,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 'event_list_block' => '',
                 'empty_read_block' => '',
                 'empty_write_block' => '',
+                'RETURN_URL' => Redirect::encode("/homepage/{$this->getContext()->getId()}")
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -99,6 +103,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
             $this->setVar(
                 array(
+                    'RETURN_URL' => Redirect::encode("/homepage/{$this->getContext()->getId()}"),
                     'CALENDAR_PREFIX' => 'group',
                     'USER_TOKEN'      => $_SESSION['key'],
                     'LIST_DATE'       => '',
@@ -136,16 +141,17 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
-                $returnStr = null;
-                $context   = $this->getContext();
-                if ($context instanceof Schoolbox\Resource\Folder\Model) {
-                    $returnStr = "/homepage/{$this->getContext()->getId()}";
-                }
+                /* Derive redirects
+                 */
+                $returnStr = $this->getContext() instanceof Folder\Model ? "/homepage/{$this->getContext()->getId()}" : null;
+
                 $htmlEvent = $eventRenderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_HTML, $returnStr);
-                if  ($htmlEvent) {
+
+                if ($htmlEvent) {
                     $this->setVar('group_events', $htmlEvent);
                     $this->parse('group_events_block', 'group_events', true);
                 }
+
                 $prevDay = $currentDay;
             }
 

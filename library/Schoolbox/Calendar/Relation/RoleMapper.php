@@ -1,46 +1,47 @@
 <?php
 /**
- * RoleMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar\Relation;
 
-use Schoolbox;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
-class RoleMapper extends Schoolbox\Mapper
+/**
+ * Class RoleMapper
+ *
+ * Maintains relationships between Roles and Events via event_role
+ * Historically, Roles and Groups were terminologies used interchangeably
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
+class RoleMapper extends Mapper
 {
 
     /**
      * Mapping
      *
-     * @return Bool|void
+     * @return void
      */
     protected function mapping()
     {
-        $this->hasTable('event_group');
+        $this->hasTable('event_role');
         $this->hasModel(Role::class);
 
-        $this->hasMap(
-            array(
-                'column' => 'event_id',
-                'property' => 'eventId',
-                'type' => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column' => 'group_id',
-                'property' => 'roleId',
-                'type' => self::TYPE_INTEGER,
-            )
-        );
+        $this->hasMap([
+            'column' => 'event_id',
+            'property' => 'eventId',
+            'type' => self::TYPE_INTEGER,
+        ]);
+
+        $this->hasMap([
+            'column' => 'role_id',
+            'property' => 'roleId',
+            'type' => self::TYPE_INTEGER,
+        ]);
     }
+
 
     /**
      * No notifications for this model
@@ -54,5 +55,4 @@ class RoleMapper extends Schoolbox\Mapper
     {
         return true;
     }
-
 }

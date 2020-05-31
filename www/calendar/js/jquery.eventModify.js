@@ -94,18 +94,18 @@
                         dialog,
                         function () {
                             // Add self to href
-                            $.post(deleteButton.attr('href') + '&efficacy=self', {
-                                action: 'Delete',
-                                id: $('input[name=id]').val()
+                            $.post(deleteButton.attr('href'), {
+                                id: $('input[name=id]').val(),
+                                efficacy: 'self'
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
                         },
                         function () {
                             // Add series to href
-                            $.post(deleteButton.attr('href') + '&efficacy=series', {
-                                action: 'Delete',
-                                id: $('input[name=id]').val()
+                            $.post(deleteButton.attr('href'), {
+                                id: $('input[name=id]').val(),
+                                efficacy: 'series'
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
@@ -119,7 +119,6 @@
                         text: 'Are you sure you want to delete this event?',
                         confirmEvent: function () {
                             $.post(deleteButton.attr('href'), {
-                                action: 'Delete',
                                 id: $('input[name=id]').val()
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;

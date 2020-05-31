@@ -382,7 +382,7 @@ class Calendar extends DeprecatedModel
             if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
-                $groupChunk = "AND event_group.group_id = {$_SESSION['gid']}";
+                $groupChunk = "AND event_role.role_id = {$_SESSION['gid']}";
             }
         }
 
@@ -401,7 +401,7 @@ class Calendar extends DeprecatedModel
                         LEFT JOIN user ON owner = user.id
                         LEFT JOIN luEventType ON type = eventTypeID
                         LEFT JOIN event_campus ON event.id = event_campus.event_id
-                        LEFT JOIN event_group ON event.id = event_group.event_id
+                        LEFT JOIN event_role ON event.id = event_role.event_id
                         LEFT JOIN event_folder ON event.id = event_folder.event_id
                         WHERE
                              (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
@@ -421,7 +421,7 @@ class Calendar extends DeprecatedModel
 						LEFT JOIN user ON owner = user.id
 						LEFT JOIN luEventType ON type = eventTypeID
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
-						LEFT JOIN event_group ON event.id = event_group.event_id
+						LEFT JOIN event_role ON event.id = event_role.event_id
 						LEFT JOIN event_folder ON event.id = event_folder.event_id
 						WHERE (
 							(access = '1' AND owner = '" . $_SESSION['id'] . "')
@@ -533,7 +533,7 @@ class Calendar extends DeprecatedModel
             if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
-                $groupChunk = "AND event_group.group_id = {$user->getRole()->getId()}";
+                $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";
             }
         }
 
@@ -642,7 +642,7 @@ class Calendar extends DeprecatedModel
             LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = " . EventModel::ACCESS_PERSONAL . "
             LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = " . EventModel::ACCESS_GROUP . "
             LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
-            LEFT JOIN event_group      ON event.id = event_group.event_id    AND access = " . EventModel::ACCESS_CAMPUS . "
+            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = " . EventModel::ACCESS_CAMPUS . "
             LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = " . EventModel::ACCESS_CAMPUS . "
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
             WHERE
@@ -730,12 +730,12 @@ class Calendar extends DeprecatedModel
 							type, title, location, detail, access, event_campus.campus_id as sid
 						FROM event
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
-						LEFT JOIN event_group ON event.id = event_group.event_id
+						LEFT JOIN event_role ON event.id = event_role.event_id
 						WHERE start_datetime = '" . date("Y-m-d", $currentDay) . "'
 						AND event.deleted_at IS NULL
 							AND (
 								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
-            . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
+            . ") AND event_role.role_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.start_datetime, event.end_datetime";
@@ -754,7 +754,7 @@ class Calendar extends DeprecatedModel
     public function getEventGroup($eventID)
     {
         $output = array();
-        $query  = "SELECT group_id FROM event_group WHERE event_id = ".intval($eventID);
+        $query  = "SELECT role_id FROM event_role WHERE event_id = ".intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['group_id'];
@@ -826,9 +826,9 @@ class Calendar extends DeprecatedModel
             foreach ($groupList as $groupID) {
                 $eventGroup = array(
                     'event_id' => $eventID,
-                    'group_id' => $groupID,
+                    'role_id' => $groupID,
                 );
-                $this->db->insert('event_group', $eventGroup);
+                $this->db->insert('event_role', $eventGroup);
             }
         }
     }
@@ -849,7 +849,7 @@ class Calendar extends DeprecatedModel
     function delPerms($eventID)
     {
 
-        $this->db->delete('event_group', 'event_id', $eventID);
+        $this->db->delete('event_role', 'event_id', $eventID);
         $this->db->delete('event_campus', 'event_id', $eventID);
     }
 

@@ -6,9 +6,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar;
-
 
 use Alaress_Date_Format;
 use DateTime;
@@ -38,6 +36,13 @@ class Event implements ISoftDeletable
     public const ATTENDANCE_INTENTION_PENDING = 1;
     public const ATTENDANCE_INTENTION_PRESENT = 2;
     public const ATTENDANCE_INTENTION_ABSENT = 3;
+
+
+    /**
+     * Int corresponding to All Day setting set to on
+     */
+    public const ALL_DAY = 1;
+
 
     /**
      * Event id
@@ -887,7 +892,7 @@ class Event implements ISoftDeletable
     /**
      * Get campus collection
      *
-     * @return Collection|Relation\Campus[]
+     * @return Collection|int[]|Campus[]|Relation\Campus[]
      */
     public function getCampusCollection()
     {

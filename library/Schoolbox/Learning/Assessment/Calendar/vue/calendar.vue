@@ -17,8 +17,15 @@
     const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
     const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = '/learning/assessment/calendar/events/grouped';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+
+    /* TODO: Events should already know about and come with their own modify link;
+     * we shouldn't be inferring and building it out here
+     */
+    const URL_EVENT_CREATE_FORM = '/calendar/event/create';
+    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
+
     const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
@@ -84,8 +91,10 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
+                    createForm: URL_EVENT_CREATE_FORM,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+                    delete: URL_EVENT_DELETE,
                     update: URL_EVENT_UPDATE,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
@@ -799,8 +808,10 @@
         <view-event-modal ref="event"
                           return-to="assessmentCalendar"
                           :to-moment="toMoment"
+                          :event-create-form-url="urls.createForm"
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
+                          :event-delete-url="urls.delete"
                           :event-update-url="urls.update"
                           :attendance-list-url="urls.attendanceList"
                           :attendance-toggle-url="urls.attendanceToggle"
