@@ -39,6 +39,28 @@ class Color implements \Serializable
 
 
     /**
+     * Create a new white color object.
+     *
+     * @return Color
+     */
+    public static function white(): Color
+    {
+        return new Color(0xFF, 0xFF, 0xFF);
+    }
+
+
+    /**
+     * Create a new black color object.
+     *
+     * @return Color
+     */
+    public static function black(): Color
+    {
+        return new Color(0x00, 0x00, 0x00);
+    }
+
+
+    /**
      * @param float $alpha
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
