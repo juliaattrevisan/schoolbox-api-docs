@@ -316,7 +316,8 @@ class Notifier extends AbstractModuleNotifier
                     Param::STACKING_APPEND
                 ),
             ])
-            ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED);
+            ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED)
+            ->setBody($comment->getContent());
 
         $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
         return $envelope;
