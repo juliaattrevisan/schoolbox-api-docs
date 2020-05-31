@@ -330,7 +330,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             ';
         } elseif ($this->groupHandler->isStaff($userId)) {
             $join = '
-                LEFT JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                INNER JOIN SCHOOLBOX_TEACHERCLASS C ON T.CLASS_CODE = C.CLASS_CODE
+                AND T.STAFF_NUMBER = C.STAFF_NUMBER
                 WHERE C.STAFF_NUMBER = :sn
             ';
         } else {
