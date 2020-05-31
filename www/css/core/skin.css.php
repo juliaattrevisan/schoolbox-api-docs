@@ -9,9 +9,9 @@
 declare(strict_types=1);
 
 use Alaress\Color\ColorFactory;
+use Alaress\Color\Transformer;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use SSNepenthe\ColorUtils;
 use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -94,13 +94,11 @@ $colorConfigMapping = [
     'skin_colour_form_input_border_color'      => '--form-border-color',
     'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
 ];
-$colorFactory = new ColorFactory();
-$twigVars     = [];
-foreach ($colorConfigMapping as $configKey => $cssVar) {
-    $configVal = $config->get($configKey);
-    $color     = $colorFactory->build($configVal);
-    $hsl       = $color->getAsHslArray();
-    $twigVars['colors'][$configKey] = [
+$colorFactory   = new ColorFactory();
+$twigVars       = [];
+$createTwigVars = static function ($color, $cssVar) {
+    $hsl = $color->getAsHslArray();
+    return [
         'cssVar'      => $cssVar,
         'colorObject' => $color,
         'h'           => $hsl['hue'],
@@ -108,21 +106,21 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
         'l'           => $hsl['lightness'],
         'a'           => $color->getAlpha() * 100,
     ];
+};
+foreach ($colorConfigMapping as $configKey => $cssVar) {
+    $twigVars['colors'][$configKey] = $createTwigVars(
+        $colorFactory->build($config->get($configKey)),
+        $cssVar
+    );
 }
 
 // Add a derived color for --body-background-contrast
-var_dump($twigVars['colors']['skin_colour_body_bg']['colorObject']->buildContrastingColor()->getAsHslArray());
-//$bodyBackgroundContrast = ColorUtils\hsla(
-//    $twigVars['colors']['skin_colour_body_bg']['colorObject']->buildContrastingColor();
-//);
-//$luminance = ColorUtils\relative_luminance($bodyBackgroundContrast);
-//$twigVars['colors']['skin_colour_body_bg_contrast'] = [
-//    'cssVar' => '--body-background-contrast',
-//    'h'      => $hsl['hue'] * 360,
-//    's'      => $hsl['saturation'] * 100,
-//    'l'      => $hsl['luminosity'] * 100,
-//    'a'      => $pixel->getColorValueQuantum(Imagick::COLOR_ALPHA) / 0xFFFF * 100,
-//];
+// Probably should just be --body-foreground
+$transformer = new Transformer();
+$twigVars['colors']['skin_colour_body_fg'] = $createTwigVars(
+    $transformer->contrast($twigVars['colors']['skin_colour_body_bg']['colorObject']),
+    '--body-foreground'
+);
 
 // Derived colors:
 // www/css/foundation/base/_typography.scss:
