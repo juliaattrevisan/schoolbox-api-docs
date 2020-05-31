@@ -21,14 +21,21 @@ class Transformer
      * This function appears to build a color that is guaranteed to contrast
      * with a background, with some parameters given for tweaking.
      *
-     * @param Color      $background The background color to contrast with
-     * @param float      $opacity
-     * @param float      $saturation
-     * @param Color|null $light
-     * @param Color|null $dark
+     * @param Color      $background The background color to contrast with.
+     * @param float      $opacity    What proportion does the contrasting color
+     *                               show through the background?
+     * @param float      $saturation How saturated is the new contrasting color?
+     * @param Color|null $light      If `$background` is dark, use this color as
+     *                               the base for the foreground (to which
+     *                               `$opacity` and `$saturation` are applied).
+     *                               Defaults to white.
+     * @param Color|null $dark       If `$background` is light, use this color
+     *                               as the base for the foreground (to which
+     *                               `$opacity` and `$saturation` are applied).
+     *                               Defaults to black.
      * @return Color
      */
-    public function buildContrastingColor(
+    public function contrast(
         Color $background,
         float $opacity = .35,
         float $saturation = 0.1,
