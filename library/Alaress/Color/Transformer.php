@@ -57,7 +57,7 @@ class Transformer
 
         // flatten opacity onto the background
         // This uses another SASS function flatten-alpha
-        $flat = $this->flattenAlpha($translucent, $background);
+        $flat = $this->convertToColorUtilsColor($this->flattenAlpha($translucent, $background));
 
         // boost saturation
         $saturated = ColorUtils\saturate($flat, $saturation);
@@ -82,7 +82,7 @@ class Transformer
             ColorUtils\mix(
                 $opaque,
                 $this->convertToColorUtilsColor($background),
-                $percent
+                (int)$percent
             )
         );
     }
