@@ -121,6 +121,10 @@ $twigVars['colors']['skin_colour_body_fg'] = $createTwigVars(
     $transformer->contrast($twigVars['colors']['skin_colour_body_bg']['colorObject']),
     '--body-foreground'
 );
+$twigVars['colors']['skin_colour_body_h1'] = $createTwigVars(
+    $transformer->contrast($twigVars['colors']['skin_colour_body_bg']['colorObject'], 0.855),
+    '--body-foreground-h1'
+);
 
 // Derived colors:
 // www/css/foundation/base/_typography.scss:
