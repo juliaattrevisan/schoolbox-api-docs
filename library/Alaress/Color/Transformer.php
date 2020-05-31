@@ -77,7 +77,7 @@ class Transformer
     public function flattenAlpha(Color $color, Color $background): Color
     {
         $percent = $color->getAlpha() * 100;
-        $opaque  = ColorUtils\color($this->convertToColorUtilsColor($color)->getHsl()->toArray() + ['alpha' => 1]);
+        $opaque  = ColorUtils\color(['alpha' => 1] + $this->convertToColorUtilsColor($color)->getHsl()->toArray());
         return $this->convertToAlaressColor(
             ColorUtils\mix(
                 $opaque,
