@@ -40,14 +40,13 @@ $f-dropdown-icon-align: 0.25rem;
 		opacity: 0.5;
 	}
 	.separator, .meta {
-        // TODO figure out what to do with this color
+        // DONE making this color transparent works okay
         color: hsla(
           var(--content-ui-foreground-h),
           var(--content-ui-foreground-s),
-          calc(var(--content-ui-foreground-l) * 1.1),
-          var(--content-ui-foreground-a)
+          var(--content-ui-foreground-l),
+          calc(var(--content-ui-foreground-a) * .35)
         );
-		//color: contrast-bg($background: var(--content-ui-background), $dark: var(--content-ui-foreground));
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
