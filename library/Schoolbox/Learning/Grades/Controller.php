@@ -466,11 +466,11 @@ class Controller extends Base
 
         // Show the graph for:
         // * instructors (always)
+        // * all staff (always)
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
-        $canSeeGraph = $this->access->isInstructor($this->getUser(), $subject)
-            || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()
-                                                        ->get('display_grade_graph'));
+        $canSeeGraph = ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
+            || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()->get('display_grade_graph'));
 
         $visibility = new Visibility($this->access);
 
