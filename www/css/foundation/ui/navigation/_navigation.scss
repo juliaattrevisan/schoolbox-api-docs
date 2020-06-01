@@ -643,13 +643,13 @@ $allow-sidebar-stash: $large-up;
     .card {
       padding: 0.5rem 0rem 0rem 1rem;
       .meta {
-        // TODO figure out what to do about this contrast
-        // For now just use accounts-menu-foreground
-        color: var(--accounts-menu-foreground);
-        //color: contrast-bg(
-        //  $background: var(--accounts-menu-background),
-        //  $dark: var(--accounts-menu-foreground)
-        //);
+        // DONE alpha of foreground is fine
+        color: hsla(
+          var(--accounts-menu-foreground-h),
+          var(--accounts-menu-foreground-s),
+          var(--accounts-menu-foreground-l),
+          calc(var(--accounts-menu-foreground-a) * 0.35)
+        );
       }
       a {
         background-color: transparent;
