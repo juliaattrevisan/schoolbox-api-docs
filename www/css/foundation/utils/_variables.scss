@@ -8,35 +8,35 @@ $charset: "utf-8";
  Refined Colour Application
  (these are Skin Builder vars)
  ****************************/
-//$navigation-foreground:            rgb(128, 179, 216) !default;
-//$navigation-background:            rgb(0, 102, 176) !default;
-//$navigation-hover:                 rgb(33, 122, 186) !default;
+$navigation-foreground:            var(--navigation-foreground) !default;
+$navigation-background:            var(--navigation-background) !default;
+$navigation-hover:                 var(--navigation-hover) !default;
 
-//$off-canvas-foreground:            rgb(0, 102, 176) !default;
-//$off-canvas-background:            rgb(229, 244, 255) !default;
-//$off-canvas-hover:                 rgb(241, 249, 255) !default;
+$off-canvas-foreground:            var(--off-canvas-foreground) !default;
+$off-canvas-background:            var(--off-canvas-background) !default;
+$off-canvas-hover:                 var(--off-canvas-hover) !default;
 
 // This has never been a var that is able to be overridden?
 //$off-canvas:                       rgb(255, 255, 255) !default;
 
-//$content-ui-foreground:            rgb(0, 102, 176) !default;
-//$content-ui-background:            rgb(193, 229, 255) !default;
-//$content-ui-hover:                 rgb(209, 236, 255) !default;
-//$content-ui-selected:              rgb(229, 244, 255) !default;
+$content-ui-foreground:            var(--content-ui-foreground) !default;
+$content-ui-background:            var(--content-ui-background) !default;
+$content-ui-hover:                 var(--content-ui-hover) !default;
+$content-ui-selected:              var(--content-ui-selected) !default;
 
-//$content-ui-submit-foreground:     rgb(255, 255, 255) !default;
-//$content-ui-submit-background:     rgb(0, 102, 176) !default;
+$content-ui-submit-foreground:     var(--content-ui-submit-foreground) !default;
+$content-ui-submit-background:     var(--content-ui-submit-background) !default;
 
-//$form-border-color:                rgb(204, 204, 204) !default;
-//$form-bg-hover-color:              rgb(245, 245, 245) !default;
+$form-border-color:                var(--form-border-color) !default;
+$form-bg-hover-color:              var(--form-bg-hover-color) !default;
 
-//$accent-foreground:                rgb(0, 102, 176) !default;
-//$accent-background:                rgb(241, 249, 255) !default;
-//$accent-hover:                     rgb(255, 255, 255) !default;
+$accent-foreground:                var(--accent-foreground) !default;
+$accent-background:                var(--accent-background) !default;
+$accent-hover:                     var(--accent-hover) !default;
 
-//$logo-background:                  rgb(255, 255, 255) !default;
-//
-//$body-bg:                          rgb(237, 237, 237) !default;
+$logo-background:                  var(--logo-background) !default;
+
+$body-bg:                          var(--body-background) !default;
 
 /*****************************
  Constants
