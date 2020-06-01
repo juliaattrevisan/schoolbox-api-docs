@@ -164,8 +164,7 @@ $button-disabled-cursor: $cursor-default-value !default;
     &:focus { background-color: $bg-hover; }
 
     // We control the text color for you based on the background color.
-    // TODO is it okay to just ignore alt-color
-    //color: if($bg-lightness > 70%, $button-font-color-alt, $button-font-color);
+    // DONE I don't think this is even used
     color: $button-font-color;
 
     //&:hover,
