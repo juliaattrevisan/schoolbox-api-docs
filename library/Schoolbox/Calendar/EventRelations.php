@@ -7,6 +7,7 @@
 namespace Schoolbox\Calendar;
 
 use PDOException;
+use Schoolbox\Calendar\Event\Attendance;
 use Schoolbox\Calendar\Relation\Personal;
 use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\Calendar\Relation\Role;
@@ -14,6 +15,7 @@ use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -86,6 +88,18 @@ class EventRelations
 
 
     /**
+     * @var Attendance\Mapper
+     */
+    private $attendanceMapper;
+
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+
+    /**
      * Constructor
      *
      * @param int|null   $level
@@ -105,6 +119,8 @@ class EventRelations
         $this->personalMapper = new PersonalMapper();
         $this->categoryMapper = new CategoryMapper();
         $this->roleMapper = new RoleMapper();
+        $this->attendanceMapper = new Attendance\Mapper();
+        $this->userMapper = new UserMapper();
     }
 
 
@@ -136,16 +152,14 @@ class EventRelations
                  */
                 case Event::ACCESS_GROUP:
                     $this->saveFolderRelation($event, $this->group);
+                    $this->saveAttendanceRelation($event, $this->guests);
                     break;
 
                 /* Access Type 3 (Campus)
                  */
                 case Event::ACCESS_CAMPUS:
-                    foreach ($this->roles as $currentRole) {
-                        $this->roleMapper->save((new Role())
-                            ->setEventId($event->getId())
-                            ->setRoleId($currentRole));
-                    }
+                    $this->saveRoleRelation($event, $this->roles);
+                    $this->saveAttendanceRelation($event, $this->guests);
                     break;
 
                 default:
@@ -191,6 +205,46 @@ class EventRelations
 
 
     /**
+     * Save a specific role relation
+     *
+     * @param Event $event
+     * @param array $roleIds
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function saveRoleRelation(Event $event, array $roleIds): void
+    {
+        foreach ($roleIds as $currentRole) {
+            $this->roleMapper->save((new Role())
+                ->setEventId($event->getId())
+                ->setRoleId($currentRole));
+        }
+    }
+
+
+    /**
+     * Save a specific user relation
+     *
+     * @param Event $event
+     * @param array $guestIds
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function saveAttendanceRelation(Event $event, array $guestIds): void
+    {
+        foreach ($guestIds as $currentGuest) {
+            $this->attendanceMapper->save((new Event\Attendance\Model())
+                ->setEvent($event)
+                ->setUser($this->userMapper->createModel()->setId($currentGuest))
+                ->setStatus(Event\Attendance\Model::STATUS_PENDING)
+                ->setIntention(0));
+        }
+    }
+
+
+    /**
      * Purge existing sids, before inserting new ones
      *
      * @param array $eventIds
@@ -200,5 +254,6 @@ class EventRelations
         $this->personalMapper->deleteByColumn('event_id', $eventIds);
         $this->categoryMapper->deleteByColumn('event_id', $eventIds);
         $this->roleMapper->deleteByColumn('event_id', $eventIds);
+        $this->attendanceMapper->deleteByColumn('event_id', $eventIds);
     }
 }

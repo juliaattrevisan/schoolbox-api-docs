@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event\Attendance;
 
 use Schoolbox\Calendar\Event;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
 
@@ -18,13 +17,14 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Calendar\Event\Attendance
  */
-class Model implements ISoftDeletable
+class Model
 {
     use ModelTrait\Id;
-    use ModelTrait\CreatedAtDate;
-    use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
 
+    /**
+     * RSVP Status Pending: waiting for intent to be declared
+     */
+    public const STATUS_PENDING = 0;
 
     /**
      * @var User

@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Example;
+namespace Schoolbox\Calendar\Event\Attendance;
 
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\UserMapper;
@@ -25,8 +25,5 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('intention', self::TYPE_INTEGER);
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }
