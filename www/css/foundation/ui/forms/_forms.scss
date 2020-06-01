@@ -481,13 +481,10 @@ input[type=radio] {
 	&:checked {
 		+ #{$label-selector} {
 			background-color: $active-color;
-            // TODO consider these color vars
-            // Either pass in a checked color, or just use $hover-background-color
+            // DONE hover-background-color works for vaporwave
             color: $hover-background-color;
-			//color: calc-text-color($active-color);
 			[class^="icon-"]{
                 color: $hover-background-color;
-				//color: calc-text-color($active-color);
 			}
 		}
 	}
