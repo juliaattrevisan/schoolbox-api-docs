@@ -16,6 +16,23 @@ use SSNepenthe\ColorUtils;
 class Transformer
 {
     /**
+     * Port of Schoolbox-written SASS function `calc-text-color`.
+     *
+     * @param Color $color     The color to contrast with
+     * @param Color $light     If `$color` is dark, return this
+     * @param Color $dark      If `$color` is light, return this
+     * @param float $threshold If relative luminance of `$color` is less than
+     *                         this, it is dark; otherwise light
+     * @return Color
+     */
+    public function getContrastingColor(Color $color, Color $light, Color $dark, float $threshold = 0.45): Color
+    {
+        $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
+        return $luminance < $threshold ? $light : $dark;
+    }
+
+
+    /**
      * Port of Schoolbox-written SASS function `contrast-bg`.
      *
      * This function appears to build a color that is guaranteed to contrast
