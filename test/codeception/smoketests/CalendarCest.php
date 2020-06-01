@@ -80,7 +80,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = 'https://vagrant.dev.schoolbox.cloud/calendar/full/' . date('d-m-Y', $timestamp) . '/' . $admin->getId();
+        $location = '/calendar';
         $i->seeHttpHeader('location', $location);
     }
 
@@ -101,7 +101,7 @@ class CalendarCest
         $createEventRequest = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_GROUP);
-        $createEventRequest->setFormParam('group[0]', $targetGroup);
+        $createEventRequest->setFormParam('folder[0]', $targetGroup);
         $createEventRequest->setFormParam('campus[0]', 1);
         $createEventRequest->setFormParam('type', 1);
         $i->amGoingTo('Send request to create group calendar event');
@@ -109,7 +109,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = 'https://vagrant.dev.schoolbox.cloud/calendar/full/' . date('d-m-Y', $timestamp) . '/' . $admin->getId();
+        $location = '/calendar';
         $i->seeHttpHeader('location', $location);
     }
 
@@ -141,7 +141,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = 'https://vagrant.dev.schoolbox.cloud/calendar/full/' . date('d-m-Y', $timestamp) . '/' . $admin->getId();
+        $location = '/calendar';
         $i->seeHttpHeader('location', $location);
     }
 
@@ -176,7 +176,8 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', 'https://vagrant.dev.schoolbox.cloud/calendar/' . date('d-m-Y', $timestamp));
+        $location = '/calendar';
+        $i->seeHttpHeader('location', $location);
     }
 
 
