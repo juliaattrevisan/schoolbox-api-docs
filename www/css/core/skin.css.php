@@ -118,11 +118,11 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
 // Probably should just be --body-foreground
 $transformer = new Transformer();
 $twigVars['colors']['skin_colour_body_fg'] = $createTwigVars(
-    $transformer->contrastBackground($twigVars['colors']['skin_colour_body_bg']['colorObject']),
+    $transformer->calculateForegroundColor($twigVars['colors']['skin_colour_body_bg']['colorObject']),
     '--body-foreground'
 );
 $twigVars['colors']['skin_colour_body_h1'] = $createTwigVars(
-    $transformer->contrastBackground($twigVars['colors']['skin_colour_body_bg']['colorObject'], 0.855),
+    $transformer->calculateForegroundColor($twigVars['colors']['skin_colour_body_bg']['colorObject'], 0.855),
     '--body-foreground-h1'
 );
 

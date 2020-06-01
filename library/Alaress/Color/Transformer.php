@@ -27,8 +27,12 @@ class Transformer
      *                              than this, it is dark; otherwise light
      * @return Color
      */
-    public function contrast(Color $color, Color $light = null, Color $dark = null, float $threshold = 0.45): Color
-    {
+    public function calculateTextColor(
+        Color $color,
+        Color $light = null,
+        Color $dark = null,
+        float $threshold = 0.45
+    ): Color {
         $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
         return $luminance < $threshold
             ? ($light ?? Color::white())
@@ -56,7 +60,7 @@ class Transformer
      *                               Defaults to black.
      * @return Color
      */
-    public function contrastBackground(
+    public function calculateForegroundColor(
         Color $background,
         float $opacity = .35,
         float $saturation = 0.1,
@@ -64,7 +68,7 @@ class Transformer
         Color $dark = null
     ): Color {
         // Is $background light or dark? Choose a contrasting color for text
-        $textColor = $this->contrast($background, $light, $dark, 0.5);
+        $textColor = $this->calculateTextColor($background, $light, $dark, 0.5);
 
         // apply the opacity given
         $translucent = $textColor->setAlpha($opacity);
