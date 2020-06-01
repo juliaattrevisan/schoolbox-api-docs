@@ -202,6 +202,15 @@ class Event implements ISoftDeletable
      */
     protected $campusCollection = null;
 
+
+    /**
+     * Associated guests
+     *
+     * @var Collection|User[]
+     */
+    protected $guests;
+
+
     /**
      * The date when the event was published (made visible to users)
      * An instance Alaress_Date_Format()
@@ -398,6 +407,24 @@ class Event implements ISoftDeletable
 
     /* Getters/Setters
      */
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getGuests()
+    {
+        return $this->guests;
+    }
+
+    /**
+     * @param Collection|User[] $guests
+     * @return $this
+     */
+    public function setGuests($guests): self
+    {
+        $this->guests = $guests;
+        return $this;
+    }
 
     /**
      * Set access

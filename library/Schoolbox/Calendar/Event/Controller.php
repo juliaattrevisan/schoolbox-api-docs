@@ -564,6 +564,16 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_START_TIME_GREATER);
         }
 
+        /* Invited guests
+         */
+        $guests = new Collection();
+
+        if ('' !== (string)$this->request->post['guests']) {
+            $guestIds = explode(',', $this->request->post['guests']);
+
+            $guests = $this->userMapper->findByColumn('id', $guestIds);
+        }
+
         /* Assign values to $event instance
          */
         $event
@@ -580,7 +590,8 @@ class Controller extends Base
             ->setAllDay($allDay)
             ->setRoleCollection(new Collection($roles))
             ->setFolderCollection(new Collection($folders))
-            ->setCampusCollection(new Collection($campuses));
+            ->setCampusCollection(new Collection($campuses))
+            ->setGuests($guests);
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
