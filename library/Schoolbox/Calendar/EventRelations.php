@@ -110,6 +110,7 @@ class EventRelations
 
     /**
      * Reset and reassign relations
+     *
      * @param Event $event
      * @throws PDOException
      * @throws Exception

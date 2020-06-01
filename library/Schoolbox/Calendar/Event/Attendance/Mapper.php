@@ -21,8 +21,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('event_attendance');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('event_id', EventMapper::class, 'id', null, null, 'eventId', 'eventId');
-        $this->joins('user_id', UserMapper::class, 'id', null, null, 'userId', 'userId');
+        $this->joins('event_id', EventMapper::class, 'id', self::TYPE_MODEL, null, 'event', 'event');
+        $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('intention', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
