@@ -18,17 +18,21 @@ class Transformer
     /**
      * Port of Schoolbox-written SASS function `calc-text-color`.
      *
-     * @param Color $color     The color to contrast with
-     * @param Color $light     If `$color` is dark, return this
-     * @param Color $dark      If `$color` is light, return this
-     * @param float $threshold If relative luminance of `$color` is less than
-     *                         this, it is dark; otherwise light
+     * @param Color      $color     The color to contrast with
+     * @param Color|null $light     If `$color` is dark, return this, or white
+     *                              if not defined
+     * @param Color|null $dark      If `$color` is light, return this, or black
+     *                              if not defined
+     * @param float      $threshold If relative luminance of `$color` is less
+     *                              than this, it is dark; otherwise light
      * @return Color
      */
-    public function getContrastingColor(Color $color, Color $light, Color $dark, float $threshold = 0.45): Color
+    public function contrast(Color $color, Color $light = null, Color $dark = null, float $threshold = 0.45): Color
     {
         $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
-        return $luminance < $threshold ? $light : $dark;
+        return $luminance < $threshold
+            ? ($light ?? Color::white())
+            : ($dark ?? Color::black());
     }
 
 
@@ -52,22 +56,15 @@ class Transformer
      *                               Defaults to black.
      * @return Color
      */
-    public function contrast(
+    public function contrastBackground(
         Color $background,
         float $opacity = .35,
         float $saturation = 0.1,
         Color $light = null,
         Color $dark = null
     ): Color {
-        $colorUtilsBackground = $this->convertToColorUtilsColor($background);
-
-        // Is this color light or dark? Choose a contrasting color for text
-        $luminance = ColorUtils\relative_luminance($colorUtilsBackground);
-        if ($luminance < 0.5) {
-            $textColor = $light ?? Color::white();
-        } else {
-            $textColor = $dark ?? Color::black();
-        }
+        // Is $background light or dark? Choose a contrasting color for text
+        $textColor = $this->contrast($background, $light, $dark, 0.5);
 
         // apply the opacity given
         $translucent = $textColor->setAlpha($opacity);
