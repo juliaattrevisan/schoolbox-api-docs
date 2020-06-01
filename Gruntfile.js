@@ -1,4 +1,4 @@
-const sass  = require('node-sass');
+const sass  = require('sass');
 const jsSrc = {
     main: [
         // Modernizr

@@ -15,7 +15,7 @@ $table-cell-highlight-background: var(--content-ui-selected);
 }
 
 table.rubric {
-    @extend table.stack-for-small-down;
+    @extend table, .stack-for-small-down;
 
     th[colspan] {
         background-color: var(--body-background);
