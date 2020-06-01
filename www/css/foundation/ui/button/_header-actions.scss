@@ -33,11 +33,11 @@
 		}
 
 		&:hover {
-            // TODO figure out what to do with this
-            background-color: hsla(
-                var(--content-ui-hover-h),
-                var(--content-ui-hover-s),
-                calc(var(--content-ui-hover-l) * 1.2),
+            // DONE modify RGB colors instead of tint
+            background-color: rgba(
+                calc(var(--content-ui-hover-r) + (255 - var(--content-ui-hover-r)) * 0.2),
+                calc(var(--content-ui-hover-g) + (255 - var(--content-ui-hover-g)) * 0.2),
+                calc(var(--content-ui-hover-b) + (255 - var(--content-ui-hover-b)) * 0.2),
                 var(--content-ui-hover-a)
             );
 			//background-color: tint(var(--content-ui-hover), 20%);
