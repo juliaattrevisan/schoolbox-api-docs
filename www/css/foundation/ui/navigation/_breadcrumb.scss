@@ -31,14 +31,13 @@ $breadcrumb-bg-color: var(--content-ui-background);
 $breadcrumb-hover-bg-color: var(--content-ui-hover);
 $breadcrumb-active-bg-color: var(--content-ui-selected);
 
-// TODO figure out what to do with this color
+// DONE scale-color (in this case lightness:40%) is possible but cumbersome
 $breadcrumb-noclick-bg-color: hsla(
     var(--content-ui-background-h),
     var(--content-ui-background-s),
-    calc(var(--content-ui-background-l) * .4),
+    calc(var(--content-ui-background-l) + (100% - var(--content-ui-background-l)) * 0.4),
     var(--content-ui-background-a)
 );
-//$breadcrumb-noclick-bg-color: scale-color($breadcrumb-bg-color, $lightness: 40%);
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
 

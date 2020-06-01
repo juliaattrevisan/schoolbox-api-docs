@@ -91,11 +91,11 @@ $f-dropdown-icon-align: 0.25rem;
         margin: 0 2px 0 0;
     }
     .separator {
-        // TODO figure out what to do with this color
+        // DONE use CSS darken
         background-color: hsla(
             var(--content-ui-background-h),
             var(--content-ui-background-s),
-            calc(var(--content-ui-background-l) * .95),
+            calc(var(--content-ui-background-l) - 5%),
             var(--content-ui-background-a)
         );
         //background-color: darken($f-dropdown-bg, 5%);

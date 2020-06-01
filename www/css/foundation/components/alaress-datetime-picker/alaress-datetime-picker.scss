@@ -5,14 +5,13 @@ $pickr-top-month-padding: rem-calc(2);
 $pickr-border-color: #e6e6e6;
 $pickr-border: rem-calc(1) solid $pickr-border-color;
 
-// TODO figure out what to do with this
+// DONE use CSS lighten
 $pickr-hover-background: hsla(
     var(--accent-foreground-h),
     var(--accent-foreground-s),
-    calc(var(--accent-foreground-l) * 1.6),
+    calc(var(--accent-foreground-l) + 60%),
     var(--accent-foreground-a)
 );
-//$pickr-hover-background: lighten(var(--accent-foreground), 60%);
 
 /**
  * The input and button

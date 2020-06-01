@@ -25,11 +25,11 @@ $input-focus-bg-color: var(--form-bg-hover-color);
 $input-focus-color: var(--form-border-color);
 //$input-focus-color: calc-text-color($input-focus-bg-color);
 $input-border-color: var(--form-border-color) !default;
-// TODO figure out what to do with this
+// DONE use CSS darken
 $input-focus-border-color: hsla(
     var(--form-border-color-h),
     var(--form-border-color-s),
-    calc(var(--form-border-color-l) * .85),
+    calc(var(--form-border-color-l) - 15%),
     var(--form-border-color-a)
 );
 //$input-focus-border-color: darken(var(--form-border-color), 15%);

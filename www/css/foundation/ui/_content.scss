@@ -1780,11 +1780,11 @@ dl {
     .pipe-meter{
         width: 0.5rem;
         height: 2rem;
-        // TODO figure out what to do with this
+        // DONE use CSS darken
         background-color: hsla(
             var(--accent-foreground-h),
             var(--accent-foreground-s),
-            calc(var(--accent-foreground-l) * .95),
+            calc(var(--accent-foreground-l) - 5%),
             var(--accent-foreground-a)
         );
         //background-color: darken(var(--accent-foreground), 5%);

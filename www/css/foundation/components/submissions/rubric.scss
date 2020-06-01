@@ -54,9 +54,13 @@ table.rb {
                 }
 
                 &:hover {
-                    // TODO figure out what to do with this
-                    background-color: var(--content-ui-selected);
-                    //background-color: lighten(var(--content-ui-selected), 3%);
+                    // DONE use CSS lighten
+                    background-color: hsla(
+                        var(--content-ui-selected-h),
+                        var(--content-ui-selected-s),
+                        calc(var(--content-ui-selected-l) + 3%),
+                        var(--content-ui-selected-a)
+                    );
                     cursor: pointer;
                 }
             }
@@ -161,20 +165,21 @@ table.rb {
     }
 
     .rb-group-summary {
-        // TODO figure out what to do with these
+        // DONE use CSS lighten
         background-color: hsla(
             var(--form-border-color-h),
             var(--form-border-color-s),
-            calc(var(--form-border-color-l) * 1.1),
+            calc(var(--form-border-color-l) + 10%),
             var(--form-border-color-a)
         ) !important;
+
+        // TODO figure out what to do with this
         color: hsla(
             var(--form-bg-hover-color),
             var(--form-bg-hover-color),
             calc(var(--form-bg-hover-color) * 1.1),
             var(--form-bg-hover-color)
         );
-        //background-color: lighten($input-border-color, 10%) !important;
         //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
