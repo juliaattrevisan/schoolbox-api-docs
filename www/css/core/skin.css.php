@@ -96,6 +96,7 @@ $colorConfigMapping = [
     'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
 ];
 $colorFactory   = new ColorFactory();
+$transformer    = new Transformer();
 $twigVars       = [];
 $createTwigVars = static function (Color $color, $cssVar) {
     $hsl = $color->getAsHslArray();
@@ -112,15 +113,18 @@ $createTwigVars = static function (Color $color, $cssVar) {
     ];
 };
 foreach ($colorConfigMapping as $configKey => $cssVar) {
-    $twigVars['colors'][$configKey] = $createTwigVars(
-        $colorFactory->build($config->get($configKey)),
-        $cssVar
+    $baseColor = $colorFactory->build($config->get($configKey));
+    $twigVars['colors'][$configKey] = $createTwigVars($baseColor, $cssVar);
+
+    // Build contrasts for every color too
+    $twigVars['colors'][$configKey.'_contrast'] = $createTwigVars(
+        $transformer->calculateTextColor($baseColor),
+        $cssVar . '-contrast'
     );
 }
 
 // Add a derived color for --body-background-contrast
 // Probably should just be --body-foreground
-$transformer = new Transformer();
 $twigVars['colors']['skin_colour_body_fg'] = $createTwigVars(
     $transformer->calculateForegroundColor($twigVars['colors']['skin_colour_body_bg']['colorObject']),
     '--body-foreground'
