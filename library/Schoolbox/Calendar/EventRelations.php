@@ -141,10 +141,9 @@ class EventRelations
                  */
                 case Event::ACCESS_CAMPUS:
                     foreach ($this->roles as $currentRole) {
-                        $roleRelation = new Role();
-                        $roleRelation->setEventId($event->getId());
-                        $roleRelation->setRoleId($currentRole);
-                        $this->roleMapper->save($roleRelation);
+                        $this->roleMapper->save((new Role())
+                            ->setEventId($event->getId())
+                            ->setRoleId($currentRole));
                     }
                     break;
 
@@ -165,10 +164,9 @@ class EventRelations
      */
     public function savePersonalRelation(Event $event): void
     {
-        $userRelation = new Personal();
-        $userRelation->setEventId($event->getId());
-        $userRelation->setUserId($event->getOwner()->getId());
-        $this->personalMapper->save($userRelation);
+        $this->personalMapper->save((new Personal())
+            ->setEventId($event->getId())
+            ->setUserId($event->getOwner()->getId()));
     }
 
 
@@ -184,10 +182,9 @@ class EventRelations
     public function saveFolderRelation(Event $event, array $folderIds): void
     {
         foreach ($folderIds as $currentGroup) {
-            $categoryRelation = new Category();
-            $categoryRelation->setEventId($event->getId());
-            $categoryRelation->setCategoryId($currentGroup);
-            $this->categoryMapper->save($categoryRelation);
+            $this->categoryMapper->save((new Category())
+                ->setEventId($event->getId())
+                ->setCategoryId($currentGroup));
         }
     }
 

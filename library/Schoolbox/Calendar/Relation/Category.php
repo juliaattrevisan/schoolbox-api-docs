@@ -1,15 +1,18 @@
 <?php
 /**
- * Sid
- *
- * I spoke with Boomerang about this.
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Calendar\Relation;
 
+/**
+ * Class Category
+ *
+ * Relationship between an Event and a Folder
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class Category
 {
 
@@ -18,24 +21,20 @@ class Category
      *
      * @var int
      */
-    private $eventId = null;
+    private $eventId;
+
 
     /**
      * Sid value
      *
      * @var int
      */
-    private $categoryId = null;
+    private $categoryId;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-    }
 
     /* Getters/Setters
      */
+
 
     /**
      * Set event id
@@ -43,21 +42,23 @@ class Category
      * @param int $eventId
      * @return $this
      */
-    public function setEventId($eventId)
+    public function setEventId(int $eventId): self
     {
         $this->eventId = $eventId;
         return $this;
     }
+
 
     /**
      * Get event id
      *
      * @return int
      */
-    public function getEventId()
+    public function getEventId(): int
     {
         return $this->eventId;
     }
+
 
     /**
      * Set category id
@@ -65,18 +66,19 @@ class Category
      * @param int $categoryId
      * @return $this
      */
-    public function setCategoryId($categoryId)
+    public function setCategoryId(int $categoryId): self
     {
         $this->categoryId = $categoryId;
         return $this;
     }
+
 
     /**
      * Get category id
      *
      * @return int
      */
-    public function getCategoryId()
+    public function getCategoryId(): int
     {
         return $this->categoryId;
     }

@@ -1,15 +1,18 @@
 <?php
 /**
- * Sid
- *
- * I spoke with Boomerang about this.
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Calendar\Relation;
 
+/**
+ * Class Personal
+ *
+ * Relationship between an Event and a User
+ *
+ * @package Schoolbox\Calendar\Relation
+ */
 class Personal
 {
 
@@ -20,6 +23,7 @@ class Personal
      */
     private $eventId;
 
+
     /**
      * Sid value
      *
@@ -27,52 +31,54 @@ class Personal
      */
     private $userId;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-    }
 
     /* Getters/Setters
      */
+
 
     /**
      * Set event id
      *
      * @param int $eventId
+     * @return $this
      */
-    public function setEventId($eventId)
+    public function setEventId(int $eventId): self
     {
         $this->eventId = $eventId;
+        return $this;
     }
+
 
     /**
      * Get event id
      *
      * @return int
      */
-    public function getEventId()
+    public function getEventId(): int
     {
         return $this->eventId;
     }
+
 
     /**
      * Set user id
      *
      * @param int $userId
+     * @return $this
      */
-    public function setUserId($userId)
+    public function setUserId(int $userId): self
     {
         $this->userId = $userId;
+        return $this;
     }
+
 
     /**
      * Get user id
      *
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
