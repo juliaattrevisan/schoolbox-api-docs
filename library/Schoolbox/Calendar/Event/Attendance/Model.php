@@ -24,7 +24,14 @@ class Model
     /**
      * RSVP Status Pending: waiting for intent to be declared
      */
-    public const STATUS_PENDING = 0;
+    public const STATUS_PENDING = 1;
+    public const STATUS_APPROVED = 2;
+    public const STATUS_REJECTED = 3;
+
+    public const INTENTION_PENDING = 1;
+    public const INTENTION_PRESENT = 2;
+    public const INTENTION_ABSENT = 3;
+
 
     /**
      * @var User

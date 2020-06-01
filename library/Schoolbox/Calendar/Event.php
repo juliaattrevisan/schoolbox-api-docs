@@ -29,14 +29,6 @@ class Event implements ISoftDeletable
     public const ACCESS_GROUP = 2;
     public const ACCESS_CAMPUS = 3;
 
-    public const ATTENDANCE_STATUS_PENDING = 1;
-    public const ATTENDANCE_STATUS_APPROVED = 2;
-    public const ATTENDANCE_STATUS_REJECTED = 3;
-
-    public const ATTENDANCE_INTENTION_PENDING = 1;
-    public const ATTENDANCE_INTENTION_PRESENT = 2;
-    public const ATTENDANCE_INTENTION_ABSENT = 3;
-
 
     /**
      * Int corresponding to All Day setting set to on

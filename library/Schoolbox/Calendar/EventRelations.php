@@ -239,7 +239,7 @@ class EventRelations
                 ->setEvent($event)
                 ->setUser($this->userMapper->createModel()->setId($currentGuest))
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING)
-                ->setIntention(0));
+                ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
         }
     }
 

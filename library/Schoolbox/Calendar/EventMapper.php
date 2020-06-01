@@ -315,8 +315,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             VALUES (null, :eventId, :userId, :status, :intention)
         ';
 
-        $statusPending = Event::ATTENDANCE_STATUS_PENDING;
-        $intentPresent = Event::ATTENDANCE_INTENTION_PRESENT;
+        $statusPending = Event\Attendance\Model::STATUS_PENDING;
+        $intentPresent = Event\Attendance\Model::INTENTION_PRESENT;
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':eventId', $eventId);
