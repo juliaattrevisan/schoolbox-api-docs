@@ -254,6 +254,10 @@
                             {% endfor %}
                         </fieldset>
                     </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Attendance</legend>
 
                     <div id="attendance" class="small-12 column">
                         <label>
@@ -268,6 +272,28 @@
                             </div>
                         </label>
                     </div>
+
+                    {% if event.attendance %}
+                        <div class="small-12 columns">
+                            <label>Add Guests</label>
+                            <input id='add-guests' name="add-guests" type='text' value='' placeholder="Start typing the name of a user" data-selectizeuser required />
+                            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                            <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+                            <script type="text/javascript">
+                                $(function() {
+                                    $('#add-guests').selectizeSelector({
+                                        ajax: {
+                                            url:      '/ajax/user.php',
+                                            type:     'GET',
+                                            data:     {groupID: 0, showCampus: true},
+                                            dataType: 'json'
+                                        },
+                                        multiple: true
+                                    });
+                                });
+                            </script>
+                        </div>
+                    {% endif %}
                 </fieldset>
             </section>
             <input id="calendar-modify-submit" type="submit" name="{{ action }}" value="{{ action }} Event" />
