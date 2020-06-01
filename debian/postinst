@@ -84,7 +84,6 @@ case "$1" in
             echo "DB root credentials file '$optionsFile' not found, skipping repair";
         else
             echo "DB root credentials file '$optionsFile' found, initiating repair";
-            mysqlcheck --defaults-file=${optionsFile} --repair schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
