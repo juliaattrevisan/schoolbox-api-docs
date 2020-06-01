@@ -250,14 +250,13 @@
 	}
 }
 
-@mixin selection($color: var(--accent-foreground)) {
-    // TODO figure out how to mix this in!
+@mixin selection($color: var(--accent-foreground), $background-color: var(--accent-background)) {
 	::-moz-selection {
-		color: calc-text-color($color);
+		color: $background-color;
 		background-color: $color;
 	}
 	::selection      {
-		color: calc-text-color($color);
+		color: $background-color;
 		background-color: $color;
 	}
 }

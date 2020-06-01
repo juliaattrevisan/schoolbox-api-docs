@@ -330,8 +330,7 @@ $container-bg: white !default;
 // CUSTOM OVERRIDES
 //
 
-// TODO restore this once I figure out what to do with it
-//@include selection;
+@include selection;
 
 .align-bottom {
     vertical-align: bottom;
