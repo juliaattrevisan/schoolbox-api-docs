@@ -60,9 +60,9 @@ $input-border-color:			   var(--form-border-color);
  */
 // DONE modify RGBA instead of tint
 $row-hover-background:             rgba(
-    calc(var(--content-ui-hover-r) + (100% - var(--content-ui-hover-r) * .87)),
-    calc(var(--content-ui-hover-g) + (100% - var(--content-ui-hover-g) * .87)),
-    calc(var(--content-ui-hover-b) + (100% - var(--content-ui-hover-b) * .87)),
+    calc(var(--content-ui-hover-r) + (255 - var(--content-ui-hover-r)) * 0.87),
+    calc(var(--content-ui-hover-g) + (255 - var(--content-ui-hover-g)) * 0.87),
+    calc(var(--content-ui-hover-b) + (255 - var(--content-ui-hover-b)) * 0.87),
     var(--content-ui-hover-a)
 );
 
