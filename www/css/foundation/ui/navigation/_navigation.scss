@@ -560,7 +560,7 @@ $allow-sidebar-stash: $large-up;
   // 5.5.3 shrinks the submenu for some reason
   .left-submenu {
     min-height: 100%;
-    background-color: var(--off-canvas-foreground);
+    background-color: var(--off-canvas-background);
     a {
       color: var(--off-canvas-foreground);
       &:hover {
