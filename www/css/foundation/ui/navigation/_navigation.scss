@@ -516,17 +516,13 @@ $allow-sidebar-stash: $large-up;
 
         /* Use adaptive for separators
          */
-        // TODO consider this calculation
+        // DONE alpha of foreground is fine
         color: hsla(
           var(--off-canvas-foreground-h),
           var(--off-canvas-foreground-s),
-          calc(var(--off-canvas-foreground-l) * 1.1),
-          var(--off-canvas-foreground-a)
+          var(--off-canvas-foreground-l),
+          calc(var(--off-canvas-foreground-a) * 0.35)
         );
-        //color: contrast-bg(
-        //  $background: $white,
-        //  $dark: $off-canvas-foreground
-        //);
         a {
           color: inherit;
           &:hover {
