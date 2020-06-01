@@ -1,6 +1,9 @@
 {% autoescape 'css' %}
 :root {
     {% for configKey, colorOptions in colors %}
+        {{ colorOptions.cssVar | raw }}-r: {{ colorOptions.r }};
+        {{ colorOptions.cssVar | raw }}-g: {{ colorOptions.g }};
+        {{ colorOptions.cssVar | raw }}-b: {{ colorOptions.b }};
         {{ colorOptions.cssVar | raw }}-h: {{ colorOptions.h | round(2) }};
         {{ colorOptions.cssVar | raw }}-s: {{ colorOptions.s | round(2) }}%;
         {{ colorOptions.cssVar | raw }}-l: {{ colorOptions.l | round(2) }}%;

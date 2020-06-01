@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
 use Schoolbox\Config\ConfigMapper;
@@ -96,11 +97,14 @@ $colorConfigMapping = [
 ];
 $colorFactory   = new ColorFactory();
 $twigVars       = [];
-$createTwigVars = static function ($color, $cssVar) {
+$createTwigVars = static function (Color $color, $cssVar) {
     $hsl = $color->getAsHslArray();
     return [
         'cssVar'      => $cssVar,
         'colorObject' => $color,
+        'r'           => $color->getRed(),
+        'g'           => $color->getGreen(),
+        'b'           => $color->getBlue(),
         'h'           => $hsl['hue'],
         's'           => $hsl['saturation'],
         'l'           => $hsl['lightness'],
