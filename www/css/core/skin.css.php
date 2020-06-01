@@ -126,6 +126,19 @@ $twigVars['colors']['skin_colour_body_h1'] = $createTwigVars(
     '--body-foreground-h1'
 );
 
+// Add a derived color for navigation foreground highlight
+$twigVars['colors']['skin_colour_navigation_foreground_highlight'] = $createTwigVars(
+    $transformer->calculateTextColor(
+        $twigVars['colors']['skin_colour_navigation_background']['colorObject'],
+        null,
+        $transformer->calculateForegroundColor(
+            $twigVars['colors']['skin_colour_navigation_background']['colorObject'],
+            0.65
+        )
+    ),
+    '--navigation-foreground-highlight'
+);
+
 // Derived colors:
 // www/css/foundation/base/_typography.scss:
 // * $subheader-font-color is --body-background passed thru contrast-bg
