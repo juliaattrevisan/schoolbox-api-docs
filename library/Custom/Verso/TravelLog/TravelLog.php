@@ -20,10 +20,10 @@ class TravelLog
 {
 
     // The Verso Gateway API URL for SchoolBox
-    private const API_URL = 'https://gateway-staging.verso.school/';
+    private const API_URL = 'https://gateway.verso.school';
 
     // Verso Gateway API URL to get token
-    private const VERSO_TOKEN_URL = 'https://verso-gateway-staging.auth.ap-southeast-1.amazoncognito.com/oauth2/token';
+    private const VERSO_TOKEN_URL = 'https://verso-gateway.auth.ap-southeast-1.amazoncognito.com/oauth2/token';
 
     // Path for student's locations
     private const LOCATION_LOG_PATH = 'location/student/';
