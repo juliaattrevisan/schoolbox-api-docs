@@ -1863,9 +1863,8 @@ $train-line-unvisited-color: var(--content-ui-background);
             span {
                 background: var(--content-ui-foreground);
                 border-radius: $train-line-stop-size / 2;
-                // TODO consider this calculation, but shouldn't it just be background?
-                color: var(--content-ui-background);
-                //color: calc-text-color(var(--content-ui-foreground));
+                // DONE use contrasting color
+                color: var(--content-ui-foreground-contrast);
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
                 padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2) (($train-line-stop-size - rem-calc($base-font-size)) / 2);

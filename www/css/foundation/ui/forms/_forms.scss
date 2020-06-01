@@ -21,9 +21,8 @@ $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 $input-bg-color: $white;
 $input-focus-bg-color: var(--form-bg-hover-color);
-// TODO figure out what to do with this
-$input-focus-color: var(--form-border-color);
-//$input-focus-color: calc-text-color($input-focus-bg-color);
+// DONE use contrasting color
+$input-focus-color: var(--form-bg-hover-color-contrast);
 $input-border-color: var(--form-border-color) !default;
 // DONE use CSS darken
 $input-focus-border-color: hsla(

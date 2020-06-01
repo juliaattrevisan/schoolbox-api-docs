@@ -40,9 +40,8 @@ table.rb {
             &:checked {
                 + label {
                     background-color: var(--content-ui-selected);
-                    // TODO figure out what to do with this. Why not just content-ui-background
-                    color: var(--content-ui-background);
-                    //color: calc-text-color(var(--content-ui-selected));
+                    // DONE use contrasting color
+                    color: var(--content-ui-selected-contrast);
                 }
             }
             + label {
@@ -173,13 +172,8 @@ table.rb {
             var(--form-border-color-a)
         ) !important;
 
-        // TODO figure out what to do with this
-        color: hsla(
-            var(--form-bg-hover-color),
-            var(--form-bg-hover-color),
-            calc(var(--form-bg-hover-color) * 1.1),
-            var(--form-bg-hover-color)
-        );
+        // DONE use contrasting color
+        color: var(--form-bg-hover-color-contrast);
         //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
@@ -282,10 +276,9 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: var(--content-ui-selected)!important;
-    // TODO figure out what to do with this. Why not just background color?
-    color: var(--content-ui-background);
-    //color: calc-text-color(var(--content-ui-selected));
+    background-color: var(--content-ui-selected) !important;
+    // DONE use contrasting color
+    color: var(--content-ui-selected-contrast);
 
     .range-selection-value {
         font-weight: bold;
@@ -306,9 +299,8 @@ table.rb {
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
-    // TODO figure out what to do with this
-    color: var(--form-bg-hover-color);
-    //color: calc-text-color($input-border-color);
+    // DONE use contrasting color
+    color: var(--form-bg-hover-color-contrast);
 }
 
 .rb-description, .rb-value {

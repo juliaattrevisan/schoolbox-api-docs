@@ -100,15 +100,8 @@ $login-img-max-height: 12rem !default; // 192px
         }
 
         a, label{
-            // TODO need to figure out what to do with this
-            // Let's say full opaque bg for now
-            color: hsla(
-                var(--login-form-background-h),
-                var(--login-form-background-s),
-                var(--login-form-background-l),
-                100%
-            );
-            //color: calc-text-color($login-form-background-color);
+            // DONE use contrasting color
+            color: var(--login-form-background-contrast);
             font-size: inherit;
         }
 
