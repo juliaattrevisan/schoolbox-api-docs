@@ -64,6 +64,12 @@ class EventRelations
 
 
     /**
+     * @var bool
+     */
+    private $attendanceDirty;
+
+
+    /**
      * An instance of PersonalMapper
      *
      * @var Relation\PersonalMapper
@@ -106,13 +112,15 @@ class EventRelations
      * @param int[]|null $group
      * @param int[]|null $roles
      * @param int[]|null $guests
+     * @param bool       $attendanceDirty
      */
-    public function __construct($level, $group, $roles, $guests)
+    public function __construct($level, $group, $roles, $guests, bool $attendanceDirty)
     {
         $this->level= $level;
         $this->group = $group;
         $this->roles = $roles;
         $this->guests = $guests;
+        $this->attendanceDirty = $attendanceDirty;
 
         /* Spawn mappers only once while iterating in series
          */
@@ -234,12 +242,38 @@ class EventRelations
      */
     private function saveAttendanceRelation(Event $event, array $guestIds): void
     {
-        foreach ($guestIds as $currentGuest) {
-            $this->attendanceMapper->save((new Event\Attendance\Model())
-                ->setEvent($event)
-                ->setUser($this->userMapper->createModel()->setId($currentGuest))
-                ->setStatus(Event\Attendance\Model::STATUS_PENDING)
-                ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
+        if ($this->attendanceDirty) {
+
+            /* If the attendanceDirty bit is set, reset attendance responses entirely
+             */
+            $this->attendanceMapper->deleteByColumn('event_id', $guestIds);
+
+            foreach ($guestIds as $currentGuest) {
+                $this->attendanceMapper->save((new Event\Attendance\Model())
+                    ->setEvent($event)
+                    ->setUser($this->userMapper->createModel()->setId($currentGuest))
+                    ->setStatus(Event\Attendance\Model::STATUS_PENDING)
+                    ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
+            }
+        } else {
+
+            /* Otherwise, keep the intersect of who was previously invited and who is currently invited
+             * thus preserving their current response setting
+             *
+             * Trim away everyone not in this set
+             */
+            $query = "
+                DELETE FROM {$this->attendanceMapper->getTable()}
+                WHERE event_id = :eventId
+                AND user_id NOT IN (:guestIds)
+            ";
+
+            $ids = implode(',', array_map('intval', $guestIds));
+
+            $this->attendanceMapper->getDatabase()->executeQuery($query, [
+                'eventId' => $event->getId(),
+                'guestIds' => $ids
+            ]);
         }
     }
 
@@ -254,6 +288,5 @@ class EventRelations
         $this->personalMapper->deleteByColumn('event_id', $eventIds);
         $this->categoryMapper->deleteByColumn('event_id', $eventIds);
         $this->roleMapper->deleteByColumn('event_id', $eventIds);
-        $this->attendanceMapper->deleteByColumn('event_id', $eventIds);
     }
 }

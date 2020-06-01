@@ -510,11 +510,6 @@ class Controller extends Base
         $allDay = (int)$this->request->post['allDay'];
         $roles = $this->request->post['roles'] ?? [];
 
-        /* Attendance settings
-         */
-        $attendance = (int)$this->request->post['attendance'];
-        $attendanceChanged = (int)$event->getAttendance() !== $attendance;
-
         /* Recurrence settings
          */
         $efficacy = $this->request->post['efficacy'];
@@ -564,6 +559,22 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_START_TIME_GREATER);
         }
 
+        /* Attendance settings
+         */
+        $attendance = (int)$this->request->post['attendance'];
+        $attendanceChanged = (int)$event->getAttendance() !== $attendance;
+
+        /* Decide if the Attendance settings need to be reset
+         *
+         * You don't need to change RSVP statuses if something non-critical changes such as
+         * updating the description to fix spelling mistakes, changing headings, etc.
+         *
+         * For now, changing datetimes requires people to respond again
+         */
+        $attendanceDirty = (int)(
+            ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
+            ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
+
         /* Invited guests
          */
         $guests = [];
@@ -594,11 +605,9 @@ class Controller extends Base
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
          */
-        if ($attendanceChanged) {
-            $event
-                ->setAttendance($attendance)
-                ->setAttendanceDirty(true);
-        }
+        $event
+            ->setAttendance($attendanceChanged)
+            ->setAttendanceDirty($attendanceDirty);
 
         /* Check minimum requirements for checkbox arrays
          *
@@ -614,7 +623,7 @@ class Controller extends Base
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests);
+        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, $attendanceDirty);
 
         /* Save this event and any recurring incidents too
          */
