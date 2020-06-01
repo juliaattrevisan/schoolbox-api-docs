@@ -1,12 +1,9 @@
 <?php
 /**
- * EventRelations
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Calendar;
 
 use Schoolbox\Calendar\Relation\Personal;
@@ -16,7 +13,16 @@ use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 
-
+/**
+ * Class EventRelations
+ *
+ * Manage relational data for each event instance, such as roles/groups/guests
+ *
+ * This can be used iteratively to process data identically for multiple instances of events
+ * such as recurring events
+ *
+ * @package Schoolbox\Calendar
+ */
 class EventRelations {
 
     /**
@@ -47,6 +53,13 @@ class EventRelations {
      */
     private $roles = [];
 
+
+    /**
+     * @var int[]
+     */
+    private $guests;
+
+
     /**
      * An instance of PersonalMapper
      *
@@ -74,12 +87,14 @@ class EventRelations {
      * @param int|null   $level
      * @param int[]|null $group
      * @param int[]|null $roles
+     * @param int[]|null $guests
      */
-    public function __construct($level, $group, $roles)
+    public function __construct($level, $group, $roles, $guests)
     {
         $this->setLevel($level);
         $this->setGroup($group);
         $this->setRoles($roles);
+        $this->guests = $guests;
 
         /* Spawn mappers only once while iterating in series
          */

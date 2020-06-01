@@ -566,12 +566,10 @@ class Controller extends Base
 
         /* Invited guests
          */
-        $guests = new Collection();
+        $guests = [];
 
         if ('' !== (string)$this->request->post['guests']) {
-            $guestIds = explode(',', $this->request->post['guests']);
-
-            $guests = $this->userMapper->findByColumn('id', $guestIds);
+            $guests = explode(',', $this->request->post['guests']);
         }
 
         /* Assign values to $event instance
@@ -591,7 +589,7 @@ class Controller extends Base
             ->setRoleCollection(new Collection($roles))
             ->setFolderCollection(new Collection($folders))
             ->setCampusCollection(new Collection($campuses))
-            ->setGuests($guests);
+            ->setGuests(new Collection($guests));
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
@@ -616,7 +614,7 @@ class Controller extends Base
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles);
+        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests);
 
         /* Save this event and any recurring incidents too
          */

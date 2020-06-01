@@ -409,7 +409,7 @@ class Event implements ISoftDeletable
      */
 
     /**
-     * @return Collection|User[]
+     * @return Collection|int[]
      */
     public function getGuests()
     {
@@ -417,7 +417,7 @@ class Event implements ISoftDeletable
     }
 
     /**
-     * @param Collection|User[] $guests
+     * @param Collection|int[] $guests
      * @return $this
      */
     public function setGuests($guests): self
