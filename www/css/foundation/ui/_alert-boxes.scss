@@ -61,15 +61,8 @@ $alert-default-background: hsla(
 
 .alert-box {
     background-color: $alert-default-background;
-    // TODO figure out what to do with this var
-    // calc-text-color uses contrast calculation
-    color: hsla(
-        var(--body-background-h),
-        var(--body-background-s),
-        calc(var(--body-background-l) * 0.5),
-        var(--body-background-a)
-    );
-    //color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
+    // DONE use contrast color
+    color: var(--body-background-contrast);
 
     .close {
         &:hover {
