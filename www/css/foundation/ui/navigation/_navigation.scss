@@ -202,17 +202,12 @@ $allow-sidebar-stash: $large-up;
         @extend .no-text;
 
         &.navthis {
-          //background-color: calc-text-color(
-          //  $tabbar-bg,
-          //  tint($tabbar-bg, 4%),
-          //  darken($tabbar-bg, 4%)
-          //);
-          // TODO consider this calculation
+          // DONE use slightly opaque background
           background-color: hsla(
-            var(--navigation-background-h),
-            var(--navigation-background-s),
-            calc(var(--navigation-background-l) * 1.1),
-            var(--navigation-background-a)
+            var(--navigation-background-contrast-h),
+            var(--navigation-background-contrast-s),
+            var(--navigation-background-contrast-l),
+            calc(var(--navigation-background-contrast-a) * .04)
           );
           &:before,
           span {
