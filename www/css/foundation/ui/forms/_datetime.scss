@@ -9,20 +9,6 @@ $datepicker-selected-background: var(--content-ui-selected);
 $datepicker-header-color: var(--content-ui-foreground);
 $timepicker-item-visible-count: 5;
 
-//@mixin datepicker-cell($sizing: $datepicker-cell-width) {
-//    text-align: center;
-//
-//    @include datepicker-header($sizing);
-//    @media #{$small-only} {
-//        width: nth($sizing, 1);
-//        line-height: nth($sizing, 1);
-//    }
-//    @media #{$medium-up} {
-//        width: nth($sizing, 2);
-//        line-height: nth($sizing, 2);
-//    }
-//}
-
 @mixin datepicker-header($sizing: $datepicker-cell-width) {
     @media #{$small-only} {
         height: nth($sizing, 1);
@@ -31,136 +17,6 @@ $timepicker-item-visible-count: 5;
         height: nth($sizing, 2);
     }
 }
-
-//// Date & Time fields
-//.date-time{
-//    width: 22% !important;
-//    float: left;
-//    margin: 0 rem-calc(($base-font-size - 10)) 0 0 !important;
-//}
-//
-//.time-separator{
-//    float: left;
-//    padding: 0.5rem 0;
-//    margin: 0 rem-calc(($base-font-size - 10)) 0 0;
-//}
-//
-//.ui-datepicker{
-//    @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
-//}
-//
-//// this is the footer button for 'Today'
-//.ui-datepicker-current {
-//    display: none;
-//}
-//
-//// this is the footer button for 'Close'
-//.ui-datepicker-close {
-//    font-weight: bold;
-//    margin: 0;
-//    text-transform: uppercase;
-//    background-color: transparent;
-//    &:hover {
-//        background-color: var(--content-ui-selected);
-//    }
-//}
-//
-//.ui-datepicker-calendar{
-//    margin: 0;
-//
-//    thead,
-//    tr.even,
-//    tr.alt,
-//    tr,
-//    td,
-//    th {
-//        background-color: $datepicker-background !important;
-//        border-width: 0 !important;
-//        text-align: center;
-//        padding: 0;
-//    }
-//    .ui-datepicker-today {
-//        background-color: $datepicker-hover-background !important;
-//    }
-//    tr a:hover, td.ui-datepicker-current-day {
-//        background-color: $datepicker-selected-background !important;
-//    }
-//    thead tr th {
-//        border-bottom-width: 0;
-//        @include datepicker-cell();
-//    }
-//    td {
-//        // DONE this whole thing is not required
-//        color: hsla(
-//            var(--content-ui-background-h),
-//            var(--content-ui-background-s),
-//            calc(var(--content-ui-background-l) * 1.1),
-//            var(--content-ui-background-a)
-//        );
-//        //@include contrast-bg(1, $datepicker-background);
-//        &.ui-datepicker-other-month {
-//          color: hsla(
-//              var(--content-ui-background-h),
-//              var(--content-ui-background-s),
-//              calc(var(--content-ui-background-l) * 1.4),
-//              var(--content-ui-background-a)
-//          );
-//          //@include contrast-bg(0.4, $datepicker-background);
-//        }
-//        a, span {
-//            @include datepicker-cell();
-//            display: block;
-//        }
-//        a {
-//            color: var(--content-ui-foreground);
-//        }
-//        .ui-datepicker-unselectable {
-//            opacity: 0.5;
-//        }
-//    }
-//}
-//
-//.ui-datepicker-header{
-//    color: $datepicker-header-color;
-//    font-weight: $font-weight-bold;
-//    @include datepicker-header();
-//
-//    .ui-datepicker-prev, .ui-datepicker-next {
-//        color: var(--content-ui-foreground);
-//        display: block;
-//        padding: 0.5rem;
-//        &:hover {
-//            color: var(--content-ui-foreground);
-//            background: $datepicker-hover-background;
-//        }
-//    }
-//}
-//
-//.ui-datepicker-title{
-//    text-align: center;
-//    padding: 0.5rem;
-//}
-//
-//.ui-datepicker-prev{
-//    float: left;
-//}
-//
-//.ui-datepicker-next{
-//    float: right;
-//}
-//
-//// header and footer
-//.ui-datepicker-buttonpane,
-//.ui-datepicker-header {
-//    background-color: $datepicker-header-background;
-//    text-transform: uppercase;
-//}
-//
-//.ui-datepicker-buttonpane,
-//.ui-datepicker-calendar {
-//    border-top: solid 1px rgba($datepicker-header-color, 0.3);
-//}
-
 
 
 //  TIMEPICKER
@@ -199,14 +55,8 @@ $timepicker-item-visible-count: 5;
 
             &:hover {
                 background: $datepicker-hover-background;
-                // TODO figure out what to do with this
-                color: hsla(
-                    var(--content-ui-background-h),
-                    var(--content-ui-background-s),
-                    calc(var(--content-ui-background-l) * 1.1),
-                    var(--content-ui-background-a)
-                );
-                //@include contrast-bg(1, $datepicker-background);
+                // DONE don't change color at all
+                //color: var(--content-ui-foreground);
             }
 
             &.ui-timepicker-selected {
@@ -215,9 +65,3 @@ $timepicker-item-visible-count: 5;
         }
     }
 }
-
-///* Hide datepicker grid by default
-// */
-//.ui-datepicker {
-//    display: none;
-//}
