@@ -132,9 +132,11 @@ class Mapper extends BaseMapper
          *
          * * We do not need to join to deleted types as the system does not permit soft-deletion
          *   of types if they are used by a non-soft deleted pastoral.
+         *   (but we do: this changed in SA-4192)
          *
          * * We do not need to join to deleted subtypes as the system does not permit soft-deletion
          *   of subtypes if they are used by a non-soft deleted pastoral.
+         *   (but we do: this changed in SA-9265 for consistency with above)
          *
          * * We do not need to join to deleted students as pastoral records for a deleted user should not exist.
          */
@@ -153,7 +155,7 @@ class Mapper extends BaseMapper
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
-            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c')}
+            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c', true)}
         ";
     }
 

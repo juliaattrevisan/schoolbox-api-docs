@@ -97,7 +97,7 @@ class Mapper extends BaseMapper
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
-            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c')}
+            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c', true)}
         ";
     }
 
