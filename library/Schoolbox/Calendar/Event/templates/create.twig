@@ -271,34 +271,47 @@
                                 </label>
                             </div>
                         </label>
+
+                        {# Show the Guests input if attendance is enabled
+                         # Hide the Guests input if attendance is disabled
+                         #}
+                        <script>
+                            $(function() {
+                                $('#attendanceCheckbox').on('change', function(event) {
+                                    if ($(this).is(':checked')) {
+                                        $('#attendance-guests').show();
+                                    } else {
+                                        $('#attendance-guests').hide();
+                                    }
+                                });
+                            });
+                        </script>
                     </div>
 
-                    {% if event.attendance %}
-                        <div class="small-12 columns">
-                            <label>Add Guests</label>
-                            <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" data-selectizeuser required />
-                            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-                            <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-                            <script type="text/javascript">
-                                $(function() {
-                                    $('#add-guests').selectizeSelector({
-                                        ajax: {
-                                            url:      '/ajax/user.php',
-                                            type:     'GET',
-                                            data:     {groupID: 0, showCampus: true},
-                                            dataType: 'json'
-                                        },
-                                        value: [
-                                            {% for guest in guests %}
-                                            {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
-                                            {% endfor %}
-                                        ],
-                                        multiple: true
-                                    });
+                    <div id="attendance-guests" class="small-12 columns" style="display:none">
+                        <label>Add Guests</label>
+                        <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" data-selectizeuser required />
+                        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+                        <script type="text/javascript">
+                            $(function() {
+                                $('#add-guests').selectizeSelector({
+                                    ajax: {
+                                        url:      '/ajax/user.php',
+                                        type:     'GET',
+                                        data:     {groupID: 0, showCampus: true},
+                                        dataType: 'json'
+                                    },
+                                    value: [
+                                        {% for guest in guests %}
+                                        {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
+                                        {% endfor %}
+                                    ],
+                                    multiple: true
                                 });
-                            </script>
-                        </div>
-                    {% endif %}
+                            });
+                        </script>
+                    </div>
                 </fieldset>
             </section>
             <input id="calendar-modify-submit" type="submit" name="{{ action }}" value="{{ action }} Event" />
