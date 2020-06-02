@@ -436,11 +436,6 @@ then
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
             rm -fR /vagrant/node_modules 2>/dev/null;
             tar xzf /vagrant/vagrantcache/$npmfile;
-
-            # Also need to rebuild node-sass, as it requires libsass.
-            # That package's install script would install libsass, but we didn't
-            # actually install node-sass.
-            npm rebuild node-sass;
         else
             # Still no luck, build from scratch with npm
             echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";

@@ -9,7 +9,7 @@ npm install;
 check=$?;
 if [ $? -ne 0 ];
 then
-    echo "An error occurred";
+	echo "An error occurred";
 fi
 
 sha1sum npm-shrinkwrap.json > node_modules/npm.shrinkwrap.checksum;
