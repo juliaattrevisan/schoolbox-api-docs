@@ -14,7 +14,7 @@ $magellan-padding: rem-calc(0);
 // Main Navigation Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: var(--navigation-background);
+$tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(72);
 $tabbar-icon-width: rem-calc(72);
 $tabbar-line-height: $tabbar-height;
@@ -30,8 +30,8 @@ $tabbar-header-weight: $header-font-weight;
 $tabbar-header-line-height: $header-line-height;
 $tabbar-header-margin: $header-bottom-margin;
 
-$tabbar-menu-icon-color: var(--navigation-foreground);
-$tabbar-menu-icon-hover: var(--navigation-hover);
+$tabbar-menu-icon-color: $navigation-foreground;
+$tabbar-menu-icon-hover: $navigation-hover;
 $tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: rem-calc(80);
 $tabbar-menu-icon-height: $tabbar-height;
@@ -45,9 +45,9 @@ $tabbar-hamburger-icon-gap: 4px;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(260);
-$off-canvas-bg: var(--off-canvas-background) !default;
+$off-canvas-bg: $off-canvas-background !default;
 $off-canvas-bg-hover: false;
-$off-canvas-hover-color: var(--off-canvas-background);
+$off-canvas-hover-color: $off-canvas-background;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
@@ -216,20 +216,20 @@ $allow-sidebar-stash: $large-up;
         }
 
         &:hover {
-          background-color: var(--navigation-hover);
+          background-color: $navigation-hover;
         }
 
         &:before {
           @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
           text-align: center;
           float: none;
-          color: var(--navigation-foreground);
+          color: $navigation-foreground;
         }
       }
 
       span {
         @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-        color: var(--navigation-foreground);
+        color: $navigation-foreground;
         font-weight: $font-weight-normal;
         line-height: rem-calc($base-font-size * 1.5);
         display: block;
@@ -309,9 +309,9 @@ $allow-sidebar-stash: $large-up;
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
-  color: var(--navigation-foreground);
+  color: $navigation-foreground;
   &:hover {
-    color: var(--navigation-foreground);
+    color: $navigation-foreground;
   }
 }
 
@@ -419,7 +419,7 @@ $allow-sidebar-stash: $large-up;
     }
 
     .left-menu-dock {
-      color: var(--off-canvas-foreground);
+      color: $off-canvas-foreground;
       display: block;
       height: 2.5rem;
       padding: 0.5rem;
@@ -429,7 +429,7 @@ $allow-sidebar-stash: $large-up;
       z-index: 1; // Safari will not see the icon without this
 
       &:hover {
-        background-color: var(--off-canvas-hover);
+        background-color: $off-canvas-hover;
       }
 
       &::after {
@@ -469,10 +469,10 @@ $allow-sidebar-stash: $large-up;
         float: right;
       }
       a {
-        color: var(--off-canvas-foreground);
+        color: $off-canvas-foreground;
         &:hover {
-          color: var(--off-canvas-foreground);
-          background-color: var(--off-canvas-hover);
+          color: $off-canvas-foreground;
+          background-color: $off-canvas-hover;
         }
       }
       h3 {
@@ -537,11 +537,11 @@ $allow-sidebar-stash: $large-up;
   // 5.5.3 shrinks the submenu for some reason
   .left-submenu {
     min-height: 100%;
-    background-color: var(--off-canvas-background);
+    background-color: $off-canvas-background;
     a {
-      color: var(--off-canvas-foreground);
+      color: $off-canvas-foreground;
       &:hover {
-        background-color: var(--off-canvas-hover);
+        background-color: $off-canvas-hover;
       }
     }
   }
@@ -553,10 +553,10 @@ $allow-sidebar-stash: $large-up;
     line-height: $tabbar-height;
     padding-top: 0;
     padding-bottom: 0;
-    color: var(--off-canvas-foreground);
-    background-color: var(--off-canvas-background);
+    color: $off-canvas-foreground;
+    background-color: $off-canvas-background;
     &:hover {
-      background-color: var(--off-canvas-hover);
+      background-color: $off-canvas-hover;
     }
   }
 

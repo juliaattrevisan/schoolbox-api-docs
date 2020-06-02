@@ -1,6 +1,6 @@
 $notification-unread-background: $alert-color !default;
 $notification-unread-color: calc-text-color($notification-unread-background);
-$notification-header-background: var(--navigation-background) !default;
+$notification-header-background: $navigation-background !default;
 $allow-notification-stash: $xlarge-up;
 
 // where data-unread != 0
@@ -15,7 +15,7 @@ $allow-notification-stash: $xlarge-up;
      */
     &[data-unread] {
         padding-left: 1.65rem;
-        color: var(--navigation-foreground);
+        color: $navigation-foreground;
 
         /* The colour of the bell in its idle state
          */
@@ -45,7 +45,7 @@ $allow-notification-stash: $xlarge-up;
 }
 
 .right-off-canvas-menu {
-    background-color: var(--off-canvas-background);
+    background-color: $off-canvas-background;
     flex: 0 0 $off-canvas-width;
     z-index: 1002;
 
@@ -54,7 +54,7 @@ $allow-notification-stash: $xlarge-up;
             label {
                 background: $notification-header-background;
                 // DONE just use --navigation-foreground instead of contrast-bg
-                color: var(--navigation-foreground);
+                color: $navigation-foreground;
             }
 
             /* Hide gap from ".island section" definition
@@ -107,7 +107,7 @@ $allow-notification-stash: $xlarge-up;
         }
         &[data-unread="0"] {
             .right-menu-dock {
-                color: var(--navigation-foreground);
+                color: $navigation-foreground;
             }
         }
     }
