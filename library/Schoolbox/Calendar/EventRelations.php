@@ -280,11 +280,9 @@ class EventRelations
                 AND user_id NOT IN (:guestIds)
             ";
 
-            $ids = implode(',', array_map('intval', $guestIds));
-
             $this->attendanceMapper->getDatabase()->query($query, [
                 'eventId' => $event->getId(),
-                'guestIds' => $ids
+                'guestIds' => implode(',', array_map('intval', $guestIds))
             ]);
 
             $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user', 'id');
