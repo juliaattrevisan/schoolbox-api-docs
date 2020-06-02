@@ -91,6 +91,15 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('modifiedBy', 'mb')},
                         {$this->getJoinColumnString('subtype', 'c')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
             FROM        {$this->getTable()}
             INNER JOIN   {$this->getJoinSql('student', '', 's', true)}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv')}
