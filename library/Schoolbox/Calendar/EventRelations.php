@@ -14,6 +14,7 @@ use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -274,6 +275,19 @@ class EventRelations
                 'eventId' => $event->getId(),
                 'guestIds' => $ids
             ]);
+
+            $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user', 'id');
+            $existingIds = (new Collection($existingUsers))->indexBy('id')->keys();
+
+            foreach ($guestIds as $currentGuest) {
+                if (!in_array($currentGuest, $existingIds, false)) {
+                    $this->attendanceMapper->save((new Event\Attendance\Model())
+                        ->setEvent($event)
+                        ->setUser($this->userMapper->createModel()->setId($currentGuest))
+                        ->setStatus(Event\Attendance\Model::STATUS_PENDING)
+                        ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
+                }
+            }
         }
     }
 
