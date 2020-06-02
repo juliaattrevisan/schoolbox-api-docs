@@ -272,7 +272,7 @@ table.rb {
 .rb-no-cell {
     background-color: var(--body-background);
     // DONE figure out what to do about this mixin
-    color: var(--body-foreground);
+    color: $body-foreground;
     line-height: 2.875rem;
 }
 .rb-selected {

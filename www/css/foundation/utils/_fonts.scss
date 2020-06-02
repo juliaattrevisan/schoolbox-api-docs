@@ -1,6 +1,6 @@
 [class^='icon-'], [class*=' icon-'] {
     // DONE figure out what to do about this mixin
-    color: var(--body-foreground);
+    color: $body-foreground;
     &:before {
         speak: none;
         font-family: $font-family-icon;

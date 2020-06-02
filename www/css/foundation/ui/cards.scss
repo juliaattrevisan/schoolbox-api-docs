@@ -240,7 +240,7 @@
     h3 {
       text-decoration: line-through;
       // DONE figure out what to do about this mixin
-      color: var(--body-foreground);
+      color: $body-foreground;
     }
   }
   /*

@@ -78,6 +78,12 @@ $login-form-background-contrast:            var(--login-form-background-contrast
  Colors derived from configured skin colors, and their contrasts
  ****************************/
 
+$body-foreground:                           var(--body-foreground) !default;
+$body-foreground-contrast:                  var(--body-foreground-contrast) !default;
+$body-foreground-h1:                        var(--body-foreground-h1) !default;
+$body-foreground-h1-contrast:               var(--body-foreground-h1-contrast) !default;
+$navigation-foreground-highlight:           var(--navigation-foreground-highlight) !default;
+$navigation-foreground-highlight-contrast:  var(--navigation-foreground-highlight-contrast) !default;
 
 
 /*****************************

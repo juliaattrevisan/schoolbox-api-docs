@@ -28,7 +28,7 @@
 		// no text? be subtle
 		&.no-text {
             // DONE figure out what to do about this mixin
-            color: var(--body-foreground);
+            color: $body-foreground;
 			background: transparent;
 		}
 

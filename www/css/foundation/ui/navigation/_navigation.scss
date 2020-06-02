@@ -87,7 +87,7 @@ $menu-slide: transform 100ms ease;
 
 // Highlight color: is white if tab background is dark, contrasting if light
 // DONE use a new CSS var
-$icon-nav-highlight-color: var(--navigation-foreground-highlight);
+$icon-nav-highlight-color: $navigation-foreground-highlight;
 
 // The point at which to allow the left sidebar to dock, the account menu to move to the top menu, and the full logo to show
 $allow-sidebar-stash: $large-up;
