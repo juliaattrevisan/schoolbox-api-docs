@@ -278,7 +278,7 @@ class Mapper extends BaseMapper
      */
     public function getRelatedRecords(Model $record)
     {
-        $query = $this->getSelectString();
+        $query = $this->getSelectString() . ' ' . $this->getFromString();
 
         if ($record->getParent() instanceof Model) {
             // This is a child item, find its parent and its other siblings
@@ -347,7 +347,7 @@ class Mapper extends BaseMapper
      */
     public function findByTag(PastoralTag $tag)
     {
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
 
             JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND
                     `pastoral_tags`.`tag_id` = :tagId
@@ -370,7 +370,7 @@ class Mapper extends BaseMapper
      */
     public function findLinked($student, $linkedStudent, $typeId = null)
     {
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
             WHERE
 
             `pastoral`.`student_id` = :linkedStudentId AND `pastoral`.`parent_id` IN (
@@ -667,7 +667,7 @@ class Mapper extends BaseMapper
         // Construct the final query
         // --------------------------------------------------------------------------------------------------------
 
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
             LEFT JOIN `pastoral_comment` ON `pastoral_comment`.`pastoral_id` = `pastoral`.`id`
             WHERE
             (
@@ -881,7 +881,9 @@ class Mapper extends BaseMapper
 
         // Execute SQL
 
-        $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} {$orderSql}");
+        $statement = $this->getDatabase()->prepare(
+            $this->getSelectString() . ' ' . $this->getFromString() . "{$criteriaSql} {$orderSql}"
+        );
         $statement->execute($this->bindings);
 
         // Hydrate records for return
