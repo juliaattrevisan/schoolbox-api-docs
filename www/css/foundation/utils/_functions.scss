@@ -6,15 +6,15 @@
  */
 @function css-tint($colorVar, $percent)
 {
-  $colorVarR: str-insert($colorVar, '-r', -1);
-  $colorVarG: str-insert($colorVar, '-g', -1);
-  $colorVarB: str-insert($colorVar, '-b', -1);
-  $colorVarA: str-insert($colorVar, '-a', -1);
-  $offset:    $percent / 100;
+  $colorVarR: str-insert($colorVar, '-r', -2);
+  $colorVarG: str-insert($colorVar, '-g', -2);
+  $colorVarB: str-insert($colorVar, '-b', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
+  $offset:    strip-unit($percent) / 100;
   @return rgba(
-                  calc($colorVarR + (255 - $colorVarR) * $offset),
-                  calc($colorVarG + (255 - $colorVarG) * $offset),
-                  calc($colorVarB + (255 - $colorVarB) * $offset),
+                  calc(#{$colorVarR} + (255 - #{$colorVarR}) * #{$offset}),
+                  calc(#{$colorVarG} + (255 - #{$colorVarG}) * #{$offset}),
+                  calc(#{$colorVarB} + (255 - #{$colorVarB}) * #{$offset}),
                   $colorVarA
   );
 }
@@ -28,15 +28,15 @@
  */
 @function css-shade($colorVar, $percent)
 {
-  $colorVarR: str-insert($colorVar, '-r', -1);
-  $colorVarG: str-insert($colorVar, '-g', -1);
-  $colorVarB: str-insert($colorVar, '-b', -1);
-  $colorVarA: str-insert($colorVar, '-a', -1);
-  $offset:    1 - ($percent / 100);
+  $colorVarR: str-insert($colorVar, '-r', -2);
+  $colorVarG: str-insert($colorVar, '-g', -2);
+  $colorVarB: str-insert($colorVar, '-b', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
+  $offset:    1 - (strip-unit($percent) / 100);
   @return rgba(
-                  calc($colorVarR * $offset),
-                  calc($colorVarG * $offset),
-                  calc($colorVarB * $offset),
+                  calc(#{$colorVarR} * #{$offset}),
+                  calc(#{$colorVarG} * #{$offset}),
+                  calc(#{$colorVarB} * #{$offset}),
                   $colorVarA
   );
 }
@@ -50,14 +50,14 @@
  */
 @function css-lighten($colorVar, $percent)
 {
-  $colorVarH: str-insert($colorVar, '-h', -1);
-  $colorVarS: str-insert($colorVar, '-s', -1);
-  $colorVarL: str-insert($colorVar, '-l', -1);
-  $colorVarA: str-insert($colorVar, '-a', -1);
+  $colorVarH: str-insert($colorVar, '-h', -2);
+  $colorVarS: str-insert($colorVar, '-s', -2);
+  $colorVarL: str-insert($colorVar, '-l', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
   @return hsla(
                   $colorVarH,
                   $colorVarS,
-                  calc($colorVarL + $percent),
+                  calc(#{$colorVarL} + #{$percent}),
                   $colorVarA
   );
 }
@@ -71,14 +71,14 @@
  */
 @function css-darken($colorVar, $percent)
 {
-  $colorVarH: str-insert($colorVar, '-h', -1);
-  $colorVarS: str-insert($colorVar, '-s', -1);
-  $colorVarL: str-insert($colorVar, '-l', -1);
-  $colorVarA: str-insert($colorVar, '-a', -1);
+  $colorVarH: str-insert($colorVar, '-h', -2);
+  $colorVarS: str-insert($colorVar, '-s', -2);
+  $colorVarL: str-insert($colorVar, '-l', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
   @return hsla(
                   $colorVarH,
                   $colorVarS,
-                  calc($colorVarL - $percent),
+                  calc(#{$colorVarL} - #{$percent}),
                   $colorVarA
   );
 }
