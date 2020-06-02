@@ -65,6 +65,12 @@ class EventRelations
 
 
     /**
+     * This bool decides whether the attendance settings are "dirty" such that they need guests
+     * to reconfirm their attendance. Events can be modified at any time which can result in
+     * the clearing and re-adding of attendees who have already RSVP'd. To prevent their RSVP
+     * setting from being lost, this bool is set when the datetime changes; changing the title
+     * and description (for example) of an event shouldn't reset one's RSVP choices
+     *
      * @var bool
      */
     private $attendanceDirty;
