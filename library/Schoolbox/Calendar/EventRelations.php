@@ -270,8 +270,7 @@ class EventRelations
                 $this->attendanceMapper->save((new Event\Attendance\Model())
                     ->setEvent($event)
                     ->setUser($this->userMapper->createModel()->setId($currentGuest))
-                    ->setStatus(Event\Attendance\Model::STATUS_PENDING)
-                    ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
+                    ->setStatus(Event\Attendance\Model::STATUS_PENDING));
             }
         } else {
 
@@ -299,8 +298,7 @@ class EventRelations
                     $this->attendanceMapper->save((new Event\Attendance\Model())
                         ->setEvent($event)
                         ->setUser($this->userMapper->createModel()->setId($currentGuest))
-                        ->setStatus(Event\Attendance\Model::STATUS_PENDING)
-                        ->setIntention(Event\Attendance\Model::INTENTION_PENDING));
+                        ->setStatus(Event\Attendance\Model::STATUS_PENDING));
                 }
             }
         }

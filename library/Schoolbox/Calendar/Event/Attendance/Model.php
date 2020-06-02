@@ -28,10 +28,6 @@ class Model
     public const STATUS_APPROVED = 2;
     public const STATUS_REJECTED = 3;
 
-    public const INTENTION_PENDING = 1;
-    public const INTENTION_PRESENT = 2;
-    public const INTENTION_ABSENT = 3;
-
 
     /**
      * @var User
@@ -49,12 +45,6 @@ class Model
      * @var int
      */
     private $status;
-
-
-    /**
-     * @var int
-     */
-    private $intention;
 
 
     /**
@@ -114,26 +104,6 @@ class Model
     public function setStatus(int $status): self
     {
         $this->status = $status;
-        return $this;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getIntention(): int
-    {
-        return $this->intention;
-    }
-
-
-    /**
-     * @param int $intention
-     * @return $this
-     */
-    public function setIntention(int $intention): self
-    {
-        $this->intention = $intention;
         return $this;
     }
 }

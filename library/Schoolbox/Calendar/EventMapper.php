@@ -312,17 +312,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $query = '
             INSERT INTO event_attendance
-            VALUES (null, :eventId, :userId, :status, :intention)
+            VALUES (null, :eventId, :userId, :status)
         ';
 
         $statusPending = Event\Attendance\Model::STATUS_PENDING;
-        $intentPresent = Event\Attendance\Model::INTENTION_PRESENT;
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':eventId', $eventId);
         $statement->bindParam(':userId', $userId);
         $statement->bindParam(':status', $statusPending);
-        $statement->bindParam(':intention', $intentPresent);
 
         $statement->execute();
     }
