@@ -132,7 +132,7 @@ class Factory
         $this->participant               = $participant;
         $this->currentUser               = $currentUser;
         $this->mostRecentFeedback        = $mostRecentFeedback;
-        $this->mark                      = ($mark === null || $mark === '') ? null : trim($mark);
+        $this->mark                      = ($mark === null || $mark === '') ? null : (trim($mark) === '' ? $mark : trim($mark));
         $this->resubmissionRequired      = $resubmissionRequired;
         $this->comment                   = $comment ? trim($comment) : '';
         $this->publish                   = $publish === '1';
