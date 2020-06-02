@@ -36,6 +36,7 @@ use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassifi
 use Schoolbox\Pastoral;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
+use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -75,8 +76,9 @@ class Controller extends Base
                 $result = $mapper->delete($record);
             } catch (MapperException $e) {
                 // Something failed in the mapper: noop
-            } catch (\Throwable $e) {
-                // Something else unexpected failed: noop
+            } catch (UnexpectedValueException $e) {
+                // Something else unexpected happened, likely thrown by a
+                // pre-delete: noop
             }
         }
 
@@ -597,6 +599,7 @@ class Controller extends Base
                 'title'             => 'Pastoral Types',
                 'mapper'            => PastoralTypeMapper::class,
                 'delete'            => true,
+                'deleteFailMsg'     => 'You cannot delete a pastoral type which is still in use in a pastoral record.',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
