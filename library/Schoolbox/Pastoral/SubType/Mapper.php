@@ -38,6 +38,31 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('pastoralType', 't')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('pastoralType', '', 't', true)}
+        ";
+    }
+
+
     /**
      * Pre-soft-delete callback to ensure there are no
      * non-soft-deleted pastoral records with this pastoral subtype.
@@ -78,10 +103,12 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Order subtypes by their base type first
+     *
      * @inheritDoc
      */
     protected function getDefaultOrderByParams(): array
     {
-        return ['sequence' => 'ASC'];
+        return ['t.sequence' => 'ASC', 'sequence' => 'ASC'];
     }
 }

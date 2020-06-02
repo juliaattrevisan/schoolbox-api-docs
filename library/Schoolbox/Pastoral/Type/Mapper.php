@@ -48,16 +48,25 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @return string
-     * @throws BaseMapper\DefinitionException
+     * @inheritDoc
      */
     protected function getSelectString(): string
     {
         return "
-            SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('subTypes', 'st')}
-            FROM        {$this->getTable()}
-            LEFT JOIN   {$this->getJoinSql('subTypes', '', 'st')}
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('subTypes', 'st')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM      {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('subTypes', '', 'st')}
         ";
     }
 
@@ -177,10 +186,12 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Order subtypes secondarily, so that they are fetched in order.
+     *
      * @inheritDoc
      */
     protected function getDefaultOrderByParams(): array
     {
-        return ['sequence' => 'ASC'];
+        return ['sequence' => 'ASC', 'st.sequence' => 'ASC'];
     }
 }
