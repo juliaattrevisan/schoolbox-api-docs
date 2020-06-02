@@ -3,15 +3,15 @@ $tree-node-height: 3rem;
 
 /* Default idle state of a node anchor
  */
-$tree-node-color: var(--content-ui-foreground);
+$tree-node-color: $content-ui-foreground;
 
-$tree-node-hover-background: var(--content-ui-hover);
-$tree-node-hover-color: var(--content-ui-foreground);
+$tree-node-hover-background: $content-ui-hover;
+$tree-node-hover-color: $content-ui-foreground;
 
-$tree-node-selected-background: var(--content-ui-background);
-$tree-node-selected-color: var(--content-ui-foreground);
+$tree-node-selected-background: $content-ui-background;
+$tree-node-selected-color: $content-ui-foreground;
 
-$tree-folder-icon-color: var(--content-ui-foreground);
+$tree-folder-icon-color: $content-ui-foreground;
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;

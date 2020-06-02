@@ -92,7 +92,7 @@ $body-bg-contrast:                          var(--body-background-contrast) !def
  * but if for some reason you need different border colours
  * you can choose that here
  */
-$input-border-color:			   var(--form-border-color);
+$input-border-color:			   $form-border-color;
 
 /* Action-list specific colouring:
  * Hover colour for action-list rows

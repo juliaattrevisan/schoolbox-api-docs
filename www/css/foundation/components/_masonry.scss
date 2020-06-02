@@ -1,5 +1,5 @@
-$masonry-background-color: var(--accent-background);
-$masonry-color: var(--accent-foreground);
+$masonry-background-color: $accent-background;
+$masonry-color: $accent-foreground;
 $masonry-drop-background: $input-focus-bg-color;
 
 // Hide the placeholders for non-empty columns

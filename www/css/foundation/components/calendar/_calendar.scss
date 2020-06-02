@@ -69,8 +69,8 @@
 
     button {
         @include button-dimensions();
-        color: var(--content-ui-foreground);
-        background-color: var(--content-ui-background);
+        color: $content-ui-foreground;
+        background-color: $content-ui-background;
         border-radius: 0;
         padding: 0 .875rem !important;
         margin: 0 1px 0 0 !important;
@@ -79,8 +79,8 @@
           @extend .disabled;
         }
         &:hover, &.fc-button-active {
-          background-color: var(--content-ui-hover) !important;
-          color: var(--content-ui-foreground) !important;
+          background-color: $content-ui-hover !important;
+          color: $content-ui-foreground !important;
         }
     }
 }

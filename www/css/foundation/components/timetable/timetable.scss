@@ -16,7 +16,7 @@ $timetable-cell-border: var(--body-background);
          * subject (div) elements
          */
         .timetable-subject-active {
-            border: 0.125rem solid var(--accent-foreground);
+            border: 0.125rem solid $accent-foreground;
             position: relative;
 
             /* Ensure Indicator always expands to fill a cell
@@ -31,7 +31,7 @@ $timetable-cell-border: var(--body-background);
                 width: 0;
                 height: 0;
                 content: " ";
-                border-top: 1.25rem solid var(--accent-foreground);
+                border-top: 1.25rem solid $accent-foreground;
                 border-left: 1.25rem solid transparent;
             }
         }
@@ -83,8 +83,8 @@ $timetable-cell-border: var(--body-background);
  * Special reversed configuration, for extra strongness
  */
 .timetable-day-active, .timetable-period-active {
-    color: var(--accent-foreground);
-    background-color: var(--accent-background);
+    color: $accent-foreground;
+    background-color: $accent-background;
 }
 
 /* Custom rules for full timetable grid

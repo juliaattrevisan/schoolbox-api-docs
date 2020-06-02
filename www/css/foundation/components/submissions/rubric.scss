@@ -39,7 +39,7 @@ table.rb {
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
-                    background-color: var(--content-ui-selected);
+                    background-color: $content-ui-selected;
                     // DONE use contrasting color
                     color: var(--content-ui-selected-contrast);
                 }
@@ -276,7 +276,7 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: var(--content-ui-selected) !important;
+    background-color: $content-ui-selected !important;
     // DONE use contrasting color
     color: var(--content-ui-selected-contrast);
 

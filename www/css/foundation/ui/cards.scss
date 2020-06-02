@@ -400,6 +400,6 @@
   float: left;
   width: 100%;
   &:hover {
-    background-color: var(--content-ui-hover);
+    background-color: $content-ui-hover;
   }
 }

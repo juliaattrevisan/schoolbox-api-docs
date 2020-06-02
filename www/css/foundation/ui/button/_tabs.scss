@@ -42,12 +42,12 @@ $border-bottom-width: 2px;
 
       &:hover {
         color: $body-font-color;
-        border-bottom: $border-bottom-width solid var(--content-ui-hover);
+        border-bottom: $border-bottom-width solid $content-ui-hover;
       }
     }
 
     &.active a {
-      border-bottom: $border-bottom-width solid var(--accent-foreground);
+      border-bottom: $border-bottom-width solid $accent-foreground;
     }
 
     &.skeleton {

@@ -74,8 +74,8 @@ $alert-default-background: hsla(
     }
 
     &.highlight {
-        background-color: var(--accent-background);
-        color: var(--accent-foreground);
+        background-color: $accent-background;
+        color: $accent-foreground;
     }
     &.success {
         background-color: $success-color;
@@ -111,7 +111,7 @@ $alert-default-background: hsla(
         [class^='icon-'],
         [class*=' icon-'] {
             &:before {
-                color: var(--accent-foreground);
+                color: $accent-foreground;
             }
         }
     }

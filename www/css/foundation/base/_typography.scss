@@ -52,20 +52,20 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
  $paragraph-text-rendering: auto !default;
 
 // We use these to style <code> tags
-$code-color: var(--accent-foreground);
+$code-color: $accent-foreground;
 // $code-font-family: $font-family-monospace;
 // $code-font-weight: $font-weight-normal;
-$code-background-color: var(--accent-background);
+$code-background-color: $accent-background;
 // $code-border-size: 1px;
 // $code-border-style: solid;
-$code-border-color: var(--accent-foreground);
+$code-border-color: $accent-foreground;
 // $code-padding: rem-calc(2) rem-calc(5) rem-calc(1);
 
 // We use these to style anchors
 // $anchor-text-decoration: none;
 // $anchor-text-decoration-hover: none;
-$anchor-font-color: var(--content-ui-foreground);
-$anchor-font-color-hover: var(--content-ui-foreground);
+$anchor-font-color: $content-ui-foreground;
+$anchor-font-color-hover: $content-ui-foreground;
 
 // We use these to style the <hr> element
 // $hr-border-width: 1px;

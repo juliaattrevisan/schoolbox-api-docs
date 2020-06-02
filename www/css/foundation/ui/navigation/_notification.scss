@@ -153,7 +153,7 @@ $allow-notification-stash: $xlarge-up;
 
 .notification-list {
     .unread {
-        background-color: var(--accent-background);
+        background-color: $accent-background;
         a {
             font-weight: bold;
         }

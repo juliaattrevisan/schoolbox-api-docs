@@ -20,7 +20,7 @@
          * into component-titlebar
          */
         .component-titlebar {
-            background-color: var(--content-ui-background);
+            background-color: $content-ui-background;
             margin-bottom: 0px;
         }
     }
@@ -61,7 +61,7 @@
         font-weight: $font-weight-semibold;
 
         &:hover{
-            background-color: var(--content-ui-hover);
+            background-color: $content-ui-hover;
         }
         &:disabled, &.disabled {
             &:hover {
@@ -71,13 +71,13 @@
         }
     }
     input {
-        color: var(--content-ui-foreground);
+        color: $content-ui-foreground;
         display: inline-block;
         font-size: rem-calc(($base-font-size - 2));
         width: auto;
 
         &:hover {
-            color: var(--content-ui-foreground);
+            color: $content-ui-foreground;
         }
     }
     p{
@@ -310,7 +310,7 @@ ul.tileList {
  */
 .countdown-timer{
     text-align: center;
-    color: var(--accent-foreground);
+    color: $accent-foreground;
     li{
         padding-right: 2px !important;
     }
@@ -318,7 +318,7 @@ ul.tileList {
         display: block;
         padding: 0.2rem;
         font-weight: 500;
-        background-color: var(--accent-background);
+        background-color: $accent-background;
     }
     .count{
         font-size: $h2-font-size;

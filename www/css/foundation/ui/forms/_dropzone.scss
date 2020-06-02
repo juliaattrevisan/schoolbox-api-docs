@@ -1,15 +1,15 @@
 
-$attachzone-resting-color: var(--accent-foreground);
-$attachzone-resting-background: var(--accent-background);
+$attachzone-resting-color: $accent-foreground;
+$attachzone-resting-background: $accent-background;
 
-$attachzone-dragging-color: var(--accent-foreground);
-$attachzone-dragging-background: var(--accent-hover);
+$attachzone-dragging-color: $accent-foreground;
+$attachzone-dragging-background: $accent-hover;
 
 $attachzone-can-accept-color: $input-focus-border-color;
 $attachzone-can-accept-background: $input-focus-bg-color;
 
-$attachzone-hover-color: var(--accent-foreground);
-$attachzone-hover-background: var(--accent-hover);
+$attachzone-hover-color: $accent-foreground;
+$attachzone-hover-background: $accent-hover;
 
 $attachzone-error-background: tint($alert-color, 96%);
 $attachzone-error-color: $alert-color;

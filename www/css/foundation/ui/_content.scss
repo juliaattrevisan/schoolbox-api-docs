@@ -105,7 +105,7 @@ $progress-bar-height: rem-calc(($base-font-size - 2));
 /* This is the track colour for the progress bar.
  * The progress bar expands to cover this colour.
  */
-$progress-bar-color: var(--accent-background);
+$progress-bar-color: $accent-background;
 
 // We use these to control the border styles
 // $progress-bar-border-color: scale-color($white, $lightness: 20%);
@@ -120,7 +120,7 @@ $progress-bar-pad: rem-calc(0);
 /* The actual coloured bar inside that increases
  * as "progress is made"
  */
-$progress-meter-color: var(--accent-foreground);
+$progress-meter-color: $accent-foreground;
 
 // We use these to set the meter colors
 // $progress-meter-secondary-color: $secondary-color;
@@ -172,10 +172,10 @@ $reveal-border-width: 9;
 // $include-html-accordion-classes: $include-html-classes;
 
 $accordion-navigation-padding: rem-calc(($base-font-size - 4));
-$accordion-navigation-bg-color: var(--content-ui-background);
-$accordion-navigation-hover-bg-color: var(--content-ui-hover);
-$accordion-navigation-active-bg-color: var(--content-ui-background);
-$accordion-navigation-font-color: var(--content-ui-foreground);
+$accordion-navigation-bg-color: $content-ui-background;
+$accordion-navigation-hover-bg-color: $content-ui-hover;
+$accordion-navigation-active-bg-color: $content-ui-background;
+$accordion-navigation-font-color: $content-ui-foreground;
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
 
@@ -444,8 +444,8 @@ table{
 
 // Override calendar default colour with accent colours
 .fc .fc-today {
-    background: var(--accent-background) !important;
-    color: var(--accent-foreground) !important;
+    background: $accent-background !important;
+    color: $accent-foreground !important;
 }
 
 /* .row-header is designed to have the same style as th elements
@@ -690,8 +690,8 @@ $rotate-span-width: 11rem;
      * Used mainly in label-timeout indicators
      */
     &.highlight {
-        color: var(--accent-foreground);
-        background-color: var(--accent-background);
+        color: $accent-foreground;
+        background-color: $accent-background;
     }
     &.filter{
         @extend .highlight;
@@ -783,7 +783,7 @@ $rotate-span-width: 11rem;
 
 // Hints
 .hint {
-    color: var(--content-ui-foreground) !important;
+    color: $content-ui-foreground !important;
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -796,7 +796,7 @@ $rotate-span-width: 11rem;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: var(--content-ui-background);
+    background-color: $content-ui-background;
     border-radius: 0.5rem;
 
     &.icon-help:before{
@@ -810,7 +810,7 @@ $rotate-span-width: 11rem;
 .accordion{
     // insane core foundation override
     .accordion-navigation.active > a{
-        background: var(--content-ui-selected);
+        background: $content-ui-selected;
         color: $accordion-navigation-font-color;
     }
     a {
@@ -827,7 +827,7 @@ $rotate-span-width: 11rem;
 }
 
 .expander {
-    color: var(--content-ui-foreground);
+    color: $content-ui-foreground;
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
@@ -878,7 +878,7 @@ $selector-width: 2.25rem;
         padding: 0;
     }
 }
-@mixin list-interaction($selector, $cursor, $icon: '', $color: var(--content-ui-foreground)) {
+@mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
     > li{
         > div:first-of-type {
             @extend %interaction-li;
@@ -1126,9 +1126,9 @@ $selector-width: 2.25rem;
     }
 
     input:checked + label {
-        background-color: var(--content-ui-submit-background);
+        background-color: $content-ui-submit-background;
         a {
-            color: var(--content-ui-submit-foreground);
+            color: $content-ui-submit-foreground;
         }
     }
 }
@@ -1314,10 +1314,10 @@ $selector-width: 2.25rem;
     @extend .action-list;
     .card {
         a {
-            color: var(--content-ui-foreground);
+            color: $content-ui-foreground;
         }
         .size-32 {
-            color: var(--content-ui-foreground);
+            color: $content-ui-foreground;
             padding-top: 1rem;
         }
     }
@@ -1348,7 +1348,7 @@ $selector-width: 2.25rem;
             padding: 0 0.5rem;
         }
         &:hover{
-            background-color: var(--accent-background);
+            background-color: $accent-background;
         }
     }
 }
@@ -1523,7 +1523,7 @@ tr:hover{
 
         &.submit {
             background-color: transparent;
-            color: var(--content-ui-submit-background);
+            color: $content-ui-submit-background;
             width: auto;
         }
     }
@@ -1554,7 +1554,7 @@ tr:hover{
 
 // Schoolbox Loader
 .loader{
-    background-color: var(--accent-foreground);
+    background-color: $accent-foreground;
     border-radius: 0.5rem;
     margin: 2rem auto;
     width: 3rem;
@@ -1786,7 +1786,7 @@ dl {
             calc(var(--accent-foreground-l) - 5%),
             var(--accent-foreground-a)
         );
-        //background-color: darken(var(--accent-foreground), 5%);
+        //background-color: darken($accent-foreground, 5%);
         position: absolute;
         top: -9px;
         &.slow{
@@ -1798,9 +1798,9 @@ dl {
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: var(--content-ui-foreground);
+$train-line-visited-color: $content-ui-foreground;
 $train-line-visited-glow-blur: 0.5rem;
-$train-line-unvisited-color: var(--content-ui-background);
+$train-line-unvisited-color: $content-ui-background;
 
 .train-line {
     display: flex;
@@ -1825,7 +1825,7 @@ $train-line-unvisited-color: var(--content-ui-background);
             width: 50%;
             position: absolute;
             top: 0;
-            background: var(--content-ui-foreground);
+            background: $content-ui-foreground;
         }
         &:before {
             left: 0;
@@ -1839,18 +1839,18 @@ $train-line-unvisited-color: var(--content-ui-background);
         }
         &.current-stop {
             &:after {
-                background: var(--content-ui-background);
+                background: $content-ui-background;
             }
             ~ li {
                 &:before, &:after {
-                    background: var(--content-ui-background);
+                    background: $content-ui-background;
                 }
                 a span {
-                    background: var(--content-ui-background);
+                    background: $content-ui-background;
                 }
             }
             a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur var(--content-ui-foreground);
+                box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
             }
         }
         a {
@@ -1861,7 +1861,7 @@ $train-line-unvisited-color: var(--content-ui-background);
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
             span {
-                background: var(--content-ui-foreground);
+                background: $content-ui-foreground;
                 border-radius: $train-line-stop-size / 2;
                 // DONE use contrasting color
                 color: var(--content-ui-foreground-contrast);

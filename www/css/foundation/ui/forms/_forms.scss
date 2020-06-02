@@ -20,10 +20,10 @@ $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 $input-bg-color: $white;
-$input-focus-bg-color: var(--form-bg-hover-color);
+$input-focus-bg-color: $form-bg-hover-color;
 // DONE use contrasting color
 $input-focus-color: var(--form-bg-hover-color-contrast);
-$input-border-color: var(--form-border-color) !default;
+$input-border-color: $form-border-color !default;
 // DONE use CSS darken
 $input-focus-border-color: hsla(
     var(--form-border-color-h),
@@ -31,8 +31,8 @@ $input-focus-border-color: hsla(
     calc(var(--form-border-color-l) - 15%),
     var(--form-border-color-a)
 );
-//$input-focus-border-color: darken(var(--form-border-color), 15%);
-$input-hover-bg-color: var(--form-bg-hover-color);
+//$input-focus-border-color: darken($form-border-color, 15%);
+$input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
 $input-border-style: solid;
 $input-border-width: .0625rem;
@@ -90,7 +90,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // $include-html-form-classes: $include-html-classes;
 
 // Controlling background color for the switch container
-$switch-bg: var(--content-ui-background);
+$switch-bg: $content-ui-background;
 
 // Controlling border styles and background colors for the switch container
 $switch-border-color: transparent;
@@ -113,7 +113,7 @@ $switch-font-size-med: 14px;
 // $switch-label-side-padding: 6px;
 
 // We use these to style the switch-paddle
-$switch-active-color: var(--content-ui-foreground);
+$switch-active-color: $content-ui-foreground;
 // $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
@@ -180,7 +180,7 @@ select {
 		}
 		&:hover {
 			background-color: $input-disabled-bg;
-			border-color: var(--form-border-color);
+			border-color: $form-border-color;
 			color: $aluminum;
 		}
 	}
@@ -309,7 +309,7 @@ th, td{
 	margin: 0;
 	text-align: center;
 }
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: var(--content-ui-foreground)) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
     $label-selector: "label";
@@ -358,8 +358,8 @@ th, td{
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
-                color: var(--content-ui-foreground) !important;
-                background-color: var(--content-ui-background);
+                color: $content-ui-foreground !important;
+                background-color: $content-ui-background;
             }
         }
     }
@@ -398,8 +398,8 @@ th, td{
 .button-block {
 	display: block;
 	background-color: $white;
-	border: $input-border-width solid var(--content-ui-background);
-	color: var(--content-ui-foreground);
+	border: $input-border-width solid $content-ui-background;
+	color: $content-ui-foreground;
 	margin: 0 0 1rem 0;
 	padding: ($base-font-size - 4);
 	width: 100%;
@@ -410,14 +410,14 @@ th, td{
 	@include transition(all, 0.1s, ease-in);
 	i {
 		@extend .size-32;
-		color: var(--content-ui-foreground);
+		color: $content-ui-foreground;
 		padding-right: 0.35rem;
 		float: left;
 		line-height: 1;
 	}
 	&:hover {
-		background-color: var(--content-ui-background);
-		color: var(--content-ui-foreground);
+		background-color: $content-ui-background;
+		color: $content-ui-foreground;
 	}
 }
 input[type=radio] {
@@ -425,11 +425,11 @@ input[type=radio] {
 		@extend .button-block;
 	}
 	&:checked + .block {
-		background-color: var(--content-ui-foreground);
-		border: $input-border-width solid var(--content-ui-foreground);
-		color: var(--content-ui-selected);
+		background-color: $content-ui-foreground;
+		border: $input-border-width solid $content-ui-foreground;
+		color: $content-ui-selected;
 		i {
-			color: var(--content-ui-selected);
+			color: $content-ui-selected;
 		}
 	}
 	&:disabled + .block {
@@ -445,7 +445,7 @@ input[type=radio] {
     $toggle-width:
     $input-height,
     $hover-background-color: $button-bg-hover,
-    $active-color: var(--content-ui-foreground),
+    $active-color: $content-ui-foreground,
 ) {
 
 	$label-selector: "label";
@@ -632,7 +632,7 @@ ul.filters {
 
 	.selected-item,
 	.more-count {
-	  background-color: var(--accent-background);
+	  background-color: $accent-background;
 	  display: block;
 	  font-size: ($base-font-size - 4);
 	  font-style: italic;

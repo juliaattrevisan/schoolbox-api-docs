@@ -84,11 +84,11 @@
 
         // Various rows and headers
         .course-row {
-            background: var(--content-ui-background);
+            background: $content-ui-background;
             color: $body-font-color;
         }
         .class-row {
-            background: var(--content-ui-selected);
+            background: $content-ui-selected;
             color: $body-font-color;
         }
         .class-row-heading {

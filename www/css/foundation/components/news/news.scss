@@ -62,7 +62,7 @@
     margin-bottom: 1rem;
 
     > li {
-        background: var(--accent-background);
+        background: $accent-background;
         border: 0;
         border-bottom: 2px solid $white;
         border-right: 2px solid $white;
@@ -96,5 +96,5 @@
 }
 
 .sticky {
-    background-color: var(--content-ui-selected);
+    background-color: $content-ui-selected;
 }

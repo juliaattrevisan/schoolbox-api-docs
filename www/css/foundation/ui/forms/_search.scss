@@ -99,23 +99,23 @@
 
     .result-meta.with-bg {
         @include button-dimensions();
-        background-color: var(--content-ui-background);
-        color: var(--content-ui-foreground);
+        background-color: $content-ui-background;
+        color: $content-ui-foreground;
         font-size: rem-calc(($base-font-size - 2));
         font-style: normal;
         line-height: inherit;
         text-align: center;
 
         &:hover {
-            background-color: var(--content-ui-hover);
-            color: var(--content-ui-foreground);
+            background-color: $content-ui-hover;
+            color: $content-ui-foreground;
             cursor: pointer;
             text-decoration: none !important; // forgive me, for I have sinned.
         }
     }
 
     .is-active {
-        background-color: var(--content-ui-hover);
+        background-color: $content-ui-hover;
     }
 }
 

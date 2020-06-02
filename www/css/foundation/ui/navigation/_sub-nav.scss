@@ -19,23 +19,23 @@ $sub-nav-active-font-weight: $font-weight-normal;
 		margin: 0 1px 1px 0;
         a {
             @include button-dimensions();
-            color: var(--content-ui-foreground);
-            background-color: var(--content-ui-background);
+            color: $content-ui-foreground;
+            background-color: $content-ui-background;
             display: inline-block;
 
             &:hover {
-                color: var(--content-ui-foreground);
-                background-color: var(--content-ui-hover);
+                color: $content-ui-foreground;
+                background-color: $content-ui-hover;
                 text-decoration: none;
             }
         }
         &.active a {
-            color: var(--content-ui-foreground);
-            background-color: var(--content-ui-selected);
+            color: $content-ui-foreground;
+            background-color: $content-ui-selected;
 
             &:hover {
-                color: var(--content-ui-foreground);
-                background-color: var(--content-ui-selected);
+                color: $content-ui-foreground;
+                background-color: $content-ui-selected;
             }
         }
 	}

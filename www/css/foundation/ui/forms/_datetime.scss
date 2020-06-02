@@ -1,12 +1,12 @@
 //  DATEPICKER
 
 $datepicker-cell-width: (2.125rem, 2.5rem);
-$datepicker-cell-color: var(--content-ui-foreground);
-$datepicker-background: var(--content-ui-background);
-$datepicker-header-background: var(--content-ui-selected);
-$datepicker-hover-background: var(--content-ui-hover);
-$datepicker-selected-background: var(--content-ui-selected);
-$datepicker-header-color: var(--content-ui-foreground);
+$datepicker-cell-color: $content-ui-foreground;
+$datepicker-background: $content-ui-background;
+$datepicker-header-background: $content-ui-selected;
+$datepicker-hover-background: $content-ui-hover;
+$datepicker-selected-background: $content-ui-selected;
+$datepicker-header-color: $content-ui-foreground;
 $timepicker-item-visible-count: 5;
 
 @mixin datepicker-header($sizing: $datepicker-cell-width) {
@@ -56,7 +56,7 @@ $timepicker-item-visible-count: 5;
             &:hover {
                 background: $datepicker-hover-background;
                 // DONE don't change color at all
-                //color: var(--content-ui-foreground);
+                //color: $content-ui-foreground;
             }
 
             &.ui-timepicker-selected {

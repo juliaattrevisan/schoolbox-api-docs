@@ -102,10 +102,10 @@ table.mceLayout tbody tr:hover td {
         width: 2rem;
         height: 2rem;
         &.mceButtonActive {
-            background-color: var(--content-ui-foreground) !important;
+            background-color: $content-ui-foreground !important;
         }
         &:hover {
-            background-color: var(--content-ui-hover) !important;
+            background-color: $content-ui-hover !important;
         }
     }
 }

@@ -3,14 +3,14 @@
 $f-dropdown-triangle-color: transparent;
 $f-dropdown-max-width: 300px;
 $f-dropdown-margin-top: 0px;
-$f-dropdown-bg: var(--content-ui-background);
+$f-dropdown-bg: $content-ui-background;
 $f-dropdown-border-width: 0px;
 $f-dropdown-border-color: transparent;
-$f-dropdown-font-color: var(--content-ui-foreground);
+$f-dropdown-font-color: $content-ui-foreground;
 $f-dropdown-font-size: rem-calc(($base-font-size - 2));
 $f-dropdown-list-padding: rem-calc(($base-font-size - 6)) rem-calc(($base-font-size - 3));
-$f-dropdown-list-hover-bg: var(--content-ui-hover);
-$f-dropdown-list-separator-bg: var(--content-ui-foreground);
+$f-dropdown-list-hover-bg: $content-ui-hover;
+$f-dropdown-list-separator-bg: $content-ui-foreground;
 $f-dropdown-content-padding: rem-calc(($base-font-size - 4));
 $f-dropdown-icon-align: 0.25rem;
 
@@ -31,7 +31,7 @@ $f-dropdown-icon-align: 0.25rem;
 		display: block;
 		width: 100%;
 		a:hover {
-			background-color: var(--content-ui-hover);
+			background-color: $content-ui-hover;
 			text-decoration: none;
 		}
 	}
@@ -56,7 +56,7 @@ $f-dropdown-icon-align: 0.25rem;
 		cursor: default;
 		font-size: rem-calc($base-font-size - 3);
 		&:hover {
-			background-color: var(--content-ui-background);
+			background-color: $content-ui-background;
 		}
 	}
 	[class*="icon-"]:before {

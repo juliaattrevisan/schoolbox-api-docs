@@ -51,7 +51,7 @@ $off-canvas-hover-color: $off-canvas-background;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size));
-$off-canvas-label-color: var(--accent-foreground);
+$off-canvas-label-color: $accent-foreground;
 $off-canvas-label-text-transform: uppercase;
 $off-canvas-label-font-size: rem-calc(($base-font-size));
 $off-canvas-label-font-weight: $font-weight-normal;
@@ -441,7 +441,7 @@ $allow-sidebar-stash: $large-up;
   }
 
   .logo-wrapper {
-    background-color: var(--logo-background);
+    background-color: $logo-background;
 
     .logo {
       display: none;

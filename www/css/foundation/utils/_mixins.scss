@@ -250,7 +250,7 @@
 	}
 }
 
-@mixin selection($color: var(--accent-foreground), $background-color: var(--accent-background)) {
+@mixin selection($color: $accent-foreground, $background-color: $accent-background) {
 	::-moz-selection {
 		color: $background-color;
 		background-color: $color;
@@ -286,12 +286,12 @@
 
 %switch-first-child{
 	text-align: left;
-	color: var(--content-ui-background);
+	color: $content-ui-background;
 	opacity: 0;
 }
 %switch-last-child{
 	text-align: right;
-	color: var(--content-ui-foreground);
+	color: $content-ui-foreground;
 	opacity: 1;
 }
 @mixin switch-label($indent: 0.75rem) {

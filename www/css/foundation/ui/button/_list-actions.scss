@@ -2,7 +2,7 @@
  * These occur as their own row, they aren't nested inside a
  * column. Typically this will look like .actions-small-12.row
  */
-@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: var(--content-ui-foreground)) {
+@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 
 	// forms + list items: compensate for input{margin-bottom:1rem}
 	form {
@@ -58,7 +58,7 @@
 						opacity: 0.33;
 					}
 					&.selected {
-						color: var(--content-ui-selected);
+						color: $content-ui-selected;
 						background-color: $button-color;
 					}
 					&:hover {
@@ -68,10 +68,10 @@
 				}
 
 				a[aria-expanded="true"]{
-					background-color: var(--content-ui-background);
+					background-color: $content-ui-background;
 					opacity: 1;
 					&:hover{
-						background-color: var(--content-ui-background);
+						background-color: $content-ui-background;
 						opacity: 0.7;
 					}
 				}
@@ -80,7 +80,7 @@
 					a {
 						background-color: $button-color;
                         // DONE As far as I can know, there's never a checkbox inside a header action
-                        color: var(--content-ui-selected);
+                        color: $content-ui-selected;
 					}
 				}
 			}
