@@ -533,7 +533,7 @@ class Controller extends Base
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
                 'types'             => $this->pastoralTypeMapper->findAll(),
-                'subTypes'          => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'subTypes'          => $this->pastoralSubTypeMapper->findAll(),
                 'severities'        => $severities,
                 'roles'             => $roles,
                 'roleUsers'         => $roleUsers,

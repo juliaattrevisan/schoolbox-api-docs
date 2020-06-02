@@ -280,7 +280,7 @@ class Controller extends Base
                     'years'            => $this->userMapper->getYearLevels(),
                     'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll(),
-                    'subTypes'         => $this->pastoralSubTypeMapper->findAll()->sortBy('name', 'asc'),
+                    'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
                     'severities'       => $severities,
                     'tags'             => $this->pastoralTagMapper->findAll(),
                     'groups'           => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
