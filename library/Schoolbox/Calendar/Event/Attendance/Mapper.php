@@ -8,9 +8,22 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
 
+use PDO;
+use PDOStatement;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Calendar\Event\Attendance
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -25,5 +38,74 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('intention', self::TYPE_INTEGER);
+    }
+
+
+    /**
+     * @return string
+     * @throws DefinitionException
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('event', 'e')},
+                   {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('event', '', 'e')}
+            INNER JOIN {$this->getJoinSql('user', '', 'u')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection|Model[]
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws UnexpectedValueException
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            /** @var User $user */
+            $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+
+            /** @var Event $event */
+            $event = $this->getJoinMapper('event')->hydrate($row, 'e');
+
+            /** @var Model $attendance */
+            $attendance = $this->hydrate($row);
+
+            $attendance->setEvent($event)->setUser($user);
+
+            $collection->add($attendance);
+        }
+
+        return $collection;
+    }
+
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    public function findAttendances(Event $event): array
+    {
+        $pairs = [];
+
+        $attendances = $this->findByColumn('event_id', $event->getId());
+
+        foreach ($attendances as $attendance) {
+            $pairs[] = [
+                'id' => $attendance->getUser()->getId(),
+                'name' => $attendance->getUser()->getFullname()
+            ];
+        }
+
+        return $pairs;
     }
 }

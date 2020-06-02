@@ -84,15 +84,22 @@ class Controller extends Base
 
 
     /**
+     * @var Attendance\Mapper
+     */
+    private $attendanceMapper;
+
+
+    /**
      * Controller constructor.
      *
-     * @param Error\Mapper    $errorMapper
-     * @param RoleMapper      $roleMapper
-     * @param Folder\Mapper   $folderMapper
-     * @param EventMapper     $eventMapper
-     * @param EventTypeMapper $eventTypeMapper
-     * @param CampusMapper    $campusMapper
-     * @param UserMapper      $userMapper
+     * @param Error\Mapper      $errorMapper
+     * @param RoleMapper        $roleMapper
+     * @param Folder\Mapper     $folderMapper
+     * @param EventMapper       $eventMapper
+     * @param EventTypeMapper   $eventTypeMapper
+     * @param CampusMapper      $campusMapper
+     * @param UserMapper        $userMapper
+     * @param Attendance\Mapper $attendanceMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -101,7 +108,8 @@ class Controller extends Base
         EventMapper $eventMapper,
         EventTypeMapper $eventTypeMapper,
         CampusMapper $campusMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Attendance\Mapper $attendanceMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -110,6 +118,7 @@ class Controller extends Base
         $this->eventTypeMapper = $eventTypeMapper;
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
+        $this->attendanceMapper = $attendanceMapper;
     }
 
 
@@ -294,6 +303,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'guests' => Attendance\Mapper::getInstance()->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
