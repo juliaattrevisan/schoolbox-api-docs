@@ -794,7 +794,8 @@ class Controller extends Base
         } elseif (isset($tables[$table]['sort'])) {
             $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
         } elseif ($prototype instanceof Sequential) {
-            $rows = $mapper->findAll(['order' => ['sequence' => 'ASC']]);
+            // Sequential: just use whatever ordering is defined in getDefaultOrderByParams
+            $rows = $mapper->findAll();
             $tables[$table]['sortable'] = true;
         } else {
             $orderArr = array($mapper->getIdentifierColumn() => 'ASC');
