@@ -81,7 +81,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString($revisions = false)
+    protected function getSelectString(): string
     {
         return "
             SELECT      {$this->getColumnString()},
@@ -97,7 +97,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getFromString()
+    protected function getFromString(): string
     {
         return "
             FROM        {$this->getTable()}

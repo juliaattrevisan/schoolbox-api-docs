@@ -125,7 +125,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         /* * We do not need to join to deleted severity as the system does not permit soft-deletion
          *   of severities if they are used by a non-soft deleted pastoral.
@@ -155,7 +155,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritDoc
      */
-    protected function getFromString()
+    protected function getFromString(): string
     {
         return "
             FROM        {$this->getTable()}
