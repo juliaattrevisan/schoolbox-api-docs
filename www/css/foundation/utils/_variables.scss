@@ -38,6 +38,7 @@ $logo-background:                  var(--logo-background) !default;
 
 $body-bg:                          var(--body-background) !default;
 
+$login-form-background:            var(--login-form-background) !default;
 
 /*****************************
  Contrasts to skin color vars above
@@ -71,6 +72,7 @@ $logo-background-contrast:                  var(--logo-background-contrast) !def
 
 $body-bg-contrast:                          var(--body-background-contrast) !default;
 
+$login-form-background-contrast:            var(--login-form-background-contrast) !default;
 
 /*****************************
  Colors derived from configured skin colors, and their contrasts
