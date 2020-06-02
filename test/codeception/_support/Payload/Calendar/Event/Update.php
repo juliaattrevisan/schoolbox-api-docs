@@ -15,14 +15,14 @@ class Update extends Request
 {
     use PostTrait;
     
-    var $eventID;
+    var $event;
 
     public function __construct(Calendar\Event $event)
     {
-        $this->eventID=$event->getId();
-        $this->setReferer("/calendar/event/" . $this->eventID . "/modify");
+        $this->event=$event;
+        $this->setReferer("/calendar/event/" . $this->event->getId() . "/modify");
 
-        $this->setFormParam('id', $this->eventID);
+        $this->setFormParam('id', $event->getId());
         $this->setFormParam('userId', $event->getAuthor()->getId());
         $this->setFormParam('authorId', $event->getAuthor()->getId());
         $this->setFormParam('allDay', $event->getAllDay());
@@ -44,7 +44,7 @@ class Update extends Request
 
     public function getUrl(): string
     {
-        return "/calendar/event/" . $this->eventID . "/modify";
+        return "/calendar/event/" . $this->event->getId() . "/modify";
     }
 }
 
