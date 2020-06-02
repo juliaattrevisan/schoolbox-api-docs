@@ -107,20 +107,10 @@ $input-border-color:			   $form-border-color;
  * Hover colour for the action button in the action-list row
  */
 // DONE modify RGBA instead of tint
-$row-hover-background:             rgba(
-    calc(var(--content-ui-hover-r) + (255 - var(--content-ui-hover-r)) * 0.87),
-    calc(var(--content-ui-hover-g) + (255 - var(--content-ui-hover-g)) * 0.87),
-    calc(var(--content-ui-hover-b) + (255 - var(--content-ui-hover-b)) * 0.87),
-    var(--content-ui-hover-a)
-);
+$row-hover-background:             css-tint($content-ui-hover, 87%);
 
 // DONE use CSS darken
-$row-action-hover-background:      hsla(
-    var(--content-ui-hover-h),
-    var(--content-ui-hover-s),
-    calc(var(--content-ui-hover-l) - 7%),
-    var(--content-ui-hover-a)
-);
+$row-action-hover-background:      css-darken($content-ui-hover, 7%);
 
 // Colours
 $primary-color:					#f0f !default;

@@ -61,21 +61,11 @@ $button-bg-hover: $content-ui-hover;
 $submit-button-color: $content-ui-submit-foreground;
 $submit-button-bg-color: $content-ui-submit-background;
 // DONE modify RBGA instead of tint
-$submit-button-bg-hover: rgba(
-    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-    var(--content-ui-submit-background-a)
-);
+$submit-button-bg-hover: css-tint($content-ui-submit-background, 20%);
 
 $button-border-color: transparent;
 // DONE modify RGBA instead of tint
-$secondary-button-bg-hover: rgba(
-    calc(var(--content-ui-submit-foreground-r) + (255 - var(--content-ui-submit-foreground-r)) * 0.2),
-    calc(var(--content-ui-submit-foreground-g) + (255 - var(--content-ui-submit-foreground-g)) * 0.2),
-    calc(var(--content-ui-submit-foreground-b) + (255 - var(--content-ui-submit-foreground-b)) * 0.2),
-    var(--content-ui-submit-foreground-a)
-);
+$secondary-button-bg-hover: css-tint($submit-button-color, 20%);
 
 $secondary-button-border-color: transparent;
 $success-button-bg-hover: tint($success-color, 20%);
