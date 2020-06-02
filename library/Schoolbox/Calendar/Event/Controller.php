@@ -530,8 +530,12 @@ class Controller extends Base
          */
         $folderAccess = FolderAccess::getInstance();
 
-        if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+        try {
+            if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+            }
+        } catch (InvalidArgumentException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check the dates
