@@ -243,11 +243,22 @@ class EventRelations
      */
     private function saveAttendanceRelation(Event $event, array $guestIds): void
     {
+
+        /* If attendances were turned off, purge everyone, then let's get out of here
+         */
+        if (!$event->getAttendance()) {
+            $this->attendanceMapper->deleteByColumn('event_id', $event->getId());
+
+            return;
+        }
+
+        /* Otherwise process the people who were added
+         */
         if ($this->attendanceDirty) {
 
             /* If the attendanceDirty bit is set, reset attendance responses entirely
              */
-            $this->attendanceMapper->deleteByColumn('event_id', $guestIds);
+            $this->attendanceMapper->deleteByColumn('event_id', $event->getId());
 
             foreach ($guestIds as $currentGuest) {
                 $this->attendanceMapper->save((new Event\Attendance\Model())
