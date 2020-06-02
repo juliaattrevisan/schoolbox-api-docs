@@ -42,6 +42,7 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralSubtypes']);
     }
 
 
@@ -129,6 +130,19 @@ class Mapper extends BaseMapper
     protected function deletePastoralAudiences(Model $type): bool
     {
         Pastoral\Audience\Mapper::getInstance()->deleteByColumn('type_id', $type->getId());
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral subtypes for this type.
+     *
+     * @param Model $type
+     * @return bool
+     */
+    protected function deletePastoralSubtypes(Model $type): bool
+    {
+        Pastoral\Subtype\Mapper::getInstance()->deleteByColumn('pastoral_type_id', $type->getId());
         return true;
     }
 
