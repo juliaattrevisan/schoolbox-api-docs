@@ -61,18 +61,19 @@
                     route:       'learningGrades.getGradesForSubject',
                     routeArgs:   {userId: student.id, subjectId: subject.id},
                     yearUrl:     yearUrl,
-                    year:        year
+                    year:        year is defined ? year : null
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
                     currentSubject: subject,
                     subjects:       folders,
                     route:         'learningGrades.getGradesForSubject',
-                    routeArgs:      {userId: student.id, termCode: term.code}
+                    routeArgs:      {userId: student.id, termCode: term.code},
+                    year:        year is defined ? year : null
                 } only %}
             </div>
         </div>
     </div>
-    {% if canSeeGradeAverage %}
+    {% if canSeeGradeAverage and markbook.studentStatistics[student.id] is defined %}
     <div class="small-12 medium-3 xlarge-2 right">
         <h2 class="subheader">{{ locale.grades.proper }} Average</h2>
         <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}-bg text-center">

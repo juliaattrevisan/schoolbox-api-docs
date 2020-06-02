@@ -49,10 +49,10 @@
                 } only %}
 
                 {% include 'sub/subjectSelector.twig' with {
-                    subjects:        folders,
-                    route:          'learningGrades.getGradesForSubject',
-                    routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code},
-                    year:           year
+                    subjects:    folders,
+                    route:       'learningGrades.getGradesForSubject',
+                    routeArgs:   {viewee: student, userId: student.id, term: term, termCode: term.code},
+                    year:        year
                 } only %}
             </div>
         </div>
@@ -101,7 +101,7 @@
                         </nav>
                     </li>
                     {% endfor %}
-                    {% if assessmentTasks[folder.id] | length %}
+                    {% if assessmentTasks[folder.id] is defined and assessmentTasks[folder.id] | length %}
                     <li>
                         <ul class="activity-list">
                             {% for assessment in assessmentTasks[folder.id] %}

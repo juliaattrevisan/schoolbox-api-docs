@@ -208,6 +208,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
+            'year'             => null,
             'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
             'folders'          => $folders,
             'markbooks'        => $markbooks,
@@ -288,6 +289,10 @@ class Controller extends Base
                 $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
             }
         }
+
+        $folders->sortByCallback(static function (Folder\Model $a, Folder\Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         // Squish this mess out
