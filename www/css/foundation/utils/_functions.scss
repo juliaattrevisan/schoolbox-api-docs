@@ -31,42 +31,42 @@
 	}
 }
 
-@function calc-button-color($bg, $light: lighten(var(--content-ui-hover), 5%), $dark: darken(var(--content-ui-hover), 5%)) {
-	@if (perceptive-luminance($bg) < 0.45) {
-		@return $dark; // Lighter background, return dark color
-	} @else {
-		@return $light; // Darker background, return light color
-	}
-}
+//@function calc-button-color($bg, $light: lighten(var(--content-ui-hover), 5%), $dark: darken(var(--content-ui-hover), 5%)) {
+//	@if (perceptive-luminance($bg) < 0.45) {
+//		@return $dark; // Lighter background, return dark color
+//	} @else {
+//		@return $light; // Darker background, return light color
+//	}
+//}
 
-@function flatten-alpha($color, $background) {
-	$percent: alpha($color) * 100%;
-	$opaque: opacify($color, 1);
-	$solid-color: mix($opaque, $background, $percent);
-	@return $solid-color;
-}
+//@function flatten-alpha($color, $background) {
+//	$percent: alpha($color) * 100%;
+//	$opaque: opacify($color, 1);
+//	$solid-color: mix($opaque, $background, $percent);
+//	@return $solid-color;
+//}
 
-@function contrast-bg($opacity: 0.35, $background: var(--body-background), $saturation: 0%, $light: $white, $dark: $black) {
-
-	$luminance: perceptive-luminance($background);
-
-	$text: $dark;
-
-	@if $luminance > 0.5 {
-		$text: $light;
-	}
-
-	// apply the opacity given
-	$translucent: rgba($text, $opacity);
-
-	// flatten opacity onto the background
-	$flat: flatten-alpha($translucent, $background);
-
-	// boost saturation
-	$saturated: saturate($flat, $saturation);
-
-	@return $saturated;
-}
+//@function contrast-bg($opacity: 0.35, $background: var(--body-background), $saturation: 0%, $light: $white, $dark: $black) {
+//
+//	$luminance: perceptive-luminance($background);
+//
+//	$text: $dark;
+//
+//	@if $luminance > 0.5 {
+//		$text: $light;
+//	}
+//
+//	// apply the opacity given
+//	$translucent: rgba($text, $opacity);
+//
+//	// flatten opacity onto the background
+//	$flat: flatten-alpha($translucent, $background);
+//
+//	// boost saturation
+//	$saturated: saturate($flat, $saturation);
+//
+//	@return $saturated;
+//}
 
 // Remove the unit of a length - https://css-tricks.com/snippets/sass/strip-unit-function/
 // @param {Number} $number - Number to remove unit from
