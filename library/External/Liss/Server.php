@@ -729,7 +729,7 @@ class External_Liss_Server
              * is what EventRelations normally does - we only need access
              * to specific operations for saving personal/folder events
              */
-            $eventRelations = new EventRelations(null, null, null);
+            $eventRelations = new EventRelations(null, null, null, null, false);
 
             /* Set up all events in a nicer format
              */

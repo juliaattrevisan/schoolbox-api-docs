@@ -493,7 +493,9 @@ class Controller extends Base
                         new Calendar\EventRelations(
                             Calendar\Event::ACCESS_PERSONAL,
                             [],
-                            []
+                            [],
+                            [],
+                            false
                         )
                     );
                 }

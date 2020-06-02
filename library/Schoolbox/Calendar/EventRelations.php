@@ -291,7 +291,7 @@ class EventRelations
                 'guestIds' => implode(',', array_map('intval', $guestIds))
             ]);
 
-            $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user', 'id');
+            $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
             $existingIds = (new Collection($existingUsers))->indexBy('id')->keys();
 
             foreach ($guestIds as $currentGuest) {
