@@ -631,7 +631,8 @@ class Controller extends Base
             'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => PastoralCategoryMapper::class,
-                'sort'              => 'pastoral_type_id',
+                'delete'            => true,
+                'deleteFailMsg'     => 'You cannot delete a pastoral sub-type which is still in use in a pastoral record.',
                 'fields'            => [
                     'pastoralType' => [
                         'getter'    => 'getPastoralType',
