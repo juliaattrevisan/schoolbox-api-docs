@@ -74,6 +74,9 @@ class Controller extends Base
                 $record = $mapper->findById($post['id']);
                 $result = $mapper->delete($record);
             } catch (MapperException $e) {
+                // Something failed in the mapper: noop
+            } catch (\Throwable $e) {
+                // Something else unexpected failed: noop
             }
         }
 
