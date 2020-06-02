@@ -15,8 +15,9 @@ Data:
  #}
 {% set url     = null %}
 {% set tooltip = null %}
+{% set responseId = responseId is defined ? responseId : (currentFeedback.response ? currentFeedback.response.id : null ) %}
 {% if not currentFeedback.isPublished %}
-    {% if currentFeedback.response.id %}
+    {% if currentFeedback.response %}
         {% if currentFeedback.isSelfGrading %}
             {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
                 assessmentId: currentFeedback.assessable.id,
