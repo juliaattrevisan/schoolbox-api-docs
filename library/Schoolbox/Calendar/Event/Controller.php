@@ -263,11 +263,7 @@ class Controller extends Base
 
         /* Recurrence
          */
-        $recurrence = [];
-
-        if ($event->getSeriesId()) {
-            $recurrence = (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event);
-        }
+        $recurrence = $event->getSeriesId() ? (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event) : [];
 
         /* Folders that you can choose, plus their current selection states
          */
