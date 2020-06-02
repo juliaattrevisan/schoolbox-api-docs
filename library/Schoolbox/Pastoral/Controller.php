@@ -532,7 +532,7 @@ class Controller extends Base
                 'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
-                'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'types'             => $this->pastoralTypeMapper->findAll(),
                 'subTypes'          => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
                 'severities'        => $severities,
                 'roles'             => $roles,
