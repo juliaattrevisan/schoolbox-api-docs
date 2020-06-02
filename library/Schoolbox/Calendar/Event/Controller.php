@@ -231,6 +231,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
