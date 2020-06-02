@@ -22,7 +22,7 @@ $input-height: $global-button-input-height;
 $input-bg-color: $white;
 $input-focus-bg-color: $form-bg-hover-color;
 // DONE use contrasting color
-$input-focus-color: var(--form-bg-hover-color-contrast);
+$input-focus-color: $form-bg-hover-color-contrast;
 $input-border-color: $form-border-color !default;
 // DONE use CSS darken
 $input-focus-border-color: hsla(

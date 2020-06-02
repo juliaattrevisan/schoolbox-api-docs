@@ -119,7 +119,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 					background: $content-ui-submit-foreground;
 					border-radius: 1rem;
                     // DONE use contrasting color
-                    color: var(--content-ui-submit-foreground-contrast);
+                    color: $content-ui-submit-foreground-contrast;
 				}
 			}
 		}

@@ -62,7 +62,7 @@ $alert-default-background: hsla(
 .alert-box {
     background-color: $alert-default-background;
     // DONE use contrast color
-    color: var(--body-background-contrast);
+    color: $body-bg-contrast;
 
     .close {
         &:hover {

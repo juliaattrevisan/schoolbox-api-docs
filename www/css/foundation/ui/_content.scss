@@ -1864,7 +1864,7 @@ $train-line-unvisited-color: $content-ui-background;
                 background: $content-ui-foreground;
                 border-radius: $train-line-stop-size / 2;
                 // DONE use contrasting color
-                color: var(--content-ui-foreground-contrast);
+                color: $content-ui-foreground-contrast;
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
                 padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2) (($train-line-stop-size - rem-calc($base-font-size)) / 2);

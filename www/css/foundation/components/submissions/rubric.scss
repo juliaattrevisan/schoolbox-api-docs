@@ -41,7 +41,7 @@ table.rb {
                 + label {
                     background-color: $content-ui-selected;
                     // DONE use contrasting color
-                    color: var(--content-ui-selected-contrast);
+                    color: $content-ui-selected-contrast;
                 }
             }
             + label {
@@ -173,7 +173,7 @@ table.rb {
         ) !important;
 
         // DONE use contrasting color
-        color: var(--form-bg-hover-color-contrast);
+        color: $form-bg-hover-color-contrast;
         //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
@@ -278,7 +278,7 @@ table.rb {
 .rb-selected {
     background-color: $content-ui-selected !important;
     // DONE use contrasting color
-    color: var(--content-ui-selected-contrast);
+    color: $content-ui-selected-contrast;
 
     .range-selection-value {
         font-weight: bold;
@@ -300,7 +300,7 @@ table.rb {
 .rb-final-summary {
     background-color: $input-border-color !important;
     // DONE use contrasting color
-    color: var(--form-bg-hover-color-contrast);
+    color: $form-bg-hover-color-contrast;
 }
 
 .rb-description, .rb-value {
