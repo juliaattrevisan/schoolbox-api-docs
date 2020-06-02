@@ -75,4 +75,13 @@ class Mapper extends BaseMapper
         Pastoral\Audience\Mapper::getInstance()->deleteByColumn('subtype_id', $subType->getId());
         return true;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }
