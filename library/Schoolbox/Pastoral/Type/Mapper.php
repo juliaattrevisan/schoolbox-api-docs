@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_code', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('pastoral_type_id', Pastoral\SubType\Mapper::class, 'subTypes', 'subTypes');
@@ -126,5 +127,14 @@ class Mapper extends BaseMapper
     {
         Pastoral\Audience\Mapper::getInstance()->deleteByColumn('type_id', $type->getId());
         return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

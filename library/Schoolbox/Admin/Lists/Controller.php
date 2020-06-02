@@ -593,7 +593,7 @@ class Controller extends Base
             'pastoral-type'      => [
                 'title'             => 'Pastoral Types',
                 'mapper'            => PastoralTypeMapper::class,
-                'sort'              => 'name',
+                'delete'            => true,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',

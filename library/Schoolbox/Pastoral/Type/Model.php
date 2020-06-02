@@ -12,15 +12,18 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 use Schoolbox\Pastoral;
 use DomainException;
+use Schoolbox\Sequential;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
     use Id;
     use DeletedAtDate;
+    use HasSequence;
 
     /** @var string */
     protected $name;
