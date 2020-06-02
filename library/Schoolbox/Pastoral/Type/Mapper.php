@@ -180,7 +180,7 @@ class Mapper extends BaseMapper
      */
     protected function deletePastoralSubtypes(Model $type): bool
     {
-        Pastoral\Subtype\Mapper::getInstance()->deleteByColumn('pastoral_type_id', $type->getId());
+        Pastoral\SubType\Mapper::getInstance()->deleteByColumn('pastoral_type_id', $type->getId());
         return true;
     }
 
