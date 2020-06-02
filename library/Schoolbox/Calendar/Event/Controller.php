@@ -562,7 +562,6 @@ class Controller extends Base
         /* Attendance settings
          */
         $attendance = (int)$this->request->post['attendance'];
-        $attendanceChanged = (int)$event->getAttendance() !== $attendance;
 
         /* Decide if the Attendance settings need to be reset
          *
@@ -571,7 +570,7 @@ class Controller extends Base
          *
          * For now, changing datetimes requires people to respond again
          */
-        $attendanceDirty = (int)(
+        $attendanceDirty = (
             ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
             ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
 
@@ -606,7 +605,7 @@ class Controller extends Base
          * setting now differs from what it previously was
          */
         $event
-            ->setAttendance($attendanceChanged)
+            ->setAttendance($attendance)
             ->setAttendanceDirty($attendanceDirty);
 
         /* Check minimum requirements for checkbox arrays

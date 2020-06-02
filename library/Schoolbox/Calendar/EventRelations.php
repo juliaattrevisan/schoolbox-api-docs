@@ -270,7 +270,7 @@ class EventRelations
 
             $ids = implode(',', array_map('intval', $guestIds));
 
-            $this->attendanceMapper->getDatabase()->executeQuery($query, [
+            $this->attendanceMapper->getDatabase()->query($query, [
                 'eventId' => $event->getId(),
                 'guestIds' => $ids
             ]);
