@@ -56,30 +56,39 @@
                 </div>
             </section>
 
-            <section class="content">
-                <form :action="modifyAttendancePath" method="post">
-                    <div class="row">
-                        <div id="attendance-guests" class="small-12 columns">
-                            <label>Add Guests</label>
-                            <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                        </div>
+            <form :action="modifyAttendancePath" method="post">
+                <div class="row">
+                    <div id="attendance-guests" class="small-12 columns">
+                        <section>
+                            <div class="content">
+                                <label>Add Guests</label>
+                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                            </div>
 
-                        <input type="submit" value="Add Guests">
+                            <ul class="action-list">
+                                <li class="actions-small-1" v-for="guest in this.event.guests">
+                                    <input type="hidden" name="existingGuests[]" :value="guest.id" />
+
+                                    <div class="list-item">
+                                        <div class="card small-11">
+                                            <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
+                                                <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
+
+                                                <p>{{ guest.name }}</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a :data-guest-delete="guest.id" class="icon-delete no-text" href="#" title="Remove guest"></a>
+                                    </nav>
+                                </li>
+                            </ul>
+                        </section>
                     </div>
 
-                    <div class="row" v-for="guest in this.event.guests">
-                        <input type="hidden" name="existingGuests[]" :value="guest.id" />
-
-                        <div class="card small-12">
-                            <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
-                                <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
-
-                                <p>{{ guest.name }}</p>
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </section>
+                    <input type="submit" value="Update Guests">
+                </div>
+            </form>
         </div>
 
         <audiences-modal
