@@ -99,14 +99,19 @@
   $colorVarA: str-insert($colorVar, '-a', -2);
 
   // Scaling works differently when < 100 and > 100.
-  // < 100: bring toward 0
-  // > 100: bring toward 1
-  $offset:    strip-unit($percent) / 100;
+  // < 0: bring toward 0
+  // > 0: bring toward 1
+  $offset: strip-unit($percent) / 100;
+  @if ($percent > 0%) {
+    $colorVarA: "#{$colorVarA} + (100% - #{$colorVarA}) * #{$offset}"
+  } @else if($percent < 0%) {
+    $colorVarA: "#{$colorVarA} - (#{$colorVarA} * #{$offset})"
+  }
   @return hsla(
                   $colorVarH,
                   $colorVarS,
                   $colorVarL,
-                  calc(#{$colorVarA} * #{$offset})
+                  $colorVarA
   );
 }
 
@@ -123,11 +128,20 @@
   $colorVarS: str-insert($colorVar, '-s', -2);
   $colorVarL: str-insert($colorVar, '-l', -2);
   $colorVarA: str-insert($colorVar, '-a', -2);
-  $offset:    strip-unit($percent) / 100;
+
+  // Scaling works differently when < 100 and > 100.
+  // < 0: bring toward 0
+  // > 0: bring toward 1
+  $offset: strip-unit($percent) / 100;
+  @if ($percent > 0%) {
+    $colorVarL: "#{$colorVarL} + (100% - #{$colorVarL}) * #{$offset}"
+  } @else if($percent < 0%) {
+    $colorVarL: "#{$colorVarL} - (#{$colorVarL} * #{$offset})"
+  }
   @return hsla(
                   $colorVarH,
                   $colorVarS,
-                  calc(#{$colorVarL} * #{$offset}),
+                  $colorVarL,
                   $colorVarA
   );
 }
