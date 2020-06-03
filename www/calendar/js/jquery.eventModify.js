@@ -208,7 +208,7 @@
                         required: {
                             depends: validateFolderSelected
                         },
-                        minLength: {
+                        minlength: {
                             param: 1,
                             depends: validateFolderSelected
                         }
