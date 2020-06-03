@@ -40,8 +40,8 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('pastoral_type_id', Pastoral\SubType\Mapper::class, 'subTypes', 'subTypes');
 
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralSubtypes']);
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+//        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralSubtypes']);
+//        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralSubtypes']);
     }
@@ -104,59 +104,59 @@ class Mapper extends BaseMapper
     }
 
 
-    /**
-     * Pre-soft-delete callback to ensure there are no
-     * non-soft-deleted pastoral records with this pastoral type.
-     *
-     * @param Model $pastoralType
-     *
-     * @return bool
-     * @throws UnexpectedValueException If pastoral records exists with this pastoral type
-     */
-    public function softDeleteCheckPastoralRecords(Model $pastoralType)
-    {
-        $pastoralRecordMapper = PastoralMapper::getInstance();
-        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
-        $pb->isNull('deleted_at');
-        $pb->equals('type_id', $pastoralType->getId());
-
-        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
-        if ($countRecords) {
-            throw new UnexpectedValueException(
-                sprintf('Cannot delete PastoralType Model. %d non-deleted pastoral records still linked', $countRecords)
-            );
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Pre-soft-delete callback to ensure there are no non-soft-deleted pastoral
-     * records with one of this record's subtypes.
-     *
-     * @param Model $pastoralType
-     *
-     * @return bool
-     * @throws UnexpectedValueException If pastoral records exists with a
-     *                                  subtype of this pastoral type
-     */
-    public function softDeleteCheckPastoralSubtypes(Model $pastoralType)
-    {
-        $pastoralRecordMapper = PastoralMapper::getInstance();
-        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
-        $pb->isNull('deleted_at');
-        $pb->equals('c.pastoral_type_id', $pastoralType->getId());
-
-        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
-        if ($countRecords) {
-            throw new UnexpectedValueException(
-                sprintf('Cannot delete PastoralType Model. %d non-deleted pastoral records still linked', $countRecords)
-            );
-        }
-
-        return true;
-    }
+//    /**
+//     * Pre-soft-delete callback to ensure there are no
+//     * non-soft-deleted pastoral records with this pastoral type.
+//     *
+//     * @param Model $pastoralType
+//     *
+//     * @return bool
+//     * @throws UnexpectedValueException If pastoral records exists with this pastoral type
+//     */
+//    public function softDeleteCheckPastoralRecords(Model $pastoralType)
+//    {
+//        $pastoralRecordMapper = PastoralMapper::getInstance();
+//        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
+//        $pb->isNull('deleted_at');
+//        $pb->equals('type_id', $pastoralType->getId());
+//
+//        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
+//        if ($countRecords) {
+//            throw new UnexpectedValueException(
+//                sprintf('Cannot delete PastoralType Model. %d non-deleted pastoral records still linked', $countRecords)
+//            );
+//        }
+//
+//        return true;
+//    }
+//
+//
+//    /**
+//     * Pre-soft-delete callback to ensure there are no non-soft-deleted pastoral
+//     * records with one of this record's subtypes.
+//     *
+//     * @param Model $pastoralType
+//     *
+//     * @return bool
+//     * @throws UnexpectedValueException If pastoral records exists with a
+//     *                                  subtype of this pastoral type
+//     */
+//    public function softDeleteCheckPastoralSubtypes(Model $pastoralType)
+//    {
+//        $pastoralRecordMapper = PastoralMapper::getInstance();
+//        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
+//        $pb->isNull('deleted_at');
+//        $pb->equals('c.pastoral_type_id', $pastoralType->getId());
+//
+//        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
+//        if ($countRecords) {
+//            throw new UnexpectedValueException(
+//                sprintf('Cannot delete PastoralType Model. %d non-deleted pastoral records still linked', $countRecords)
+//            );
+//        }
+//
+//        return true;
+//    }
 
 
     /**

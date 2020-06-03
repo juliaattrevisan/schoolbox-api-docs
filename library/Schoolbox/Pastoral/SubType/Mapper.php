@@ -34,7 +34,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+//        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
@@ -63,30 +63,30 @@ class Mapper extends BaseMapper
     }
 
 
-    /**
-     * Pre-soft-delete callback to ensure there are no
-     * non-soft-deleted pastoral records with this pastoral subtype.
-     *
-     * @param Model $pastoralSubType
-     *
-     * @return bool
-     * @throws UnexpectedValueException If pastoral records exists with this pastoral subtype
-     */
-    public function softDeleteCheckPastoralRecords(Model $pastoralSubType)
-    {
-        $pastoralRecordMapper = Pastoral\Mapper::getInstance();
-        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
-        $pb->isNull('deleted_at');
-        $pb->equals('subtype_id', $pastoralSubType->getId());
-
-        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
-        if ($countRecords) {
-            $message = 'Cannot delete PastoralSubType Model. %d non-deleted pastoral records still linked';
-            throw new UnexpectedValueException(sprintf($message, $countRecords));
-        }
-
-        return true;
-    }
+//    /**
+//     * Pre-soft-delete callback to ensure there are no
+//     * non-soft-deleted pastoral records with this pastoral subtype.
+//     *
+//     * @param Model $pastoralSubType
+//     *
+//     * @return bool
+//     * @throws UnexpectedValueException If pastoral records exists with this pastoral subtype
+//     */
+//    public function softDeleteCheckPastoralRecords(Model $pastoralSubType)
+//    {
+//        $pastoralRecordMapper = Pastoral\Mapper::getInstance();
+//        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
+//        $pb->isNull('deleted_at');
+//        $pb->equals('subtype_id', $pastoralSubType->getId());
+//
+//        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
+//        if ($countRecords) {
+//            $message = 'Cannot delete PastoralSubType Model. %d non-deleted pastoral records still linked';
+//            throw new UnexpectedValueException(sprintf($message, $countRecords));
+//        }
+//
+//        return true;
+//    }
 
 
     /**
