@@ -32,20 +32,10 @@ $off-canvas-height: rem-calc(300) !default;
 $off-canvas-bg: $oil !default;
 
 // DONE multiply lightness instead of scale-color
-$off-canvas-bg-hover: hsla(
-    var(--navigation-foreground-h),
-    var(--navigation-foreground-s),
-    calc(var(--navigation-foreground-l) * 0.7),
-    var(--navigation-foreground-a)
-) !default;
+$off-canvas-bg-hover: css-scale-lightness($navigation-foreground, -30%) !default;
 
 // DONE multiply lightness instead of scale-color
-$off-canvas-bg-active: hsla(
-    var(--navigation-foreground-h),
-    var(--navigation-foreground-s),
-    calc(var(--navigation-foreground-l) * 0.7),
-    var(--navigation-foreground-a)
-) !default;
+$off-canvas-bg-active: css-scale-lightness($navigation-foreground, -30%) !default;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: .3rem rem-calc(15) !default;

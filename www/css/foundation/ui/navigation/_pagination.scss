@@ -24,12 +24,7 @@ $pagination-link-active-bg: $content-ui-selected;
 // $pagination-link-unavailable-cursor: default;
 // $pagination-link-unavailable-font-color: $aluminum;
 // DONE scale-color (in this case lightness:-10%) works
-$pagination-link-unavailable-bg-active: hsla(
-  var(--content-ui-background-h),
-  var(--content-ui-background-s),
-  calc(var(--content-ui-background-l) * .9),
-  var(--content-ui-background-a)
-);
+$pagination-link-unavailable-bg-active: css-scale-color($content-ui-background, -10%);
 
 // We use these for currently selected anchor links
 $pagination-link-current-background: $content-ui-selected;
