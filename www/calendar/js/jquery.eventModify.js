@@ -184,17 +184,6 @@
                 return false;
             };
 
-            var validateNotAllDaySelected = function () {
-                var allDaySelector = $(':checkbox[name="allday"]');
-
-                if (allDaySelector.length && !allDaySelector.prop('checked')) {
-                    return true;
-                }
-
-                // No all day selector (EOTC)? Don't apply this rule
-                return false;
-            };
-
             $(config.element).alaressValidate({
                 rules: {
                     'campus[]': {
