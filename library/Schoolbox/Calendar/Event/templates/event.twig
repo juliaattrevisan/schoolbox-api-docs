@@ -86,6 +86,9 @@
                         text: name + ' has been added',
                         css: 'success'
                     });
+                },
+                error: function(responseText) {
+                    $toast.toastTimeout({text: 'Could not add ' + name, css: 'alert'});
                 }
             });
         });
@@ -99,12 +102,16 @@
                 text: 'Are you sure you want to remove attendance for ' + element.attr('data-guest-name') + '?',
                 confirmEvent: function() {
 
+                    /* User's name
+                     */
+                    let name = element.attr('data-guest-name');
+
                     /* A toast - to your valour, my sword, and our victory together
                      */
                     let $toast = $('[data-toast]');
 
                     $toast.toastActivate({
-                        text: 'Removing ' + element.attr('data-guest-name') + '...'
+                        text: 'Removing ' + name + '...'
                     });
 
                     $.ajax({
@@ -113,9 +120,12 @@
                         data: {guest: element.attr('data-guest-delete')},
                         success: function(responseText) {
                             $toast.toastTimeout({
-                                text: element.attr('data-guest-name') + ' has been removed',
+                                text: name + ' has been removed',
                                 css: 'success'
                             });
+                        },
+                        error: function(responseText) {
+                            $toast.toastTimeout({text: 'Could not remove ' + name, css: 'alert'});
                         }
                     });
                 }
