@@ -6,12 +6,7 @@ $pickr-border-color: #e6e6e6;
 $pickr-border: rem-calc(1) solid $pickr-border-color;
 
 // DONE use CSS lighten
-$pickr-hover-background: hsla(
-    var(--accent-foreground-h),
-    var(--accent-foreground-s),
-    calc(var(--accent-foreground-l) + 60%),
-    var(--accent-foreground-a)
-);
+$pickr-hover-background: css-lighten($accent-foreground, 60%);
 
 /**
  * The input and button

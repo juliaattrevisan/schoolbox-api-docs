@@ -92,13 +92,7 @@ $f-dropdown-icon-align: 0.25rem;
     }
     .separator {
         // DONE use CSS darken
-        background-color: hsla(
-            var(--content-ui-background-h),
-            var(--content-ui-background-s),
-            calc(var(--content-ui-background-l) - 5%),
-            var(--content-ui-background-a)
-        );
-        //background-color: darken($f-dropdown-bg, 5%);
+        background-color: css-darken($f-dropdown-bg, 5%);
         color: $anchor-font-color;
     }
 }

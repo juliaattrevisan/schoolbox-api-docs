@@ -25,13 +25,7 @@ $input-focus-bg-color: $form-bg-hover-color;
 $input-focus-color: $form-bg-hover-color-contrast;
 $input-border-color: $form-border-color !default;
 // DONE use CSS darken
-$input-focus-border-color: hsla(
-    var(--form-border-color-h),
-    var(--form-border-color-s),
-    calc(var(--form-border-color-l) - 15%),
-    var(--form-border-color-a)
-);
-//$input-focus-border-color: darken($form-border-color, 15%);
+$input-focus-border-color: css-darken($form-border-color, 15%);
 $input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
 $input-border-style: solid;
@@ -44,7 +38,7 @@ $input-box-shadow: none;
 // We use these to style the fieldset border and spacing.
 $fieldset-border-style: solid;
 $fieldset-border-width: 2px;
-$fieldset-border-color: var(--body-background);
+$fieldset-border-color: $body-bg;
 $fieldset-padding: rem-calc(($base-font-size - 8));
 $fieldset-margin: rem-calc(($base-font-size - 8, 0));
 
@@ -946,7 +940,7 @@ section > fieldset {
 
 	// second sibling onwards
 	~ fieldset {
-		border-top: solid $fieldset-border-width var(--body-background);
+		border-top: solid $fieldset-border-width $body-bg;
 	}
 
 	> legend {
@@ -973,7 +967,7 @@ section > fieldset {
 .mage > section > fieldset fieldset {
 	// second sibling onwards
 	~ fieldset, ~ fieldset fieldset {
-		border-top: solid $fieldset-border-width var(--body-background);
+		border-top: solid $fieldset-border-width $body-bg;
 	}
 }
 

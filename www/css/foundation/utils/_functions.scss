@@ -6,6 +6,7 @@
  */
 @function css-tint($colorVar, $percent)
 {
+  // TODO assert that $colorVar matches `var()` pattern
   $colorVarR: str-insert($colorVar, '-r', -2);
   $colorVarG: str-insert($colorVar, '-g', -2);
   $colorVarB: str-insert($colorVar, '-b', -2);

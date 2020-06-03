@@ -52,12 +52,7 @@ $alert-transition-ease: ease-out;
 $alert-tint-amount: 90%;
 
 // DONE use CSS darken
-$alert-default-background: hsla(
-    var(--body-background-h),
-    var(--body-background-s),
-    calc(var(--body-background-l) - 10%),
-    var(--body-background-a)
-);
+$alert-default-background: css-darken($body-bg, 10%);
 
 .alert-box {
     background-color: $alert-default-background;

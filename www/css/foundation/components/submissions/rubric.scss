@@ -1,5 +1,5 @@
 .rubric-wrap {
-    border-top: solid 0.5rem var(--body-background);
+    border-top: solid 0.5rem $body-bg;
 }
 .threaded .rubric-wrap {
     border-top-color: $snow;
@@ -54,12 +54,7 @@ table.rb {
 
                 &:hover {
                     // DONE use CSS lighten
-                    background-color: hsla(
-                        var(--content-ui-selected-h),
-                        var(--content-ui-selected-s),
-                        calc(var(--content-ui-selected-l) + 3%),
-                        var(--content-ui-selected-a)
-                    );
+                    background-color: css-lighten($content-ui-selected, 3%);
                     cursor: pointer;
                 }
             }
@@ -105,16 +100,16 @@ table.rb {
     }
 
     tbody th:first-of-type {
-        border-right: solid 1px var(--body-background);
+        border-right: solid 1px $body-bg;
         border-left: 0;
     }
     tbody th:last-of-type,
     thead th:first-of-type {
-        border-right: solid 2px var(--body-background);
+        border-right: solid 2px $body-bg;
         border-left: 0;
     }
     td, th {
-        border-left: 1px solid var(--body-background);
+        border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         &:hover {
             input[type=text], input[type=tel], textarea {
@@ -165,12 +160,7 @@ table.rb {
 
     .rb-group-summary {
         // DONE use CSS lighten
-        background-color: hsla(
-            var(--form-border-color-h),
-            var(--form-border-color-s),
-            calc(var(--form-border-color-l) + 10%),
-            var(--form-border-color-a)
-        ) !important;
+        background-color: css-lighten($input-border-color, 10%) !important;
 
         // DONE use contrasting color
         color: $form-bg-hover-color-contrast;
@@ -246,11 +236,11 @@ table.rb {
         }
     }
     tr.rb-group-header {
-        border-top: solid 1px var(--body-background);
+        border-top: solid 1px $body-bg;
     }
     .rb-group-header {
         + tr {
-            border-top: solid 1px var(--body-background);
+            border-top: solid 1px $body-bg;
         }
         th {
             border-right-width: 1px;
@@ -270,7 +260,7 @@ table.rb {
     }
 }
 .rb-no-cell {
-    background-color: var(--body-background);
+    background-color: $body-bg;
     // DONE figure out what to do about this mixin
     color: $body-foreground;
     line-height: 2.875rem;
