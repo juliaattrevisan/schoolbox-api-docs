@@ -16,7 +16,7 @@
                   calc(#{$colorVarR} + (255 - #{$colorVarR}) * #{$offset}),
                   calc(#{$colorVarG} + (255 - #{$colorVarG}) * #{$offset}),
                   calc(#{$colorVarB} + (255 - #{$colorVarB}) * #{$offset}),
-                  $colorVarA
+                  #{$colorVarA}
   );
 }
 
@@ -38,7 +38,7 @@
                   calc(#{$colorVarR} * #{$offset}),
                   calc(#{$colorVarG} * #{$offset}),
                   calc(#{$colorVarB} * #{$offset}),
-                  $colorVarA
+                  #{$colorVarA}
   );
 }
 
@@ -56,10 +56,10 @@
   $colorVarL: str-insert($colorVar, '-l', -2);
   $colorVarA: str-insert($colorVar, '-a', -2);
   @return hsla(
-                  $colorVarH,
-                  $colorVarS,
+                  #{$colorVarH},
+                  #{$colorVarS},
                   calc(#{$colorVarL} + #{$percent}),
-                  $colorVarA
+                  #{$colorVarA}
   );
 }
 
@@ -77,10 +77,10 @@
   $colorVarL: str-insert($colorVar, '-l', -2);
   $colorVarA: str-insert($colorVar, '-a', -2);
   @return hsla(
-                  $colorVarH,
-                  $colorVarS,
+                  #{$colorVarH},
+                  #{$colorVarS},
                   calc(#{$colorVarL} - #{$percent}),
-                  $colorVarA
+                  #{$colorVarA}
   );
 }
 
