@@ -66,6 +66,8 @@
                     </div>
 
                     <div class="row" v-for="guest in this.event.guests">
+                        <input type="hidden" name="existingGuests[]" :value="guest.id" />
+
                         <div class="card small-12">
                             <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
                                 <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
