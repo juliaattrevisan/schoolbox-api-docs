@@ -4464,3 +4464,9 @@ parameters:
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
+
+		-
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			count: 1
+			path: library/Schoolbox/Calendar/Event/Attendance/Module.php
+

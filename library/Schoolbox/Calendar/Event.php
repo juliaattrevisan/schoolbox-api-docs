@@ -29,14 +29,6 @@ class Event implements ISoftDeletable
     public const ACCESS_GROUP = 2;
     public const ACCESS_CAMPUS = 3;
 
-    public const ATTENDANCE_STATUS_PENDING = 1;
-    public const ATTENDANCE_STATUS_APPROVED = 2;
-    public const ATTENDANCE_STATUS_REJECTED = 3;
-
-    public const ATTENDANCE_INTENTION_PENDING = 1;
-    public const ATTENDANCE_INTENTION_PRESENT = 2;
-    public const ATTENDANCE_INTENTION_ABSENT = 3;
-
 
     /**
      * Int corresponding to All Day setting set to on
@@ -201,6 +193,15 @@ class Event implements ISoftDeletable
      * @var Collection|Campus[]
      */
     protected $campusCollection = null;
+
+
+    /**
+     * Associated guests
+     *
+     * @var Collection|User[]
+     */
+    protected $guests;
+
 
     /**
      * The date when the event was published (made visible to users)
@@ -398,6 +399,24 @@ class Event implements ISoftDeletable
 
     /* Getters/Setters
      */
+
+    /**
+     * @return Collection|int[]
+     */
+    public function getGuests()
+    {
+        return $this->guests;
+    }
+
+    /**
+     * @param Collection|int[] $guests
+     * @return $this
+     */
+    public function setGuests($guests): self
+    {
+        $this->guests = $guests;
+        return $this;
+    }
 
     /**
      * Set access

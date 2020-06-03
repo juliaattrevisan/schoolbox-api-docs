@@ -1,0 +1,109 @@
+<?php
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Calendar\Event\Attendance;
+
+use Schoolbox\Calendar\Event;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
+
+/**
+ * Class Model
+ *
+ * @package Schoolbox\Calendar\Event\Attendance
+ */
+class Model
+{
+    use ModelTrait\Id;
+
+    /**
+     * RSVP Status Pending: waiting for intent to be declared
+     */
+    public const STATUS_PENDING = 1;
+    public const STATUS_APPROVED = 2;
+    public const STATUS_REJECTED = 3;
+
+
+    /**
+     * @var User
+     */
+    private $user;
+
+
+    /**
+     * @var Event
+     */
+    private $event;
+
+
+    /**
+     * @var int
+     */
+    private $status;
+
+
+    /**
+     * @return User
+     */
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+
+    /**
+     * @param User $user
+     * @return $this
+     *
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+
+    /**
+     * @return Event
+     */
+    public function getEvent(): Event
+    {
+        return $this->event;
+    }
+
+
+    /**
+     * @param Event $event
+     * @return $this
+     */
+    public function setEvent(Event $event): self
+    {
+        $this->event = $event;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param int $status
+     * @return $this
+     */
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+}

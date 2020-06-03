@@ -95,7 +95,7 @@ class Calendar extends DeprecatedModel
      */
     public function getPending($eventId)
     {
-        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_PENDING);
+        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_PENDING);
     }
 
     /**
@@ -107,7 +107,7 @@ class Calendar extends DeprecatedModel
      */
     public function getAttending($eventId)
     {
-        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_APPROVED);
+        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_APPROVED);
     }
 
     /**
@@ -119,14 +119,14 @@ class Calendar extends DeprecatedModel
      */
     public function getRejected($eventId)
     {
-        return $this->getByStatus($eventId, EventModel::ATTENDANCE_STATUS_REJECTED);
+        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_REJECTED);
     }
 
     public function getAttendeeList($eventId)
     {
         $query = "
             SELECT u.*, g.name as groupName,
-                ea.id, ea.user_id, ea.status, ea.intention
+                ea.id, ea.user_id, ea.status
             FROM event_attendance ea
             JOIN `user` u ON u.id = ea.user_id
             JOIN `groups` g ON g.id = u.group_id
@@ -572,7 +572,7 @@ class Calendar extends DeprecatedModel
         }
 
         $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}'
-            AND event_attendance.status = '". EventModel::ATTENDANCE_STATUS_APPROVED ."' )";
+            AND event_attendance.status = '". \Schoolbox\Calendar\Event\Attendance\Model::STATUS_APPROVED ."' )";
 
         $access_query = "AND (
             (access = " . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')

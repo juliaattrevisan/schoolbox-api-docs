@@ -73,11 +73,11 @@ abstract class Base extends RendererBase
     public function attendanceStatus()
     {
         if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
-            if ($attendance['status'] == Event::ATTENDANCE_STATUS_PENDING) {
+            if ($attendance['status'] == Event\Attendance\Model::STATUS_PENDING) {
                 return 'Pending';
-            } else if ($attendance['status'] == Event::ATTENDANCE_STATUS_APPROVED) {
+            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_APPROVED) {
                 return 'Approved';
-            } else if ($attendance['status'] == Event::ATTENDANCE_STATUS_REJECTED) {
+            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_REJECTED) {
                 return 'Rejected';
             }
         }

@@ -296,7 +296,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ';
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(':eventId', $event->getId());
+        $statement->bindValue(':eventId', $event->getId());
         $statement->execute();
     }
 
@@ -312,17 +312,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $query = '
             INSERT INTO event_attendance
-            VALUES (null, :eventId, :userId, :status, :intention)
+            VALUES (null, :eventId, :userId, :status)
         ';
 
-        $statusPending = Event::ATTENDANCE_STATUS_PENDING;
-        $intentPresent = Event::ATTENDANCE_INTENTION_PRESENT;
+        $statusPending = Event\Attendance\Model::STATUS_PENDING;
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(':eventId', $eventId);
-        $statement->bindParam(':userId', $userId);
-        $statement->bindParam(':status', $statusPending);
-        $statement->bindParam(':intention', $intentPresent);
+        $statement->bindValue(':eventId', $eventId);
+        $statement->bindValue(':userId', $userId);
+        $statement->bindValue(':status', $statusPending);
 
         $statement->execute();
     }
@@ -343,8 +341,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             ';
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $eventId);
-        $statement->bindParam(":userId", $userId);
+        $statement->bindValue(':eventId', $eventId);
+        $statement->bindValue(':userId', $userId);
         $statement->execute();
     }
 
@@ -451,8 +449,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             ';
 
             $statement = $this->database->prepare($query);
-            $statement->bindParam(':eventId', $event->getId());
-            $statement->bindParam(':roleId', $roleId);
+            $statement->bindValue(':eventId', $event->getId());
+            $statement->bindValue(':roleId', $roleId);
             $statement->execute();
         }
     }
@@ -573,8 +571,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         }
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":startDate", $startDate);
-        $statement->bindParam(":endDate", $endDate);
+        $statement->bindValue(':startDate', $startDate);
+        $statement->bindValue(':endDate', $endDate);
         $statement->execute();
 
         $allEvents = $this->hydrateSelect($statement);

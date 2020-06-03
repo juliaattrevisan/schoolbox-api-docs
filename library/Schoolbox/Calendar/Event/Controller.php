@@ -84,15 +84,22 @@ class Controller extends Base
 
 
     /**
+     * @var Attendance\Mapper
+     */
+    private $attendanceMapper;
+
+
+    /**
      * Controller constructor.
      *
-     * @param Error\Mapper    $errorMapper
-     * @param RoleMapper      $roleMapper
-     * @param Folder\Mapper   $folderMapper
-     * @param EventMapper     $eventMapper
-     * @param EventTypeMapper $eventTypeMapper
-     * @param CampusMapper    $campusMapper
-     * @param UserMapper      $userMapper
+     * @param Error\Mapper      $errorMapper
+     * @param RoleMapper        $roleMapper
+     * @param Folder\Mapper     $folderMapper
+     * @param EventMapper       $eventMapper
+     * @param EventTypeMapper   $eventTypeMapper
+     * @param CampusMapper      $campusMapper
+     * @param UserMapper        $userMapper
+     * @param Attendance\Mapper $attendanceMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -101,7 +108,8 @@ class Controller extends Base
         EventMapper $eventMapper,
         EventTypeMapper $eventTypeMapper,
         CampusMapper $campusMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Attendance\Mapper $attendanceMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -110,6 +118,7 @@ class Controller extends Base
         $this->eventTypeMapper = $eventTypeMapper;
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
+        $this->attendanceMapper = $attendanceMapper;
     }
 
 
@@ -222,6 +231,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
@@ -253,11 +263,7 @@ class Controller extends Base
 
         /* Recurrence
          */
-        $recurrence = [];
-
-        if ($event->getSeriesId()) {
-            $recurrence = (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event);
-        }
+        $recurrence = $event->getSeriesId() ? (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event) : [];
 
         /* Folders that you can choose, plus their current selection states
          */
@@ -294,6 +300,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
@@ -510,11 +517,6 @@ class Controller extends Base
         $allDay = (int)$this->request->post['allDay'];
         $roles = $this->request->post['roles'] ?? [];
 
-        /* Attendance settings
-         */
-        $attendance = (int)$this->request->post['attendance'];
-        $attendanceChanged = (int)$event->getAttendance() !== $attendance;
-
         /* Recurrence settings
          */
         $efficacy = $this->request->post['efficacy'];
@@ -528,8 +530,12 @@ class Controller extends Base
          */
         $folderAccess = FolderAccess::getInstance();
 
-        if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+        try {
+            if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
+            }
+        } catch (InvalidArgumentException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check the dates
@@ -564,6 +570,29 @@ class Controller extends Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_START_TIME_GREATER);
         }
 
+        /* Attendance settings
+         */
+        $attendance = (int)$this->request->post['attendance'];
+
+        /* Decide if the Attendance settings need to be reset
+         *
+         * You don't need to change RSVP statuses if something non-critical changes such as
+         * updating the description to fix spelling mistakes, changing headings, etc.
+         *
+         * For now, changing datetimes requires people to respond again
+         */
+        $attendanceDirty = $event->getStartDateTime() && $event->getEndDateTime() && (
+            ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
+            ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
+
+        /* Invited guests
+         */
+        $guests = [];
+
+        if ('' !== (string)$this->request->post['guests']) {
+            $guests = explode(',', $this->request->post['guests']);
+        }
+
         /* Assign values to $event instance
          */
         $event
@@ -580,16 +609,15 @@ class Controller extends Base
             ->setAllDay($allDay)
             ->setRoleCollection(new Collection($roles))
             ->setFolderCollection(new Collection($folders))
-            ->setCampusCollection(new Collection($campuses));
+            ->setCampusCollection(new Collection($campuses))
+            ->setGuests(new Collection($guests));
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
          */
-        if ($attendanceChanged) {
-            $event
-                ->setAttendance($attendance)
-                ->setAttendanceDirty(true);
-        }
+        $event
+            ->setAttendance($attendance)
+            ->setAttendanceDirty($attendanceDirty);
 
         /* Check minimum requirements for checkbox arrays
          *
@@ -605,7 +633,7 @@ class Controller extends Base
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles);
+        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, $attendanceDirty);
 
         /* Save this event and any recurring incidents too
          */

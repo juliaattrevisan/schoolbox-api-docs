@@ -166,58 +166,21 @@
         function setupEventValidation() {
             // Campus selection validation - only required if eventType === Campus
             var validateCampusSelected = function () {
-                var normalSelector = $('select[name="level"]');
-
-                /* Normal calendar selector
-                 */
-                if (normalSelector.length) {
+                if ($('select[name="level"]').length) {
                     return $('select[name="level"]').val() == 3;
                 }
-                /* For EOTC
-                 */
-                else {
-                    return $('input[name="campus[]"]').length;
-                }
+
+                return false;
             };
 
             /* Check if a Group is selected when using the Group
              * level option in the dropdown
              */
-            var validateGroupSelected = function () {
-                var level = parseInt($('select[name=level]').val());
-
-                return level == 2;
-            };
-
-            /* For EOTC
-             * Disabled need for files to be uploaded, regardless of the setting
-             */
-            var validateRamsFile = function () {
-                return false;
-            };
-
-            /* For EOTC
-             */
-            var validateTeacherInCharge = function () {
-                var ticExists = $('input[name=teacherInCharge]').length;
-
-                if (ticExists) {
-                    var ticValue = $('input[name=teacherInCharge]').val()
-
-                    if (ticValue == '[]' || ticValue == '') {
-                        return true;
-                    }
+            var validateFolderSelected = function () {
+                if ($('select[name="level"]').length) {
+                    return parseInt($('select[name=level]').val()) == 2;
                 }
 
-                return false;
-            };
-
-            var validateNotAllDaySelected = function () {
-                var allDaySelector = $(':checkbox[name="allday"]');
-                if (allDaySelector.length && !allDaySelector.prop('checked')) {
-                    return true;
-                }
-                // No all day selector (EOTC)? Don't apply this rule
                 return false;
             };
 
@@ -241,25 +204,13 @@
                             depends: validateCampusSelected
                         }
                     },
-                    'ramsFile': {
+                    'folder[]': {
                         required: {
-                            depends: validateRamsFile
+                            depends: validateFolderSelected
                         },
                         minlength: {
-                            param: 1
-                        }
-                    },
-                    'teacherInCharge': {
-                        required: {
-                            depends: validateTeacherInCharge
-                        },
-                        minlength: {
-                            param: 1
-                        }
-                    },
-                    'group[]': {
-                        required: {
-                            depends: validateGroupSelected
+                            param: 1,
+                            depends: validateFolderSelected
                         }
                     },
                     startDate: {
@@ -271,6 +222,17 @@
                         datepickerDate: true
                     }
                 },
+
+                /**
+                 * Executes when form is valid
+                 *
+                 * Note: if you have a non-visible input field with the "required" attribute assigned
+                 * (such as an input element inside a div with display:none) the submitHandler doesn't
+                 * fire at all, and silently does nothing. Remove the "required" attribute in accordance
+                 * with the element's visibility, in those circumstances; or just make it optional
+                 *
+                 * @param form
+                 */
                 submitHandler: function (form) {
                     // Find the submit button for this form and disable it,
                     // to avoid accidental multiple requests

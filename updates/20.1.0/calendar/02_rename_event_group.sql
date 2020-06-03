@@ -16,3 +16,7 @@ ALTER TABLE `event_role`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION;
 
+-- remove mysterious column whose purpose was lost in time
+
+ALTER TABLE `event_attendance`
+    DROP COLUMN `intention`;
