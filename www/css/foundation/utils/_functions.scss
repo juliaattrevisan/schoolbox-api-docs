@@ -83,19 +83,19 @@
   $components: color-var-components($colorVar);
   @if ($hue) {
     $temp:       map-get($components, 'h');
-    $components: map-merge($components, ('h': "calc(#{$temp} + #{$hue}"));
+    $components: map-merge($components, ('h': "calc(#{$temp} + #{$hue})"));
   }
   @if ($saturation) {
     $temp:       map-get($components, 's');
-    $components: map-merge($components, ('s': "calc(#{$temp} + #{$saturation}"));
+    $components: map-merge($components, ('s': "calc(#{$temp} + #{$saturation})"));
   }
   @if ($lightness) {
     $temp:       map-get($components, 'l');
-    $components: map-merge($components, ('l': "calc(#{$temp} + #{$lightness}"));
+    $components: map-merge($components, ('l': "calc(#{$temp} + #{$lightness})"));
   }
   @if ($alpha) {
     $temp:       map-get($components, 'a');
-    $components: map-merge($components, ('a': "calc(#{$temp} + #{$alpha}"));
+    $components: map-merge($components, ('a': "calc(#{$temp} + #{$alpha})"));
   }
   @return hsla(
                   #{map-get($components, 'h')},
