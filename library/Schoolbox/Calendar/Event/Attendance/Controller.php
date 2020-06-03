@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use PDOException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -62,6 +63,42 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEventAttendance/index.twig', [
             'event' => $event,
         ])->setTitle('Example'));
+    }
+
+
+    /**
+     * Find the ids of attendees currently for $event
+     *
+     * @param Event $event
+     * @return array
+     */
+    private function findExistingIds(Event $event): array
+    {
+        $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
+
+        return (new Collection($existingUsers))->indexBy('id')->keys();
+    }
+
+
+    /**
+     * Add attendees to the list
+     *
+     * @param Event $event
+     */
+    public function postCreate(Event $event): void
+    {
+        new \Alaress_Probe($this->findExistingIds($event));
+    }
+
+
+    /**
+     * Remove attendees from the list
+     *
+     * @param Event $event
+     */
+    public function postDelete(Event $event): void
+    {
+        new \Alaress_Probe($this->findExistingIds($event));
     }
 
 

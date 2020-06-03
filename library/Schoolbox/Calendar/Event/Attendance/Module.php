@@ -51,7 +51,9 @@ class Module extends BaseModule
         $preloadEvent = function ($params) { return $this->preloadEvent($params); };
 
         $this->register('GET', '/{id}', 'getCurrent', $getPerms, $preloadEvent);
+        $this->register('POST', '/{id}/create', 'postCreate', $postPerms, $preloadEvent);
         $this->register('POST', '/{id}/modify', 'postModify', $postPerms, $preloadEvent);
+        $this->register('POST', '/{id}/delete', 'postDelete', $postPerms, $preloadEvent);
     }
 
 
