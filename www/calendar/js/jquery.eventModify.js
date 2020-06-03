@@ -257,7 +257,7 @@
                             param: 1
                         }
                     },
-                    'group[]': {
+                    'folder[]': {
                         required: {
                             depends: validateGroupSelected
                         }
