@@ -24,6 +24,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
@@ -209,12 +210,14 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
             'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'attendanceMapper' => $this->getMapperFactory()->getLazy(Attendance\Mapper::class),
         ];
     }
 }

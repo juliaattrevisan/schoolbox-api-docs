@@ -300,7 +300,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'guests' => Attendance\Mapper::getInstance()->findAttendances($event),
+            'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
