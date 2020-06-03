@@ -25,6 +25,7 @@
             "roles"     : roleCollection,
             "folders"   : folderCollection
         },
+        'guests'     : guests,
         "attendance" : attendance,
         "canModify"  : canModify,
         "level"      : level,
@@ -34,3 +35,23 @@
 </div>
 
 <script src="/javascript/components/eventDetails.bundle.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#add-guests').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0, showCampus: true},
+                dataType: 'json'
+            },
+            value: [
+                {% for guest in guests %}
+                {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
+                {% endfor %}
+            ],
+            multiple: true
+        });
+    });
+</script>

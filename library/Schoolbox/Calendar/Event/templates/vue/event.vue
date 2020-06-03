@@ -55,6 +55,17 @@
                     </section>
                 </div>
             </section>
+
+            <section class="content">
+                <form :action="modifyAttendancePath">
+                    <div class="row">
+                        <div id="attendance-guests" class="small-12 columns">
+                            <label>Add Guests</label>
+                            <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                        </div>
+                    </div>
+                </form>
+            </section>
         </div>
 
         <audiences-modal
@@ -85,6 +96,10 @@
     const ATTENDANCE_NEXT_ACTION_ADD_LABEL = 'RSVP';
     const ATTENDANCE_NEXT_ACTION_REMOVE_LABEL = 'Unattend';
 
+    /* Inline alteration of attendees on event detail screen
+     */
+    const URL_ATTENDANCE_MODIFY = '/calendar/event/{eventId}/attendance/modify';
+
     export default {
         props: ['event'],
         name: "event-details",
@@ -110,6 +125,23 @@
              */
             generateModifyUrl(eventId, returnUrl) {
                 var url = URL_EVENT_MODIFY_FORM.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+            /**
+             * Route to the Attendance Modify endpoint to asynchronously update attendees
+             *
+             * @param eventId
+             * @param returnUrl
+             * @returns {string}
+             */
+            generateAttendanceModifyUrl(eventId, returnUrl) {
+                var url= URL_ATTENDANCE_MODIFY.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
@@ -205,6 +237,10 @@
 
             modifyPath: function() {
                 return this.generateModifyUrl(this.event.id, btoa(window.location.pathname));
+            },
+
+            modifyAttendancePath: function() {
+                return this.generateAttendanceModifyUrl(this.event.id);
             }
         }
     }
