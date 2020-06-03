@@ -103,15 +103,15 @@
   // > 0: bring toward 1
   $offset: strip-unit($percent) / 100;
   @if ($percent > 0%) {
-    $colorVarA: "#{$colorVarA} + (100% - #{$colorVarA}) * #{$offset}"
+    $colorVarA: "calc(#{$colorVarA} + (100% - #{$colorVarA}) * #{$offset})"
   } @else if($percent < 0%) {
-    $colorVarA: "#{$colorVarA} - (#{$colorVarA} * #{$offset})"
+    $colorVarA: "calc(#{$colorVarA} * (1 + #{$offset}))"
   }
   @return hsla(
-                  $colorVarH,
-                  $colorVarS,
-                  $colorVarL,
-                  $colorVarA
+                  #{$colorVarH},
+                  #{$colorVarS},
+                  #{$colorVarL},
+                  #{$colorVarA}
   );
 }
 
@@ -134,15 +134,15 @@
   // > 0: bring toward 1
   $offset: strip-unit($percent) / 100;
   @if ($percent > 0%) {
-    $colorVarL: "#{$colorVarL} + (100% - #{$colorVarL}) * #{$offset}"
+    $colorVarL: "calc(#{$colorVarL} + (100% - #{$colorVarL}) * #{$offset})"
   } @else if($percent < 0%) {
-    $colorVarL: "#{$colorVarL} - (#{$colorVarL} * #{$offset})"
+    $colorVarL: "calc(#{$colorVarL} * (1 + #{$offset}))"
   }
   @return hsla(
-                  $colorVarH,
-                  $colorVarS,
-                  $colorVarL,
-                  $colorVarA
+                  #{$colorVarH},
+                  #{$colorVarS},
+                  #{$colorVarL},
+                  #{$colorVarA}
   );
 }
 

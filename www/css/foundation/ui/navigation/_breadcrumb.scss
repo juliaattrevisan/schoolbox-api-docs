@@ -46,7 +46,7 @@ $breadcrumb-noclick-bg-color: css-scale-lightness($breadcrumb-bg-color, 40%);
   li {
     a { // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
       // DONE isn't this just content-ui-background after all?
-      color: $content-ui-background;
+      color: $breadcrumb-bg-color;
       //color: scale-color($breadcrumb-noclick-bg-color, $lightness: -40%);
       line-height: rem-calc($base-font-size);
       padding: rem-calc(($base-font-size / 2));
