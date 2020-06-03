@@ -176,7 +176,7 @@
             /* Check if a Group is selected when using the Group
              * level option in the dropdown
              */
-            var validateGroupSelected = function () {
+            var validateFolderSelected = function () {
                 if ($('select[name="level"]').length) {
                     return parseInt($('select[name=level]').val()) == 2;
                 }
@@ -217,11 +217,11 @@
                     },
                     'folder[]': {
                         required: {
-                            depends: validateGroupSelected
+                            depends: validateFolderSelected
                         },
                         minLength: {
                             param: 1,
-                            depends: validateGroupSelected
+                            depends: validateFolderSelected
                         }
                     },
                     startDate: {
