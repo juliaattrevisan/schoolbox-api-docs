@@ -40,6 +40,10 @@ $body-bg:                          var(--body-background) !default;
 
 $login-form-background:            var(--login-form-background) !default;
 
+$accounts-menu-foreground:         var(--accounts-menu-foreground) !default;
+$accounts-menu-background:         var(--accounts-menu-background) !default;
+$accounts-menu-hover:              var(--accounts-menu-hover) !default;
+
 /*****************************
  Contrasts to skin color vars above
  (this replaces usages of calc-text-color function, which works only with colors
@@ -73,6 +77,10 @@ $logo-background-contrast:                  var(--logo-background-contrast) !def
 $body-bg-contrast:                          var(--body-background-contrast) !default;
 
 $login-form-background-contrast:            var(--login-form-background-contrast) !default;
+
+$accounts-menu-foreground-contrast:         var(--accounts-menu-foreground-contrast) !default;
+$accounts-menu-background-contrast:         var(--accounts-menu-background-contrast) !default;
+$accounts-menu-hover-contrast:              var(--accounts-menu-hover-contrast) !default;
 
 /*****************************
  Colors derived from configured skin colors, and their contrasts
