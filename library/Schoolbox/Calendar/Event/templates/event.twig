@@ -71,7 +71,7 @@
             let $toast = $('[data-toast]');
 
             $toast.toastActivate({
-                text: 'Adding ' + name + '...'
+                text: 'Inviting ' + name + '...'
             });
 
             $.ajax({
@@ -83,12 +83,12 @@
                 },
                 success: function(responseText) {
                     $toast.toastTimeout({
-                        text: name + ' has been added',
+                        text: name + ' has been succesfully invited',
                         css: 'success'
                     });
                 },
                 error: function(responseText) {
-                    $toast.toastTimeout({text: 'Could not add ' + name, css: 'alert'});
+                    $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
                 }
             });
         });
@@ -125,7 +125,7 @@
                             });
                         },
                         error: function(responseText) {
-                            $toast.toastTimeout({text: 'Could not remove ' + name, css: 'alert'});
+                            $toast.toastTimeout({text: 'Unable to remove ' + name + '; please try again', css: 'alert'});
                         }
                     });
                 }
