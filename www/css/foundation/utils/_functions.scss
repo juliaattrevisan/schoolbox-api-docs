@@ -73,6 +73,40 @@
 
 
 /**
+ * Partial port of SASS `adjust_color`: works only for the HSL and A channels.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ */
+@function css-adjust-color($colorVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)
+{
+  $components: color-var-components($colorVar);
+  @if ($hue) {
+    $temp:       map-get($components, 'h');
+    $components: map-merge($components, ('h': "calc(#{$temp} + #{$hue}"));
+  }
+  @if ($saturation) {
+    $temp:       map-get($components, 's');
+    $components: map-merge($components, ('s': "calc(#{$temp} + #{$saturation}"));
+  }
+  @if ($lightness) {
+    $temp:       map-get($components, 'l');
+    $components: map-merge($components, ('l': "calc(#{$temp} + #{$lightness}"));
+  }
+  @if ($alpha) {
+    $temp:       map-get($components, 'a');
+    $components: map-merge($components, ('a': "calc(#{$temp} + #{$alpha}"));
+  }
+  @return hsla(
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
+                  #{map-get($components, 'l')},
+                  #{map-get($components, 'a')}
+  );
+}
+
+
+/**
  * Partial port of SASS `scale_color`: works only for the alpha channel.
  *
  * Expects that $colorVar is a `var(--name)` value, and that

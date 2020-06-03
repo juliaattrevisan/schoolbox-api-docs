@@ -190,6 +190,7 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
         &, &.active {
             color: lighten(desaturate($selectize-color-item-text, 100%), $selectize-lighten-disabled-item-text);
             // DONE: Complete desaturation + lighten by 30% is close enough
+            //background: css-adjust-color($content-ui-hover, $saturation: -100%, $lightness: 30%);
             background: hsla(
                 var(--content-ui-hover-h),
                 0%,
