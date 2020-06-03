@@ -85,8 +85,6 @@
                             </ul>
                         </section>
                     </div>
-
-                    <input type="submit" value="Update Guests">
                 </div>
             </form>
         </div>
