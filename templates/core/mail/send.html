@@ -21,9 +21,16 @@ $(function() {
             data:     {groupID: 0, email: 1},
             dataType: 'json'
         },
+        createOnBlur: false,
         multiple: true,
         selectize: {
             plugins: ['remove_button', 'restore_on_backspace'],
+            create: function(input) {
+                var freeEntry = {};
+                freeEntry[this.settings.valueField]  = input;
+                freeEntry[this.settings.searchField] = input;
+                return freeEntry;
+            },
             onItemAdd: function(key, $item) {
                 if (validateEmail(key) === false) {
                     $item.addClass('error');
