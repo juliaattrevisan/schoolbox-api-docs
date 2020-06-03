@@ -32,7 +32,7 @@ $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
 
 // DONE scale-color (in this case lightness:40%) is possible but cumbersome
-$breadcrumb-noclick-bg-color: css-scale-lightness($breadcrumb-bg-color, 40%);
+$breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 40%);
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
 

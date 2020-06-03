@@ -107,60 +107,46 @@
 
 
 /**
- * Partial port of SASS `scale_color`: works only for the alpha channel.
+ * Partial port of SASS `scale_color`: works only for the HSL and A channels.
  *
  * Expects that $colorVar is a `var(--name)` value, and that
  * `var(--name-{h,s,l,a})` variables are defined.
  */
-@function css-scale-alpha($colorVar, $percent)
+@function css-scale-color($colorVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)
 {
   $components: color-var-components($colorVar);
-
-  // Scaling works differently when < 100 and > 100.
-  // < 0: bring toward 0
-  // > 0: bring toward 1
-  $offset:    strip-unit($percent) / 100;
-  $colorVarA: map-get($components, 'a');
-  @if ($percent > 0%) {
-    $colorVarA: "calc(#{$colorVarA} + (100% - #{$colorVarA}) * #{$offset})"
-  } @else if($percent < 0%) {
-    $colorVarA: "calc(#{$colorVarA} * (1 + #{$offset}))"
+  @if ($hue) {
+    $components: map-merge($components, ('h': scale-channel(map-get($components, 'h'), $hue)));
+  }
+  @if ($saturation) {
+    $components: map-merge($components, ('s': scale-channel(map-get($components, 's'), $saturation)));
+  }
+  @if ($lightness) {
+    $components: map-merge($components, ('l': scale-channel(map-get($components, 'l'), $lightness)));
+  }
+  @if ($alpha) {
+    $components: map-merge($components, ('a': scale-channel(map-get($components, 'a'), $alpha)));
   }
   @return hsla(
                   #{map-get($components, 'h')},
                   #{map-get($components, 's')},
                   #{map-get($components, 'l')},
-                  #{$colorVarA}
+                  #{map-get($components, 'a')}
   );
 }
 
 
 /**
- * Partial port of SASS `scale_color`: works only for the lightness channel.
- *
- * Expects that $colorVar is a `var(--name)` value, and that
- * `var(--name-{h,s,l,a})` variables are defined.
+ * Helper function for scaling the value of a channel var.
  */
-@function css-scale-lightness($colorVar, $percent)
-{
-  $components: color-var-components($colorVar);
-
-  // Scaling works differently when < 100 and > 100.
-  // < 0: bring toward 0
-  // > 0: bring toward 1
-  $offset:    strip-unit($percent) / 100;
-  $colorVarL: map-get($components, 'l');
+@function scale-channel($channelVar, $percent) {
+  $offset: strip-unit($percent) / 100;
   @if ($percent > 0%) {
-    $colorVarL: "calc(#{$colorVarL} + (100% - #{$colorVarL}) * #{$offset})"
+    @return "calc(#{$channelVar} + (100% - #{$channelVar}) * #{$offset})"
   } @else if($percent < 0%) {
-    $colorVarL: "calc(#{$colorVarL} * (1 + #{$offset}))"
+    @return "calc(#{$channelVar} * (1 + #{$offset}))"
   }
-  @return hsla(
-                  #{map-get($components, 'h')},
-                  #{map-get($components, 's')},
-                  #{$colorVarL},
-                  #{map-get($components, 'a')}
-  );
+  @return $channelVar;
 }
 
 

@@ -203,7 +203,7 @@ $allow-sidebar-stash: $large-up;
 
         &.navthis {
           // DONE use slightly opaque background
-          background-color: css-scale-alpha($navigation-background-contrast, -96%);
+          background-color: css-scale-color($navigation-background-contrast, $alpha: -96%);
           &:before,
           span {
             color: $icon-nav-highlight-color;
@@ -493,7 +493,7 @@ $allow-sidebar-stash: $large-up;
         /* Use adaptive for separators
          */
         // DONE alpha of foreground is fine
-        color: css-scale-alpha($off-canvas-foreground, -65%);
+        color: css-scale-color($off-canvas-foreground, $alpha: -65%);
         a {
           color: inherit;
           &:hover {
@@ -584,7 +584,7 @@ $allow-sidebar-stash: $large-up;
 
   .separator {
     // DONE alpha of foreground is fine
-    color: css-scale-alpha($accounts-menu-foreground, -65%);
+    color: css-scale-color($accounts-menu-foreground, $alpha: -65%);
     background: $accounts-menu-background;
     padding: 0.625rem 0.8125rem;
     font-weight: 300;
@@ -609,7 +609,7 @@ $allow-sidebar-stash: $large-up;
       padding: 0.5rem 0rem 0rem 1rem;
       .meta {
         // DONE alpha of foreground is fine
-        color: css-scale-alpha($accounts-menu-foreground, -65%);
+        color: css-scale-color($accounts-menu-foreground, $alpha: -65%);
       }
       a {
         background-color: transparent;

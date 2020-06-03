@@ -41,7 +41,7 @@ $f-dropdown-icon-align: 0.25rem;
 	}
 	.separator, .meta {
         // DONE making this color transparent works okay
-        color: css-scale-alpha($content-ui-foreground, -65%);
+        color: css-scale-color($content-ui-foreground, $alpha: -65%);
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
