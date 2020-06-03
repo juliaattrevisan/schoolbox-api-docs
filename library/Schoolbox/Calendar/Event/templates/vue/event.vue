@@ -64,6 +64,16 @@
                             <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                         </div>
                     </div>
+
+                    <div class="row" v-for="guest in this.event.guests">
+                        <div class="card small-12">
+                            <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
+                                <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
+
+                                <p>{{ guest.name }}</p>
+                            </a>
+                        </div>
+                    </div>
                 </form>
             </section>
         </div>
