@@ -18,14 +18,14 @@ table.rubric {
     @extend table, .stack-for-small-down;
 
     th[colspan] {
-        background-color: var(--body-background);
+        background-color: $body-bg;
         font-size: $h3-font-size;
         @extend .subheader;
         margin-top: 0;
         padding-left: 0;
         font-weight: $header-font-weight;
         &:hover{
-            background-color: var(--body-background);
+            background-color: $body-bg;
         }
     }
 

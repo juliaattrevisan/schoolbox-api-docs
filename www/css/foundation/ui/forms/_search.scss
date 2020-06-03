@@ -10,7 +10,7 @@
     input[type="text"] {
         border: 0;
         background-color: transparent;
-        color: var(--body-background);
+        color: $body-bg;
         height: $tabbar-height;
         width: $tabbar-height;
         padding: $base-font-size;

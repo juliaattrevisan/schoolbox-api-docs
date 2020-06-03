@@ -216,7 +216,7 @@
 //	@return $solid-color;
 //}
 
-//@function contrast-bg($opacity: 0.35, $background: var(--body-background), $saturation: 0%, $light: $white, $dark: $black) {
+//@function contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
 //
 //	$luminance: perceptive-luminance($background);
 //

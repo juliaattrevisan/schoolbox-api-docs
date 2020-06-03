@@ -1,4 +1,4 @@
-$timetable-cell-border: var(--body-background);
+$timetable-cell-border: $body-bg;
 
 .timetable, .timetable-small {
     td, th {
