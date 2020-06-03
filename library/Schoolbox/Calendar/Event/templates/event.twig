@@ -46,11 +46,6 @@
                 data:     {groupID: 0, showCampus: true},
                 dataType: 'json'
             },
-            value: [
-                {% for guest in guests %}
-                {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
-                {% endfor %}
-            ],
             multiple: true
         });
     });
