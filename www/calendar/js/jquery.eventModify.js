@@ -222,6 +222,17 @@
                         datepickerDate: true
                     }
                 },
+
+                /**
+                 * Executes when form is valid
+                 *
+                 * Note: if you have a non-visible input field with the "required" attribute assigned
+                 * (such as an input element inside a div with display:none) the submitHandler doesn't
+                 * fire at all, and silently does nothing. Remove the "required" attribute in accordance
+                 * with the element's visibility, in those circumstances; or just make it optional
+                 *
+                 * @param form
+                 */
                 submitHandler: function (form) {
                     // Find the submit button for this form and disable it,
                     // to avoid accidental multiple requests
