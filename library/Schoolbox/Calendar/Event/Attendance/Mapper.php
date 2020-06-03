@@ -42,7 +42,6 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * @return string
-     * @throws DefinitionException
      */
     protected function getSelectString()
     {
@@ -50,6 +49,17 @@ class Mapper extends \Schoolbox\Mapper
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('event', 'e')},
                    {$this->getJoinColumnString('user', 'u')}
+        ";
+    }
+
+
+    /**
+     * @return string
+     * @throws DefinitionException
+     */
+    protected function getFromString()
+    {
+        return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('event', '', 'e')}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
