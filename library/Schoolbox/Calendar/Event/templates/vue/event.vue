@@ -57,12 +57,14 @@
             </section>
 
             <section class="content">
-                <form :action="modifyAttendancePath">
+                <form :action="modifyAttendancePath" method="post">
                     <div class="row">
                         <div id="attendance-guests" class="small-12 columns">
                             <label>Add Guests</label>
                             <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                         </div>
+
+                        <input type="submit" value="Add Guests">
                     </div>
 
                     <div class="row" v-for="guest in this.event.guests">
@@ -110,7 +112,7 @@
 
     /* Inline alteration of attendees on event detail screen
      */
-    const URL_ATTENDANCE_MODIFY = '/calendar/event/{eventId}/attendance/modify';
+    const URL_ATTENDANCE_MODIFY = '/calendar/event/attendance/{eventId}/modify';
 
     export default {
         props: ['event'],

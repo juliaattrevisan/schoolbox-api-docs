@@ -51,7 +51,7 @@ class Module extends BaseModule
         $preloadEvent = function ($params) { return $this->preloadEvent($params); };
 
         $this->register('GET', '/{id}', 'getCurrent', $getPerms, $preloadEvent);
-        $this->register('POST', '/{id}', 'postCurrent', $postPerms, null);
+        $this->register('POST', '/{id}/modify', 'postModify', $postPerms, null);
     }
 
 
@@ -111,7 +111,8 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class)
+            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'attendanceMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }
 }

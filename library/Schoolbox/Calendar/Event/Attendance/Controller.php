@@ -17,11 +17,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
-    /**
-     * @var EventMapper
-     */
-    private $eventMapper;
-
 
     /**
      * @var ErrorMapper
@@ -30,15 +25,29 @@ class Controller extends Base
 
 
     /**
+     * @var EventMapper
+     */
+    private $eventMapper;
+
+
+    /**
+     * @var Mapper
+     */
+    private $attendanceMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
      * @param EventMapper $eventMapper
      */
-    public function __construct(ErrorMapper $errorMapper, EventMapper $eventMapper)
+    public function __construct(ErrorMapper $errorMapper, EventMapper $eventMapper, Mapper $attendanceMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->eventMapper = $eventMapper;
+        $this->attendanceMapper = $attendanceMapper;
+
     }
 
 
@@ -59,18 +68,8 @@ class Controller extends Base
     /**
      * Process the form vars
      */
-    public function postCurrent(): void
+    public function postModify(): void
     {
-        try {
-            $event = $this->eventMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEventAttendance/submit.twig', [
-            'event' => $event,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Example Form Output'));
+        new \Alaress_Probe($this->request->post['guests'], $this->request->post['existingGuests']);
     }
 }
