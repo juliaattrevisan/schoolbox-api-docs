@@ -581,7 +581,7 @@ class Controller extends Base
          *
          * For now, changing datetimes requires people to respond again
          */
-        $attendanceDirty = (
+        $attendanceDirty = $event->getStartDateTime() && $event->getEndDateTime() && (
             ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
             ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
 
