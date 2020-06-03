@@ -272,7 +272,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     /* Set up individual relations for each event in the series
      * Event object is provided within eventRecurrenceMapper
      */
-    $eventRelations = new EventRelations(null, null, null);
+    $eventRelations = new EventRelations(null, null, null, null, false);
 
     /* Save this event and any recurring incidents too
      */
