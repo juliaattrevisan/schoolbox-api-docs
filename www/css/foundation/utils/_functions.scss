@@ -6,17 +6,13 @@
  */
 @function css-tint($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarR: str-insert($colorVar, '-r', -2);
-  $colorVarG: str-insert($colorVar, '-g', -2);
-  $colorVarB: str-insert($colorVar, '-b', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
-  $offset:    strip-unit($percent) / 100;
+  $components: color-var-components($colorVar);
+  $offset:     strip-unit($percent) / 100;
   @return rgba(
-                  calc(#{$colorVarR} + (255 - #{$colorVarR}) * #{$offset}),
-                  calc(#{$colorVarG} + (255 - #{$colorVarG}) * #{$offset}),
-                  calc(#{$colorVarB} + (255 - #{$colorVarB}) * #{$offset}),
-                  #{$colorVarA}
+                  calc(#{map-get($components, 'r')} + (255 - #{map-get($components, 'r')}) * #{$offset}),
+                  calc(#{map-get($components, 'g')} + (255 - #{map-get($components, 'g')}) * #{$offset}),
+                  calc(#{map-get($components, 'b')} + (255 - #{map-get($components, 'b')}) * #{$offset}),
+                  #{map-get($components, 'a')}
   );
 }
 
@@ -29,17 +25,13 @@
  */
 @function css-shade($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarR: str-insert($colorVar, '-r', -2);
-  $colorVarG: str-insert($colorVar, '-g', -2);
-  $colorVarB: str-insert($colorVar, '-b', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
-  $offset:    1 - (strip-unit($percent) / 100);
+  $components: color-var-components($colorVar);
+  $offset:     1 - (strip-unit($percent) / 100);
   @return rgba(
-                  calc(#{$colorVarR} * #{$offset}),
-                  calc(#{$colorVarG} * #{$offset}),
-                  calc(#{$colorVarB} * #{$offset}),
-                  #{$colorVarA}
+                  calc(#{map-get($components, 'r')} + (255 - #{map-get($components, 'r')}) * #{$offset}),
+                  calc(#{map-get($components, 'g')} + (255 - #{map-get($components, 'g')}) * #{$offset}),
+                  calc(#{map-get($components, 'b')} + (255 - #{map-get($components, 'b')}) * #{$offset}),
+                  #{map-get($components, 'a')}
   );
 }
 
@@ -52,16 +44,12 @@
  */
 @function css-lighten($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarH: str-insert($colorVar, '-h', -2);
-  $colorVarS: str-insert($colorVar, '-s', -2);
-  $colorVarL: str-insert($colorVar, '-l', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
+  $components: color-var-components($colorVar);
   @return hsla(
-                  #{$colorVarH},
-                  #{$colorVarS},
-                  calc(#{$colorVarL} + #{$percent}),
-                  #{$colorVarA}
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
+                  calc(#{map-get($components, 'l')} + #{$percent}),
+                  #{map-get($components, 'a')}
   );
 }
 
@@ -74,16 +62,12 @@
  */
 @function css-darken($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarH: str-insert($colorVar, '-h', -2);
-  $colorVarS: str-insert($colorVar, '-s', -2);
-  $colorVarL: str-insert($colorVar, '-l', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
+  $components: color-var-components($colorVar);
   @return hsla(
-                  #{$colorVarH},
-                  #{$colorVarS},
-                  calc(#{$colorVarL} - #{$percent}),
-                  #{$colorVarA}
+                  #{map-get($components, 'h')}
+                  #{map-get($components, 's')}
+                  calc(#{map-get($components, 'l')} - #{$percent}),
+                  #{map-get($components, 'a')}
   );
 }
 
@@ -96,25 +80,22 @@
  */
 @function css-scale-alpha($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarH: str-insert($colorVar, '-h', -2);
-  $colorVarS: str-insert($colorVar, '-s', -2);
-  $colorVarL: str-insert($colorVar, '-l', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
+  $components: color-var-components($colorVar);
 
   // Scaling works differently when < 100 and > 100.
   // < 0: bring toward 0
   // > 0: bring toward 1
-  $offset: strip-unit($percent) / 100;
+  $offset:    strip-unit($percent) / 100;
+  $colorVarA: map-get($components, 'a');
   @if ($percent > 0%) {
     $colorVarA: "calc(#{$colorVarA} + (100% - #{$colorVarA}) * #{$offset})"
   } @else if($percent < 0%) {
     $colorVarA: "calc(#{$colorVarA} * (1 + #{$offset}))"
   }
   @return hsla(
-                  #{$colorVarH},
-                  #{$colorVarS},
-                  #{$colorVarL},
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
+                  #{map-get($components, 'l')},
                   #{$colorVarA}
   );
 }
@@ -128,26 +109,23 @@
  */
 @function css-scale-lightness($colorVar, $percent)
 {
-  $assert:    assert-color-var($colorVar);
-  $colorVarH: str-insert($colorVar, '-h', -2);
-  $colorVarS: str-insert($colorVar, '-s', -2);
-  $colorVarL: str-insert($colorVar, '-l', -2);
-  $colorVarA: str-insert($colorVar, '-a', -2);
+  $components: color-var-components($colorVar);
 
   // Scaling works differently when < 100 and > 100.
   // < 0: bring toward 0
   // > 0: bring toward 1
-  $offset: strip-unit($percent) / 100;
+  $offset:    strip-unit($percent) / 100;
+  $colorVarL: map-get($components, 'l');
   @if ($percent > 0%) {
     $colorVarL: "calc(#{$colorVarL} + (100% - #{$colorVarL}) * #{$offset})"
   } @else if($percent < 0%) {
     $colorVarL: "calc(#{$colorVarL} * (1 + #{$offset}))"
   }
   @return hsla(
-                  #{$colorVarH},
-                  #{$colorVarS},
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
                   #{$colorVarL},
-                  #{$colorVarA}
+                  #{map-get($components, 'a')}
   );
 }
 
@@ -165,6 +143,24 @@
     @error "Color var \"#{$colorVar}\" must be a CSS variable in format \"var(--name)\"";
   }
   @return true;
+}
+
+
+/**
+ * Retrieves a map of the HSL+RGB+A vars for `$colorVar`.
+ */
+@function color-var-components($colorVar)
+{
+  $assert: assert-color-var($colorVar);
+  @return (
+          'h': str-insert($colorVar, '-h', -2),
+          's': str-insert($colorVar, '-s', -2),
+          'l': str-insert($colorVar, '-l', -2),
+          'r': str-insert($colorVar, '-r', -2),
+          'g': str-insert($colorVar, '-g', -2),
+          'b': str-insert($colorVar, '-b', -2),
+          'a': str-insert($colorVar, '-a', -2)
+  );
 }
 
 
