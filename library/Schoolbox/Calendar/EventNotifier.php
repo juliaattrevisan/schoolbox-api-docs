@@ -35,6 +35,7 @@ class EventNotifier extends AbstractModuleNotifier
     // how many minutes prior to an event the notification should go out
     const UPCOMING_WINDOW = 10;
 
+    private const EVENT_DETAIL_URL = '/calendar/event/%d';
 
     /**
      * @return string
@@ -143,7 +144,7 @@ class EventNotifier extends AbstractModuleNotifier
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=" . NSMapper::NS_CALENDAR)
             // we need to stack based on series if that's possible
-            ->setHref("/calendar/event/" . $event->getId())
+            ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId()))
             ->setBody($event->getDetail())
             ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
             ->addFilter('roletype', [$roleType])
@@ -180,7 +181,7 @@ class EventNotifier extends AbstractModuleNotifier
         $bob = $this->newBuilder(self::TRIGGER_UPCOMING, $roleType, $event)
                     ->setTitle(':name is about to start')
                     ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
-                    ->setParam('name', new Param($event->getTitle()));
+                    ->setParam('name', new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())));
 
         return $this->notify($event, [$bob->build()]);
     }
@@ -223,7 +224,7 @@ class EventNotifier extends AbstractModuleNotifier
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                         'old'  => new Param($diff['title'][1]),
-                        'new'  => new Param($event->getTitle()),
+                        'new'  => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
                 );
             $instances[] = $bob->build();
@@ -235,7 +236,7 @@ class EventNotifier extends AbstractModuleNotifier
             $bob->setTitle(':event has moved from :old to :new')
                 ->setParams(
                     [
-                        'event' => new Param($event->getTitle()),
+                        'event' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         'old'   => new Param($diff['location'][1]),
                         'new'   => new Param($event->getLocation()),
                     ]
@@ -250,7 +251,7 @@ class EventNotifier extends AbstractModuleNotifier
                 ->setParams(
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                        'name' => new Param($event->getTitle()),
+                        'name' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         'time' => new Param($event->getStartDateTime()->getShort()),
                     ]
                 );
@@ -265,7 +266,7 @@ class EventNotifier extends AbstractModuleNotifier
                 ->setParams(
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                        'name' => new Param($event->getTitle()),
+                        'name' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
                 );
 
