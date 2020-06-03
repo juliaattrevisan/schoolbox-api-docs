@@ -584,12 +584,7 @@ $allow-sidebar-stash: $large-up;
 
   .separator {
     // DONE alpha of foreground is fine
-    color: hsla(
-      var(--accounts-menu-foreground-h),
-      var(--accounts-menu-foreground-s),
-      var(--accounts-menu-foreground-l),
-      calc(var(--accounts-menu-foreground-a) * 0.35)
-    );
+    color: css-scale-alpha($accounts-menu-foreground, -65%);
     background: $accounts-menu-background;
     padding: 0.625rem 0.8125rem;
     font-weight: 300;
@@ -614,12 +609,7 @@ $allow-sidebar-stash: $large-up;
       padding: 0.5rem 0rem 0rem 1rem;
       .meta {
         // DONE alpha of foreground is fine
-        color: hsla(
-          var(--accounts-menu-foreground-h),
-          var(--accounts-menu-foreground-s),
-          var(--accounts-menu-foreground-l),
-          calc(var(--accounts-menu-foreground-a) * 0.35)
-        );
+        color: css-scale-alpha($accounts-menu-foreground, -65%);
       }
       a {
         background-color: transparent;
