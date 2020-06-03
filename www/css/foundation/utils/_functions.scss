@@ -6,7 +6,7 @@
  */
 @function css-tint($colorVar, $percent)
 {
-  // TODO assert that $colorVar matches `var()` pattern
+  $assert:    assert-color-var($colorVar);
   $colorVarR: str-insert($colorVar, '-r', -2);
   $colorVarG: str-insert($colorVar, '-g', -2);
   $colorVarB: str-insert($colorVar, '-b', -2);
@@ -29,6 +29,7 @@
  */
 @function css-shade($colorVar, $percent)
 {
+  $assert:    assert-color-var($colorVar);
   $colorVarR: str-insert($colorVar, '-r', -2);
   $colorVarG: str-insert($colorVar, '-g', -2);
   $colorVarB: str-insert($colorVar, '-b', -2);
@@ -51,6 +52,7 @@
  */
 @function css-lighten($colorVar, $percent)
 {
+  $assert:    assert-color-var($colorVar);
   $colorVarH: str-insert($colorVar, '-h', -2);
   $colorVarS: str-insert($colorVar, '-s', -2);
   $colorVarL: str-insert($colorVar, '-l', -2);
@@ -72,6 +74,7 @@
  */
 @function css-darken($colorVar, $percent)
 {
+  $assert:    assert-color-var($colorVar);
   $colorVarH: str-insert($colorVar, '-h', -2);
   $colorVarS: str-insert($colorVar, '-s', -2);
   $colorVarL: str-insert($colorVar, '-l', -2);
@@ -93,6 +96,7 @@
  */
 @function css-scale-alpha($colorVar, $percent)
 {
+  $assert:    assert-color-var($colorVar);
   $colorVarH: str-insert($colorVar, '-h', -2);
   $colorVarS: str-insert($colorVar, '-s', -2);
   $colorVarL: str-insert($colorVar, '-l', -2);
@@ -124,6 +128,7 @@
  */
 @function css-scale-lightness($colorVar, $percent)
 {
+  $assert:    assert-color-var($colorVar);
   $colorVarH: str-insert($colorVar, '-h', -2);
   $colorVarS: str-insert($colorVar, '-s', -2);
   $colorVarL: str-insert($colorVar, '-l', -2);
@@ -144,6 +149,22 @@
                   #{$colorVarL},
                   #{$colorVarA}
   );
+}
+
+
+/**
+ * Asserts that $colorVar is a CSS color var declaration:
+ * * starts with `var(--`
+ * * ends with `)`
+ */
+@function assert-color-var($colorVar)
+{
+  $prefix: to-lower-case(str-slice($colorVar, 1, 6));
+  $suffix: str-slice($colorVar, -1, -1);
+  @if ($prefix != 'var(--' and $suffix != ')') {
+    @error "Color var \"#{$colorVar}\" must be a CSS variable in format \"var(--name)\"";
+  }
+  @return true;
 }
 
 
