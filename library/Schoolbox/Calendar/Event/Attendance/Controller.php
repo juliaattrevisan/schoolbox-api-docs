@@ -84,10 +84,23 @@ class Controller extends Base
      * Add attendees to the list
      *
      * @param Event $event
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function postCreate(Event $event): void
     {
-        new \Alaress_Probe($this->findExistingIds($event));
+        $newGuests = explode(',', $this->request->post['guests'] ?? '');
+        $oldGuests = $this->findExistingIds($event);
+
+        $ids = array_diff($newGuests, $oldGuests);
+
+        foreach ($ids as $id) {
+            $this->attendanceMapper->save((new Event\Attendance\Model())
+                ->setEvent($event)
+                ->setUser($this->userMapper->createModel()->setId($id))
+                ->setStatus(Event\Attendance\Model::STATUS_PENDING));
+        }
     }
 
 
