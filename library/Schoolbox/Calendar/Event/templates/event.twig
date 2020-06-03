@@ -92,7 +92,7 @@
             let element = $(this);
 
             element.confirmDialog({
-                text: 'Are you sure you want to remove attendance for ' + element.attr('data-guest-name') + '?',
+                text: 'Are you sure you want to uninvite' + element.attr('data-guest-name') + '?',
                 confirmEvent: function() {
 
                     /* User's name
@@ -104,7 +104,7 @@
                     let $toast = $('[data-toast]');
 
                     $toast.toastActivate({
-                        text: 'Removing ' + name + '...'
+                        text: 'Uninviting ' + name + '...'
                     });
 
                     $.ajax({
@@ -113,12 +113,12 @@
                         data: {guest: element.attr('data-guest-delete')},
                         success: function(responseText) {
                             $toast.toastTimeout({
-                                text: name + ' has been removed',
+                                text: name + ' has been uninvited',
                                 css: 'success'
                             });
                         },
                         error: function(responseText) {
-                            $toast.toastTimeout({text: 'Unable to remove ' + name + '; please try again', css: 'alert'});
+                            $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
                         }
                     });
                 }
