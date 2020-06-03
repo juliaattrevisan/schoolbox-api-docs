@@ -56,7 +56,7 @@
                 </div>
             </section>
 
-            <form :action="modifyAttendancePath" method="post" v-if="this.event.options.isAttendable">
+            <form :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable">
                 <div class="row">
                     <div id="attendance-guests" class="small-12 columns">
                         <section>
@@ -67,8 +67,6 @@
 
                             <ul class="action-list">
                                 <li class="actions-small-1" v-for="guest in this.event.guests">
-                                    <input type="hidden" name="existingGuests[]" :value="guest.id" />
-
                                     <div class="compact card small-11">
                                         <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
                                             <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />

@@ -58,12 +58,6 @@
             let name = user.html().split(' - ')[0];
             let id = user.attr('data-value');
 
-            /* Existing users
-             */
-            let existingGuests = $('input[name="existingGuests[]"]').map(function(index, element) {
-                return $(element).val();
-            }).get();
-
             let element = $(this);
 
             /* A toast - to your valour, my sword, and our victory together
@@ -78,8 +72,7 @@
                 url: element.parents('form').attr('action'),
                 method: 'POST',
                 data: {
-                    guests: id,
-                    existingGuests: existingGuests
+                    guests: id
                 },
                 success: function(responseText) {
                     $toast.toastTimeout({

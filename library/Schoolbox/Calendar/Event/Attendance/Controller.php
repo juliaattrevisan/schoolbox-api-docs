@@ -74,9 +74,7 @@ class Controller extends Base
      */
     private function findExistingIds(Event $event): array
     {
-        $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
-
-        return (new Collection($existingUsers))->indexBy('id')->keys();
+        return array_column($this->attendanceMapper->findAttendances($event), 'id');
     }
 
 
@@ -133,7 +131,7 @@ class Controller extends Base
          * That should allow us get a diff of people in one request
          */
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
-        $oldGuests = $this->request->post['existingGuests'] ?? [];
+        $oldGuests = $this->findExistingIds($event);
 
         $guestIds = array_unique(array_merge($newGuests, $oldGuests));
 
