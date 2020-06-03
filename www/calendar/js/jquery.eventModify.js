@@ -166,47 +166,19 @@
         function setupEventValidation() {
             // Campus selection validation - only required if eventType === Campus
             var validateCampusSelected = function () {
-                var normalSelector = $('select[name="level"]');
-
-                /* Normal calendar selector
-                 */
-                if (normalSelector.length) {
+                if ($('select[name="level"]').length) {
                     return $('select[name="level"]').val() == 3;
                 }
-                /* For EOTC
-                 */
-                else {
-                    return $('input[name="campus[]"]').length;
-                }
+
+                return false;
             };
 
             /* Check if a Group is selected when using the Group
              * level option in the dropdown
              */
             var validateGroupSelected = function () {
-                var level = parseInt($('select[name=level]').val());
-
-                return level == 2;
-            };
-
-            /* For EOTC
-             * Disabled need for files to be uploaded, regardless of the setting
-             */
-            var validateRamsFile = function () {
-                return false;
-            };
-
-            /* For EOTC
-             */
-            var validateTeacherInCharge = function () {
-                var ticExists = $('input[name=teacherInCharge]').length;
-
-                if (ticExists) {
-                    var ticValue = $('input[name=teacherInCharge]').val()
-
-                    if (ticValue == '[]' || ticValue == '') {
-                        return true;
-                    }
+                if ($('select[name="level"]').length) {
+                    return parseInt($('select[name=level]').val()) == 2;
                 }
 
                 return false;
@@ -214,9 +186,11 @@
 
             var validateNotAllDaySelected = function () {
                 var allDaySelector = $(':checkbox[name="allday"]');
+
                 if (allDaySelector.length && !allDaySelector.prop('checked')) {
                     return true;
                 }
+
                 // No all day selector (EOTC)? Don't apply this rule
                 return false;
             };
@@ -241,24 +215,12 @@
                             depends: validateCampusSelected
                         }
                     },
-                    'ramsFile': {
-                        required: {
-                            depends: validateRamsFile
-                        },
-                        minlength: {
-                            param: 1
-                        }
-                    },
-                    'teacherInCharge': {
-                        required: {
-                            depends: validateTeacherInCharge
-                        },
-                        minlength: {
-                            param: 1
-                        }
-                    },
                     'folder[]': {
                         required: {
+                            depends: validateGroupSelected
+                        },
+                        minLength: {
+                            param: 1,
                             depends: validateGroupSelected
                         }
                     },
