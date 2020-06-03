@@ -35,7 +35,7 @@ class EventNotifier extends AbstractModuleNotifier
     // how many minutes prior to an event the notification should go out
     const UPCOMING_WINDOW = 10;
 
-    const EVENT_DETAIL_URL = '/calendar/event/%d';
+    private const EVENT_DETAIL_URL = '/calendar/event/%d';
 
     /**
      * @return string
