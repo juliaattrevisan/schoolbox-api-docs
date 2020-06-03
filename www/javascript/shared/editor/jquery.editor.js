@@ -86,7 +86,10 @@
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
                 magicline_color: '#0066b0',
                 format_tags: 'p;h2;h3;h4;pre',
-                contentsCss: '/css/core/editor.css',
+                contentsCss: [
+                    '/css/core/skin.css.php',
+                    '/css/core/editor.css',
+                ],
 
                 /* set to use our iframely API key for oEmbed calls
                  */
