@@ -280,8 +280,10 @@
                                 $('#attendanceCheckbox').on('change', function(event) {
                                     if ($(this).is(':checked')) {
                                         $('#attendance-guests').show();
+                                        $('#attendance-guests').attr('required', 'true');
                                     } else {
                                         $('#attendance-guests').hide();
+                                        $('#attendance-guests').removeAttr('required');
                                     }
                                 });
                             });
