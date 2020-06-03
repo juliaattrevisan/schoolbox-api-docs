@@ -49,15 +49,28 @@
             multiple: true
         });
 
-        $('[data-guest-delete]').on('click', function(event) {
+        $('#attendance-guests').on('click', '[data-guest-delete]', function(event) {
             event.preventDefault();
 
-            $.ajax({
-                url: $(this).attr('href'),
-                method: 'POST',
-                data: {guest: $(this).attr('data-guest-delete')},
-                success: function(responseText) {
-                    console.log(responseText);
+            let element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove this attendance?',
+                confirmEvent: function() {
+
+                    /* A toast - to your valour, my sword, and our victory together
+                     */
+                    let $toast = $('[data-toast]');
+                    $toast.toastActivate({text: 'Deleting attendance...'});
+
+                    $.ajax({
+                        url: element.attr('href'),
+                        method: 'POST',
+                        data: {guest: element.attr('data-guest-delete')},
+                        success: function(responseText) {
+                            $toast.toastTimeout({text: 'Attendance deleted', css: 'success'});
+                        }
+                    });
                 }
             });
         });

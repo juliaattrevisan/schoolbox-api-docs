@@ -91,6 +91,8 @@
             </form>
         </div>
 
+        <div data-toast class="toast"></div>
+
         <audiences-modal
                 ref="audiencesModal"
                 :campus-audiences="this.event.audiences.campus"
