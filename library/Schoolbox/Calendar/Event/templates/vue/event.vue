@@ -69,14 +69,12 @@
                                 <li class="actions-small-1" v-for="guest in this.event.guests">
                                     <input type="hidden" name="existingGuests[]" :value="guest.id" />
 
-                                    <div class="list-item">
-                                        <div class="card small-11">
-                                            <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
-                                                <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
+                                    <div class="compact card small-11">
+                                        <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
+                                            <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
 
-                                                <p>{{ guest.name }}</p>
-                                            </a>
-                                        </div>
+                                            <p>{{ guest.name }}</p>
+                                        </a>
                                     </div>
                                     <nav>
                                         <a :data-guest-delete="guest.id" :data-guest-name="guest.name" class="icon-delete no-text" :href="deleteAttendancePath" title="Remove guest"></a>
