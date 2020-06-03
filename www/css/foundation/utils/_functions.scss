@@ -64,8 +64,8 @@
 {
   $components: color-var-components($colorVar);
   @return hsla(
-                  #{map-get($components, 'h')}
-                  #{map-get($components, 's')}
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
                   calc(#{map-get($components, 'l')} - #{$percent}),
                   #{map-get($components, 'a')}
   );
