@@ -99,6 +99,9 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find a list of attendees, sorted by lastname then by firstname, for a particular event
+     * Returns as a set of key-value pairs of (id, name) in said order
+     *
      * @param Event $event
      * @return array
      */
@@ -106,7 +109,13 @@ class Mapper extends \Schoolbox\Mapper
     {
         $pairs = [];
 
-        $attendances = $this->findByColumn('event_id', $event->getId());
+        $attendances = $this->findByColumn('event_id', $event->getId())->sortByCallback(static function (Model $a, Model $b) {
+            if ($b->getUser()->getLastname() === $a->getUser()->getLastname()) {
+                return $b->getUser()->getFirstname() < $a->getUser()->getFirstname();
+            }
+
+            return $b->getUser()->getLastname() < ($a->getUser()->getLastname());
+        });
 
         foreach ($attendances as $attendance) {
             $pairs[] = [
