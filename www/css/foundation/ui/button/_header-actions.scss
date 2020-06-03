@@ -34,13 +34,7 @@
 
 		&:hover {
             // DONE modify RGB colors instead of tint
-            background-color: rgba(
-                calc(var(--content-ui-hover-r) + (255 - var(--content-ui-hover-r)) * 0.2),
-                calc(var(--content-ui-hover-g) + (255 - var(--content-ui-hover-g)) * 0.2),
-                calc(var(--content-ui-hover-b) + (255 - var(--content-ui-hover-b)) * 0.2),
-                var(--content-ui-hover-a)
-            );
-			//background-color: tint($content-ui-hover, 20%);
+            background-color: css-tint($content-ui-hover, 20%);;
 		}
 		&[aria-expanded=true] {
 			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
