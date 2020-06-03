@@ -85,6 +85,53 @@
 }
 
 
+/**
+ * Partial port of SASS `scale_color`: works only for the alpha channel.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ */
+@function css-scale-alpha($colorVar, $percent)
+{
+  $colorVarH: str-insert($colorVar, '-h', -2);
+  $colorVarS: str-insert($colorVar, '-s', -2);
+  $colorVarL: str-insert($colorVar, '-l', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
+
+  // Scaling works differently when < 100 and > 100.
+  // < 100: bring toward 0
+  // > 100: bring toward 1
+  $offset:    strip-unit($percent) / 100;
+  @return hsla(
+                  $colorVarH,
+                  $colorVarS,
+                  $colorVarL,
+                  calc(#{$colorVarA} * #{$offset})
+  );
+}
+
+
+/**
+ * Partial port of SASS `scale_color`: works only for the lightness channel.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ */
+@function css-scale-lightness($colorVar, $percent)
+{
+  $colorVarH: str-insert($colorVar, '-h', -2);
+  $colorVarS: str-insert($colorVar, '-s', -2);
+  $colorVarL: str-insert($colorVar, '-l', -2);
+  $colorVarA: str-insert($colorVar, '-a', -2);
+  $offset:    strip-unit($percent) / 100;
+  @return hsla(
+                  $colorVarH,
+                  $colorVarS,
+                  calc(#{$colorVarL} * #{$offset}),
+                  $colorVarA
+  );
+}
+
 
 // Add percentage of white to a color
 @function tint($color, $percent){

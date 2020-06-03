@@ -203,12 +203,7 @@ $allow-sidebar-stash: $large-up;
 
         &.navthis {
           // DONE use slightly opaque background
-          background-color: hsla(
-            var(--navigation-background-contrast-h),
-            var(--navigation-background-contrast-s),
-            var(--navigation-background-contrast-l),
-            calc(var(--navigation-background-contrast-a) * .04)
-          );
+          background-color: css-scale-alpha($navigation-background-contrast, -4%);
           &:before,
           span {
             color: $icon-nav-highlight-color;
@@ -498,12 +493,7 @@ $allow-sidebar-stash: $large-up;
         /* Use adaptive for separators
          */
         // DONE alpha of foreground is fine
-        color: hsla(
-          var(--off-canvas-foreground-h),
-          var(--off-canvas-foreground-s),
-          var(--off-canvas-foreground-l),
-          calc(var(--off-canvas-foreground-a) * 0.35)
-        );
+        color: css-scale-alpha($off-canvas-foreground, -35%);
         a {
           color: inherit;
           &:hover {
