@@ -56,7 +56,7 @@
                 </div>
             </section>
 
-            <form :action="createAttendancePath" method="post">
+            <form :action="modifyAttendancePath" method="post">
                 <div class="row">
                     <div id="attendance-guests" class="small-12 columns">
                         <section>

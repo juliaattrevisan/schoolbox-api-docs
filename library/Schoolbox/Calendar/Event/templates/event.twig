@@ -49,6 +49,47 @@
             multiple: true
         });
 
+        $('#attendance-guests').on('change', '#add-guests', function(event) {
+            event.preventDefault();
+
+            /* User's name
+             */
+            let user = $('#attendance-guests [data-value]:last')
+            let name = user.html().split(' - ')[0];
+            let id = user.attr('data-value');
+
+            /* Existing users
+             */
+            let existingGuests = $('input[name="existingGuests[]"]').map(function(index, element) {
+                return $(element).val();
+            }).get();
+
+            let element = $(this);
+
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            let $toast = $('[data-toast]');
+
+            $toast.toastActivate({
+                text: 'Adding ' + name + '...'
+            });
+
+            $.ajax({
+                url: element.parents('form').attr('action'),
+                method: 'POST',
+                data: {
+                    guests: id,
+                    existingGuests: existingGuests
+                },
+                success: function(responseText) {
+                    $toast.toastTimeout({
+                        text: name + ' has been added',
+                        css: 'success'
+                    });
+                }
+            });
+        });
+
         $('#attendance-guests').on('click', '[data-guest-delete]', function(event) {
             event.preventDefault();
 
