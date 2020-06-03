@@ -37,7 +37,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('event_id', EventMapper::class, 'id', self::TYPE_MODEL, null, 'event', 'event');
         $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
         $this->uses('status', self::TYPE_INTEGER);
-        $this->uses('intention', self::TYPE_INTEGER);
     }
 
 
