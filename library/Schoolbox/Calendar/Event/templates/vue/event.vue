@@ -79,7 +79,7 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a :data-guest-delete="guest.id" class="icon-delete no-text" href="#" title="Remove guest"></a>
+                                        <a :data-guest-delete="guest.id" class="icon-delete no-text" :href="deleteAttendancePath" title="Remove guest"></a>
                                     </nav>
                                 </li>
                             </ul>

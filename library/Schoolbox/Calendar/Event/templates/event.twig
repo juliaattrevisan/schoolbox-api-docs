@@ -48,5 +48,18 @@
             },
             multiple: true
         });
+
+        $('[data-guest-delete]').on('click', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('href'),
+                method: 'POST',
+                data: {guest: $(this).attr('data-guest-delete')},
+                success: function(responseText) {
+                    console.log(responseText);
+                }
+            });
+        });
     });
 </script>

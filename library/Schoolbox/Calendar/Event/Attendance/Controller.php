@@ -111,7 +111,10 @@ class Controller extends Base
      */
     public function postDelete(Event $event): void
     {
-        new \Alaress_Probe($this->findExistingIds($event));
+        $this->attendanceMapper->deleteByColumnList([
+            'event_id' => $event->getId(),
+            'user_id' => $this->request->post['guest']
+        ]);
     }
 
 
