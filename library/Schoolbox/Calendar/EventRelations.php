@@ -8,13 +8,13 @@ namespace Schoolbox\Calendar;
 
 use PDOException;
 use Schoolbox\Calendar\Event\Attendance;
+use Schoolbox\Calendar\Event\Attendance\Transactor;
 use Schoolbox\Calendar\Relation\Personal;
 use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -273,34 +273,7 @@ class EventRelations
                     ->setStatus(Event\Attendance\Model::STATUS_PENDING));
             }
         } else {
-
-            /* Otherwise, keep the intersect of who was previously invited and who is currently invited
-             * thus preserving their current response setting
-             *
-             * Trim away everyone not in this set
-             */
-            $query = "
-                DELETE FROM {$this->attendanceMapper->getTable()}
-                WHERE event_id = :eventId
-                AND user_id NOT IN (:guestIds)
-            ";
-
-            $this->attendanceMapper->getDatabase()->query($query, [
-                'eventId' => $event->getId(),
-                'guestIds' => implode(',', array_map('intval', $guestIds))
-            ]);
-
-            $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
-            $existingIds = (new Collection($existingUsers))->indexBy('id')->keys();
-
-            foreach ($guestIds as $currentGuest) {
-                if (!in_array($currentGuest, $existingIds, false)) {
-                    $this->attendanceMapper->save((new Event\Attendance\Model())
-                        ->setEvent($event)
-                        ->setUser($this->userMapper->createModel()->setId($currentGuest))
-                        ->setStatus(Event\Attendance\Model::STATUS_PENDING));
-                }
-            }
+            (new Transactor($this->attendanceMapper, $this->userMapper))->update($event, $guestIds);
         }
     }
 
