@@ -41,6 +41,7 @@ class Controller extends Base
      *
      * @param ErrorMapper $errorMapper
      * @param EventMapper $eventMapper
+     * @param Mapper      $attendanceMapper
      */
     public function __construct(ErrorMapper $errorMapper, EventMapper $eventMapper, Mapper $attendanceMapper)
     {
@@ -70,6 +71,15 @@ class Controller extends Base
      */
     public function postModify(): void
     {
-        new \Alaress_Probe($this->request->post['guests'], $this->request->post['existingGuests']);
+
+        /* Combine the two sets of guests: new, from the selectize; old, from some hidden inputs
+         * That should allow us get a diff of people in one request
+         */
+        $newGuests = explode(',', $this->request->post['guests']);
+        $oldGuests = $this->request->post['existingGuests'];
+
+        $guestIds = array_unique(array_merge($newGuests, $oldGuests));
+
+        new \Alaress_Probe($newGuests, $oldGuests, $guestIds);
     }
 }
