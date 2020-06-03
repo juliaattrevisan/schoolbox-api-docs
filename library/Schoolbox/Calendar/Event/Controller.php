@@ -24,6 +24,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -126,7 +127,11 @@ class Controller extends Base
      * View an event's detail screen
      *
      * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function getEvent(Event $event): void
     {
@@ -138,7 +143,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event'            => $event,
             'level'            => $helper->getEventLevel($event),
-            'canModify'        => $calendar->getPerm($event->getId()) >= UserAccess::ACCESS_WRITE,
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection'   => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
@@ -147,6 +151,7 @@ class Controller extends Base
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
             'guests' => $this->attendanceMapper->findAttendances($event),
+            'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
         ])->setTitle($event->getTitle()));
     }
 

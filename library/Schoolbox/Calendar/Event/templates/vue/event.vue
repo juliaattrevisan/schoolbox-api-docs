@@ -56,7 +56,7 @@
                 </div>
             </section>
 
-            <form :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable">
+            <form :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable && this.event.canModify">
                 <div class="row">
                     <div id="attendance-guests" class="small-12 columns">
                         <section>
