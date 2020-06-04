@@ -36,6 +36,7 @@ use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassifi
 use Schoolbox\Pastoral;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
+use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -74,6 +75,10 @@ class Controller extends Base
                 $record = $mapper->findById($post['id']);
                 $result = $mapper->delete($record);
             } catch (MapperException $e) {
+                // Something failed in the mapper: noop
+            } catch (UnexpectedValueException $e) {
+                // Something else unexpected happened, likely thrown by a
+                // pre-delete: noop
             }
         }
 
@@ -593,7 +598,8 @@ class Controller extends Base
             'pastoral-type'      => [
                 'title'             => 'Pastoral Types',
                 'mapper'            => PastoralTypeMapper::class,
-                'sort'              => 'name',
+                'delete'            => true,
+                'deleteFailMsg'     => 'You cannot delete a pastoral type which is still in use in a pastoral record.',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -625,7 +631,8 @@ class Controller extends Base
             'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => PastoralCategoryMapper::class,
-                'sort'              => 'pastoral_type_id',
+                'delete'            => true,
+                'deleteFailMsg'     => 'You cannot delete a pastoral sub-type which is still in use in a pastoral record.',
                 'fields'            => [
                     'pastoralType' => [
                         'getter'    => 'getPastoralType',
@@ -787,7 +794,8 @@ class Controller extends Base
         } elseif (isset($tables[$table]['sort'])) {
             $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
         } elseif ($prototype instanceof Sequential) {
-            $rows = $mapper->findAll(['order' => ['sequence' => 'ASC']]);
+            // Sequential: just use whatever ordering is defined in getDefaultOrderByParams
+            $rows = $mapper->findAll();
             $tables[$table]['sortable'] = true;
         } else {
             $orderArr = array($mapper->getIdentifierColumn() => 'ASC');

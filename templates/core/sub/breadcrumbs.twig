@@ -20,7 +20,7 @@
     <ul class="breadcrumb">
         {% for crumb in crumbs %}
             <li{% if loop.last %} class="active"{% endif %}>
-                <a{% if crumb[1] %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+                <a{% if crumb[0] is defined and crumb[1] is defined %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
             </li>
         {% endfor %}
     </ul>
@@ -43,7 +43,7 @@
     <ul class="breadcrumb-basic meta">
         {% for crumb in crumbs %}
             <li{% if loop.last %} class="active"{% endif %}>
-                <a{% if crumb[1] %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+                <a{% if crumb[0] is defined and crumb[1] is defined %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
             </li>
         {% endfor %}
     </ul>

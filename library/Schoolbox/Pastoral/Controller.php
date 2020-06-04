@@ -532,8 +532,8 @@ class Controller extends Base
                 'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
-                'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
-                'subTypes'          => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'types'             => $this->pastoralTypeMapper->findAll(),
+                'subTypes'          => $this->pastoralSubTypeMapper->findAll(),
                 'severities'        => $severities,
                 'roles'             => $roles,
                 'roleUsers'         => $roleUsers,
@@ -807,29 +807,54 @@ class Controller extends Base
             try {
                 /** @var PastoralTypeModel $type */
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
-
-                try {
-                    /** @var PastoralSubTypeModel $subtype */
-                    $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
-                    $record->setSubType($subtype);
-                } catch (MapperException $e) {
-                    // Noop, this can be blank
-                }
-
-                if (!$this->getConfigLoader()->get('pastoral_severity')) {
-                    $severity = null;
-                } else {
-                    /** @var PastoralSeverityModel $severity */
-                    $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+                $record->setType($type);
+            } catch (MapperException\Deleted $e) {
+                // Type was deleted. Was it changed?
+                // If not, allow it to be saved with the same deleted type
+                $deletedType = $e->getDeletedObject();
+                if ($deletedType instanceof PastoralTypeModel) {
+                    $existingId = $record->getType()
+                        ? $record->getType()->getId()
+                        : null;
+                    if ($existingId !== $deletedType->getId()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    }
                 }
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
+            try {
+                /** @var PastoralSubTypeModel $subtype */
+                $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
+                $record->setSubType($subtype);
+            } catch (MapperException\Deleted $e) {
+                // Subtype was deleted. Was it changed?
+                // If not, allow it to be saved with the same deleted subtype
+                $deletedSubtype = $e->getDeletedObject();
+                if ($deletedSubtype instanceof PastoralSubTypeModel) {
+                    $existingId = $record->getSubType()
+                        ? $record->getSubType()->getId()
+                        : null;
+                    if ($existingId !== $deletedSubtype->getId()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    }
+                }
+            } catch (MapperException $e) {
+                // Noop, this can be blank
+            }
+
+            // Set severity separately from type
+            if (!$this->getConfigLoader()->get('pastoral_severity')) {
+                $severity = null;
+            } else {
+                /** @var PastoralSeverityModel $severity */
+                $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+            }
+
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
             $record->setHeading($heading);
-            $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
             $record->setBodyPublic(trim($post["body_public"]));

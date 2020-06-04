@@ -24,40 +24,69 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('lu_pastoral_subtype');
         $this->hasModel(Model::class);
-        $this->joins('pastoral_type_id', PastoralTypeMapper::class, 'id', null, null, 'pastoralType', 'pastoralType');
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('external_code', self::TYPE_STRING);
+        $this->joins('pastoral_type_id', PastoralTypeMapper::class, 'id', null, null, 'pastoralType', 'pastoralType');
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('external_code', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+//        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
+
     /**
-     * Pre-soft-delete callback to ensure there are no
-     * non-soft-deleted pastoral records with this pastoral subtype.
-     *
-     * @param Model $pastoralSubType
-     *
-     * @return bool
-     * @throws UnexpectedValueException If pastoral records exists with this pastoral subtype
+     * @inheritDoc
      */
-    public function softDeleteCheckPastoralRecords(Model $pastoralSubType)
+    protected function getSelectString(): string
     {
-        $pastoralRecordMapper = Pastoral\Mapper::getInstance();
-        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
-        $pb->isNull('deleted_at');
-        $pb->equals('subtype_id', $pastoralSubType->getId());
-
-        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
-        if ($countRecords) {
-            $message = 'Cannot delete PastoralSubType Model. %d non-deleted pastoral records still linked';
-            throw new UnexpectedValueException(sprintf($message, $countRecords));
-        }
-
-        return true;
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('pastoralType', 't')}
+        ";
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('pastoralType', '', 't', true)}
+        ";
+    }
+
+
+//    /**
+//     * Pre-soft-delete callback to ensure there are no
+//     * non-soft-deleted pastoral records with this pastoral subtype.
+//     *
+//     * @param Model $pastoralSubType
+//     *
+//     * @return bool
+//     * @throws UnexpectedValueException If pastoral records exists with this pastoral subtype
+//     */
+//    public function softDeleteCheckPastoralRecords(Model $pastoralSubType)
+//    {
+//        $pastoralRecordMapper = Pastoral\Mapper::getInstance();
+//        $pb                   = $pastoralRecordMapper->getPredicateBuilder();
+//        $pb->isNull('deleted_at');
+//        $pb->equals('subtype_id', $pastoralSubType->getId());
+//
+//        $countRecords = $pastoralRecordMapper->countByPredicates($pb);
+//        if ($countRecords) {
+//            $message = 'Cannot delete PastoralSubType Model. %d non-deleted pastoral records still linked';
+//            throw new UnexpectedValueException(sprintf($message, $countRecords));
+//        }
+//
+//        return true;
+//    }
 
 
     /**
@@ -70,5 +99,16 @@ class Mapper extends BaseMapper
     {
         Pastoral\Audience\Mapper::getInstance()->deleteByColumn('subtype_id', $subType->getId());
         return true;
+    }
+
+
+    /**
+     * Order subtypes by their base type first
+     *
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['t.sequence' => 'ASC', 'sequence' => 'ASC'];
     }
 }

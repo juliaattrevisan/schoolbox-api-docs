@@ -125,16 +125,18 @@ class Mapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         /* * We do not need to join to deleted severity as the system does not permit soft-deletion
          *   of severities if they are used by a non-soft deleted pastoral.
          *
          * * We do not need to join to deleted types as the system does not permit soft-deletion
          *   of types if they are used by a non-soft deleted pastoral.
+         *   (but we do: this changed in SA-4192)
          *
          * * We do not need to join to deleted subtypes as the system does not permit soft-deletion
          *   of subtypes if they are used by a non-soft deleted pastoral.
+         *   (but we do: this changed in SA-9265 for consistency with above)
          *
          * * We do not need to join to deleted students as pastoral records for a deleted user should not exist.
          */
@@ -147,13 +149,22 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('modifiedBy', 'mb')},
                         {$this->getJoinColumnString('subtype', 'c')}
+        ";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM        {$this->getTable()}
             INNER JOIN   {$this->getJoinSql('student', '', 's')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv')}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
-            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c')}
+            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c', true)}
         ";
     }
 
@@ -267,7 +278,7 @@ class Mapper extends BaseMapper
      */
     public function getRelatedRecords(Model $record)
     {
-        $query = $this->getSelectString();
+        $query = $this->getSelectString() . ' ' . $this->getFromString();
 
         if ($record->getParent() instanceof Model) {
             // This is a child item, find its parent and its other siblings
@@ -336,7 +347,7 @@ class Mapper extends BaseMapper
      */
     public function findByTag(PastoralTag $tag)
     {
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
 
             JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND
                     `pastoral_tags`.`tag_id` = :tagId
@@ -359,7 +370,7 @@ class Mapper extends BaseMapper
      */
     public function findLinked($student, $linkedStudent, $typeId = null)
     {
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
             WHERE
 
             `pastoral`.`student_id` = :linkedStudentId AND `pastoral`.`parent_id` IN (
@@ -656,7 +667,7 @@ class Mapper extends BaseMapper
         // Construct the final query
         // --------------------------------------------------------------------------------------------------------
 
-        $sql = $this->getSelectString() . "
+        $sql = $this->getSelectString() . ' ' . $this->getFromString() . "
             LEFT JOIN `pastoral_comment` ON `pastoral_comment`.`pastoral_id` = `pastoral`.`id`
             WHERE
             (
@@ -870,7 +881,9 @@ class Mapper extends BaseMapper
 
         // Execute SQL
 
-        $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} {$orderSql}");
+        $statement = $this->getDatabase()->prepare(
+            $this->getSelectString() . ' ' . $this->getFromString() . "{$criteriaSql} {$orderSql}"
+        );
         $statement->execute($this->bindings);
 
         // Hydrate records for return

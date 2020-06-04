@@ -81,7 +81,7 @@ class Mapper extends BaseMapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString($revisions = false)
+    protected function getSelectString(): string
     {
         return "
             SELECT      {$this->getColumnString()},
@@ -91,13 +91,22 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('modifiedBy', 'mb')},
                         {$this->getJoinColumnString('subtype', 'c')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM        {$this->getTable()}
             INNER JOIN   {$this->getJoinSql('student', '', 's', true)}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv')}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
-            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c')}
+            LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c', true)}
         ";
     }
 

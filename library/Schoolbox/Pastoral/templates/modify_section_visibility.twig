@@ -109,7 +109,7 @@
 
 {% if not record.id %}
     {% set name = "yourself" %}
-{% elseif user.id != record.owner.id %}
+{% elseif USER.id != record.owner.id %}
     {% set name = "yourself" %}
 {% else %}
     {% set name = record.owner.fullName %}
