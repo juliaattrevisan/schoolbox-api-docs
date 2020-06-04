@@ -138,7 +138,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->parse('due_work_block', 'due_work');
             }
 
-            if ($isParent && $this->getConfigLoader()->get('restrict_parent_grades')) {
+            // Hide grades from parents, if grades access is restricted or module is disabled
+            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED)
+                || ($isParent && $this->getConfigLoader()->get('restrict_parent_grades'))
+            ) {
                 $this->setVar('grades_button_block', '');
             } else {
                 $this->parse('grades_button_block', 'grades_button');

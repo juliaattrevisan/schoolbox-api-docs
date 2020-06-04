@@ -116,9 +116,12 @@ class Renderer extends Handler
                     $hasActions = true;
                 }
 
-                if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
-                    $this->getPage()->setVar('grades_button_block', '');
-                } elseif (!$groupHandler->isStudent($user['id']) || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))) {
+                // Hide grades from parents, if grades access is restricted or module is disabled
+                if (!Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+                    || !$groupHandler->isStudent($user['id'])
+                    || ($groupHandler->isParent() && Config::get('restrict_parent_grades'))
+                    || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))
+                ) {
                     $this->getPage()->setVar('grades_button_block', '');
                 } else {
                     $this->getPage()->parse('grades_button_block', 'grades_button');
