@@ -20,3 +20,8 @@ ALTER TABLE `event_role`
 
 ALTER TABLE `event_attendance`
     DROP COLUMN `intention`;
+
+-- Attendees can only be invited to an event once (can't have multiple identical attendance records)
+
+ALTER TABLE `event_attendance`
+    ADD UNIQUE INDEX `event_attendance_event_user` (`event_id`, `user_id`);
