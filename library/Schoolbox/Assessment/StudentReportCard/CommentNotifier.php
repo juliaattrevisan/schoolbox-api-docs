@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -141,6 +142,11 @@ class CommentNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         $bob      = new Builder();
+
+        if (!$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED)) {
+            // there is no grades page to show
+            return $envelope;
+        }
 
         // extract elements we'll be using
         $student  = $comment->getStudent();

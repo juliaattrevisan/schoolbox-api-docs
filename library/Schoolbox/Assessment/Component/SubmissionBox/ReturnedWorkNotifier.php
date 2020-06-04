@@ -16,6 +16,7 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as assessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -223,10 +224,12 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $assessment = $this->getAssessment($box, $student);
 
         // Request re-submission, even when mark is not visible.
+        $restrictGrades = $this->conf->get('restrict_parent_grades')
+            || !$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED);
         $requestResubmission = $returnedWork->getResubmissionRequired();
         if (!$assessment
             || $this->conf->get('restrict_parent_duework_access')  // hide due work
-            || ($this->conf->get('restrict_parent_grades') && $this->conf->get('restrict_student_submissions'))
+            || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
             || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT) || $requestResubmission)) {
             return $envelope;
         }
@@ -235,7 +238,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $cat  = $assessment->getBaseContext()->getFolder();
 
         $term      = $this->termMapper->findForDate($assessment->getDueAt());
-        $hrefGrade = $this->conf->get('restrict_parent_grades') ? '' : "/learning/grades/{$student->getId()}/{$term->getCode()}/{$cat->getId()}";
+        $hrefGrade = $restrictGrades ? '' : "/learning/grades/{$student->getId()}/{$term->getCode()}/{$cat->getId()}";
         $href      = $this->conf->get('restrict_student_submissions') ? $hrefGrade : "/learning/assessments/{$assessment->getId()}/{$student->getId()}";
 
         $bob  = new Builder();
