@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Delete;
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Assessment\Rubric\Repair\Base;
+use Schoolbox\Assessment\Rubric\Util as RubricUtil;
 
 /**
  * Script for deleting empty duplicate rubric indicators.
@@ -194,7 +195,7 @@ class Indicator extends Base
 
                 $groupedIndicators = [];
                 foreach ($this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id') as $indId => $indName) {
-                    $groupedIndicators[$indName][] = $indId;
+                    $groupedIndicators[RubricUtil::normalizeName($indName)][] = $indId;
                 }
 
                 $this->createSavepoint();

@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Merge;
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Assessment\Rubric\Repair\Base;
+use Schoolbox\Assessment\Rubric\Util as RubricUtil;
 use UnexpectedValueException;
 
 /**
@@ -248,7 +249,7 @@ class Capability extends Base
 
             $groupedCapabilities = [];
             foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $id => $name) {
-                $groupedCapabilities[$name][] = $id;
+                $groupedCapabilities[RubricUtil::normalizeName($name)][] = $id;
             }
 
             $this->mergeCapabilities($groupedCapabilities, $folderId);
