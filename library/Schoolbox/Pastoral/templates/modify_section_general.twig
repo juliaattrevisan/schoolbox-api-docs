@@ -24,7 +24,10 @@
             <label> Sub-Type <select name="subtypeId" id="subtypeId">
                     {# Is this record's subtype deleted? #}
                     {% if record.subtype.deleted %}
-                        <option data-chained="{{ record.subtype.pastoralType.id }}" selected value="{{ record.subtype.id }}">{{ record.subtype.name }} (deleted)</option>
+                        <option data-chained="{{ record.subtype.pastoralType.id }}"
+                                class="{{ record.subtype.pastoralType.id }}"
+                                selected
+                                value="{{ record.subtype.id }}">{{ record.subtype.name }} (deleted)</option>
                     {% endif %}
                     {% for subtype in subTypes %}
                         <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}" {% if subtype.id == record.subtype.id %}selected{% endif %} value="{{ subtype.id }}">{{ subtype.name }}</option>
