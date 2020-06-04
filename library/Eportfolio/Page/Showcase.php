@@ -6,6 +6,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
@@ -55,7 +57,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Intro text
          */
-        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']
+            && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+        ) {
             $this->getPage()->parse('has_intro_block', 'has_intro');
         } else {
             $this->getPage()->setVar('has_intro_block', '');
@@ -221,7 +225,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
         } else {
-            if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+            if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']
+                && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+            ) {
                 $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
             }
             $this->getPage()->setVar('has_showcased_work_block', '');
