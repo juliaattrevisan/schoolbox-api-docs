@@ -105,9 +105,7 @@
     /* Inline alteration of attendees on event detail screen
      */
     const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-    const URL_ATTENDANCE_MODIFY = '/calendar/event/attendance/{eventId}/modify';
     const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
-
 
     export default {
         props: ['event'],
@@ -159,22 +157,6 @@
                 return url;
             },
 
-            /**
-             * Route to the Attendance Modify endpoint to asynchronously update attendees
-             *
-             * @param eventId
-             * @param returnUrl
-             * @returns {string}
-             */
-            generateAttendanceModifyUrl(eventId, returnUrl) {
-                var url= URL_ATTENDANCE_MODIFY.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
 
             /**
              * Route to the Attendance Delete endpoint to asynchronously remove attendees
@@ -287,13 +269,6 @@
              */
             createAttendancePath: function() {
                 return this.generateAttendanceCreateUrl(this.event.id);
-            },
-
-            /**
-             * Update diff of attendances
-             */
-            modifyAttendancePath: function() {
-                return this.generateAttendanceModifyUrl(this.event.id);
             },
 
             /**
