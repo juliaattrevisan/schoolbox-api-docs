@@ -79,6 +79,10 @@
                     });
 
                     selectize[0].selectize.clear();
+
+                    /* Update list
+                     */
+                    $('#attendance-guests ul').replaceWith(responseText);
                 },
                 error: function(responseText) {
                     $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
@@ -96,7 +100,7 @@
             let element = $(this);
 
             element.confirmDialog({
-                text: 'Are you sure you want to uninvite' + element.attr('data-guest-name') + '?',
+                text: 'Are you sure you want to uninvite ' + element.attr('data-guest-name') + '?',
                 confirmEvent: function() {
 
                     /* User's name
@@ -120,6 +124,10 @@
                                 text: name + ' has been uninvited',
                                 css: 'success'
                             });
+
+                            /* Update list
+                             */
+                            $('#attendance-guests ul').replaceWith(responseText);
                         },
                         error: function(responseText) {
                             $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});

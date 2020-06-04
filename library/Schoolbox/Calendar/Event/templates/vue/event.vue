@@ -65,20 +65,7 @@
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </div>
 
-                            <ul class="action-list">
-                                <li class="actions-small-1" v-for="guest in this.event.guests">
-                                    <div class="compact card small-11">
-                                        <a v-bind:href="'/search/user/' + guest.id" title="View Profile">
-                                            <img v-bind:src="'/portrait.php?userId=' + guest.id + '&size=square64'" />
-
-                                            <p>{{ guest.name }}</p>
-                                        </a>
-                                    </div>
-                                    <nav>
-                                        <a :data-guest-delete="guest.id" :data-guest-name="guest.name" class="icon-delete no-text" :href="deleteAttendancePath" title="Remove guest"></a>
-                                    </nav>
-                                </li>
-                            </ul>
+                            <article v-html="this.event.guests"></article>
                         </section>
                     </div>
                 </div>

@@ -9,10 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use PDOException;
 use Schoolbox\Calendar\Event;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -53,16 +51,22 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Generate an html fragment containing the current list of attendees
+     *
+     * Ideally this would be managed in vue somehow, but we have to build a vue-compatible
+     * toast that behaves synonymously with our jquery toast; plus, selectize and confirmDialog
+     * wrangling is a thing we have yet to defeat
      *
      * @param Event $event
-     * @throws ServiceNotFound
      */
     public function getCurrent(Event $event): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEventAttendance/index.twig', [
+        $guests = $this->attendanceMapper->findAttendances($event);
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
             'event' => $event,
-        ])->setTitle('Example'));
+            'guests' => $guests,
+        ]));
     }
 
 
@@ -99,6 +103,10 @@ class Controller extends Base
                 ->setUser($this->userMapper->createModel()->setId($id))
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
+
+        /* Regenerate a new html fragment for the people currently invited
+         */
+        $this->getCurrent($event);
     }
 
 
@@ -113,6 +121,10 @@ class Controller extends Base
             'event_id' => $event->getId(),
             'user_id' => $this->request->post['guest']
         ]);
+
+        /* Regenerate a new html fragment for the people currently invited
+         */
+        $this->getCurrent($event);
     }
 
 
@@ -136,5 +148,9 @@ class Controller extends Base
         $guestIds = array_unique(array_merge($newGuests, $oldGuests));
 
         (new Transactor($this->attendanceMapper, $this->userMapper))->update($event, $guestIds);
+
+        /* Regenerate a new html fragment for the people currently invited
+         */
+        $this->getCurrent($event);
     }
 }

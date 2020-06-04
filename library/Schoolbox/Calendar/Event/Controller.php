@@ -150,7 +150,10 @@ class Controller extends Base
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
-            'guests' => $this->attendanceMapper->findAttendances($event),
+            'guests' => $this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
+                'event' => $event,
+                'guests' => $this->attendanceMapper->findAttendances($event),
+            ])->getAsString(),
             'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
         ])->setTitle($event->getTitle()));
     }

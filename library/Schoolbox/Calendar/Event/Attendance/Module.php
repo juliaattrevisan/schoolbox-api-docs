@@ -69,8 +69,7 @@ class Module extends BaseModule
     {
         try {
             $event = $this->getMapperFactory()->get(EventMapper::class)->findById($params['id']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound();
         }
 
