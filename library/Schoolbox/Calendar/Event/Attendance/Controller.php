@@ -18,6 +18,11 @@ use UnexpectedValueException;
 /**
  * Class Controller
  *
+ * Manages the creation and deletion of attendance records for an event
+ *
+ * Most methods will return a list of attendees currently invited to a particular event
+ * Vue should handle that at some point, but we have too many jquery assets to juggle atm
+ *
  * @package Schoolbox\Calendar\Event\Attendance
  */
 class Controller extends Base
@@ -71,18 +76,6 @@ class Controller extends Base
 
 
     /**
-     * Find the ids of attendees currently for $event
-     *
-     * @param Event $event
-     * @return array
-     */
-    private function findExistingIds(Event $event): array
-    {
-        return array_column($this->attendanceMapper->findAttendances($event), 'id');
-    }
-
-
-    /**
      * Add attendees to the list
      *
      * @param Event $event
@@ -93,7 +86,7 @@ class Controller extends Base
     public function postCreate(Event $event): void
     {
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
-        $oldGuests = $this->findExistingIds($event);
+        $oldGuests = array_column($this->attendanceMapper->findAttendances($event), 'id');
 
         $ids = array_diff($newGuests, $oldGuests);
 
@@ -121,33 +114,6 @@ class Controller extends Base
             'event_id' => $event->getId(),
             'user_id' => $this->request->post['guest']
         ]);
-
-        /* Regenerate a new html fragment for the people currently invited
-         */
-        $this->getCurrent($event);
-    }
-
-
-    /**
-     * Process the diff of attendees
-     *
-     * @param Event $event
-     * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
-     */
-    public function postModify(Event $event): void
-    {
-
-        /* Combine the two sets of guests: new, from the selectize; old, from some hidden inputs
-         * That should allow us get a diff of people in one request
-         */
-        $newGuests = explode(',', $this->request->post['guests'] ?? '');
-        $oldGuests = $this->findExistingIds($event);
-
-        $guestIds = array_unique(array_merge($newGuests, $oldGuests));
-
-        (new Transactor($this->attendanceMapper, $this->userMapper))->update($event, $guestIds);
 
         /* Regenerate a new html fragment for the people currently invited
          */
