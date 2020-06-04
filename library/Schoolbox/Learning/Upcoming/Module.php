@@ -10,6 +10,7 @@ use Alaress\Authorizer\Rule;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -54,6 +55,7 @@ class Module extends BaseModule
         }
         $access = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED, $this->getConfig()),
             $access
         );
 
