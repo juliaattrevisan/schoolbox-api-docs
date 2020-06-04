@@ -807,6 +807,7 @@ class Controller extends Base
             try {
                 /** @var PastoralTypeModel $type */
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
+                $record->setType($type);
 
                 try {
                     /** @var PastoralSubTypeModel $subtype */
@@ -816,20 +817,28 @@ class Controller extends Base
                     // Noop, this can be blank
                 }
 
-                if (!$this->getConfigLoader()->get('pastoral_severity')) {
-                    $severity = null;
-                } else {
-                    /** @var PastoralSeverityModel $severity */
-                    $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+            } catch (MapperException\Deleted $e) {
+                // Type was deleted. Was it changed?
+                // If not, allow it to be saved with the deleted type
+                $deletedType = $e->getDeletedObject();
+                if ($deletedType instanceof PastoralTypeModel && $deletedType->getId() !== $record->getType()->getId()) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
+            // Set severity separately from type
+            if (!$this->getConfigLoader()->get('pastoral_severity')) {
+                $severity = null;
+            } else {
+                /** @var PastoralSeverityModel $severity */
+                $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+            }
+
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
             $record->setHeading($heading);
-            $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
             $record->setBodyPublic(trim($post["body_public"]));
