@@ -22,7 +22,7 @@ $data = {
 <div class="attachzone s{{ attachzone.size }}" id="{{ attachzone.id }}-zone">
     <label>{{ attachzone.label }}</label>
     <ul data-dz-previews class="az-list">
-        {% for attachment in attachzone.attachments %}
+        {% for attachment in attachzone.attachments ?? [] %}
         <li class="dz-success {% if not attachzone.readonly %}actions-small-1{% endif %}">
             <div class="list-item">
                 <div class="card small-12">
@@ -76,7 +76,7 @@ $data = {
                 thumbnailSize: '{{ attachzone.size }}',
                 fallbackButtonSelector: 'a[data-attach-fallback]',
                 previewsContainerSelector: '[data-dz-previews]',
-                onDetach: {{ onDetach|length ? onDetach|raw : 'null' }},
+                onDetach: {{ onDetach is defined ? onDetach|raw : 'null' }},
                 useFolder: false
             });
         });
