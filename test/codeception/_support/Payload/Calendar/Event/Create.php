@@ -25,13 +25,13 @@ class Create extends Request
         $eventTimestamp = time();
         $eventDate      = date('d/m/Y', $eventTimestamp);
 
-        $this->setReferer("/calendar/modify.php");
+        $this->setReferer("/calendar/event/create");
 
         $this->setFormParam('id', '');
         $this->setFormParam('userId', $userId);
         $this->setFormParam('authorId', $authorId);
-        $this->setFormParam('allday', 1);
-        $this->setFormParam('return', '/calendar/full/' . date('d-m-Y', $eventTimestamp) . '/' . $userId);
+        $this->setFormParam('allDay', 1);
+        //$this->setFormParam('return', '/calendar/full/' . date('d-m-Y', $eventTimestamp) . '/' . $userId);
         $this->setFormParam('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
         $this->setFormParam('action', 'Add');
         $this->setFormParam('title', '');
@@ -39,7 +39,7 @@ class Create extends Request
         $this->setFormParam('endDate', $eventDate);
         $this->setFormParam('repeat', '');
         $this->setFormParam('repeat_until', '');
-        $this->setFormParam('type', '');
+        $this->setFormParam('type', '1');
         $this->setFormParam('location', 'Automated test location');
         $this->setFormParam('detail', '<p>Automated test description</p>');
         $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 1 day', $eventTimestamp)));
@@ -55,6 +55,6 @@ class Create extends Request
 
     public function getUrl(): string
     {
-        return "/calendar/modifyForm.php";
+        return "/calendar/event/create";
     }
 }

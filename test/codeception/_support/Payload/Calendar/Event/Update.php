@@ -14,15 +14,18 @@ use Schoolbox\Calendar;
 class Update extends Request
 {
     use PostTrait;
+    
+    var $event;
 
     public function __construct(Calendar\Event $event)
     {
-        $this->setReferer("/calendar/modify.php?eventID=7527&returnTo=calendar");
+        $this->event=$event;
+        $this->setReferer("/calendar/event/" . $this->event->getId() . "/modify");
 
         $this->setFormParam('id', $event->getId());
         $this->setFormParam('userId', $event->getAuthor()->getId());
         $this->setFormParam('authorId', $event->getAuthor()->getId());
-        $this->setFormParam('allday', $event->getAllDay());
+        $this->setFormParam('allDay', $event->getAllDay());
         $this->setFormParam('return', '/calendar/' . date('d-m-Y', $event->getStartDateTime()->getUnixTimeStamp()));
         $this->setFormParam('efficacy', $event->inSeries() ? Calendar\EventRecurrenceMapper::EFFICACY_SERIES : Calendar\EventRecurrenceMapper::EFFICACY_SELF);
         $this->setFormParam('action', 'Update');
@@ -41,7 +44,7 @@ class Update extends Request
 
     public function getUrl(): string
     {
-        return "/calendar/modifyForm.php";
+        return "/calendar/event/" . $this->event->getId() . "/modify";
     }
 }
 
