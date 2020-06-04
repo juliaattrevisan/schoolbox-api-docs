@@ -16,5 +16,5 @@
 
 declare(strict_types=1);
 
-passthru(__DIR__ .  '/../../../tools/rubric/repairFolders.php -vvv --perform --mailto=support@schoolbox.com.au', $returnVar);
+passthru(__DIR__ .  '/../../../tools/rubric/repairFolders.php -vvv --perform', $returnVar);
 exit($returnVar);
