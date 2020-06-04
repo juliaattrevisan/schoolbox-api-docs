@@ -39,26 +39,24 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#add-guests').selectizeSelector({
+        var selectize = $('#add-guests').selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
                 data:     {groupID: 0, showCampus: true},
                 dataType: 'json'
             },
-            multiple: true
+            multiple: false
         });
 
-        $('#attendance-guests').on('change', '#add-guests', function(event) {
-            event.preventDefault();
+        /* Add one person at a time, spawn the toast, transact, then clear the selectize
+         */
+        selectize[0].selectize.on('item_add', function (value, item) {
 
             /* User's name
              */
-            let user = $('#attendance-guests [data-value]:last')
-            let name = user.html().split(' - ')[0];
-            let id = user.attr('data-value');
-
-            let element = $(this);
+            let name = $(item[0]).html().split(' - ')[0];
+            let id = value;
 
             /* A toast - to your valour, my sword, and our victory together
              */
@@ -69,23 +67,29 @@
             });
 
             $.ajax({
-                url: element.parents('form').attr('action'),
+                url: $('#createAttendanceForm').attr('action'),
                 method: 'POST',
                 data: {
                     guests: id
                 },
                 success: function(responseText) {
                     $toast.toastTimeout({
-                        text: name + ' has been succesfully invited',
+                        text: name + ' has been successfully invited',
                         css: 'success'
                     });
+
+                    selectize[0].selectize.clear();
                 },
                 error: function(responseText) {
                     $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
+
+                    selectize[0].selectize.clear();
                 }
             });
         });
 
+        /* Asynchronously remove people's invites
+         */
         $('#attendance-guests').on('click', '[data-guest-delete]', function(event) {
             event.preventDefault();
 
