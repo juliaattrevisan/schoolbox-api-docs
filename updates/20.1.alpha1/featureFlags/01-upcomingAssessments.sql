@@ -13,7 +13,7 @@ INSERT INTO config(
     required
 ) VALUES (
     'upcoming_assessments_enabled',
-    '0',
+    '1',
     'Enable Upcoming Assessments Module',
     'If toggled to ''ON'', the upcoming assessments page for students will be enabled.',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),

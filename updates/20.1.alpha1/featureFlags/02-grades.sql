@@ -13,7 +13,7 @@ INSERT INTO config(
     required
 ) VALUES (
     'grades_enabled',
-    '0',
+    '1',
     'Enable Grades Module',
     'If toggled to ''ON'', the grades page for students will be enabled.',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
