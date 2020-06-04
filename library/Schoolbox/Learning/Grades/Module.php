@@ -15,6 +15,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Selection as FilterSelection;
@@ -47,9 +48,13 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $permissions = new Rule\LazyCallback(function () {
+        $basicPermissions = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_GRADES_ENABLED, $this->getConfig())
+        );
+        $permissions = new Rule\LazyCallback(function () use ($basicPermissions) {
             return new Rule\All(
-                new Rule\IsLoggedIn(),
+                $basicPermissions,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -100,7 +105,7 @@ class Module extends BaseModule
         $this->register('GET', '/grades-year/{userId}/year/{year}', 'getGradesYear', $permissions, $loadViewee);
 
         // Overview and single class pages
-        $this->register('GET', '', 'getGradesForCurrentUser', new Rule\IsLoggedIn());
+        $this->register('GET', '', 'getGradesForCurrentUser', $basicPermissions);
         $this->register('GET', '/{userId:\d+}{/termCode}',                         'getGrades',           $permissions, $loadVieweeTerm);
         $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
