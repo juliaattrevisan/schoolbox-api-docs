@@ -9,6 +9,7 @@
 
 namespace Schoolbox\User\Search;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use Alaress_Date_Format;
@@ -94,11 +95,13 @@ class Renderer extends Handler
                 $this->getPage()->setVar('academic_reports_block');
                 $this->getPage()->setVar('tot_block');
 
-                /* Hide Due Work link from parents, if Due Work access is restricted
+                /* Hide Due Work link from parents, if Due Work access is restricted or the module is disabled
                  */
-                if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
-                    $this->getPage()->setVar('due_work_block', '');
-                } elseif (!$groupHandler->isStudent($user['id']) || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))) {
+                if (!Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)
+                    || !$groupHandler->isStudent($user['id'])
+                    || ($groupHandler->isParent() && Config::get('restrict_parent_duework_access'))
+                    || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))
+                ) {
                     $this->getPage()->setVar('due_work_block', '');
                 } else {
                     $this->getPage()->parse('due_work_block', 'due_work');
