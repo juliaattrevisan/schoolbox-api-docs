@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
@@ -248,10 +249,11 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 $this->getPage()->setVar('submission_file_list_block','');
             }
 
-            if($this->getUser()->getId() == $this->getCurrentUser()->getId()) {
+            if ($this->getUser()->getId() == $this->getCurrentUser()->getId()
+                && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+            ) {
                 $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
-            }
-            else {
+            } else {
                 $this->getPage()->setVar('edit_showcase_work_block');
             }
 
