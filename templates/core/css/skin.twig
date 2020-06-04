@@ -16,5 +16,5 @@
         );
     {% endfor %}
 }
-{{ config.skin_custom_css | raw }}
+{{ config.skin_custom_css ?? '' | raw }}
 {% endautoescape %}
