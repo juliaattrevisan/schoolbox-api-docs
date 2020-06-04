@@ -30,7 +30,8 @@ $h6-font-reduction: 0;
 
 // These control how subheaders are styled.
 $subheader-line-height: 1.4;
-$subheader-font-color: contrast-bg();
+// DONE figure out what to do instead of this mixin
+$subheader-font-color: $body-foreground;
 $subheader-font-weight: $header-font-weight;
 $subheader-top-margin: .625rem;
 $subheader-bottom-margin: .5rem;
@@ -124,7 +125,8 @@ $blockquote-cite-link-color: $blockquote-cite-font-color;
 
 // Heading 1
 h1{
-    @include contrast-bg(0.855, $body-bg, 0%, $white, $black); // 0.855 = $jet
+    // DONE figure out what to do with this mixin
+    color: $body-foreground-h1;
 }
 
 .subheader{
@@ -156,7 +158,8 @@ a{
 }
 
 .meta{
-	@include contrast-bg();
+    // DONE figure out what to do about this mixin
+    color: $body-foreground;
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: $paragraph-font-size;
 	font-style: italic;

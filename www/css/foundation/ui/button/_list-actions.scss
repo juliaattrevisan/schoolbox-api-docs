@@ -79,7 +79,8 @@
 				input:checked + label {
 					a {
 						background-color: $button-color;
-						color: calc-text-color($button-color);
+                        // DONE As far as I can know, there's never a checkbox inside a header action
+                        color: $content-ui-selected;
 					}
 				}
 			}

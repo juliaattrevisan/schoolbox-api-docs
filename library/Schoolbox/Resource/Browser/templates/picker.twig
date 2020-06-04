@@ -2,7 +2,7 @@
 
 {# Load in required JS/CSS as we are not inside the chrome #}
 <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ site_version }}"></script>
-<link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation.css?v={{ site_version }}" />
+{% include 'include/skin.twig' with { config: config } only %}
 
 {# Load JS for treeview #}
 

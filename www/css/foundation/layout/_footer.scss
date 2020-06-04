@@ -28,5 +28,6 @@ $footer-margin-bottom: 1rem;
 
 #footer,
 #footer a{
-    @include contrast-bg();
+    // DONE figure out what to do about this mixin
+    color: $body-foreground;
 }

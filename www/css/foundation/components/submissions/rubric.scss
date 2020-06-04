@@ -35,11 +35,13 @@ table.rb {
             }
         }
 
+        // Styling for the selected descriptor on the rubric marked grid
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
                     background-color: $content-ui-selected;
-                    color: calc-text-color($content-ui-selected);
+                    // DONE use contrasting color
+                    color: $content-ui-selected-contrast;
                 }
             }
             + label {
@@ -51,7 +53,8 @@ table.rb {
                 }
 
                 &:hover {
-                    background-color: lighten($content-ui-selected, 3%);
+                    // DONE use CSS lighten
+                    background-color: css-lighten($content-ui-selected, 3%);
                     cursor: pointer;
                 }
             }
@@ -156,8 +159,12 @@ table.rb {
     }
 
     .rb-group-summary {
-        background-color: lighten($input-border-color, 10%) !important;
-        color: calc-text-color(lighten($input-border-color, 10%));
+        // DONE use CSS lighten
+        background-color: css-lighten($input-border-color, 10%) !important;
+
+        // DONE use contrasting color
+        color: $form-bg-hover-color-contrast;
+        //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
             font-weight: bold!important;
@@ -254,12 +261,14 @@ table.rb {
 }
 .rb-no-cell {
     background-color: $body-bg;
-    color: contrast-bg();
+    // DONE figure out what to do about this mixin
+    color: $body-foreground;
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: $content-ui-selected!important;
-    color: calc-text-color($content-ui-selected);
+    background-color: $content-ui-selected !important;
+    // DONE use contrasting color
+    color: $content-ui-selected-contrast;
 
     .range-selection-value {
         font-weight: bold;
@@ -280,7 +289,8 @@ table.rb {
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
-    color: calc-text-color($input-border-color);
+    // DONE use contrasting color
+    color: $form-bg-hover-color-contrast;
 }
 
 .rb-description, .rb-value {

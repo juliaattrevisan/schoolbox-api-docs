@@ -1,6 +1,5 @@
-var shell = require('shelljs');
-
-var jsSrc = {
+const sass  = require('sass');
+const jsSrc = {
     main: [
         // Modernizr
         'www/javascript/components/modernizr/modernizr.js',
@@ -163,7 +162,7 @@ var jsSrc = {
         'node_modules/axios/dist/axios.js'
     ]
 };
-var jsDest = {
+const jsDest = {
     main: 'www/javascript/components/<%= pkg.name %>.min.js',
     masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
     fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
@@ -181,9 +180,14 @@ module.exports = function(grunt) {
             install: {}
         },
         sass: { // Only used for development, skips the skin build process
+            options: {
+                implementation: sass,
+                sourceMap: true
+            },
             dist: {
                 files: {
-                    'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
+                    'www/css/core/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss',
+                    'www/css/core/editor.css': 'www/css/foundation/editor.scss'
                 }
             }
         },
@@ -256,7 +260,7 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Dev tasks
@@ -265,15 +269,6 @@ module.exports = function(grunt) {
 
     // Build tasks
     grunt.registerTask('build.js', 'uglify');
-    grunt.registerTask('build.sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
-        // Run sass build
-        var result = shell.exec('php ./tools/skin/builder.php --force');
-        if (result.code === 0) {
-            grunt.log.writeln('Skin built successfully');
-        } else {
-            grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
-        }
-    });
-    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass']);
-    grunt.registerTask('default',    'build');
+    grunt.registerTask('build',    ['bower', 'build.js', 'sass']);
+    grunt.registerTask('default',  'build');
 };

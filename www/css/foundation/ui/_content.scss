@@ -1779,7 +1779,8 @@ dl {
     .pipe-meter{
         width: 0.5rem;
         height: 2rem;
-        background-color: darken($accent-foreground, 5%);
+        // DONE use CSS darken
+        background-color: css-darken($accent-foreground, 5%);
         position: absolute;
         top: -9px;
         &.slow{
@@ -1856,7 +1857,8 @@ $train-line-unvisited-color: $content-ui-background;
             span {
                 background: $content-ui-foreground;
                 border-radius: $train-line-stop-size / 2;
-                color: calc-text-color($content-ui-foreground);
+                // DONE use contrasting color
+                color: $content-ui-foreground-contrast;
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
                 padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2) (($train-line-stop-size - rem-calc($base-font-size)) / 2);

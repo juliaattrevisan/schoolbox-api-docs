@@ -118,7 +118,8 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 					text-decoration: none;
 					background: $content-ui-submit-foreground;
 					border-radius: 1rem;
-					color: calc-text-color($content-ui-submit-foreground);
+                    // DONE use contrasting color
+                    color: $content-ui-submit-foreground-contrast;
 				}
 			}
 		}

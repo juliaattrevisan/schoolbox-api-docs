@@ -184,10 +184,13 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
             border: $selectize-width-item-border solid $selectize-color-item-active-border;
         }
     }
+
+    // Rendering for options in a disabled selectize
     .selectize-control.multi &.disabled > div {
         &, &.active {
             color: lighten(desaturate($selectize-color-item-text, 100%), $selectize-lighten-disabled-item-text);
-            background: lighten(desaturate($selectize-color-item, 100%), $selectize-lighten-disabled-item);
+            // DONE: Complete desaturation + lighten by 30% is close enough
+            background: css-adjust-color($content-ui-hover, $saturation: -100%, $lightness: 30%);
             border: $selectize-width-item-border solid lighten(desaturate($selectize-color-item-border, 100%), $selectize-lighten-disabled-item-border);
         }
     }

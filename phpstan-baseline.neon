@@ -4401,16 +4401,6 @@ parameters:
 			path: tools/quiz/autoFinish.php
 
 		-
-			message: "#^Variable \\$newCustomSha might not be defined\\.$#"
-			count: 1
-			path: tools/skin/builder.php
-
-		-
-			message: "#^Variable \\$origCustomSha might not be defined\\.$#"
-			count: 1
-			path: tools/skin/builder.php
-
-		-
 			message: "#^Binary operation \"\\+\" between array\\('Using strategy\\:'\\) and array\\|string results in an error\\.$#"
 			count: 1
 			path: tools/socket/socketd.php

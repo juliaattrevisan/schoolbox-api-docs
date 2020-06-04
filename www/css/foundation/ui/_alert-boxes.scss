@@ -50,11 +50,14 @@ $alert-transition-ease: ease-out;
 //
 
 $alert-tint-amount: 90%;
-$alert-default-background: darken($body-bg, 10%);
+
+// DONE use CSS darken
+$alert-default-background: css-darken($body-bg, 10%);
 
 .alert-box {
     background-color: $alert-default-background;
-    color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
+    // DONE use contrast color
+    color: $body-bg-contrast;
 
     .close {
         &:hover {

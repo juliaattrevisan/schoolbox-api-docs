@@ -239,7 +239,8 @@
   &.removed {
     h3 {
       text-decoration: line-through;
-      @include contrast-bg();
+      // DONE figure out what to do about this mixin
+      color: $body-foreground;
     }
   }
   /*

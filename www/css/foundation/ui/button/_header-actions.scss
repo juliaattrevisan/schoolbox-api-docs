@@ -27,12 +27,14 @@
 
 		// no text? be subtle
 		&.no-text {
-			//@include contrast-bg();
+            // DONE figure out what to do about this mixin
+            color: $body-foreground;
 			background: transparent;
 		}
 
 		&:hover {
-			background-color: tint($content-ui-hover, 20%);
+            // DONE modify RGB colors instead of tint
+            background-color: css-tint($content-ui-hover, 20%);;
 		}
 		&[aria-expanded=true] {
 			@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));

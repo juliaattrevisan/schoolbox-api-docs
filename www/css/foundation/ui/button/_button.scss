@@ -148,7 +148,7 @@ input[type="submit"]{
  */
 a.submit,
 button.submit {
-	@extend input[type="submit"];
+	@extend input, [type="submit"];
     font-size: $base-font-size;
     font-weight: $font-weight-semibold;
 	.splash {
@@ -169,7 +169,7 @@ button.submit {
 			justify-content: center;
             margin-bottom: 0;
 			&.submit {
-				@extend input[type="submit"];
+				@extend input, [type="submit"];
 			}
 		}
     }

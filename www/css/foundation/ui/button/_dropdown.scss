@@ -40,7 +40,8 @@ $f-dropdown-icon-align: 0.25rem;
 		opacity: 0.5;
 	}
 	.separator, .meta {
-		color: contrast-bg($background: $content-ui-background, $dark: $content-ui-foreground);
+        // DONE making this color transparent works okay
+        color: css-scale-color($content-ui-foreground, $alpha: -65%);
 	}
 	.separator {
 		padding: $f-dropdown-list-padding;
@@ -85,7 +86,8 @@ $f-dropdown-icon-align: 0.25rem;
         margin: 0 2px 0 0;
     }
     .separator {
-        background-color: darken($f-dropdown-bg, 5%);
+        // DONE use CSS darken
+        background-color: css-darken($f-dropdown-bg, 5%);
         color: $anchor-font-color;
     }
 }

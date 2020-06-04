@@ -21,9 +21,11 @@ $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 $input-bg-color: $white;
 $input-focus-bg-color: $form-bg-hover-color;
-$input-focus-color: calc-text-color($input-focus-bg-color);
+// DONE use contrasting color
+$input-focus-color: $form-bg-hover-color-contrast;
 $input-border-color: $form-border-color !default;
-$input-focus-border-color: darken($form-border-color, 15%);
+// DONE use CSS darken
+$input-focus-border-color: css-darken($form-border-color, 15%);
 $input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
 $input-border-style: solid;
@@ -119,7 +121,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Outline Style for tabbing through switches
 // $switch-label-outline: 1px dotted $jumbo;
 
-@import "../../../../javascript/components/foundation/scss/foundation/components/forms";
+@import "../../css-only/components/forms";
 @import "../../../../javascript/components/foundation/scss/foundation/components/switches";
 
 //
@@ -430,7 +432,15 @@ input[type=radio] {
 }
 
 // Toggle Checkbox (VAPORWAVE)
-@mixin vaporwave($label-class: false, $toggle-height: $input-height, $toggle-width: $input-height, $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
+@mixin vaporwave(
+    $label-class: false,
+    $toggle-height:
+    $input-height,
+    $toggle-width:
+    $input-height,
+    $hover-background-color: $button-bg-hover,
+    $active-color: $content-ui-foreground,
+) {
 
 	$label-selector: "label";
 
@@ -465,9 +475,10 @@ input[type=radio] {
 	&:checked {
 		+ #{$label-selector} {
 			background-color: $active-color;
-			color: calc-text-color($active-color);
+            // DONE hover-background-color works for vaporwave
+            color: $hover-background-color;
 			[class^="icon-"]{
-				color: calc-text-color($active-color);
+                color: $hover-background-color;
 			}
 		}
 	}

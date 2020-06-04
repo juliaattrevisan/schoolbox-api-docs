@@ -8,33 +8,91 @@ $charset: "utf-8";
  Refined Colour Application
  (these are Skin Builder vars)
  ****************************/
-$navigation-foreground:            rgb(128, 179, 216) !default;
-$navigation-background:            rgb(0, 102, 176) !default;
-$navigation-hover:                 rgb(33, 122, 186) !default;
+$navigation-foreground:            var(--navigation-foreground) !default;
+$navigation-background:            var(--navigation-background) !default;
+$navigation-hover:                 var(--navigation-hover) !default;
 
-$off-canvas-foreground:            rgb(0, 102, 176) !default;
-$off-canvas-background:            rgb(229, 244, 255) !default;
-$off-canvas-hover:                 rgb(241, 249, 255) !default;
-$off-canvas:                       rgb(255, 255, 255) !default;
+$off-canvas-foreground:            var(--off-canvas-foreground) !default;
+$off-canvas-background:            var(--off-canvas-background) !default;
+$off-canvas-hover:                 var(--off-canvas-hover) !default;
 
-$content-ui-foreground:            rgb(0, 102, 176) !default;
-$content-ui-background:            rgb(193, 229, 255) !default;
-$content-ui-hover:                 rgb(209, 236, 255) !default;
-$content-ui-selected:              rgb(229, 244, 255) !default;
+// This has never been a var that is able to be overridden?
+//$off-canvas:                       rgb(255, 255, 255) !default;
 
-$content-ui-submit-foreground:     rgb(255, 255, 255) !default;
-$content-ui-submit-background:     rgb(0, 102, 176) !default;
+$content-ui-foreground:            var(--content-ui-foreground) !default;
+$content-ui-background:            var(--content-ui-background) !default;
+$content-ui-hover:                 var(--content-ui-hover) !default;
+$content-ui-selected:              var(--content-ui-selected) !default;
 
-$form-border-color:				   rgb(204, 204, 204) !default;
-$form-bg-hover-color:			   rgb(245, 245, 245) !default;
+$content-ui-submit-foreground:     var(--content-ui-submit-foreground) !default;
+$content-ui-submit-background:     var(--content-ui-submit-background) !default;
 
-$accent-foreground:                rgb(0, 102, 176) !default;
-$accent-background:                rgb(241, 249, 255) !default;
-$accent-hover:                     rgb(255, 255, 255) !default;
+$form-border-color:                var(--form-border-color) !default;
+$form-bg-hover-color:              var(--form-bg-hover-color) !default;
 
-$logo-background:                  rgb(255, 255, 255) !default;
+$accent-foreground:                var(--accent-foreground) !default;
+$accent-background:                var(--accent-background) !default;
+$accent-hover:                     var(--accent-hover) !default;
 
-$body-bg:                          rgb(237, 237, 237) !default;
+$logo-background:                  var(--logo-background) !default;
+
+$body-bg:                          var(--body-background) !default;
+
+$login-form-background:            var(--login-form-background) !default;
+
+$accounts-menu-foreground:         var(--accounts-menu-foreground) !default;
+$accounts-menu-background:         var(--accounts-menu-background) !default;
+$accounts-menu-hover:              var(--accounts-menu-hover) !default;
+
+/*****************************
+ Contrasts to skin color vars above
+ (this replaces usages of calc-text-color function, which works only with colors
+  known at SASS compilation time)
+ ****************************/
+$navigation-foreground-contrast:            var(--navigation-foreground-contrast) !default;
+$navigation-background-contrast:            var(--navigation-background-contrast) !default;
+$navigation-hover-contrast:                 var(--navigation-hover-contrast) !default;
+
+$off-canvas-foreground-contrast:            var(--off-canvas-foreground-contrast) !default;
+$off-canvas-background-contrast:            var(--off-canvas-background-contrast) !default;
+$off-canvas-hover-contrast:                 var(--off-canvas-hover-contrast) !default;
+
+$content-ui-foreground-contrast:            var(--content-ui-foreground-contrast) !default;
+$content-ui-background-contrast:            var(--content-ui-background-contrast) !default;
+$content-ui-hover-contrast:                 var(--content-ui-hover-contrast) !default;
+$content-ui-selected-contrast:              var(--content-ui-selected-contrast) !default;
+
+$content-ui-submit-foreground-contrast:     var(--content-ui-submit-foreground-contrast) !default;
+$content-ui-submit-background-contrast:     var(--content-ui-submit-background-contrast) !default;
+
+$form-border-color-contrast:                var(--form-border-color-contrast) !default;
+$form-bg-hover-color-contrast:              var(--form-bg-hover-color-contrast) !default;
+
+$accent-foreground-contrast:                var(--accent-foreground-contrast) !default;
+$accent-background-contrast:                var(--accent-background-contrast) !default;
+$accent-hover-contrast:                     var(--accent-hover-contrast) !default;
+
+$logo-background-contrast:                  var(--logo-background-contrast) !default;
+
+$body-bg-contrast:                          var(--body-background-contrast) !default;
+
+$login-form-background-contrast:            var(--login-form-background-contrast) !default;
+
+$accounts-menu-foreground-contrast:         var(--accounts-menu-foreground-contrast) !default;
+$accounts-menu-background-contrast:         var(--accounts-menu-background-contrast) !default;
+$accounts-menu-hover-contrast:              var(--accounts-menu-hover-contrast) !default;
+
+/*****************************
+ Colors derived from configured skin colors, and their contrasts
+ ****************************/
+
+$body-foreground:                           var(--body-foreground) !default;
+$body-foreground-contrast:                  var(--body-foreground-contrast) !default;
+$body-foreground-h1:                        var(--body-foreground-h1) !default;
+$body-foreground-h1-contrast:               var(--body-foreground-h1-contrast) !default;
+$navigation-foreground-highlight:           var(--navigation-foreground-highlight) !default;
+$navigation-foreground-highlight-contrast:  var(--navigation-foreground-highlight-contrast) !default;
+
 
 /*****************************
  Constants
@@ -56,8 +114,11 @@ $input-border-color:			   $form-border-color;
  * Hover colour for action-list rows
  * Hover colour for the action button in the action-list row
  */
-$row-hover-background:             tint($content-ui-hover, 87%);
-$row-action-hover-background:      darken($content-ui-hover, 7%);
+// DONE modify RGBA instead of tint
+$row-hover-background:             css-tint($content-ui-hover, 87%);
+
+// DONE use CSS darken
+$row-action-hover-background:      css-darken($content-ui-hover, 7%);
 
 // Colours
 $primary-color:					#f0f !default;

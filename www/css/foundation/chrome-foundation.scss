@@ -1,7 +1,8 @@
 @charset "UTF-8";
 
 // Utils
-@import 'utils/skin';
+// Skin no longer required as vars are included in www/css/core/skin.css.php
+//@import 'utils/skin';
 @import 'utils/colors';
 @import 'utils/font-faces';
 @import 'utils/variables';
@@ -140,5 +141,6 @@
 @import '../../javascript/components/jquery-ui/themes/base/draggable.css';
 @import '../../javascript/components/jquery-ui/themes/base/sortable.css';
 
-// client custom CSS overrides
-@import 'utils/custom';
+// client custom CSS overrides:
+// no longer required, as they're included by www/css/core/skin.css.php
+//@import 'utils/custom';

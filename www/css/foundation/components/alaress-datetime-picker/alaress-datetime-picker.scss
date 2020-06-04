@@ -4,7 +4,9 @@ $pickr-top-month-padding: rem-calc(2);
 
 $pickr-border-color: #e6e6e6;
 $pickr-border: rem-calc(1) solid $pickr-border-color;
-$pickr-hover-background: lighten($accent-foreground, 60%);
+
+// DONE use CSS lighten
+$pickr-hover-background: css-lighten($accent-foreground, 60%);
 
 /**
  * The input and button
