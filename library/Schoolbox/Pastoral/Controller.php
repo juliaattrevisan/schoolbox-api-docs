@@ -812,8 +812,13 @@ class Controller extends Base
                 // Type was deleted. Was it changed?
                 // If not, allow it to be saved with the same deleted type
                 $deletedType = $e->getDeletedObject();
-                if ($deletedType instanceof PastoralTypeModel && $deletedType->getId() !== $record->getType()->getId()) {
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                if ($deletedType instanceof PastoralTypeModel) {
+                    $existingId = $record->getType()
+                        ? $record->getType()->getId()
+                        : null;
+                    if ($existingId !== $deletedType->getId()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    }
                 }
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
