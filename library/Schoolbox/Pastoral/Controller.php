@@ -808,24 +808,35 @@ class Controller extends Base
                 /** @var PastoralTypeModel $type */
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
                 $record->setType($type);
-
-                try {
-                    /** @var PastoralSubTypeModel $subtype */
-                    $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
-                    $record->setSubType($subtype);
-                } catch (MapperException $e) {
-                    // Noop, this can be blank
-                }
-
             } catch (MapperException\Deleted $e) {
                 // Type was deleted. Was it changed?
-                // If not, allow it to be saved with the deleted type
+                // If not, allow it to be saved with the same deleted type
                 $deletedType = $e->getDeletedObject();
                 if ($deletedType instanceof PastoralTypeModel && $deletedType->getId() !== $record->getType()->getId()) {
                     throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            }
+
+            try {
+                /** @var PastoralSubTypeModel $subtype */
+                $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
+                $record->setSubType($subtype);
+            } catch (MapperException\Deleted $e) {
+                // Subtype was deleted. Was it changed?
+                // If not, allow it to be saved with the same deleted subtype
+                $deletedSubtype = $e->getDeletedObject();
+                if ($deletedSubtype instanceof PastoralSubTypeModel) {
+                    $existingId = $record->getSubType()
+                        ? $record->getSubType()->getId()
+                        : null;
+                    if ($existingId !== $deletedSubtype->getId()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    }
+                }
+            } catch (MapperException $e) {
+                // Noop, this can be blank
             }
 
             // Set severity separately from type
