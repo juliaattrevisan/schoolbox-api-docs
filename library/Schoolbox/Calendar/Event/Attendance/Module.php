@@ -79,9 +79,9 @@ class Module extends BaseModule
 
         $preloadEvent = function ($params) { return $this->preloadEvent($params); };
 
-        $this->register('GET', '/{id}', 'getCurrent', $getPerms, $preloadEvent);
-        $this->register('POST', '/{id}/create', 'postCreate', $modifyPerms, $preloadEvent);
-        $this->register('POST', '/{id}/delete', 'postDelete', $modifyPerms, $preloadEvent);
+        $this->register('GET', '/{eventId}', 'getCurrent', $getPerms, $preloadEvent);
+        $this->register('POST', '/{eventId}/create', 'postCreate', $modifyPerms, $preloadEvent);
+        $this->register('POST', '/{eventId}/delete', 'postDelete', $modifyPerms, $preloadEvent);
     }
 
 
@@ -96,7 +96,7 @@ class Module extends BaseModule
     private function preloadEvent(array $params): array
     {
         try {
-            $event = $this->getMapperFactory()->get(EventMapper::class)->findById($params['id']);
+            $event = $this->getMapperFactory()->get(EventMapper::class)->findById($params['eventId']);
         } catch (MapperException $e) {
             throw new NotFound();
         }

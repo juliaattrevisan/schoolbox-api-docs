@@ -17,7 +17,7 @@
             </a>
         </div>
         <nav>
-            <a data-guest-delete="{{ guest.id }}" data-guest-name="{{ guest.name }}" class="icon-close no-text" href="{{ routeLookupIfAuthorized('calendarEventAttendance.postDelete', {id: event.id}) }}" title="Remove guest"></a>
+            <a data-guest-delete="{{ guest.id }}" data-guest-name="{{ guest.name }}" class="icon-close no-text" href="{{ routeLookupIfAuthorized('calendarEventAttendance.postDelete', {eventId: event.id}) }}" title="Remove guest"></a>
         </nav>
     </li>
     {% endfor %}
