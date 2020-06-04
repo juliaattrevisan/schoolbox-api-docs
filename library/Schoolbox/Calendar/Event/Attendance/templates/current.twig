@@ -1,4 +1,12 @@
-<ul class="action-list">
+{##
+ # Current
+ #
+ # Get an html fragment containing the current attendees for a given event
+ #
+ # @param array $guests  A list of (id, name) tuples
+ # @param Event $event   An instance of \Schoolbox\Calendar\Event
+ #}
+<ul class="action-list" class="attendance-guests">
     {% for guest in guests %}
     <li class="actions-small-1">
         <div class="compact card small-11">
