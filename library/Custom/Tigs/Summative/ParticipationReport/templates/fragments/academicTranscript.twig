@@ -226,7 +226,7 @@ Data:
                                     {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
                                     {% set commentData = folderData.nesaGraphData.data.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                 {% endif %}
-                                {% if commentData.comment %}
+                                {% if commentData.comment is not null %}
                                     {% set commentFound = true %}
                                     {{ commentData.comment | nl2br }}
                                 {% endif %}
