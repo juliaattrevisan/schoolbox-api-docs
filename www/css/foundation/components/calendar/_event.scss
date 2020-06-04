@@ -72,3 +72,16 @@
     padding-bottom: .5rem;
   }
 }
+
+// Attendance Guest list
+.attendance-guest-list {
+
+  // Special style for removing attendance records
+  .actions-small-1>nav a[class^="icon-"] {
+    line-height: 3.1;
+  }
+
+  [class^="icon-"]:before {
+    font-size: .5rem;
+  }
+}
