@@ -125,13 +125,13 @@ class HelpRequest
         $request  = new GuzzleHttp\Psr7\Request($method, $uri, $headers, $body);
         $response = (new GuzzleHttp\Client())->send($request, ['allow_redirects' => ['strict' => true]]);
 
-        if(CourseParticipation\Controller::STATUS_NO_CONTENT === $response->getStatusCode()){
+        if (CourseParticipation\Controller::STATUS_NO_CONTENT === $response->getStatusCode()) {
             // There's no contents to read.
             return [];
         }
 
         // Attempt to json decode the response body
-        try{
+        try {
             $decoded_response = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e){
             throw new Exception\UnexpectedResponseException('Unable to read SHAPS API response', $request, $response, $e);
@@ -193,12 +193,12 @@ class HelpRequest
 
         $provisionedUsers = $this->findProvisionedUsers();
 
-        foreach($enrolments as $i => $enrolment) {
+        foreach ($enrolments as $i => $enrolment) {
 
             /** @var array $participants */
             $participants = $enrolment['participants'];
 
-            foreach($participants as $n => $participant) {
+            foreach ($participants as $n => $participant) {
 
                 /* Check if this participant's id exists in the provisionedUsers index
                  *

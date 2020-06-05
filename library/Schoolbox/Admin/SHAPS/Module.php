@@ -45,8 +45,8 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
-        
-        $this->register('GET', '/provisioning', 'getAll', $getPerms);
+
+        $this->register('GET', '', 'getAll', $getPerms);
         $this->register('GET', '/provisioning/provisioned', 'getProvisioned', $getPerms);
         $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
         $this->register('GET', '/provisioning/search', 'getUserProvisioningSearch', $getPerms);

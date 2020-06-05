@@ -60,8 +60,8 @@ class Controller extends Base
     }
 
     /**
-     * Contructs an array of field names based on whether the field was empty.
-     * TODO factor this out into a common location; currently the fields are hardcoded seperately here
+     * Constructs an array of field names based on whether the field was empty.
+     * TODO factor this out into a common location; currently the fields are hardcoded separately here
      * and in library/Custom/Help/CourseParticipation/Handler.php
      * Also, this solution does not work for the ajax search page, as it is not asynchronous.
      *
@@ -119,8 +119,9 @@ class Controller extends Base
                 '@shaps/provisioning/index.twig', [
                 'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
-                'pageCurrent' => 'shaps/provisioning',
-                'errors' => $errors
+                'pageCurrent' => 'shaps',
+                'errors' => $errors,
+                'errorMessage' => null,
             ])->setTitle($title)
         );
     }
@@ -162,8 +163,9 @@ class Controller extends Base
                 '@shaps/provisioning/provisioned.twig', [
                     'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers,
-                    'pageCurrent' => 'shaps/provisioning',
-                    'errors' => $errors
+                    'pageCurrent' => 'shaps',
+                    'errors' => $errors,
+                    'errorMessage' => null,
             ])->setTitle($title)
         );
     }
@@ -201,8 +203,9 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
                     'allUsers' => $allStaff->diff($provisionedUsers),
-                    'pageCurrent' => 'shaps/provisioning',
-                    'errors' => $errors
+                    'pageCurrent' => 'shaps',
+                    'errors' => $errors,
+                    'errorMessage' => null,
             ])->setTitle($title)
         );
     }
@@ -220,7 +223,9 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/search.twig', [
-                'pageCurrent' => 'shaps/provisioning'
+                'allUsers' => [],
+                'pageCurrent' => 'shaps',
+                'errorMessage' => null,
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
@@ -258,7 +263,8 @@ class Controller extends Base
             'provisioned' => $exists,
             'id' => $user->getId(),
             'externalID' => $user->getExternalId(),
-            'errorList' => $errors
+            'errorList' => $errors,
+            'errorMessage' => null,
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($userJSON));
@@ -286,7 +292,7 @@ class Controller extends Base
             'errorMessage' => $errorMessage,
             'courses' => $courses,
             'serverUrl' => $this->helpRequest->getServerUrl(),
-            'pageCurrent' => 'shaps/courses'
+            'pageCurrent' => 'shaps'
         ])->setTitle('Schoolbox Help Course Enrolments'));
     }
 
@@ -300,7 +306,7 @@ class Controller extends Base
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
-            'pageCurrent' => 'shaps/courses/search'
+            'pageCurrent' => 'shaps'
         ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 
