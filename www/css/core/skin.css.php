@@ -81,7 +81,7 @@ $createTwigVars = static function (Color $color, $cssVar) {
         'h'           => $hsl['hue'],
         's'           => $hsl['saturation'],
         'l'           => $hsl['lightness'],
-        'a'           => $color->getAlpha() * 100,
+        'a'           => $color->getAlpha(),
     ];
 };
 foreach ($colorConfigMapping as $configKey => $cssVar) {
