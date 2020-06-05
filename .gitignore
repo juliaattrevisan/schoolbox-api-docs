@@ -18,6 +18,7 @@ chrome-foundation*.scss
 chrome-foundation*.css.map
 chrome-foundation-ie9*.css
 editor.css
+editor.css.map
 legacy.css
 variables.css
 mixins.css
