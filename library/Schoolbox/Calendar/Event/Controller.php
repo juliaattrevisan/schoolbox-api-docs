@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Event\Attendance\ListPayload;
 use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
@@ -150,10 +151,7 @@ class Controller extends Base
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
-            'guests' => $this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
-                'event' => $event,
-                'guests' => $this->attendanceMapper->findAttendances($event),
-            ])->getAsString(),
+            'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event),
             'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
         ])->setTitle($event->getTitle()));
     }

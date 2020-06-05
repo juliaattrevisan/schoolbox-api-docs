@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
 use PDOException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -63,18 +64,11 @@ class Controller extends Base
      * wrangling is a thing we have yet to defeat
      *
      * @param Event $event
+     * @throws ServiceNotFound
      */
     public function getCurrent(Event $event): void
     {
-        $guests = $this->attendanceMapper->findAttendances($event);
-
-        $data = [
-            'available' => null === $event->getMaxAttendees() ? -1 : $event->getMaxAttendees() - \count($guests),
-            'guests' => $this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
-                'event' => $event,
-                'guests' => $guests,
-            ])->getAsString()
-        ];
+        $data = (new ListPayload($this->di, $this->attendanceMapper))->generate($event);
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
@@ -87,6 +81,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws ServiceNotFound
      */
     public function postCreate(Event $event): void
     {
@@ -112,6 +107,7 @@ class Controller extends Base
      * Remove attendees from the list
      *
      * @param Event $event
+     * @throws ServiceNotFound
      */
     public function postDelete(Event $event): void
     {

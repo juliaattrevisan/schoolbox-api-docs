@@ -61,11 +61,11 @@
                     <div id="attendance-guests" class="small-12 columns">
                         <section>
                             <div class="content">
-                                <label>Add Guests</label>
+                                <span class="meta" id="attendance-guests-available" v-if="this.event.guests.available != null">{{ this.event.guests.available }} remaining</span>
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </div>
 
-                            <article v-html="this.event.guests"></article>
+                            <article v-html="this.event.guests.fragment"></article>
                         </section>
                     </div>
                 </div>

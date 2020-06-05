@@ -83,7 +83,7 @@
 
                     /* Update list
                      */
-                    $('#attendance-guests article').html(responseText.guests);
+                    $('#attendance-guests article').html(responseText.fragment);
                 },
                 error: function(responseText) {
                     $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
@@ -129,7 +129,7 @@
 
                             /* Update list
                              */
-                            $('#attendance-guests ul').replaceWith(responseText.guests);
+                            $('#attendance-guests ul').replaceWith(responseText.fragment);
                         },
                         error: function(responseText) {
                             $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
