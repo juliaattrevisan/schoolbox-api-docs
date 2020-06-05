@@ -86,11 +86,11 @@
 @import 'components/discussion/discussion';
 
 // Slider
-@import '../../javascript/components/swiper/dist/css/swiper.css';
+@import '../../javascript/components/swiper/dist/css/swiper';
 @import 'ui/slider';
 
 // Feature Tour
-@import '../../javascript/components/intro.js/introjs.css';
+@import '../../javascript/components/intro.js/introjs';
 @import 'components/feature-tour/feature-tour';
 
 // Select Source shard
@@ -135,11 +135,11 @@
 @import 'ui/combobox';
 
 // jqmath
-@import '../../javascript/math/jqmath-0.4.0.css';
+@import '../../javascript/math/jqmath-0.4.0';
 
 // jQuery UI
-@import '../../javascript/components/jquery-ui/themes/base/draggable.css';
-@import '../../javascript/components/jquery-ui/themes/base/sortable.css';
+@import '../../javascript/components/jquery-ui/themes/base/draggable';
+@import '../../javascript/components/jquery-ui/themes/base/sortable';
 
 // client custom CSS overrides:
 // no longer required, as they're included by www/css/core/skin.css.php
