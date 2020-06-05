@@ -55,7 +55,8 @@
                             </tr>
 
                             {% for user in allUsers %}
-                                {% if not provisionedUsers[user.id] %}
+                                {% set provisioned = provisionedUsers[user.id] is defined %}
+                                {% if not provisioned %}
                                     {% if errors[user.id] %}
                                         <tr class="highlight-alert">
                                     {% else %}
@@ -65,7 +66,7 @@
                                     <tr>
                                 {% endif %}
                                 <td>
-                                    {% if provisionedUsers[user.id] %}
+                                    {% if provisioned %}
                                         <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
                                     {% else %}
                                         {% if errors[user.id] %}
@@ -83,7 +84,7 @@
 
                                 {% block provisioned_column %}
                                     <td>
-                                        {% if provisionedUsers[user.id] %}
+                                        {% if provisioned %}
                                             <div class="checklist">
                                                 <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" disabled>
                                                 <label for="provision-{{ user.id }}" title="Already provisioned"></label>
@@ -165,6 +166,7 @@
         });
 
         form.on('submit', function (event) {
+            form.find('input[type=submit]').prop("disabled", true);
             event.preventDefault();
 
             var $toast     = $('#toast'),
@@ -182,6 +184,7 @@
                     findSelectedRows().each(function() {
                         markAsProvisioned($(this));
                     });
+                    form.find('input[type=submit]').prop("disabled", false);
                 })
                 .fail(function (xhr) {
                     $toast.toastTimeout({text: 'Provision failed!', css: 'alert'});
@@ -198,6 +201,7 @@
                             markAsFailed($(this), 'Failed');
                         });
                     }
+                    form.find('input[type=submit]').prop("disabled", false);
                 })
         });
     });
