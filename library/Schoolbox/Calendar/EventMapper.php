@@ -379,7 +379,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $seriesId = $event->getSeriesId();
 
-        if (!isset($seriesId)) {
+        if (null === $seriesId) {
             return new Collection();
         }
 
