@@ -289,8 +289,8 @@
                     </div>
 
                     <div id="attendance-guests" class="small-12 columns" {% if not event.attendance %}style="display:none"{% endif %}>
-                        <label>Maximum Attendees</label>
-                        <input name="maxAttendees" type="text" value="{{ event.maxAttendees }}" />
+                        <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
+                        <input name="maxAttendees" type="number" value="{{ event.maxAttendees }}" />
 
                         <label>Add Guests</label>
                         <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
