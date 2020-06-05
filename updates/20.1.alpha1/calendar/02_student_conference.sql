@@ -32,3 +32,11 @@ INNER JOIN event_attendance ea2 ON ea1.id < ea2.id
 
 ALTER TABLE `event_attendance`
     ADD UNIQUE INDEX `event_attendance_event_user` (`event_id`, `user_id`);
+
+-- Add max_attendees; null = no limit (which is synonymous with attendance = 1, no migration needed)
+-- Reorganise data a bit
+
+ALTER TABLE `event`
+    ADD COLUMN `max_attendees` INT(11) NULL AFTER `location`,
+    CHANGE COLUMN `allday` `allday` TINYINT(1) NULL DEFAULT '0' AFTER `end_datetime`,
+    CHANGE COLUMN `completed` `completed` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'For marking Tasks as complete or not.' AFTER `attendance`;
