@@ -158,6 +158,17 @@ class Event implements ISoftDeletable
      */
     protected $attendance = 0;
 
+
+    /**
+     * Maximum number of people who can be invited to this event
+     *
+     * null == no limit
+     *
+     * @var int
+     */
+    protected $maxAttendees;
+
+
     /**
      * Determine whether the attendance state changed prior to saving
      *
@@ -1017,6 +1028,26 @@ class Event implements ISoftDeletable
     public function setSource(?string $source): self
     {
         $this->source = $source;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getMaxAttendees(): ?int
+    {
+        return $this->maxAttendees;
+    }
+
+
+    /**
+     * @param int|null $maxAttendees
+     * @return $this
+     */
+    public function setMaxAttendees(?int $maxAttendees): self
+    {
+        $this->maxAttendees = $maxAttendees;
         return $this;
     }
 }
