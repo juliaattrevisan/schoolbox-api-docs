@@ -47,7 +47,7 @@
                     </td>
                 </tr>
                     <td>
-                        {% if msg.meta.blurb %}
+                        {% if msg.meta.blurb is defined %}
                             {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
                         {% else %}
                             <p>{{ msg.meta.body | cutSentence(300, true) }}</p>

@@ -9,8 +9,9 @@
 {% set showNames = group and criterion %}
 {% set readonly  = not allowModifyUsed and criterion is not null and criterion.usage|length > 0 %}
 {% set new       = criterion is null %}
+{% set criterionId = new ? 0 : criterion.id %}
 <li class="actions-small-1"
-    data-rubric-criterion-row="{{ criterion.id }}"
+    data-rubric-criterion-row="{{ criterionId }}"
     {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
 >
     <div class="list-item">
@@ -18,7 +19,7 @@
         <input type="hidden"
                data-template="rubric-criterion-id"
                {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][id]"{% endif %}
-               value="{{ criterion.id }}"
+               value="{{ criterionId }}"
                {% if readonly %}readonly{% endif %}
         />
 
@@ -30,7 +31,7 @@
                {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][name]"{% endif %}
                {% if showNames %}id="i{{ criterion.id }}"{% endif %}
                {% if readonly %}readonly{% endif %}
-        />{{ criterion.name }}</textarea>
+        />{{ new ? '' : criterion.name }}</textarea>
 
         {# Input for criterion curriculum codes #}
         {% if curriculumTaggingEnabled %}
@@ -41,6 +42,7 @@
                     {% if new %}class="hide"{% endif %}
                     data-placeholder="Add curriculum codes..."
             >
+                {% if not new %}
                 {% for code in criterion.curriculumNodes %}
                     <option label="{{ code.code }}"
                             value="{{ code.id }}"
@@ -49,6 +51,7 @@
                             selected
                     >{{ code.code }}</option>
                 {% endfor %}
+                {% endif %}
             </select>
         {% endif %}
     </div>
@@ -59,7 +62,7 @@
             {# Hide it until the item is actually in use, though #}
             <a class="icon-delete hide"
                data-template="rubric-criterion-delete"
-               data-rubric-criterion="{{ criterion.id }}"
+               data-rubric-criterion=""
                data-role="remove-criterion"
                title="Delete {{ locale.rubricCriterion.proper }}"
                href="#"></a>
@@ -82,8 +85,8 @@
     </nav>
 
     {# Tot for existent criteria #}
-    {% set criterionUsageCount = criterion.usage|length %}
-    <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
+    {% set criterionUsageCount = criterion ? criterion.usage|length : 0 %}
+    <ul id="dropdown-i{{ criterionId }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
                 <a class="icon-info"
@@ -93,7 +96,7 @@
         {% endif %}
         <li>
             <a class="icon-delete"
-               data-rubric-criterion="{{ criterion.id }}"
+               data-rubric-criterion="{{ criterionId }}"
                data-role="remove-criterion"
                href="#">Delete {{ locale.rubricCriterion.proper }}</a>
         </li>

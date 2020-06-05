@@ -10,7 +10,7 @@
 <ul class="breadcrumb">
     {% for node in tree %}
         <li>
-        {%- if node.disabled is defined and node.disabled -%}
+        {%- if node.disabled ?? false -%}
             <a class="disabled" data-selectnode="{{ node.categoryId }}">{{ node.name }}</a>
         {%- else -%}
             <a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a>
@@ -19,27 +19,27 @@
     {% endfor %}
 </ul>
 {% endif %}
-
+{% set hasHomepage = folder.hasHomepage ?? false %}
 <div class="row">
     <div class="card small-12 column meta-preview">
-        {% if folder.hasHomepage %}
+        {% if hasHomepage %}
             <a title="View Homepage" href="/homepage/{{ folder.id }}">
         {% endif %}
-        {% if folder.hasCoverImage %}
+        {% if folder.hasCoverImage ?? false %}
             <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
             <div class="{{ nodeIcon.icon(nodeType) }} size-32" alt="{{ folder.name }}"></div>
         {% endif %}
-        {% if folder.hasHomepage %}
+        {% if hasHomepage %}
             </a>
         {% endif %}
         <h3>
-            {% if folder.hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
+            {% if hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
                 {{ folder.name }}
-                {% if folder.hasHomepage %}</a>{% endif %}
+                {% if hasHomepage %}</a>{% endif %}
             <span class="hint has-tip" data-reveal-id="modal-folder-{{ folder.id }}" title="View folder permissions">?</span>
         </h3>
-        {% if folder.group %}
+        {% if folder.group ?? false %}
 
             {% if folder.codeString and folder.teachers|length > 0 %}
                 {% set type = 'class' %}
@@ -53,7 +53,7 @@
                 {% if folder.group.free      %}Open {{ type | capitalize }} <span data-tooltip aria-haspopup="true" class="hint has-tip" title="Can be joined or left by anyone at any time">?</span>{% endif %}
             </li>
 
-        {% elseif folder.codeString and folder.teachers|length > 0 %}
+        {% elseif folder.codeString is defined and folder.teachers|length > 0 %}
             <p class="meta">Class</p>
         {% else %}
             <p class="meta">Folder</p>
@@ -135,12 +135,12 @@
     <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
         <h2>{{ folder.name }}</h2>
         <dl class="inline-dl">
-        {% if (folder.codeString and folder.teachers|length > 0) or folder.group %}
-            {% if folder.group %}
+        {% if (folder.codeString is defined and folder.teachers|length > 0) or folder.group is defined %}
+            {% if folder.group is defined and admin is defined %}
                 <dt class="small-12 medium-4">Group Administrator</dt>
                 <dd class="small-12 medium-8">
                     <div class="card tiny">
-                        <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
+                        <a href="/search/user/{{ admin.id }}">
                             <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
                             <p>{{ admin.formatName }}</p>
                         </a>

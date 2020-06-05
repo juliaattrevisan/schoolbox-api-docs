@@ -8,7 +8,7 @@
         idSuffix:      string                - (optional) suffix to ensure ID uniqueness
         disabled:      bool                  - (optional) If true and userSelection exists, set value in hidden field, and disable checkbox
 #}
-{% set idSuffix = idSuffix is defined ? idSuffix : '' %}
+{% set idSuffix = idSuffix ?? '' %}
 
 {% if not userSelection %}
     <input
