@@ -82,7 +82,7 @@
 
                     /* Update list
                      */
-                    $('#attendance-guests ul').replaceWith(responseText);
+                    $('#attendance-guests article').html(responseText);
                 },
                 error: function(responseText) {
                     $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
