@@ -365,12 +365,12 @@ $container-bg: white !default;
 }
 
 .error-state section {
-    background-color: #0080ff;
-    color: $white;
-    padding: 1rem 2rem;
+    background-color: transparent;
+    color: $black;
+    padding: 2rem;
 
     h1, h2, a {
-        color: $white;
+        color: $black;
     }
     .row {
         display: flex;
