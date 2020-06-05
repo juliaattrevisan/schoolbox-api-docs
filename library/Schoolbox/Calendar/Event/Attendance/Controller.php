@@ -10,8 +10,11 @@ namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
 use PDOException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -30,6 +33,12 @@ class Controller extends Base
 {
 
     /**
+     * @var Error\Mapper
+     */
+    private $errorMapper;
+
+
+    /**
      * @var Mapper
      */
     private $attendanceMapper;
@@ -44,13 +53,16 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Mapper      $attendanceMapper
-     * @param UserMapper  $userMapper
+     * @param Error\Mapper $errorMapper
+     * @param Mapper       $attendanceMapper
+     * @param UserMapper   $userMapper
      */
     public function __construct(
+        Error\Mapper $errorMapper,
         Mapper $attendanceMapper,
         UserMapper $userMapper
     ) {
+        $this->errorMapper = $errorMapper;
         $this->attendanceMapper = $attendanceMapper;
         $this->userMapper = $userMapper;
     }
@@ -80,13 +92,23 @@ class Controller extends Base
      * @param Event $event
      * @throws MapperException
      * @throws PDOException
-     * @throws UnexpectedValueException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws Exception
      */
     public function postCreate(Event $event): void
     {
+
+        /* Don't exceed the maximum number of guests, if one was specified
+         */
+        $guests = $this->attendanceMapper->findAttendances($event);
+
+        if ($event->getMaxAttendees() && \count($guests) >= $event->getMaxAttendees()) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
+        }
+
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
-        $oldGuests = array_column($this->attendanceMapper->findAttendances($event), 'id');
+        $oldGuests = array_column($guests, 'id');
 
         $ids = array_diff($newGuests, $oldGuests);
 

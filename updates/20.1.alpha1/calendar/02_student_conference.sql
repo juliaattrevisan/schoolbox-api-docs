@@ -40,3 +40,8 @@ ALTER TABLE `event`
     ADD COLUMN `max_attendees` INT(11) NULL AFTER `location`,
     CHANGE COLUMN `allday` `allday` TINYINT(1) NULL DEFAULT '0' AFTER `end_datetime`,
     CHANGE COLUMN `completed` `completed` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'For marking Tasks as complete or not.' AFTER `attendance`;
+
+-- Special error message when you reach the max attendees
+
+INSERT INTO `error` (id, message) VALUES
+(227, 'Maximum number of attendees has been reached.')

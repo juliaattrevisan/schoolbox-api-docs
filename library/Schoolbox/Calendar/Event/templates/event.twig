@@ -86,8 +86,10 @@
                     $('#attendance-guests article').html(responseText.fragment);
                     $('#attendance-guests-available').html(responseText.available);
                 },
-                error: function(responseText) {
-                    $toast.toastTimeout({text: 'Unable to invite ' + name + '; please try again', css: 'alert'});
+                error: function(xhr, status, error) {
+                    let responseText = $.parseJSON(xhr.responseText)
+
+                    $toast.toastTimeout({text: 'Unable to invite ' + name + '. ' + responseText.message, css: 'alert'});
 
                     selectize[0].selectize.clear();
                 }
@@ -133,7 +135,7 @@
                             $('#attendance-guests ul').replaceWith(responseText.fragment);
                             $('#attendance-guests-available').html(responseText.available);
                         },
-                        error: function(responseText) {
+                        error: function(xhr, status, error) {
                             $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
                         }
                     });
