@@ -98,19 +98,28 @@ class Controller extends Base
      */
     public function postCreate(Event $event): void
     {
-
-        /* Don't exceed the maximum number of guests, if one was specified
-         */
         $guests = $this->attendanceMapper->findAttendances($event);
-
-        if ($event->getMaxAttendees() && \count($guests) >= $event->getMaxAttendees()) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
-        }
 
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
         $oldGuests = array_column($guests, 'id');
 
         $ids = array_diff($newGuests, $oldGuests);
+
+        /* Added a user who's already in the list
+
+         * Regenerate a new html fragment for the people currently invited
+         * (another user, other than you, might have invited them and they don't appear in the list atm)
+         */
+        if (empty($ids)) {
+            $this->getCurrent($event);
+            return;
+        }
+
+        /* Don't exceed the maximum number of guests, if one was specified
+         */
+        if ($event->getMaxAttendees() && \count($guests) >= $event->getMaxAttendees()) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
+        }
 
         foreach ($ids as $id) {
             $this->attendanceMapper->save((new Event\Attendance\Model())
