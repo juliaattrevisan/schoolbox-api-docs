@@ -60,8 +60,18 @@ class ListPayload
     {
         $guests = $this->attendanceMapper->findAttendances($event);
 
+        $available = null;
+
+        if (null !== $event->getMaxAttendees()) {
+            $available = $event->getMaxAttendees() - \count($guests);
+
+            if ($available < 0) {
+                $available = 0;
+            }
+        }
+
         return [
-            'available' => null === $event->getMaxAttendees() ? null : $event->getMaxAttendees() - \count($guests),
+            'available' => $available,
             'guests' => $guests,
             'fragment' => $this->di
                 ->get('webOutput:nochrome')
