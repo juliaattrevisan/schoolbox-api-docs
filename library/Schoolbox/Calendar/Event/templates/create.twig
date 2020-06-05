@@ -289,6 +289,9 @@
                     </div>
 
                     <div id="attendance-guests" class="small-12 columns" {% if not event.attendance %}style="display:none"{% endif %}>
+                        <label>Maximum Attendees</label>
+                        <input name="maxAttendees" type="text" value="{{ event.maxAttendees }}" />
+
                         <label>Add Guests</label>
                         <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                         <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
