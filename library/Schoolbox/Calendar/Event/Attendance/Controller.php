@@ -68,10 +68,15 @@ class Controller extends Base
     {
         $guests = $this->attendanceMapper->findAttendances($event);
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
-            'event' => $event,
-            'guests' => $guests,
-        ]));
+        $data = [
+            'available' => null === $event->getMaxAttendees() ? -1 : $event->getMaxAttendees() - \count($guests),
+            'guests' => $this->buildUnthemedHtmlOutput('@calendarEventAttendance/current.twig', [
+                'event' => $event,
+                'guests' => $guests,
+            ])->getAsString()
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
 
