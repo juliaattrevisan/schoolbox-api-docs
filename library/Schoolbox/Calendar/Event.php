@@ -1,7 +1,5 @@
 <?php
 /**
- * Event
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -10,6 +8,8 @@ namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
 use DateTime;
+use InvalidArgumentException;
+use OutOfBoundsException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -20,11 +20,32 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 
+/**
+ * Class Event
+ *
+ * @package Schoolbox\Calendar
+ */
 class Event implements ISoftDeletable
 {
+
+    /**
+     * Implement soft delete traits
+     */
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
+    /**
+     * Variant
+     *
+     * Events are one of two variants: an "event" or a "task" which is a to-do list
+     */
     public const VARIANT_EVENT = 'event';
     public const VARIANT_TASK  = 'task';
 
+    /**
+     * Event Levels
+     */
     public const ACCESS_PERSONAL = 1;
     public const ACCESS_GROUP = 2;
     public const ACCESS_CAMPUS = 3;
@@ -41,40 +62,38 @@ class Event implements ISoftDeletable
      *
      * @var int
      */
-    protected $id = null;
+    protected $id;
+
 
     /**
      * Series Id for recurring events, I think
      *
      * @var int
      */
-    protected $seriesId = null;
+    protected $seriesId;
+
 
     /**
-     * An instance of \Schoolbox\User
-     *
      * The person who spawned the event in the first place
      *
      * @var User
      */
-    protected $author = null;
+    protected $author;
+
 
     /**
-     * An instance of \Schoolbox\User
-     *
      * This denotes to whom the event is relevant for a particular
      * combination of sid and access (I don't remember/understand which)
      *
      * @var User
      */
-    protected $owner = null;
+    protected $owner;
+
 
     /**
-     * An instance of \Schoolbox\Resource\Folder\Model
-     *
      * @var Folder
      */
-    protected $category = null;
+    protected $folder;
 
     /**
      * Access level
@@ -98,7 +117,7 @@ class Event implements ISoftDeletable
      *
      * @var EventType
      */
-    protected $type = null;
+    protected $type;
 
     /**
      * The variant of the event.
@@ -171,28 +190,28 @@ class Event implements ISoftDeletable
      *
      * @var Collection|Role[]
      */
-    protected $roleCollection = null;
+    protected $roleCollection;
 
     /**
      * Any associated users (Type 1)
      *
      * @var null
      */
-    protected $userCollection = null;
+    protected $userCollection;
 
     /**
      * Any associated folders (Type 2)
      *
      * @var null
      */
-    protected $folderCollection = null;
+    protected $folderCollection;
 
     /**
      * Any associated campuses (Type 3)
      *
      * @var Collection|Campus[]
      */
-    protected $campusCollection = null;
+    protected $campusCollection;
 
 
     /**
@@ -209,35 +228,31 @@ class Event implements ISoftDeletable
      *
      * @var Alaress_Date_Format
      */
-    protected $publishDateTime = null;
+    protected $publishDateTime;
 
     /**
      * The datetime when the event starts
      *
      * @var Alaress_Date_Format
      */
-    protected $startDateTime = null;
+    protected $startDateTime;
 
     /**
      * The datetime when the event ends
      *
      * @var Alaress_Date_Format
      */
-    protected $endDateTime = null;
+    protected $endDateTime;
 
     /**
      * Source of import
      *
+     * This string identifies the origin of an event in the db, which is a federated
+     * list of events from multiple sources.
+     *
      * @var string
      */
     protected $source;
-
-    /**
-     * Implement soft delete traits
-     */
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
 
 
     /**
@@ -252,6 +267,7 @@ class Event implements ISoftDeletable
         $this->setup();
     }
 
+
     /**
      * Hook method
      */
@@ -259,35 +275,39 @@ class Event implements ISoftDeletable
     {
     }
 
+
     /**
      * Is this event a personal-accesslevel instance?
      *
      * @return bool
      */
-    public function isPersonalLevel()
+    public function isPersonalLevel(): bool
     {
-        return $this->getAccess() == self::ACCESS_PERSONAL;
+        return $this->getAccess() === self::ACCESS_PERSONAL;
     }
+
 
     /**
      * Is this event a group-accesslevel instance?
      *
      * @return bool
      */
-    public function isGroupLevel()
+    public function isGroupLevel(): bool
     {
-        return $this->getAccess() == self::ACCESS_GROUP;
+        return $this->getAccess() === self::ACCESS_GROUP;
     }
+
 
     /**
      * Is this event a campus-accesslevel instance?
      *
      * @return bool
      */
-    public function isCampusLevel()
+    public function isCampusLevel(): bool
     {
-        return $this->getAccess() == self::ACCESS_CAMPUS;
+        return $this->getAccess() === self::ACCESS_CAMPUS;
     }
+
 
     /**
      * Is this event published as of `$date`?
@@ -318,8 +338,9 @@ class Event implements ISoftDeletable
      * Derive start and end dates from a date.
      *
      * @param string $date A string in either "d-m-Y" or "d-m-Y H:i" format.
+     * @throws InvalidArgumentException
      */
-    public function setupDates($date)
+    public function setupDates($date): void
     {
         if (preg_match(
             '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
@@ -422,9 +443,9 @@ class Event implements ISoftDeletable
      * Set access
      *
      * @param int $access
-     * @return self
+     * @return $this
      */
-    public function setAccess($access)
+    public function setAccess($access): self
     {
         $this->access = $access;
         return $this;
@@ -435,7 +456,7 @@ class Event implements ISoftDeletable
      *
      * @return int
      */
-    public function getAccess()
+    public function getAccess(): int
     {
         return $this->access;
     }
@@ -443,10 +464,10 @@ class Event implements ISoftDeletable
     /**
      * Set all day
      *
-     * @param bool|int $allDay
-     * @return self
+     * @param int $allDay
+     * @return $this
      */
-    public function setAllDay($allDay)
+    public function setAllDay($allDay): self
     {
         $this->allDay = (int)$allDay;
         return $this;
@@ -457,7 +478,7 @@ class Event implements ISoftDeletable
      *
      * @return int
      */
-    public function getAllDay()
+    public function getAllDay(): int
     {
         return $this->allDay;
     }
@@ -466,7 +487,7 @@ class Event implements ISoftDeletable
      * Set attendance
      *
      * @param int $attendance
-     * @return self
+     * @return $this
      */
     public function setAttendance($attendance)
     {
@@ -488,9 +509,9 @@ class Event implements ISoftDeletable
      * Set author
      *
      * @param User $author
-     * @return self
+     * @return $this
      */
-    public function setAuthor($author)
+    public function setAuthor(User $author): self
     {
         $this->author = $author;
         return $this;
@@ -501,7 +522,7 @@ class Event implements ISoftDeletable
      *
      * @return User
      */
-    public function getAuthor()
+    public function getAuthor(): User
     {
         return $this->author;
     }
@@ -509,12 +530,12 @@ class Event implements ISoftDeletable
     /**
      * Set category
      *
-     * @param Folder $category
-     * @return self
+     * @param Folder $folder
+     * @return $this
      */
-    public function setCategory($category)
+    public function setCategory(Folder $folder): self
     {
-        $this->category = $category;
+        $this->folder = $folder;
         return $this;
     }
 
@@ -523,9 +544,9 @@ class Event implements ISoftDeletable
      *
      * @return Folder
      */
-    public function getCategory()
+    public function getCategory(): Folder
     {
-        return $this->category;
+        return $this->folder;
     }
 
     /**
@@ -533,9 +554,9 @@ class Event implements ISoftDeletable
      *
      * @deprecated
      * @param string $colour
-     * @return self
+     * @return $this
      */
-    public function setColour($colour)
+    public function setColour($colour): self
     {
         $this->colour = $colour;
         return $this;
@@ -547,7 +568,7 @@ class Event implements ISoftDeletable
      * @deprecated
      * @return string
      */
-    public function getColour()
+    public function getColour(): string
     {
         return $this->colour;
     }
@@ -555,12 +576,12 @@ class Event implements ISoftDeletable
     /**
      * Set completed
      *
-     * @param bool|int $completed
-     * @return self
+     * @param int $completed
+     * @return $this
      */
-    public function setCompleted($completed)
+    public function setCompleted(int $completed): self
     {
-        $this->completed = (int)$completed;
+        $this->completed = $completed;
         return $this;
     }
 
@@ -569,7 +590,7 @@ class Event implements ISoftDeletable
      *
      * @return int
      */
-    public function getCompleted()
+    public function getCompleted(): int
     {
         return $this->completed;
     }
@@ -578,9 +599,9 @@ class Event implements ISoftDeletable
      * Set detail
      *
      * @param string $detail
-     * @return self
+     * @return $this
      */
-    public function setDetail($detail)
+    public function setDetail(string $detail): self
     {
         $this->detail = $detail;
         return $this;
@@ -591,7 +612,7 @@ class Event implements ISoftDeletable
      *
      * @return string
      */
-    public function getDetail()
+    public function getDetail(): string
     {
         return $this->detail;
     }
@@ -600,9 +621,10 @@ class Event implements ISoftDeletable
      * Set end datetime
      *
      * @param Alaress_Date_Format $endDateTime
-     * @return self
+     * @return $this
+     * @throws InvalidArgumentException
      */
-    public function setEndDateTime($endDateTime)
+    public function setEndDateTime($endDateTime): self
     {
         // enforce casting to ADF
         if ($endDateTime instanceof DateTime) {
@@ -617,7 +639,7 @@ class Event implements ISoftDeletable
      *
      * @return Alaress_Date_Format
      */
-    public function getEndDateTime()
+    public function getEndDateTime(): Alaress_Date_Format
     {
         return $this->endDateTime;
     }
@@ -625,10 +647,10 @@ class Event implements ISoftDeletable
     /**
      * Set id
      *
-     * @param int $id
-     * @return self
+     * @param int|null $id
+     * @return $this
      */
-    public function setId($id)
+    public function setId(?int $id): self
     {
         $this->id = $id;
         return $this;
@@ -637,9 +659,9 @@ class Event implements ISoftDeletable
     /**
      * Get id
      *
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -648,9 +670,9 @@ class Event implements ISoftDeletable
      * Set location
      *
      * @param string $location
-     * @return self
+     * @return $this
      */
-    public function setLocation($location)
+    public function setLocation(string $location): self
     {
         $this->location = $location;
         return $this;
@@ -661,7 +683,7 @@ class Event implements ISoftDeletable
      *
      * @return string
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->location;
     }
@@ -670,9 +692,9 @@ class Event implements ISoftDeletable
      * Set title
      *
      * @param string $title
-     * @return self
+     * @return $this
      */
-    public function setTitle($title)
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -684,7 +706,7 @@ class Event implements ISoftDeletable
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -693,9 +715,9 @@ class Event implements ISoftDeletable
      * Set owner
      *
      * @param User $owner
-     * @return self
+     * @return $this
      */
-    public function setOwner($owner)
+    public function setOwner(User $owner): self
     {
         $this->owner = $owner;
         return $this;
@@ -706,7 +728,7 @@ class Event implements ISoftDeletable
      *
      * @return User
      */
-    public function getOwner()
+    public function getOwner(): User
     {
         return $this->owner;
     }
@@ -714,10 +736,10 @@ class Event implements ISoftDeletable
     /**
      * Set series id
      *
-     * @param int $seriesId
-     * @return self
+     * @param int|null $seriesId
+     * @return $this
      */
-    public function setSeriesId($seriesId)
+    public function setSeriesId(?int $seriesId): self
     {
         $this->seriesId = $seriesId;
         return $this;
@@ -726,25 +748,31 @@ class Event implements ISoftDeletable
     /**
      * Get series id
      *
-     * @return int
+     * @return int|null
      */
-    public function getSeriesId()
+    public function getSeriesId(): ?int
     {
         return $this->seriesId;
     }
 
-    public function inSeries()
+    /**
+     * This event is one instance in a series
+     *
+     * @return bool
+     */
+    public function inSeries(): bool
     {
-        return !!$this->seriesId;
+        return (bool)$this->seriesId;
     }
 
     /**
      * Set start datetime
      *
      * @param Alaress_Date_Format $startDateTime
-     * @return self
+     * @return $this
+     * @throws InvalidArgumentException
      */
-    public function setStartDateTime($startDateTime)
+    public function setStartDateTime($startDateTime): self
     {
         // enforce casting to ADF
         if ($startDateTime instanceof DateTime) {
@@ -759,7 +787,7 @@ class Event implements ISoftDeletable
      *
      * @return Alaress_Date_Format
      */
-    public function getStartDateTime()
+    public function getStartDateTime(): Alaress_Date_Format
     {
         return $this->startDateTime;
     }
@@ -768,9 +796,9 @@ class Event implements ISoftDeletable
      * Set type
      *
      * @param EventType $type
-     * @return self
+     * @return $this
      */
-    public function setType($type)
+    public function setType(EventType $type): self
     {
         $this->type = $type;
         return $this;
@@ -781,7 +809,7 @@ class Event implements ISoftDeletable
      *
      * @return EventType
      */
-    public function getType()
+    public function getType(): EventType
     {
         return $this->type;
     }
@@ -798,14 +826,14 @@ class Event implements ISoftDeletable
 
     /**
      * @param string $variant
-     * @return self
-     * @throws \OutOfBoundsException if `$class` isn't a `self::VARIANT_*` value
+     * @return $this
+     * @throws OutOfBoundsException if `$class` isn't a `self::VARIANT_*` value
      */
     public function setVariant(string $variant): self
     {
         // Why doesn't PHP have enumerated types yet?
         if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK], true)) {
-            throw new \OutOfBoundsException(
+            throw new OutOfBoundsException(
                 sprintf('Class must be one of the `%s::VARIANT_*` constants', __CLASS__)
             );
         }
@@ -818,9 +846,9 @@ class Event implements ISoftDeletable
      * Set end date
      *
      * @param string $endDate in the format Y-m-d
-     * @return self
+     * @return $this
      */
-    public function setEndDate($endDate)
+    public function setEndDate(string $endDate): self
     {
         // preserve time if already set
         [$year, $month, $day] = explode('-',$endDate);
@@ -834,9 +862,9 @@ class Event implements ISoftDeletable
      * Set end time
      *
      * @param string $endTime in the format H:i:s
-     * @return self
+     * @return $this
      */
-    public function setEndTime($endTime)
+    public function setEndTime(string $endTime): self
     {
         // preserve date if already set
         [$hour, $min, $sec] = explode(':',$endTime);
@@ -850,9 +878,9 @@ class Event implements ISoftDeletable
      * Set start date
      *
      * @param string $startDate
-     * @return self
+     * @return $this
      */
-    public function setStartDate($startDate)
+    public function setStartDate(string $startDate): self
     {
         // preserve time if set
         [$year, $month, $day] = explode('-',$startDate);
@@ -864,10 +892,9 @@ class Event implements ISoftDeletable
      * Set start time
      *
      * @param string $startTime
-     * @return self
-     *
+     * @return $this
      */
-    public function setStartTime($startTime)
+    public function setStartTime(string $startTime): self
     {
         [$hour, $min, $sec] = explode(':',$startTime);
         $this->getStartDateTime()->setTime($hour,$min,$sec);
@@ -878,9 +905,9 @@ class Event implements ISoftDeletable
      * Set publish datetime
      *
      * @param Alaress_Date_Format|null $publishDateTime
-     * @return self
+     * @return $this
      */
-    public function setPublishDateTime($publishDateTime)
+    public function setPublishDateTime(?Alaress_Date_Format $publishDateTime): self
     {
         $this->publishDateTime = $publishDateTime;
         return $this;
@@ -891,7 +918,7 @@ class Event implements ISoftDeletable
      *
      * @return Alaress_Date_Format|null
      */
-    public function getPublishDateTime()
+    public function getPublishDateTime(): ?Alaress_Date_Format
     {
         return $this->publishDateTime;
     }
@@ -899,10 +926,10 @@ class Event implements ISoftDeletable
     /**
      * Set campus collection
      *
-     * @param Collection|Relation\Campus[] $campusCollection
-     * @return self
+     * @param Collection|int[]|Campus[]|Relation\Campus[] $campusCollection
+     * @return $this
      */
-    public function setCampusCollection($campusCollection)
+    public function setCampusCollection($campusCollection): self
     {
         $this->campusCollection = $campusCollection;
         return $this;
@@ -922,9 +949,9 @@ class Event implements ISoftDeletable
      * Set role collection
      *
      * @param Collection|Relation\Role[] $roleCollection
-     * @return self
+     * @return $this
      */
-    public function setRoleCollection($roleCollection)
+    public function setRoleCollection($roleCollection): self
     {
         $this->roleCollection = $roleCollection;
         return $this;
@@ -943,10 +970,10 @@ class Event implements ISoftDeletable
     /**
      * Set attendance dirty bit
      *
-     * @param boolean $attendanceDirty
-     * @return self
+     * @param bool $attendanceDirty
+     * @return $this
      */
-    public function setAttendanceDirty($attendanceDirty)
+    public function setAttendanceDirty(bool $attendanceDirty): self
     {
         $this->attendanceDirty = $attendanceDirty;
         return $this;
@@ -955,9 +982,9 @@ class Event implements ISoftDeletable
     /**
      * Get attendance dirty bit
      *
-     * @return boolean
+     * @return bool
      */
-    public function getAttendanceDirty()
+    public function getAttendanceDirty(): bool
     {
         return $this->attendanceDirty;
     }
@@ -968,7 +995,7 @@ class Event implements ISoftDeletable
      * @param Collection $folderCollection
      * @return $this
      */
-    public function setFolderCollection($folderCollection): self
+    public function setFolderCollection(Collection $folderCollection): self
     {
         $this->folderCollection = $folderCollection;
         return $this;
@@ -988,10 +1015,12 @@ class Event implements ISoftDeletable
      * Set user collection
      *
      * @param Collection|Relation\Personal[] $userCollection
+     * @return $this
      */
-    public function setUserCollection($userCollection)
+    public function setUserCollection($userCollection): self
     {
         $this->userCollection = $userCollection;
+        return $this;
     }
 
     /**
@@ -1027,10 +1056,11 @@ class Event implements ISoftDeletable
 
     /**
      * @param string $source
+     * @return $this
      */
-    public function setSource(string $source = null)
+    public function setSource(?string $source): self
     {
         $this->source = $source;
+        return $this;
     }
-
 }
