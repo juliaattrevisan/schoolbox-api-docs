@@ -364,6 +364,31 @@ $container-bg: white !default;
     }
 }
 
+.error-state section {
+    background-color: #0080ff;
+    color: $white;
+    padding: 1rem 2rem;
+
+    h1, h2, a {
+        color: $white;
+    }
+    .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        div {
+            max-width: rem-calc(600);
+            padding-right: 2rem;
+        }
+    }
+    @media #{$small-only} {
+        img {
+            display: none;
+        }
+    }
+}
+
 // component-container already has it's own margin-bottom,
 // empty states in information lists shouldn't have padding or margin
 .component-container .empty-state,
