@@ -373,50 +373,6 @@ class Event implements ISoftDeletable
         $this->setEndDateTime($endDate);
     }
 
-    /**
-     * TODO: move this. it doesn't belong here.
-     *
-     * Ensure that the user hasn't modified the URL in an untoward manner.
-     * If they have, or it's somehow absent, default to week view.
-     *
-     * Really, the redirect should be passed as a base-64 encoded paramter
-     * (or similar) rather than having to implicitly "guess" where to go next
-     *
-     * @param string $returnView
-     * @param string $returnDate
-     * @param int $groupId
-     * @param int $userId
-     *
-     * @return string
-     * @internal param $returnTo
-     */
-    public function setupRedirect($returnView, $returnDate = "", $groupId = null, $userId = null)
-    {
-        if ($returnView === 'dashboard') {
-            return '/';
-        } else if ($returnView === 'upcomingEventAttendance') {
-            return '/calendar/attendance/upcomingEvents/';
-        } else if ($returnView === 'homepage') {
-            return '/homepage/' . $groupId;
-        } else if ($returnView === 'assessmentCalendar') {
-            return '/learning/assessment/calendar/';
-        } else {
-            if ($returnView === 'calendar') {
-                $return = "/calendar/$returnDate";
-
-                if ($userId) {
-                    $return .= '/' . $userId;
-                }
-                return $return;
-            }
-        }
-        //Assuming the complete url has been passed over
-        if(strlen(urldecode($returnView)) > 0){
-            return urldecode($returnView);
-        }
-        // Otherwise - guess using Back to the future!
-        return '';
-    }
 
     /* Getters/Setters
      */
