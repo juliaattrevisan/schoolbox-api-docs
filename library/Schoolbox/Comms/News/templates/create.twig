@@ -88,14 +88,14 @@
         <ul class="meta">
             {% if article.acceptedBy %}
                 <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                    {% if article.isAccepted is defined and article.isAccepted %}
+                    {% if article.acceptedAt %}
                         on {{ article.acceptedAt.local }}
                     {% endif %}
                 </li>
             {% endif %}
         </ul>
     </div>
-    {% set hasDropDownRoutes = deleteRoute is defined ? deleteRoute : null %}
+    {% set hasDropDownRoutes = deleteRoute ?? null %}
     {% if hasDropDownRoutes %}
         <nav>
             <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
@@ -103,7 +103,7 @@
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
             {% if deleteRoute %}
-                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString is defined ? returnUrlQueryString : '' }}"
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString ?? '' }}"
                        data-delete="{{ article.title }}">Delete</a></li>
             {% endif %}
 
@@ -133,7 +133,7 @@
             {% else %}
                 {% set formActionSubmit = submitRoute %}
             {% endif %}
-        {% elseif article.id and (isAutosavable is not defined or not isAutosavable) %}
+        {% elseif article.id %}
             {% set formAction = '' %} {# No drafting or previewing if the article is submitted (not auto-savable) #}
             {% set formActionSubmit = updateRoute %}
         {% else %}
@@ -1414,7 +1414,7 @@
         delimiters: ['${', '}'],
         data: {
             articleId: '{{ article.id }}',
-            approveRoute: '{{ approveRoute is defined ? approveRoute : '' }}',
+            approveRoute: '{{ approveRoute ?? '' }}',
             globalModeration: '{{ config.global_moderation }}',
             globalPosting: '{{ config.news_staff_post_enabled }}',
             isSubmitted: '{{ (article.isSubmitted) }}',

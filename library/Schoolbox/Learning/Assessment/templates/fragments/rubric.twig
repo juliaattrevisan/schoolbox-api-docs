@@ -340,7 +340,7 @@ Usage:
                 folderId: assessment.context.folder.id,
                 usingMarkPerCapability: assessment.markPerCapability,
                 usingMarkRange: assessment.useMarkRange,
-                idSuffix: idSuffix is defined ? idSuffix : '',
+                idSuffix: idSuffix ?? '',
             } only %}
         </div>
     </div>

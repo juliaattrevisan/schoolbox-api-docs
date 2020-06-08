@@ -35,7 +35,7 @@ These are its args, which is given for you
 <ul class="breadcrumb" id="breadcrumbs">
     {% for node in tree %}
         <li>
-            {%- if node.disabled is defined and node.disabled -%}
+            {%- if node.disabled ?? false -%}
                 <a class="disabled" data-selectnode="{{ node.categoryId }}">{{ node.name }}</a>
             {%- else -%}
                 <a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a>

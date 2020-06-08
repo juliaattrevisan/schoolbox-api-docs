@@ -9,11 +9,11 @@
 {% set statusReviewed   = 'reviewed'  %}
 
 {# Does the information list require an extra CSS class ? eg 'expandable-card', 'sortable-card', 'card-selectable' etc #}
-{% set listClass = listClass is defined ? listClass : '' %}
+{% set listClass = listClass ?? '' %}
 
 {# child templates may override #}
-{% set routeModify = routeModify is defined ? routeModify : routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
-{% set responseHistory = responseHistory is defined ? responseHistory : locale.submissionHistory.proper %}
+{% set routeModify = routeModify ?? routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
+{% set responseHistory = responseHistory ?: locale.submissionHistory.proper %}
 
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
@@ -48,7 +48,7 @@
             {% include '@learning/fragments/meta/workType.twig' %}
             {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
 
-            {% if readonly is defined and readonly %}
+            {% if readonly ?? false %}
                 <li class="icon-archive">Term has been archived</li>
             {% endif %}
         </ul>

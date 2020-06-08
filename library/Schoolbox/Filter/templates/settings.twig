@@ -283,7 +283,7 @@
                                     </td>
                                     {% for roleType in roleTypes %}
                                         <td>
-                                            {% set default = option.defaults[roleType] is defined ? option.defaults[roleType] : null %}
+                                            {% set default = option.defaults[roleType] ?? null %}
                                             {% if not default %}
                                                 <span title="This role type does not have access to this page">NA</span>
                                             {% else %}

@@ -355,6 +355,7 @@ class ListController extends Web\Controller\Base
      * @throws Mapper\DefinitionException
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
+     * @throws RouteNotFound
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
     {
@@ -396,6 +397,10 @@ class ListController extends Web\Controller\Base
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
         $data['context']     = $context;
+        $data['breadcrumbs'] = [
+            ['Learning', $this->router->generate('learning.getClasses')],
+            [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }

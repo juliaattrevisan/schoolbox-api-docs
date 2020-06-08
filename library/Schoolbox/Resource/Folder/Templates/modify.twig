@@ -369,15 +369,15 @@
                                 <tr>
                                     <td>{{ role.getName }}</td>
                                     <td>
-                                        <input type="radio" class="no_permission required" id="groupNone{{ role.getId }}" name="group[{{ role.getId }}]" value="0" {% if rolePermissions|length and rolePermissions[role.getId] == deny %}checked{% endif %} />
+                                        <input type="radio" class="no_permission required" id="groupNone{{ role.getId }}" name="group[{{ role.getId }}]" value="0" {% if (rolePermissions[role.getId] ?? '') == deny %}checked{% endif %} />
                                         <label class="radio-label" for="groupNone{{ role.getId }}"></label>
                                     </td>
                                     <td>
-                                        <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if rolePermissions|length and rolePermissions[role.getId] == read %}checked{% endif %} />
+                                        <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if (rolePermissions[role.getId] ?? '') == read %}checked{% endif %} />
                                         <label class="radio-label" for="groupRead{{ role.getId }}"></label>
                                     </td>
                                     <td>
-                                        <input type="radio" name="group[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {% if rolePermissions|length and rolePermissions[role.getId] == write %}checked{% endif %} />
+                                        <input type="radio" name="group[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {% if (rolePermissions[role.getId] ?? '') == write %}checked{% endif %} />
                                         <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
                                     </td>
                                 </tr>

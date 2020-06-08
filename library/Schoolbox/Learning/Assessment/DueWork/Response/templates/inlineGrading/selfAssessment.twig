@@ -92,7 +92,7 @@
             %}
             {% include '@rubric/' ~ rubricTemplate with {
                 rubricGrid: assessment.rubricGrid,
-                rubricMarkedGrid: feedback ? feedback.rubricMarkedGrid : null,
+                rubricMarkedGrid: feedback.rubricMarkedGrid ?? null,
                 learner: participant.user,
                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                 showDescriptorValue: showDescriptorValue,
@@ -100,7 +100,7 @@
                 showRubricTotal: showRubricTotal,
                 self: self,
                 studentView: true,
-                selfAssessmentFeedback: selfAssessmentFeedback is defined ? selfAssessmentFeedback : null,
+                selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                 selfAssess: selfAssess,
                 selfReflect: selfReflect
             } only %}

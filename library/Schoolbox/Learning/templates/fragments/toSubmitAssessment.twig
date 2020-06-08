@@ -15,9 +15,9 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
-{% set isTask    = isTask    or assessment is task %}
-{% set isQuiz    = isQuiz    or assessment is quiz %}
-{% set isDueWork = isDueWork or assessment is dueWork %}
+{% set isTask    = isTask    ?? assessment is task %}
+{% set isQuiz    = isQuiz    ?? assessment is quiz %}
+{% set isDueWork = isDueWork ?? assessment is dueWork %}
 
 {%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
 {%- set state = isQuiz ? 'unattempted' : 'unsubmitted' -%}

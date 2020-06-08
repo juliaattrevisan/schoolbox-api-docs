@@ -296,7 +296,7 @@ Data:
         <div class="row">
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
-                    <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
+                    <input type="hidden" name="responseId" value="{{ response.id ?? '' }}"/>
                     <section>
                         <div class="content">
                             {# Submitted my own work checkbox #}

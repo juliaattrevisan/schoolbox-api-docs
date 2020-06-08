@@ -24,9 +24,9 @@
                     <div class="list-item">
                         <h3><a href="/homepage/{{ group.id }}" title="{{ group.name }}">{{ group.name }}</a></h3>
                     </div>
-                    {% set isAccessAdmin = userAccess[group.id].admin is defined and userAccess[group.id].admin %}
-                    {% set isAccessWrite = userAccess[group.id].write is defined and userAccess[group.id].write %}
-                    {% set isAccessRead = userAccess[group.id].read is defined and userAccess[group.id].read %}
+                    {% set isAccessAdmin = userAccess[group.id].admin ?? false %}
+                    {% set isAccessWrite = userAccess[group.id].write ?? false %}
+                    {% set isAccessRead = userAccess[group.id].read ?? false %}
                     {% if (not group.group.private or isAccessWrite or isAccessAdmin) %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>

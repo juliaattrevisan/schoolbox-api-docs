@@ -196,7 +196,7 @@
                             <select id="house" name="house">
                                 <option value="">Not Set</option>
                                 {% for house in houses %}
-                                    <option value="{{ house.id }}" {% if user.schoolHouse.id == house.id %}selected{% endif %}>{{ house.house }}</option>
+                                    <option value="{{ house.id }}" {% if user.schoolHouse.id ?? 0 == house.id %}selected{% endif %}>{{ house.house }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -207,7 +207,7 @@
                                 <option value="">Not Set</option>
                                 {% for residentialHouse in residentialHouses %}
                                     <option value="{{ residentialHouse.id }}"
-                                            {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
+                                            {% if user.residentialHouse.id ?? 0 == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
                                 {% endfor %}
                             </select>
                         </div>

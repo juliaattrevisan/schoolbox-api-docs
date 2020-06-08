@@ -160,26 +160,20 @@
 
             {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}
 
-            {% if tables[table].fixed is defined %}
-            {% for field_key, value in tables[table].fixed %}
+            {% for field_key, value in tables[table].fixed ?? [] %}
                 <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}" />
             {% endfor %}
-            {% endif %}
 
-            <section id="listEditor" class="{{ listClass ?? '' }}">
+            <section id="listEditor" class="{{ listClass }}">
                 <div{% if sortable %} class="sortable"{% endif %}>
                     <header class="list-header actions-small-{{ deletable ? 1 : 0 }}">
                         <div class="list-item">
                             {% for field_key, field in tables[table].fields %}
-                                {% if field.hidden is not defined or field.hidden is empty %}
+                                {% if field.hidden is empty %}
                                     <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
                                         {{ field.caption }}
                                         {% if field.tooltip is defined %}
-                                            {% if field.tooltipPosition is defined %}
-                                                <span class="hint has-tip tip-{{ field.tooltipPosition }}" data-tooltip title="{{ field.tooltip }}">?</span>
-                                            {% else %}
-                                                <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
-                                            {% endif %}
+                                            <span class="hint has-tip tip-{{ field.tooltipPosition ?? 'top' }}" data-tooltip title="{{ field.tooltip }}">?</span>
                                         {% endif %}
                                     </div>
                                 {% endif %}

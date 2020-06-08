@@ -1,9 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{% if breadcrumbs is defined %}
 {{ bread.crumbsArray(breadcrumbs) }}
-{% endif %}
 
 <script src="/javascript/shared/jquery.mage.js"></script>
 <script src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
@@ -34,7 +32,7 @@
             });
         }
 
-        {% if assessmentType is defined and assessmentType|length %}
+        {% if assessmentType is defined %}
 
             /* Save everything when Part 1 was already chosen in route
              */
@@ -132,7 +130,7 @@
      <div class="list-item">
          <div class="small-12 column">
              <h1>Create
-                 {% if assessment is defined and assessment.typeName|length %}
+                 {% if assessment.typeName is defined %}
                      {% if attribute(locale, assessment.typeName|lower) is defined %}
                          {{ attribute(locale, assessment.typeName|lower).proper }}
                      {% else %}
@@ -165,7 +163,7 @@
     <div class="small-12 columns island">
         <form action="{{ formAction }}" class="mage" id="assessmentForm" method="post">
             <section>
-                {% if assessmentType is not defined or not assessmentType|length %}
+                {% if assessmentType is not defined %}
                 <fieldset class="content" data-mage="part-1">
                     <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
@@ -186,7 +184,7 @@
                 </fieldset>
                 {% endif %}
 
-                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
+                <fieldset class="content" data-mage="part-2" {% if not assessmentType ?? ''|length %}disabled="disabled"{% endif %}>
                     {% if returnUrl ?? '' |length %}
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}

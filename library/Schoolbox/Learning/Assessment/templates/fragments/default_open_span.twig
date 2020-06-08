@@ -5,7 +5,7 @@
         assessment: IAssessable
         context:    AssessmentContext  - (optional) defaults to assessment.context
 #}
-{% set context = context is defined ? context : assessment.context %}
+{% set context = context ?? assessment.context %}
 
 {% if context.baseContext is unitSpecification %}
     <label>

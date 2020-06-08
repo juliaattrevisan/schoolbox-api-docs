@@ -2,7 +2,7 @@
     - participant: (Participant) object
     - cardSize:    (string)      sizing for foundation
  #}
-<div class="{{ cardSize is defined ? cardSize : 'small-12' }} card">
+<div class="{{ cardSize ?? 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
         <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
     </a>
