@@ -109,13 +109,13 @@ class Mapper extends \Schoolbox\Mapper
     {
         $pairs = [];
 
-        $attendances = $this->findByColumn('event_id', $event->getId(), [ 'cache' => false ])->sortByCallback(static function (Model $a, Model $b) {
-            if ($b->getUser()->getLastname() === $a->getUser()->getLastname()) {
-                return $b->getUser()->getFirstname() < $a->getUser()->getFirstname();
-            }
-
-            return $b->getUser()->getLastname() < ($a->getUser()->getLastname());
-        });
+        $attendances = $this->findByColumn('event_id', $event->getId(), [
+            'cache' => false,
+            'order' => [
+                'u.lastname' => 'asc',
+                'u.firstname' => 'asc'
+            ]
+        ]);
 
         foreach ($attendances as $attendance) {
             $pairs[] = [
