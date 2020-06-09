@@ -36,3 +36,17 @@ UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_confi
 UPDATE config SET sequence = 27 WHERE name = 'show_boarder_block';
 
 UPDATE config SET hidden='true' WHERE name = 'webdav_fallback_enabled';
+
+
+
+UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Resources') and sequence >= 3;
+
+UPDATE config SET sequence = 3 WHERE name = 'otfs_verify_previous_file';
+UPDATE config SET sequence = 10 WHERE name = 'browser_cache_image_timeout';
+UPDATE config SET sequence = 11 WHERE name = 'browser_cache_portrait_timeout';
+UPDATE config SET sequence = 12 WHERE name = 'webdav_enable';
+UPDATE config SET sequence = 13 WHERE name = 'webdav_auth_type';
+
+UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Board Leave') and sequence >= 2;
+UPDATE config SET sequence = 2 WHERE name = 'boarder_leave_parent_notification_enabled';
+
