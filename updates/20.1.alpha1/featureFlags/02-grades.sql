@@ -15,7 +15,7 @@ INSERT INTO config(
     'grades_enabled',
     '1',
     'Enable Grades Module',
-    'If toggled to ''ON'', the grades page for students will be enabled.',
+    'If toggled to ''ON'', the grades module (for displaying a student''s completed assessments and feedback) will be enabled. If toggled to ''OFF'', it will be disabled for all users.',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     '',
     (SELECT id FROM lu_config_type WHERE type = 'Modules'),

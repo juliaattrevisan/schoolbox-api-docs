@@ -15,7 +15,7 @@ INSERT INTO config(
     'upcoming_assessments_enabled',
     '1',
     'Enable Upcoming Assessments Module',
-    'If toggled to ''ON'', the upcoming assessments page for students will be enabled.',
+    'If toggled to ''ON'', the upcoming assessments module (for displaying a student''s upcoming assessments in a calendar) will be enabled. If toggled to ''OFF'', it will be disabled for all users.',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     '',
     (SELECT id FROM lu_config_type WHERE type = 'Modules'),
