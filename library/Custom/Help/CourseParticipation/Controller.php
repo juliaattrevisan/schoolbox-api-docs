@@ -16,7 +16,6 @@ use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
-use PDOException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
@@ -376,8 +375,8 @@ class Controller extends Base
      * @since 170
      *
      * @param string $schoolCode
-     * @throws Mapper\DefinitionException
-     * @throws PDOException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     public function postUserRegistrations(string $schoolCode): void
     {

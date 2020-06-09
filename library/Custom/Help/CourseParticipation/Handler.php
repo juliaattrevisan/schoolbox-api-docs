@@ -221,8 +221,8 @@ class Handler
      * @param bool     $byUsername
      * @param iterable $post
      * @return array
-     * @throws Mapper\DefinitionException
-     * @throws \PDOException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post) : array
     {
@@ -252,7 +252,6 @@ class Handler
 
                 // cache the old values
                 $oldUsername   = $user->getUsername();
-                $oldExternalId = $user->getExternalId();
 
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
@@ -274,7 +273,6 @@ class Handler
 
                 // no previous data
                 $oldUsername   = '';
-                $oldExternalId = '';
             }
 
             // update user object

@@ -49,7 +49,7 @@ class AdminV2_Nav
             'usage/all'                => ['name' => 'Usage',                       'visible' => true],
             'engagement'               => ['name' => 'Engagement',                  'visible' => true],
             'ups'                      => ['name' => 'User Provisioning System',    'visible' => true],
-            'shaps/provisioning'       => ['name' => 'Schoolbox Help Provisioning', 'visible' => true],
+            'shaps'                    => ['name' => 'Schoolbox Help Provisioning', 'visible' => true],
             'video'                    => ['name' => 'Media Queue',                 'visible' => true],
             'import/schoolDataImport'  => ['name' => 'School Data Import',          'visible' => $configLoader->get('external_type') === 'schoolbox'],
             'import/directImport'      => ['name' => 'Direct Import',               'visible' => true],
