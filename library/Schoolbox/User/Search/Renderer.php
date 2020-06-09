@@ -180,16 +180,19 @@ class Renderer extends Handler
                             $hasActions = true;
                         }
                     }
-                    if ($currentUserIsStaff
-                        && $user['residential_house_id']
-                        && Config::get('boarder_leave_enabled')
-                    ) {
-                        $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
-                        $hasActions = true;
-                    }
                 } elseif ($currentUserIsStaff && $resultIsStaff) {
                     // Show staff timetables to other staff
                     $this->getPage()->parse('timetable_block', 'timetable');
+                    $hasActions = true;
+                }
+
+                // Boarder Leave: only show to res house students if enabled
+                if ($resultIsStudent
+                    && $currentUserIsStaff
+                    && $user['residential_house_id']
+                    && Config::get('boarder_leave_enabled')
+                ) {
+                    $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                     $hasActions = true;
                 }
 
