@@ -21,6 +21,13 @@ ALTER TABLE `event_role`
 ALTER TABLE `event_attendance`
     DROP COLUMN `intention`;
 
+-- Remove duplicate attendance data
+
+DELETE ea1 FROM event_attendance ea1
+INNER JOIN event_attendance ea2 ON ea1.id < ea2.id
+    AND ea1.event_id = ea2.event_id
+    AND ea1.user_id = ea2.user_id;
+
 -- Attendees can only be invited to an event once (can't have multiple identical attendance records)
 
 ALTER TABLE `event_attendance`
