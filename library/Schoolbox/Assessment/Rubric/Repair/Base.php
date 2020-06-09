@@ -340,16 +340,35 @@ abstract class Base extends CliTool\App
         $this->outputSummary();
         $this->log->notice('-----');
 
+
+        // Did this script do nothing? Report differently
+        $isAnythingChanged =
+            count($this->failedIndicators) > 0
+            || count($this->failedCapabilities) > 0
+            || count($this->failedDueWorks) > 0
+            || count($this->fixedIndicators) > 0
+            || count($this->fixedCapabilities) > 0
+            || count($this->fixedDueWorks) > 0
+        ;
+
         if ($this->perform()) {
             if ($transaction) {
                 $this->db->commit();
             }
-            $this->log->warning('Changes written to database');
+            if ($isAnythingChanged) {
+                $this->log->warning('Changes written to database');
+            } else {
+                $this->log->notice('No changes needed to be written');
+            }
         } else {
             if ($transaction) {
                 $this->db->rollBack();
             }
-            $this->log->warning('Dry-run complete - no changes written to database');
+            if ($isAnythingChanged) {
+                $this->log->warning('Dry-run complete - changes would be written to database');
+            } else {
+                $this->log->notice('Dry-run complete - no changes would have needed to be written');
+            }
         }
 
     }
