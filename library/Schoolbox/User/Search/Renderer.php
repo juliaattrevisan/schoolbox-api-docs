@@ -11,6 +11,7 @@ namespace Schoolbox\User\Search;
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Search\Renderer\Handler;
+use Schoolbox\User;
 use Scrub;
 use Alaress_Date_Format;
 use Config;
@@ -97,15 +98,20 @@ class Renderer extends Handler
 
                 /* Hide Due Work link from parents, if Due Work access is restricted or the module is disabled
                  */
-                if (!Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)
-                    || !$groupHandler->isStudent($user['id'])
-                    || ($groupHandler->isParent() && Config::get('restrict_parent_duework_access'))
-                    || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))
-                ) {
-                    $this->getPage()->setVar('due_work_block', '');
-                } else {
-                    $this->getPage()->parse('due_work_block', 'due_work');
-                    $hasActions = true;
+                /** @var User $currentUser */
+                $currentUser = $_SESSION['user'];
+                $this->getPage()->setVar('due_work_block', '');
+                if (Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)) {
+                    if ($groupHandler->isStaff()
+                        || ($groupHandler->isStudent($user['id']) && $currentUser->getId() == $user['id'])
+                        || ($groupHandler->isParent()
+                            && !Config::get('restrict_parent_duework_access')
+                            && $groupHandler->isParentOfChild($user['id'])
+                        )
+                    ) {
+                        $this->getPage()->parse('due_work_block', 'due_work');
+                        $hasActions = true;
+                    }
                 }
 
                 if (Config::get('external_document_report_enabled')
@@ -117,15 +123,18 @@ class Renderer extends Handler
                 }
 
                 // Hide grades from parents, if grades access is restricted or module is disabled
-                if (!Config::get(ConfigMapper::NAME_GRADES_ENABLED)
-                    || !$groupHandler->isStudent($user['id'])
-                    || ($groupHandler->isParent() && Config::get('restrict_parent_grades'))
-                    || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))
-                ) {
-                    $this->getPage()->setVar('grades_button_block', '');
-                } else {
-                    $this->getPage()->parse('grades_button_block', 'grades_button');
-                    $hasActions = true;
+                $this->getPage()->setVar('grades_button_block', '');
+                if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
+                    if ($groupHandler->isStaff()
+                        || ($groupHandler->isStudent($user['id']) && $currentUser->getId() == $user['id'])
+                        || ($groupHandler->isParent()
+                            && !Config::get('restrict_parent_grades')
+                            && $groupHandler->isParentOfChild($user['id'])
+                        )
+                    ) {
+                        $this->getPage()->parse('grades_button_block', 'grades_button');
+                        $hasActions = true;
+                    }
                 }
 
                 // Hide if disabled or not a student
@@ -135,7 +144,7 @@ class Renderer extends Handler
                 else
                 {
                     // Show this student's pastoral link to staff, or parents if config allows.
-                    if ( $_SESSION['user']->getRole()->isStaff() ||
+                    if ($currentUser->getRole()->isStaff() ||
                         ($groupHandler->isParentOfChild($user['id']) && \Config::get('pastoral_parent_access'))
                     ){
                         $this->getPage()->parse('pastoral_block', 'pastoral');
@@ -156,7 +165,7 @@ class Renderer extends Handler
 
                 //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
-                    if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
+                    if ($currentUser->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
                         if (Config::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
@@ -174,12 +183,12 @@ class Renderer extends Handler
                     }
                 } else {
                     //Show staff timetables to other staff
-                    if ($_SESSION['user']->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
+                    if ($currentUser->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
                         $this->getPage()->parse('timetable_block', 'timetable');
                         $hasActions = true;
                     }
                 }
-                if (!$_SESSION['user']->isSuperuser()) {
+                if (!$currentUser->isSuperuser()) {
                     $this->getPage()->setVar('modify_block');
                 } else {
                     if ($user['enabled']) {
@@ -195,7 +204,7 @@ class Renderer extends Handler
 
                 /* ePortfolio link
                  */
-                $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $user['id'], 'profile');
+                $authenticator = new Eportfolio_Authenticator($currentUser->getId(), $user['id'], 'profile');
 
                 if ($authenticator->canView()) {
                     $this->getPage()->parse('eportfolio_block', 'eportfolio');
@@ -206,9 +215,9 @@ class Renderer extends Handler
                  * Calendar only exist for students' parents, staff, supers, and themselves
                  */
                 $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
-                $isSuperuser = $_SESSION['user']->isSuperuser();
-                $isStaff =  $_SESSION['user']->getRole()->isStaff();
-                $isSelf = ($user['id'] == $_SESSION['user']->getId());
+                $isSuperuser = $currentUser->isSuperuser();
+                $isStaff =  $currentUser->getRole()->isStaff();
+                $isSelf = ($user['id'] == $currentUser->getId());
 
                 if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
