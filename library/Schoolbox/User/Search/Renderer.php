@@ -68,6 +68,13 @@ class Renderer extends Handler
                 'CURRENT_TAB'     => $this->getCurrentTab(),
             ));
 
+            /** @var User $currentUser */
+            $currentUser            = $_SESSION['user'];
+            $currentUserIsSuperuser = $currentUser->isSuperuser();
+            $currentUserIsStaff     = $currentUser->getRole()->isStaff();
+            $currentUserIsStudent   = $currentUser->getRole()->isStudent();
+            $currentUserIsParent    = $currentUser->getRole()->isParent();
+
             foreach ($result as $user) {
 
                 /* Remember if any actions were available to render in a tot
@@ -96,31 +103,30 @@ class Renderer extends Handler
                 $this->getPage()->setVar('academic_reports_block');
                 $this->getPage()->setVar('tot_block');
 
-                /** @var User $currentUser */
-                $currentUser     = $_SESSION['user'];
-                $isParent        = $currentUser->getRole()->isParent();
-                $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
-                $isSuperuser     = $currentUser->isSuperuser();
-                $isStaff         = $currentUser->getRole()->isStaff();
-                $isSelf          = ($user['id'] == $currentUser->getId());
-                $isStudent       = $currentUser->getRole()->isStudent();
+                $resultIsStaff               = $groupHandler->isStaff($user['id']);
+                $resultIsStudent             = $groupHandler->isStudent($user['id']);
+                $currentUserIsParentOfResult = $groupHandler->isParentOfChild($user['id']);
+                $currentUserIsResult         = ($user['id'] == $currentUser->getId());
 
                 /* Hide Due Work link from parents, if Due Work access is restricted or the module is disabled
                  */
                 $this->getPage()->setVar('due_work_block', '');
                 if (Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)) {
-                    if ($isStaff
-                        || ($isStudent && $isSelf)
-                        || ($isParent && $isParentOfChild && !Config::get('restrict_parent_duework_access'))
+                    if ($currentUserIsStaff
+                        || ($currentUserIsStudent && $currentUserIsResult)
+                        || ($currentUserIsParent
+                            && $currentUserIsParentOfResult
+                            && !Config::get('restrict_parent_duework_access')
+                        )
                     ) {
                         $this->getPage()->parse('due_work_block', 'due_work');
                         $hasActions = true;
                     }
                 }
 
-                if (Config::get('external_document_report_enabled')
-                    && $groupHandler->isStudent($user['id'])
-                    && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id']))
+                if ($resultIsStudent
+                    && ($currentUserIsStaff || $currentUserIsParentOfResult)
+                    && Config::get('external_document_report_enabled')
                 ) {
                     $this->getPage()->parse('academic_reports_block', 'academic_reports');
                     $hasActions = true;
@@ -129,9 +135,12 @@ class Renderer extends Handler
                 // Hide grades from parents, if grades access is restricted or module is disabled
                 $this->getPage()->setVar('grades_button_block', '');
                 if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
-                    if ($isStaff
-                        || ($isStudent && $isSelf)
-                        || ($isParent && $isParentOfChild && !Config::get('restrict_parent_grades'))
+                    if ($currentUserIsStaff
+                        || ($currentUserIsStudent && $currentUserIsResult)
+                        || ($currentUserIsParent
+                            && $currentUserIsParentOfResult
+                            && !Config::get('restrict_parent_grades')
+                        )
                     ) {
                         $this->getPage()->parse('grades_button_block', 'grades_button');
                         $hasActions = true;
@@ -139,15 +148,13 @@ class Renderer extends Handler
                 }
 
                 // Hide if disabled or not a student
-                if (\Config::get('pastoral_enabled') != 1 || !$groupHandler->isStudent($user['id'])) {
+                if (!($resultIsStudent && Config::get('pastoral_enabled'))) {
                     $this->getPage()->setVar('pastoral_block', '');
-                }
-                else
-                {
+                } else {
                     // Show this student's pastoral link to staff, or parents if config allows.
-                    if ($currentUser->getRole()->isStaff() ||
-                        ($groupHandler->isParentOfChild($user['id']) && \Config::get('pastoral_parent_access'))
-                    ){
+                    if ($currentUserIsStaff
+                        || ($currentUserIsParentOfResult && Config::get('pastoral_parent_access'))
+                    ) {
                         $this->getPage()->parse('pastoral_block', 'pastoral');
                         $hasActions = true;
                     } else {
@@ -165,8 +172,8 @@ class Renderer extends Handler
                 }
 
                 //Show student timetables to staff and parents of child
-                if ($groupHandler->isStudent($user['id'])) {
-                    if ($currentUser->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
+                if ($resultIsStudent) {
+                    if ($currentUserIsStaff || $currentUserIsParentOfResult) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
                         if (Config::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
@@ -176,20 +183,20 @@ class Renderer extends Handler
                         }
 
                     }
-                    if (Config::get('boarder_leave_enabled') == '1') {
-                        if ($groupHandler->isStaff() and $user['residential_house_id']) {
+                    if (Config::get('boarder_leave_enabled')) {
+                        if ($currentUserIsStaff && $user['residential_house_id']) {
                             $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                             $hasActions = true;
                         }
                     }
                 } else {
                     //Show staff timetables to other staff
-                    if ($currentUser->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
+                    if ($currentUserIsStaff && $resultIsStaff) {
                         $this->getPage()->parse('timetable_block', 'timetable');
                         $hasActions = true;
                     }
                 }
-                if (!$currentUser->isSuperuser()) {
+                if (!$currentUserIsSuperuser) {
                     $this->getPage()->setVar('modify_block');
                 } else {
                     if ($user['enabled']) {
@@ -215,7 +222,11 @@ class Renderer extends Handler
                 /* Calendar link
                  * Calendar only exist for students' parents, staff, supers, and themselves
                  */
-                if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
+                if ($currentUserIsParentOfResult
+                    || $currentUserIsSuperuser
+                    || $currentUserIsStaff
+                    || $currentUserIsResult
+                ) {
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
                     $this->getPage()->setVar(array(
