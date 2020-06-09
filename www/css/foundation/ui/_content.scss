@@ -366,11 +366,11 @@ $container-bg: white !default;
 
 .error-state section {
     background-color: transparent;
-    color: $black;
+    color: $jet;
     padding: 2rem;
 
-    h1, h2, a {
-        color: $black;
+    h1, h2 {
+        color: $jet;
     }
     .row {
         display: flex;
