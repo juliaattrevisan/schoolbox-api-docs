@@ -96,18 +96,22 @@ class Renderer extends Handler
                 $this->getPage()->setVar('academic_reports_block');
                 $this->getPage()->setVar('tot_block');
 
+                /** @var User $currentUser */
+                $currentUser     = $_SESSION['user'];
+                $isParent        = $currentUser->getRole()->isParent();
+                $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
+                $isSuperuser     = $currentUser->isSuperuser();
+                $isStaff         = $currentUser->getRole()->isStaff();
+                $isSelf          = ($user['id'] == $currentUser->getId());
+                $isStudent       = $currentUser->getRole()->isStudent();
+
                 /* Hide Due Work link from parents, if Due Work access is restricted or the module is disabled
                  */
-                /** @var User $currentUser */
-                $currentUser = $_SESSION['user'];
                 $this->getPage()->setVar('due_work_block', '');
                 if (Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)) {
-                    if ($groupHandler->isStaff()
-                        || ($groupHandler->isStudent($user['id']) && $currentUser->getId() == $user['id'])
-                        || ($groupHandler->isParent()
-                            && !Config::get('restrict_parent_duework_access')
-                            && $groupHandler->isParentOfChild($user['id'])
-                        )
+                    if ($isStaff
+                        || ($isStudent && $isSelf)
+                        || ($isParent && $isParentOfChild && !Config::get('restrict_parent_duework_access'))
                     ) {
                         $this->getPage()->parse('due_work_block', 'due_work');
                         $hasActions = true;
@@ -125,12 +129,9 @@ class Renderer extends Handler
                 // Hide grades from parents, if grades access is restricted or module is disabled
                 $this->getPage()->setVar('grades_button_block', '');
                 if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
-                    if ($groupHandler->isStaff()
-                        || ($groupHandler->isStudent($user['id']) && $currentUser->getId() == $user['id'])
-                        || ($groupHandler->isParent()
-                            && !Config::get('restrict_parent_grades')
-                            && $groupHandler->isParentOfChild($user['id'])
-                        )
+                    if ($isStaff
+                        || ($isStudent && $isSelf)
+                        || ($isParent && $isParentOfChild && !Config::get('restrict_parent_grades'))
                     ) {
                         $this->getPage()->parse('grades_button_block', 'grades_button');
                         $hasActions = true;
@@ -214,11 +215,6 @@ class Renderer extends Handler
                 /* Calendar link
                  * Calendar only exist for students' parents, staff, supers, and themselves
                  */
-                $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
-                $isSuperuser = $currentUser->isSuperuser();
-                $isStaff =  $currentUser->getRole()->isStaff();
-                $isSelf = ($user['id'] == $currentUser->getId());
-
                 if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
