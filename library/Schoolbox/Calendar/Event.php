@@ -604,9 +604,9 @@ class Event implements ISoftDeletable
     /**
      * Get end datetime
      *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getEndDateTime(): Alaress_Date_Format
+    public function getEndDateTime(): ?Alaress_Date_Format
     {
         return $this->endDateTime;
     }
@@ -752,9 +752,9 @@ class Event implements ISoftDeletable
     /**
      * Get start datetime
      *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getStartDateTime(): Alaress_Date_Format
+    public function getStartDateTime(): ?Alaress_Date_Format
     {
         return $this->startDateTime;
     }

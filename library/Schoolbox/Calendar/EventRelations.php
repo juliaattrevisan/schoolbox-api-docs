@@ -161,6 +161,7 @@ class EventRelations
                  */
                 case Event::ACCESS_PERSONAL:
                     $this->savePersonalRelation($event);
+                    $this->saveAttendanceRelation($event, $this->guests);
                     break;
 
                 /* Access Type 2 (Category)

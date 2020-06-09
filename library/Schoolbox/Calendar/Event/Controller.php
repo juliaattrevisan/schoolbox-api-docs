@@ -177,7 +177,7 @@ class Controller extends Base
         /* Set up default values
          */
         $event = (new Event())
-            ->setTitle($this->request->query['title'])
+            ->setTitle($this->request->query['title'] ?? '')
             ->setAuthor($this->getUser())
             ->setAccess((int)$this->request->query['level'])
             ->setAllDay((int)$this->request->query['allDay'])
