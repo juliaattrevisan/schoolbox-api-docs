@@ -179,10 +179,10 @@ module.exports = function(grunt) {
             },
             install: {}
         },
-        sass: { // Only used for development, skips the skin build process
+        sass: {
             options: {
                 implementation: sass,
-                sourceMap: true
+                outputStyle: 'compressed'
             },
             dist: {
                 files: {
