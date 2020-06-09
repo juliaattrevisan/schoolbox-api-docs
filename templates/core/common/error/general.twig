@@ -1,56 +1,60 @@
 <div class="row">
-    <div class="small-12 island">
-        <div class="empty-state">
-            <i class="icon-info"></i>
-            <h2>Sorry, we are unable to complete this request </h2>
-
-            {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
-            <p>{{ message|raw }}</p>
-
-            {% if info|length %}
-                <p>{{ info }}</p>
-            {% endif %}
-
-            {% if url|length %}
-                <p class="meta">{{ url }}</p>
-            {% endif %}
-
-            <p><br />Issue occurred at {{ date.long }}, further information may have been logged.</p>
-        </div>
-
-        {% if outputStackTrace %}
+    <div class="error-state small-12 columns">
+        <section>
             <div class="row">
-                <div class="small-12 island">
-                    <h2 class="subheader">Stack trace</h2>
-                    <section class="scrollable">
-                        <ul class="action-list trace">
-                            <li>
-                                <div class="column small-1"><pre>#0 </pre></div>
-                                <div class="column small-11">
-                                    <pre>{{ exceptionClass }}{% if stackTrace.message %}: "{{ stackTrace.message }}"{% endif %}</pre>
-                                    <pre class="meta">thrown on {{ stackTrace.file }}:{{ stackTrace.line }}</pre>
-                                </div>
-                            </li>
-                            {% for frame in stackTrace.trace %}
-                                <li>
-                                    <div class="column small-1"><pre>#{{ loop.index }} </pre></div>
-                                    <div class="column small-11">
-                                        <pre>{% if frame.class is defined %}{{ frame.class }}{% endif %}{% if frame.type is defined %}{{ frame.type }}{% endif %}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
-                                        <pre class="meta">called from {{ frame.file ?? '' }}:{{ frame.line ?? '' }}</pre>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                </div>
-            </div>
-        {% endif %}
+                <div>
+                    {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
+                    <h1>{{ message|raw }}</h1>
+                    <h2>Sorry, we are unable to complete this request </h2>
 
-        <div class="row">
-            <div class="small-12 island">
-                {% include 'common/error/fragment/options.twig' %}
+                    {% if url|length %}
+                        <p>{{ url }}</p>
+                    {% endif %}
+
+                    {% if info|length %}
+                        <p>{{ info }}</p>
+                    {% endif %}
+
+                    <p>Issue occurred at {{ date.long }}, further information may have been logged.</p>
+
+                    <p><a href="javascript:history.back()">&#8592; Go Back</a></p>
+                </div>
+                <img src="/images/core/error-whale.png" alt="error" width="300" />
             </div>
         </div>
+    </div>
+</div>
 
+{% if outputStackTrace %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Stack trace</h2>
+        <section class="scrollable">
+            <ul class="action-list trace">
+                <li>
+                    <div class="column small-1"><pre>#0 </pre></div>
+                    <div class="column small-11">
+                        <pre>{{ exceptionClass }}{% if stackTrace.message %}: "{{ stackTrace.message }}"{% endif %}</pre>
+                        <pre class="meta">thrown on {{ stackTrace.file }}:{{ stackTrace.line }}</pre>
+                    </div>
+                </li>
+                {% for frame in stackTrace.trace %}
+                    <li>
+                        <div class="column small-1"><pre>#{{ loop.index }} </pre></div>
+                        <div class="column small-11">
+                            <pre>{% if frame.class is defined %}{{  frame.class }}{% endif %}{%  if frame.type is defined %}{{  frame.type }}{% endif %}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+                            <pre class="meta">called from {{ frame.file }}:{{ frame.line }}</pre>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="small-12 island">
+        {% include 'common/error/fragment/options.twig' %}
     </div>
 </div>
