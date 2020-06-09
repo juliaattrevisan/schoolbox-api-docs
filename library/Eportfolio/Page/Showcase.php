@@ -6,6 +6,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
@@ -33,6 +35,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setTab('ePortfolio');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
+        $this->getPage()->setBlock('no_showcased_work', 'grades_enabled', 'grades_enabled_block');
+        $this->getPage()->setBlock('no_showcased_work', 'grades_disabled', 'grades_disabled_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
         $this->getPage()->setBlock('has_showcased_work', 'has_intro', 'has_intro_block');
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work_subject', 'showcased_work_subject_block');
@@ -55,7 +59,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Intro text
          */
-        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']
+            && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+        ) {
             $this->getPage()->parse('has_intro_block', 'has_intro');
         } else {
             $this->getPage()->setVar('has_intro_block', '');
@@ -223,6 +229,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         } else {
             if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
                 $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
+                $this->getPage()->setVar('grades_enabled_block', '');
+                $this->getPage()->setVar('grades_disabled_block', '');
+                if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
+                    $this->getPage()->parse('grades_enabled_block', 'grades_enabled');
+                } else {
+                    $this->getPage()->parse('grades_disabled_block', 'grades_disabled');
+                }
             }
             $this->getPage()->setVar('has_showcased_work_block', '');
         }

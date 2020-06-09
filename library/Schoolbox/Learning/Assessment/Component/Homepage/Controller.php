@@ -108,13 +108,15 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      */
     private function getTwigContext()
     {
+        $term = $this->getTermMapper()->findForToday();
         return [
             'component_id' => $this->getInstance()->getId(),
             'compact'      => $this->getConfig('compactMode'),
             'context'      => $this->getSource(),
             'contextType'  => AssessmentContextType::TYPE_FOLDER.'s',
             'assessables'  => $this->assessments,
-            'termCode'     => $this->getTermMapper()->findForToday()->getCode(),
+            'term'         => $term,
+            'termCode'     => $term->getCode(),
             'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
             'canWrite'     => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
         ];

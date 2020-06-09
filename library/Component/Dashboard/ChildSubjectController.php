@@ -4,6 +4,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 use Custom\Diocesan\ValidJuniorSchoolStudent;
@@ -127,15 +128,20 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
             $this->setVar('CAL_TODAY_DATE', $now->getURLDate());
 
-            /* Hide Due Work link from parents, if Due Work access is restricted
+            /* Hide Due Work link from parents, if Due Work access is restricted and module is disabled
              */
-            if ($isParent && $this->getConfigLoader()->get('restrict_parent_duework_access')) {
+            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)
+                || ($isParent && $this->getConfigLoader()->get('restrict_parent_duework_access'))
+            ) {
                 $this->setVar('due_work_block', '');
             } else {
                 $this->parse('due_work_block', 'due_work');
             }
 
-            if ($isParent && $this->getConfigLoader()->get('restrict_parent_grades')) {
+            // Hide grades from parents, if grades access is restricted or module is disabled
+            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED)
+                || ($isParent && $this->getConfigLoader()->get('restrict_parent_grades'))
+            ) {
                 $this->setVar('grades_button_block', '');
             } else {
                 $this->parse('grades_button_block', 'grades_button');

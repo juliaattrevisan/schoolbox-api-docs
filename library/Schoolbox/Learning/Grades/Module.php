@@ -4,6 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Grades;
 
 use Alaress\Authorizer\Rule;
@@ -15,11 +16,9 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
-use Schoolbox\Filter;
 use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -33,7 +32,7 @@ class Module extends BaseModule
      */
     public function __construct(ContainerInterface $injector, $basename = '')
     {
-        if('' === $basename){
+        if ('' === $basename) {
             $basename = 'learningGrades';
         }
         parent::__construct($injector, $basename);
@@ -47,9 +46,13 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $permissions = new Rule\LazyCallback(function () {
+        $basicPermissions = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_GRADES_ENABLED, $this->getConfig())
+        );
+        $permissions      = new Rule\LazyCallback(function () use ($basicPermissions) {
             return new Rule\All(
-                new Rule\IsLoggedIn(),
+                $basicPermissions,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
@@ -71,12 +74,12 @@ class Module extends BaseModule
         };
 
         $loadTerm = function ($params) {
-            if(null === $params['termCode']){
+            if (null === $params['termCode']) {
                 return ['term' => $this->getTermMapper()->findForToday()];
             }
-            try{
+            try {
                 return ['term' => $this->getTermMapper()->findOneByColumn('code', $params['termCode'])];
-            } catch (Mapper\Exception $e){
+            } catch (Mapper\Exception $e) {
                 throw new NotFound("No term found for code: {$params['termCode']}");
             }
         };
@@ -89,23 +92,23 @@ class Module extends BaseModule
             }
         };
 
-        $loadVieweeTerm = function ($params) use($loadViewee, $loadTerm) {
+        $loadVieweeTerm = function ($params) use ($loadViewee, $loadTerm) {
             return array_merge($loadViewee($params), $loadTerm($params));
         };
 
-        $loadVieweeTermFolder = function ($params) use($loadViewee, $loadTerm, $loadFolder) {
+        $loadVieweeTermFolder = function ($params) use ($loadViewee, $loadTerm, $loadFolder) {
             return array_merge($loadViewee($params), $loadTerm($params), $loadFolder($params));
         };
 
         $this->register('GET', '/grades-year/{userId}/year/{year}', 'getGradesYear', $permissions, $loadViewee);
 
         // Overview and single class pages
-        $this->register('GET', '', 'getGradesForCurrentUser', new Rule\IsLoggedIn());
-        $this->register('GET', '/{userId:\d+}{/termCode}',                         'getGrades',           $permissions, $loadVieweeTerm);
-        $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
+        $this->register('GET', '', 'getGradesForCurrentUser', $basicPermissions);
+        $this->register('GET', '/{userId:\d+}{/termCode}', 'getGrades', $permissions, $loadVieweeTerm);
+        $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
         // Filtered routes (todo merge GET + POST and distinguish via sync vs. ajax)
-        $this->register('POST', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadVieweeTermFolder);
+        $this->register('POST', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport', $permissions, $loadVieweeTermFolder);
     }
 
 
@@ -127,15 +130,15 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
-            'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-            'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
-            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
+            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
+            'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+            'folderMapper'          => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+            'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
+            'access'                => $this->getMapperFactory()->getLazy(Access::class),
+            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
+            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
         ];
     }
 

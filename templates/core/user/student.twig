@@ -273,19 +273,19 @@
 
                         {% if showButtons %}
                             {% block buttons_dueWork %}
-                                {% if (not session.user.role.parent) or (not config.restrict_parent_duework_access) %}
+                                {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
+                                {% if route %}
                                     <li>
-                                        <a href="/learning/due/{{ user.id }}"
-                                           class="icon-due-work">{{ locale.dueWork.proper }}</a>
+                                        <a href="{{ route }}" class="icon-due-work">{{ locale.dueWork.proper }}</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_dueWork %}
 
                             {% block buttons_grades %}
-                                {% if (not session.user.role.parent) or (not config.restrict_parent_grades) %}
+                                {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
+                                {% if route %}
                                     <li>
-                                        <a href="/learning/grades/{{ user.id }}"
-                                           class="icon-tick">{{ locale.grades.properPlural }}</a>
+                                        <a href="{{ route }}" class="icon-tick">{{ locale.grades.properPlural }}</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_grades %}

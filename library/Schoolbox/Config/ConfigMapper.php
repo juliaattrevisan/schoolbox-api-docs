@@ -114,6 +114,8 @@ class ConfigMapper extends Mapper
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
 
+    public const NAME_UPCOMING_ASSESSMENTS_ENABLED = 'upcoming_assessments_enabled';
+    public const NAME_GRADES_ENABLED               = 'grades_enabled';
 
     /**
      * @throws \InvalidArgumentException

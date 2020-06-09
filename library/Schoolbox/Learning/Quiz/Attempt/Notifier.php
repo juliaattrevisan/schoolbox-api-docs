@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -277,8 +278,10 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
+        $restrictGrades = $this->conf->get('restrict_parent_grades')
+            || !$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED);
         if ($this->conf->get('restrict_parent_duework_access')
-            || ($this->conf->get('restrict_parent_grades') && $this->conf->get('restrict_student_submissions'))
+            || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
             || !$assess->isMarkShownToParents()) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));
             return $envelope;
@@ -297,7 +300,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $term      = $this->termMapper->findForDate($assess->getFinish());
-        $hrefGrade = $this->conf->get('restrict_parent_grades') ? '' : "/learning/grades/{$student->getId()}/{$term->getCode()}/{$assess->getCategory()->getId()}";
+        $hrefGrade = $restrictGrades ? '' : "/learning/grades/{$student->getId()}/{$term->getCode()}/{$assess->getCategory()->getId()}";
         $href      = $this->conf->get('restrict_student_submissions') ? $hrefGrade : "/learning/assessments/{$assess->getAssessmentModel()->getId()}/$studentId";
 
         $bob = new Builder();

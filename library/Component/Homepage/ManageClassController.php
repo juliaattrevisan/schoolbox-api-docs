@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
@@ -164,7 +165,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
-        if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
+        if (($involvedInGroup || $involvedInClass)
+            && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+            && UserAccess::ACCESS_READ === $this->getContentPermission()
+        ) {
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;
         } else {

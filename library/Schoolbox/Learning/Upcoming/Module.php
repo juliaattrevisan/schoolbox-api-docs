@@ -10,6 +10,7 @@ use Alaress\Authorizer\Rule;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -52,8 +53,15 @@ class Module extends BaseModule
                 return new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId');
             }));
         }
-        $access = new Rule\All(
+
+        // Basic access to the upcoming due work module
+        $basicAccess = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED, $this->getConfig())
+        );
+
+        $access = new Rule\All(
+            $basicAccess,
             $access
         );
 
@@ -89,7 +97,7 @@ class Module extends BaseModule
             return $preload;
         };
 
-        $this->register('GET',  '',                        'getUpcoming', new Rule\IsLoggedIn());
+        $this->register('GET',  '',                        'getUpcoming', $basicAccess);
         $this->register('GET',  '/events/{studentId:\d+}', 'getEvents', $access, $preloadStudent);
         $this->register('GET',  '/{studentId:\d+}{/date}', 'getUpcomingForStudent',  $access, $preloadStudentAndDate);
         $this->register('POST', '/{studentId:\d+}',        'postUpcomingForStudent', $access, $preloadStudent);
