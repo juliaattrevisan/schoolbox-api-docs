@@ -217,7 +217,6 @@ class Controller extends Base
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
             'efficacy' => [
                 'self' => EventRecurrenceMapper::EFFICACY_SELF,
                 'series' => EventRecurrenceMapper::EFFICACY_SERIES,
@@ -286,7 +285,6 @@ class Controller extends Base
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
             'efficacy' => [
                 'self' => EventRecurrenceMapper::EFFICACY_SELF,
                 'series' => EventRecurrenceMapper::EFFICACY_SERIES,

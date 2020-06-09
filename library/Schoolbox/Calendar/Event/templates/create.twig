@@ -5,7 +5,6 @@
  # @param User       $user          A User instance (this person receives the event on their calendar)
  # @param Collection $eventTypes    A list of Event Types
  # @param array      $recurrence    A list of recurring instances
- # @param int        $personalLevel An int corresponding to the Personal event level
  # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
  # @param array      $levels        An array of Event Levels (personal/group/school)
  # @param array      $roles         A list of available and selected Roles
@@ -30,21 +29,6 @@
         // Collapsables
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
-        });
-
-        var personalLevel = "{{ personalLevel }}";
-        var calendarEvent = $("#level");
-
-        if (calendarEvent.val() === personalLevel) {
-            $("#attendance").hide();
-        }
-
-        calendarEvent.change(function() {
-            if ($("#level").val() === personalLevel) {
-                $("#attendance").hide();
-            } else {
-                $("#attendance").show();
-            }
         });
     });
 </script>
