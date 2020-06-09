@@ -55,7 +55,24 @@
                     </section>
                 </div>
             </section>
+
+            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable && this.event.canModify">
+                <div class="row">
+                    <div id="attendance-guests" class="small-12 columns">
+                        <section>
+                            <div class="content">
+                                <span class="meta" v-if="this.event.guests.available != null"><span id="attendance-guests-available">{{ this.event.guests.available }}</span> available attendee slots</span>
+                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                            </div>
+
+                            <article v-html="this.event.guests.fragment"></article>
+                        </section>
+                    </div>
+                </div>
+            </form>
         </div>
+
+        <div data-toast class="toast"></div>
 
         <audiences-modal
                 ref="audiencesModal"
@@ -85,6 +102,11 @@
     const ATTENDANCE_NEXT_ACTION_ADD_LABEL = 'RSVP';
     const ATTENDANCE_NEXT_ACTION_REMOVE_LABEL = 'Unattend';
 
+    /* Inline alteration of attendees on event detail screen
+     */
+    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
+    const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
+
     export default {
         props: ['event'],
         name: "event-details",
@@ -110,6 +132,41 @@
              */
             generateModifyUrl(eventId, returnUrl) {
                 var url = URL_EVENT_MODIFY_FORM.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+            /**
+             * Route to the Attendance Create endpoint to asynchronously create attendees
+             *
+             * @param eventId
+             * @param returnUrl
+             * @returns {string}
+             */
+            generateAttendanceCreateUrl(eventId, returnUrl) {
+                var url= URL_ATTENDANCE_CREATE.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+
+            /**
+             * Route to the Attendance Delete endpoint to asynchronously remove attendees
+             *
+             * @param eventId
+             * @param returnUrl
+             * @returns {string}
+             */
+            generateAttendanceDeleteUrl(eventId, returnUrl) {
+                var url= URL_ATTENDANCE_DELETE.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
@@ -205,6 +262,20 @@
 
             modifyPath: function() {
                 return this.generateModifyUrl(this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * Create new attendances
+             */
+            createAttendancePath: function() {
+                return this.generateAttendanceCreateUrl(this.event.id);
+            },
+
+            /**
+             * Delete attendances
+             */
+            deleteAttendancePath: function() {
+                return this.generateAttendanceDeleteUrl(this.event.id);
             }
         }
     }

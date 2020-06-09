@@ -38,11 +38,11 @@ $event
     ->setCampusCollection(new Collection())
     ->setRoleCollection(new Collection())
     ->setType($type)
-    ->setVariant($_POST['variant'])
-    ->setTitle($_POST['title'])
-    ->setLocation($_POST['location'])
-    ->setAttendance($_POST['attendance'])
-    ->setDetail($_POST['detail'])
+    ->setVariant($_POST['variant'] ?? Event::VARIANT_EVENT)
+    ->setTitle($_POST['title'] ?? '')
+    ->setLocation($_POST['location'] ?? '')
+    ->setAttendance($_POST['attendance'] ?? 0)
+    ->setDetail($_POST['detail'] ?? '')
     ->setPublishDateTime(null)
     ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 

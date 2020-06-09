@@ -1,0 +1,24 @@
+{##
+ # Current
+ #
+ # Get an html fragment containing the current attendees for a given event
+ #
+ # @param array $guests  A list of (id, name) tuples
+ # @param Event $event   An instance of \Schoolbox\Calendar\Event
+ #}
+<ul class="action-list attendance-guest-list">
+    {% for guest in guests %}
+    <li class="actions-small-1">
+        <div class="compact card small-11">
+            <a href="/search/user/{{ guest.id }}" title="View Profile">
+                <img src="/portrait.php?id={{ guest.id }}&size=square64" />
+
+                <p>{{ guest.name }}</p>
+            </a>
+        </div>
+        <nav>
+            <a data-guest-delete="{{ guest.id }}" data-guest-name="{{ guest.name }}" class="icon-close no-text" href="{{ routeLookupIfAuthorized('calendarEventAttendance.postDelete', {eventId: event.id}) }}" title="Remove guest"></a>
+        </nav>
+    </li>
+    {% endfor %}
+</ul>

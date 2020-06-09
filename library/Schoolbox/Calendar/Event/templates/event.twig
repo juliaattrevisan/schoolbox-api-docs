@@ -25,6 +25,7 @@
             "roles"     : roleCollection,
             "folders"   : folderCollection
         },
+        'guests'     : guests,
         "attendance" : attendance,
         "canModify"  : canModify,
         "level"      : level,
@@ -34,3 +35,106 @@
 </div>
 
 <script src="/javascript/components/eventDetails.bundle.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var selectize = $('#add-guests').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0, showCampus: true},
+                dataType: 'json'
+            },
+            multiple: false
+        });
+
+        /* Add one person at a time, spawn the toast, transact, then clear the selectize
+         */
+        selectize[0].selectize.on('item_add', function (value, item) {
+
+            /* User's name
+             */
+            let name = $(item[0]).html().split(' - ')[0];
+            let id = value;
+
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            let $toast = $('[data-toast]');
+
+            $toast.toastActivate({
+                text: 'Inviting ' + name + '...'
+            });
+
+            $.ajax({
+                url: $('#createAttendanceForm').attr('action'),
+                method: 'post',
+                dataType: 'json',
+                data: {
+                    guests: id
+                },
+                success: function(responseText) {
+                    $toast.toastTimeout({
+                        text: name + ' has been successfully invited',
+                        css: 'success'
+                    });
+
+                    selectize[0].selectize.clear();
+
+                    /* Update list
+                     */
+                    $('#attendance-guests article').html(responseText.fragment);
+                    $('#attendance-guests-available').html(responseText.available);
+                },
+                error: function(xhr, status, error) {
+                    let responseText = $.parseJSON(xhr.responseText)
+
+                    $toast.toastTimeout({text: 'Unable to invite ' + name + '. ' + responseText.message, css: 'alert'});
+
+                    selectize[0].selectize.clear();
+                }
+            });
+        });
+
+        /* Asynchronously remove people's invites
+         */
+        $('#attendance-guests').on('click', '[data-guest-delete]', function(event) {
+            event.preventDefault();
+
+            let element = $(this);
+
+            /* User's name
+             */
+            let name = element.attr('data-guest-name');
+
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            let $toast = $('[data-toast]');
+
+            $toast.toastActivate({
+                text: 'Uninviting ' + name + '...'
+            });
+
+            $.ajax({
+                url: element.attr('href'),
+                method: 'post',
+                dataType: 'json',
+                data: {guest: element.attr('data-guest-delete')},
+                success: function(responseText) {
+                    $toast.toastTimeout({
+                        text: name + ' has been uninvited',
+                        css: 'success'
+                    });
+
+                    /* Update list
+                     */
+                    $('#attendance-guests ul').replaceWith(responseText.fragment);
+                    $('#attendance-guests-available').html(responseText.available);
+                },
+                error: function(xhr, status, error) {
+                    $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
+                }
+            });
+        });
+    });
+</script>

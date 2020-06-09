@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Event\Attendance\ListPayload;
 use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
@@ -24,6 +25,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -126,7 +128,11 @@ class Controller extends Base
      * View an event's detail screen
      *
      * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function getEvent(Event $event): void
     {
@@ -138,14 +144,15 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event'            => $event,
             'level'            => $helper->getEventLevel($event),
-            'canModify'        => $calendar->getPerm($event->getId()) >= UserAccess::ACCESS_WRITE,
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection'   => $helper->getRoleCollection($event),
-            'folderCollection'  => $helper->getFolderCollection($event),
+            'folderCollection' => $helper->getFolderCollection($event),
             'attendance'       => [
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
+            'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event),
+            'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
         ])->setTitle($event->getTitle()));
     }
 
@@ -170,7 +177,7 @@ class Controller extends Base
         /* Set up default values
          */
         $event = (new Event())
-            ->setTitle($this->request->query['title'])
+            ->setTitle($this->request->query['title'] ?? '')
             ->setAuthor($this->getUser())
             ->setAccess((int)$this->request->query['level'])
             ->setAllDay((int)$this->request->query['allDay'])
@@ -210,7 +217,6 @@ class Controller extends Base
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
             'efficacy' => [
                 'self' => EventRecurrenceMapper::EFFICACY_SELF,
                 'series' => EventRecurrenceMapper::EFFICACY_SERIES,
@@ -279,7 +285,6 @@ class Controller extends Base
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
             'recurrence' => $recurrence,
-            'personalLevel' => Event::ACCESS_PERSONAL,
             'efficacy' => [
                 'self' => EventRecurrenceMapper::EFFICACY_SELF,
                 'series' => EventRecurrenceMapper::EFFICACY_SERIES,
@@ -573,6 +578,7 @@ class Controller extends Base
         /* Attendance settings
          */
         $attendance = (int)$this->request->post['attendance'];
+        $maxAttendees = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
 
         /* Decide if the Attendance settings need to be reset
          *
@@ -616,6 +622,7 @@ class Controller extends Base
          * setting now differs from what it previously was
          */
         $event
+            ->setMaxAttendees($maxAttendees)
             ->setAttendance($attendance)
             ->setAttendanceDirty($attendanceDirty);
 
