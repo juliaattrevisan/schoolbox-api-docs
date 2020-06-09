@@ -103,42 +103,36 @@
 
             let element = $(this);
 
-            element.confirmDialog({
-                text: 'Are you sure you want to uninvite ' + element.attr('data-guest-name') + '?',
-                confirmEvent: function() {
+            /* User's name
+             */
+            let name = element.attr('data-guest-name');
 
-                    /* User's name
-                     */
-                    let name = element.attr('data-guest-name');
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            let $toast = $('[data-toast]');
 
-                    /* A toast - to your valour, my sword, and our victory together
-                     */
-                    let $toast = $('[data-toast]');
+            $toast.toastActivate({
+                text: 'Uninviting ' + name + '...'
+            });
 
-                    $toast.toastActivate({
-                        text: 'Uninviting ' + name + '...'
+            $.ajax({
+                url: element.attr('href'),
+                method: 'post',
+                dataType: 'json',
+                data: {guest: element.attr('data-guest-delete')},
+                success: function(responseText) {
+                    $toast.toastTimeout({
+                        text: name + ' has been uninvited',
+                        css: 'success'
                     });
 
-                    $.ajax({
-                        url: element.attr('href'),
-                        method: 'post',
-                        dataType: 'json',
-                        data: {guest: element.attr('data-guest-delete')},
-                        success: function(responseText) {
-                            $toast.toastTimeout({
-                                text: name + ' has been uninvited',
-                                css: 'success'
-                            });
-
-                            /* Update list
-                             */
-                            $('#attendance-guests ul').replaceWith(responseText.fragment);
-                            $('#attendance-guests-available').html(responseText.available);
-                        },
-                        error: function(xhr, status, error) {
-                            $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
-                        }
-                    });
+                    /* Update list
+                     */
+                    $('#attendance-guests ul').replaceWith(responseText.fragment);
+                    $('#attendance-guests-available').html(responseText.available);
+                },
+                error: function(xhr, status, error) {
+                    $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
                 }
             });
         });
