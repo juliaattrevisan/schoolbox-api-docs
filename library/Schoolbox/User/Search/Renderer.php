@@ -9,13 +9,13 @@
 
 namespace Schoolbox\User\Search;
 
+use Alaress_Date_Format;
+use Config;
+use Eportfolio_Authenticator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Schoolbox\User;
 use Scrub;
-use Alaress_Date_Format;
-use Config;
-use Eportfolio_Authenticator;
 
 class Renderer extends Handler
 {
@@ -39,7 +39,7 @@ class Renderer extends Handler
      */
     public function render()
     {
-        $userHandler = new \User();
+        $userHandler  = new \User();
         $groupHandler = new \Group();
 
         $result = $this->getResult($this->getType());
@@ -62,11 +62,11 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'academic_reports', 'academic_reports_block');
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
-            $this->getPage()->setVar(array(
+            $this->getPage()->setVar([
                 'USER_DISP_COUNT' => count($this->getResult($this->getType())),
                 'USER_COUNT'      => $this->getCount($this->getType()),
                 'CURRENT_TAB'     => $this->getCurrentTab(),
-            ));
+            ]);
 
             /** @var User $currentUser */
             $currentUser            = $_SESSION['user'];
@@ -83,18 +83,18 @@ class Renderer extends Handler
                 */
                 $hasActions = false;
 
-                $this->getPage()->setVar(array(
-                    'USER_SEARCH_ID' => $user['id'],
+                $this->getPage()->setVar([
+                    'USER_SEARCH_ID'         => $user['id'],
                     'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
-                    'USER_SEARCH_NAME' => Scrub::text($userHandler->formatName($user)),
-                    'USER_SEARCH_USERNAME' => Scrub::text($user['username']),
-                    'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
-                    'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
-                    'USER_POSITION_TITLE' => $user['position_title'],
+                    'USER_SEARCH_NAME'       => Scrub::text($userHandler->formatName($user)),
+                    'USER_SEARCH_USERNAME'   => Scrub::text($user['username']),
+                    'USER_SEARCH_COUNT'      => $this->getCount($this->getType()),
+                    'USER_SEARCH_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
+                    'USER_POSITION_TITLE'    => $user['position_title'],
                     // For now, do not output a user's campus
-                    'USER_SEARCH_CAMPUS' => '',
-                    'USER_SEARCH_GROUP' => Scrub::text($user['group_name'])
-                ));
+                    'USER_SEARCH_CAMPUS'     => '',
+                    'USER_SEARCH_GROUP'      => Scrub::text($user['group_name']),
+                ]);
 
                 $this->getPage()->setVar('timetable_block');
                 $this->getPage()->setVar('pastoral_block');
@@ -147,19 +147,17 @@ class Renderer extends Handler
                     }
                 }
 
-                // Hide if disabled or not a student
-                if (!($resultIsStudent && Config::get('pastoral_enabled'))) {
-                    $this->getPage()->setVar('pastoral_block', '');
-                } else {
-                    // Show this student's pastoral link to staff, or parents if config allows.
-                    if ($currentUserIsStaff
+                // Show this student's pastoral link to staff, or parents if config allows.
+                $this->getPage()->setVar('pastoral_block', '');
+                if ($resultIsStudent
+                    && Config::get('pastoral_enabled')
+                    && (
+                        $currentUserIsStaff
                         || ($currentUserIsParentOfResult && Config::get('pastoral_parent_access'))
-                    ) {
-                        $this->getPage()->parse('pastoral_block', 'pastoral');
-                        $hasActions = true;
-                    } else {
-                        $this->getPage()->setVar('pastoral_block', '');
-                    }
+                    )
+                ) {
+                    $this->getPage()->parse('pastoral_block', 'pastoral');
+                    $hasActions = true;
                 }
 
                 //Show student timetables to staff and parents of child
@@ -171,31 +169,31 @@ class Renderer extends Handler
                     $this->getPage()->setVar('normal_title_block', '');
                 }
 
-                //Show student timetables to staff and parents of child
+                // Show student timetables to staff and parents of child
+                $this->getPage()->setVar('timetable_block', '');
                 if ($resultIsStudent) {
                     if ($currentUserIsStaff || $currentUserIsParentOfResult) {
-                        // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
-                        if (Config::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
+                        // Timetable shouldn't appear if synergy is disabled in the conf,
+                        // or the students timetable is marked as hidden
+                        if ($user['synergy_id'] && !$user['hide_timetable'] && Config::get('external_enable')) {
                             $this->getPage()->parse('timetable_block', 'timetable');
                             $hasActions = true;
-                        } else {
-                            $this->getPage()->setVar('timetable_block', '');
-                        }
-
-                    }
-                    if (Config::get('boarder_leave_enabled')) {
-                        if ($currentUserIsStaff && $user['residential_house_id']) {
-                            $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
-                            $hasActions = true;
                         }
                     }
-                } else {
-                    //Show staff timetables to other staff
-                    if ($currentUserIsStaff && $resultIsStaff) {
-                        $this->getPage()->parse('timetable_block', 'timetable');
+                    if ($currentUserIsStaff
+                        && $user['residential_house_id']
+                        && Config::get('boarder_leave_enabled')
+                    ) {
+                        $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                         $hasActions = true;
                     }
+                } elseif ($currentUserIsStaff && $resultIsStaff) {
+                    // Show staff timetables to other staff
+                    $this->getPage()->parse('timetable_block', 'timetable');
+                    $hasActions = true;
                 }
+
+                // Modify: show only to supers
                 if (!$currentUserIsSuperuser) {
                     $this->getPage()->setVar('modify_block');
                 } else {
@@ -229,9 +227,9 @@ class Renderer extends Handler
                 ) {
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-                    $this->getPage()->setVar(array(
-                            'USER_CALENDAR_CURRENTDATE' => $now->getURLDate(),
-                        ));
+                    $this->getPage()->setVar([
+                        'USER_CALENDAR_CURRENTDATE' => $now->getURLDate(),
+                    ]);
 
                     $this->getPage()->parse('user_calendar_block', 'user_calendar');
                     $hasActions = true;
