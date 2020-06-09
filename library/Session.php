@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -9,6 +10,7 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -289,31 +291,77 @@ class Session
         }
     }
 
+
     /**
-     * @param string    $username
-     * @param string    $password
-     * @param string    $ds
-     * @param string    $ldap_user
-     * @param string    $ldap_base
-     * @param int       $version
-     * @param int       $referrals
+     * Connect to the provided LDAP host.
+     *
+     * @param string      $host       The LDAP host's URL
+     * @param string      $username   A username for auth to the LDAP host.
+     *                                This is distinct from the username that is
+     *                                being searched for within LDAP.
+     * @param string      $password   A password for auth to the LDAP host.
+     *                                This is distinct from the password for the
+     *                                username that is being searched for.
+     * @param string|null $caCertPath If provided, a local path to a cert.
+     *                                This must be a local file, because the
+     *                                LDAP extension needs to access this file.
+     * @return bool|resource The connection, or false if none could be created.
+     */
+    private function ldapConnect(string $host, string $username, string $password, ?string $caCertPath)
+    {
+        if ($host) {
+            $ds = ldap_connect($host);
+            if ($ds) {
+                ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+                if ($caCertPath) {
+                    // https://bugs.php.net/bug.php?id=73558
+                    // suggests that both CA cert dir and file need to be set.
+                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTDIR, dirname($caCertPath));
+                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTFILE, $caCertPath);
+                }
+                @ldap_bind($ds, $this->ldap_escape($username), utf8_encode($password));
+                return $ds;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Authenticates a username/password against the provided LDAP connection.
+     *
+     * @param bool|resource $ds            An LDAP connection
+     * @param string        $username      The username to authenticate in the
+     *                                     LDAP connection
+     * @param string        $password      The password for user $username
+     * @param string        $userDn        What is the distinguished name of the
+     *                                     directory which contains usernames?
+     * @param string        $usernameField Which field in $userDn contains the
+     *                                     username?
+     * @param string        $searchFilter  What other filters should be applied
+     *                                     to the username field search?
+     * @return bool
      * @throws SchoolboxAccountDisabledException
      * @throws SchoolboxPasswordExpiredException
-     * @return bool
-     *
      */
-    private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0)
-    {
+    private function ldapAuth(
+        $ds,
+        string $username,
+        string $password,
+        string $userDn,
+        string $usernameField,
+        string $searchFilter
+    ) {
         // perform search for user in ldap server specified
-        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, $version);
-        ldap_set_option($ds, LDAP_OPT_REFERRALS, $referrals);
-        @ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Config::get('ldap_pass')));
-        $searchString = "(" . Config::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
-        $ldap_search_filter = Config::get('ldap_search_filter');
-        if (strlen($ldap_search_filter)) {
-            $searchString = sprintf('(&(%s)%s)', $ldap_search_filter, $searchString);
+        if (!$ds) {
+            return false;
         }
-        $result = ldap_search($ds, $ldap_base, $searchString, array('dn'));
+        $searchString = "(" . $usernameField . "=" . $this->ldap_escape($username) . ")";
+        if ($searchFilter !== '') {
+            $searchString = sprintf('(&(%s)%s)', $searchFilter, $searchString);
+        }
+        $result = ldap_search($ds, $userDn, $searchString, array('dn'));
         // user exists
         if ($result) {
             $entries = ldap_get_entries($ds, $result);
@@ -324,8 +372,8 @@ class Session
 
                 // failed to bind. find out why.
                 if (!$bind) {
-                    // get LDAP response: 0x0032 correlates to LDAP_OPT_DIAGNOSTIC_MESSAGE (but PHP doesn't map it by default)
-                    if (ldap_get_option($ds, 0x0032, $ldap_error)) {
+                    // get LDAP response
+                    if (ldap_get_option($ds, LDAP_OPT_DIAGNOSTIC_MESSAGE, $ldap_error)) {
                         // extract error code
                         preg_match('/(data [0-9a-z]*)/', $ldap_error, $matches);
                         // if the preg_match finds an error formatted as expected
@@ -368,25 +416,51 @@ class Session
 
     private function authenticateLDAP($username, $password)
     {
-        $ds = ldap_connect(Config::get('ldap_host'));
-
-        // test authentication in primary server
-        if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user'), Config::get('ldap_base'))) {
-            return true;
-        }
-
-        // test authentication in secondary server
-        if (Config::get('ldap_host_alt')) {
-            $ds = ldap_connect(Config::get('ldap_host_alt'));
-            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_alt'), Config::get('ldap_base_alt'))) {
-                return true;
+        $ldapConfigs = [
+            [
+                'host'       => Config::get('ldap_host'),
+                'username'   => Config::get('ldap_user'),
+                'searchBase' => Config::get('ldap_base'),
+            ],
+            [
+                'host'       => Config::get('ldap_host_alt'),
+                'username'   => Config::get('ldap_user_alt'),
+                'searchBase' => Config::get('ldap_base_alt'),
+            ],
+            [
+                'host'       => Config::get('ldap_host_ter'),
+                'username'   => Config::get('ldap_user_ter'),
+                'searchBase' => Config::get('ldap_base_ter'),
+            ],
+        ];
+        $ldapPassword      = Config::get('ldap_pass');
+        $ldapUsernameField = Config::get('ldap_username');
+        $ldapSearchFilter  = Config::get('ldap_search_filter');
+        $ldapCaCertHash    = Config::get('ldap_ca_certificate');
+        $ldapCaCertPath    = null;
+        if ($ldapCaCertHash) {
+            // Copy this file to local cache somewhere (stream_dir I guess)
+            $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
+            $ldapCaCertPath = sprintf(
+                '%s/ldap-ca-cert-%s-%s',
+                Config::get('stream_dir'),
+                INSTANCE_ID,
+                $ldapCaCert->getHash()
+            );
+            if (!file_exists($ldapCaCertPath)) {
+                file_put_contents($ldapCaCertPath, $ldapCaCert->read());
             }
         }
-
-        // test authentication in tertiary server
-        if (Config::get('ldap_host_ter')) {
-            $ds = ldap_connect(Config::get('ldap_host_ter'));
-            if ($this->_authLDAP($username, $password, $ds, Config::get('ldap_user_ter'), Config::get('ldap_base_ter'))) {
+        foreach ($ldapConfigs as $ldapConfig) {
+            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertPath);
+            if ($ds && $this->ldapAuth(
+                $ds,
+                $username,
+                $password,
+                $ldapConfig['searchBase'],
+                $ldapUsernameField,
+                $ldapSearchFilter
+            )) {
                 return true;
             }
         }
@@ -482,7 +556,7 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
-                        } catch (\Schoolbox\Mapper\Exception $e) {
+                        } catch (MapperException $e) {
                             continue;
                         }
                         $childObject->setParents(new GenericCollection(User::class));
