@@ -8,58 +8,59 @@
         assessments           IAssessable[]
         returnUrlSuffix       string
 #}
-
-<table class="rb markable stack-for-medium-down">
-    <thead>
-    <tr><th colspan="2">&nbsp;</th>
-        {% for activity_id, activity in rubricAssessmentList  %}
-            <th>
-                {% set activityAssessment = assessments.by('id', activity_id) %}
-                {% if activityAssessment %}
-                    {%- set activityHref = routeLookupIfAuthorized(
-                        'learningAssessment.getSummary',
-                        {
-                            assessmentId: activity_id,
-                            studentId: student.id,
-                            student: student,
-                            assessment: activityAssessment,
-                        }
-                        ) -%}
-                {% else %}
-                    {%- set activityHref = '' -%}
+<div class="scrollable">
+    <table class="rb markable stack-for-medium-down">
+        <thead>
+        <tr><th colspan="2">&nbsp;</th>
+            {% for activity_id, activity in rubricAssessmentList  %}
+                <th>
+                    {% set activityAssessment = assessments.by('id', activity_id) %}
+                    {% if activityAssessment %}
+                        {%- set activityHref = routeLookupIfAuthorized(
+                            'learningAssessment.getSummary',
+                            {
+                                assessmentId: activity_id,
+                                studentId: student.id,
+                                student: student,
+                                assessment: activityAssessment,
+                            }
+                            ) -%}
+                    {% else %}
+                        {%- set activityHref = '' -%}
+                    {% endif %}
+                    {%- if activityHref -%}
+                        <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
+                    {%- else -%}
+                        {{ activity.name }}
+                    {%- endif -%}
+                </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for capability in longitudinalRubric %}
+            <tr >
+            <th class="rb-group-name" rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></th>
+            {% for indicator in capability.indicators %}
+                {% if not loop.first %}
+                    <tr>
                 {% endif %}
-                {%- if activityHref -%}
-                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                {%- else -%}
-                    {{ activity.name }}
-                {%- endif -%}
-            </th>
-        {% endfor %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for capability in longitudinalRubric %}
-        <tr >
-        <th class="rb-group-name" rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></th>
-        {% for indicator in capability.indicators %}
-            {% if not loop.first %}
-                <tr>
-            {% endif %}
-            <th class="rb-criterion-name">{{ indicator.name | nl2br }}</th>
-            {% for activity_id, activity in rubricAssessmentList %}
-                {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                <td><div><span class="rb-description">
-                        {% if activity %}<b>{{ activity.level }}</b><br />{% endif %}
-                        {{ activity ? activity.descriptor : '' }} {% if activity and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
-                    </span></div>
-                </td>
+                <th class="rb-criterion-name">{{ indicator.name | nl2br }}</th>
+                {% for activity_id, activity in rubricAssessmentList %}
+                    {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
+                    <td><div><span class="rb-description">
+                            {% if activity %}<b>{{ activity.level }}</b><br />{% endif %}
+                            {{ activity ? activity.descriptor : '' }} {% if activity and config.rubric_show_points %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                        </span></div>
+                    </td>
 
+                {% endfor %}
+                </tr>
             {% endfor %}
             </tr>
         {% endfor %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 
