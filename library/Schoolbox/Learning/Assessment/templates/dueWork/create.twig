@@ -12,7 +12,7 @@
         <select name="workType">
             <option value="" selected>None</option>
             {% for workType in allWorkTypes %}
-                <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+                <option value="{{ workType.id }}" {% if assessment.workType and assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
             {% endfor %}
         </select>
     </label>
@@ -96,7 +96,6 @@
 
     {% include '@learningAssessment/fragments/markType.twig' %}
     {% include '@learningAssessment/fragments/rubric.twig' with {
-        rubric: rubric,
         rubricGrid: rubricGrid,
         rubricAttachZone: rubricAttachZone,
         resultSets: rubricResultSets,
@@ -123,7 +122,7 @@
 {# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
-{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+{{ mage.submitRow(actionLabel is defined ? actionLabel : 'Create', 'part-2', 'end') }}
 
 
 {# ----------------------------------------------------------- #}

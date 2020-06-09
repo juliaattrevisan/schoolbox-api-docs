@@ -4,7 +4,7 @@
 
         {% include '@rubric/grid.twig' with {
             rubricGrid: assessment.rubricGrid,
-            rubricMarkedGrid: markVisibility ?? rubricMarkedGrid,
+            rubricMarkedGrid: markVisibility ? rubricMarkedGrid : null,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
             showDescriptorValue: showDescriptorValue,
             selfAssessmentFeedback: selfAssessmentFeedback,
