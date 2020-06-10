@@ -76,7 +76,7 @@ class ListPayload
 
         /* Whether $user has modify capability
          */
-        $canModify = $user->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($user, $event);
+        $canModify = (new Event\Access(Access::getInstance()))->checkExisting($user, $event);
 
         /* Number of available places
          * Could be null, 0, or many
