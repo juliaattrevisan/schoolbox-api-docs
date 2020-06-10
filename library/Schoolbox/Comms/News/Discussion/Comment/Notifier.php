@@ -423,7 +423,8 @@ class Notifier extends AbstractModuleNotifier
                     Param::STACKING_APPEND
                 ),
             ])
-            ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_FOLLOWED);
+            ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_FOLLOWED)
+            ->setBody($comment->getContent());
 
         foreach ($recipientIds as $recipient) {
             $envelope->targetToUser($recipient, $bob->build());
