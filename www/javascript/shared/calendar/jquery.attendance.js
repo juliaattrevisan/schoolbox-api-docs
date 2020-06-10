@@ -84,10 +84,13 @@
         /**
          * Conditionally show options
          *
-         * If you're on the invite list, always show rsvp island
-         * Else, check if there's a mandatory limit
-         * Else, see if you can insert yourself into the list because there are available places
+         * Show rsvp island under any of the following:
+         *  - You're on the invite list,
+         *  - There's no guest limit
+         *  - See if you can insert yourself into the list because there are available places
+         *
          * Otherwise, there are no spaces remaining and you're not explicitly invited
+         * You don't get to join the event
          *
          * @param available int
          */
