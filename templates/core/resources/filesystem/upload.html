@@ -136,12 +136,14 @@ $(function () {
                     file.hash = msg.hash;
 
                     $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
-
-                    // Restore the remove button
-                    $(file.previewElement).find('a[data-dz-remove]').removeClass('hide');
                 }
 
                 checkState.call(this);
+            });
+
+            this.on('complete', function (file) {
+                // Restore the remove button
+                $(file.previewElement).find('a[data-dz-remove]').removeClass('hide');
             });
         },
 
@@ -164,25 +166,35 @@ $(function () {
      * the button if it was previously disabled
      */
     function checkState() {
-        var ql, dz;
 
         // This prevents the upload button from re-enabling if it the file was rejected.
         // if (abUploadSubmitBtn.data('uploading')) {
         //     return;
         // }
 
-        ql = this.getQueuedFiles().length;
+        let queueLength   = this.getQueuedFiles().length,
+            successFiles  = this.getFilesWithStatus(Dropzone.SUCCESS),
+            errorFiles    = this.getFilesWithStatus(Dropzone.ERROR),
+            uploadLength  = queueLength + successFiles.length,
+            uploadEnabled = uploadLength > 0 && errorFiles.length === 0;
 
-        if (ql === 0) {
+
+        // Is upload feasible right now?
+        // * At least one queued file? Yes
+        // * No error files? Yes
+        // * Otherwise? No
+
+
+        if (!uploadEnabled) {
             abUploadSubmitBtn
                 .html('Upload')
                 .attr('disabled', 'disabled')
                 .off('click');
         } else {
-            dz = this;
+            let dz = this;
 
             abUploadSubmitBtn
-                .html('Upload (' + ql + ')')
+                .html('Upload (' + uploadLength + ')')
                 .removeAttr('disabled')
                 .one('click', function (e) {
                     e.preventDefault();
