@@ -127,7 +127,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         'VIDEO_LIST_DURATION'  => $video->getDuration() >= 3600 ? gmdate('H:i:s', $video->getDuration()) : gmdate('i:s', $video->getDuration()),
                         'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
                         'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
-                        'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     )
                 );
 
@@ -145,6 +144,15 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         $this->setVar(array(
                             'video_list_comment_block' => ''
                         ));
+                    }
+
+                    // Owner name and optional link
+                    if($video->getFile()->getOwner()->isDeleted()){
+                        $this->setVar('owner_exists_block', '');
+                        $this->parse('owner_deleted_block', 'owner_deleted');
+                    } else {
+                        $this->parse('owner_exists_block', 'owner_exists');
+                        $this->setVar('owner_deleted_block', '');
                     }
 
                     $this->parse('video_list_block', 'video_list', true);
@@ -172,15 +180,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                         $this->parse('video_pending_list_block', 'video_pending_list', true);
                     }
-                }
-
-                // Owner name and optional link
-                if($video->getFile()->getOwner()->isDeleted()){
-                    $this->setVar('owner_exists_block', '');
-                    $this->parse('owner_deleted_block', 'owner_deleted');
-                } else {
-                    $this->parse('owner_exists_block', 'owner_exists');
-                    $this->setVar('owner_deleted_block', '');
                 }
 
                 /* Clear children after parsing out the parent
