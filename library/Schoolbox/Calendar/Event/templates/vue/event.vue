@@ -43,9 +43,10 @@
                 </div>
             </section>
 
+            <h2 class="subheader">Guests</h2>
+
             <div class="row">
                 <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
-                    <h2 class="subheader">Guests</h2>
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
