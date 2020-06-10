@@ -84,4 +84,27 @@
   [class^="icon-"]:before {
     font-size: .5rem;
   }
+
+  // Status icons
+  .pending {
+    opacity: 0.4;
+  }
+
+  .accepted {
+    span {
+      &:after {
+        content: '\e604';
+        font-family: $font-family-icon;
+      }
+    }
+  }
+
+  .declined {
+    span {
+      &:after {
+        content: '\e60d';
+        font-family: $font-family-icon;
+      }
+    }
+  }
 }
