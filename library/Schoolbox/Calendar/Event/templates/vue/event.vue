@@ -41,7 +41,7 @@
                         <p v-html="this.event.location"></p>
                     </div>
                 </div>
-                <div class="component-action" v-if="this.event.options.isAttendable || showAddToCalendar">
+                <div class="component-action" v-if="this.event.options.isAttendable">
                     <section>
                         <a href="#"
                            class="button"
@@ -51,7 +51,6 @@
                             {{ attendanceActionLabel }}
                         </a>
                         <a v-if="this.event.canModify" class="button" :href="attendanceLink">View Attendees</a>
-                        <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
                     </section>
                 </div>
             </section>
@@ -136,8 +135,7 @@
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
                 isCampusEvent: this.event.level === 'campus',
-                attendanceLink: URL_ATTENDEES + this.event.id,
-                showAddToCalendar: false, // Disabled for now...
+                attendanceLink: URL_ATTENDEES + this.event.id
             }
         },
         methods: {
