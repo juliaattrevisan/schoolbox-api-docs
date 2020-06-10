@@ -116,3 +116,18 @@
     }
   }
 }
+
+// RSVP Buttons
+.rsvp {
+  &.flex-list.buttons a {
+    &.accepted {
+      background-color: tint($success-color, 74%);
+      color: $success-color;
+    }
+
+    &.declined {
+      background-color: tint($alert-color, 74%);
+      color: $alert-color;
+    }
+  }
+}
