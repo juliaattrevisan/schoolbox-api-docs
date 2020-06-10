@@ -120,6 +120,16 @@
                 $(element).on('click', function(event) {
                     event.preventDefault();
 
+                    /* Special case: if you're not in the list and you're declining, exit early
+                     */
+                    if ($(this).attr('data-rsvp') === 'decline') {
+                        const onList = config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length;
+
+                        if (!onList) {
+                            return;
+                        }
+                    }
+
                     /* A toast - to your valour, my sword, and our victory together
                      */
                     config.toast.toastActivate({
