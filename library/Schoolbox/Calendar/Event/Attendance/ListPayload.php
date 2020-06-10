@@ -102,6 +102,11 @@ class ListPayload
                     'canModify' => $canModify,
                     'event' => $event,
                     'guests' => $guests,
+                    'status' => [
+                        Model::STATUS_PENDING => 'pending',
+                        Model::STATUS_APPROVED => 'accepted',
+                        Model::STATUS_REJECTED => 'declined'
+                    ]
                 ])->getAsString()
         ];
     }
