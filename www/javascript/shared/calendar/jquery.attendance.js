@@ -85,15 +85,18 @@
          * Conditionally show options
          *
          * If you're on the invite list, always show rsvp island
-         * Else, see if you can insert yourself into the list
+         * Else, check if there's a mandatory limit
+         * Else, see if you can insert yourself into the list because there are available places
          * Otherwise, there are no spaces remaining and you're not explicitly invited
          *
          * @param available int
          */
         function toggleRSVP(available) {
-            if (config.attendanceList.find('[data-guest="'+config.currentUserId+'"]').length) {
-                config.rsvpAttendanceForm.show();
-            } else if (available > 0) {
+            const onList = config.attendanceList.find('[data-guest="'+config.currentUserId+'"]').length;
+            const noLimit = available === undefined || available === null;
+            const hasAvailablePlaces = available > 0;
+
+            if (onList || noLimit || hasAvailablePlaces) {
                 config.rsvpAttendanceForm.show();
             } else {
                 config.rsvpAttendanceForm.hide();
