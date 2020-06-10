@@ -50,3 +50,19 @@ UPDATE config SET sequence = 13 WHERE name = 'webdav_auth_type';
 UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Board Leave') and sequence >= 2;
 UPDATE config SET sequence = 2 WHERE name = 'boarder_leave_parent_notification_enabled';
 
+
+UPDATE config SET sequence = 10 WHERE name = 'safe_iframe_source_list';
+UPDATE config SET sequence = 11 WHERE name = 'api_key';
+
+UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Policy') and sequence >= 21;
+UPDATE config SET sequence = 21 WHERE name = 'email_all_parents';
+
+SET @new_order = 0;
+UPDATE config SET sequence = (@new_order := @new_order + 1)
+WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'External DB') AND sequence is not null AND hidden='false'
+ORDER BY sequence;
+
+
+UPDATE config SET sequence = 32 WHERE name = 'cyberhound_whitelist';
+
+UPDATE config SET sequence = 10 WHERE name = 'pastoral_create_tag_enable';
