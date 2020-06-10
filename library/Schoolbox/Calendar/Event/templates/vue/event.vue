@@ -56,41 +56,39 @@
                 </div>
             </section>
 
-            <form :id="'rsvpAttendanceForm'" :action="'abc'" method="post" :data-guests-available="this.event.guests.available" :style="{display: 'none'}">
-                <div class="row">
-                    <div class="small-12 island">
-                        <section>
-                            <div class="row">
-                                <div class="small-6 columns">
-                                    Yes
-                                </div>
-                                <div class="small-6 columns">
-                                    No
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </form>
+            <div class="row" v-if="this.event.options.isAttendable">
+                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
+                    <h2 class="subheader">Guests</h2>
+                    <section class="content no-margin">
+                        <p><strong>Attending?</strong></p>
 
-            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable">
-                <div class="row">
-                    <div id="attendance-guests" class="small-12 columns">
-                        <section>
-                            <div class="content">
-                                <span class="meta" v-if="this.event.guests.available != null">
-                                    <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
-                                    <span id="attendance-guests-available" v-else>No</span>
-                                    available places remaining
-                                </span>
+                        <form :action="'abc'" method="post">
+                            <ul class="flex-list buttons">
+                                <li><a href="#">Yes</a></li>
+                                <li><a href="#">No</a></li>
+                            </ul>
+                        </form>
+                    </section>
+                </div>
+                <div id="attendance-guests" class="small-12 columns">
+                    <section>
+                        <div class="content">
+                            <span class="meta" v-if="this.event.guests.available != null">
+                                <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
+                                <span id="attendance-guests-available" v-else>No</span>
+                                available places remaining
+                            </span>
+
+                            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                            </div>
+                            </form>
+                        </div>
 
-                            <article v-html="this.event.guests.fragment"></article>
-                        </section>
-                    </div>
+                        <article v-html="this.event.guests.fragment"></article>
+                    </section>
                 </div>
-            </form>
+            </div>
+
         </div>
 
         <div data-toast class="toast"></div>
