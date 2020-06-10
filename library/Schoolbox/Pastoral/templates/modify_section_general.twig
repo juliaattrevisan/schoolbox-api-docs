@@ -30,7 +30,7 @@
                                 value="{{ record.subtype.id }}">{{ record.subtype.name }} (deleted)</option>
                     {% endif %}
                     {% for subtype in subTypes %}
-                        <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}" {% if subtype.id == record.subtype.id %}selected{% endif %} value="{{ subtype.id }}">{{ subtype.name }}</option>
+                        <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}" {% if subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}">{{ subtype.name }}</option>
                     {% endfor %}
                 </select> </label>
         </div>

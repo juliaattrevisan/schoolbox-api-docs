@@ -798,7 +798,7 @@ class Mapper extends BaseMapper
         }
 
         if ($severity && $this->getConfigLoader()->get('pastoral_severity')) {
-            $this->bindings[':severity'] = $severity->getId();
+            $this->bindings[':severity'] = $severity->getSequence();
             $this->filters[]             = '`sv`.`sequence` >= :severity';
         }
 
