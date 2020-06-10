@@ -191,26 +191,35 @@ $(function () {
      * When the queue is completely processed, call this method.
      */
     function onQueueComplete() {
-        let accepted = this.getAcceptedFiles(),
-            data     = [],
+        let successFiles = this.getFilesWithStatus(Dropzone.SUCCESS),
+            errorFiles   = this.getFilesWithStatus(Dropzone.ERROR),
+            data         = [],
             i;
 
+        // Does the button say we're uploading? return
         if (!abUploadSubmitBtn.data('uploading')) {
             return;
         }
 
-        // TODO Don't add rejected files: handle them here instead
-        $.extend(accepted, this.getRejectedFiles());
+        // Any error files or queued files? return
+        if (errorFiles.length) {
+            return;
+        }
 
-        if (accepted.length) {
-            for (i = 0; i < accepted.length; ++i) {
-                if (accepted[i].hash) {
+        if (this.getQueuedFiles().length) {
+            return;
+        }
+
+        // Finally post the message
+        if (successFiles.length) {
+            for (i = 0; i < successFiles.length; ++i) {
+                if (successFiles[i].hash) {
                     data.push({
-                        title: accepted[i].name,
-                        mimeType: accepted[i].type,
-                        filesize: accepted[i].size,
-                        hash: accepted[i].hash,
-                        status: accepted[i].status,
+                        title: successFiles[i].name,
+                        mimeType: successFiles[i].type,
+                        filesize: successFiles[i].size,
+                        hash: successFiles[i].hash,
+                        status: successFiles[i].status,
                     });
                 }
             }
