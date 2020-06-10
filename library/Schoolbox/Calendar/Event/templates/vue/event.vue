@@ -52,8 +52,8 @@
 
                         <form :action="''" method="post">
                             <ul class="flex-list buttons">
-                                <li><a href="#">Yes</a></li>
-                                <li><a href="#">No</a></li>
+                                <li><a :href="rsvpAcceptPath">Yes</a></li>
+                                <li><a :href="rsvpDeclinePath">No</a></li>
                             </ul>
                         </form>
                     </section>
@@ -99,12 +99,20 @@
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
+
+    /* Event Modify screen
+     */
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
 
     /* Inline alteration of attendees on event detail screen
      */
     const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
     const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
+
+    /* RSVP Status mutation routes
+     */
+    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
+    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
     export default {
         props: ['event'],
@@ -120,47 +128,10 @@
         methods: {
 
             /**
-             * Route to the Event Modify screen with optional returnUrl redirect
-             *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             * Generate a path via const
              */
-            generateModifyUrl(eventId, returnUrl) {
-                var url = URL_EVENT_MODIFY_FORM.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            /**
-             * Route to the Attendance Create endpoint to asynchronously create attendees
-             *
-             * @param eventId
-             * @param returnUrl
-             * @returns {string}
-             */
-            generateAttendanceCreateUrl(eventId, returnUrl) {
-                var url= URL_ATTENDANCE_CREATE.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-
-            /**
-             * Route to the Attendance Delete endpoint to asynchronously remove attendees
-             *
-             * @param eventId
-             * @param returnUrl
-             * @returns {string}
-             */
-            generateAttendanceDeleteUrl(eventId, returnUrl) {
-                var url= URL_ATTENDANCE_DELETE.replace('{eventId}', eventId);
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
@@ -230,22 +201,39 @@
                 return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
             },
 
+            /**
+             * Onwards to the modify screen
+             */
             modifyPath: function() {
-                return this.generateModifyUrl(this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateAttendanceCreateUrl(this.event.id);
+                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Delete attendances
              */
             deleteAttendancePath: function() {
-                return this.generateAttendanceDeleteUrl(this.event.id);
+                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Accept
+             */
+            rsvpAcceptPath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Decline
+             */
+            rsvpDeclinePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
             }
         }
     }
