@@ -82,6 +82,8 @@ class Module extends BaseModule
         $this->register('GET', '/{eventId}', 'getCurrent', $getPerms, $preloadEvent);
         $this->register('POST', '/{eventId}/create', 'postCreate', $modifyPerms, $preloadEvent);
         $this->register('POST', '/{eventId}/delete', 'postDelete', $modifyPerms, $preloadEvent);
+        $this->register('POST', '/{eventId}/accept', 'postAccept', $getPerms, $preloadEvent);
+        $this->register('POST', '/{eventId}/decline', 'postDecline', $getPerms, $preloadEvent);
     }
 
 

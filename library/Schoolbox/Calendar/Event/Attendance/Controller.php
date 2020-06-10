@@ -163,4 +163,42 @@ class Controller extends Base
          */
         $this->getCurrent($event);
     }
+
+
+    /**
+     * User accepts invitation to an event
+     *
+     * @param Event $event
+     */
+    public function postAccept(Event $event): void
+    {
+        /* Check if they're already on the list - if so, shank down their existing record
+         * Otherwise, spawn a new record for them if the maximum guests haven't been reached
+         */
+
+        /* Then update its status and user details if necessary
+         */
+
+        /* Regenerate a new html fragment for the people currently invited
+         */
+    }
+
+
+    /**
+     * User declines invitation to an event
+     *
+     * @param Event $event
+     */
+    public function postDecline(Event $event): void
+    {
+        /* Check if they're already on the list - if so, shank down their existing record
+         * Otherwise exit early - no changes required
+         */
+
+        /* Then update its status
+         */
+
+        /* Regenerate a new html fragment for the people currently invited
+         */
+    }
 }
