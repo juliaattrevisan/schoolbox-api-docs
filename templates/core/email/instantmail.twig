@@ -42,7 +42,7 @@
                     <td>
                         <p>
                             {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
-                            <em>{{ msg.meta.byline | raw }}</em>
+                            <em>{{ msg.meta.byline ?? '' | raw }}</em>
                         </p>
                     </td>
                 </tr>

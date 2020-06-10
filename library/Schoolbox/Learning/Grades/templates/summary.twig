@@ -67,7 +67,7 @@
             {% for folder in folders %}
                 <ul class="activity-list group">
                     <li class="subject-group">
-                        {% if year is not defined %}
+                        {% if year is empty %}
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}"
                                class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
                                 {% include '@learningGrades/fragments/subject.twig' with {
@@ -99,7 +99,7 @@
                         </nav>
                     </li>
                     {% endfor %}
-                    {% if assessmentTasks[folder.id] is defined and assessmentTasks[folder.id] | length %}
+                    {% if assessmentTasks[folder.id] ?? []| length %}
                     <li>
                         <ul class="activity-list">
                             {% for assessment in assessmentTasks[folder.id] %}

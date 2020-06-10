@@ -20,7 +20,7 @@ Usage: include 'sub/subjectSelector.twig
     });
 </script>
 
-{% if year is not defined %}
+{% if year is empty %}
 <div class="subject">
     <select id="context-selector-subject" title="Select a {{ locale.subject }}">
         <option disabled="" selected="" label="Select a {{ locale.subject }}">Select a {{ locale.subject }}</option>
