@@ -78,14 +78,6 @@ case "$1" in
         # Bring site back up
         /usr/share/schoolbox/tools/maintenance/site_up.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
-        # Attempt to execute repair on schoolbox database using database root user credentials
-        optionsFile="/root/.my.cnf";
-        if [ ! -f ${optionsFile} ]; then
-            echo "DB root credentials file '$optionsFile' not found, skipping repair";
-        else
-            echo "DB root credentials file '$optionsFile' found, initiating repair";
-            mysqlcheck --defaults-file=${optionsFile} --repair schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        fi
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
           /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
