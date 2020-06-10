@@ -264,9 +264,10 @@ class External_Doublefirst_User implements External_UserInterface
             SELECT DISTINCT   pc.ContactID            AS RelatedID,
                               cei.EmailID             AS DefaultEmail
             FROM              VLPupilContact          pc
-            LEFT JOIN         ContactEmailInformation cei ON cei.ContactID = pc.ContactID
+            INNER JOIN        ContactEmailInformation cei ON cei.ContactID = pc.ContactID
             WHERE             pc.PupilID IN ($id_list)
-            AND 	          pc.IsContactParental = 1
+            AND               pc.IsContactParental = 1
+            AND               cei.PrimaryEmail = 1
             AND               pc.ContactID <> ''
             AND               cei.EmailID <> ''
         ";
