@@ -8,7 +8,7 @@
  #}
 <ul class="action-list attendance-guest-list">
     {% for guest in guests %}
-    <li class="actions-small-1">
+    <li class="actions-small-1" data-guest="{{ guest.id }}">
         <div class="compact card small-11">
             <a href="/search/user/{{ guest.id }}" title="View Profile">
                 <img src="/portrait.php?id={{ guest.id }}&size=square64" />

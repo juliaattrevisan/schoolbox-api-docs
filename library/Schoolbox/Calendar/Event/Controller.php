@@ -151,6 +151,7 @@ class Controller extends Base
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
+            'user' => $this->getUser(),
             'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event),
             'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
         ])->setTitle($event->getTitle()));

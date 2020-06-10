@@ -39,29 +39,26 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-        const currentUserId = parseInt('{{ currentUserId}}');
+        const currentUserId = parseInt('{{ user.id}}');
 
         /**
          * Conditionally show options
          *
+         * If you're on the invite list, always show rsvp island
+         * Else, see if you can insert yourself into the list
+         * Otherwise, there are no spaces remaining and you're not explicitly invited
+         *
+         * @param currentUserId int
          * @param available int
          */
-        function toggleRSVP(available) {
-            var rsvpAttendanceForm = $('#rsvpAttendanceForm');
+        function toggleRSVP(currentUserId, available) {
+            const rsvpAttendanceForm = $('#rsvpAttendanceForm');
 
-            /* If you're on the invite list, always show rsvp island
-             */
-            rsvpAttendanceForm.show();
-
-            /* Otherwise, see if you can insert yourself into the list
-             */
-            if (available > 0) {
-
-                // show the island
+            if ($('#attendance-guests [data-guest="'+currentUserId+'"]').length) {
+                rsvpAttendanceForm.show();
+            } else if (available > 0) {
                 rsvpAttendanceForm.show();
             } else {
-
-                // hide the island
                 rsvpAttendanceForm.hide();
             }
         }
@@ -96,7 +93,6 @@
             },
             multiple: false
         });
-
 
         /* Add one person at a time, spawn the toast, transact, then clear the selectize
          */
