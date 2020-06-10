@@ -60,14 +60,14 @@
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content">
+                        <div class="content" v-if="this.event.guests.available != null || this.event.canModify">
                             <span class="meta" v-if="this.event.guests.available != null">
                                 <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
                                 <span id="attendance-guests-available" v-else>No</span>
                                 available places remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post">
+                            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.canModify">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>

@@ -31,10 +31,7 @@
 
             setupOnAddAttendee(selectize);
             setupOnRemoveAttendee(selectize);
-        } else {
-            config.createAttendanceSelector.remove();
         }
-
 
         /**
          * Init
