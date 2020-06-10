@@ -73,7 +73,7 @@
                 </div>
             </form>
 
-            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable && this.event.canModify">
+            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable">
                 <div class="row">
                     <div id="attendance-guests" class="small-12 columns">
                         <section>

@@ -9,7 +9,13 @@ namespace Schoolbox\Calendar\Event\Attendance;
 
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
+use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class ListPayload
@@ -53,13 +59,28 @@ class ListPayload
      * Generate attendance payload info for $event
      *
      * @param Event $event
+     * @param User $user
      * @return array
      * @throws ServiceNotFound
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function generate(Event $event): array
+    public function generate(Event $event, User $user): array
     {
+
+        /* Current list of attendees for $event
+         */
         $guests = $this->attendanceMapper->findAttendances($event);
 
+        /* Whether $user has modify capability
+         */
+        $canModify = $user->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($user, $event);
+
+        /* Number of available places
+         * Could be null, 0, or many
+         */
         $available = null;
 
         if (null !== $event->getMaxAttendees()) {
@@ -77,6 +98,7 @@ class ListPayload
                 ->get('webOutput:nochrome')
                 ->setTemplate('@calendarEventAttendance/current.twig')
                 ->setData([
+                    'canModify' => $canModify,
                     'event' => $event,
                     'guests' => $guests,
                 ])->getAsString()

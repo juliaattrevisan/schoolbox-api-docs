@@ -25,7 +25,6 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -152,8 +151,7 @@ class Controller extends Base
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
             'user' => $this->getUser(),
-            'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event),
-            'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
+            'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser()),
         ])->setTitle($event->getTitle()));
     }
 
