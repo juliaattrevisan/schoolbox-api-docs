@@ -169,7 +169,7 @@ class Controller extends BaseController
      * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
      *                                           value: true/false
-     * @internal param string[][] $_GET ['dates']            by unitImpl.id, then ['publish', 'open', 'due', 'close']
+     * @internal param string[][] $_GET ['dates']            by unitImpl.id, then ['publish', 'open', 'due', 'late']
      */
     public function postExport(IAssessable $assessmentSpec)
     {
@@ -202,7 +202,7 @@ class Controller extends BaseController
         }
 
         $enableReimport    = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
-        $expectedDateTypes = ['publish', 'open', 'due', 'close'];
+        $expectedDateTypes = ['publish', 'open', 'due', 'late'];
         foreach ($assessmentImpls as $assessmentImpl) {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl = $assessmentImpl->getBaseContext();
@@ -242,7 +242,7 @@ class Controller extends BaseController
                 $datesObjects['publish'],
                 $datesObjects['open'] ?? $datesObjects['publish'],
                 $datesObjects['due'],
-                $datesObjects['close'] ?? $datesObjects['due']
+                $datesObjects['late'] ?? $datesObjects['due']
             );
         }
 
