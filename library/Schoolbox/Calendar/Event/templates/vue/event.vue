@@ -41,20 +41,9 @@
                         <p v-html="this.event.location"></p>
                     </div>
                 </div>
-                <div class="component-action" v-if="this.event.options.isAttendable">
-                    <section>
-                        <a href="#"
-                           class="button"
-                           v-if="this.event.options.isAttendable"
-                           @click="toggleAttendance()"
-                           :disabled="this.attendanceButtonIsDisabled">
-                            {{ attendanceActionLabel }}
-                        </a>
-                    </section>
-                </div>
             </section>
 
-            <div class="row" v-if="this.event.options.isAttendable">
+            <div class="row">
                 <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
                     <h2 class="subheader">Guests</h2>
                     <section class="content no-margin">
@@ -109,13 +98,7 @@
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
-    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-    const URL_ATTENDEES = '/calendar/attendance/list/';
-    const ATTENDANCE_NEXT_ACTION_ADD = 'add';
-    const ATTENDANCE_NEXT_ACTION_REMOVE = 'remove';
-    const ATTENDANCE_NEXT_ACTION_ADD_LABEL = 'RSVP';
-    const ATTENDANCE_NEXT_ACTION_REMOVE_LABEL = 'Unattend';
 
     /* Inline alteration of attendees on event detail screen
      */
@@ -128,13 +111,9 @@
         components: {audiencesModal},
         data() {
             return {
-                attendanceNextAction: this.event.attendance.nextAction,
-                attendanceActionLabel: (this.event.attendance.nextAction === ATTENDANCE_NEXT_ACTION_ADD) ? ATTENDANCE_NEXT_ACTION_ADD_LABEL : ATTENDANCE_NEXT_ACTION_REMOVE_LABEL,
-                attendanceButtonIsDisabled: false,
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus',
-                attendanceLink: URL_ATTENDEES + this.event.id
+                isCampusEvent: this.event.level === 'campus'
             }
         },
         methods: {
@@ -191,30 +170,6 @@
 
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
-            },
-
-            toggleAttendance() {
-                let self = this,
-                    data = {
-                        status:      this.attendanceNextAction,
-                        'event[id]': this.event.id,
-                    };
-
-                self.attendanceButtonIsDisabled = true;
-
-                axios.post(URL_ATTENDANCE_TOGGLE, qs.stringify(data)).then(function () {
-
-                    if (self.attendanceNextAction === ATTENDANCE_NEXT_ACTION_ADD) {
-                        self.attendanceActionLabel = ATTENDANCE_NEXT_ACTION_REMOVE_LABEL;
-                        self.attendanceNextAction = ATTENDANCE_NEXT_ACTION_REMOVE;
-                    } else {
-                        self.attendanceActionLabel = ATTENDANCE_NEXT_ACTION_ADD_LABEL;
-                        self.attendanceNextAction = ATTENDANCE_NEXT_ACTION_ADD;
-                    }
-
-                }).finally(function() {
-                    self.attendanceButtonIsDisabled = false;
-                });
             }
         },
         computed: {

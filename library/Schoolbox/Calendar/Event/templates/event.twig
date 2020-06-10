@@ -13,8 +13,7 @@
             "type"  : {
                 "name": event.type.type,
                 "color": event.type.color,
-            },
-            "isAttendable": event.attendance,
+            }
         },
         "dates"   : {
             "start": event.startDateTime.getDatabase,
@@ -26,7 +25,6 @@
             "folders"   : folderCollection
         },
         'guests'     : guests,
-        "attendance" : attendance,
         "canModify"  : canModify,
         "level"      : level,
     } %}
@@ -39,7 +37,6 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.attendance.js"></script>
 <script>
-
     $(function() {
         $.fn.attendance({
             currentUserId: parseInt('{{ user.id}}'),
