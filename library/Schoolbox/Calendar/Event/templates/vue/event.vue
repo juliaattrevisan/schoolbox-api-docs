@@ -79,7 +79,8 @@
                         <section>
                             <div class="content">
                                 <span class="meta" v-if="this.event.guests.available != null">
-                                    <span id="attendance-guests-available">{{ this.event.guests.available }}</span>
+                                    <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
+                                    <span id="attendance-guests-available" v-else>No</span>
                                     available places remaining
                                 </span>
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
