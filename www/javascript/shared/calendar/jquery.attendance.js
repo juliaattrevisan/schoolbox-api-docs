@@ -16,20 +16,24 @@
          */
         toggleRSVP(config.rsvpAttendanceForm.attr('data-guests-available'));
 
-        /* Set up selectizes
+        /* Set up selectizes if you have perms
          */
-        const selectize = config.createAttendanceSelector.selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'get',
-                data:     {groupID: 0, showCampus: true},
-                dataType: 'json'
-            },
-            multiple: false
-        });
+        if (config.canModify) {
+            const selectize = config.createAttendanceSelector.selectizeSelector({
+                ajax: {
+                    url: '/ajax/user.php',
+                    type: 'get',
+                    data: {groupID: 0, showCampus: true},
+                    dataType: 'json'
+                },
+                multiple: false
+            });
 
-        setupOnAddAttendee(selectize);
-        setupOnRemoveAttendee(selectize);
+            setupOnAddAttendee(selectize);
+            setupOnRemoveAttendee(selectize);
+        } else {
+            config.createAttendanceSelector.remove();
+        }
 
 
         /**
@@ -46,6 +50,10 @@
                 /* Your user id
                  */
                 currentUserId: 0,
+
+                /* Access perms for hiding/showing form elements
+                 */
+                canModify: false,
 
                 /* Add a person
                  */

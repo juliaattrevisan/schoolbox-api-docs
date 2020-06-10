@@ -39,9 +39,11 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.attendance.js"></script>
 <script>
+
     $(function() {
         $.fn.attendance({
-            currentUserId: parseInt('{{ user.id}}')
+            currentUserId: parseInt('{{ user.id}}'),
+            canModify: {{ guests.canModify ? 'true' : 'false' }}
         });
     });
 </script>

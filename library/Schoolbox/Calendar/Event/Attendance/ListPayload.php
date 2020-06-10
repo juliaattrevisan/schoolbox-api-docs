@@ -94,6 +94,7 @@ class ListPayload
         return [
             'available' => $available,
             'guests' => $guests,
+            'canModify' => $canModify,
             'fragment' => $this->di
                 ->get('webOutput:nochrome')
                 ->setTemplate('@calendarEventAttendance/current.twig')
