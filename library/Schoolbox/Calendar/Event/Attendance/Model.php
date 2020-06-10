@@ -23,6 +23,10 @@ class Model
 
     /**
      * RSVP Status Pending: waiting for intent to be declared
+     * RSVP Status Approved: user accepted invitation
+     * RSVP Status Rejected: user declined invitation
+     *
+     * TODO: Rename consts
      */
     public const STATUS_PENDING = 1;
     public const STATUS_APPROVED = 2;

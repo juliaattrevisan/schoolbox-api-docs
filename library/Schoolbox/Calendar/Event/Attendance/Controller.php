@@ -114,7 +114,7 @@ class Controller extends Base
         $ids = array_diff($newGuests, $oldGuests);
 
         /* Added a user who's already in the list
-
+         *
          * Regenerate a new html fragment for the people currently invited
          * (another user, other than you, might have invited them and they don't appear in the list atm)
          */
@@ -169,18 +169,50 @@ class Controller extends Base
      * User accepts invitation to an event
      *
      * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
+     * @throws PDOException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function postAccept(Event $event): void
     {
         /* Check if they're already on the list - if so, shank down their existing record
          * Otherwise, spawn a new record for them if the maximum guests haven't been reached
          */
+        try {
+            $attendance = $this->attendanceMapper->findOneByColumnList([
+                'event_id' => $event->getId(),
+                'user_id'  => $this->getUser()->getId()
+            ]);
+        } catch (MapperException $e) {
+
+            /* Check if there are any free slots; if not, throw the ususal message
+             */
+            if ($event->getMaxAttendees() !== null) {
+                $numGuests = $this->attendanceMapper->countByColumn('event_id', $event->getId());
+
+                if ($numGuests >= $event->getMaxAttendees()) {
+                    throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
+                }
+            }
+
+            $attendance = $this->attendanceMapper->createModel()
+                ->setEvent($event)
+                ->setUser($this->getUser());
+        }
 
         /* Then update its status and user details if necessary
          */
+        $attendance->setStatus(Model::STATUS_APPROVED);
+
+        $this->attendanceMapper->save($attendance);
 
         /* Regenerate a new html fragment for the people currently invited
          */
+        $this->getCurrent($event);
     }
 
 
@@ -188,17 +220,36 @@ class Controller extends Base
      * User declines invitation to an event
      *
      * @param Event $event
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
+     * @throws PDOException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function postDecline(Event $event): void
     {
         /* Check if they're already on the list - if so, shank down their existing record
          * Otherwise exit early - no changes required
          */
+        try {
+            $attendance = $this->attendanceMapper->findOneByColumnList([
+                'event_id' => $event->getId(),
+                'user_id'  => $this->getUser()->getId()
+            ]);
 
-        /* Then update its status
-         */
+            /* Then update its status
+             */
+            $attendance->setStatus(Model::STATUS_REJECTED);
+
+            $this->attendanceMapper->save($attendance);
+        } catch (MapperException $e) {
+
+            // noop
+        }
 
         /* Regenerate a new html fragment for the people currently invited
          */
+        $this->getCurrent($event);
     }
 }
