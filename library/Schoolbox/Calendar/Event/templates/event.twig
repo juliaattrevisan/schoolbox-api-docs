@@ -49,6 +49,40 @@
             multiple: false
         });
 
+
+        /**
+         * Conditionally show options
+         *
+         * @param available int
+         */
+        function toggleRSVP(available) {
+            if (available > 0) {
+
+                // show the island
+                console.log('show rsvp');
+            } else {
+
+                // hide the island
+                console.log('hide rsvp');
+            }
+        }
+
+
+        /**
+         * Facade for what to do when the attendance list changes
+         *
+         * Update attendance list, counter and rsvp island
+         *
+         * @param responseText object A json response payload
+         */
+        function onAfterAttendanceChange(responseText) {
+            $('#attendance-guests ul').replaceWith(responseText.fragment);
+            $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
+
+            toggleRSVP(responseText.available);
+        }
+
+
         /* Add one person at a time, spawn the toast, transact, then clear the selectize
          */
         selectize[0].selectize.on('item_add', function (value, item) {
@@ -81,10 +115,9 @@
 
                     selectize[0].selectize.clear();
 
-                    /* Update list
+                    /* Update pieces
                      */
-                    $('#attendance-guests article').html(responseText.fragment);
-                    $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
+                    onAfterAttendanceChange(responseText);
                 },
                 error: function(xhr, status, error) {
                     let responseText = $.parseJSON(xhr.responseText)
@@ -126,10 +159,9 @@
                         css: 'success'
                     });
 
-                    /* Update list
+                    /* Update pieces
                      */
-                    $('#attendance-guests ul').replaceWith(responseText.fragment);
-                    $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
+                    onAfterAttendanceChange(responseText);
                 },
                 error: function(xhr, status, error) {
                     $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
