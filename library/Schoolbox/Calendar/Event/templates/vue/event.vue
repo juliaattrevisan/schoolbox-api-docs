@@ -62,7 +62,7 @@
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
-                        <form :action="'abc'" method="post">
+                        <form :action="''" method="post">
                             <ul class="flex-list buttons">
                                 <li><a href="#">Yes</a></li>
                                 <li><a href="#">No</a></li>
@@ -88,7 +88,6 @@
                     </section>
                 </div>
             </div>
-
         </div>
 
         <div data-toast class="toast"></div>
@@ -100,7 +99,6 @@
                 :group-audiences="this.event.audiences.folders"
                 :is-group="this.isGroupEvent"
         ></audiences-modal>
-
     </div>
 </template>
 
