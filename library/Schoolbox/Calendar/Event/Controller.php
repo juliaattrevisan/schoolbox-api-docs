@@ -135,29 +135,40 @@ class Controller extends Base
      */
     public function getEvent(Event $event): void
     {
-        $calendar = new \Calendar();
         $helper = new Helper($this->roleMapper, $this->folderMapper);
 
-        $attendanceStatus = $calendar->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
+        try {
+            $attendanceStatus = $this->attendanceMapper->findOneByColumnList([
+                'event_id' => $event->getId(),
+                'user_id'  => $this->getUser()->getId()
+            ])->getStatus();
+        } catch (Exception $e) {
+            $attendanceStatus = null;
+        }
+
         $payload = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
-            'event'            => $event,
-            'level'            => $helper->getEventLevel($event),
+            'event' => $event,
+            'level' => $helper->getEventLevel($event),
             'campusCollection' => $helper->getCampusCollection($event),
-            'roleCollection'   => $helper->getRoleCollection($event),
+            'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
-            'attendance'       => [
-                'status'       => $attendanceStatus,
-                'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
-            ],
             'user' => $this->getUser(),
             'guests' => $payload,
 
             /* Modify perms are calculated in the attendance list fragment
              * This is synonymous with calling (new Event\Access())->checkExisting() again
              */
-            'canModify' => $payload['canModify']
+            'canModify' => $payload['canModify'],
+
+            /* Attendance info
+             */
+            'attendance' => [
+                'status' => [
+                    'current' => Attendance\Model::CLASSES[$attendanceStatus],
+                ],
+            ],
         ])->setTitle($event->getTitle()));
     }
 

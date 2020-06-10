@@ -34,6 +34,16 @@ class Model
 
 
     /**
+     * Suggested css classes corresponding to each status
+     */
+    public const CLASSES = [
+        self::STATUS_PENDING => 'pending',
+        self::STATUS_APPROVED => 'accepted',
+        self::STATUS_REJECTED => 'declined'
+    ];
+
+
+    /**
      * @var User
      */
     private $user;
