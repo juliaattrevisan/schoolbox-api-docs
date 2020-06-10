@@ -39,6 +39,7 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
+        const currentUserId = parseInt('{{ currentUserId}}');
 
         /**
          * Conditionally show options
@@ -46,16 +47,22 @@
          * @param available int
          */
         function toggleRSVP(available) {
+            var rsvpAttendanceForm = $('#rsvpAttendanceForm');
+
+            /* If you're on the invite list, always show rsvp island
+             */
+            rsvpAttendanceForm.show();
+
+            /* Otherwise, see if you can insert yourself into the list
+             */
             if (available > 0) {
 
                 // show the island
-                console.log('show rsvp');
-                $('#rsvpAttendanceForm').show();
+                rsvpAttendanceForm.show();
             } else {
 
                 // hide the island
-                console.log('hide rsvp');
-                $('#rsvpAttendanceForm').hide();
+                rsvpAttendanceForm.hide();
             }
         }
 
@@ -65,19 +72,20 @@
          *
          * Update attendance list, counter and rsvp island
          *
+         * @param currentUserId int
          * @param responseText object A json response payload
          */
-        function onAfterAttendanceChange(responseText) {
+        function onAfterAttendanceChange(currentUserId, responseText) {
             $('#attendance-guests ul').replaceWith(responseText.fragment);
             $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
 
-            toggleRSVP(responseText.available);
+            toggleRSVP(currentUserId, responseText.available);
         }
 
 
         /* Initial conditions
          */
-        toggleRSVP($('#rsvpAttendanceForm').attr('data-guests-available'));
+        toggleRSVP(currentUserId, $('#rsvpAttendanceForm').attr('data-guests-available'));
 
         var selectize = $('#add-guests').selectizeSelector({
             ajax: {
@@ -124,7 +132,7 @@
 
                     /* Update pieces
                      */
-                    onAfterAttendanceChange(responseText);
+                    onAfterAttendanceChange(currentUserId, responseText);
                 },
                 error: function(xhr, status, error) {
                     let responseText = $.parseJSON(xhr.responseText)
@@ -168,7 +176,7 @@
 
                     /* Update pieces
                      */
-                    onAfterAttendanceChange(responseText);
+                    onAfterAttendanceChange(currentUserId, responseText);
                 },
                 error: function(xhr, status, error) {
                     $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
