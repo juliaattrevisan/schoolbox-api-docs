@@ -39,16 +39,6 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-        var selectize = $('#add-guests').selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0, showCampus: true},
-                dataType: 'json'
-            },
-            multiple: false
-        });
-
 
         /**
          * Conditionally show options
@@ -60,10 +50,12 @@
 
                 // show the island
                 console.log('show rsvp');
+                $('#rsvpAttendanceForm').show();
             } else {
 
                 // hide the island
                 console.log('hide rsvp');
+                $('#rsvpAttendanceForm').hide();
             }
         }
 
@@ -81,6 +73,17 @@
 
             toggleRSVP(responseText.available);
         }
+
+
+        var selectize = $('#add-guests').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0, showCampus: true},
+                dataType: 'json'
+            },
+            multiple: false
+        });
 
 
         /* Add one person at a time, spawn the toast, transact, then clear the selectize

@@ -56,6 +56,23 @@
                 </div>
             </section>
 
+            <form :id="'rsvpAttendanceForm'" :action="'abc'" method="post" :style="this.event.guests.available > 0 ? {display: 'block'} : { display: 'none'}">
+                <div class="row">
+                    <div class="small-12 island">
+                        <section>
+                            <div class="row">
+                                <div class="small-6 columns">
+                                    Yes
+                                </div>
+                                <div class="small-6 columns">
+                                    No
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </form>
+
             <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable && this.event.canModify">
                 <div class="row">
                     <div id="attendance-guests" class="small-12 columns">
