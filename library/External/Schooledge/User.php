@@ -6,6 +6,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 
@@ -48,10 +49,13 @@ class External_Schooledge_User implements External_UserInterface
             return [];
         }
 
+        // Hydrate campuses, if not set.
+        $campusList = $user->getCampusCollection() ?? CampusMapper::getInstance()->getAvailableCampusesForUser($user);
+
         $quotedId    = $this->database->smartQuote($externalId);
         $campusCodes = array_map(
             [$this->database, 'smartQuote'],
-            $user->getCampusCollection()->getColumnValues('extTimetableCode')
+            $campusList->getColumnValues('extTimetableCode')
         );
         if (empty($campusCodes)) {
             return [];
