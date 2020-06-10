@@ -75,6 +75,10 @@
         }
 
 
+        /* Initial conditions
+         */
+        toggleRSVP($('#rsvpAttendanceForm').attr('data-guests-available'));
+
         var selectize = $('#add-guests').selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',

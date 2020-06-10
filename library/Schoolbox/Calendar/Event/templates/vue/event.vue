@@ -56,7 +56,7 @@
                 </div>
             </section>
 
-            <form :id="'rsvpAttendanceForm'" :action="'abc'" method="post" :style="this.event.guests.available > 0 ? {display: 'block'} : { display: 'none'}">
+            <form :id="'rsvpAttendanceForm'" :action="'abc'" method="post" :data-guests-available="this.event.guests.available" :style="{display: 'none'}">
                 <div class="row">
                     <div class="small-12 island">
                         <section>
