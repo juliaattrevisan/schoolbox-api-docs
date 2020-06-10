@@ -61,7 +61,10 @@
                     <div id="attendance-guests" class="small-12 columns">
                         <section>
                             <div class="content">
-                                <span class="meta" v-if="this.event.guests.available != null"><span id="attendance-guests-available">{{ this.event.guests.available }}</span> available attendee slots</span>
+                                <span class="meta" v-if="this.event.guests.available != null">
+                                    <span id="attendance-guests-available">{{ this.event.guests.available }}</span>
+                                    available places remaining
+                                </span>
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </div>
 

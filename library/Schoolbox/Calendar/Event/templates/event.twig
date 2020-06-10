@@ -84,7 +84,7 @@
                     /* Update list
                      */
                     $('#attendance-guests article').html(responseText.fragment);
-                    $('#attendance-guests-available').html(responseText.available);
+                    $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
                 },
                 error: function(xhr, status, error) {
                     let responseText = $.parseJSON(xhr.responseText)
@@ -129,7 +129,7 @@
                     /* Update list
                      */
                     $('#attendance-guests ul').replaceWith(responseText.fragment);
-                    $('#attendance-guests-available').html(responseText.available);
+                    $('#attendance-guests-available').html(responseText.available ? responseText.available : 'No');
                 },
                 error: function(xhr, status, error) {
                     $toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
