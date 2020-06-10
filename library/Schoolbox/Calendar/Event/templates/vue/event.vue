@@ -46,7 +46,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
+                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.guests.available">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
@@ -58,9 +58,9 @@
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.guests.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.guests.available != null">
-                                <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
+                        <div class="content" v-if="this.event.attendance.guests.available != null || this.event.canModify">
+                            <span class="meta" v-if="this.event.attendance.guests.available != null">
+                                <span id="attendance-guests-available" v-if="this.event.attendance.guests.available > 0">{{ this.event.attendance.guests.available }}</span>
                                 <span id="attendance-guests-available" v-else>No</span>
                                 available places remaining
                             </span>
@@ -70,7 +70,7 @@
                             </form>
                         </div>
 
-                        <article v-html="this.event.guests.fragment"></article>
+                        <article v-html="this.event.attendance.guests.fragment"></article>
                     </section>
                 </div>
             </div>

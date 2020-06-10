@@ -155,7 +155,6 @@ class Controller extends Base
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
             'user' => $this->getUser(),
-            'guests' => $payload,
 
             /* Modify perms are calculated in the attendance list fragment
              * This is synonymous with calling (new Event\Access())->checkExisting() again
@@ -163,8 +162,10 @@ class Controller extends Base
             'canModify' => $payload['canModify'],
 
             /* Attendance info
+             * Current attendee info and your current rsvp status
              */
             'attendance' => [
+                'guests' => $payload,
                 'status' => [
                     'current' => Attendance\Model::CLASSES[$attendanceStatus],
                 ],
