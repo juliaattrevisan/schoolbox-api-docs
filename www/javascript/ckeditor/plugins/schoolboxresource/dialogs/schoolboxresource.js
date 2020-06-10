@@ -558,7 +558,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     /* Homepages have a hidden input field containing the homepage id
                                      * If that exists, use it; otherwise assume root node 0
                                      */
-                                    var defaultFolderSelector = $('#categoryID').val() ?? config.defaultFolderSelector;
+                                    var defaultFolderSelector = $('#categoryID').val() ? $('#categoryID').val() : config.defaultFolderSelector;
 
                                     /* Select something from the Resource Browser
                                      */
