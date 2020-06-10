@@ -50,7 +50,6 @@
                            :disabled="this.attendanceButtonIsDisabled">
                             {{ attendanceActionLabel }}
                         </a>
-                        <a v-if="this.event.canModify" class="button" :href="attendanceLink">View Attendees</a>
                     </section>
                 </div>
             </section>
