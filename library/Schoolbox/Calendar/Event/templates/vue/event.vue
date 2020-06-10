@@ -52,8 +52,8 @@
 
                         <form :action="''" method="post">
                             <ul class="flex-list buttons">
-                                <li><a :href="rsvpAcceptPath">Yes</a></li>
-                                <li><a :href="rsvpDeclinePath">No</a></li>
+                                <li><a :href="rsvpAcceptPath" data-rsvp>Yes</a></li>
+                                <li><a :href="rsvpDeclinePath" data-rsvp>No</a></li>
                             </ul>
                         </form>
                     </section>

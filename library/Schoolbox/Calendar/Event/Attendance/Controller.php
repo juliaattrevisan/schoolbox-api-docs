@@ -189,7 +189,7 @@ class Controller extends Base
             ]);
         } catch (MapperException $e) {
 
-            /* Check if there are any free slots; if not, throw the ususal message
+            /* Check if there are any free slots; if not, throw the usual message
              */
             if ($event->getMaxAttendees() !== null) {
                 $numGuests = $this->attendanceMapper->countByColumn('event_id', $event->getId());
