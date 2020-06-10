@@ -87,37 +87,7 @@ $(function () {
 
             /* When you finish processing the queue of files you chose to upload
              */
-            this.on('queuecomplete', function () {
-                var accepted = this.getAcceptedFiles(),
-                        data = [],
-                        i;
-
-                if (!abUploadSubmitBtn.data('uploading')) {
-                    return;
-                }
-
-                $.extend(accepted, this.getRejectedFiles());
-
-                if (accepted.length) {
-                    for (i = 0; i < accepted.length; ++i) {
-                        if (accepted[i].hash) {
-                            data.push({
-                                title: accepted[i].name,
-                                mimeType: accepted[i].type,
-                                filesize: accepted[i].size,
-                                hash: accepted[i].hash,
-                                status: accepted[i].status,
-                            });
-                        }
-                    }
-
-                    /* Send a list of file data to message receiver in modal.js
-                     */
-                    setTimeout(function () {
-                        window.top.postMessage(JSON.stringify({ data: data }), location.origin);
-                    }, 1000);
-                }
-            });
+            this.on('queuecomplete', onQueueComplete.bind(this));
 
             this.on('error', function (file, msg, xhr) {
                 // console.log(file);
@@ -204,8 +174,52 @@ $(function () {
                         .html('Uploading')
                         .attr('disabled', 'disabled');
                     abUploadCancelBtn.attr('disabled', 'disabled');
-                    dz.processQueue();
+
+                    // Is the queue complete anyway?
+                    // Trigger the message that queueComplete would send
+                    if (queueLength === 0) {
+                        onQueueComplete.call(dz);
+                    } else {
+                        dz.processQueue();
+                    }
                 });
+        }
+    }
+
+
+    /**
+     * When the queue is completely processed, call this method.
+     */
+    function onQueueComplete() {
+        let accepted = this.getAcceptedFiles(),
+            data     = [],
+            i;
+
+        if (!abUploadSubmitBtn.data('uploading')) {
+            return;
+        }
+
+        // TODO Don't add rejected files: handle them here instead
+        $.extend(accepted, this.getRejectedFiles());
+
+        if (accepted.length) {
+            for (i = 0; i < accepted.length; ++i) {
+                if (accepted[i].hash) {
+                    data.push({
+                        title: accepted[i].name,
+                        mimeType: accepted[i].type,
+                        filesize: accepted[i].size,
+                        hash: accepted[i].hash,
+                        status: accepted[i].status,
+                    });
+                }
+            }
+
+            /* Send a list of file data to message receiver in modal.js
+             */
+            setTimeout(function () {
+                window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+            }, 1000);
         }
     }
 });
