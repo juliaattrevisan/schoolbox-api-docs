@@ -258,12 +258,8 @@
 
                 /* Special case: if you're not in the list and you're declining, exit early
                  */
-                if ($(this).attr('data-rsvp') === 'decline') {
-                    const onList = config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length;
-
-                    if (!onList) {
-                        return;
-                    }
+                if ($(this).attr('data-rsvp') === 'decline' && !config.onList) {
+                    return;
                 }
 
                 /* A toast - to your valour, my sword, and our victory together
@@ -306,10 +302,6 @@
             let defaults = {
                 element: element,
 
-                /* Your user id
-                 */
-                currentUserId: 0,
-
                 /* Form to present rsvp options
                  */
                 rsvpAttendanceForm: $('#rsvpAttendanceForm'),
@@ -320,7 +312,11 @@
 
                 /* Toaster element
                  */
-                toast: $('[data-toast]')
+                toast: $('[data-toast]'),
+
+                /* Whether you're already invited
+                 */
+                onList: false
             };
 
             return $.extend(defaults, options);
