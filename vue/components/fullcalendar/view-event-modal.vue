@@ -45,6 +45,7 @@
         },
         computed: {
             window: () => window,
+            jQuery: () => window.jQuery,
 
             /**
              * Generate extended properties for the component's event.
@@ -155,6 +156,26 @@
             }
         },
         methods: {
+
+            /**
+             * Set up a selectize in a modal
+             *
+             * At some point during startup, eventId is undefined and this method is called
+             * But I don't know where that happens, or what event it is. Anyway, we skip trying
+             * to do selectizes on events with unknown eventIds
+             *
+             * @param eventId
+             * @returns {boolean}
+             */
+            attendanceSelectize(eventId) {
+                if (eventId !== undefined) {
+                    this.jQuery.fn.attendance({
+                        createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
+                        createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
+                        canModify: true
+                    });
+                }
+            },
 
             /**
              * Generate a path via const
@@ -576,6 +597,9 @@
                         No places remaining
                     </template>
                 </meta-item>
+                <form @click="attendanceSelectize(eventExtendedProps.eventId)" :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="''" method="post" v-if="true">
+                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                </form>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
