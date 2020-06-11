@@ -68,8 +68,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnUrl);
-                        deleteLink = this.generateDeleteUrl(metadata?.eventId, this.returnUrl);
+                        modifyLink = this.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
+                        deleteLink = this.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
                     }
                 }
 
@@ -133,27 +133,10 @@
         methods: {
 
             /**
-             * Route to the Event Modify screen with optional returnUrl redirect
-             *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             * Generate a path via const
              */
-            generateModifyUrl(eventId, returnUrl) {
-                var url = this.eventModifyFormUrl.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            /**
-             * Route to the Event Delete screen with optional returnUrl redirect
-             *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
-             */
-            generateDeleteUrl(eventId, returnUrl) {
-                var url = this.eventDeleteUrl.replace('{eventId}', eventId);
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
