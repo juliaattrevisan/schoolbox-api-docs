@@ -12,7 +12,9 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
@@ -114,8 +116,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @inheritdoc
      *
      * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function syncAssessment(IAssessable $assessment): bool
     {
@@ -194,8 +196,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param IAssessable $assessment
      * @return bool
      * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function createAssessment(IAssessable $assessment): bool
     {
@@ -232,8 +234,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @see $this->hasAssessment()
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException\Deleted
+     * @throws MapperException
      * @throws \Alaress\Database\Exception
      */
     private function updateAssessment(IAssessable $assessment): bool
@@ -574,8 +576,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param string      $comment
      * @return bool
      * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function setActivityMark(IAssessable $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $markText, $comment): bool
     {
@@ -797,8 +799,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IAssessable $assessment
      * @return string
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function getResultType(IAssessable $assessment): string
     {
@@ -807,19 +809,31 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // Does this assessment have a work type with an external result type?
         $resultType = null;
         $workType   = $assessment->getWorkType();
+        $workTypeId = null;
         if ($workType) {
+            $workTypeId = $workType->getId();
+
+            // Use the cache if we can
+            if (array_key_exists($workTypeId, $this->resultTypeCache)) {
+                return $this->resultTypeCache[$workTypeId];
+            }
+
             $resultType = $workType->getExternalResultType();
+            if ($workTypeId && !isset($resultType)) {
+                // Reload the work type from the DB, because it's not guaranteed
+                // to be fully hydrated
+                try {
+                    $workType   = WorkTypeMapper::getInstance()->findById($workTypeId);
+                    $resultType = $workType->getExternalResultType();
+                } catch (MapperException $e) {
+                    // noop: probably fall back to the default type
+                }
+            }
         }
 
         // We know OGRaw is in the DB, and if it's not there's bigger problems
         if (empty($resultType)) {
             return $defaultType;
-        }
-
-        // Use the cache if we can
-        $workTypeId = $workType->getId();
-        if (array_key_exists($workTypeId, $this->resultTypeCache)) {
-            return $this->resultTypeCache[$workTypeId];
         }
 
         // Validate the result type is in the DB: if not use the default
@@ -894,8 +908,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param int         $fileSemester
      * @return bool
      * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function insertMarkbooksIfNotExists(IAssessable $activity, array $folderCodes, int $fileYear, int $fileSemester): bool
     {
@@ -1073,8 +1087,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IAssessable $assessment
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
     {
