@@ -528,15 +528,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $bindings = [
-            'fileType'     => $assessmentRemote['FileType'],
-            'fileYear'     => $this->getUserFileYear($student->getExternalId()),
-            'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
-            'classCampus'  => $assessmentRemote['ClassCampus'],
-            'classCode'    => $assessmentRemote['ClassCode'],
-            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
-            'externalID'   => $student->getExternalId(),
-        ];
+        $params = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
 
         $sql = "
             SELECT  COUNT(*) AS result
@@ -550,7 +542,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     ID           = :externalID
         ";
 
-        return (bool)$this->getConnector()->executeQuery($sql, $bindings)->fetchColumn();
+        return (bool)$this->getConnector()->executeQuery($sql, $params)->fetchColumn();
     }
 
 
