@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
-use Schoolbox\Pastoral\DocumentClassification\Model;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
@@ -299,7 +298,6 @@ class Controller extends Base
         $luDocumentClassifications = [];
         $pastoralExternal          = new \External_Pastoral();
         foreach ($documentClassifications as $classification) {
-            /** @var Model $classification */
             $luDocumentClassifications[] = [
                 'key'     => $classification->getId(),
                 'value'   => $classification->getName(),
