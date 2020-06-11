@@ -77,11 +77,12 @@ interface IFactoryFactory
      *                                These will be used to create a URL with `$route`.
      *                                (If called from a controller, this is generally `func_get_args`)
      * @param array       $request    If set, the query string parameters for the current request.
+     * @param bool        $mergeUserSelections If false, the user's filter selections will be ignored.
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
+    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = [], bool $mergeUserSelections = true): Panel;
 
 
     /**

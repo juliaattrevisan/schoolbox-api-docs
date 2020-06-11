@@ -86,16 +86,13 @@ class Controller extends Base
         $queryArgs = $this->request->query->getArrayCopy();
         unset($queryArgs['page']);
 
-        // If course id is provided, filter to the course
-        if (is_numeric($queryArgs['course'])) {
-            $queryArgs = $this->appendFilter($queryArgs, 'course', (int)$queryArgs['course']);
-            unset($queryArgs['course']);
-        }
-
-        // If folder id is provided, filter to the class/group
-        if (is_numeric($queryArgs['folder'])) {
-            $queryArgs = $this->appendFilter($queryArgs, 'folder', (int)$queryArgs['folder']);
-            unset($queryArgs['folder']);
+        $inContext = false;
+        // If course/folder id is provided, filter to the course/folder
+        if (is_numeric($queryArgs['course']) || is_numeric($queryArgs['folder'])) {
+            $filterType = is_numeric($queryArgs['course']) ? 'course' : 'folder';
+            $queryArgs  = $this->applyFilter($filterType, (int)$queryArgs[$filterType]);
+            $inContext  = true;
+            unset($queryArgs[$filterType]);
         }
 
         // This filter panel does not post anywhere when its filters change.
@@ -107,7 +104,8 @@ class Controller extends Base
             null,
             $this->getUser(),
             [],
-            $queryArgs
+            $queryArgs,
+            !$inContext
         );
 
         $this->response->content->set(
@@ -122,6 +120,7 @@ class Controller extends Base
                         ->sortByCallback(static function (EventType $a, EventType $b) {
                             return strnatcasecmp($a->getType(), $b->getType());
                         }),
+                    'inContext'   =>  $inContext,
                 ],
                 'Assessment Calendar',
                 $pageTitle
@@ -130,14 +129,15 @@ class Controller extends Base
     }
 
     /**
-     * Appends filterValue of filterType to queryArgs
-     * @param array  $queryArgs
+     * Apply filterValue of filterType only to queryArgs
      * @param string $filterType
      * @param int    $filterValue
      * @return array
      */
-    private function appendFilter(array $queryArgs, string $filterType, int $filterValue):array
+    private function applyFilter(string $filterType, int $filterValue):array
     {
+        // clear current selection
+        $queryArgs = [];
         switch ($filterType) {
             case 'course':
                 $definitionClass = CourseImportSpecDefinition::class;

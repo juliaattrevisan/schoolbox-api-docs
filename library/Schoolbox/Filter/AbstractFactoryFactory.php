@@ -151,6 +151,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @param null|User   $viewee
      * @param array       $routeArgs  Any route params, as received by the controller's public API method
      * @param array       $request Indexed by filter.id
+     * @param bool        $mergeUserSelections If false, the user's filter selections will be ignored.
      * @return Panel
      * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes
      * @throws DomainException                       If this class has not defined the entity it is filtering
@@ -160,7 +161,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \UnderflowException                   If we generate an empty PB IN query
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
+    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = [], bool $mergeUserSelections = true): Panel
     {
         // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
         if (array_key_exists('page', $request)) {
@@ -185,7 +186,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         // This is because overrideSelections can insert options, but userSelections cannot
         $codec      = new Codec($this->getFilterMapper(), $this->getSelectionMapper());
         $overrides  = $codec->convertRequestToSelections($user, $page, $request);
-        $selections = $this->findUserSelections($overrides, $userConfigurablePageFilters, $user, $page);
+        $selections = $mergeUserSelections ? $this->findUserSelections($overrides, $userConfigurablePageFilters, $user, $page) : $overrides;
 
         // Build Panel Components
         foreach ($enabledPageFilters as $pageFilter) {
