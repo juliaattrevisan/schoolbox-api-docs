@@ -517,12 +517,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Determines if a student has already been marked or not, used to determining if to use insert or update
      *
-     * @param array $assessmentRemote
-     * @param User  $student
+     * @param array     $assessmentRemote
+     * @param IFeedback $feedback
      * @return bool
      */
-    private function doesMarkExist(array $assessmentRemote, Schoolbox\User $student): bool
+    private function doesMarkExist(array $assessmentRemote, IFeedback $feedback): bool
     {
+        $student = $feedback->getReviewee();
         if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
@@ -567,7 +568,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private function setActivityMark(IFeedback $feedback): bool
     {
         $activity            = $feedback->getAssessable();
-        $marker              = $feedback->getReviewer();
         $student             = $feedback->getReviewee();
         $mark                = $feedback->getNormalisedMark();
         $markText            = $feedback->getHumanReadableMark();
@@ -592,13 +592,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $assessmentRemoteList = $this->getSynergeticMarkbookList($activity, $studentFileYear, $studentFileSemester);
 
-        /* Ensure we cater for 0 which coerces to 'false'.
-         * If no mark, set the insert value to a magic number.
-         */
-        $markValue = null === $mark
-            ? self::NO_MARK_GIVEN
-            : round($mark, 2);
-
         $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
 
         $changesMade = false;
@@ -609,21 +602,21 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             }
 
             // Does the student have already have a mark for the assessment in Synergetic?
-            $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $student);
+            $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $feedback);
 
             if (!$remoteMarkExists && $hasMarkOrComment) {
                 // No mark in synergetic, mark/comment in SB
-                if ($this->insertActivityMark($activity, $assessmentRemote, $marker, $student, $markValue, $comment)) {
+                if ($this->insertActivityMark($assessmentRemote, $feedback)) {
                     $changesMade = true;
                 }
             } elseif ($hasMarkOrComment) {
                 // Mark/Comment in synergetic + SB
-                if ($this->updateActivityMark($assessmentRemote, $student, $markValue, $comment)) {
+                if ($this->updateActivityMark($assessmentRemote, $feedback)) {
                     $changesMade = true;
                 }
             } elseif ($remoteMarkExists) {
                 // Mark/Comment in synergetic , none in SB
-                if ($this->deleteActivityMark($assessmentRemote, $student)) {
+                if ($this->deleteActivityMark($assessmentRemote, $feedback)) {
                     $changesMade = true;
                 }
             }
@@ -635,19 +628,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Update a student's existing mark/comment in synergetic
      *
-     * @param array           $assessmentRemote
-     * @param User            $student
-     * @param int|float       $markValue
-     * @param string          $comment
+     * @param array     $assessmentRemote
+     * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
      */
-    private function updateActivityMark(
-        array $assessmentRemote,
-        Schoolbox\User $student,
-        $markValue,
-        $comment
-    ): bool {
+    private function updateActivityMark(array $assessmentRemote, IFeedback $feedback): bool
+    {
+        // TODO make mark value calculation consistent
+        $student   = $feedback->getReviewee();
+        $comment   = $feedback->getComment();
+        $mark      = $feedback->getNormalisedMark();
+        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
+
         $sql       = '
             UPDATE  StudentAssessmentMarkBook
             SET     Result       = :mark,
@@ -684,13 +677,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Delete a student's mark/comment from synergetic
      *
-     * @param array $assessmentRemote
-     * @param User  $student
+     * @param array     $assessmentRemote
+     * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
      */
-    private function deleteActivityMark(array $assessmentRemote, Schoolbox\User $student): bool
+    private function deleteActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
+        $student   = $feedback->getReviewee();
         $sql       = '
             DELETE FROM StudentAssessmentMarkBook
             WHERE   FileType     = :fileType
@@ -718,23 +712,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Insert a student's mark/comment into Synergetic
      *
-     * @param IAssessable $activity
-     * @param array       $assessmentRemote
-     * @param User        $marker
-     * @param User        $student
-     * @param int         $markValue
-     * @param string      $comment
+     * @param array     $assessmentRemote
+     * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
      */
-    private function insertActivityMark(
-        IAssessable $activity,
-        array $assessmentRemote,
-        Schoolbox\User $marker,
-        Schoolbox\User $student,
-        $markValue,
-        $comment
-    ): bool {
+    private function insertActivityMark(array $assessmentRemote, IFeedback $feedback): bool
+    {
+        $activity  = $feedback->getAssessable();
+        $marker    = $feedback->getReviewer();
+        $student   = $feedback->getReviewee();
+        $mark      = $feedback->getNormalisedMark();
+        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
+        $comment   = $feedback->getComment();
         $sql       = "
             INSERT INTO StudentAssessmentMarkBook (
                 FileType,
