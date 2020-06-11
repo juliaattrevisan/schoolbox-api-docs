@@ -402,7 +402,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function deleteFeedback(IAssessable $assessment, User $student): bool
     {
-        // TODO: Implement deleteFeedback() method.
+        if (!$this->isSyncable($assessment)) {
+            return false;
+        }
+
+        $studentExternalId = $student->getExternalId();
+        if (!$this->isExternalIdValid($studentExternalId)) {
+            return false;
+        }
+
+        $studentFileYear      = $this->getUserFileYear($studentExternalId);
+        $studentFileSemester  = $this->getUserFileSemester($studentExternalId);
+        $assessmentRemoteList = $this->getSynergeticMarkbookList($assessment, $studentFileYear, $studentFileSemester);
+        foreach ($assessmentRemoteList as $assessmentRemote) {
+            $this->deleteActivityMark($assessmentRemote, $student);
+        }
+
         return true;
     }
 
@@ -618,7 +633,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 }
             } elseif ($remoteMarkExists) {
                 // Mark/Comment in synergetic , none in SB
-                if ($this->deleteActivityMark($assessmentRemote, $feedback)) {
+                if ($this->deleteActivityMark($assessmentRemote, $feedback->getReviewee())) {
                     $changesMade = true;
                 }
             }
@@ -666,12 +681,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Delete a student's mark/comment from synergetic
      *
-     * @param array     $assessmentRemote
-     * @param IFeedback $feedback
+     * @param array $assessmentRemote
+     * @param User  $student
      * @return bool
      * @throws \Alaress\Database\Exception
      */
-    private function deleteActivityMark(array $assessmentRemote, IFeedback $feedback): bool
+    private function deleteActivityMark(array $assessmentRemote, User $student): bool
     {
         $sql       = '
             DELETE FROM StudentAssessmentMarkBook
@@ -684,7 +699,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     ID           = :externalID
         ';
         $statement = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $feedback->getReviewee()));
+        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $student));
     }
 
 
