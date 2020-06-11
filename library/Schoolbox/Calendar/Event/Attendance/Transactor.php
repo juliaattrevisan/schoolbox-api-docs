@@ -67,16 +67,22 @@ class Transactor
      */
     public function update(Event $event, array $guestIds): void
     {
-        $sanitisedGuestIds = implode(',', array_map('intval', $guestIds));
+
+        /* No guests to process; just leave early
+         */
+        if (empty($guestIds)) {
+            return;
+        }
 
         $query = "
             DELETE FROM {$this->attendanceMapper->getTable()}
             WHERE event_id = :eventId
-            AND user_id NOT IN ({$sanitisedGuestIds})
+            AND user_id NOT IN (:guestIds)
         ";
 
         $this->attendanceMapper->getDatabase()->query($query, [
             'eventId' => $event->getId(),
+            'guestIds' => implode(',', array_map('intval', $guestIds))
         ]);
 
         $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
