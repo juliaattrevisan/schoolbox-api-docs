@@ -113,6 +113,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
+     * Syncs assessment from Schoolbox to Synergetic.
+     *
+     * If the activity belongs to a Schoolbox folder with multiple folder codes,
+     * this will create a markbook in Synergetic per folder code.
+     *
+     * Creates any assessments in Synergetic's globally-configured year and
+     * semester, rather than in the context of a specific user.
+     *
+     * Returns true if ANY markbooks are created in Synergetic. Consider the
+     * case where a SB assessment resides on a folder with 2 folder codes, but
+     * only 1 markbook in synergetic: `$this->hasAssessment($assessment)` will
+     * return TRUE, even though it is only a partial truth.
+     *
      * @inheritdoc
      *
      * @throws \Alaress\Database\Exception
@@ -121,10 +134,56 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function syncAssessment(IAssessable $assessment): bool
     {
-        if (!$this->hasAssessment($assessment)) {
-            return $this->createAssessment($assessment);
+        if (!$this->isSyncable($assessment)) {
+            return false;
         }
-        return $this->updateAssessment($assessment);
+
+        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
+        if (!count($folderCodes)) {
+            return false;
+        }
+
+        $markbookId = $this->getMarkbookIdentifier($assessment);
+        if (!isset($markbookId)) {
+            return false;
+        }
+
+        $this->insertMarkbooksIfNotExists(
+            $assessment,
+            $folderCodes,
+            $this->getSystemFileYear(),
+            $this->getSystemFileSemester()
+        );
+
+        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+        $resultType            = $this->getResultType($assessment);
+        $bindings              = Predicate\Builder::getBindings($folderCodes, 'code');
+
+        $sql = "
+            UPDATE StaffAssessmentMarkBook
+            SET    Heading         = :heading,
+                   HdgAbbrev1      = :headingAbbreviation1,
+                   WeightingFactor = :weightingFactor,
+                   ResultType      = :resultType,
+                   TestDate        = :dueDate
+            WHERE  HdgAbbrev2      = :headingAbbreviation2
+            AND    FileYear        = :fileYear
+            AND    FileSemester    = :fileSemester
+            AND    ClassCode       IN ({$bindings->getPlaceholder()})
+        ";
+
+        $params = array_merge([
+            'heading'              => $assessmentFieldValues["Heading"],
+            'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
+            'headingAbbreviation2' => $markbookId,
+            'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
+            'resultType'           => $resultType,
+            'fileYear'             => $this->getSystemFileYear(),
+            'fileSemester'         => $this->getSystemFileSemester(),
+            'dueDate'              => $assessment->getDueAt()->getDatabase(),
+        ], $bindings->getParams());
+
+        return $this->getConnector()->prepareQuery($sql, $params)->execute();
     }
 
 
@@ -179,117 +238,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $statement = $this->getConnector()->executeQuery($sql, $params);
 
         return $statement->fetchColumn() > 0;
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * If the activity belongs to a Schoolbox folder with multiple folder codes, this will
-     * create a markbook in Synergetic per folder code.
-     *
-     * Creates the assessment in Synergetic's globally-configured year and semester, rather
-     * than in the context of a specific user
-     *
-     * Returns true if ANY markbooks are created in Synergetic.
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     * @throws \Alaress\Database\Exception
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     */
-    private function createAssessment(IAssessable $assessment): bool
-    {
-        if (!$this->isSyncable($assessment)) {
-            return false;
-        }
-
-        $owner = $this->retrieveOwnerFromAssessment($assessment);
-        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
-            return false;
-        }
-
-        // Hydrate result type
-        $resultType = $this->getResultType($assessment);
-        $year       = $this->getSystemFileYear();
-        $semester   = $this->getSystemFileSemester();
-
-        $result = false;
-        foreach ($this->retrieveFolderCodesFromAssessment($assessment) as $code) {
-            if ($this->insertStaffMarkbook($assessment, $owner, $code, $resultType, $year, $semester)) {
-                $result = true;
-            }
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * May perform creations in synergetic, in addition to the update.
-     *
-     * Consider the case where a SB assessment resides on a folder with 2 folder codes, but only 1 markbook in synergetic.
-     * $this->hasAssessment($assessment) will return TRUE, even though it is only a partial truth.
-     *
-     * @see $this->hasAssessment()
-     * @inheritdoc
-     * @throws MapperException\Deleted
-     * @throws MapperException
-     * @throws \Alaress\Database\Exception
-     */
-    private function updateAssessment(IAssessable $assessment): bool
-    {
-        if (!$this->isSyncable($assessment)) {
-            return false;
-        }
-
-        $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
-        if (!count($folderCodes)) {
-            return false;
-        }
-
-        $markbookId = $this->getMarkbookIdentifier($assessment);
-        if (!isset($markbookId)) {
-            return false;
-        }
-
-        $this->insertMarkbooksIfNotExists(
-            $assessment,
-            $folderCodes,
-            $this->getSystemFileYear(),
-            $this->getSystemFileSemester()
-        );
-
-        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
-        $resultType            = $this->getResultType($assessment);
-        $bindings              = Predicate\Builder::getBindings($folderCodes, 'code');
-
-        $sql = "
-            UPDATE  StaffAssessmentMarkBook
-            SET     Heading = :heading,
-                    HdgAbbrev1 = :headingAbbreviation1,
-                    WeightingFactor = :weightingFactor,
-                    ResultType = :resultType,
-                    TestDate = :dueDate
-            WHERE   HdgAbbrev2 = :headingAbbreviation2 AND
-                    FileYear = :fileYear AND
-                    FileSemester = :fileSemester AND
-                    ClassCode IN ({$bindings->getPlaceholder()})
-        ";
-
-        $params = array_merge([
-            'heading'              => $assessmentFieldValues["Heading"],
-            'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $markbookId,
-            'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'resultType'           => $resultType,
-            'fileYear'             => $this->getSystemFileYear(),
-            'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDueAt()->getDatabase(),
-        ], $bindings->getParams());
-
-        return $this->getConnector()->prepareQuery($sql, $params)->execute();
     }
 
 
