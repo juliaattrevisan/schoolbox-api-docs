@@ -905,12 +905,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoral = $this->pastoralMapper->findById($upload->getPastoral()->getId());
         $storage = $upload->getStorage();
 
+        $documentClassification = null;
         if ($pastoral->getType()->getDocumentClassification() instanceof PastoralDocumentClassification) {
-            $documentClassification = $this->pastoralDocumentClassificationMapper->findById(
-                $pastoral->getType()->getDocumentClassification()->getId()
-            );
-        } else {
-            $documentClassification = null;
+            try {
+                $documentClassification = $this->pastoralDocumentClassificationMapper->findById(
+                    $pastoral->getType()->getDocumentClassification()->getId()
+                );
+            } catch (BaseMapper\Exception $e) {
+                // noop: leave document classification as null
+            }
         }
 
         // Save the file into to the database
