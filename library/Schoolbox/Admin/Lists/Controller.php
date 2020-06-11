@@ -262,44 +262,42 @@ class Controller extends Base
         ];
 
         $luRole = [];
-        $roles = RoleMapper::getInstance()->findAll();
+        $roles  = RoleMapper::getInstance()->findAll(['deleted' => true]);
 
         foreach ($roles as $role) {
             $luRole[] = [
-                'key' => $role->getId(),
-                'value' => $role->getName()
+                'key'     => $role->getId(),
+                'value'   => $role->getName(),
+                'deleted' => $role->isDeleted(),
             ];
         }
 
         $luCampus = [];
-        $campuses = CampusMapper::getInstance()->findAll();
-
+        $campuses = CampusMapper::getInstance()->findAll(['deleted' => true]);
         foreach ($campuses as $campus) {
             $luCampus[] = [
-                'key' => $campus->getId(),
-                'value' => $campus->getName()
+                'key'     => $campus->getId(),
+                'value'   => $campus->getName(),
+                'deleted' => $campus->isDeleted(),
             ];
         }
 
         // This array defines the tables that can be updated
         // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
-        $pastoralTypes = PastoralTypeMapper::getInstance()->findAll();
-
+        $pastoralTypes  = PastoralTypeMapper::getInstance()->findAll(['deleted' => true]);
         $luPastoralType = [];
-
         foreach ($pastoralTypes as $type) {
             $luPastoralType[] = [
-                'key'   => $type->getId(),
-                'value' => $type->getName(),
+                'key'     => $type->getId(),
+                'value'   => $type->getName(),
+                'deleted' => $type->isDeleted(),
             ];
         }
 
-        $documentClassifications = PastoralDocumentClassificationMapper::getInstance()->findAll(['deleted' => true]);
-
+        $documentClassifications   = PastoralDocumentClassificationMapper::getInstance()->findAll(['deleted' => true]);
         $luDocumentClassifications = [];
-
-        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal          = new \External_Pastoral();
         foreach ($documentClassifications as $classification) {
             /** @var Model $classification */
             $luDocumentClassifications[] = [
