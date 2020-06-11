@@ -635,12 +635,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function updateActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
-        // TODO make mark value calculation consistent
-        $student   = $feedback->getReviewee();
-        $comment   = $feedback->getComment();
-        $mark      = $feedback->getNormalisedMark();
-        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
-
         $sql       = '
             UPDATE  StudentAssessmentMarkBook
             SET     Result       = :mark,
@@ -653,23 +647,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     MarkBookSeq  = :markbookSeq
             AND     ID           = :externalID
         ';
-        $params    = [
-            // Key fields
-            'fileType'         => $assessmentRemote['FileType'],
-            'fileYear'         => $this->getUserFileYear($student->getExternalId()),
-            'fileSemester'     => $this->getUserFileSemester($student->getExternalId()),
-            'classCampus'      => $assessmentRemote['ClassCampus'],
-            'classCode'        => $assessmentRemote['ClassCode'],
-            'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
-            'externalID'       => $student->getExternalId(),
+        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
+        $valueParams = $this->determineActivityMarkValueParams($feedback);
+        $params      = array_merge($keyParams, $valueParams);
 
-            // Value fields
-            'mark'             => $markValue,
-            'topicComment'     => $comment,
-//            'resultDate'       => $activity->getDueAt()->getDatabase(),
-//            'markerExternalId' => $marker->getExternalId(),
-        ];
-        $statement = $this->getConnector()->prepareQuery($sql);
+        // For now, don't set result date or marker external ID
+        unset($params['resultDate'], $params['markerExternalId']);
+
+        $statement   = $this->getConnector()->prepareQuery($sql);
         return $statement->execute($params);
     }
 
@@ -684,7 +669,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function deleteActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
-        $student   = $feedback->getReviewee();
         $sql       = '
             DELETE FROM StudentAssessmentMarkBook
             WHERE   FileType     = :fileType
@@ -695,17 +679,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     MarkBookSeq  = :markbookSeq
             AND     ID           = :externalID
         ';
-        $params    = [
-            'fileType'     => $assessmentRemote['FileType'],
-            'fileYear'     => $this->getUserFileYear($student->getExternalId()),
-            'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
-            'classCampus'  => $assessmentRemote['ClassCampus'],
-            'classCode'    => $assessmentRemote['ClassCode'],
-            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
-            'externalID'   => $student->getExternalId(),
-        ];
         $statement = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($params);
+        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $feedback));
     }
 
 
@@ -719,12 +694,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function insertActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
-        $activity  = $feedback->getAssessable();
-        $marker    = $feedback->getReviewer();
-        $student   = $feedback->getReviewee();
-        $mark      = $feedback->getNormalisedMark();
-        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
-        $comment   = $feedback->getComment();
         $sql       = "
             INSERT INTO StudentAssessmentMarkBook (
                 FileType,
@@ -756,24 +725,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 CURRENT_TIMESTAMP
             )
         ";
-        $params    = [
-            // Key fields
-            'fileType'         => $assessmentRemote['FileType'],
-            'fileYear'         => $this->getUserFileYear($student->getExternalId()),
-            'fileSemester'     => $this->getUserFileSemester($student->getExternalId()),
-            'classCampus'      => $assessmentRemote['ClassCampus'],
-            'classCode'        => $assessmentRemote['ClassCode'],
-            'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
-            'externalID'       => $student->getExternalId(),
-
-            // Value fields
-            'mark'             => $markValue,
-            'topicComment'     => $comment,
-            'resultDate'       => $activity->getDueAt()->getDatabase(),
-            'markerExternalId' => $marker->getExternalId(),
-        ];
-        $statement = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($params);
+        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
+        $valueParams = $this->determineActivityMarkValueParams($feedback);
+        $statement   = $this->getConnector()->prepareQuery($sql);
+        return $statement->execute(array_merge($keyParams, $valueParams));
     }
 
 
@@ -1082,5 +1037,50 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $folderCodes = FolderMapper::getInstance()->findById($folder->getId());
         }
         return $folderCodes->getPropertyValues('code');
+    }
+
+
+    /**
+     * Determine the query parameters for finding the key of an activity mark.
+     *
+     * @param array $assessmentRemote
+     * @param IFeedback $feedback
+     * @return array
+     */
+    private function determineActivityMarkKeyParams(array $assessmentRemote, IFeedback $feedback): array
+    {
+        $student = $feedback->getReviewee();
+        return [
+            'fileType'     => $assessmentRemote['FileType'],
+            'fileYear'     => $this->getUserFileYear($student->getExternalId()),
+            'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
+            'classCampus'  => $assessmentRemote['ClassCampus'],
+            'classCode'    => $assessmentRemote['ClassCode'],
+            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+            'externalID'   => $student->getExternalId(),
+        ];
+    }
+
+
+    /**
+     * Determine the query parameters for inserting or updating the value of an
+     * activity mark.
+     *
+     * @param IFeedback $feedback
+     * @return array
+     */
+    private function determineActivityMarkValueParams(IFeedback $feedback): array
+    {
+        $activity  = $feedback->getAssessable();
+        $marker    = $feedback->getReviewer();
+        $mark      = $feedback->getNormalisedMark();
+        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
+        $comment   = $feedback->getComment();
+        return [
+            'mark'             => $markValue,
+            'topicComment'     => $comment,
+            'resultDate'       => $activity->getDueAt()->getDatabase(),
+            'markerExternalId' => $marker->getExternalId(),
+        ];
     }
 }
