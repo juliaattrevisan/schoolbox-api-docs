@@ -28,6 +28,6 @@ class ValidHasData
      */
     public function isSatisfiedBy(int $yearLevel, bool $hasData): bool
     {
-        return \in_array($yearLevel, [3,4,5,6,7,8,9,10], true) || $hasData;
+        return \in_array($yearLevel, [3,4,5,6,7,8,9,10], true) && $hasData;
     }
 }
