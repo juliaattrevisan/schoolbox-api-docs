@@ -398,6 +398,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
+     * @inheritDoc
+     */
+    public function deleteFeedback(IAssessable $assessment, User $student): bool
+    {
+        // TODO: Implement deleteFeedback() method.
+        return true;
+    }
+
+
+    /**
      * Creates a staff markbook in synergetic for this assessment
      *
      * Supports creating the markbook in a file year/semester other than the globally-configured values.

@@ -7,6 +7,7 @@
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\User;
 
 class External_Markbook implements External_MarkbookInterface
 {
@@ -72,5 +73,14 @@ class External_Markbook implements External_MarkbookInterface
     public function syncFeedback(IFeedback $returnedWork): bool
     {
         return $this->database->syncFeedback($returnedWork);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteFeedback(IAssessable $assessment, User $student): bool
+    {
+        return $this->database->deleteFeedback($assessment, $student);
     }
 }
