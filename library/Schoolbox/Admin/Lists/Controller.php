@@ -662,7 +662,7 @@ class Controller extends Base
             'pastoral-document-classification' => [
                 'title'             => 'Pastoral SIS Document Classifications',
                 'mapper'            => PastoralDocumentClassificationMapper::class,
-                'sort'              => 'name',
+                'delete'            => true,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
