@@ -538,7 +538,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $params = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
+        $params = $this->determineActivityMarkKeyParams($assessmentRemote, $student);
 
         $sql = "
             SELECT  COUNT(*) AS result
@@ -655,7 +655,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     MarkBookSeq  = :markbookSeq
             AND     ID           = :externalID
         ';
-        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
+        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback->getReviewee());
         $valueParams = $this->determineActivityMarkValueParams($feedback);
         $params      = array_merge($keyParams, $valueParams);
         $statement   = $this->getConnector()->prepareQuery($sql);
@@ -684,7 +684,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     ID           = :externalID
         ';
         $statement = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $feedback));
+        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $feedback->getReviewee()));
     }
 
 
@@ -729,7 +729,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 CURRENT_TIMESTAMP
             )
         ";
-        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
+        $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback->getReviewee());
         $valueParams = $this->determineActivityMarkValueParams($feedback);
         $statement   = $this->getConnector()->prepareQuery($sql);
         return $statement->execute(array_merge($keyParams, $valueParams));
@@ -1048,12 +1048,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Determine the query parameters for finding the key of an activity mark.
      *
      * @param array $assessmentRemote
-     * @param IFeedback $feedback
+     * @param User  $student
      * @return array
      */
-    private function determineActivityMarkKeyParams(array $assessmentRemote, IFeedback $feedback): array
+    private function determineActivityMarkKeyParams(array $assessmentRemote, User $student): array
     {
-        $student = $feedback->getReviewee();
         return [
             'fileType'     => $assessmentRemote['FileType'],
             'fileYear'     => $this->getUserFileYear($student->getExternalId()),
