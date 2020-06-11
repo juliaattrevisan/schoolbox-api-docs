@@ -19,8 +19,23 @@ class Mapper extends BaseMapper
         $this->hasTable('lu_pastoral_document_classification');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('external_code', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('external_code', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+
+    /**
+     * Order by sequence field.
+     *
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }
