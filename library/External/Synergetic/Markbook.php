@@ -393,14 +393,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        return $this->setActivityMark(
-            $feedback->getAssessable(),
-            $feedback->getReviewer(),
-            $feedback->getReviewee(),
-            $feedback->getNormalisedMark(),
-            $feedback->getHumanReadableMark(),
-            $feedback->getComment()
-        );
+        return $this->setActivityMark($feedback);
     }
 
 
@@ -565,19 +558,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * Returns whether any changes were made to the remote system.
      *
-     * @param IAssessable $activity
-     * @param User        $marker
-     * @param User        $student
-     * @param null|float  $mark
-     * @param null|string $markText
-     * @param string      $comment
+     * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    private function setActivityMark(IAssessable $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $markText, $comment): bool
+    private function setActivityMark(IFeedback $feedback): bool
     {
+        $activity            = $feedback->getAssessable();
+        $marker              = $feedback->getReviewer();
+        $student             = $feedback->getReviewee();
+        $mark                = $feedback->getNormalisedMark();
+        $markText            = $feedback->getHumanReadableMark();
+        $comment             = $feedback->getComment();
         $studentExternalId   = $student->getExternalId();
         $studentFileYear     = $this->getUserFileYear($studentExternalId);
         $studentFileSemester = $this->getUserFileSemester($studentExternalId);
