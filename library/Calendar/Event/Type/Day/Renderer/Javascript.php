@@ -136,6 +136,8 @@ class Javascript extends Base
         }
 
         return [
+            'maxAttendees'  => $this->getEvent()->getMaxAttendees(),
+
             'icon'          => $hasIcon,
             'status'        => $hasStatus,
             'nextAction'    => $nextAttendanceAction,

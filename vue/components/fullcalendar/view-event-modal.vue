@@ -99,6 +99,26 @@
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: {
+
+                        /* Data struct
+                         *
+                         * The output is a json payload from /calendar/ajax/full.php
+                         * This feeds into the main fullcalendar
+                         *
+                         * full.php uses the Calendar API Composite to get all the events from everywhere
+                         * Inside that Factory you'll find specialised classes to collate events from various places
+                         * The regular calendar events are in Calendar_Api_EventType_Event_Schoolbox_Default
+                         *
+                         * This uses the Calendar handler to find events
+                         *
+                         * Fields come from the javascript-rendered data via the abstraction
+                         * library/Calendar/Event/Type/Day/Renderer/Javascript.php
+                         */
+
+                        /* Maximum allowed guests
+                         */
+                        maxAttendees: data?.attendance?.maxAttendees,
+
                         // Massage attendance data into something resembling usability
                         isAttendable: data?.attendance?.icon,
                         status: data?.attendance?.status,
@@ -543,6 +563,9 @@
                 </meta-item>
                 <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
                     Attendance: {{ eventExtendedProps.attendance.status }}
+                </meta-item>
+                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.maxAttendees != null">
+                    Guest Limit: {{ eventExtendedProps.attendance.maxAttendees }}
                 </meta-item>
             </meta-list>
             <article>

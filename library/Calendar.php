@@ -623,6 +623,7 @@ class Calendar extends DeprecatedModel
                 location,
                 detail,
                 attendance,
+                max_attendees,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -705,6 +706,7 @@ class Calendar extends DeprecatedModel
                 }
 
                 $event->setAttendance($currentEvent['attendance']);
+                $event->setMaxAttendees($currentEvent['max_attendees']);
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);
 
