@@ -93,6 +93,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
     }
 

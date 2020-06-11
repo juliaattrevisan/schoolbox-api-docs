@@ -103,7 +103,7 @@ class Adapter
     public function syncParticipation(IAssessableDataModel $assessmentModel, User $student): void
     {
         try {
-            $assessment = $this->findAssessmentFromDataModel($assessmentModel);
+            $assessment = $this->findAssessmentFromDataModel($assessmentModel, $student);
         } catch (BaseMapper\Exception\Deleted $e) {
             return;
         }
