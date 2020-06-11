@@ -524,27 +524,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Determines if a student has already been marked or not, used to determining if to use insert or update
      *
-     * @param string $fileType
-     * @param string $classCampus
-     * @param string $classCode
-     * @param int $assessmentID
-     * @param string $studentID
+     * @param array $assessmentRemote
+     * @param User  $student
      * @return bool
      */
-    private function doesMarkExist($fileType, $classCampus, $classCode, $assessmentID, $studentID): bool
+    private function doesMarkExist(array $assessmentRemote, Schoolbox\User $student): bool
     {
-        if (!$this->isExternalIdValid($studentID)) {
+        if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
 
         $bindings = [
-            'fileType'     => $fileType,
-            'fileYear'     => $this->getUserFileYear($studentID),
-            'fileSemester' => $this->getUserFileSemester($studentID),
-            'classCampus'  => $classCampus,
-            'classCode'    => $classCode,
-            'markbookSeq'  => $assessmentID,
-            'externalID'   => $studentID,
+            'fileType'     => $assessmentRemote['FileType'],
+            'fileYear'     => $this->getUserFileYear($student->getExternalId()),
+            'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
+            'classCampus'  => $assessmentRemote['ClassCampus'],
+            'classCode'    => $assessmentRemote['ClassCode'],
+            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+            'externalID'   => $student->getExternalId(),
         ];
 
         $sql = "
@@ -618,14 +615,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             }
 
             // Does the student have already have a mark for the assessment in Synergetic?
-//            $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $student);
-            $remoteMarkExists = $this->doesMarkExist(
-                $assessmentRemote['FileType'],
-                $assessmentRemote['ClassCampus'],
-                $assessmentRemote['ClassCode'],
-                $assessmentRemote['MarkBookSeq'],
-                $student->getExternalId()
-            );
+            $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $student);
 
             if (!$remoteMarkExists && $hasMarkOrComment) {
                 // No mark in synergetic, mark/comment in SB
