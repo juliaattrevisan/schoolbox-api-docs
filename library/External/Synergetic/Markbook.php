@@ -635,10 +635,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function updateActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
+        // This now updates the result date, modified by ID and modified date
+        // fields.
+        // (I think it should update the modified date?)
         $sql       = '
             UPDATE  StudentAssessmentMarkBook
             SET     Result       = :mark,
-                    TopicComment = :topicComment
+                    TopicComment = :topicComment,
+                    ResultDate   = :resultDate,
+                    ModifiedByID = :markerExternalId,
+                    ModifiedDate = CURRENT_TIMESTAMP
             WHERE   FileType     = :fileType
             AND     FileYear     = :fileYear
             AND     FileSemester = :fileSemester
@@ -650,10 +656,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback);
         $valueParams = $this->determineActivityMarkValueParams($feedback);
         $params      = array_merge($keyParams, $valueParams);
-
-        // For now, don't set result date or marker external ID
-        unset($params['resultDate'], $params['markerExternalId']);
-
         $statement   = $this->getConnector()->prepareQuery($sql);
         return $statement->execute($params);
     }
