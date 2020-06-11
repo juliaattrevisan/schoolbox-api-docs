@@ -103,6 +103,12 @@ class Event extends EventBase
 
 
     /**
+     * @var int|null
+     */
+    protected $numAttendees;
+
+
+    /**
      * Can someone attend this event
      *
      * @return bool
@@ -385,6 +391,24 @@ class Event extends EventBase
     public function setMaxAttendees(?int $maxAttendees): EventInterface
     {
         $this->maxAttendees = $maxAttendees;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getNumAttendees(): ?int
+    {
+        return $this->numAttendees;
+    }
+
+    /**
+     * @param int|null $numAttendees
+     * @return $this
+     */
+    public function setNumAttendees(?int $numAttendees): EventInterface
+    {
+        $this->numAttendees = $numAttendees;
         return $this;
     }
 

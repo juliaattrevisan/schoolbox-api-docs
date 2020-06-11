@@ -628,6 +628,11 @@ class Calendar extends DeprecatedModel
                 detail,
                 attendance,
                 max_attendees,
+                (
+                    SELECT COUNT(*)
+                    FROM event_attendance
+                    WHERE event_id = event.id
+                ) AS num_attendees,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -710,7 +715,10 @@ class Calendar extends DeprecatedModel
                 }
 
                 $event->setAttendance($currentEvent['attendance']);
+
                 $event->setMaxAttendees($currentEvent['max_attendees']);
+                $event->setNumAttendees($currentEvent['num_attendees']);
+
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);
 

@@ -119,6 +119,10 @@
                          */
                         maxAttendees: data?.attendance?.maxAttendees,
 
+                        /* Current number of invited attendees
+                         */
+                        numAttendees: data?.attendance?.numAttendees,
+
                         // Massage attendance data into something resembling usability
                         isAttendable: data?.attendance?.icon,
                         status: data?.attendance?.status,
@@ -565,7 +569,7 @@
                     Attendance: {{ eventExtendedProps.attendance.status }}
                 </meta-item>
                 <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.maxAttendees != null">
-                    Guest Limit: {{ eventExtendedProps.attendance.maxAttendees }}
+                    {{ eventExtendedProps.attendance.maxAttendees - eventExtendedProps.attendance.numAttendees }} places remaining
                 </meta-item>
             </meta-list>
             <article>
