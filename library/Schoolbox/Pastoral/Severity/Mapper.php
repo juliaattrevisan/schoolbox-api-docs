@@ -24,6 +24,9 @@ class Mapper extends BaseMapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('dashboard', self::TYPE_BOOLEAN);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);

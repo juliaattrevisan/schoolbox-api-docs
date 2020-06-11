@@ -8,16 +8,17 @@
 namespace Schoolbox\Pastoral\Severity;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\HasSequence;
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Sequential;
 
 class Model implements ISoftDeletable, Sequential
 {
-    use Id;
-    use HasSequence;
-    use DeletedAtDate;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\HasSequence;
 
     /** @var string */
     protected $name;
