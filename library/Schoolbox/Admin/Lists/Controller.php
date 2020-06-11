@@ -290,12 +290,12 @@ class Controller extends Base
 
         foreach ($pastoralTypes as $type) {
             $luPastoralType[] = [
-                'key' => $type->getId(),
-                'value' => $type->getName()
+                'key'   => $type->getId(),
+                'value' => $type->getName(),
             ];
         }
 
-        $documentClassifications = PastoralDocumentClassificationMapper::getInstance()->findAll();
+        $documentClassifications = PastoralDocumentClassificationMapper::getInstance()->findAll(['deleted' => true]);
 
         $luDocumentClassifications = [];
 
@@ -303,8 +303,9 @@ class Controller extends Base
         foreach ($documentClassifications as $classification) {
             /** @var Model $classification */
             $luDocumentClassifications[] = [
-                'key' => $classification->getId(),
-                'value' => $classification->getName()
+                'key'     => $classification->getId(),
+                'value'   => $classification->getName(),
+                'deleted' => $classification->isDeleted(),
             ];
         }
 
