@@ -812,6 +812,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $workTypeId = null;
         if ($workType) {
             $workTypeId = $workType->getId();
+
+            // Use the cache if we can
+            if (array_key_exists($workTypeId, $this->resultTypeCache)) {
+                return $this->resultTypeCache[$workTypeId];
+            }
+
             $resultType = $workType->getExternalResultType();
             if ($workTypeId && !isset($resultType)) {
                 // Reload the work type from the DB, because it's not guaranteed
@@ -828,11 +834,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // We know OGRaw is in the DB, and if it's not there's bigger problems
         if (empty($resultType)) {
             return $defaultType;
-        }
-
-        // Use the cache if we can
-        if (array_key_exists($workTypeId, $this->resultTypeCache)) {
-            return $this->resultTypeCache[$workTypeId];
         }
 
         // Validate the result type is in the DB: if not use the default
