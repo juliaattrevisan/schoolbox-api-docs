@@ -544,19 +544,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'classCampus'  => $classCampus,
             'classCode'    => $classCode,
             'markbookSeq'  => $assessmentID,
-            'studentID'    => $studentID,
+            'externalID'   => $studentID,
         ];
 
         $sql = "
             SELECT  COUNT(*) AS result
             FROM    StudentAssessmentMarkBook
-            WHERE   FileType = :fileType AND
-                    FileYear = :fileYear AND
-                    FileSemester = :fileSemester AND
-                    ClassCampus = :classCampus AND
-                    ClassCode = :classCode AND
-                    MarkBookSeq = :markbookSeq AND
-                    ID = :studentID
+            WHERE   FileType     = :fileType
+            AND     FileYear     = :fileYear
+            AND     FileSemester = :fileSemester
+            AND     ClassCampus  = :classCampus
+            AND     ClassCode    = :classCode
+            AND     MarkBookSeq  = :markbookSeq
+            AND     ID           = :externalID
         ";
 
         return (bool)$this->getConnector()->executeQuery($sql, $bindings)->fetchColumn();
@@ -618,6 +618,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             }
 
             // Does the student have already have a mark for the assessment in Synergetic?
+//            $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $student);
             $remoteMarkExists = $this->doesMarkExist(
                 $assessmentRemote['FileType'],
                 $assessmentRemote['ClassCampus'],
@@ -665,26 +666,31 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     ): bool {
         $sql       = '
             UPDATE  StudentAssessmentMarkBook
-            SET     Result = :mark,
+            SET     Result       = :mark,
                     TopicComment = :topicComment
-            WHERE   FileType = :fileType AND
-                    FileYear = :fileYear AND
-                    FileSemester = :fileSemester AND
-                    ClassCampus = :classCampus AND
-                    ClassCode = :classCode AND
-                    ID = :ID AND
-                    MarkBookSeq = :markbookSeq
+            WHERE   FileType     = :fileType
+            AND     FileYear     = :fileYear
+            AND     FileSemester = :fileSemester
+            AND     ClassCampus  = :classCampus
+            AND     ClassCode    = :classCode
+            AND     MarkBookSeq  = :markbookSeq
+            AND     ID           = :externalID
         ';
         $params    = [
-            'mark'         => $markValue,
-            'topicComment' => $comment,
-            'fileType'     => $assessmentRemote['FileType'],
-            'fileYear'     => $this->getUserFileYear($student->getExternalId()),
-            'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
-            'classCampus'  => $assessmentRemote['ClassCampus'],
-            'classCode'    => $assessmentRemote['ClassCode'],
-            'ID'           => $student->getExternalId(),
-            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+            // Key fields
+            'fileType'         => $assessmentRemote['FileType'],
+            'fileYear'         => $this->getUserFileYear($student->getExternalId()),
+            'fileSemester'     => $this->getUserFileSemester($student->getExternalId()),
+            'classCampus'      => $assessmentRemote['ClassCampus'],
+            'classCode'        => $assessmentRemote['ClassCode'],
+            'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
+            'externalID'       => $student->getExternalId(),
+
+            // Value fields
+            'mark'             => $markValue,
+            'topicComment'     => $comment,
+//            'resultDate'       => $activity->getDueAt()->getDatabase(),
+//            'markerExternalId' => $marker->getExternalId(),
         ];
         $statement = $this->getConnector()->prepareQuery($sql);
         return $statement->execute($params);
@@ -703,13 +709,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $sql       = '
             DELETE FROM StudentAssessmentMarkBook
-            WHERE       FileType = :fileType AND
-                        FileYear = :fileYear AND
-                        FileSemester = :fileSemester AND
-                        ClassCampus = :classCampus AND
-                        ClassCode = :classCode AND
-                        ID = :ID AND
-                        MarkBookSeq = :markbookSeq
+            WHERE   FileType     = :fileType
+            AND     FileYear     = :fileYear
+            AND     FileSemester = :fileSemester
+            AND     ClassCampus  = :classCampus
+            AND     ClassCode    = :classCode
+            AND     MarkBookSeq  = :markbookSeq
+            AND     ID           = :externalID
         ';
         $params    = [
             'fileType'     => $assessmentRemote['FileType'],
@@ -717,8 +723,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'fileSemester' => $this->getUserFileSemester($student->getExternalId()),
             'classCampus'  => $assessmentRemote['ClassCampus'],
             'classCode'    => $assessmentRemote['ClassCode'],
-            'ID'           => $student->getExternalId(),
             'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+            'externalID'   => $student->getExternalId(),
         ];
         $statement = $this->getConnector()->prepareQuery($sql);
         return $statement->execute($params);
@@ -777,13 +783,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             )
         ";
         $params    = [
+            // Key fields
             'fileType'         => $assessmentRemote['FileType'],
             'fileYear'         => $this->getUserFileYear($student->getExternalId()),
             'fileSemester'     => $this->getUserFileSemester($student->getExternalId()),
             'classCampus'      => $assessmentRemote['ClassCampus'],
             'classCode'        => $assessmentRemote['ClassCode'],
-            'externalID'       => $student->getExternalId(),
             'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
+            'externalID'       => $student->getExternalId(),
+
+            // Value fields
             'mark'             => $markValue,
             'topicComment'     => $comment,
             'resultDate'       => $activity->getDueAt()->getDatabase(),
