@@ -722,7 +722,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             }
 
             $resultType = $workType->getExternalResultType();
-            if ($workTypeId && !isset($resultType)) {
+            if ($workTypeId && empty($resultType)) {
                 // Reload the work type from the DB, because it's not guaranteed
                 // to be fully hydrated
                 try {
