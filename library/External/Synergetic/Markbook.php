@@ -157,7 +157,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
         $resultType            = $this->getResultType($assessment);
-        $bindings              = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
             UPDATE StaffAssessmentMarkBook
@@ -169,10 +168,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE  HdgAbbrev2      = :headingAbbreviation2
             AND    FileYear        = :fileYear
             AND    FileSemester    = :fileSemester
-            AND    ClassCode       IN ({$bindings->getPlaceholder()})
         ";
 
-        $params = array_merge([
+        $params = [
             'heading'              => $assessmentFieldValues["Heading"],
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
             'headingAbbreviation2' => $markbookId,
@@ -181,7 +179,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'fileYear'             => $this->getSystemFileYear(),
             'fileSemester'         => $this->getSystemFileSemester(),
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
-        ], $bindings->getParams());
+        ];
 
         return $this->getConnector()->prepareQuery($sql, $params)->execute();
     }
