@@ -12,20 +12,6 @@
 
         let config = init(options, $(this));
 
-        /* Initial conditions
-         */
-        $.fn.rsvpToggle({
-            available: config.rsvpAttendanceForm.attr('data-guests-available'),
-            onList: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
-        });
-
-        /* Apply listeners to RSVP buttons to post and reload
-         * That'll reload with the most recent state of affairs
-         */
-        $.fn.rsvp({
-            currentUserId: config.currentUserId
-        });
-
         /* Set up selectizes if you have perms
          */
         if (config.canModify) {
@@ -55,10 +41,6 @@
             let defaults = {
                 element: element,
 
-                /* Your user id
-                 */
-                currentUserId: 0,
-
                 /* Access perms for hiding/showing form elements
                  */
                 canModify: false,
@@ -70,10 +52,6 @@
                 /* Selectize for adding a person
                  */
                 createAttendanceSelector: $('#add-guests'),
-
-                /* Form to present rsvp options
-                 */
-                rsvpAttendanceForm: $('#rsvpAttendanceForm'),
 
                 /* Container for list fragment
                  */
