@@ -281,29 +281,37 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
             }
 
             // Retrieve the class list for the submission box
-
-            $action        = str_pad("Assessment Feedback Found:", 30, " ");
-            $feedbackCount = 0;
+            $feedbackCount   = 0;
+            $noFeedbackCount = 0;
             foreach ($assessment->getAllParticipants() as $participant) {
                 if ($participant->hasPublishedFeedback()) {
                     $feedbackCount++;
+                } else {
+                    $noFeedbackCount++;
                 }
             }
 
-            $log->info("    {$action}" . $feedbackCount);
+            $log->info(sprintf("    %s%d",  str_pad("Assessment Feedback Found:", 30, " "), $feedbackCount));
+            $log->info(sprintf("    %s%d",  str_pad("Assessment Feedback Missing:", 30, " "), $noFeedbackCount));
 
             foreach ($assessment->getAllParticipants() as $participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
-                if (!$feedback) {
-                    continue;
-                }
+                $student  = $participant->getUser();
 
-                $student = $participant->getUser();
-                $name    = str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " ");
-                $log->info("        {$name}{$feedback->getHumanReadableMark()}");
+                $log->info(
+                    sprintf(
+                        "        %s%s",
+                        str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " "),
+                        $feedback ? $feedback->getHumanReadableMark() : '(missing)'
+                    )
+                );
 
                 if (!$dryRun) {
-                    $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
+                    if ($feedback) {
+                        $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
+                    } else {
+                        $markbookExternal->deleteFeedback($assessment, $student);
+                    }
                 }
             }
         }
