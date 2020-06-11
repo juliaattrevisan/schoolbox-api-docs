@@ -697,8 +697,9 @@ class Controller extends Base
 
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $return['pastoral-severity'] = [
-                'title' => 'Pastoral Record Severity',
+                'title'  => 'Pastoral Record Severity',
                 'mapper' => PastoralSeverityMapper::class,
+                'delete' => true,
                 'fields' => [
                     'name' => [
                         'caption' => 'Name',
