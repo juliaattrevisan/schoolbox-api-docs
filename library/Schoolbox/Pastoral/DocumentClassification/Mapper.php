@@ -7,8 +7,12 @@
 
 namespace Schoolbox\Pastoral\DocumentClassification;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * @method GenericCollection|Model[] findAll($options = [])
+ */
 class Mapper extends BaseMapper
 {
     /**

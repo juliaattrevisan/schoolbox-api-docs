@@ -11,13 +11,12 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as DocumentClassificationMapper;
-use UnexpectedValueException;
 
 /**
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method GenericCollection|Model[] findAll($options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper

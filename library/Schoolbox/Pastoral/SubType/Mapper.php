@@ -7,13 +7,14 @@
 
 namespace Schoolbox\Pastoral\SubType;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use UnexpectedValueException;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
 {
