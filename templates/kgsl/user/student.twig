@@ -1,0 +1,29 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_coordTeacher %}
+    {% if coordTeacher %}
+    <dt class="small-4 medium-3 columns">Head of Year:</dt>
+    <dd class="small-8 medium-9 columns">
+    {% if coordTeacher.id %}
+    <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
+    {% else %}
+    {{ coordTeacher.formatName }}
+    {% endif %}
+    </dd>
+    {% endif %}
+{% endblock details_coordTeacher %}
+
+{% block details_hohTeacher %}
+    {% if showClasses %}
+        {% if hohTeacher %}
+            <dt class="small-4 medium-3 columns">Dean of Wellbeing:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if hohTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
+                {% else %}
+                    {{ hohTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_hohTeacher %}
