@@ -849,6 +849,7 @@ class Controller extends Base
                 $severity = null;
             } else {
                 /** @var PastoralSeverityModel $severity */
+                // TODO allow save of this value if it's deleted, and not being changed
                 $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
             }
 
