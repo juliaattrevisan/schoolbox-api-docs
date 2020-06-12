@@ -207,7 +207,8 @@
 
                     this.jQuery.fn.rsvp({
                         rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                        onList: false
+                        onList: false,
+                        reload: false
                     });
                 });
             },
@@ -804,6 +805,5 @@
                 <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
-
     </reveal-modal>
 </template>

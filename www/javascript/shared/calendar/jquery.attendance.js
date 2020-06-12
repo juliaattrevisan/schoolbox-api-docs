@@ -279,7 +279,9 @@
                             css: 'success'
                         });
 
-                        window.location.reload();
+                        if (config.reload) {
+                            window.location.reload();
+                        }
                     },
                     error: function(xhr, status, error) {
                         let responseText = $.parseJSON(xhr.responseText)
@@ -316,7 +318,11 @@
 
                 /* Whether you're already invited
                  */
-                onList: false
+                onList: false,
+
+                /* Reload window.location.href when successfully updated rsvp
+                 */
+                reload: true
             };
 
             return $.extend(defaults, options);
