@@ -1,3 +1,152 @@
+<script>
+    import moment           from 'moment';
+    import audiencesModal   from './audiencesModal';
+    import qs               from 'qs';
+
+    const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
+    const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
+    const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
+    const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
+
+    /* Event Modify screen
+     */
+    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
+
+    /* Inline alteration of attendees on event detail screen
+     */
+    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
+    const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
+
+    /* RSVP Status mutation routes
+     */
+    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
+    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
+
+    export default {
+        props: ['event'],
+        name: "event-details",
+        components: {audiencesModal},
+        data() {
+            return {
+                isPersonalEvent: this.event.level === 'personal',
+                isGroupEvent: this.event.level === 'group',
+                isCampusEvent: this.event.level === 'campus'
+            }
+        },
+        methods: {
+
+            /**
+             * Generate a path via const
+             */
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+            showAudiencesModal() {
+                this.$refs.audiencesModal.open();
+            }
+        },
+        computed: {
+            dateTimeDisplay: function() {
+                if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
+
+                let startDate = moment(this.event.dates.start),
+                        endDate = moment(this.event.dates.end);
+
+                if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
+                    return startDate.format(FORMAT_LONG_DATE) +
+                            '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
+                }
+
+                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
+            },
+
+            monthDisplay: function() {
+                return moment(this.event.dates.start).format('MMM');
+            },
+
+            dateDisplay: function() {
+                return moment(this.event.dates.start).format('DD');
+            },
+
+            byLine: function() {
+                if (this.event.author.id && this.event.author.fullName) return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>';
+                if (!this.event.author.id && this.data.author.fullName) return 'By ' + this.event.author.fullName;
+
+                return '';
+            },
+
+            audiencesMeta: function() {
+                let result = [],
+                        campusCount = this.event.audiences.campus.length,
+                        rolesCount  = this.event.audiences.roles.length;
+
+                if (this.isPersonalEvent) return 'Personal';
+                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0].id +'">' + this.event.audiences.folders[0].name  + '</a>';
+
+                if (campusCount) {
+                    let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
+                    result.push(campusCount + suffix);
+                }
+
+                if (rolesCount) {
+                    let suffix = (rolesCount > 1) ? ' Roles' : ' Role';
+                    result.push(rolesCount + suffix);
+                }
+
+                return result.join(' & ');
+            },
+
+            showMoreGroups: function() {
+                let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
+
+                return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
+            },
+
+            /**
+             * Onwards to the modify screen
+             */
+            modifyPath: function() {
+                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * Create new attendances
+             */
+            createAttendancePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * Delete attendances
+             */
+            deleteAttendancePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Accept
+             */
+            rsvpAcceptPath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Decline
+             */
+            rsvpDeclinePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
+            }
+        }
+    }
+</script>
+
 <template>
     <div>
         <div class="small-12 columns" v-if="this.event.canModify">
@@ -88,151 +237,3 @@
     </div>
 </template>
 
-<script>
-    import moment           from 'moment';
-    import audiencesModal   from './audiencesModal';
-    import qs               from 'qs';
-
-    const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
-    const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
-    const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
-    const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
-
-    /* Event Modify screen
-     */
-    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-
-    /* Inline alteration of attendees on event detail screen
-     */
-    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-    const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
-
-    /* RSVP Status mutation routes
-     */
-    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
-    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
-
-    export default {
-        props: ['event'],
-        name: "event-details",
-        components: {audiencesModal},
-        data() {
-            return {
-                isPersonalEvent: this.event.level === 'personal',
-                isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus'
-            }
-        },
-        methods: {
-
-            /**
-             * Generate a path via const
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            showAudiencesModal() {
-                this.$refs.audiencesModal.open();
-            }
-        },
-        computed: {
-            dateTimeDisplay: function() {
-                if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
-
-                let startDate = moment(this.event.dates.start),
-                    endDate = moment(this.event.dates.end);
-
-                if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
-                    return startDate.format(FORMAT_LONG_DATE) +
-                        '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
-                }
-
-                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
-            },
-
-            monthDisplay: function() {
-                return moment(this.event.dates.start).format('MMM');
-            },
-
-            dateDisplay: function() {
-                return moment(this.event.dates.start).format('DD');
-            },
-
-            byLine: function() {
-                if (this.event.author.id && this.event.author.fullName) return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>';
-                if (!this.event.author.id && this.data.author.fullName) return 'By ' + this.event.author.fullName;
-
-                return '';
-            },
-
-            audiencesMeta: function() {
-                let result = [],
-                    campusCount = this.event.audiences.campus.length,
-                    rolesCount  = this.event.audiences.roles.length;
-
-                if (this.isPersonalEvent) return 'Personal';
-                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0].id +'">' + this.event.audiences.folders[0].name  + '</a>';
-
-                if (campusCount) {
-                    let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
-                    result.push(campusCount + suffix);
-                }
-
-                if (rolesCount) {
-                    let suffix = (rolesCount > 1) ? ' Roles' : ' Role';
-                    result.push(rolesCount + suffix);
-                }
-
-                return result.join(' & ');
-            },
-
-            showMoreGroups: function() {
-                let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
-
-                return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
-            },
-
-            /**
-             * Onwards to the modify screen
-             */
-            modifyPath: function() {
-                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * Create new attendances
-             */
-            createAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * Delete attendances
-             */
-            deleteAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Accept
-             */
-            rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Decline
-             */
-            rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
-            }
-        }
-    }
-</script>

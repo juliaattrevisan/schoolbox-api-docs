@@ -15,6 +15,10 @@
     const ATTENDANCE_ACTION_ADD = 'add';
     const ATTENDANCE_ACTION_REMOVE = 'remove';
 
+    /* Inline alteration of attendees on event modal
+     */
+    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
+
     export default {
         name: "view-event-modal",
         props: {
@@ -153,7 +157,14 @@
                         path: data?.links?.path
                     },
                 };
-            }
+            },
+
+            /**
+             * Create new attendances
+             */
+            createAttendancePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+            },
         },
         methods: {
 
@@ -603,7 +614,7 @@
                         No places remaining
                     </template>
                 </meta-item>
-                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="''" method="post" v-if="true">
+                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">
                     <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                 </form>
             </meta-list>
