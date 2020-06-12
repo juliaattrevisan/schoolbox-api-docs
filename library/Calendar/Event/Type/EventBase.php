@@ -680,4 +680,42 @@ abstract class EventBase implements EventInterface
      * @return string[]
      */
     abstract protected function getRenderClasses(): array;
+
+
+    /**
+     * @return int|null
+     */
+    public function getMaxAttendees(): ?int
+    {
+        return null;
+    }
+
+
+    /**
+     * @param int|null $maxAttendees
+     * @return $this
+     */
+    public function setMaxAttendees(?int $maxAttendees): EventInterface
+    {
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getNumAttendees(): ?int
+    {
+        return null;
+    }
+
+
+    /**
+     * @param int|null $numAttendees
+     * @return $this
+     */
+    public function setNumAttendees(?int $numAttendees): EventInterface
+    {
+        return $this;
+    }
 }
