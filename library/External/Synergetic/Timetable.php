@@ -408,12 +408,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodsForSequenceIds = [];
 
         // pvTimetableDefinitionAll
-        foreach ($allowedFileTypes as $fileType) {
+//        foreach ($allowedFileTypes as $fileType) {
             $periodList = [];
             $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
             $statement->bindInputs(
                 [
-                    'FileType'                  => $fileType,
+//                    'FileType'                  => $fileType,
                     'FileYear'                  => $fileYear,
                     'FileSemester'              => $fileSemester,
                     'ID'                        => $externalUserId,
@@ -429,7 +429,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             foreach ($iterator as $spRow) {
                 // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
-                if ($spRow['FileType'] !== $fileType) {
+//                if ($spRow['FileType'] !== $fileType) {
+                if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
                     continue;
                 }
 
@@ -498,8 +499,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             // Add classes into it
             $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
-        }
-
+//        }
         usort($timetable, [$this, 'sortTimetable']);
 
         return $timetable;
