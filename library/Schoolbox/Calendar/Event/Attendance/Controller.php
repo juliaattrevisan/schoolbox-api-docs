@@ -11,6 +11,8 @@ namespace Schoolbox\Calendar\Event\Attendance;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
+use InvalidArgumentException;
+use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
@@ -76,11 +78,15 @@ class Controller extends Base
      * wrangling is a thing we have yet to defeat
      *
      * @param Event $event
+     * @throws MapperException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function getCurrent(Event $event): void
     {
-        $data = (new ListPayload($this->di, $this->attendanceMapper))->generate($event);
+        $data = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
@@ -90,11 +96,13 @@ class Controller extends Base
      * Add attendees to the list
      *
      * @param Event $event
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
      * @throws MapperException
      * @throws PDOException
      * @throws ServiceNotFound
      * @throws UnexpectedValueException
-     * @throws Exception
      */
     public function postCreate(Event $event): void
     {
@@ -138,7 +146,11 @@ class Controller extends Base
      * Remove attendees from the list
      *
      * @param Event $event
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws MapperException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function postDelete(Event $event): void
     {

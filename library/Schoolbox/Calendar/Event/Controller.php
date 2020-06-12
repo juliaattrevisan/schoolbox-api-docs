@@ -25,7 +25,6 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -140,6 +139,7 @@ class Controller extends Base
         $helper = new Helper($this->roleMapper, $this->folderMapper);
 
         $attendanceStatus = $calendar->getAttendanceByEventAndUser($event->getId(), $this->getUser()->getId());
+        $payload = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event'            => $event,
@@ -151,8 +151,13 @@ class Controller extends Base
                 'status'       => $attendanceStatus,
                 'nextAction'   => ($attendanceStatus) ? 'remove' : 'add',
             ],
-            'guests' => (new ListPayload($this->di, $this->attendanceMapper))->generate($event),
-            'canModify' => $this->getUser()->isSuperuser() || (new Event\Access(Access::getInstance()))->checkExisting($this->getUser(), $event),
+            'user' => $this->getUser(),
+            'guests' => $payload,
+
+            /* Modify perms are calculated in the attendance list fragment
+             * This is synonymous with calling (new Event\Access())->checkExisting() again
+             */
+            'canModify' => $payload['canModify']
         ])->setTitle($event->getTitle()));
     }
 

@@ -64,6 +64,12 @@ class Access
      */
     public function checkExisting(User $effector, Event $event): bool
     {
+        /* Superusers can always make changes
+         */
+        if ($effector->isSuperuser()) {
+            return true;
+        }
+
         // Split groups into an array of ints, if there are any
         if ($event->getFolderCollection()) {
             $groups = $event->getFolderCollection()->getPropertyValues('id');

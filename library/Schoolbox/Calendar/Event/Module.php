@@ -67,7 +67,7 @@ class Module extends BaseModule
                         $loggedInUser = $this->getAuthorizer()->getUser();
 
                         /**
-                         * Personal Event: owner, parent of owner and staff can see event
+                         * Personal Event: owner, parent of owner, staff, or invited guest, can see event
                          * Group: READ+ members of group can see event
                          * Campus: user can see event if in campus and roles
                          */
@@ -76,7 +76,15 @@ class Module extends BaseModule
                             $isOwner        = $event->getAuthor()->getId() === $loggedInUser->getId();
                             $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
 
-                            if ($isOwner || $isStaff || $isParentOfUser) {
+                            /* I suppose if you're on the invited list,
+                             * you should be able to see it
+                             */
+                            $isAttendee = $this->getMapperFactory()->get(Attendance\Mapper::class)->countByColumnList([
+                                'event_id' => $event->getId(),
+                                'user_id' => $loggedInUser->getId()
+                            ]);
+
+                            if ($isOwner || $isStaff || $isParentOfUser || $isAttendee) {
                                 return true;
                             }
                         } elseif ($event->isGroupLevel()) {

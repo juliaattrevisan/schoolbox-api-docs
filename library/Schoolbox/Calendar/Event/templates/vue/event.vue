@@ -41,35 +41,41 @@
                         <p v-html="this.event.location"></p>
                     </div>
                 </div>
-                <div class="component-action" v-if="this.event.options.isAttendable || showAddToCalendar">
-                    <section>
-                        <a href="#"
-                           class="button"
-                           v-if="this.event.options.isAttendable"
-                           @click="toggleAttendance()"
-                           :disabled="this.attendanceButtonIsDisabled">
-                            {{ attendanceActionLabel }}
-                        </a>
-                        <a v-if="this.event.canModify" class="button" :href="attendanceLink">View Attendees</a>
-                        <a v-if="showAddToCalendar" href="#" class="button">Add to Calendar</a>
-                    </section>
-                </div>
             </section>
 
-            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.options.isAttendable && this.event.canModify">
-                <div class="row">
-                    <div id="attendance-guests" class="small-12 columns">
-                        <section>
-                            <div class="content">
-                                <span class="meta" v-if="this.event.guests.available != null"><span id="attendance-guests-available">{{ this.event.guests.available }}</span> available attendee slots</span>
-                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                            </div>
+            <h2 class="subheader">Guests</h2>
 
-                            <article v-html="this.event.guests.fragment"></article>
-                        </section>
-                    </div>
+            <div class="row">
+                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
+                    <section class="content no-margin">
+                        <p><strong>Attending?</strong></p>
+
+                        <form :action="''" method="post">
+                            <ul class="flex-list buttons">
+                                <li><a href="#">Yes</a></li>
+                                <li><a href="#">No</a></li>
+                            </ul>
+                        </form>
+                    </section>
                 </div>
-            </form>
+                <div id="attendance-guests" class="small-12 columns">
+                    <section>
+                        <div class="content" v-if="this.event.guests.available != null || this.event.canModify">
+                            <span class="meta" v-if="this.event.guests.available != null">
+                                <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
+                                <span id="attendance-guests-available" v-else>No</span>
+                                available places remaining
+                            </span>
+
+                            <form :id="'createAttendanceForm'" :action="createAttendancePath" method="post" v-if="this.event.canModify">
+                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                            </form>
+                        </div>
+
+                        <article v-html="this.event.guests.fragment"></article>
+                    </section>
+                </div>
+            </div>
         </div>
 
         <div data-toast class="toast"></div>
@@ -81,7 +87,6 @@
                 :group-audiences="this.event.audiences.folders"
                 :is-group="this.isGroupEvent"
         ></audiences-modal>
-
     </div>
 </template>
 
@@ -94,13 +99,7 @@
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
-    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-    const URL_ATTENDEES = '/calendar/attendance/list/';
-    const ATTENDANCE_NEXT_ACTION_ADD = 'add';
-    const ATTENDANCE_NEXT_ACTION_REMOVE = 'remove';
-    const ATTENDANCE_NEXT_ACTION_ADD_LABEL = 'RSVP';
-    const ATTENDANCE_NEXT_ACTION_REMOVE_LABEL = 'Unattend';
 
     /* Inline alteration of attendees on event detail screen
      */
@@ -113,14 +112,9 @@
         components: {audiencesModal},
         data() {
             return {
-                attendanceNextAction: this.event.attendance.nextAction,
-                attendanceActionLabel: (this.event.attendance.nextAction === ATTENDANCE_NEXT_ACTION_ADD) ? ATTENDANCE_NEXT_ACTION_ADD_LABEL : ATTENDANCE_NEXT_ACTION_REMOVE_LABEL,
-                attendanceButtonIsDisabled: false,
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus',
-                attendanceLink: URL_ATTENDEES + this.event.id,
-                showAddToCalendar: false, // Disabled for now...
+                isCampusEvent: this.event.level === 'campus'
             }
         },
         methods: {
@@ -177,30 +171,6 @@
 
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
-            },
-
-            toggleAttendance() {
-                let self = this,
-                    data = {
-                        status:      this.attendanceNextAction,
-                        'event[id]': this.event.id,
-                    };
-
-                self.attendanceButtonIsDisabled = true;
-
-                axios.post(URL_ATTENDANCE_TOGGLE, qs.stringify(data)).then(function () {
-
-                    if (self.attendanceNextAction === ATTENDANCE_NEXT_ACTION_ADD) {
-                        self.attendanceActionLabel = ATTENDANCE_NEXT_ACTION_REMOVE_LABEL;
-                        self.attendanceNextAction = ATTENDANCE_NEXT_ACTION_REMOVE;
-                    } else {
-                        self.attendanceActionLabel = ATTENDANCE_NEXT_ACTION_ADD_LABEL;
-                        self.attendanceNextAction = ATTENDANCE_NEXT_ACTION_ADD;
-                    }
-
-                }).finally(function() {
-                    self.attendanceButtonIsDisabled = false;
-                });
             }
         },
         computed: {
