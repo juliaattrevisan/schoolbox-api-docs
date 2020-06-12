@@ -8,6 +8,7 @@
  # @param bool  $canModify  Whether the current user can modify the event
  # @param array $status     An array of status consts and their meaning
  #}
+<p class="content"><strong>{{ counts.accepted }} accepted, {{ counts.declined }} declined, {{ counts.pending }} pending</strong></p>
 <ul class="action-list attendance-guest-list">
     {% for guest in guests %}
     <li class="actions-small-1" data-guest="{{ guest.id }}">
