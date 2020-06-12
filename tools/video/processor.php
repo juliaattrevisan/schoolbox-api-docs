@@ -62,7 +62,12 @@ $app = new class extends CliTool\App{
                 $log->alert("Unable to proceed, timeout of media processing is disabled");
                 exit(1);
             }
-            if (($num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+
+            $totalProcessing = $queueMapper->countByColumn('status', $queueMapper::STATUS_PROCESSING);
+            $num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout);
+
+            //If videos exceeded the timeout, and we timed all videos out, kill the process (otherwise we are still processing videos)
+            if ($num_timed_out > 0 && $totalProcessing - $num_timed_out === 0) {
                 $log->error("Error: {$num_timed_out} media item(s) timed out");
                 $lock->killProcess();
                 $lock->acquire();
