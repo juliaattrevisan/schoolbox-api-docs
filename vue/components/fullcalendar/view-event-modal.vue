@@ -199,17 +199,20 @@
              */
             attendanceSelectize(eventId) {
                 this.$nextTick(() => {
-                    this.jQuery.fn.attendance({
-                        createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
-                        createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
-                        canModify: true
-                    });
 
-                    this.jQuery.fn.rsvp({
-                        rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                        onList: false,
-                        reload: false
-                    });
+                    // SA-10476
+                    // this.jQuery.fn.attendance({
+                    //     createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
+                    //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
+                    //     canModify: true
+                    // });
+
+                    // SA-10475
+                    // this.jQuery.fn.rsvp({
+                    //     rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
+                    //     onList: false,
+                    //     reload: false
+                    // });
                 });
             },
 
@@ -639,9 +642,10 @@
                         No places remaining
                     </template>
                 </meta-item>
-                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">
-                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                </form>
+<!-- SA-10476 -->
+<!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->
+<!--                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />-->
+<!--                </form>-->
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
@@ -683,14 +687,15 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">
-                            <span>
-                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>
-                            </span>
-                            <span>
-                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>
-                            </span>
-                        </span>
+<!-- SA-10475 -->
+<!--                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">-->
+<!--                            <span>-->
+<!--                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>-->
+<!--                            </span>-->
+<!--                            <span>-->
+<!--                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>-->
+<!--                            </span>-->
+<!--                        </span>-->
 
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
