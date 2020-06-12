@@ -160,21 +160,21 @@
             /**
              * Set up a selectize in a modal
              *
-             * At some point during startup, eventId is undefined and this method is called
-             * But I don't know where that happens, or what event it is. Anyway, we skip trying
-             * to do selectizes on events with unknown eventIds
+             * Use $nextTick() to execute this when data has been loaded, otherwise
+             * really odd behaviour occurs. Things about elements not existing or
+             * certain javascript not executing are really cryptic to figure out
              *
              * @param eventId
              * @returns {boolean}
              */
             attendanceSelectize(eventId) {
-                if (eventId !== undefined) {
+                this.$nextTick(() => {
                     this.jQuery.fn.attendance({
                         createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
                         createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
                         canModify: true
                     });
-                }
+                });
             },
 
             /**
@@ -244,6 +244,12 @@
                 this.event = event;
 
                 this.$refs.modal.open();
+
+                /* Set up the selectize for adding more guests
+                 */
+                if (this.event.extendedProps.data.meta.eventId !== undefined) {
+                    this.attendanceSelectize(this.event.extendedProps.data.meta.eventId);
+                }
             },
 
             /**
@@ -597,7 +603,7 @@
                         No places remaining
                     </template>
                 </meta-item>
-                <form @click="attendanceSelectize(eventExtendedProps.eventId)" :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="''" method="post" v-if="true">
+                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="''" method="post" v-if="true">
                     <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                 </form>
             </meta-list>
