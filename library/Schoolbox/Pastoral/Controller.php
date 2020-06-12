@@ -798,14 +798,12 @@ class Controller extends Base
             }
 
             try {
-                /** @var User $student */
                 $student = $this->userMapper->findById($studentIdCurrent);
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
             }
 
             try {
-                /** @var PastoralTypeModel $type */
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
                 $record->setType($type);
             } catch (MapperException\Deleted $e) {
@@ -825,7 +823,6 @@ class Controller extends Base
             }
 
             try {
-                /** @var PastoralSubTypeModel $subtype */
                 $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
                 $record->setSubType($subtype);
             } catch (MapperException\Deleted $e) {
@@ -845,19 +842,29 @@ class Controller extends Base
             }
 
             // Set severity separately from type
-            if (!$this->getConfigLoader()->get('pastoral_severity')) {
-                $severity = null;
-            } else {
-                /** @var PastoralSeverityModel $severity */
-                // TODO allow save of this value if it's deleted, and not being changed
-                $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+            if ($this->getConfigLoader()->get('pastoral_severity')) {
+                try {
+                    $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
+                    $record->setSeverity($severity);
+                } catch (MapperException\Deleted $e) {
+                    $deletedSeverity = $e->getDeletedObject();
+                    if ($deletedSeverity instanceof PastoralSeverityModel) {
+                        $existingId = $record->getSeverity()
+                            ? $record->getSeverity()->getId()
+                            : null;
+                        if ($existingId !== $deletedSeverity->getId()) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                        }
+                    }
+                } catch (MapperException $e) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                }
             }
 
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
             $record->setHeading($heading);
             $record->setPoints($post["points"]);
-            $record->setSeverity($severity);
             $record->setBodyPublic(trim($post["body_public"]));
             $record->setBodyPrivate(trim($post["body_private"]));
 

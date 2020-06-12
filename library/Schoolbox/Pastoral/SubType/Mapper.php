@@ -14,6 +14,7 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
  * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
