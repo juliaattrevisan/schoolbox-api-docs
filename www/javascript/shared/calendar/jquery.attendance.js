@@ -263,7 +263,7 @@
          * @param responseText object A json response payload
          */
         function onAfterAttendanceChange(responseText) {
-            config.attendanceList.find('ul').replaceWith(responseText.fragment);
+            config.attendanceList.find('article').html(responseText.fragment);
             config.available.html(responseText.available ? responseText.available : 'No');
 
             toggleRSVP(responseText.available);
