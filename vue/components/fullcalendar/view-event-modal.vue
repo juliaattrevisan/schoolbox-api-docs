@@ -19,6 +19,11 @@
      */
     const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
 
+    /* RSVP Status mutation routes
+     */
+    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
+    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
+
     export default {
         name: "view-event-modal",
         props: {
@@ -165,6 +170,20 @@
             createAttendancePath: function() {
                 return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             },
+
+            /**
+             * RSVP Accept
+             */
+            rsvpAcceptPath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Decline
+             */
+            rsvpDeclinePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+            }
         },
         methods: {
 
@@ -184,6 +203,11 @@
                         createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
                         createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
                         canModify: true
+                    });
+
+                    this.jQuery.fn.rsvp({
+                        rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
+                        onList: false
                     });
                 });
             },
@@ -658,6 +682,15 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
+                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">
+                            <span>
+                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>
+                            </span>
+                            <span>
+                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>
+                            </span>
+                        </span>
+
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
                             <a class="button"
