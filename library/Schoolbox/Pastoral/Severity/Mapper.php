@@ -7,10 +7,14 @@
 
 namespace Schoolbox\Pastoral\Severity;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
 use UnexpectedValueException;
 
+/**
+ * @method GenericCollection|Model[] findAll($options = [])
+ */
 class Mapper extends BaseMapper
 {
     /**
