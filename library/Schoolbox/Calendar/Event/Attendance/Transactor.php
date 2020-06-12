@@ -7,11 +7,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use PDOException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use UnderflowException;
 use UnexpectedValueException;
 
 /**
@@ -64,6 +66,8 @@ class Transactor
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     public function update(Event $event, array $guestIds): void
     {
@@ -74,20 +78,10 @@ class Transactor
             return;
         }
 
-        /* Sanitize values for now
-         * You'd have to iteratively create placeholders into the query, otherwise
+        /* Delete $guestIds that are no longer in the list
          */
-        $ids = implode(',', array_map('intval', $guestIds));
-
-        $query = "
-            DELETE FROM {$this->attendanceMapper->getTable()}
-            WHERE event_id = :eventId
-            AND user_id NOT IN ({$ids})
-        ";
-
-        $this->attendanceMapper->getDatabase()->query($query, [
-            'eventId' => $event->getId(),
-        ]);
+        $this->attendanceMapper->deleteByPredicates(($this->attendanceMapper->getPredicateBuilder())
+            ->notIn('user_id', $guestIds));
 
         $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
         $existingIds = (new Collection($existingUsers))->indexBy('id')->keys();
