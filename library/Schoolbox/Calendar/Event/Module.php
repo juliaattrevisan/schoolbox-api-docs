@@ -79,10 +79,10 @@ class Module extends BaseModule
                             /* I suppose if you're on the invited list,
                              * you should be able to see it
                              */
-                            $isAttendee = $this->getMapperFactory()->get(Attendance\Mapper::class)->findByColumnList([
+                            $isAttendee = $this->getMapperFactory()->get(Attendance\Mapper::class)->countByColumnList([
                                 'event_id' => $event->getId(),
                                 'user_id' => $loggedInUser->getId()
-                            ])->count();
+                            ]);
 
                             if ($isOwner || $isStaff || $isParentOfUser || $isAttendee) {
                                 return true;
