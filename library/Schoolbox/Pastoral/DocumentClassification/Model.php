@@ -10,13 +10,17 @@ namespace Schoolbox\Pastoral\DocumentClassification;
 
 use JsonSerializable;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Sequential;
 
-class Model implements ISoftDeletable, JsonSerializable
+class Model implements ISoftDeletable, JsonSerializable, Sequential
 {
-    use Id;
-    use DeletedAtDate;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\UpdatedBy;
+    use ModelTrait\HasSequence;
 
     /** @var string */
     protected $name;

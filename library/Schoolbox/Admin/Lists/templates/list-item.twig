@@ -53,7 +53,13 @@
                                             <option value="">Not Selected</option>
                                         {% endif %}
                                         {% for option in field.lookup %}
-                                            <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
+                                            {% if record[field_key] == option.key or not (option.deleted ?? false) %}
+                                            <option
+                                                    {% if record[field_key] == option.key %}selected{% endif %}
+                                                    value="{{ option.key }}">
+                                                {{ option.value }}{% if option.deleted %} (deleted){% endif %}
+                                            </option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 {% endif %}

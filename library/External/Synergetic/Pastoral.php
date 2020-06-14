@@ -14,9 +14,8 @@ use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
-use Schoolbox\Pastoral\DocumentClassification\Mapper as DocumentClassificationMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
-use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
+use Schoolbox\Pastoral\DocumentClassification\Model as PastoralDocumentClassification;
 use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
 use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
@@ -906,14 +905,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoral = $this->pastoralMapper->findById($upload->getPastoral()->getId());
         $storage = $upload->getStorage();
 
-        $pastoralDocumentClassificationMapper = DocumentClassificationMapper::getInstance();
-
-        if ($pastoral->getType()->getDocumentClassification() instanceof DocumentClassification) {
-            $documentClassification = $pastoralDocumentClassificationMapper->findById(
-                $pastoral->getType()->getDocumentClassification()->getId()
-            );
-        } else {
-            $documentClassification = null;
+        $documentClassification = null;
+        if ($pastoral->getType()->getDocumentClassification() instanceof PastoralDocumentClassification) {
+            try {
+                $documentClassification = $this->pastoralDocumentClassificationMapper->findById(
+                    $pastoral->getType()->getDocumentClassification()->getId()
+                );
+            } catch (BaseMapper\Exception $e) {
+                // noop: leave document classification as null
+            }
         }
 
         // Save the file into to the database
@@ -925,7 +925,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoralExternalId = $pastoral->getExternalId();
 
         // Documents get uploaded with a classification code that is based on the pastoral records type
-        if ($documentClassification instanceof DocumentClassification) {
+        if ($documentClassification instanceof PastoralDocumentClassification) {
             $classificationCode = $documentClassification->getExternalCode();
         } else {
             $classificationCode = '';
