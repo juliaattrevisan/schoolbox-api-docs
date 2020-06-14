@@ -37,11 +37,14 @@
         <div class="small-12 medium-6 columns">
             {% if severities | length %}
                 <label for="severityId">{{ locale.severity.proper }}</label>
-                    <select name="severityId" id="severityId">
-                        {% for severity in severities %}
-                            <option {% if severity.id == record.severity.id %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
-                        {% endfor %}
-                    </select>
+                <select name="severityId" id="severityId">
+                    {% if record.severity.deleted %}
+                        <option selected value="{{ record.severity.id }}">{{ record.severity.name }} (deleted)</option>
+                    {% endif %}
+                    {% for severity in severities %}
+                        <option {% if severity.id == record.severity.id %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                    {% endfor %}
+                </select>
             {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
