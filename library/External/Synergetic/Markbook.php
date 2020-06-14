@@ -121,11 +121,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Creates any assessments in Synergetic's globally-configured year and
      * semester, rather than in the context of a specific user.
      *
-     * Returns true if ANY markbooks are created in Synergetic. Consider the
-     * case where a SB assessment resides on a folder with 2 folder codes, but
-     * only 1 markbook in synergetic: `$this->hasAssessment($assessment)` will
-     * return TRUE, even though it is only a partial truth.
-     *
      * @inheritdoc
      *
      * @throws \Alaress\Database\Exception
@@ -188,15 +183,21 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Returns TRUE if there are any markbooks in synergetic for this assessment.
      *
-     * Only checks Synergetic's current globally-configured year and semester, rather than in the context of a specific user.
+     * Only checks Synergetic's current globally-configured year and semester,
+     * rather than in the context of a specific user.
      *
-     * Moving an assessment to a new folder, or changing the assessment's folder's codes, break the link to synergetic's markbooks.
+     * Moving an assessment to a new folder, or changing the assessment's
+     * folder's codes, will break the link to synergetic's markbooks.
      *
-     * IMPORTANT: A TRUE return value does not mean that Schoolbox and Synergetic are in sync regarding folders.
+     * IMPORTANT: A TRUE return value does not mean that Schoolbox and
+     * Synergetic are in sync regarding folders.
      *
-     * Consider case where a folder has a single folder code, and an assessment is created. This will create a markbook in synergetic.
-     * If the user adds another class code to the folder, this method will still return true, but we still need to CREATE the second markbook
-     * in synergetic before we attempt to apply an update(). This extra logic is implemented in update().
+     * Consider case where a folder has a single folder code, and an assessment
+     * is created. This will create a markbook in synergetic.
+     * If the user adds another class code to the folder, this method will still
+     * return true, but we still need to CREATE the second markbook in
+     * synergetic before we attempt to apply an update().
+     * This extra logic is implemented in insertMarkbooksIfNotExists().
      *
      * @inheritdoc
      */
@@ -801,9 +802,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
-     * Ensures this assessment has a markbook in each relevant folder, fileYear, and fileSemester
+     * Ensures this assessment has a markbook in each relevant folder, fileYear
+     * and fileSemester, creating the markbook entry if it does not exist.
      *
-     * Returns true if any markbooks were created.
+     * Returns true if ANY markbooks are created in Synergetic. Consider the
+     * case where a SB assessment resides on a folder with 2 folder codes, but
+     * only 1 markbook in synergetic: this method will return TRUE, even though
+     * it is only a partial truth.
      *
      * @param IAssessable $activity
      * @param string[]    $folderCodes
