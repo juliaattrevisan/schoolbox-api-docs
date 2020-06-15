@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\StandardFeed;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  *
@@ -84,6 +85,15 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             }
 
             $this->parse('has_activity_block', 'has_activity');
+        }
+
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
         }
 
         return true;
