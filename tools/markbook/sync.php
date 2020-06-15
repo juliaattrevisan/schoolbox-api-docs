@@ -298,11 +298,18 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
                 $student  = $participant->getUser();
 
+                // Output the HR and normalized mark that are synced
+                $markLog = '(missing)';
+                if ($feedback) {
+                    $hrMark   = $feedback->getHumanReadableMark();
+                    $normMark = $feedback->getNormalisedMark();
+                    $markLog  = sprintf('%s (%s)', $hrMark, isset($normMark) ? round($normMark, 2) : 'null');
+                }
                 $log->info(
                     sprintf(
                         "        %s%s",
                         str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " "),
-                        $feedback ? $feedback->getHumanReadableMark() : '(missing)'
+                        $markLog
                     )
                 );
 
