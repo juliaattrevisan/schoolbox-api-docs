@@ -15,6 +15,13 @@
         /* Set up selectizes if you have perms
          */
         if (config.canModify) {
+
+            /* Initial conditions
+             */
+            toggleCreateAttendance(config.available.attr('data-available'));
+
+            /* Selectize for adding/removing people
+             */
             const selectize = config.createAttendanceSelector.selectizeSelector({
                 ajax: {
                     url: '/ajax/user.php',
@@ -67,6 +74,20 @@
             };
 
             return $.extend(defaults, options);
+        }
+
+
+        /**
+         * Decide whether you can still add people
+         *
+         * @param available int
+         */
+        function toggleCreateAttendance(available) {
+            if (available === null || available === undefined || available > 0) {
+                config.createAttendanceForm.show();
+            } else {
+                config.createAttendanceForm.hide();
+            }
         }
 
 
@@ -175,6 +196,8 @@
         function onAfterAttendanceChange(responseText) {
             config.attendanceList.find('article').html(responseText.fragment);
             config.available.html(responseText.available ? responseText.available : 'No');
+
+            toggleCreateAttendance(responseText.available);
 
             $.fn.rsvpToggle({
                 available: responseText.available,
