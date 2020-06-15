@@ -200,8 +200,8 @@
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" data-rsvp="accept" :class="this.event.attendance.status.current == 'accepted' ? 'accepted' : ''">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" data-rsvp="decline" :class="this.event.attendance.status.current == 'declined' ? 'declined' : ''">No</a></li>
+                            <li><a :href="rsvpAcceptPath" data-rsvp="accept" :class="this.event.attendance.status.current === 'accepted' ? 'accepted' : ''">Yes</a></li>
+                            <li><a :href="rsvpDeclinePath" data-rsvp="decline" :class="this.event.attendance.status.current === 'declined' ? 'declined' : ''">No</a></li>
                         </ul>
                     </section>
                 </div>
