@@ -150,7 +150,7 @@
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
-            $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
+            $(config.assessmentList).on('mousedown click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
                 var $participant = findParticipantElement($(this)),
