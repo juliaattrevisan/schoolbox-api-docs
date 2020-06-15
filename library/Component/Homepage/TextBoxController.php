@@ -201,9 +201,10 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->parseConfig();
 
-        /* Hide Headings From Readonly Users
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
          */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');
             $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
