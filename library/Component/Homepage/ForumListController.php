@@ -19,7 +19,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
      *
      * @var array
      */
-    protected $sortFields = array('Threads', 'Posts');
+    protected $sortFields = ['Threads', 'Posts'];
 
     /**
      * Prepares data for the render function. Business logic.
@@ -48,7 +48,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         if (!parent::loadTemplate($templateHandle, 'forumList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -58,7 +58,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $forumHandler = new Forum();
-        $threadList = $forumHandler->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
+        $threadList   = $forumHandler->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
 
         // don't show forums to parents if they not a direct member of group
         // (Allow parents to read, but not post, if a child is in group)
@@ -73,11 +73,11 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
 
             $this->setVar([
-                'has_posts_block' => '',
-                'empty_write_block' => '',
-                'empty_read_block' => '',
+                'has_posts_block'         => '',
+                'empty_write_block'       => '',
+                'empty_read_block'        => '',
                 'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
-                'SOURCE_ID' => $this->getSource()->getId(),
+                'SOURCE_ID'               => $this->getSource()->getId(),
             ]);
 
             if ($is_post_allowed) {
@@ -98,11 +98,11 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
             // Set up component name
             $this->setVar([
-                'empty_state_block' => '',
-                'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                'empty_state_block'         => '',
+                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => Scrub::text($this->getSource()->getName()),
-                'COMPONENT_HANDLE' => strtolower($templateHandle),
-                'COMPONENT_NAME' => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : $this->getComponentName(),
+                'COMPONENT_HANDLE'          => strtolower($templateHandle),
+                'COMPONENT_NAME'            => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : $this->getComponentName(),
             ]);
 
             if (!$this->isSourceRenderable()) {
@@ -111,7 +111,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                 $this->setVar([
                     'source_folder_deleted_block' => '',
-                    'forum_post_block' => '',
+                    'forum_post_block'            => '',
                 ]);
 
                 if ($is_post_allowed) {
@@ -125,26 +125,26 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                 // Iterate
                 if (is_array($threadList)) {
-                    $j = 0;
+                    $j           = 0;
                     $userHandler = new User();
 
                     foreach ($threadList as $thread) {
-                        $user = array(
-                            'title' => $thread['userTitle'],
+                        $user = [
+                            'title'     => $thread['userTitle'],
                             'firstname' => $thread['userFirstname'],
-                            'lastname' => $thread['userLastname'],
-                        );
+                            'lastname'  => $thread['userLastname'],
+                        ];
 
                         $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
 
                         $this->setVar([
-                            'THREAD_ID' => $thread['threadID'],
-                            'THREAD_USER' => $userHandler->formatName($user),
-                            'THREAD_USER_ID' => $thread['userID'],
+                            'THREAD_ID'               => $thread['threadID'],
+                            'THREAD_USER'             => $userHandler->formatName($user),
+                            'THREAD_USER_ID'          => $thread['userID'],
                             'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
-                            'THREAD_DATE' => $threadTime->getRelativeTime(),
-                            'THREAD_TITLE' => Scrub::text($thread['title']),
-                            'forum_reply_block' => '',
+                            'THREAD_DATE'             => $threadTime->getRelativeTime(),
+                            'THREAD_TITLE'            => Scrub::text($thread['title']),
+                            'forum_reply_block'       => '',
                         ]);
 
                         if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= UserAccess::ACCESS_FULL)) {
@@ -161,9 +161,15 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             }
         }
 
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
+
         return true;
     }
-
-    /* Getters / Setters
-     */
 }
