@@ -24,7 +24,7 @@
             "roles"     : roleCollection,
             "folders"   : folderCollection
         },
-        'guests'     : guests,
+        "attendance" : attendance,
         "canModify"  : canModify,
         "level"      : level,
     } %}
@@ -40,7 +40,7 @@
     $(function() {
         $.fn.attendance({
             currentUserId: parseInt('{{ user.id}}'),
-            canModify: {{ guests.canModify ? 'true' : 'false' }}
+            canModify: {{ attendance.guests.canModify ? 'true' : 'false' }}
         });
     });
 </script>

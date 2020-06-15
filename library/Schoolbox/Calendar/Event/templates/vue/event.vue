@@ -46,23 +46,21 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.guests.available">
+                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.guests.available">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
-                        <form :action="''" method="post">
-                            <ul class="flex-list buttons">
-                                <li><a href="#">Yes</a></li>
-                                <li><a href="#">No</a></li>
-                            </ul>
-                        </form>
+                        <ul class="flex-list buttons rsvp">
+                            <li><a :href="rsvpAcceptPath" data-rsvp="accept" :class="this.event.attendance.status.current == 'accepted' ? 'accepted' : ''">Yes</a></li>
+                            <li><a :href="rsvpDeclinePath" data-rsvp="decline" :class="this.event.attendance.status.current == 'declined' ? 'declined' : ''">No</a></li>
+                        </ul>
                     </section>
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.guests.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.guests.available != null">
-                                <span id="attendance-guests-available" v-if="this.event.guests.available > 0">{{ this.event.guests.available }}</span>
+                        <div class="content" v-if="this.event.attendance.guests.available != null || this.event.canModify">
+                            <span class="meta" v-if="this.event.attendance.guests.available != null">
+                                <span id="attendance-guests-available" v-if="this.event.attendance.guests.available > 0">{{ this.event.attendance.guests.available }}</span>
                                 <span id="attendance-guests-available" v-else>No</span>
                                 available places remaining
                             </span>
@@ -72,7 +70,7 @@
                             </form>
                         </div>
 
-                        <article v-html="this.event.guests.fragment"></article>
+                        <article v-html="this.event.attendance.guests.fragment"></article>
                     </section>
                 </div>
             </div>
@@ -99,12 +97,20 @@
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
+
+    /* Event Modify screen
+     */
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
 
     /* Inline alteration of attendees on event detail screen
      */
     const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
     const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
+
+    /* RSVP Status mutation routes
+     */
+    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
+    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
     export default {
         props: ['event'],
@@ -120,47 +126,10 @@
         methods: {
 
             /**
-             * Route to the Event Modify screen with optional returnUrl redirect
-             *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             * Generate a path via const
              */
-            generateModifyUrl(eventId, returnUrl) {
-                var url = URL_EVENT_MODIFY_FORM.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            /**
-             * Route to the Attendance Create endpoint to asynchronously create attendees
-             *
-             * @param eventId
-             * @param returnUrl
-             * @returns {string}
-             */
-            generateAttendanceCreateUrl(eventId, returnUrl) {
-                var url= URL_ATTENDANCE_CREATE.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-
-            /**
-             * Route to the Attendance Delete endpoint to asynchronously remove attendees
-             *
-             * @param eventId
-             * @param returnUrl
-             * @returns {string}
-             */
-            generateAttendanceDeleteUrl(eventId, returnUrl) {
-                var url= URL_ATTENDANCE_DELETE.replace('{eventId}', eventId);
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
@@ -230,22 +199,39 @@
                 return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
             },
 
+            /**
+             * Onwards to the modify screen
+             */
             modifyPath: function() {
-                return this.generateModifyUrl(this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateAttendanceCreateUrl(this.event.id);
+                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Delete attendances
              */
             deleteAttendancePath: function() {
-                return this.generateAttendanceDeleteUrl(this.event.id);
+                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Accept
+             */
+            rsvpAcceptPath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Decline
+             */
+            rsvpDeclinePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
             }
         }
     }

@@ -16,6 +16,11 @@
          */
         toggleRSVP(config.rsvpAttendanceForm.attr('data-guests-available'));
 
+        /* Apply listeners to RSVP buttons to post and reload
+         * That'll reload with the most recent state of affairs
+         */
+        setupRSVP();
+
         /* Set up selectizes if you have perms
          */
         if (config.canModify) {
@@ -104,6 +109,54 @@
             } else {
                 config.rsvpAttendanceForm.hide();
             }
+        }
+
+
+        /**
+         * Process your response
+         */
+        function setupRSVP() {
+            $.each(config.rsvpAttendanceForm.find('[data-rsvp]'), function(index, element) {
+                $(element).on('click', function(event) {
+                    event.preventDefault();
+
+                    /* Special case: if you're not in the list and you're declining, exit early
+                     */
+                    if ($(this).attr('data-rsvp') === 'decline') {
+                        const onList = config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length;
+
+                        if (!onList) {
+                            return;
+                        }
+                    }
+
+                    /* A toast - to your valour, my sword, and our victory together
+                     */
+                    config.toast.toastActivate({
+                        text: 'Updating invitation...'
+                    });
+
+                    $.ajax({
+                        url: $(element).attr('href'),
+                        method: 'post',
+                        dataType: 'json',
+                        data: {},
+                        success: function(responseText) {
+                            config.toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+
+                            window.location.reload();
+                        },
+                        error: function(xhr, status, error) {
+                            let responseText = $.parseJSON(xhr.responseText)
+
+                            config.toast.toastTimeout({text: 'Unable to update invitation. ' + responseText.message, css: 'alert'});
+                        }
+                    });
+                });
+            });
         }
 
 
@@ -210,7 +263,7 @@
          * @param responseText object A json response payload
          */
         function onAfterAttendanceChange(responseText) {
-            config.attendanceList.find('ul').replaceWith(responseText.fragment);
+            config.attendanceList.find('article').html(responseText.fragment);
             config.available.html(responseText.available ? responseText.available : 'No');
 
             toggleRSVP(responseText.available);

@@ -23,6 +23,9 @@ use UnexpectedValueException;
  * Class Mapper
  *
  * @package Schoolbox\Calendar\Event\Attendance
+ *
+ * @method Model[]|Collection findByColumn($columnName, $columnValue, $options = array())
+ * @method Model findOneByColumnList($columnList, array $options = array())
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -100,7 +103,7 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Find a list of attendees, sorted by lastname then by firstname, for a particular event
-     * Returns as a set of key-value pairs of (id, name) in said order
+     * Returns as a set of key-value pairs of (id, name, status) in said order
      *
      * @param Event $event
      * @return array
@@ -120,7 +123,8 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($attendances as $attendance) {
             $pairs[] = [
                 'id' => $attendance->getUser()->getId(),
-                'name' => $attendance->getUser()->getFullname()
+                'name' => $attendance->getUser()->getFullname(),
+                'status' => $attendance->getStatus()
             ];
         }
 

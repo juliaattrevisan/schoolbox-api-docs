@@ -70,13 +70,13 @@ class ListPayload
     public function generate(Event $event, User $user): array
     {
 
-        /* Current list of attendees for $event
-         */
-        $guests = $this->attendanceMapper->findAttendances($event);
-
         /* Whether $user has modify capability
          */
         $canModify = (new Event\Access(Access::getInstance()))->checkExisting($user, $event);
+
+        /* Current list of attendees for $event
+         */
+        $guests = $this->attendanceMapper->findAttendances($event);
 
         /* Number of available places
          * Could be null, 0, or many
@@ -91,6 +91,20 @@ class ListPayload
             }
         }
 
+        /* Other counts
+         */
+        $pending = \count(array_filter($guests, static function($element) {
+            return $element['status'] === Model::STATUS_PENDING;
+        }));
+
+        $accepted = \count(array_filter($guests, static function($element) {
+            return $element['status'] === Model::STATUS_APPROVED;
+        }));
+
+        $declined = \count(array_filter($guests, static function($element) {
+            return $element['status'] === Model::STATUS_REJECTED;
+        }));
+
         return [
             'available' => $available,
             'guests' => $guests,
@@ -99,9 +113,15 @@ class ListPayload
                 ->get('webOutput:nochrome')
                 ->setTemplate('@calendarEventAttendance/current.twig')
                 ->setData([
+                    'counts' => [
+                        'pending' => $pending,
+                        'accepted' => $accepted,
+                        'declined' => $declined
+                    ],
                     'canModify' => $canModify,
                     'event' => $event,
                     'guests' => $guests,
+                    'status' => Model::CLASSES
                 ])->getAsString()
         ];
     }

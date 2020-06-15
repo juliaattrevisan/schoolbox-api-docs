@@ -5,8 +5,10 @@
  #
  # @param array $guests     A list of (id, name) tuples
  # @param Event $event      An instance of \Schoolbox\Calendar\Event
- # @param boool $canModify  Whether the current user can modify the event
+ # @param bool  $canModify  Whether the current user can modify the event
+ # @param array $status     An array of status consts and their meaning
  #}
+<p class="content"><strong>{{ counts.accepted }} accepted, {{ counts.declined }} declined, {{ counts.pending }} pending</strong></p>
 <ul class="action-list attendance-guest-list">
     {% for guest in guests %}
     <li class="actions-small-1" data-guest="{{ guest.id }}">
@@ -14,7 +16,12 @@
             <a href="/search/user/{{ guest.id }}" title="View Profile">
                 <img src="/portrait.php?id={{ guest.id }}&size=square64" />
 
-                <p>{{ guest.name }}</p>
+                {# Value of the status key is used as css class
+                 # You don't have to, but it's kind of convenient
+                 #}
+                {% set class = status[guest.status] %}
+
+                <p class="{{ class }}">{{ guest.name }} <span class="status-icon"></span></p>
             </a>
         </div>
         <nav>
