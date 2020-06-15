@@ -1,5 +1,7 @@
 <?php
-use Schoolbox\Resource\Attachment\Zone;
+
+use Schoolbox\Permission\Access\UserAccess;
+
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -40,7 +42,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                 )
             );
 
-
             /* If you can neither comment nor collaborate, hide the form
              * and disable javascript and hide links
              */
@@ -61,8 +62,9 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                             'FORM_CLASS' => ''
                         )
                     );
-                } /* Use hidden cloneable
-			 */
+                }
+                /* Use hidden cloneable
+                 */
                 else {
                     if ($authenticator->canComment()) {
                         $this->setVar(
@@ -86,6 +88,15 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                 )
             );
             $this->parse('source_folder_exists_block','source_folder_exists');
+        }
+
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
         }
 
         return true;
