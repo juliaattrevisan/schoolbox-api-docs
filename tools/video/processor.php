@@ -63,16 +63,22 @@ $app = new class extends CliTool\App{
                 exit(1);
             }
 
+            // If videos exceeded the timeout, and we timed all videos out,
+            // kill the process (otherwise we are still processing videos)
             $totalProcessing = $queueMapper->countByColumn('status', $queueMapper::STATUS_PROCESSING);
-            $num_timed_out = $queueMapper->markAllProcessingAsTimedOut($timeout);
-
-            //If videos exceeded the timeout, and we timed all videos out, kill the process (otherwise we are still processing videos)
-            if ($num_timed_out > 0 && $totalProcessing - $num_timed_out === 0) {
-                $log->error("Error: {$num_timed_out} media item(s) timed out");
-                $lock->killProcess();
-                $lock->acquire();
+            $numTimedOut     = $queueMapper->markAllProcessingAsTimedOut($timeout);
+            if ($numTimedOut > 0) {
+                $log->error("Error: {$numTimedOut} media item(s) timed out");
+                if (($totalProcessing - $numTimedOut) === 0) {
+                    $log->info("Existing transcode timed out and no further media item(s) processing: terminating existing processor");
+                    $lock->killProcess();
+                    $lock->acquire();
+                } else {
+                    $log->info("Unable to proceed, existing transcode running and still has media to process");
+                    exit(1);
+                }
             } else {
-                $log->info("Unable to proceed, existing transcode still within timeout period");
+                $log->info("Unable to proceed, existing transcode running and no media item(s) timed out");
                 exit(1);
             }
         }
