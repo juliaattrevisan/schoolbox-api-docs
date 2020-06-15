@@ -23,11 +23,11 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         if (!parent::loadTemplate($templateHandle, 'dropBox')) {
             return false;
         }
-        
+
         $this->parseConfig();
 
         // Output drop box
-        
+
         $this->setBlock($templateHandle, "drop_student", "drop_student_block");
         $this->setBlock('drop_student', "drop_success", "drop_success_block");
         $this->setBlock($templateHandle, "drop_staff", "drop_staff_block");
@@ -90,6 +90,15 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             }
 
             $this->parse("drop_staff_block", "drop_staff");
+        }
+
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
         }
 
         return true;
