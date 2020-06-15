@@ -247,6 +247,15 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->parse('has_students_block', 'has_students');
         }
 
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
+
         return true;
     }
 }
