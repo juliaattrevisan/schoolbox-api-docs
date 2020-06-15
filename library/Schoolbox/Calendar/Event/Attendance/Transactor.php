@@ -81,6 +81,7 @@ class Transactor
         /* Delete $guestIds that are no longer in the list
          */
         $this->attendanceMapper->deleteByPredicates(($this->attendanceMapper->getPredicateBuilder())
+            ->equals('event_id', $event->getId())
             ->notIn('user_id', $guestIds));
 
         $existingUsers = $this->attendanceMapper->findByColumn('event_id', $event->getId())->getPropertyValues('user');
