@@ -316,8 +316,8 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 if (!$dryRun) {
                     if ($feedback) {
                         $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
-                    } else {
-                        $markbookExternal->deleteFeedback($assessment, $student);
+//                    } else {
+//                        $markbookExternal->deleteFeedback($assessment, $student);
                     }
                 }
             }

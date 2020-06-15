@@ -114,9 +114,9 @@ class Adapter
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
                 if ($feedback) {
                     $this->externalMarkbook->syncFeedback($feedback);
-                } else {
-                    // Attempt to delete this student's participation
-                    $this->externalMarkbook->deleteFeedback($assessment, $student);
+//                } else {
+//                    // Attempt to delete this student's participation
+//                    $this->externalMarkbook->deleteFeedback($assessment, $student);
                 }
             }
         }
