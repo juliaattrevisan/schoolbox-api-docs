@@ -1,4 +1,5 @@
--- Add a new Component Config Definition to all components
+-- Add a new Component Config Definition to all Homepage components
+-- I had a look at what happens in Dashboard if I add for them; crazy crap is going on over there
 
 INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
@@ -6,6 +7,7 @@ component_config_definition (`component_definition_id`, `key`, `default_value`, 
     SELECT
         id, 'showComponentTitle', 1, 'Show title to read-only users', null
     FROM component_definition
+    WHERE `module` = 'homepage'
 );
 
 -- Invert special usages of CompactMode in particular components:
