@@ -72,9 +72,12 @@ class Transactor
     public function update(Event $event, array $guestIds): void
     {
 
-        /* No guests to process; just leave early
+        /* No guests in this event - clear all attendances
          */
         if (empty($guestIds)) {
+            $this->attendanceMapper->deleteByPredicates(($this->attendanceMapper->getPredicateBuilder())
+                ->equals('event_id', $event->getId()));
+
             return;
         }
 
