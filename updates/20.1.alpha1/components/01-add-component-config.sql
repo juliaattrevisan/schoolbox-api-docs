@@ -51,7 +51,7 @@ INNER JOIN component_definition cd2 ON ccd2.component_definition_id = cd2.id AND
 )
 SET cci1.`value` = IF(cci2.`value` = '1', '0', '1');
 
--- Update old "hide heading" component configs back to their original name
+-- Update old "hide heading" Homepage component configs back to their original name
 -- Yes, there are two variants in legacy
 
 UPDATE component_config_definition
@@ -59,15 +59,4 @@ SET `label` = 'Compact Mode'
 WHERE `label` IN (
     'Hide heading from read only users',
     'Hide Heading from read-only users'
-);
-
--- These seem orphaned in legacy data, but I can't tell what happens in the wild
--- Update those to be the same, regardless
-
-UPDATE component_config_definition
-SET `label` = 'Compact Mode'
-WHERE `label` IN (
-    'Hide header',
-    'Hide heading',
-    'Hide Heading'
 );
