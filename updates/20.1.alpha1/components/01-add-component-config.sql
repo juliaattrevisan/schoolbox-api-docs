@@ -4,7 +4,7 @@ INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
 (
     SELECT
-        id, 'showComponentTitle', 1, 'Show Title', null
+        id, 'showComponentTitle', 1, 'Show title to read-only users', null
     FROM component_definition
 );
 
