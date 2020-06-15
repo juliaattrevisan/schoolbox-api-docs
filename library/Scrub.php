@@ -260,6 +260,9 @@ class Scrub
                 $def->addAttribute('a', 'data-template', 'Text');
                 $def->addAttribute('a', 'data-portal', 'Text');
                 $def->addAttribute('blockquote', 'data-id', 'Text');
+                $def->addAttribute('iframe', 'allow', 'Text');
+                $def->addAttribute('iframe', 'allowfullscreen', 'Bool');
+
 
                 //
                 // Definition of customised elements, copied directly out of modules.
@@ -384,64 +387,6 @@ class Scrub
         return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
     }
 
-
-
-    /**
-     * Mangles HTML-purified DOM - this is needed for things that HTMLPurifier
-     * can't do, such as adding new nodes.
-     *
-     * Currently:
-     * * adds "allowfullscreen=true" to iframes
-     *
-     * @param string $html
-     * @return string
-     */
-    protected static function htmlDomModify($html)
-    {
-        // Don't bother parsing anything if $html is empty
-        if (strlen($html) === 0) {
-            return $html;
-        }
-
-        // Now try loading into a document
-        $domDocument = new DOMDocument();
-        // Silence noisy DomDocument errors
-        $xmlErrors = libxml_use_internal_errors(true);
-        if ($domDocument->loadHTML('<?xml encoding="UTF-8">'.$html)) {
-            $touched = false;
-
-            // Mangle iframes: add allowfullscreen, and wrap in div
-            foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
-                /** @var DOMElement $iframe */
-                $touched = true;
-                $iframe->setAttribute('allowfullscreen', 'true');
-            }
-
-            // I only want the fragment content, but saveHTML loads doc into a
-            // full HTML document with doctype, body, etc.
-            if ($touched) {
-                /** @var DOMElement $body */
-                $body = $domDocument->getElementsByTagName('body')->item(0);
-                if ($body) {
-                    // I don't want any attributes interfering with the regexp
-                    foreach ($body->attributes as $attribute) {
-                        $body->removeAttribute($attribute->name);
-                    }
-                    // And get rid of the actual body tag
-                    $html = preg_replace(
-                        ['|^<body\\s*>|i', '|</body\\s*>$|i'],
-                        '',
-                        $domDocument->saveHTML($body)
-                    );
-                }
-            }
-        }
-        libxml_clear_errors();
-        libxml_use_internal_errors($xmlErrors);
-        return $html;
-    }
-
-
     /**
      * Cleans crap out of input using HTMLPurifier.
      * Now caches previous calls in Redis!
@@ -454,7 +399,7 @@ class Scrub
         return Alaress\Redis::getInstance()->cacheFunctionCall(
             'scrub.html',
             function ($param) {
-                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
+                return self::getHtmlPurifierInstance()->purify($param);
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
@@ -475,7 +420,7 @@ class Scrub
             'scrub.htmlAbsoluteUri',
             function ($params) {
                 $purifier = self::getHtmlPurifierInstance($params[1]);
-                return self::htmlDomModify($purifier->purify($params[0]));
+                return $purifier->purify($params[0]);
             },
             ["$html", $domain],
             Config::get('scrub_html_cache_timeout')
