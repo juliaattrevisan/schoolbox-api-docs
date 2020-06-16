@@ -14,6 +14,7 @@
 use External\IOfflineConnector;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\User;
 
 class External_Offline_Markbook implements External_MarkbookInterface, IOfflineConnector
 {
@@ -55,6 +56,14 @@ class External_Offline_Markbook implements External_MarkbookInterface, IOfflineC
      * @inheritdoc
      */
     public function syncFeedback(IFeedback $returnedWork): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteFeedback(IAssessable $assessment, User $student): bool
     {
         return false;
     }

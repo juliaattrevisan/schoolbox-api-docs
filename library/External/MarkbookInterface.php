@@ -9,6 +9,7 @@
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\User;
 
 interface External_MarkbookInterface extends External\IConnector
 {
@@ -51,5 +52,14 @@ interface External_MarkbookInterface extends External\IConnector
      * @return bool
      */
     public function syncFeedback(IFeedback $returnedWork): bool;
+
+    /**
+     * Deletes the mark for a student in the remote markbook
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return bool
+     */
+    public function deleteFeedback(IAssessable $assessment, User $student): bool;
 }
 

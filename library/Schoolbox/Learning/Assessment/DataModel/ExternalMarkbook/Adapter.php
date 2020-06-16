@@ -103,7 +103,7 @@ class Adapter
     public function syncParticipation(IAssessableDataModel $assessmentModel, User $student): void
     {
         try {
-            $assessment = $this->findAssessmentFromDataModel($assessmentModel);
+            $assessment = $this->findAssessmentFromDataModel($assessmentModel, $student);
         } catch (BaseMapper\Exception\Deleted $e) {
             return;
         }
@@ -114,6 +114,9 @@ class Adapter
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
                 if ($feedback) {
                     $this->externalMarkbook->syncFeedback($feedback);
+//                } else {
+//                    // Attempt to delete this student's participation
+//                    $this->externalMarkbook->deleteFeedback($assessment, $student);
                 }
             }
         }
