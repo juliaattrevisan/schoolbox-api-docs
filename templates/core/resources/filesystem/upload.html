@@ -201,12 +201,16 @@ $(function () {
             return;
         }
 
-        // Any error files or queued files? return
-        if (errorFiles.length) {
+        // Any queued files? return
+        if (this.getQueuedFiles().length) {
             return;
         }
 
-        if (this.getQueuedFiles().length) {
+        // Cancel button is no longer disabled, even if there's error files
+        abUploadCancelBtn.removeAttr('disabled');
+
+        // Any error files? return
+        if (errorFiles.length) {
             return;
         }
 
