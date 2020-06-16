@@ -55,12 +55,13 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          * A callback which you use to deal with the url produced
          * by interacting with the modal
          *
-         * @param url     string  the url to which you linked
-         * @param name    string  user-facing name of the thing you linked
-         * @param mime    string  the mime type of the thing you linked
-         * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+         * @param url      string the url to which you linked
+         * @param name     string user-facing name of the thing you linked
+         * @param mime     string the mime type of the thing you linked
+         * @param dialog   object the cke dialog to update (supply null if you aren't using cke dialogs)
+         * @param response object the actual JSON response for the thing you linked
          */
-        onSelect: function(url, name, mime, dialog) {
+        onSelect: function(url, name, mime, dialog, response) {
 
             /* Manufacture link url based on whether it was
              * a file or a folder
@@ -70,7 +71,42 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
              */
             var fields = dialogFields(dialog);
 
-            fields.url.setValue(url);
+            fields.type.setValue(response.type);
+            fields.filesystem.setValue(response.filesystem);
+
+            /* Renderer Strategy (I guess)
+             */
+            if (fields.type.getValue() == 'video') {
+                fields.id.setValue(response.id);
+                fields.url.setValue(config.video.source(response.id, fields.filesystem.getValue()));
+            }
+            else if (fields.type.getValue() == 'audio') {
+                fields.id.setValue(response.id);
+                fields.url.setValue(config.audio.source(response.id, fields.filesystem.getValue()));
+            }
+            else if (fields.type.getValue() == 'image') {
+                fields.url.setValue(config.image.source(response.hash));
+            }
+
+            /* Prevent rendering attempt for uploaded files that
+             * aren't actually renderable
+             */
+            if (fields.type.getValue().length) {
+                render(fields, fields.url.getValue(), false);
+            }
+
+            /* Enable Constrain Aspect Ratio only if a width
+             * and height are provided (both are now optional)
+             *
+             * If optional, to re-activate Constrain, you must untick
+             * then re-tick the Constrain checkbox. Save some hassle
+             * by leaving it unticked when you don't specify a dimension
+             */
+            if (fields.width.getValue() && fields.height.getValue()) {
+                fields.aspectRatio.setValue(true);
+            }
+
+            // fields.url.setValue(url);
 
             $('#participant-customise-modal').css('z-index', '10000');
         }
