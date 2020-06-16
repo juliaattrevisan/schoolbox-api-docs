@@ -628,11 +628,7 @@ class Calendar extends DeprecatedModel
                 detail,
                 attendance,
                 max_attendees,
-                (
-                    SELECT COUNT(*)
-                    FROM event_attendance
-                    WHERE event_id = event.id
-                ) AS num_attendees,
+                COUNT(DISTINCT event_attendance.user_id) AS num_attendees,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
