@@ -148,7 +148,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
             $this->setVar('CONFIGURATION', '');
             $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
         }
 
         return true;
