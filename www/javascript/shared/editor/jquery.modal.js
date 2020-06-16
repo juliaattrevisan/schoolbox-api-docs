@@ -409,7 +409,13 @@
                     }
                     if (status === 'success') {
                         $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                            config.onSelect(processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id), responseText.name, responseText.mime, dialog);
+                            config.onSelect(
+                                processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id),
+                                responseText.name,
+                                responseText.mime,
+                                dialog,
+                                responseText
+                            );
 
                             /* Shut modal, go back to Dialog
                              */
@@ -507,12 +513,13 @@
              * A callback which you use to deal with the url produced
              * by interacting with the modal
              *
-             * @param url     string  the url to which you linked
-             * @param name    string  user-facing name of the thing you linked
-             * @param mime    string  the mime type of the thing you linked
-             * @param dialog  object  the cke dialog to update (supply null if you aren't using cke dialogs)
+             * @param url      string the url to which you linked
+             * @param name     string user-facing name of the thing you linked
+             * @param mime     string the mime type of the thing you linked
+             * @param dialog   object the cke dialog to update (supply null if you aren't using cke dialogs)
+             * @param response object the actual JSON response for the thing you linked
              */
-            onSelect: function(url, name, mime, dialog) {
+            onSelect: function(url, name, mime, dialog, response) {
                 return url;
             },
 
