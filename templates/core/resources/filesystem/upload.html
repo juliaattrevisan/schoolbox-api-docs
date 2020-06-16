@@ -90,10 +90,6 @@ $(function () {
             this.on('queuecomplete', onQueueComplete.bind(this));
 
             this.on('error', function (file, msg, xhr) {
-                // console.log(file);
-                // console.log(msg);
-                // console.log(xhr);
-
                 if (xhr) {
                     try {
                         msg = JSON.parse(msg);
@@ -139,25 +135,16 @@ $(function () {
      * the button if it was previously disabled
      */
     function checkState() {
-
-        // This prevents the upload button from re-enabling if it the file was rejected.
-        // if (abUploadSubmitBtn.data('uploading')) {
-        //     return;
-        // }
-
         let queueLength   = this.getQueuedFiles().length,
             successFiles  = this.getFilesWithStatus(Dropzone.SUCCESS),
             errorFiles    = this.getFilesWithStatus(Dropzone.ERROR),
             uploadLength  = queueLength + successFiles.length,
             uploadEnabled = uploadLength > 0 && errorFiles.length === 0;
 
-
         // Is upload feasible right now?
         // * At least one queued file? Yes
         // * No error files? Yes
         // * Otherwise? No
-
-
         if (!uploadEnabled) {
             abUploadSubmitBtn
                 .html('Upload')

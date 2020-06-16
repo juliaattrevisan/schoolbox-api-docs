@@ -454,12 +454,6 @@ ul.az-error-list {
             }
         }
     }
-    //.dz-error-mark, .dz-success-mark {
-    //    display: none;
-    //    position: absolute;
-    //    top: 23px;
-    //    left: 9px;
-    //}
     .dz-details {
         padding-bottom: 1rem;
     }
@@ -472,11 +466,9 @@ ul.az-error-list {
     .dz-preview {
         &.dz-error {
             color: $alert-color;
-            //@extend .dz-error-mark;
         }
         &.dz-success {
             color: $success-color;
-            //@extend .dz-success-mark;
         }
     }
     .dz-error .dz-error-message {
@@ -492,13 +484,7 @@ ul.az-error-list {
         // Undo some of the base background styles
         opacity: 1;
         background: transparent;
-        //width: 100px;
-        //height: 100px;
-        //margin: rem-calc(($base-font-size - 8));
-        //background: $alert-color;
-        //padding: rem-calc(($base-font-size - 6));
-        //box-sizing: border-box;
-        //text-align: center;
+
         // Make space for .dz-progress
         margin-bottom: 6px;
     }
@@ -508,7 +494,6 @@ ul.az-error-list {
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
-        //display: block;
         display: none;
     }
     .dz-preview {
@@ -518,7 +503,6 @@ ul.az-error-list {
         border: solid 1px $monsoon;
         box-sizing: border-box;
         float: left;
-        //padding-bottom: 1rem;
     }
     img[data-dz-thumbnail] {
         margin: 9px;

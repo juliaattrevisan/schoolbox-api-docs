@@ -426,15 +426,7 @@
                             $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                         });
                     } else {
-                        // // assume error: do these things
-                        // $('#file-picker').foundation('reveal', 'close');
-                        // config.onAfterClose();
-                        // $.fn.schoolboxRestorePreviousModal(config.restoreModal);
-
-                        // Stick the error in the preview, or however errors get rendered
-                        // Eh. Just put it in an alert box for now
-                        // alert(message.data[0].hash.split(':')[1]);
-                        console.log(message.data[0].hash.split(':')[1]);
+                        // assume error: do nothing, as the modal already shows the error
                     }
                 } else if ('meetingUrl' in message.data) {
 
