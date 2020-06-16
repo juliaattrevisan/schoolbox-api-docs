@@ -571,11 +571,15 @@ class Calendar extends DeprecatedModel
             $filter_query = " AND ($filter_query)";
         }
 
-        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}'
-            AND event_attendance.status = '". \Schoolbox\Calendar\Event\Attendance\Model::STATUS_APPROVED ."' )";
+        /* If you've been explicitly invited to this event, show it regardless of status
+         *
+         * Status is the response from the invitee so they should still have an opportunity
+         * to change that response if they want
+         */
+        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}')";
 
-        $access_query = "AND (
-            (access = " . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
+        $access_query = 'AND (
+            (access = ' . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
             $groupQuery
             OR (access = " . EventModel::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
             $attendance_query
@@ -607,7 +611,7 @@ class Calendar extends DeprecatedModel
 
         // get single events for the day
         // Don't get events for resources, get them separately.
-        $query = "
+        $query = '
             SELECT DISTINCT
                 event.id,
                 event.series_id,
@@ -623,6 +627,8 @@ class Calendar extends DeprecatedModel
                 location,
                 detail,
                 attendance,
+                max_attendees,
+                COUNT(DISTINCT event_attendance.user_id) AS num_attendees,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -639,11 +645,11 @@ class Calendar extends DeprecatedModel
             LEFT JOIN user             ON event.author_id = user.id
             LEFT JOIN luEventType      ON type = eventTypeID
             LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = " . EventModel::ACCESS_PERSONAL . "
-            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = " . EventModel::ACCESS_GROUP . "
+            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = ' . EventModel::ACCESS_PERSONAL . '
+            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = ' . EventModel::ACCESS_GROUP . '
             LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
-            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = " . EventModel::ACCESS_CAMPUS . "
-            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = " . EventModel::ACCESS_CAMPUS . "
+            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = ' . EventModel::ACCESS_CAMPUS . '
+            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = ' . EventModel::ACCESS_CAMPUS . "
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
             WHERE
                 event.deleted_at is NULL AND
@@ -705,6 +711,10 @@ class Calendar extends DeprecatedModel
                 }
 
                 $event->setAttendance($currentEvent['attendance']);
+
+                $event->setMaxAttendees($currentEvent['max_attendees']);
+                $event->setNumAttendees($currentEvent['num_attendees']);
+
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);
 

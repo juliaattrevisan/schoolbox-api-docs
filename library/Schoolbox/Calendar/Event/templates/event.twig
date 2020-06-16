@@ -38,9 +38,27 @@
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.attendance.js"></script>
 <script>
     $(function() {
+
+        /* Attendance list modification
+         */
         $.fn.attendance({
-            currentUserId: parseInt('{{ user.id}}'),
             canModify: {{ attendance.guests.canModify ? 'true' : 'false' }}
+        });
+
+        /* Initial conditions
+         */
+        const onList = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id}}') + '"]').length > 0;
+
+        $.fn.rsvpToggle({
+            available: $('#rsvpAttendanceForm').attr('data-guests-available'),
+            onList: onList
+        });
+
+        /* Apply listeners to RSVP buttons to post and reload
+         * That'll reload with the most recent state of affairs
+         */
+        $.fn.rsvp({
+            onList: onList
         });
     });
 </script>

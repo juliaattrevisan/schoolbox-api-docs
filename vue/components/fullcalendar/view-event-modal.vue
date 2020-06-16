@@ -15,6 +15,15 @@
     const ATTENDANCE_ACTION_ADD = 'add';
     const ATTENDANCE_ACTION_REMOVE = 'remove';
 
+    /* Inline alteration of attendees on event modal
+     */
+    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
+
+    /* RSVP Status mutation routes
+     */
+    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
+    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
+
     export default {
         name: "view-event-modal",
         props: {
@@ -45,6 +54,7 @@
         },
         computed: {
             window: () => window,
+            jQuery: () => window.jQuery,
 
             /**
              * Generate extended properties for the component's event.
@@ -68,8 +78,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateModifyUrl(metadata?.eventId, this.returnUrl);
-                        deleteLink = this.generateDeleteUrl(metadata?.eventId, this.returnUrl);
+                        modifyLink = this.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
+                        deleteLink = this.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
                     }
                 }
 
@@ -99,6 +109,30 @@
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: {
+
+                        /* Data struct
+                         *
+                         * The output is a json payload from /calendar/ajax/full.php
+                         * This feeds into the main fullcalendar
+                         *
+                         * full.php uses the Calendar API Composite to get all the events from everywhere
+                         * Inside that Factory you'll find specialised classes to collate events from various places
+                         * The regular calendar events are in Calendar_Api_EventType_Event_Schoolbox_Default
+                         *
+                         * This uses the Calendar handler to find events
+                         *
+                         * Fields come from the javascript-rendered data via the abstraction
+                         * library/Calendar/Event/Type/Day/Renderer/Javascript.php
+                         */
+
+                        /* Maximum allowed guests
+                         */
+                        max: data?.attendance?.maxAttendees,
+
+                        /* Remaining attendee places
+                         */
+                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
+
                         // Massage attendance data into something resembling usability
                         isAttendable: data?.attendance?.icon,
                         status: data?.attendance?.status,
@@ -128,32 +162,65 @@
                         path: data?.links?.path
                     },
                 };
+            },
+
+            /**
+             * Create new attendances
+             */
+            createAttendancePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Accept
+             */
+            rsvpAcceptPath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+            },
+
+            /**
+             * RSVP Decline
+             */
+            rsvpDeclinePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             }
         },
         methods: {
 
             /**
-             * Route to the Event Modify screen with optional returnUrl redirect
+             * Set up a selectize in a modal
              *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             * Use $nextTick() to execute this when data has been loaded, otherwise
+             * really odd behaviour occurs. Things about elements not existing or
+             * certain javascript not executing are really cryptic to figure out
+             *
+             * @param eventId
+             * @returns {boolean}
              */
-            generateModifyUrl(eventId, returnUrl) {
-                var url = this.eventModifyFormUrl.replace('{eventId}', eventId);
+            attendanceSelectize(eventId) {
+                this.$nextTick(() => {
 
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
+                    // SA-10476
+                    // this.jQuery.fn.attendance({
+                    //     createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
+                    //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
+                    //     canModify: true
+                    // });
 
-                return url;
+                    // SA-10475
+                    // this.jQuery.fn.rsvp({
+                    //     rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
+                    //     onList: false,
+                    //     reload: false
+                    // });
+                });
             },
 
             /**
-             * Route to the Event Delete screen with optional returnUrl redirect
-             *
-             * TODO: Obtain from backend, I guess, instead of hardcoding it front-end
+             * Generate a path via const
              */
-            generateDeleteUrl(eventId, returnUrl) {
-                var url = this.eventDeleteUrl.replace('{eventId}', eventId);
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
 
                 if (returnUrl !== undefined) {
                     url += '?returnUrl=' + returnUrl;
@@ -216,6 +283,12 @@
                 this.event = event;
 
                 this.$refs.modal.open();
+
+                /* Set up the selectize for adding more guests
+                 */
+                if (this.event.extendedProps.data.meta.eventId !== undefined) {
+                    this.attendanceSelectize(this.event.extendedProps.data.meta.eventId);
+                }
             },
 
             /**
@@ -561,6 +634,18 @@
                 <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
                     Attendance: {{ eventExtendedProps.attendance.status }}
                 </meta-item>
+                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.max != null">
+                    <template v-if="eventExtendedProps.attendance.available > 0">
+                        {{ eventExtendedProps.attendance.available }} places remaining
+                    </template>
+                    <template v-else>
+                        No places remaining
+                    </template>
+                </meta-item>
+<!-- SA-10476 -->
+<!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->
+<!--                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />-->
+<!--                </form>-->
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
@@ -602,6 +687,16 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
+<!-- SA-10475 -->
+<!--                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">-->
+<!--                            <span>-->
+<!--                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>-->
+<!--                            </span>-->
+<!--                            <span>-->
+<!--                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>-->
+<!--                            </span>-->
+<!--                        </span>-->
+
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
                             <a class="button"
@@ -715,6 +810,5 @@
                 <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
-
     </reveal-modal>
 </template>

@@ -227,4 +227,30 @@ interface EventInterface
      * @return string
      */
     public function getLocation();
+
+
+    /**
+     * @return int|null
+     */
+    public function getMaxAttendees(): ?int;
+
+
+    /**
+     * @param int|null $maxAttendees
+     * @return $this
+     */
+    public function setMaxAttendees(?int $maxAttendees): EventInterface;
+
+
+    /**
+     * @return int|null
+     */
+    public function getNumAttendees(): ?int;
+
+
+    /**
+     * @param int|null $numAttendees
+     * @return $this
+     */
+    public function setNumAttendees(?int $numAttendees): EventInterface;
 }

@@ -13,6 +13,7 @@
 namespace Calendar\Event\Type\Day;
 
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\EventInterface;
 
 class Event extends EventBase
 {
@@ -93,6 +94,18 @@ class Event extends EventBase
      * @var string
      */
     protected $path;
+
+
+    /**
+     * @var int|null
+     */
+    protected $maxAttendees;
+
+
+    /**
+     * @var int|null
+     */
+    protected $numAttendees;
 
 
     /**
@@ -363,6 +376,41 @@ class Event extends EventBase
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getMaxAttendees(): ?int
+    {
+        return $this->maxAttendees;
+    }
+
+    /**
+     * @param int|null $maxAttendees
+     * @return $this
+     */
+    public function setMaxAttendees(?int $maxAttendees): EventInterface
+    {
+        $this->maxAttendees = $maxAttendees;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getNumAttendees(): ?int
+    {
+        return $this->numAttendees;
+    }
+
+    /**
+     * @param int|null $numAttendees
+     * @return $this
+     */
+    public function setNumAttendees(?int $numAttendees): EventInterface
+    {
+        $this->numAttendees = $numAttendees;
+        return $this;
+    }
 
     /**
      * @return string[]

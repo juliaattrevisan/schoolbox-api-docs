@@ -12,18 +12,16 @@
 
         let config = init(options, $(this));
 
-        /* Initial conditions
-         */
-        toggleRSVP(config.rsvpAttendanceForm.attr('data-guests-available'));
-
-        /* Apply listeners to RSVP buttons to post and reload
-         * That'll reload with the most recent state of affairs
-         */
-        setupRSVP();
-
         /* Set up selectizes if you have perms
          */
         if (config.canModify) {
+
+            /* Initial conditions
+             */
+            toggleCreateAttendance(config.available.attr('data-available'));
+
+            /* Selectize for adding/removing people
+             */
             const selectize = config.createAttendanceSelector.selectizeSelector({
                 ajax: {
                     url: '/ajax/user.php',
@@ -38,6 +36,7 @@
             setupOnRemoveAttendee(selectize);
         }
 
+
         /**
          * Init
          *
@@ -48,10 +47,6 @@
         function init(options, element) {
             let defaults = {
                 element: element,
-
-                /* Your user id
-                 */
-                currentUserId: 0,
 
                 /* Access perms for hiding/showing form elements
                  */
@@ -64,10 +59,6 @@
                 /* Selectize for adding a person
                  */
                 createAttendanceSelector: $('#add-guests'),
-
-                /* Form to present rsvp options
-                 */
-                rsvpAttendanceForm: $('#rsvpAttendanceForm'),
 
                 /* Container for list fragment
                  */
@@ -87,76 +78,16 @@
 
 
         /**
-         * Conditionally show options
-         *
-         * Show rsvp island under any of the following:
-         *  - You're on the invite list,
-         *  - There's no guest limit
-         *  - See if you can insert yourself into the list because there are available places
-         *
-         * Otherwise, there are no spaces remaining and you're not explicitly invited
-         * You don't get to join the event
+         * Decide whether you can still add people
          *
          * @param available int
          */
-        function toggleRSVP(available) {
-            const onList = config.attendanceList.find('[data-guest="'+config.currentUserId+'"]').length;
-            const noLimit = available === undefined || available === null;
-            const hasAvailablePlaces = available > 0;
-
-            if (onList || noLimit || hasAvailablePlaces) {
-                config.rsvpAttendanceForm.show();
+        function toggleCreateAttendance(available) {
+            if (available === null || available === undefined || available > 0) {
+                config.createAttendanceForm.show();
             } else {
-                config.rsvpAttendanceForm.hide();
+                config.createAttendanceForm.hide();
             }
-        }
-
-
-        /**
-         * Process your response
-         */
-        function setupRSVP() {
-            $.each(config.rsvpAttendanceForm.find('[data-rsvp]'), function(index, element) {
-                $(element).on('click', function(event) {
-                    event.preventDefault();
-
-                    /* Special case: if you're not in the list and you're declining, exit early
-                     */
-                    if ($(this).attr('data-rsvp') === 'decline') {
-                        const onList = config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length;
-
-                        if (!onList) {
-                            return;
-                        }
-                    }
-
-                    /* A toast - to your valour, my sword, and our victory together
-                     */
-                    config.toast.toastActivate({
-                        text: 'Updating invitation...'
-                    });
-
-                    $.ajax({
-                        url: $(element).attr('href'),
-                        method: 'post',
-                        dataType: 'json',
-                        data: {},
-                        success: function(responseText) {
-                            config.toast.toastTimeout({
-                                text: 'Invitation successfully updated',
-                                css: 'success'
-                            });
-
-                            window.location.reload();
-                        },
-                        error: function(xhr, status, error) {
-                            let responseText = $.parseJSON(xhr.responseText)
-
-                            config.toast.toastTimeout({text: 'Unable to update invitation. ' + responseText.message, css: 'alert'});
-                        }
-                    });
-                });
-            });
         }
 
 
@@ -266,7 +197,158 @@
             config.attendanceList.find('article').html(responseText.fragment);
             config.available.html(responseText.available ? responseText.available : 'No');
 
-            toggleRSVP(responseText.available);
+            toggleCreateAttendance(responseText.available);
+
+            $.fn.rsvpToggle({
+                available: responseText.available,
+                onList: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
+            });
+        }
+    }
+
+
+    /**
+     * Conditionally show options
+     *
+     * Show rsvp island under any of the following:
+     *  - You're on the invite list,
+     *  - There's no guest limit
+     *  - See if you can insert yourself into the list because there are available places
+     *
+     * Otherwise, there are no spaces remaining and you're not explicitly invited
+     * You don't get to join the event
+     */
+    $.fn.rsvpToggle = function(options) {
+        options = options || {};
+
+        let config = init(options, $(this));
+
+        const onList = config.onList;
+        const noLimit = config.available === undefined || config.available === null;
+        const hasAvailablePlaces = config.available > 0;
+
+        if (onList || noLimit || hasAvailablePlaces) {
+            config.rsvpAttendanceForm.show();
+        } else {
+            config.rsvpAttendanceForm.hide();
+        }
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            let defaults = {
+                element: element,
+
+                /* Form to present rsvp options
+                 */
+                rsvpAttendanceForm: $('#rsvpAttendanceForm'),
+
+                /* Number of available places
+                 */
+                available: 0,
+
+                /* Whether you're already invited
+                 */
+                onList: false
+            };
+
+            return $.extend(defaults, options);
+        }
+    }
+
+
+    /**
+     * Set up event listeners for the RSVP buttons themselves
+     *
+     * @param options
+     */
+    $.fn.rsvp = function(options) {
+        options = options || {};
+
+        let config = init(options, $(this));
+
+        /* Apply listeners to RSVP buttons to post and reload
+         * That'll reload with the most recent state of affairs
+         */
+        $.each(config.rsvpAttendanceForm.find('[data-rsvp]'), function(index, element) {
+            $(element).on('click', function(event) {
+                event.preventDefault();
+
+                /* Special case: if you're not in the list and you're declining, exit early
+                 */
+                if ($(this).attr('data-rsvp') === 'decline' && !config.onList) {
+                    return;
+                }
+
+                /* A toast - to your valour, my sword, and our victory together
+                 */
+                config.toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
+
+                $.ajax({
+                    url: $(element).attr('href'),
+                    method: 'post',
+                    dataType: 'json',
+                    data: {},
+                    success: function(responseText) {
+                        config.toast.toastTimeout({
+                            text: 'Invitation successfully updated',
+                            css: 'success'
+                        });
+
+                        if (config.reload) {
+                            window.location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        let responseText = $.parseJSON(xhr.responseText)
+
+                        config.toast.toastTimeout({text: 'Unable to update invitation. ' + responseText.message, css: 'alert'});
+                    }
+                });
+            });
+        });
+
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            let defaults = {
+                element: element,
+
+                /* Form to present rsvp options
+                 */
+                rsvpAttendanceForm: $('#rsvpAttendanceForm'),
+
+                /* Container for list fragment
+                 */
+                attendanceList: $('#attendance-guests'),
+
+                /* Toaster element
+                 */
+                toast: $('[data-toast]'),
+
+                /* Whether you're already invited
+                 */
+                onList: false,
+
+                /* Reload window.location.href when successfully updated rsvp
+                 */
+                reload: true
+            };
+
+            return $.extend(defaults, options);
         }
     }
 }(jQuery));

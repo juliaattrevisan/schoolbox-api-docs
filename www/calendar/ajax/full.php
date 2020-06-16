@@ -32,4 +32,6 @@ $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $factory,
     new ModuleChecker(ConfigLoader::getInstance())
 );
+
+
 $calendar->render();
