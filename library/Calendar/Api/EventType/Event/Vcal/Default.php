@@ -150,6 +150,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             return new Collection();
         }
 
+        $decodedConfig->setUrl($this->tokenReplaceUrl($decodedConfig->getUrl()));
+
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
@@ -163,6 +165,16 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             // Hit up the cache
             $cache     = new Vcal(Alaress\Redis::getClientInstance());
             $allEvents = $cache->read($decodedConfig);
+
+            // Cache doesn't hold this VCal - happens when URL has tokens
+            if (!$allEvents) {
+                try {
+                    $cache->write($decodedConfig);
+                    $allEvents = $cache->read($decodedConfig);
+                } catch (Exception $e) {
+                    // ignore
+                }
+            }
 
             if ($allEvents instanceof VCalendar) {
                 $start = new DateTime('@' . $startTimestamp);
