@@ -433,6 +433,9 @@ ul.az-error-list {
 // Attach-browser upload
 #ab-upload {
     .dzone {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
         width: 100%;
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
@@ -502,7 +505,6 @@ ul.az-error-list {
         width: 120px;
         border: solid 1px $monsoon;
         box-sizing: border-box;
-        float: left;
     }
     img[data-dz-thumbnail] {
         margin: 9px;
