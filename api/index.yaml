@@ -3,8 +3,6 @@ openapi: 3.0.2
 info:
   title:       Schoolbox API
   description: |
-    Schoolbox API.
-
     An umbrella spec for all the other API specs that have been developed for
     Schoolbox.
   x-api-id:    0609d493-8804-4e97-b5ac-0ed7b3c99db8
@@ -14,6 +12,8 @@ info:
     name:  Schoolbox Team
     url:   https://schoolbox.com.au
     email: developers@schoolbox.com.au
+  x-logo:
+    url: https://schoolbox.com.au/wp-content/themes/Phoenix/dist/assets/images/sb-logo-blue.png
 
 
 # TODO reference servers to common.yaml once this is actually possible
@@ -33,6 +33,18 @@ security:
   # Authorization is handled by Schoolbox itself once a user is authenticated:
   # therefore, no scopes are defined for any security scheme.
   - bearerAuth:     []
+
+
+tags:
+  - name: user
+    x-displayName: Users
+    description: |
+      Create and manage users.
+
+  - name: discussion
+    x-displayName: Discussions
+    description: |
+      Create and manage discussion threads and comments.
 
 
 paths:

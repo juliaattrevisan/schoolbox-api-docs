@@ -37,6 +37,7 @@ paths:
   /user:
     get:
       operationId: userSearch
+      tags: [user]
       summary: Returns users which match a search term and set of filters.
       responses:
         '200':
@@ -51,6 +52,7 @@ paths:
 
     post:
       operationId: userPost
+      tags: [user]
       summary: Creates a user
       responses:
         '201':
@@ -66,6 +68,7 @@ paths:
   /user/{id}:
     put:
       operationId: userPut
+      tags: [user]
       summary: Updates a user
       responses:
         '200':
@@ -77,6 +80,7 @@ paths:
 
     patch:
       operationId: userPatch
+      tags: [user]
       summary: Updates a subset of a user's fields
       responses:
         '200':
@@ -88,6 +92,7 @@ paths:
 
     delete:
       operationId: userDelete
+      tags: [user]
       summary: Deletes a user
       responses:
         '204':
@@ -97,6 +102,7 @@ paths:
 
     get:
       operationId: userGet
+      tags: [user]
       summary: Returns a user
       responses:
         '200':
