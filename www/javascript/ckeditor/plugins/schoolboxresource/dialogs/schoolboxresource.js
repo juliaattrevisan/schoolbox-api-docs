@@ -79,13 +79,14 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             if (fields.type.getValue() == 'video') {
                 fields.id.setValue(response.id);
                 fields.url.setValue(config.video.source(response.id, fields.filesystem.getValue()));
-            }
-            else if (fields.type.getValue() == 'audio') {
+            } else if (fields.type.getValue() == 'audio') {
                 fields.id.setValue(response.id);
                 fields.url.setValue(config.audio.source(response.id, fields.filesystem.getValue()));
-            }
-            else if (fields.type.getValue() == 'image') {
+            } else if (fields.type.getValue() == 'image') {
                 fields.url.setValue(config.image.source(response.hash));
+            } else {
+                // Fall back to just setting the URL as normal I guess
+                fields.url.setValue(url);
             }
 
             /* Prevent rendering attempt for uploaded files that
@@ -106,7 +107,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 fields.aspectRatio.setValue(true);
             }
 
-            // fields.url.setValue(url);
 
             $('#participant-customise-modal').css('z-index', '10000');
         }
