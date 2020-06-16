@@ -200,15 +200,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->parse('has_folder_block', 'has_folder');
         }
 
-        /* Decide whether to show Component Title using !showComponentTitle
-         * Inverted from "Hide headings from readonly users" via compactMode
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
-        }
-
         return true;
     }
 }

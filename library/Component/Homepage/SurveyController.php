@@ -216,15 +216,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $this->parse('has_survey_block', 'has_survey');
         }
 
-        /* Decide whether to show Component Title using !showComponentTitle
-         * Inverted from "Hide headings from readonly users" via compactMode
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
-        }
-
         return true; // everything went according to plan
     }
 }

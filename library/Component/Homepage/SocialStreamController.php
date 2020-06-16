@@ -1,8 +1,4 @@
 <?php
-
-use Schoolbox\Permission\Access\UserAccess;
-
-
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -88,15 +84,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                 )
             );
             $this->parse('source_folder_exists_block','source_folder_exists');
-        }
-
-        /* Decide whether to show Component Title using !showComponentTitle
-         * Inverted from "Hide headings from readonly users" via compactMode
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
         }
 
         return true;

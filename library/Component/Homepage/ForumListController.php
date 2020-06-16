@@ -161,15 +161,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             }
         }
 
-        /* Decide whether to show Component Title using !showComponentTitle
-         * Inverted from "Hide headings from readonly users" via compactMode
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
-        }
-
         return true;
     }
 }

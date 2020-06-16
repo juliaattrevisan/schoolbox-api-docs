@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -68,15 +67,6 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             }
 
             $this->parse('chat_block', 'chat');
-        }
-
-        /* Decide whether to show Component Title using !showComponentTitle
-         * Inverted from "Hide headings from readonly users" via compactMode
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
         }
 
         return true; // everything went according to plan
