@@ -42,6 +42,12 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
         $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
+        /* Derive heading from xml field
+         */
+        if (!$emptyState) {
+            $this->setComponentName(Scrub::text($xml->channel->title));
+        }
+
         $this->parseConfig();
 
         if ($emptyState) {
@@ -69,7 +75,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 
             // Podcasts from xml feed
             $j = 0;
-            $this->setComponentName(Scrub::text($xml->channel->title));
 
             // Iterate through each item in the channel
             for ($i = 0; $i < count($xml->channel->item); $i++) {
