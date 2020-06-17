@@ -61,7 +61,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 
     /* Update config
      */
-    $componentConfigDefinitionId = $instance->getConfig('textbox')->getBy('key', 'textbox')->getId();
+    $componentConfigDefinitionId = $instance->getConfig()->getBy('key', 'textbox')->getId();
 
     try {
         $config = $ccm->findOneByColumnList([
