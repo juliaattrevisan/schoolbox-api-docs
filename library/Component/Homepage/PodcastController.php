@@ -117,7 +117,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             // If there are no podcasts in the list
             if ($j === 0) {
                 $this->setVar([
-                    'PODCAST_COMPONENT_TITLE'     => 'Podcast - URL does not contain any valid audio podcasts',
                     'podcast_list_block'          => '',
                     'default_podcast_block'       => '',
                     'empty_read_block'            => '',
