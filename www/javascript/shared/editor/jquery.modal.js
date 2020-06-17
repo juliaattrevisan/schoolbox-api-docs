@@ -403,7 +403,7 @@
              */
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
-                    let status = 'success';
+                    var status = 'success';
                     if ('status' in message.data[0]) {
                         status = message.data[0].status;
                     }
