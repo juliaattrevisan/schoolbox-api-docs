@@ -8,6 +8,8 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
+
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
@@ -89,7 +91,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
-                    /** @var \Schoolbox\Assessment\Component\SubmissionBox $currentBox */
+                    /** @var SubmissionBox $currentBox */
                     $currentBox = $currentShowcasedItem->getSubmissionBox();
 
                     $submission = $this->getLatestSubmission(
@@ -168,7 +170,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                 $this->getPage()->setVar(
                                     array(
                                         'SHOWCASED_WORK_SUBMISSION_ID'        => $submission->getId(),
-                                        'SHOWCASED_WORK_FILE_NAME'        => $currentFile->getFilename(),
+                                        'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
                                         'SHOWCASED_WORK_FILE_HASH'            => $currentFile->getHash(),
                                         'SHOWCASED_WORK_SUBMISSION_FILESIZE'  =>
                                             Alaress_Byte_Format::bytesToString($currentFile->getSize()),
