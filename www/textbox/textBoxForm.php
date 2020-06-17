@@ -61,15 +61,17 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 
     /* Update config
      */
+    $componentConfigDefinitionId = $instance->getConfig('textbox')->getBy('key', 'textbox')->getId();
+
     try {
         $config = $ccm->findOneByColumnList([
             'component_instance_id'          => $instance->getId(),
-            'component_config_definition_id' => $instance->getConfig('textbox')->getBy('key', 'textbox')->getId()
+            'component_config_definition_id' => $componentConfigDefinitionId
         ]);
     } catch (\Schoolbox\Mapper\Exception $e) {
         $config = (new Component_Config())
             ->setInstanceId($instance->getId())
-            ->setConfigDefinitionId($instance->getConfig('textbox')->getBy('key', 'textbox')->getId());
+            ->setConfigDefinitionId($componentConfigDefinitionId);
     }
 
     $config->setValue($textbox->getId());
