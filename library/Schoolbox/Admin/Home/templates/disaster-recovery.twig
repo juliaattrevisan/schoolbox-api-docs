@@ -1,0 +1,93 @@
+{#
+Data:
+    pageCurrent          string         The admin tab to highlight
+    enabled              bool           Whether the feature is enabled
+    bucketSize           null|string    Number of bytes being used by S3 Bucket
+    domainTtl            null|int       TTL in seconds of domain name
+    fqdn                 null|string    This site's FQDN
+    mostRecentSyncStatus null|string    Status of most recent DR tool execution
+    backupFiles          null|array     Indexed by date, then 'conf','etc','redis','mariaDb'
+    backupFileTotals     null|array     Indexed by 'conf','etc','redis','mariaDb'
+    storageFileCount     null|int
+    storageFileUsage     null|string
+#}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<sec class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Cloud Disaster Recovery Service</h2>
+        {% if enabled %}
+            {% if domainTtl is null %}
+                <div data-alert class="alert-box warning">
+                    Unable to determine time-to-live of DNS record for {{ fqdn }}.<br>
+                </div>
+            {% elseif domainTtl > (24 * 3600) %}
+                <div data-alert class="alert-box warning">
+                    The time-to-live of the DNS record for {{ fqdn }} is longer than 24 hours.<br>
+                    Updates to DNS records to switch Internet traffic to your Disaster Recovery instance may take a long time to propagate.
+                </div>
+            {% endif %}
+        {% else %}
+            <div data-alert class="alert-box highlight">
+                This feature is not enabled for this instance. Please contact your account manager for more information.
+            </div>
+        {% endif %}
+
+        <div data-alert class="alert-box success">
+            This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize }}</strong> of cloud storage.
+        </div>
+
+        <h2>Summary</h2>
+        <table>
+            <tbody>
+            <tr><th>Domain TTL (seconds)</th><td>{{ domainTtl is null ? '-' : domainTtl|number_format }}</td></tr>
+            <tr><th>Most Recent Sync status</th><td>{{ mostRecentSyncStatus|default('-') }}</td></tr>
+            </tbody>
+        </table>
+
+        <h2>File Storage</h2>
+        <table>
+            <tbody>
+                <tr><th>File Count</th><td>{{ storageFileCount is null ? '-' : storageFileCount|number_format }}</td></tr>
+                <tr><th>Disk Usage</th><td>{{ storageFileUsage|default('-') }}</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Databases & Host Configuration backups</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Conf</th>
+                    <th>Etc</th>
+                    <th>Redis</th>
+                    <th>MariaDB</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for date, fileSizes in backupFiles %}
+                <tr>
+                    <td>{{ date|default('Unknown') }}</td>
+                    <td>{{ fileSizes.conf|default('-') }}</td>
+                    <td>{{ fileSizes.etc|default('-') }}</td>
+                    <td>{{ fileSizes.redis|default('-') }}</td>
+                    <td>{{ fileSizes.mariaDb|default('-') }}</td>
+                    <td>{{ fileSizes.total|default('-') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>{{ backupFileTotals.conf|default('-') }}</td>
+                    <td>{{ backupFileTotals.etc|default('-') }}</td>
+                    <td>{{ backupFileTotals.redis|default('-') }}</td>
+                    <td>{{ backupFileTotals.mariaDb|default('-') }}</td>
+                    <td>{{ backupFileTotals.total|default('-') }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</sec>
