@@ -1,147 +1,230 @@
 <script type="text/javascript">
-    $(function () {
+$(function () {
 
-        var abUpload          = $('#ab-upload'),
-            abUploadForm      = abUpload.find('form.dzone'),
-            abUploadControls  = abUpload.siblings('div.ctrl'),
-            abUploadSubmitBtn = abUploadControls.find('[data-submit]'),
-            abUploadCancelBtn = abUploadControls.find('[data-cancel]'),
-            maxFiles           = {MAX_FILES};
+    var abUpload          = $('#ab-upload'),
+        abUploadForm      = abUpload.find('form.dzone'),
+        abUploadControls  = abUpload.siblings('div.ctrl'),
+        abUploadSubmitBtn = abUploadControls.find('[data-submit]'),
+        abUploadCancelBtn = abUploadControls.find('[data-cancel]'),
+        maxFiles          = {MAX_FILES};
 
-        abUploadForm.dropzone({
-            paramName: 'upload',
-            parallelUploads: {MAX_FILES},
-            dictDefaultMessage: 'Click or drag here to upload',
-            dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
-            maxFiles: maxFiles,
-            maxFilesize: 2048,
-            autoProcessQueue: false,
-            addRemoveLinks: false,
-            previewTemplate: $('#ab-preview-template').html(),
-            acceptedFiles: {ACCEPTED_FILES},
+    abUploadForm.dropzone({
+        paramName: 'upload',
+        parallelUploads: {MAX_FILES},
+        dictDefaultMessage: 'Click or drag here to upload',
+        dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
+        maxFiles: maxFiles,
 
-            accept: function (file, done) {
-                done();
+        /* TODO this is an admin config
+         */
+        maxFilesize: 2048,
+
+        autoProcessQueue: false,
+        addRemoveLinks: false,
+        previewTemplate: $('#ab-preview-template').html(),
+        acceptedFiles: {ACCEPTED_FILES},
+
+        /**
+         * Initialise this dropzone implementation
+         */
+        init: function () {
+            var dz = this;
+
+            /* Prepare a dropzone
+             */
+            abUpload.data('dropzone', this);
+
+            /* Clear the upload queue if you jump ship via the Cancel button
+             */
+            abUploadCancelBtn.on('click', function (e) {
+                dz.removeAllFiles(true);
+            });
+
+            /* Show a little preview in the modal's staging area after you select it from the browser
+             */
+            this.on('addedfile', function (file) {
+                var img = $(file.previewElement).find('img[data-dz-thumbnail]');
+                img.attr('src', '/ajax/mime/' + file.type);
+            });
+
+            /* Remove a file from the staging area
+             */
+            this.on('removedfile', function (file) {
                 checkState.call(this);
-            },
+            });
 
-            init: function () {
-                var dz = this;
+            /* Just update quantity of files you're allowed to have if
+             * you selected more than what was allowed in maxFiles
+             */
+            this.on('maxfilesreached', function (file) {
+                checkState.call(this);
+            });
 
-                abUpload.data('dropzone', this);
+            /* When you click the Upload button to begin the transmission:
+             * hide but don't detach the remove button
+             */
+            this.on('sending', function (file, xhr, formData) {
+                $(file.previewElement).find('a[data-dz-remove]').addClass('hide')
+            });
 
-                abUploadCancelBtn.on('click', function (e) {
-                    dz.removeAllFiles(true);
-                });
+            /* When a file was successfully uploaded
+             * Parse the json response and get the file hash
+             *
+             * TODO Relies on an exception being thrown wth
+             * TODO sometimes xhr is already a javascript literal and you can't re-parse it
+             */
+            this.on('success', function (file, xhr) {
+                var data;
 
-                this.on('addedfile', function (file) {
-                    var img = $(file.previewElement).find('img[data-dz-thumbnail]');
-                    img.attr('src', '/ajax/mime/' + file.type);
-                });
+                try {
+                    data = JSON.parse(xhr);
+                } catch (err) {
+                    data = xhr;
+                }
 
-                this.on('removedfile', function (file) {
-                    checkState.call(this);
-                });
+                file.hash = data.hash;
+            });
 
-                this.on('error', function (file, msg, xhr) {
-                    if (xhr) {
-                        try {
-                            msg = JSON.parse(msg);
-                        } catch (err) {
-                            // noop
-                        }
-                        file.hash = msg.hash;
+            /* When you finish processing the queue of files you chose to upload
+             */
+            this.on('queuecomplete', onQueueComplete.bind(this));
 
-                        $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
-                    }
-                    checkState.call(this);
-                });
-
-                this.on('maxfilesreached', function (file) {
-                    checkState.call(this);
-                });
-
-                this.on('sending', function (file, xhr, formData) {
-                    $(file.previewElement).find('a[data-dz-remove]').detach()
-                });
-
-                this.on('success', function (file, xhr) {
+            this.on('error', function (file, msg, xhr) {
+                if (xhr) {
                     try {
-                        data = JSON.parse(xhr);
-                    }
-                    catch (err) {
-                        data = xhr;
-                    }
-                    file.hash = data.hash;
-                });
-
-                this.on('queuecomplete', function () {
-                    var accepted = this.getAcceptedFiles(),
-                        data = [],
-                        i;
-
-                    if (!abUploadSubmitBtn.data('uploading')) {
-                        return;
+                        msg = JSON.parse(msg);
+                    } catch (err) {
+                        // noop
                     }
 
-                    $.extend(accepted, this.getRejectedFiles());
+                    file.hash = msg.hash;
 
-                    if (accepted.length) {
-                        for (i = 0; i < accepted.length; ++i) {
-                            if (accepted[i].hash) {
-                                data.push({
-                                    title: accepted[i].name,
-                                    mimeType: accepted[i].type,
-                                    filesize: accepted[i].size,
-                                    hash: accepted[i].hash
-                                });
-                            }
-                        }
+                    $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
 
-                        setTimeout(function () {
-                            window.top.postMessage(JSON.stringify({ data: data }), location.origin);
-                        }, 1000);
-                    }
-                });
-            }
-        });
+                    // Don't need to show the progress bar once it's broken
+                    $(file.previewElement).find('.dz-progress').hide();
+                }
 
-        function checkState() {
-            var ql, dz;
+                checkState.call(this);
+            });
 
-            if (abUploadSubmitBtn.data('uploading')) {
-                return;
-            }
+            this.on('complete', function (file) {
+                // Restore the remove button
+                $(file.previewElement).find('a[data-dz-remove]').removeClass('hide');
+            });
+        },
 
-            ql = this.getQueuedFiles().length;
-            if (ql == 0) {
-                abUploadSubmitBtn
-                    .html('Upload')
-                    .attr('disabled', 'disabled')
-                    .off('click');
-            }
-            else {
-                dz = this;
-
-                abUploadSubmitBtn
-                    .html('Upload (' + ql + ')')
-                    .removeAttr('disabled')
-                    .one('click', function (e) {
-                        e.preventDefault();
-
-                        abUploadSubmitBtn
-                            .data('uploading', dz.getQueuedFiles())
-                            .html('Uploading')
-                            .attr('disabled', 'disabled');
-                        abUploadCancelBtn.attr('disabled', 'disabled');
-                        dz.processQueue();
-                    });
-            }
-
-          }
-
-
+        /**
+         * See https://www.dropzonejs.com/#config-accept
+         *
+         * @param file
+         * @param done
+         */
+        accept: function (file, done) {
+            done();
+            checkState.call(this);
+        }
     });
+
+
+    /**
+     * Decide how many files were being prepared for upload and inject
+     * the count into the Upload button's label text. This also reenables
+     * the button if it was previously disabled
+     */
+    function checkState() {
+        let queueLength   = this.getQueuedFiles().length,
+            successFiles  = this.getFilesWithStatus(Dropzone.SUCCESS),
+            errorFiles    = this.getFilesWithStatus(Dropzone.ERROR),
+            uploadLength  = queueLength + successFiles.length,
+            uploadEnabled = uploadLength > 0 && errorFiles.length === 0;
+
+        // Is upload feasible right now?
+        // * At least one queued file? Yes
+        // * No error files? Yes
+        // * Otherwise? No
+        if (!uploadEnabled) {
+            abUploadSubmitBtn
+                .html('Upload')
+                .attr('disabled', 'disabled')
+                .off('click');
+            abUploadCancelBtn.removeAttr('disabled');
+        } else {
+            let dz = this;
+
+            abUploadSubmitBtn
+                .html('Upload (' + uploadLength + ')')
+                .removeAttr('disabled')
+                .one('click', function (e) {
+                    e.preventDefault();
+
+                    abUploadSubmitBtn
+                        .data('uploading', dz.getQueuedFiles())
+                        .html('Uploading')
+                        .attr('disabled', 'disabled');
+                    abUploadCancelBtn.attr('disabled', 'disabled');
+
+                    // Is the queue complete anyway?
+                    // Trigger the message that queueComplete would send
+                    if (queueLength === 0) {
+                        onQueueComplete.call(dz);
+                    } else {
+                        dz.processQueue();
+                    }
+                });
+        }
+    }
+
+
+    /**
+     * When the queue is completely processed, call this method.
+     */
+    function onQueueComplete() {
+        let successFiles = this.getFilesWithStatus(Dropzone.SUCCESS),
+            errorFiles   = this.getFilesWithStatus(Dropzone.ERROR),
+            data         = [],
+            i;
+
+        // Does the button say we're uploading? return
+        if (!abUploadSubmitBtn.data('uploading')) {
+            return;
+        }
+
+        // Any queued files? return
+        if (this.getQueuedFiles().length) {
+            return;
+        }
+
+        // Cancel button is no longer disabled, even if there's error files
+        abUploadCancelBtn.removeAttr('disabled');
+
+        // Any error files? return
+        if (errorFiles.length) {
+            return;
+        }
+
+        // Finally post the message
+        if (successFiles.length) {
+            for (i = 0; i < successFiles.length; ++i) {
+                if (successFiles[i].hash) {
+                    data.push({
+                        title: successFiles[i].name,
+                        mimeType: successFiles[i].type,
+                        filesize: successFiles[i].size,
+                        hash: successFiles[i].hash,
+                        status: successFiles[i].status,
+                    });
+                }
+            }
+
+            /* Send a list of file data to message receiver in modal.js
+             */
+            setTimeout(function () {
+                window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+            }, 1000);
+        }
+    }
+});
 </script>
 
 <div id="ab-upload" class="ab-pane">
@@ -162,9 +245,9 @@
             <div class="dz-size"><span data-dz-size></span></div>
             <div class="dz-filename"><span data-dz-name></span></div>
         </div>
-        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         <a class="button dz-remove full-width no-margin" data-dz-remove>Remove file</a>
         <div class="dz-error-message"><span data-dz-errormessage></span></div>
+        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         <div class="dz-success-mark">
             <span class="icon-approve"></span>
         </div>

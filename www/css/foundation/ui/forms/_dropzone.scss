@@ -433,6 +433,9 @@ ul.az-error-list {
 // Attach-browser upload
 #ab-upload {
     .dzone {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
         width: 100%;
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
@@ -454,11 +457,8 @@ ul.az-error-list {
             }
         }
     }
-    .dz-error-mark, .dz-success-mark {
-        display: none;
-        position: absolute;
-        top: 23px;
-        left: 9px;
+    .dz-details {
+        padding-bottom: 1rem;
     }
     .dz-error-mark {
         color: $alert-color;
@@ -468,31 +468,36 @@ ul.az-error-list {
     }
     .dz-preview {
         &.dz-error {
-            @extend .dz-error-mark;
+            color: $alert-color;
         }
         &.dz-success {
-            @extend .dz-success-mark;
+            color: $success-color;
         }
     }
     .dz-error .dz-error-message {
-        position: absolute;
-        top: 37px;
+        display: inherit;
+        position: relative;
+        top: 0;
         left: 0;
-        width: 100px;
-        height: 100px;
-        margin: rem-calc(($base-font-size - 8));
-        background: $alert-color;
-        padding: rem-calc(($base-font-size - 6));
-        box-sizing: border-box;
-        text-align: center;
+        // Massage to fit within the file display block
+        min-width: 100px;
+        max-width: 118px;
+        word-break: break-word;
+
+        // Undo some of the base background styles
+        opacity: 1;
+        background: transparent;
+
+        // Make space for .dz-progress
+        margin-bottom: 6px;
     }
     .dz-remove {
         position: relative;
-        top: 1rem;
+        //top: 1rem;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
-        display: block;
+        display: none;
     }
     .dz-preview {
         background-color: $white;
@@ -500,8 +505,6 @@ ul.az-error-list {
         width: 120px;
         border: solid 1px $monsoon;
         box-sizing: border-box;
-        float: left;
-        padding-bottom: 1rem;
     }
     img[data-dz-thumbnail] {
         margin: 9px;

@@ -57,14 +57,13 @@ class Manager
         $fileMime = $storage->getMimetype();
         $fileName = $storage->getBasename();
 
-        $errorPrefix = "Your file, '{$fileName}',";
         $errorSuffix = "Try a different file or contact your IT administrator.";
 
         // Assert: Mime set
 
         if (!$fileMime instanceof Mimetype) {
             throw new FileException(
-                "{$errorPrefix} has no detectable type. {$errorSuffix}",
+                "This file has no detectable type. {$errorSuffix}",
                 FileException::CODE_MIMETYPE_NOT_FOUND
             );
         }
@@ -73,7 +72,7 @@ class Manager
 
         if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
             throw new FileException(
-                "{$errorPrefix} is not a valid file type. {$errorSuffix}",
+                "This file is not a valid file type. {$errorSuffix}",
                 FileException::CODE_MIMETYPE_NOT_ALLOWED
             );
         }
@@ -83,7 +82,7 @@ class Manager
         if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
             $humanSize = $this->alaressByteFormat->bytesToString($fileMime->getActualMaxFileSize());
             throw new FileException(
-                "{$errorPrefix} exceeds the file size restriction of {$humanSize}. {$errorSuffix}",
+                "This file exceeds the file size restriction of {$humanSize}. {$errorSuffix}",
                 FileException::CODE_FILE_TOO_LARGE
             );
         }
