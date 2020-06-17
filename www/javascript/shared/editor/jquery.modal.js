@@ -403,7 +403,7 @@
              */
             if (message.data != undefined) {
                 if (0 in message.data && 'hash' in message.data[0]) {
-                    var status = 'error';
+                    let status = 'success';
                     if ('status' in message.data[0]) {
                         status = message.data[0].status;
                     }
@@ -426,7 +426,7 @@
                             $.fn.schoolboxRestorePreviousModal(config.restoreModal);
                         });
                     } else {
-                        // assume error: do nothing, as the modal already shows the error
+                        // Unknown status: assume error and do nothing, as the modal already shows the error
                     }
                 } else if ('meetingUrl' in message.data) {
 
