@@ -143,11 +143,7 @@
 
                         /* Remaining attendee places
                          */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
-
-                        // Massage attendance data into something resembling usability
-                        isAttendable: data?.attendance?.icon,
-                        status: data?.attendance?.status
+                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -620,9 +616,6 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
-                    Attendance: {{ eventExtendedProps.attendance.status }}
-                </meta-item>
                 <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.max != null">
                     <template v-if="eventExtendedProps.attendance.available > 0">
                         {{ eventExtendedProps.attendance.available }} places remaining
@@ -658,14 +651,6 @@
              -->
             <template v-else></template>
 
-            <!--
-            <div v-if="eventExtendedProps.attendance.isAttendable">
-                <dl>
-                    <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
-                    <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
-                </dl>
-            </div>
-            -->
             <template v-if="eventExtendedProps.folder.id ||
             eventExtendedProps.links.view ||
             eventExtendedProps.links.modify ||
