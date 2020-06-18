@@ -431,7 +431,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
                 continue;
             }
-            $allowedFileTypesFound[$spRow['FileType']] = $spRow['FileType'];
 
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
                 // There is a SeqLinkedTo field, which is only set for linked classes.
@@ -441,6 +440,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 if (isset($sequenceId) && $multiPeriodAttendance) {
                     $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
                 }
+
+                $allowedFileTypesFound[$spRow['FileType']] = $spRow['FileType'];
 
                 $periodList[] = [
                     'Room'                      => $spRow['Room'],
