@@ -477,7 +477,7 @@ class CourseSections
      *   UnitImpl.UnitSpec.Folder
      *
      * @param CourseImpl\Model $courseImpl
-     * @return CourseImpl\Model|null
+     * @return UnitImpl\Model|null
      * @throws Database\Exception
      * @throws UnexpectedValueException
      * @throws Mapper\Exception

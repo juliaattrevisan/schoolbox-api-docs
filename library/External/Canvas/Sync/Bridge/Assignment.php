@@ -32,17 +32,17 @@ class Assignment
     public const QUIZ_TYPE_SURVEY        = 'survey';
 
 
-    /** @var GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] */
+    /** @var GenericCollection|SubmissionBox\MarkType[] */
     private $markTypes;
 
-    /** @var GenericCollection<WorkType\Model>|WorkType\Model[] */
+    /** @var GenericCollection|WorkType\Model[] */
     protected $workTypes;
 
     /** @var WorkType\Mapper */
     protected $workTypeMapper;
 
     /**
-     * @param GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] $markTypes
+     * @param GenericCollection|SubmissionBox\MarkType[] $markTypes
      * @param WorkType\Mapper   $workTypeMapper
      */
     public function __construct(GenericCollection $markTypes, WorkType\Mapper $workTypeMapper)

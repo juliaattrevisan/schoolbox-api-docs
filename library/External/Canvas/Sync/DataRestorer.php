@@ -114,11 +114,11 @@ class DataRestorer
     /**
      * Stores data from the data file in the data dir to tables
      *
-     * @param $tableName
-     * @param $tableFile
+     * @param string $tableName
+     * @param string $tableFile
      * @throws Database\Exception
      */
-    public function restoreTableData($tableName, $tableFile): void
+    public function restoreTableData(string $tableName, string $tableFile): void
     {
         $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
         $this->executeIfPersisting($sql);

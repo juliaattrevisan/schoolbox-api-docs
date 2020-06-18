@@ -80,7 +80,7 @@ class AssignmentOverride
      *
      * @param int         $overrideCanvasId
      * @param int         $assessmentImplId
-     * @param string|null $planTable
+     * @param string      $planTable
      * @return Builder
      * @throws InvalidColumnException
      */

@@ -30,7 +30,7 @@ class Course extends \External\Canvas\Sync\Bridge\Course
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
         $minYear = 2019;
-        $maxYear = date('Y') + 1;  // We need to include next year for students who commence Yr 12 curriculum in T4 of Yr 11.
+        $maxYear = intval(date('Y')) + 1;  // We need to include next year for students who commence Yr 12 curriculum in T4 of Yr 11.
         $innerPb = new Builder($this->canvasDb, '');
         for ($year = $minYear; $year <= $maxYear; $year++) {
             $innerPb->like("{$sectionAlias}.sis_source_id", "Y{$year}C%NOT");
