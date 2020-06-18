@@ -71,12 +71,33 @@ INNER JOIN component_definition cd2 ON ccd2.component_definition_id = cd2.id AND
 )
 SET cci1.`value` = IF(cci2.`value` = '1', '0', '1');
 
--- Update old "hide heading" Homepage component configs back to their original name
--- Yes, there are two variants in legacy
+-- Old "Hide Heading" homepage component configs no longer have any behaviours in components
+-- therefore they can be removed
 
-UPDATE component_config_definition
-SET `label` = 'Compact Mode'
-WHERE `label` IN (
-    'Hide heading from read only users',
-    'Hide Heading from read-only users'
+-- Remove the compactMode instances from textbox/breadcrumb/tiles
+
+DELETE cci
+FROM component_config_instance cci
+LEFT JOIN component_config_definition ccd ON ccd.id = cci.component_config_definition_id
+WHERE ccd.`key` = 'compactMode'
+  AND ccd.component_definition_id IN (
+    SELECT id
+    FROM component_definition
+    WHERE `class` IN (
+        'Component_Homepage_TextBoxController',
+        'Component_Homepage_BreadcrumbController',
+        'Schoolbox\\Tile\\Component\\HomepageTileController'
+    )
+);
+
+-- Remove the compactMode definitions from textbox/breadcrumb/tiles
+
+DELETE ccd
+FROM component_config_definition ccd
+LEFT JOIN component_definition cd ON ccd.component_definition_id = cd.id
+WHERE ccd.`key` = 'compactMode'
+  AND cd.`class` IN (
+    'Component_Homepage_TextBoxController',
+    'Component_Homepage_BreadcrumbController',
+    'Schoolbox\\Tile\\Component\\HomepageTileController'
 );
