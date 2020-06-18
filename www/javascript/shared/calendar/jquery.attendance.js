@@ -233,6 +233,13 @@
             config.rsvpAttendanceForm.hide();
         }
 
+        /* If you were on the list, but you removed yourself,
+         * reset your button styles
+         */
+        if (!onList) {
+            config.rsvpAttendanceForm.find('[data-rsvp]').removeClass();
+        }
+
         /**
          * Init
          *
