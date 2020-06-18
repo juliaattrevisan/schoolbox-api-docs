@@ -125,9 +125,8 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
             }
 
             $this->parse('pinterest_block', 'pinterest');
-
         }
 
         return true;
     }
-} 
+}

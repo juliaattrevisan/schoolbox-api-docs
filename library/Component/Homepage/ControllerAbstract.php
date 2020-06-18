@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Permission\Access\Access;
 
@@ -72,7 +73,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         // DETERMINE WHAT TO DISPLAY
         // there is configuration
-        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->getInstance()->getConfigArray());
+        [$hasWriteAccess, $processConfig] = $this->determineConfigPermissions($this->getInstance()->getConfigArray());
 
         $this->setupConfigRendering($targetHandle);
 
@@ -140,6 +141,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
 
         $this->getSitePage()->parse($targetHandle, 'configTpl', false);
+
+        /* Decide whether to show Component Title using !showComponentTitle
+         * Inverted from "Hide headings from readonly users" via compactMode
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setVar('header_block', '');
+        }
 
         return true;
     }

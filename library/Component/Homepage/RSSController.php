@@ -133,7 +133,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
          */
         $this->parseConfig();
 
-
         return true; // everything went according to plan
     }
 }

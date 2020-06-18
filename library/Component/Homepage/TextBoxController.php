@@ -201,16 +201,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->parseConfig();
 
-        /* Hide Headings From Readonly Users
-         */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
-            $this->setVar('CONFIGURATION', '');
-            $this->setBlock($templateHandle, 'header', 'header_block');
-            $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
-        }
-
         return true; // everything went according to plan
     }
 }

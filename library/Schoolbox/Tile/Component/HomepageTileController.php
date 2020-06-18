@@ -75,7 +75,12 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
                 'component'   => $this,
                 'writeAccess' => $this->hasWriteAccess(),
             ];
-            $renderHeader = !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
+
+            /* Decide whether to show Component Title using showComponentTitle
+             * Inverted from "Hide headings from readonly users" via compactMode
+             */
+            $renderHeader = $this->getConfig('showComponentTitle') || $this->hasContextWriteAccess();
+
             return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
         }
     }

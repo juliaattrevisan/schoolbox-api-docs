@@ -159,6 +159,4 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
         return true; // everything went according to plan
     }
-
-
 }

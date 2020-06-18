@@ -1,6 +1,4 @@
 <?php
-use Schoolbox\Resource\Attachment\Zone;
-
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -40,7 +38,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                 )
             );
 
-
             /* If you can neither comment nor collaborate, hide the form
              * and disable javascript and hide links
              */
@@ -61,8 +58,9 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                             'FORM_CLASS' => ''
                         )
                     );
-                } /* Use hidden cloneable
-			 */
+                }
+                /* Use hidden cloneable
+                 */
                 else {
                     if ($authenticator->canComment()) {
                         $this->setVar(

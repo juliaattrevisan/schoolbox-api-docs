@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\StandardFeed;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  *

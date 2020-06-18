@@ -221,10 +221,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->parse('has_audio_block', 'has_audio');
         }
 
-
-
         return true;
     }
-
-
 }

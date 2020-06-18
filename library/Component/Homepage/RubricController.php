@@ -113,7 +113,6 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             }
 
             $this->parse('rubric_block', 'rubric');
-
         }
 
         return true;

@@ -150,5 +150,4 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
         return true; // everything went according to plan
     }
-
 }
