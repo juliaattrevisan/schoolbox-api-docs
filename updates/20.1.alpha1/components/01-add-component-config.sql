@@ -7,7 +7,7 @@ INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
 (
     SELECT
-        id, 'showComponentTitle', 1, 'Show title to read-only users', null
+        id, 'showComponentTitle', 1, 'Show Title to Read-Only Users', null
     FROM component_definition
     WHERE `module` = 'homepage'
     AND `class` = 'Component_Homepage_TextBoxController'
@@ -19,7 +19,7 @@ INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
 (
     SELECT
-        id, 'showComponentTitle', 0, 'Show title to read-only users', null
+        id, 'showComponentTitle', 0, 'Show Title to Read-Only Users', null
     FROM component_definition
     WHERE `module` = 'homepage'
     AND `class` IN
