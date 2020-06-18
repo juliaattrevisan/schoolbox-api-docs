@@ -81,10 +81,12 @@ class ListPayload
         /* Number of available places
          * Could be null, 0, or many
          */
+        $maxAttendees = $event->getMaxAttendees();
+        $numAttendees = \count($guests);
         $available = null;
 
-        if (null !== $event->getMaxAttendees()) {
-            $available = $event->getMaxAttendees() - \count($guests);
+        if (null !== $maxAttendees) {
+            $available = $maxAttendees - $numAttendees;
 
             if ($available < 0) {
                 $available = 0;
@@ -110,6 +112,14 @@ class ListPayload
             /* The current user
              */
             'user' => $user,
+
+            /* Maximum number of people you can invite
+             */
+            'maxAttendees' => $maxAttendees,
+
+            /* Number of people currently invited
+             */
+            'numAttendees' => $numAttendees,
 
             /* The number of empty spots that can be filled
              */

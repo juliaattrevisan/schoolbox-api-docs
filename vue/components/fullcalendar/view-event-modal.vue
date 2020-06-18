@@ -68,6 +68,11 @@
             window: () => window,
             jQuery: () => window.jQuery,
 
+
+            monger: function() {
+                return this.poop;
+            },
+
             /**
              * Generate extended properties for the component's event.
              *
@@ -194,7 +199,9 @@
              * @param eventId int
              * @param attendanceStatus bool
              */
-            jqueryPlugins(eventId, attendanceStatus) {
+            jqueryPlugins(eventExtendedProps, eventId, attendanceStatus) {
+                let self = this;
+
                 this.$nextTick(() => {
 
                     // SA-10476
@@ -226,6 +233,13 @@
                                         break;
                                 }
                             }
+
+                            /* I am disgusted that this was a way of doing it
+                             */
+                            eventExtendedProps.data.attendance.maxAttendees = responseText.maxAttendees;
+                            eventExtendedProps.data.attendance.numAttendees = responseText.numAttendees;
+
+                            self.event.setExtendedProp('data', eventExtendedProps.data);
                         }
                     });
                 });
@@ -304,7 +318,7 @@
                 const data = this.event.extendedProps.data;
 
                 if (data.meta.eventId !== undefined) {
-                    this.jqueryPlugins(data.meta.eventId, data.attendance.attendanceStatus);
+                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data.attendance.attendanceStatus);
                 }
             },
 
