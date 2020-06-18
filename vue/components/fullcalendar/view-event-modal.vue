@@ -658,7 +658,7 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">
+                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
                             <span>
                                 <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>
                             </span>
