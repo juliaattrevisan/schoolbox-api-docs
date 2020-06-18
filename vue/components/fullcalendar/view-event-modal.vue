@@ -198,6 +198,7 @@
                             config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
 
                             /* Inspect the responseText payload to evaluate current status
+                             * TODO: Deal with magic numbers
                              */
                             if (responseText.onList) {
                                 switch (responseText.guests[responseText.user.id].status) {
