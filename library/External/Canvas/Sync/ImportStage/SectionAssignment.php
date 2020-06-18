@@ -223,8 +223,10 @@ class SectionAssignment extends SectionAssessmentAbstract
         string $openDate,
         string $dueDate
     ): bool {
-        /** @var SubmissionBox $assessableImpl */
-        /** @var SubmissionBox $assessableSpec */
+        if (!$assessableImpl instanceof SubmissionBox
+            || !$assessableSpec instanceof SubmissionBox) {
+            return false;
+        }
         if (
             $assessableImpl->getMaxMark() === $assessableSpec->getMaxMark() &&
             $assessableImpl->getAcceptOnline() === $assessableSpec->getAcceptOnline() &&

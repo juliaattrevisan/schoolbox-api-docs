@@ -627,7 +627,7 @@ class SectionQuiz extends SectionAssessmentAbstract
         // Insert Quiz Impl
         $this->quizMapper->save($quizImpl);
 
-        /** @var Quiz\Model $assessable */
+        /** @var Quiz\Model $assessableSpec */
         foreach ($assessableSpec->getSections() as $sectionSpec) {
             $this->copySection($sectionSpec, $quizImpl);
         }

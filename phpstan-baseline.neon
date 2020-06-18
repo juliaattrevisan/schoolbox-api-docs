@@ -1156,6 +1156,76 @@ parameters:
 			path: library/External/AscTimetables/Translator/Timetable/Map.php
 
 		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/Submission.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/Submission.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
+
+		-
 			message: "#^Anonymous function has an unused use \\$db\\.$#"
 			count: 1
 			path: library/External/Edumate/Class.php
