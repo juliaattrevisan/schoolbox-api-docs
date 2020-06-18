@@ -629,7 +629,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (isset($fileTypes)) {
             $allowedFileTypes = array_intersect($allowedFileTypes, $fileTypes);
         }
-        if (empty($fileTypes)) {
+        if (empty($allowedFileTypes)) {
             return [];
         }
 
