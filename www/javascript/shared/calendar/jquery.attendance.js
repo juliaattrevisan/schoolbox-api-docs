@@ -201,7 +201,7 @@
 
             $.fn.rsvpToggle({
                 available: responseText.available,
-                onList: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
+                isInvited: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
             });
         }
     }
@@ -223,11 +223,11 @@
 
         let config = init(options, $(this));
 
-        const onList = config.onList;
+        const isInvited = config.isInvited;
         const noLimit = config.available === undefined || config.available === null;
         const hasAvailablePlaces = config.available > 0;
 
-        if (onList || noLimit || hasAvailablePlaces) {
+        if (isInvited || noLimit || hasAvailablePlaces) {
             config.rsvpAttendanceForm.show();
         } else {
             config.rsvpAttendanceForm.hide();
@@ -236,7 +236,7 @@
         /* If you were on the list, but you removed yourself,
          * reset your button styles
          */
-        if (!onList) {
+        if (!isInvited) {
             config.rsvpAttendanceForm.find('[data-rsvp]').removeClass();
         }
 
@@ -261,7 +261,7 @@
 
                 /* Whether you're already invited
                  */
-                onList: false
+                isInvited: false
             };
 
             return $.extend(defaults, options);
@@ -288,7 +288,7 @@
 
                 /* Special case: if you're not in the list and you're declining, exit early
                  */
-                if ($(this).attr('data-rsvp') === 'decline' && !config.onList) {
+                if ($(this).attr('data-rsvp') === 'decline' && !config.isInvited) {
                     return;
                 }
 
@@ -346,7 +346,7 @@
 
                 /* Whether you're already invited
                  */
-                onList: false,
+                isInvited: false,
 
                 /* A callback after invitation was successfully updated
                  * Applies to both accept and decline scenarios

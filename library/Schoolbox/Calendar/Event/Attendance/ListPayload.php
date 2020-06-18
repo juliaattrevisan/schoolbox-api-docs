@@ -122,7 +122,7 @@ class ListPayload
             /* Whether the current user is currently invited
              * i.e. currently on the attendance list
              */
-            'onList' => isset($guests[$user->getId()]),
+            'isInvited' => isset($guests[$user->getId()]),
 
             /* Whether the current user can modify the event
              */
