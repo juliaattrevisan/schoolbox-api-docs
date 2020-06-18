@@ -21,6 +21,12 @@
     const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
     const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
+    /* RSVP Status consts synonymous with Attendance/Model consts
+     */
+    const ATTENDANCE_STATUS_PENDING = 1;
+    const ATTENDANCE_STATUS_APPROVED = 2;
+    const ATTENDANCE_STATUS_REJECTED = 3;
+
     export default {
         name: "view-event-modal",
         props: {
@@ -38,6 +44,17 @@
             MetaItem,
             MetaList,
             RevealModal
+        },
+        created() {
+
+            /* RSVP Status consts synonymous with Attendance/Model consts
+             *
+             * Expost consts in vue land
+             * https://stackoverflow.com/questions/42662144/how-could-i-use-const-in-vue-template
+             */
+            this.ATTENDANCE_STATUS_PENDING = ATTENDANCE_STATUS_PENDING;
+            this.ATTENDANCE_STATUS_APPROVED = ATTENDANCE_STATUS_APPROVED;
+            this.ATTENDANCE_STATUS_REJECTED = ATTENDANCE_STATUS_REJECTED;
         },
         data() {
             return {
@@ -198,15 +215,14 @@
                             config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
 
                             /* Inspect the responseText payload to evaluate current status
-                             * TODO: Deal with magic numbers
                              */
                             if (responseText.isInvited) {
                                 switch (responseText.guests[responseText.user.id].status) {
-                                    case 2:
+                                    case ATTENDANCE_STATUS_APPROVED:
                                         config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
                                         break;
 
-                                    case 3:
+                                    case ATTENDANCE_STATUS_REJECTED:
                                         config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
                                         break;
 
@@ -660,10 +676,10 @@
                     <section>
                         <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === 2}" data-rsvp="accept">Yes</a>
+                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_APPROVED}" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === 3}" data-rsvp="decline">No</a>
+                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_REJECTED}" data-rsvp="decline">No</a>
                             </span>
                         </span>
 
