@@ -236,8 +236,8 @@
 
                             /* I am disgusted that this was a way of doing it
                              */
-                            eventExtendedProps.data.attendance.maxAttendees = responseText.maxAttendees;
-                            eventExtendedProps.data.attendance.numAttendees = responseText.numAttendees;
+                            eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
+                            eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
 
                             self.event.setExtendedProp('data', eventExtendedProps.data);
                         }

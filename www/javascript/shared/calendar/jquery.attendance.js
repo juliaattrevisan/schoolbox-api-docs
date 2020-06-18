@@ -195,12 +195,12 @@
          */
         function onAfterAttendanceChange(responseText) {
             config.attendanceList.find('article').html(responseText.fragment);
-            config.available.html(responseText.available ? responseText.available : 'No');
+            config.available.html(responseText.attendees.available ? responseText.attendees.available : 'No');
 
-            toggleCreateAttendance(responseText.available);
+            toggleCreateAttendance(responseText.attendees.available);
 
             $.fn.rsvpToggle({
-                available: responseText.available,
+                available: responseText.attendees.available,
                 isInvited: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
             });
         }

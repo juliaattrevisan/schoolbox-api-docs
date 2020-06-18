@@ -113,17 +113,22 @@ class ListPayload
              */
             'user' => $user,
 
-            /* Maximum number of people you can invite
+            /* Convenient counts
              */
-            'maxAttendees' => $maxAttendees,
+            'attendees' => [
 
-            /* Number of people currently invited
-             */
-            'numAttendees' => $numAttendees,
+                /* Maximum number of people you can invite
+                 */
+                'max' => $maxAttendees,
 
-            /* The number of empty spots that can be filled
-             */
-            'available' => $available,
+                /* Number of people currently invited
+                 */
+                'num' => $numAttendees,
+
+                /* The number of empty spots that can be filled
+                 */
+                'available' => $available,
+            ],
 
             /* A list of invited users index by their user id
              */

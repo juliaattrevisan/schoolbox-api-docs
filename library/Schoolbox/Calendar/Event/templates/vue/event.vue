@@ -207,10 +207,10 @@
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.attendance.guests.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.attendance.guests.available != null">
-                                <span id="attendance-guests-available" :data-available="this.event.attendance.guests.available">
-                                    <template v-if="this.event.attendance.guests.available > 0">{{ this.event.attendance.guests.available }}</template>
+                        <div class="content" v-if="this.event.attendance.guests.attendees.available != null || this.event.canModify">
+                            <span class="meta" v-if="this.event.attendance.guests.attendees.available != null">
+                                <span id="attendance-guests-available" :data-available="this.event.attendance.guests.attendees.available">
+                                    <template v-if="this.event.attendance.guests.attendees.available > 0">{{ this.event.attendance.guests.attendees.available }}</template>
                                     <template v-else>No</template>
                                 </span> available place(s) remaining
                             </span>
