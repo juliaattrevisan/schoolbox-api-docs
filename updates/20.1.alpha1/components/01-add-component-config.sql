@@ -106,3 +106,24 @@ WHERE ccd.`key` = 'compactMode'
     'Component_Homepage_BreadcrumbController',
     'Schoolbox\\Tile\\Component\\HomepageTileController'
 );
+
+
+-- Find all the components who don't have usages of componentname
+
+-- SELECT cd.*
+-- FROM component_definition cd
+-- LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id AND `key` = 'componentname'
+-- WHERE module = 'homepage'
+-- AND ccd.id IS NULL
+
+-- Assign a componentname config definition to components who don't already have it
+
+INSERT INTO
+component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
+(
+    SELECT cd.id, 'componentname', `name`, 'Heading', null
+    FROM component_definition cd
+    LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id AND `key` = 'componentname'
+    WHERE module = 'homepage'
+    AND ccd.id IS NULL
+);
