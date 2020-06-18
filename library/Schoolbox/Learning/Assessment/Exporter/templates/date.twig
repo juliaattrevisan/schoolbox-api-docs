@@ -1,12 +1,13 @@
 {#
     'fullSetOfDates'     bool
+    'date'               Alaress_Date_Format
     'dateType'           string
+    'label'              string
     'unitImplementation' UnitImplementation\Model
     'assessment'         IAssessable
 #}
 
 {% set large = (fullSetOfDates) ? 3 : 6 %}
-{% set date  = attribute(assessment, dateType ~ 'At') %}
 
 {% if dateType == 'publish' %}
     {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
@@ -15,13 +16,13 @@
     {% set endSync = 'due' %}
 {% elseif dateType == 'due' %}
     {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
-    {% set endSync = (fullSetOfDates) ? 'close' : '' %}
+    {% set endSync = (fullSetOfDates) ? 'late' : '' %}
 {% else %}
     {% set startSync = 'due' %}
 {% endif %}
 
 <div class="small-12 medium-6 large-{{ large }} columns">
-    <label for="{{ dateType }}Date-{{ unitImplementation.id }}">{{ dateType|capitalize }} Date</label>
+    <label for="{{ dateType }}Date-{{ unitImplementation.id }}">{{ label }} Date</label>
     <input id="{{ dateType }}Date-{{ unitImplementation.id }}"
            name="unit[{{ unitImplementation.id }}][{{ dateType }}]"
            type="text"

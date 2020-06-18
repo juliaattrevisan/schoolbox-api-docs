@@ -107,10 +107,18 @@
     </div>
 
     {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
-        {% set dates = ['publish', 'open', 'due', 'late'] %}
+        {% set dates = [
+            {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
+            {type: 'open',    label: 'Open',    date: assessmentImpl.openAt},
+            {type: 'due',     label: 'Due',     date: assessmentImpl.dueAt},
+            {type: 'late',    label: 'Late',    date: assessmentImpl.closeAt},
+        ] %}
         {% set fullSetOfDates = true %}
     {% else %}
-        {% set dates = ['publish', 'due'] %}
+        {% set dates = [
+            {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
+            {type: 'due',     label: 'Due',     date: assessmentImpl.dueAt},
+        ] %}
         {% set fullSetOfDates = false %}
     {% endif %}
 
@@ -118,7 +126,9 @@
         {% for date in dates %}
             {% include '@learningAssessmentExporter/date.twig' with {
                 fullSetOfDates:     fullSetOfDates,
-                dateType:           date,
+                date:               date.date,
+                dateType:           date.type,
+                label:              date.label,
                 unitImplementation: unitImpl,
                 assessment:         assessmentImpl
             } only %}
