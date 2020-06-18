@@ -37,6 +37,7 @@ paths:
   /discussion/{contextType}/{contextId}/comments/{id}:
     delete:
       operationId: deleteComment
+      tags: [discussion]
       summary: Deletes a comment
       responses:
         '204':
@@ -52,6 +53,7 @@ paths:
   /discussion/{contextType}/{contextId}/comments/{id}/comments:
     get:
       operationId: getCommentsByParent
+      tags: [discussion]
       summary: Returns child comments for a parent comment
       responses:
         '200':
@@ -70,6 +72,7 @@ paths:
   /discussion/{contextType}/{contextId}/threads/{id}:
     get:
       operationId: getThread
+      tags: [discussion]
       summary: Returns a thread
       responses:
         '200':
@@ -85,6 +88,7 @@ paths:
   /discussion/{contextType}/{contextId}/threads:
     post:
       operationId: createThread
+      tags: [discussion]
       summary: Creates a thread
       responses:
         '201':
@@ -108,6 +112,7 @@ paths:
   /discussion/{contextType}/{contextId}/threads/{id}/comments:
     get:
       operationId: getCommentsByThread
+      tags: [discussion]
       summary: Returns comments for a thread
       responses:
         '200':
@@ -117,6 +122,7 @@ paths:
 
     post:
       operationId: createCommentInThread
+      tags: [discussion]
       summary: Creates a new comment
       responses:
         '201':
@@ -142,6 +148,7 @@ paths:
   /discussion/{contextType}/{contextId}/threads/{id}/open:
     put:
       operationId: openThread
+      tags: [discussion]
       summary: Open commenting thread
       responses:
         '200':
@@ -161,6 +168,7 @@ paths:
   /discussion/{contextType}/{contextId}/threads/{id}/close:
     put:
       operationId: closeThread
+      tags: [discussion]
       summary: Close commenting thread
       responses:
         '200':
