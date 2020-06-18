@@ -404,7 +404,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (empty($allowedFileTypes)) {
             $allowedFileTypes = [self::DEFAULT_FILE_TYPE];
         }
-        $allowedFileTypesFound = $allowedFileTypes;
 
         $periodsForSequenceIds = [];
 
@@ -491,20 +490,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             unset($period);
 
-        // Try this for all filetypes not found by the stored proc
-        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
-        if (!empty($allowedFileTypesNotFound)) {
-            // Fall back to getDayTimetable() for anything the proc didn't find
-            $periodList = $this->getTimetablePeriods(
+        // Use getDayTimetable() for anything the proc didn't find
+        $periodList = array_merge(
+            $periodList,
+            $this->getTimetablePeriods(
                 $externalUserId,
                 (int)$userId,
                 (int)$dayNumber,
-                $allowedFileTypesNotFound,
+                $allowedFileTypes,
                 $fileSemester,
                 $fileYear,
                 $campus
-            );
-        }
+            )
+        );
 
         // Add classes into it
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
