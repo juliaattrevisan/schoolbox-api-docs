@@ -629,7 +629,7 @@ class Calendar extends DeprecatedModel
                 attendance,
                 max_attendees,
                 COUNT(DISTINCT event_attendance.user_id) AS num_attendees,
-                SUM(IF(event_attendance.user_id = '{$user->getId()}', 1, 0)) AS is_invited,
+                MAX(IF(event_attendance.user_id = '{$user->getId()}', event_attendance.`status`, null)) AS attendance_status,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -715,7 +715,7 @@ class Calendar extends DeprecatedModel
 
                 $event->setMaxAttendees($currentEvent['max_attendees']);
                 $event->setNumAttendees($currentEvent['num_attendees']);
-                $event->setIsInvited((bool)$currentEvent['is_invited']);
+                $event->setAttendanceStatus($currentEvent['attendance_status']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);

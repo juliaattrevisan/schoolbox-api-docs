@@ -256,14 +256,14 @@ interface EventInterface
 
 
     /**
-     * @return bool
+     * @return int|null
      */
-    public function getIsInvited(): bool;
+    public function getAttendanceStatus(): ?int;
 
 
     /**
-     * @param bool $isInvited
+     * @param int|null $attendanceStatus
      * @return $this
      */
-    public function setIsInvited(bool $isInvited): EventInterface;
+    public function setAttendanceStatus(?int $attendanceStatus): EventInterface;
 }

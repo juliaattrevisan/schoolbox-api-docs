@@ -179,9 +179,9 @@
              * certain javascript not executing are really cryptic to figure out
              *
              * @param eventId int
-             * @param isInvited bool
+             * @param attendanceStatus bool
              */
-            attendanceSelectize(eventId, isInvited) {
+            attendanceSelectize(eventId, attendanceStatus) {
                 this.$nextTick(() => {
 
                     // SA-10476
@@ -193,7 +193,7 @@
 
                     this.jQuery.fn.rsvp({
                         rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                        onList: isInvited ? 'true' : 'false',
+                        onList: attendanceStatus !== null ? 'true' : 'false',
                         onUpdate: function(config, responseText) {
                             config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
 
@@ -292,7 +292,7 @@
                 const data = this.event.extendedProps.data;
 
                 if (data.meta.eventId !== undefined) {
-                    this.attendanceSelectize(data.meta.eventId, data.attendance.isInvited);
+                    this.attendanceSelectize(data.meta.eventId, data.attendance.attendanceStatus);
                 }
             },
 
@@ -660,10 +660,10 @@
                     <section>
                         <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>
+                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === 2}" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>
+                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === 3}" data-rsvp="decline">No</a>
                             </span>
                         </span>
 
