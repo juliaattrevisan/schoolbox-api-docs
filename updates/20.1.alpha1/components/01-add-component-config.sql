@@ -1,6 +1,8 @@
 -- Add a new Component Config Definition to all Homepage components
 -- I had a look at what happens in Dashboard if I add for them; crazy crap is going on over there
 
+-- Textboxes show titles by default
+
 INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
 (
@@ -8,7 +10,25 @@ component_config_definition (`component_definition_id`, `key`, `default_value`, 
         id, 'showComponentTitle', 1, 'Show title to read-only users', null
     FROM component_definition
     WHERE `module` = 'homepage'
+    AND `class` = 'Component_Homepage_TextBoxController'
 );
+
+-- Tiles and Breadcrumbs hide titles by default
+
+INSERT INTO
+component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
+(
+    SELECT
+        id, 'showComponentTitle', 0, 'Show title to read-only users', null
+    FROM component_definition
+    WHERE `module` = 'homepage'
+    AND `class` IN
+    (
+        'Component_Homepage_BreadcrumbController',
+        'Schoolbox\\Tile\\Component\\HomepageTileController'
+    )
+);
+
 
 -- Invert special usages of CompactMode in particular components:
 -- TextBox, Tiles, Breadcrumbs
