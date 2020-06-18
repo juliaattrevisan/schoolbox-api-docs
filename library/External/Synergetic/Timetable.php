@@ -404,26 +404,25 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (empty($allowedFileTypes)) {
             $allowedFileTypes = [self::DEFAULT_FILE_TYPE];
         }
+        $allowedFileTypesFound = $allowedFileTypes;
 
         $periodsForSequenceIds = [];
 
         // pvTimetableDefinitionAll
-//        foreach ($allowedFileTypes as $fileType) {
-            $periodList = [];
-            $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
-            $statement->bindInputs(
-                [
-//                    'FileType'                  => $fileType,
-                    'FileYear'                  => $fileYear,
-                    'FileSemester'              => $fileSemester,
-                    'ID'                        => $externalUserId,
-                    'Date'                      => $date->getDatabaseDate(),
-                    'IncludeStaffScheduleFlag'  => 1,
-                    'CheckAttendancesExistFlag' => 1,
-                    'IncludeSparesFlag'         => 0,
-                    'IncludeRecessFlag'         => 0,
-                ]
-            );
+        $periodList = [];
+        $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
+        $statement->bindInputs(
+            [
+                'FileYear'                  => $fileYear,
+                'FileSemester'              => $fileSemester,
+                'ID'                        => $externalUserId,
+                'Date'                      => $date->getDatabaseDate(),
+                'IncludeStaffScheduleFlag'  => 1,
+                'CheckAttendancesExistFlag' => 1,
+                'IncludeSparesFlag'         => 0,
+                'IncludeRecessFlag'         => 0,
+            ]
+        );
 
             $iterator = $statement->getIterator();
 
@@ -475,7 +474,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $periodsForSequenceId = array_unique($periodsForSequenceId);
             }
 
-            unset($periodsForSequenceId);
+        unset($periodsForSequenceId);
 
             // Merge period numbers for attendance all together
             foreach ($periodList as &$period) {
@@ -492,14 +491,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             unset($period);
 
-            if (empty($periodList)) {
-                // Fall back to getDayTimetable()
-                $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, $fileType, $fileSemester, $fileYear, $campus);
-            }
+        // Try this for all filetypes not found by the stored proc
+        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
+        if (!empty($allowedFileTypesNotFound)) {
+            // Fall back to getDayTimetable() for anything the proc didn't find
+            $periodList = $this->getTimetablePeriods(
+                $externalUserId,
+                (int)$userId,
+                (int)$dayNumber,
+                $allowedFileTypesNotFound,
+                $fileSemester,
+                $fileYear,
+                $campus
+            );
+        }
 
-            // Add classes into it
-            $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
-//        }
+        // Add classes into it
+        $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
+
         usort($timetable, [$this, 'sortTimetable']);
 
         return $timetable;
@@ -602,24 +611,28 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string      $externalUserId
-     * @param int         $userId
-     * @param int         $dayNumber
-     * @param string|null $fileType
-     * @param string      $fileSemester
-     * @param string      $fileYear
-     * @param Campus      $campus
+     * @param string              $externalUserId
+     * @param int                 $userId
+     * @param int                 $dayNumber
+     * @param array|string[]|null $fileTypes
+     * @param string              $fileSemester
+     * @param string              $fileYear
+     * @param Campus              $campus
      * @return array
      */
-    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?string $fileType, string $fileSemester, string $fileYear, Campus $campus): array
+    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?array $fileTypes, string $fileSemester, string $fileYear, Campus $campus): array
     {
         $campusString = $campus->getExtTimetableCode();
 
-        // Get fileType to limit the data to
+        // Get file types to limit the data to
         $allowedFileTypes = $this->getAllowedFileTypes();
-        if ($fileType && (empty($allowedFileTypes) || in_array($fileType, $allowedFileTypes))) {
-            $allowedFileTypes = [$fileType];
+        if (isset($fileTypes)) {
+            $allowedFileTypes = array_intersect($allowedFileTypes, $fileTypes);
         }
+        if (empty($fileTypes)) {
+            return [];
+        }
+
         $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
                 $this->database,
                 'quote',
