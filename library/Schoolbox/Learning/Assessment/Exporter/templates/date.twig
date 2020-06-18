@@ -17,7 +17,7 @@
     {% set endSync = 'due' %}
 {% elseif dateType == 'due' %}
     {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
-    {% set endSync = (fullSetOfDates) ? 'close' : '' %}
+    {% set endSync = (fullSetOfDates) ? 'late' : '' %}
 {% else %}
     {% set startSync = 'due' %}
 {% endif %}
