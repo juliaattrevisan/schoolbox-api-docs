@@ -68,11 +68,6 @@
             window: () => window,
             jQuery: () => window.jQuery,
 
-
-            monger: function() {
-                return this.poop;
-            },
-
             /**
              * Generate extended properties for the component's event.
              *
