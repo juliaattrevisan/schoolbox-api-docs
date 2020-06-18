@@ -309,9 +309,7 @@
                             css: 'success'
                         });
 
-                        if (config.reload) {
-                            window.location.reload();
-                        }
+                        config.onUpdate(config, responseText);
                     },
                     error: function(xhr, status, error) {
                         let responseText = $.parseJSON(xhr.responseText)
@@ -350,9 +348,13 @@
                  */
                 onList: false,
 
-                /* Reload window.location.href when successfully updated rsvp
+                /* A callback after invitation was successfully updated
+                 * Applies to both accept and decline scenarios
+                 * By default, reloads
                  */
-                reload: true
+                onUpdate: function(config, responseText) {
+                    window.location.reload()
+                }
             };
 
             return $.extend(defaults, options);

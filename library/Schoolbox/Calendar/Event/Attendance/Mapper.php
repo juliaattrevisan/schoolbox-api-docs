@@ -121,7 +121,7 @@ class Mapper extends \Schoolbox\Mapper
         ]);
 
         foreach ($attendances as $attendance) {
-            $pairs[] = [
+            $pairs[$attendance->getUser()->getId()] = [
                 'id' => $attendance->getUser()->getId(),
                 'name' => $attendance->getUser()->getFullname(),
                 'status' => $attendance->getStatus()

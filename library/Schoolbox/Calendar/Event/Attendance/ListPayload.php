@@ -106,9 +106,31 @@ class ListPayload
         }));
 
         return [
+
+            /* The current user
+             */
+            'user' => $user,
+
+            /* The number of empty spots that can be filled
+             */
             'available' => $available,
+
+            /* A list of invited users index by their user id
+             */
             'guests' => $guests,
+
+            /* Whether the current user is currently invited
+             * i.e. currently on the attendance list
+             */
+            'onList' => isset($guests[$user->getId()]),
+
+            /* Whether the current user can modify the event
+             */
             'canModify' => $canModify,
+
+            /* html chunk containing a list of invited users and their associated buttons
+             * and icons representing their current rsvp state
+             */
             'fragment' => $this->di
                 ->get('webOutput:nochrome')
                 ->setTemplate('@calendarEventAttendance/current.twig')
