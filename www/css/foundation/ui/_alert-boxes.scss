@@ -125,7 +125,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     position: fixed;
     right: 1rem;
     text-align: center;
-    z-index: 100;
+    z-index: 2000;
     @include transition(all, .3s, cubic-bezier(0.65, 0.05, 0.36, 1), 0s);
     &.pop {
         @include transform(translateY(0));
