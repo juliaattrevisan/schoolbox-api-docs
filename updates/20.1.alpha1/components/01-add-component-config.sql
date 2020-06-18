@@ -2,6 +2,7 @@
 -- I had a look at what happens in Dashboard if I add for them; crazy crap is going on over there
 
 -- Textboxes show titles by default
+-- All components except Breadcrumbs and Tiles show titles by default
 
 INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
@@ -10,7 +11,10 @@ component_config_definition (`component_definition_id`, `key`, `default_value`, 
         id, 'showComponentTitle', 1, 'Show Title to Read-Only Users', null
     FROM component_definition
     WHERE `module` = 'homepage'
-    AND `class` = 'Component_Homepage_TextBoxController'
+    AND `class` NOT IN (
+        'Component_Homepage_BreadcrumbController',
+        'Schoolbox\\Tile\\Component\\HomepageTileController'
+    )
 );
 
 -- Tiles and Breadcrumbs hide titles by default
@@ -28,6 +32,7 @@ component_config_definition (`component_definition_id`, `key`, `default_value`, 
         'Schoolbox\\Tile\\Component\\HomepageTileController'
     )
 );
+
 
 
 -- Invert special usages of CompactMode in particular components:
