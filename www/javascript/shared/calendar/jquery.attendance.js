@@ -283,7 +283,20 @@
          * That'll reload with the most recent state of affairs
          */
         $.each(config.rsvpAttendanceForm.find('[data-rsvp]'), function(index, element) {
-            $(element).on('click', function(event) {
+
+            /* Don't stack multiple listeners every time the plugin runs
+             */
+            if ($(element).attr('data-listening') !== undefined) {
+                return;
+            }
+
+            /* Set flag to know that we've been here and done this already
+             */
+            $(element).attr('data-listening', true);
+
+            /* The guts
+             */
+            $(element).on('click', function (event) {
                 event.preventDefault();
 
                 /* Special case: if you're not in the list and you're declining, exit early
@@ -303,7 +316,7 @@
                     method: 'post',
                     dataType: 'json',
                     data: {},
-                    success: function(responseText) {
+                    success: function (responseText) {
                         config.toast.toastTimeout({
                             text: 'Invitation successfully updated',
                             css: 'success'
@@ -311,10 +324,13 @@
 
                         config.onUpdate(config, responseText);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         let responseText = $.parseJSON(xhr.responseText)
 
-                        config.toast.toastTimeout({text: 'Unable to update invitation. ' + responseText.message, css: 'alert'});
+                        config.toast.toastTimeout({
+                            text: 'Unable to update invitation. ' + responseText.message,
+                            css: 'alert'
+                        });
                     }
                 });
             });
