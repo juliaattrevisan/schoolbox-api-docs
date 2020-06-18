@@ -109,11 +109,11 @@ class Event extends EventBase
 
 
     /**
-     * A csv of user ids who are attending an event
+     * Whether the current user is invited to attend an event
      *
-     * @var string|null
+     * @var bool
      */
-    protected $attendees;
+    protected $isInvited;
 
     /**
      * Can someone attend this event
@@ -420,20 +420,20 @@ class Event extends EventBase
     }
 
     /**
-     * @return string|null
+     * @return bool
      */
-    public function getAttendees(): ?string
+    public function getIsInvited(): bool
     {
-        return $this->attendees;
+        return (bool)$this->isInvited;
     }
 
     /**
-     * @param string|null $attendees
+     * @param bool $isInvited
      * @return $this
      */
-    public function setAttendees(?string $attendees): EventInterface
+    public function setIsInvited(bool $isInvited): EventInterface
     {
-        $this->attendees = $attendees;
+        $this->isInvited = $isInvited;
         return $this;
     }
 

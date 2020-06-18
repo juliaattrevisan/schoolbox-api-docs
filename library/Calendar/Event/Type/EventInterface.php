@@ -256,18 +256,14 @@ interface EventInterface
 
 
     /**
-     * A csv of user ids
-     *
-     * @return string|null
+     * @return bool
      */
-    public function getAttendees(): ?string;
+    public function getIsInvited(): bool;
 
 
     /**
-     * A csv of user ids
-     *
-     * @param string|null $attendees
+     * @param bool $isInvited
      * @return $this
      */
-    public function setAttendees(?string $attendees): EventInterface;
+    public function setIsInvited(bool $isInvited): EventInterface;
 }

@@ -138,7 +138,7 @@ class Javascript extends Base
         return [
             'maxAttendees' => $this->getEvent()->getMaxAttendees(),
             'numAttendees' => $this->getEvent()->getNumAttendees(),
-            'attendees'    => $this->getEvent()->getAttendees(),
+            'isInvited'    => $this->getEvent()->getIsInvited(),
 
             'icon'          => $hasIcon,
             'status'        => $hasStatus,
