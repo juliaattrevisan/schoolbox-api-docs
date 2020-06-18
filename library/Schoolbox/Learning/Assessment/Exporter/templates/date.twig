@@ -6,7 +6,6 @@
 #}
 
 {% set large = (fullSetOfDates) ? 3 : 6 %}
-{% set date  = attribute(assessment, dateType ~ 'At') %}
 
 {% if dateType == 'publish' %}
     {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
@@ -18,6 +17,13 @@
     {% set endSync = (fullSetOfDates) ? 'close' : '' %}
 {% else %}
     {% set startSync = 'due' %}
+{% endif %}
+
+{# The jankiest way of fixing this there is #}
+{% if dateType == 'late' %}
+    {% set date = attribute(assessment, 'closeAt') %}
+{% else %}
+    {% set date = attribute(assessment, dateType ~ 'At') %}
 {% endif %}
 
 <div class="small-12 medium-6 large-{{ large }} columns">
