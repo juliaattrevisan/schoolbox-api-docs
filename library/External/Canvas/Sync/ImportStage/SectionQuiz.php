@@ -260,6 +260,7 @@ class SectionQuiz extends SectionAssessmentAbstract
      */
     protected function getAssessableOwner(IAssessableDataModel $assessable): User
     {
+        /** @var Quiz\Model $assessable */
         return $assessable->getUser();
     }
 
@@ -626,6 +627,7 @@ class SectionQuiz extends SectionAssessmentAbstract
         // Insert Quiz Impl
         $this->quizMapper->save($quizImpl);
 
+        /** @var Quiz\Model $assessable */
         foreach ($assessableSpec->getSections() as $sectionSpec) {
             $this->copySection($sectionSpec, $quizImpl);
         }

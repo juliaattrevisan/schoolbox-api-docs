@@ -29,14 +29,15 @@ trait ModelSaveTrait
      * we want to by-pass pre/post save hooks, eg auto-creation of Assessment's dynamic plan.
      *
      * @param IMapper $mapper
-     * @param         $model
+     * @param mixed   $model
      * @param bool    $populateTimestamps
      * @param bool    $triggerCallbacks
      * @return mixed
-     * @throws Database\Exception
+     * @throws Mapper\Exception
      */
     private function saveModel(IMapper $mapper, $model, bool $populateTimestamps = true, bool $triggerCallbacks = true)
     {
+        /** @var Mapper $mapper */
         $hasId     = (bool)$mapper->getIdentifier();
         $currentId = $hasId ? $mapper->getModelProperty($model, $mapper->getIdentifierProperty()) : null;
 

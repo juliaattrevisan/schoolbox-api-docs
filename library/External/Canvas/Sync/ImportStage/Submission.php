@@ -170,7 +170,6 @@ class Submission extends SectionAssignment
                     $markScheme = $markSchemaFactory->spawnMarkSchemeFor($assessmentImpl);
 
                     foreach ($assessmentImpl->getPlans() as $plan) {
-                        /** @var Participant\Plan\Model $plan */
                         foreach ($plan->getParticipants() as $participant) {
                             foreach ($canvasSubmissions as $canvasSubmission) {
                                 if ($canvasSubmission['reviewee_id'] !== $participant->getUser()->getExternalId()) {

@@ -204,6 +204,7 @@ class SectionAssignment extends SectionAssessmentAbstract
      */
     protected function getAssessableOwner(IAssessableDataModel $assessable): User
     {
+        /** @var SubmissionBox $assessable */
         return $assessable->getOwner();
     }
 
@@ -222,6 +223,8 @@ class SectionAssignment extends SectionAssessmentAbstract
         string $openDate,
         string $dueDate
     ): bool {
+        /** @var SubmissionBox $assessableImpl */
+        /** @var SubmissionBox $assessableSpec */
         if (
             $assessableImpl->getMaxMark() === $assessableSpec->getMaxMark() &&
             $assessableImpl->getAcceptOnline() === $assessableSpec->getAcceptOnline() &&
