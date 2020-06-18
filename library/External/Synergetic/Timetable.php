@@ -404,6 +404,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (empty($allowedFileTypes)) {
             $allowedFileTypes = [self::DEFAULT_FILE_TYPE];
         }
+        $allowedFileTypesFound = [];
 
         $periodsForSequenceIds = [];
 
@@ -430,6 +431,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
                 continue;
             }
+            $allowedFileTypesFound[$spRow['FileType']] = $spRow['FileType'];
 
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
                 // There is a SeqLinkedTo field, which is only set for linked classes.
@@ -490,18 +492,21 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         unset($period);
 
         // Use getDayTimetable() for anything the proc didn't find
-        $periodList = array_merge(
-            $periodList,
-            $this->getTimetablePeriods(
-                $externalUserId,
-                (int)$userId,
-                (int)$dayNumber,
-                $allowedFileTypes,
-                $fileSemester,
-                $fileYear,
-                $campus
-            )
-        );
+        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
+        if (!empty($allowedFileTypesNotFound)) {
+            $periodList = array_merge(
+                $periodList,
+                $this->getTimetablePeriods(
+                    $externalUserId,
+                    (int)$userId,
+                    (int)$dayNumber,
+                    $allowedFileTypesNotFound,
+                    $fileSemester,
+                    $fileYear,
+                    $campus
+                )
+            );
+        }
 
         // Add classes into it
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
