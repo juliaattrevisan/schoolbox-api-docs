@@ -98,11 +98,11 @@ class ListPayload
         }));
 
         $accepted = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_APPROVED;
+            return $element['status'] === Model::STATUS_ACCEPTED;
         }));
 
         $declined = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_REJECTED;
+            return $element['status'] === Model::STATUS_DECLINED;
         }));
 
         return [

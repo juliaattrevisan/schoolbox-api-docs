@@ -107,7 +107,7 @@ class Calendar extends DeprecatedModel
      */
     public function getAttending($eventId)
     {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_APPROVED);
+        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_ACCEPTED);
     }
 
     /**
@@ -119,7 +119,7 @@ class Calendar extends DeprecatedModel
      */
     public function getRejected($eventId)
     {
-        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_REJECTED);
+        return $this->getByStatus($eventId, \Schoolbox\Calendar\Event\Attendance\Model::STATUS_DECLINED);
     }
 
     public function getAttendeeList($eventId)

@@ -206,7 +206,7 @@ class Controller extends Base
 
         /* Then update its status and user details if necessary
          */
-        $attendance->setStatus(Model::STATUS_APPROVED);
+        $attendance->setStatus(Model::STATUS_ACCEPTED);
 
         $this->attendanceMapper->save($attendance);
 
@@ -240,7 +240,7 @@ class Controller extends Base
 
             /* Then update its status
              */
-            $attendance->setStatus(Model::STATUS_REJECTED);
+            $attendance->setStatus(Model::STATUS_DECLINED);
 
             $this->attendanceMapper->save($attendance);
         } catch (MapperException $e) {
