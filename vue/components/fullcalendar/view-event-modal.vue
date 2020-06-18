@@ -198,7 +198,7 @@
              * @param eventId int
              * @param attendanceStatus bool
              */
-            attendanceSelectize(eventId, attendanceStatus) {
+            jqueryPlugins(eventId, attendanceStatus) {
                 this.$nextTick(() => {
 
                     // SA-10476
@@ -308,7 +308,7 @@
                 const data = this.event.extendedProps.data;
 
                 if (data.meta.eventId !== undefined) {
-                    this.attendanceSelectize(data.meta.eventId, data.attendance.attendanceStatus);
+                    this.jqueryPlugins(data.meta.eventId, data.attendance.attendanceStatus);
                 }
             },
 
