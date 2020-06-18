@@ -253,4 +253,21 @@ interface EventInterface
      * @return $this
      */
     public function setNumAttendees(?int $numAttendees): EventInterface;
+
+
+    /**
+     * A csv of user ids
+     *
+     * @return string|null
+     */
+    public function getAttendees(): ?string;
+
+
+    /**
+     * A csv of user ids
+     *
+     * @param string|null $attendees
+     * @return $this
+     */
+    public function setAttendees(?string $attendees): EventInterface;
 }

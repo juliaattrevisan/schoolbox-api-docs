@@ -629,6 +629,7 @@ class Calendar extends DeprecatedModel
                 attendance,
                 max_attendees,
                 COUNT(DISTINCT event_attendance.user_id) AS num_attendees,
+                GROUP_CONCAT(DISTINCT event_attendance.user_id) AS attendees,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -714,6 +715,7 @@ class Calendar extends DeprecatedModel
 
                 $event->setMaxAttendees($currentEvent['max_attendees']);
                 $event->setNumAttendees($currentEvent['num_attendees']);
+                $event->setAttendees($currentEvent['attendees']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);

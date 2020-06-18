@@ -109,6 +109,13 @@ class Event extends EventBase
 
 
     /**
+     * A csv of user ids who are attending an event
+     *
+     * @var string|null
+     */
+    protected $attendees;
+
+    /**
      * Can someone attend this event
      *
      * @return bool
@@ -409,6 +416,24 @@ class Event extends EventBase
     public function setNumAttendees(?int $numAttendees): EventInterface
     {
         $this->numAttendees = $numAttendees;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAttendees(): ?string
+    {
+        return $this->attendees;
+    }
+
+    /**
+     * @param string|null $attendees
+     * @return $this
+     */
+    public function setAttendees(?string $attendees): EventInterface
+    {
+        $this->attendees = $attendees;
         return $this;
     }
 
