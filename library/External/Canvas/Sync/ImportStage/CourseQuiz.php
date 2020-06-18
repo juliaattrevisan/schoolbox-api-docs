@@ -16,7 +16,6 @@ use Evaluation_Section;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
-use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
@@ -35,7 +34,6 @@ use UnderflowException;
 use UnexpectedValueException;
 use function array_key_exists;
 use function array_keys;
-use function array_map;
 use function count;
 
 /**
@@ -44,9 +42,6 @@ use function count;
 class CourseQuiz extends CourseAssessmentAbstract
 {
     use ModelSaveTrait;
-
-    /** @var Bridge\Course */
-    private $courseBridge;
 
     /** @var Bridge\Assignment */
     private $assignmentBridge;
@@ -107,11 +102,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         Bridge\Course $courseBridge
     ) {
         parent::__construct(
-            $canvasDb,
-            $schoolboxDb,
-            $assessmentMapper,
-            $log,
-            $config
+            $canvasDb, $schoolboxDb, $assessmentMapper, $log, $config, $courseBridge
         );
         $this->assignmentBridge   = $assignmentBridge;
         $this->quizMapper         = $quizMapper;
@@ -120,7 +111,6 @@ class CourseQuiz extends CourseAssessmentAbstract
         $this->questionTypeMapper = $quizQuestionTypeMapper;
         $this->quizSolutionMapper = $quizSolutionMapper;
         $this->folderMapper       = $folderMapper;
-        $this->courseBridge       = $courseBridge;
     }
 
 
@@ -134,6 +124,11 @@ class CourseQuiz extends CourseAssessmentAbstract
      */
     public function synchronise(): void
     {
+        if (!$this->assignmentBridge->syncCanvasQuizzes()) {
+            $this->log->info('Skipping syncing course quizzes');
+            return;
+        }
+
         $this->log->notice("Synchronising Canvas Quiz => Schoolbox QuizSpec...");
         $this->resetCounts();
 
@@ -240,38 +235,6 @@ class CourseQuiz extends CourseAssessmentAbstract
         $this->deleteUnSynchronizedQuizzes($synchronizedQuizIds);
         $this->printCounts();
     }
-
-
-    /**
-     * Returns the canvas ids of the Canvas courses to import
-     *
-     * Course must:
-     *   * Have workflow_state 'available' or 'completed'
-     *   * Have 1+ CourseSections where the Sections:
-     *     * Has a SisSourceId LIKE 'Y2019C%NOT', ... where year is from 2019 to current calendar year + 1
-     *
-     * @return int[]
-     * @throws Database\Exception
-     * @throws InvalidColumnException
-     * @throws UnderflowException
-     */
-    private function getCanvasCourseIdsToImport(): array
-    {
-        // TODO dedupe this with 'CourseAssignments'
-        $pb          = $this->courseBridge->getCanvasCoursesToImport();
-        $whereClause = $pb->getWhere()[0];
-        $sql         = "
-            SELECT DISTINCT c.canvas_id
-            FROM course_dim c
-            JOIN course_section_dim cs ON cs.course_id = c.id
-            WHERE {$whereClause}
-        ";
-        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
-        return array_map(static function (string $canvasId) {
-            return (int)$canvasId;
-        }, $canvasIds);
-    }
-
 
     /**
      * Returns the Schoolbox Admin user's id

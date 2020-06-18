@@ -10,13 +10,11 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use InvalidArgumentException;
-use PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -32,7 +30,6 @@ use UnderflowException;
 use UnexpectedValueException;
 use function array_key_exists;
 use function array_keys;
-use function array_map;
 use function count;
 
 /**
@@ -44,9 +41,6 @@ class CourseAssignments extends CourseAssessmentAbstract
 
     /** @var Bridge\Account */
     private $accountBridge;
-
-    /** @var Bridge\Course */
-    private $courseBridge;
 
     /** @var Bridge\Assignment */
     private $assignmentBridge;
@@ -88,15 +82,10 @@ class CourseAssignments extends CourseAssessmentAbstract
         Folder\Mapper $folderMapper
     ) {
         parent::__construct(
-            $canvasDb,
-            $schoolboxDb,
-            $assessmentMapper,
-            $log,
-            $config
+            $canvasDb, $schoolboxDb, $assessmentMapper, $log, $config, $courseBridge
         );
         $this->assignmentBridge    = $assignmentBridge;
         $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->courseBridge        = $courseBridge;
         $this->folderMapper        = $folderMapper;
     }
 
@@ -130,7 +119,8 @@ class CourseAssignments extends CourseAssessmentAbstract
                assignment.submission_types 'assignment.submission_types',
                assignment.created_at       'assignment.created_at',
                assignment.updated_at       'assignment.updated_at',
-               assignment.muted            'assignment.muted'
+               assignment.muted            'assignment.muted',
+               assignment_group.name       'assignment_group.name'
         FROM course_dim course
         JOIN assignment_dim assignment ON assignment.course_id = course.id AND assignment.workflow_state = 'published'
         LEFT JOIN assignment_group_dim assignment_group on assignment.assignment_group_id = assignment_group.id
@@ -169,6 +159,7 @@ class CourseAssignments extends CourseAssessmentAbstract
                     'muted'            => $row['assignment.muted'] === 'true',
                     // TODO this has been deprecated by Canvas, will always be NULL
                     'position'         => $assessmentSequence++,
+                    'assignment_group' => $row['assignment_group.name']
                 ];
             }
         }
@@ -206,7 +197,8 @@ class CourseAssignments extends CourseAssessmentAbstract
                     $assignmentData['created_at'],
                     $assignmentData['updated_at'],
                     $assignmentData['muted'],
-                    $assignmentData['position']
+                    $assignmentData['position'],
+                    $assignmentData['assignment_group']
                 );
                 $synchronizedSubmissionBoxIds[] = $submissionBox->getId();
             }
@@ -216,37 +208,6 @@ class CourseAssignments extends CourseAssessmentAbstract
 
         $this->printCounts();
     }
-
-
-    /**
-     * Returns the canvas ids of the Canvas courses to import
-     *
-     * Course must:
-     *   * Have workflow_state 'available' or 'completed'
-     *   * Have 1+ CourseSections where the Sections:
-     *     * Has a SisSourceId LIKE 'Y2019C%NOT', ... where year is from 2019 to current calendar year + 1
-     *
-     * @return int[]
-     * @throws Database\Exception
-     * @throws InvalidColumnException
-     * @throws UnderflowException
-     */
-    private function getCanvasCourseIdsToImport(): array
-    {
-        $pb          = $this->courseBridge->getCanvasCoursesToImport();
-        $whereClause = $pb->getWhere()[0];
-        $sql         = "
-            SELECT DISTINCT c.canvas_id
-            FROM course_dim c
-            JOIN course_section_dim cs ON cs.course_id = c.id
-            WHERE {$whereClause}
-        ";
-        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
-        return array_map(static function (string $canvasId) {
-            return (int)$canvasId;
-        }, $canvasIds);
-    }
-
 
     /**
      * Returns the Schoolbox Admin user's id
@@ -276,12 +237,9 @@ class CourseAssignments extends CourseAssessmentAbstract
      * @param string       $updatedAt
      * @param bool         $muted
      * @param int          $position
+     * @param string|null  $assignmentGroup
      * @return SubmissionBox
-     * @throws Database\Exception
-     * @throws InvalidArgumentException
      * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     * @throws PDOException
      */
     private function syncWithSubmissionBox(
         Folder\Model $unitSpecFolder,
@@ -295,7 +253,8 @@ class CourseAssignments extends CourseAssessmentAbstract
         string $createdAt,
         string $updatedAt,
         bool $muted,
-        int $position
+        int $position,
+        ?string $assignmentGroup
     ): SubmissionBox {
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
         $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
@@ -304,7 +263,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
         $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
         $selfReviewability = $this->assignmentBridge->getSelfReviewability();
-        $workType          = $this->assignmentBridge->getSubmissionBoxWorkType();
+        $workType          = $assignmentGroup ? $this->assignmentBridge->getSubmissionBoxWorkType($assignmentGroup) : null;
         $weight            = $this->assignmentBridge->getSubmissionBoxWeight();
         $submissionBox     = $this->findSubmissionBoxSpec($canvasId);
 

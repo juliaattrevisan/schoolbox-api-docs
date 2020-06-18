@@ -218,6 +218,7 @@ class Courses
             SELECT DISTINCT c.canvas_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
+            JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
         $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);

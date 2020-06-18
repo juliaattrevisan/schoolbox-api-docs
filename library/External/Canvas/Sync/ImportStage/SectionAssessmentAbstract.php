@@ -463,7 +463,6 @@ abstract class SectionAssessmentAbstract
      * @param int[] $candidatePlanIds    All SubBox plan ids
      * @param int[] $synchronisedPlanIds Plan ids we wish to preserve
      * @throws InvalidColumnException
-     * @throws Mapper\Exception
      * @throws UnderflowException
      */
     protected function deleteUnSynchronisedAssessablePlans(array $candidatePlanIds, array $synchronisedPlanIds): void
@@ -480,17 +479,30 @@ abstract class SectionAssessmentAbstract
             ->isNull("{$planTable}.deleted_at")
             ->in("{$planTable}.id", $planIdsToDelete);
 
-        $plansAndParticipants = $this->participantPlanMapper->findPlansAndParticipants($pb);
+        try {
+            $plansAndParticipants = $this->participantPlanMapper->findPlansAndParticipants($pb);
+        } catch (Mapper\Exception $e) {
+            $this->log->debug('Failed to find un-synchronised plans: ' . $e->getMessage() . $e->getTraceAsString());
+            return;
+        }
         foreach ($plansAndParticipants as $plan) {
             $this->log->debug("Deleting un-synchronised Plan '{$plan->getName()}' (id: {$plan->getId()})");
             foreach ($plan->getParticipants() as $participant) {
                 $user = $participant->getUser();
                 // This implies that if we add participants manually in Schoolbox, they will also be deleted here.
                 $this->log->debug("Deleting un-synchronised Plan participant (user: '{$user->getFullName()}') (user.externalId: {$user->getExternalId()})");
-                $this->participantMapper->delete($participant);
+                try {
+                    $this->participantMapper->delete($participant);
+                } catch (Mapper\Exception $e) {
+                    $this->log->debug("Failed to delete participant (user: '{$user->getFullName()}') (user.externalId: {$user->getExternalId()}): " . $e->getMessage() . $e->getTraceAsString());
+                }
                 $this->countParticipantsDeleted++;
             }
-            $this->participantPlanMapper->delete($plan);
+            try {
+                $this->participantPlanMapper->delete($plan);
+            } catch (Mapper\Exception $e) {
+                $this->log->debug("Failed to delete plan '{$plan->getName()}' (id: {$plan->getId()}): " . $e->getMessage() . $e->getTraceAsString());
+            }
             $this->countPlansDeleted++;
         }
     }

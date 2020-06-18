@@ -32,28 +32,33 @@ class Assignment
     public const QUIZ_TYPE_SURVEY        = 'survey';
 
 
-    /** @var string */
-    private $siteLocation;
-
     /** @var GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] */
     private $markTypes;
 
     /** @var GenericCollection<WorkType\Model>|WorkType\Model[] */
-    private $workTypes;
+    protected $workTypes;
 
+    /** @var WorkType\Mapper */
+    protected $workTypeMapper;
 
     /**
-     * @param string                                                             $siteLocation
      * @param GenericCollection<SubmissionBox\MarkType>|SubmissionBox\MarkType[] $markTypes
-     * @param GenericCollection<WorkType\Model>|WorkType\Model[]                 $workTypes
+     * @param WorkType\Mapper   $workTypeMapper
      */
-    public function __construct(string $siteLocation, GenericCollection $markTypes, GenericCollection $workTypes)
+    public function __construct(GenericCollection $markTypes, WorkType\Mapper $workTypeMapper)
     {
-        $this->siteLocation = $siteLocation;
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
+        $this->workTypeMapper = $workTypeMapper;
     }
 
+    /**
+     * Returns whether to sync canvas quizzes
+     * @return bool
+     */
+    public function syncCanvasQuizzes(): bool
+    {
+        return true;
+    }
 
     /**
      * @param float|null $pointsPossible
@@ -111,11 +116,15 @@ class Assignment
     /**
      * Returns the work type to assign to imported Canvas Assignments
      *
+     * @param string $workTypeName
      * @return null|WorkType\Model
      */
-    public function getSubmissionBoxWorkType(): ?WorkType\Model
+    public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
     {
-        return null;
+        if (!isset($this->workTypes)) {
+            $this->workTypes = $this->workTypeMapper->findAll()->indexBy('name');
+        }
+        return $this->workTypes->offsetGet($workTypeName);
     }
 
 
@@ -140,7 +149,6 @@ class Assignment
         return 1;
     }
 
-
     /**
      * Returns the work type to assign to this quiz type
      *
@@ -149,27 +157,15 @@ class Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        switch ($this->siteLocation) {
-            // Hard-coded for now to the staloy/demo dataset
-            case 'staloy':
-                $config = [
-                    self::QUIZ_TYPE_PRACTICE      => 5,
-                    self::QUIZ_TYPE_ASSIGNMENT    => 5,
-                    self::QUIZ_TYPE_SURVEY        => 5,
-                    self::QUIZ_TYPE_GRADED_SURVEY => 5,
-                ];
-                break;
-            case 'demo':
-                $config = [
-                    self::QUIZ_TYPE_PRACTICE      => 11,
-                    self::QUIZ_TYPE_ASSIGNMENT    => 11,
-                    self::QUIZ_TYPE_SURVEY        => 11,
-                    self::QUIZ_TYPE_GRADED_SURVEY => 11,
-                ];
-                break;
-            default:
-                $config = [];
+        if (!$this->workTypes) {
+            $this->workTypes = $this->workTypeMapper->findAll()->shallowClone()->indexBy('id');
         }
+        $config = [
+            self::QUIZ_TYPE_PRACTICE      => 11,
+            self::QUIZ_TYPE_ASSIGNMENT    => 11,
+            self::QUIZ_TYPE_SURVEY        => 11,
+            self::QUIZ_TYPE_GRADED_SURVEY => 11,
+        ];
         if (!array_key_exists($quizType, $config)) {
             return null;
         }
