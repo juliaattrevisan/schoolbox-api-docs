@@ -423,72 +423,71 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             ]
         );
 
-            $iterator = $statement->getIterator();
+        $iterator = $statement->getIterator();
 
-            foreach ($iterator as $spRow) {
-                // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
-//                if ($spRow['FileType'] !== $fileType) {
-                if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
-                    continue;
-                }
-
-                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                    // There is a SeqLinkedTo field, which is only set for linked classes.
-                    $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
-                    $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
-
-                    if (isset($sequenceId) && $multiPeriodAttendance) {
-                        $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
-                    }
-
-                    $periodList[] = [
-                        'Room'                      => $spRow['Room'],
-                        'Description'               => $spRow['ClassDescription'],
-                        'PeriodNumber'              => $spRow['Period'],
-                        'ClassCampus'               => $spRow['ClassCampus'],
-                        'ClassCode'                 => $spRow['ClassCode'],
-                        'FileType'                  => $spRow['FileType'],
-                        'SubstituteFlag'            => $spRow['SubstituteFlag'],
-                        'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
-                        'PeriodSequence'            => $sequenceId,
-                        'AttendancePeriods'         => [$spRow['Period']],
-                        'AttendanceMarked'          => $spRow['IsMarkedFlag'],
-                        'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
-                        'ClassCancelled'            => $spRow['ClassCancelledFlag'],
-                        'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
-                    ];
-                }
+        foreach ($iterator as $spRow) {
+            // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
+            if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
+                continue;
             }
 
-            // Sort the periods and period sequences for niceness
-            usort(
-                $periodList,
-                static function ($a, $b) {
-                    return $a['PeriodNumber'] <=> $b['PeriodNumber'];
-                }
-            );
+            if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                // There is a SeqLinkedTo field, which is only set for linked classes.
+                $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
+                $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
 
-            foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
-                sort($periodsForSequenceId);
-                $periodsForSequenceId = array_unique($periodsForSequenceId);
+                if (isset($sequenceId) && $multiPeriodAttendance) {
+                    $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
+                }
+
+                $periodList[] = [
+                    'Room'                      => $spRow['Room'],
+                    'Description'               => $spRow['ClassDescription'],
+                    'PeriodNumber'              => $spRow['Period'],
+                    'ClassCampus'               => $spRow['ClassCampus'],
+                    'ClassCode'                 => $spRow['ClassCode'],
+                    'FileType'                  => $spRow['FileType'],
+                    'SubstituteFlag'            => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
+                    'PeriodSequence'            => $sequenceId,
+                    'AttendancePeriods'         => [$spRow['Period']],
+                    'AttendanceMarked'          => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
+                    'ClassCancelled'            => $spRow['ClassCancelledFlag'],
+                    'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
+                ];
             }
+        }
+
+        // Sort the periods and period sequences for niceness
+        usort(
+            $periodList,
+            static function ($a, $b) {
+                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+            }
+        );
+
+        foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
+            sort($periodsForSequenceId);
+            $periodsForSequenceId = array_unique($periodsForSequenceId);
+        }
 
         unset($periodsForSequenceId);
 
-            // Merge period numbers for attendance all together
-            foreach ($periodList as &$period) {
-                $periodSequence = $period['PeriodSequence'];
+        // Merge period numbers for attendance all together
+        foreach ($periodList as &$period) {
+            $periodSequence = $period['PeriodSequence'];
 
-                if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
-                    $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
+            if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
+                $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
 
-                    // Clear the list of periods for sequence IDs, so that later
-                    // classes in the sequence don't get an attendance link.
-                    $periodsForSequenceIds[$periodSequence] = [];
-                }
+                // Clear the list of periods for sequence IDs, so that later
+                // classes in the sequence don't get an attendance link.
+                $periodsForSequenceIds[$periodSequence] = [];
             }
+        }
 
-            unset($period);
+        unset($period);
 
         // Use getDayTimetable() for anything the proc didn't find
         $periodList = array_merge(
