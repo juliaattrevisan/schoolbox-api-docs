@@ -50,7 +50,7 @@
         const isInvited = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id}}') + '"]').length > 0;
 
         $.fn.rsvpToggle({
-            available: {{ attendance.guests.available is null ? 'null' : attendance.guests.available }},
+            available: {{ attendance.guests.attendees.available is null ? 'null' : attendance.guests.attendees.available }},
             isInvited: isInvited
         });
 
