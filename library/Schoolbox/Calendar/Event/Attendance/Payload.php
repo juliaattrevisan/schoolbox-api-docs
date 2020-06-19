@@ -18,7 +18,7 @@ use Schoolbox\User;
 use UnexpectedValueException;
 
 /**
- * Class ListPayload
+ * Class Payload
  *
  * Generate a list of people invited to attend $event
  * Also calculate a count of how many places are remaining
@@ -27,7 +27,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Calendar\Event\Attendance
  */
-class ListPayload
+class Payload
 {
 
     /**
@@ -43,7 +43,7 @@ class ListPayload
 
 
     /**
-     * ListPayload constructor.
+     * Payload constructor.
      *
      * @param Container $di
      * @param Mapper    $attendanceMapper

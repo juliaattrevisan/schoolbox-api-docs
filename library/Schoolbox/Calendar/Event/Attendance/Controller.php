@@ -85,7 +85,7 @@ class Controller extends Base
      */
     public function getCurrent(Event $event): void
     {
-        $data = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+        $data = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
