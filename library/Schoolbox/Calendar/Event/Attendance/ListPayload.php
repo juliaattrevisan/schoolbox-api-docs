@@ -78,34 +78,9 @@ class ListPayload
          */
         $guests = $this->attendanceMapper->findAttendances($event);
 
-        /* Attendance status counts
+        /* Do some counts and analysis on the $guest data
          */
-        $pending = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_PENDING;
-        }));
-
-        $accepted = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_ACCEPTED;
-        }));
-
-        $declined = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_DECLINED;
-        }));
-
-        /* Number of available places
-         * Could be null, 0, or many
-         */
-        $maxAttendees = $event->getMaxAttendees();
-        $numAttendees = $pending + $accepted;
-        $available = null;
-
-        if (null !== $maxAttendees) {
-            $available = $maxAttendees - $numAttendees;
-
-            if ($available < 0) {
-                $available = 0;
-            }
-        }
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         return [
 
@@ -119,15 +94,15 @@ class ListPayload
 
                 /* Maximum number of people you can invite
                  */
-                'max' => $maxAttendees,
+                'max' => $event->getMaxAttendees(),
 
-                /* Number of people currently invited
+                /* Number of people currently invited who have, or could, Accept their invitation
                  */
-                'num' => $numAttendees,
+                'num' => $analysis->getNumAttendees(),
 
                 /* The number of empty spots that can be filled
                  */
-                'available' => $available,
+                'available' => $analysis->getNumAvailable(),
             ],
 
             /* A list of invited users index by their user id
@@ -151,9 +126,9 @@ class ListPayload
                 ->setTemplate('@calendarEventAttendance/current.twig')
                 ->setData([
                     'counts' => [
-                        'pending' => $pending,
-                        'accepted' => $accepted,
-                        'declined' => $declined
+                        'pending' => $analysis->getNumPending(),
+                        'accepted' => $analysis->getNumAccepted(),
+                        'declined' => $analysis->getNumDeclined()
                     ],
                     'canModify' => $canModify,
                     'event' => $event,
