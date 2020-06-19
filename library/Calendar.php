@@ -628,7 +628,7 @@ class Calendar extends DeprecatedModel
                 detail,
                 attendance,
                 max_attendees,
-                COUNT(DISTINCT event_attendance.user_id) AS num_attendees,
+                SUM(IF(event_attendance.`status` != 3, 1, 0)) AS num_attendees,
                 MAX(IF(event_attendance.user_id = '{$user->getId()}', event_attendance.`status`, null)) AS attendance_status,
                 user.id as uid,
                 user.title as userTitle,
