@@ -12,6 +12,7 @@
 namespace Calendar\Event\Type;
 
 use Alaress_Date_Format;
+use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\Event as EventModel;
 
 abstract class EventBase implements EventInterface
@@ -715,6 +716,25 @@ abstract class EventBase implements EventInterface
      * @return $this
      */
     public function setNumAttendees(?int $numAttendees): EventInterface
+    {
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getAttendanceStatus(): ?int
+    {
+        return null;
+    }
+
+
+    /**
+     * @param int|null $attendanceStatus
+     * @return $this|EventInterface
+     */
+    public function setAttendanceStatus(?int $attendanceStatus): EventInterface
     {
         return $this;
     }
