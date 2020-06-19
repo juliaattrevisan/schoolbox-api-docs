@@ -104,8 +104,7 @@ class Controller extends Base
             null,
             $this->getUser(),
             [],
-            $queryArgs,
-            !$inContext
+            $queryArgs
         );
 
         $this->response->content->set(
@@ -129,35 +128,29 @@ class Controller extends Base
     }
 
     /**
-     * Apply filterValue of filterType only to queryArgs
+     * Apply single course / folder filter provided
      * @param string $filterType
      * @param int    $filterValue
      * @return array
      */
-    private function applyFilter(string $filterType, int $filterValue):array
+    private function applyFilter(string $filterType, int $filterValue): array
     {
-        // clear current selection
+        $filterTypesToApply = [
+          'folder' =>  FolderReadableDefinition::class,
+          'course' => CourseImportSpecDefinition::class,
+        ];
         $queryArgs = [];
-        switch ($filterType) {
-            case 'course':
-                $definitionClass = CourseImportSpecDefinition::class;
-                break;
-            case 'folder':
-                $definitionClass = FolderReadableDefinition::class;
-                break;
-            default:
-                return $queryArgs;
+        $filters   = $this->filterMapper->findForEntity(AssessmentMapper::class);
+        foreach ($filters as $filter) {
+            if (!in_array($filter->getClass(), $filterTypesToApply)) {
+                continue;
+            }
+            if ($filterTypesToApply[$filterType] === $filter->getClass()) {
+                $queryArgs[$filter->getId()][$filterValue] = 1;
+            } else {
+                $queryArgs[$filter->getId()] = [];
+            }
         }
-        try {
-            /** @var Filter\Model $filter */
-            $filter = $this->filterMapper->findOneByColumnList([
-                'entity' => AssessmentMapper::class,
-                'class'  => $definitionClass,
-            ]);
-        } catch (Mapper\Exception $e) {
-            return $queryArgs;
-        }
-        $queryArgs[$filter->getId()][$filterValue] = 1;
         return $queryArgs;
     }
 
