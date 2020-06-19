@@ -7,7 +7,7 @@
     <tbody id="permission-groups">
 
         {% if record.id != '' %}
-            {% for userAccess in record.access if userAccess.group.id != '' %}
+            {% for userAccess in record.access if userAccess.group %}
                 {# Work out which radio should be checked for each row #}
 
                 {% set checkedDeny = '' %}
@@ -209,7 +209,7 @@
 
             window.groupsAdded = [];
 
-            {% for access in record.access if access.group.id != '' %}
+            {% for access in record.access if access.group %}
                 window.groupsAdded[{{ access.group.id }}] = true;
             {% endfor %}
 

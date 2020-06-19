@@ -31,7 +31,7 @@
 
                 {% if user.role.isStaff %}
 
-                    {% if record.severity.name is not empty and config.pastoral_severity %}
+                    {% if record.severity and config.pastoral_severity %}
                         <dt class="small-12 medium-3">{{ locale.severity.proper }}:</dt>
                         <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
                     {% endif %}
@@ -39,7 +39,7 @@
                     <dt class="small-12 medium-3">Type:</dt>
                     <dd class="small-12 medium-9">{{ record.type.name }}</dd>
 
-                    {% if record.subtype.name is not empty %}
+                    {% if record.subtype.name ?? '' is not empty %}
                         <dt class="small-12 medium-3">Sub-Type:</dt>
                         <dd class="small-12 medium-9">{{ record.subtype.name }}</dd>
                     {% endif %}

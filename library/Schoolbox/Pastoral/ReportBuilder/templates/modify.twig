@@ -69,8 +69,8 @@
                                 <select id="filterSeverity" name="severity">
                                     <option value="">Show All {{ locale.severity.proper }} Levels</option>
                                     {% for severity in severities %}
-                                        <option {% if severity.sequence == report.severity.id %}selected{% endif %}
-                                                value="{{ severity.sequence }}">
+                                        <option {% if severity.id == report.severity.id ?? '' %}selected{% endif %}
+                                                value="{{ severity.id }}">
                                             {{ severity.name }}
                                         </option>
                                     {% endfor %}
@@ -118,7 +118,7 @@
                             <label for="datetime_after">
                                 From
                                 <input type="text" name="after" id="datetime_after"
-                                       value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                                       value="{{ report.afterDate.usingFormat('d/m/Y') ?? '' }}"
                                        data-datepicker data-datesync-enddate="#datetime_before"/>
                             </label>
                         </div>
@@ -126,7 +126,7 @@
                             <label for="datetime_before">
                                 To
                                 <input type="text" name="before" id="datetime_before"
-                                       value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                                       value="{{ report.beforeDate.usingFormat('d/m/Y') ?? '' }}"
                                        data-datepicker data-datesync-startdate="#datetime_after"/>
                             </label>
                         </div>

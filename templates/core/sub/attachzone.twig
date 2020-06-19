@@ -76,7 +76,7 @@ $data = {
                 thumbnailSize: '{{ attachzone.size }}',
                 fallbackButtonSelector: 'a[data-attach-fallback]',
                 previewsContainerSelector: '[data-dz-previews]',
-                onDetach: {{ onDetach is defined ? onDetach|raw : 'null' }},
+                onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
                 useFolder: false
             });
         });

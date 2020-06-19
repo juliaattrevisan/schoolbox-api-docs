@@ -1,4 +1,4 @@
-<div class="empty-state {% if hidden %}hide{% endif %}">
+<div class="empty-state {% if hidden ?? false %}hide{% endif %}">
     <i class="icon-report"></i>
     <p>
         You do not have any saved {{ locale.pastoralCare }} reports.

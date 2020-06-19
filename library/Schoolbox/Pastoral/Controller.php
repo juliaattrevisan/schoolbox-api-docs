@@ -302,6 +302,8 @@ class Controller extends Base
                 // 'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
                 'linkedStudents' => [],
                 'typeSelected'   => $typeId,
+                'resultsPerPage' => $resultsPerPage,
+                'pagesToDisplay' => $maxPage,
             ],
             'title'    => $student->getFullName(),
         ]);
@@ -451,6 +453,7 @@ class Controller extends Base
                 'user'               => $this->getUser(),
                 'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
                 'access'             => $access,
+                'linkedStudents'     => [],
             ],
             'title' => $record->getHeading(),
         ]);

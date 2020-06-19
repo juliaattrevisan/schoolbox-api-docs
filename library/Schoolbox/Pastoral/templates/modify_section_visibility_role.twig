@@ -7,7 +7,7 @@
     <tbody id="permission-roles">
 
         {% if record.id != '' %}
-            {% for userAccess in record.access if userAccess.role.id != '' %}
+            {% for userAccess in record.access if userAccess.role %}
                 {# Work out which radio should be checked for each row #}
                 {% set checkedDeny = '' %}
                 {% set checkedPublic = '' %}
@@ -222,7 +222,7 @@
 
             window.rolesAdded = [];
 
-            {% for userAccess in record.access if userAccess.role.id != '' %}
+            {% for userAccess in record.access if userAccess.role %}
                 window.rolesAdded.push({{ userAccess.role.id }});
             {% endfor %}
 

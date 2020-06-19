@@ -84,11 +84,11 @@ class Mapper extends BaseMapper
             // Delete any existing pastoral groups from the report that are no longer to be given access
 
             $sql = "
-      
+
                 UPDATE      `pastoral_report_groups`
-                SET         `deleted_at` = NOW() 
-                WHERE       `report_id` = :reportId AND 
-                            `group_id` NOT IN ({$bindings['placeholders']}) AND 
+                SET         `deleted_at` = NOW()
+                WHERE       `report_id` = :reportId AND
+                            `group_id` NOT IN ({$bindings['placeholders']}) AND
                             `deleted_at` IS NULL
             ";
 
@@ -99,9 +99,9 @@ class Mapper extends BaseMapper
         } else {
             $statement = $this->getDatabase()->prepare("
                 UPDATE      `pastoral_report_groups`
-                SET         `deleted_at` = NOW() 
-                WHERE       `report_id` = :reportId AND 
-                            `deleted_at` IS NULL            
+                SET         `deleted_at` = NOW()
+                WHERE       `report_id` = :reportId AND
+                            `deleted_at` IS NULL
             ");
 
             $statement->execute(['reportId' => $model->getId()]);
@@ -112,18 +112,18 @@ class Mapper extends BaseMapper
         foreach ($groupIds as $groupId) {
             $sql = "
                 INSERT INTO `pastoral_report_groups` (
-                    report_id, 
+                    report_id,
                     group_id,
                     created_at
-                ) 
-                SELECT :reportId, :groupId, NOW() 
+                )
+                SELECT :reportId, :groupId, NOW()
                 WHERE (
-                  SELECT    COUNT(*) 
-                  FROM      `pastoral_report_groups` 
-                  WHERE     `report_id` = :reportIdCount AND 
-                            `group_id` = :groupIdCount AND 
-                            `deleted_at` IS NULL   
-                ) = 0          
+                  SELECT    COUNT(*)
+                  FROM      `pastoral_report_groups`
+                  WHERE     `report_id` = :reportIdCount AND
+                            `group_id` = :groupIdCount AND
+                            `deleted_at` IS NULL
+                ) = 0
             ";
 
             $statement = $this->getDatabase()->prepare($sql);
@@ -155,7 +155,7 @@ class Mapper extends BaseMapper
                     /** @var null|PastoralSeverity $severity */
                     try {
                         $severity = $this->getJoinMapper('severity')->findById($row['severity_id']);
-                    } catch (MapperException\Deleted $e) {
+                    } catch (MapperException $e) {
                         $severity = null;
                     }
                     $model->setSeverity($severity);
@@ -200,9 +200,9 @@ class Mapper extends BaseMapper
             SELECT      {$this->getColumnString()},
                         GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
             FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON 
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
-                            `pastoral_report_groups`.`deleted_at` IS NULL           
+            LEFT JOIN   `pastoral_report_groups` ON
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
+                            `pastoral_report_groups`.`deleted_at` IS NULL
         ";
     }
 
@@ -239,17 +239,17 @@ class Mapper extends BaseMapper
                         GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`,
                         `pastoral_report_dashboard`.`id` as `dashboard_id`
             FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON 
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
-                            `pastoral_report_groups`.`deleted_at` IS NULL           
+            LEFT JOIN   `pastoral_report_groups` ON
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
+                            `pastoral_report_groups`.`deleted_at` IS NULL
             LEFT JOIN   `pastoral_report_dashboard` ON
                             `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
                             `pastoral_report_dashboard`.`user_id` = {$userId} AND
                             `pastoral_report_dashboard`.`deleted_at` IS NULL
             WHERE       (`pastoral_report`.`owner_id` = :userId OR (
                             `pastoral_report`.`id` IN (
-                                SELECT    `report_id` 
-                                FROM      `pastoral_report_groups` 
+                                SELECT    `report_id`
+                                FROM      `pastoral_report_groups`
                                 WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )
@@ -298,9 +298,9 @@ class Mapper extends BaseMapper
             SELECT      {$this->getColumnString()},
                         GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
             FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON 
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
-                            `pastoral_report_groups`.`deleted_at` IS NULL           
+            LEFT JOIN   `pastoral_report_groups` ON
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
+                            `pastoral_report_groups`.`deleted_at` IS NULL
             JOIN        `pastoral_report_dashboard` ON
                             `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
                             `pastoral_report_dashboard`.`user_id` = {$userId} AND
@@ -308,8 +308,8 @@ class Mapper extends BaseMapper
             WHERE       `pastoral_report`.`deleted_at` IS NULL AND
             (`pastoral_report`.`owner_id` = :userId OR (
                             `pastoral_report`.`id` IN (
-                                SELECT    `report_id` 
-                                FROM      `pastoral_report_groups` 
+                                SELECT    `report_id`
+                                FROM      `pastoral_report_groups`
                                 WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )

@@ -2,7 +2,7 @@
     <div class="small-12 island">
         <section class="content">
             <form action="{{ routeLookup('pastoral.getSearch') }}" class="no-margin">
-                <input autofocus type="text" name="keyword" value="{{ search }}" placeholder="Search {{ locale.pastoral.proper }} Records" maxlength="50">
+                <input autofocus type="text" name="keyword" value="{{ search ?? '' }}" placeholder="Search {{ locale.pastoral.proper }} Records" maxlength="50">
                 <input type="submit" value="Search {{ locale.pastoral.proper }} Records">
             </form>
         </section>

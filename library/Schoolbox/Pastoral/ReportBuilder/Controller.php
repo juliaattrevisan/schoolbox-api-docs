@@ -355,6 +355,7 @@ class Controller extends Base
                 'data'     => [
                     'results' => $records,
                     'report'  => $report,
+                    'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
                 ],
                 'title' => $report->getName(),
             ]
