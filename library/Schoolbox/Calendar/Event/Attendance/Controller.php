@@ -10,7 +10,6 @@ namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
