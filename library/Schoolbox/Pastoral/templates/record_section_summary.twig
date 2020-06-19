@@ -39,7 +39,7 @@
                     <dt class="small-12 medium-3">Type:</dt>
                     <dd class="small-12 medium-9">{{ record.type.name }}</dd>
 
-                    {% if record.subtype.name is not empty %}
+                    {% if record.subtype.name ?? '' is not empty %}
                         <dt class="small-12 medium-3">Sub-Type:</dt>
                         <dd class="small-12 medium-9">{{ record.subtype.name }}</dd>
                     {% endif %}

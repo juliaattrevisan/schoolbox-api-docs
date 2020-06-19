@@ -11,11 +11,11 @@
             <label for="typeId">Type</label>
                 <select name="typeId" id="typeId">
                     {# Is this record's type deleted? #}
-                    {% if record.type.deleted %}
+                    {% if record.type.deleted ?? false %}
                         <option selected value="{{ record.type.id }}">{{ record.type.name }} (deleted)</option>
                     {% endif %}
                     {% for type in types %}
-                        <option {% if type.id == record.type.id %}selected{% endif %}
+                        <option {% if type.id == record.type.id ?? '' %}selected{% endif %}
                                 value="{{ type.id }}">{{ type.name }}</option>
                     {% endfor %}
                 </select>
@@ -23,7 +23,7 @@
         <div class="small-12 medium-6 columns">
             <label> Sub-Type <select name="subtypeId" id="subtypeId">
                     {# Is this record's subtype deleted? #}
-                    {% if record.subtype.deleted %}
+                    {% if record.subtype.deleted ?? false %}
                         <option data-chained="{{ record.subtype.pastoralType.id }}"
                                 class="{{ record.subtype.pastoralType.id }}"
                                 selected
@@ -38,11 +38,11 @@
             {% if severities | length %}
                 <label for="severityId">{{ locale.severity.proper }}</label>
                 <select name="severityId" id="severityId">
-                    {% if record.severity.deleted %}
+                    {% if record.severity.deleted ?? false %}
                         <option selected value="{{ record.severity.id }}">{{ record.severity.name }} (deleted)</option>
                     {% endif %}
                     {% for severity in severities %}
-                        <option {% if severity.id == record.severity.id %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                        <option {% if severity.id == record.severity.id ?? '' %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
                     {% endfor %}
                 </select>
             {% endif %}
