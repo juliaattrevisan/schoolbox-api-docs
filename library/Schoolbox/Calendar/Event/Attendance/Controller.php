@@ -107,6 +107,7 @@ class Controller extends Base
     public function postCreate(Event $event): void
     {
         $guests = $this->attendanceMapper->findAttendances($event);
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
         $oldGuests = array_column($guests, 'id');
@@ -125,7 +126,7 @@ class Controller extends Base
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
-        if ($event->getMaxAttendees() && \count($guests) >= $event->getMaxAttendees()) {
+        if ($analysis->getNumAvailable() <= 0) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
         }
 
