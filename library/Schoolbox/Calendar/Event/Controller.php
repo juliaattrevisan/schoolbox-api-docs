@@ -165,7 +165,7 @@ class Controller extends Base
              * Current attendee info and your current rsvp status
              */
             'attendance' => [
-                'guests' => $payload,
+                'payload' => $payload,
                 'status' => [
                     'current' => Attendance\Model::CLASSES[$attendanceStatus],
                 ],
