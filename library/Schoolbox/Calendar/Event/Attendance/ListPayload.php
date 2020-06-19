@@ -78,22 +78,7 @@ class ListPayload
          */
         $guests = $this->attendanceMapper->findAttendances($event);
 
-        /* Number of available places
-         * Could be null, 0, or many
-         */
-        $maxAttendees = $event->getMaxAttendees();
-        $numAttendees = \count($guests);
-        $available = null;
-
-        if (null !== $maxAttendees) {
-            $available = $maxAttendees - $numAttendees;
-
-            if ($available < 0) {
-                $available = 0;
-            }
-        }
-
-        /* Other counts
+        /* Attendance status counts
          */
         $pending = \count(array_filter($guests, static function($element) {
             return $element['status'] === Model::STATUS_PENDING;
@@ -106,6 +91,21 @@ class ListPayload
         $declined = \count(array_filter($guests, static function($element) {
             return $element['status'] === Model::STATUS_DECLINED;
         }));
+
+        /* Number of available places
+         * Could be null, 0, or many
+         */
+        $maxAttendees = $event->getMaxAttendees();
+        $numAttendees = $pending + $accepted;
+        $available = null;
+
+        if (null !== $maxAttendees) {
+            $available = $maxAttendees - $numAttendees;
+
+            if ($available < 0) {
+                $available = 0;
+            }
+        }
 
         return [
 
