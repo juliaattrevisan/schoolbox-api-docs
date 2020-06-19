@@ -380,8 +380,17 @@ ul.tileList {
 }
 
 // Image gallery specific
-.img-gallery li{
-    margin-bottom: $inline-list-default-float-list-margin;
+.img-gallery {
+    @extend .inline-list;
+    margin-left: 0;
+
+    > a {
+      display: $inline-list-display;
+      float: $default-float;
+      list-style: none;
+      margin-right: $inline-list-default-float-list-margin;
+      margin-bottom: $inline-list-default-float-list-margin;
+    }
 }
 
 /**
