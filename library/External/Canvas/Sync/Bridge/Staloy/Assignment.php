@@ -21,14 +21,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
-    {
-        return null;
-    }
-
-    /**
      * Returns the work type to assign to this quiz type
      *
      * @param string $quizType
@@ -36,9 +28,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        if (!$this->workTypes) {
-            $this->workTypes = $this->workTypeMapper->findAll()->shallowClone()->indexBy('id');
-        }
         $config = [
             self::QUIZ_TYPE_PRACTICE      => 5,
             self::QUIZ_TYPE_ASSIGNMENT    => 5,

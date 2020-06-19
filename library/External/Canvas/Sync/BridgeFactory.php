@@ -52,13 +52,13 @@ class BridgeFactory
     /**
      * Gets class for assignment
      * @param GenericCollection $markTypes
-     * @param WorkType\Mapper   $workTypeMapper
+     * @param GenericCollection $workTypes
      * @return Assignment
      */
-    public function getAssignment(GenericCollection $markTypes, Worktype\Mapper $workTypeMapper): Assignment
+    public function getAssignment(GenericCollection $markTypes, GenericCollection $workTypes): Assignment
     {
         $className = $this->getClassName('Assignment');
-        return new $className($markTypes, $workTypeMapper);
+        return new $className($markTypes, $workTypes);
     }
 
     /**

@@ -237,7 +237,7 @@ class DataSync
         $accountBridge            = new Bridge\Account($this->schoolboxDb);
         $assignmentBridge         = $bridgeFactory->getAssignment(
             $this->markTypeMapper->findAll(),
-            $this->workTypeMapper
+            $this->workTypeMapper->findAll()
         );
         $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);

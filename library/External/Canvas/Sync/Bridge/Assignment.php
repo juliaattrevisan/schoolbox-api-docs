@@ -33,22 +33,19 @@ class Assignment
 
 
     /** @var GenericCollection|SubmissionBox\MarkType[] */
-    private $markTypes;
+    protected $markTypes;
 
     /** @var GenericCollection|WorkType\Model[] */
     protected $workTypes;
 
-    /** @var WorkType\Mapper */
-    protected $workTypeMapper;
-
     /**
      * @param GenericCollection|SubmissionBox\MarkType[] $markTypes
-     * @param WorkType\Mapper   $workTypeMapper
+     * @param GenericCollection|WorkType\Model[]         $workTypes
      */
-    public function __construct(GenericCollection $markTypes, WorkType\Mapper $workTypeMapper)
+    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
     {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypeMapper = $workTypeMapper;
+        $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
     }
 
     /**
@@ -121,10 +118,7 @@ class Assignment
      */
     public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
     {
-        if (!isset($this->workTypes)) {
-            $this->workTypes = $this->workTypeMapper->findAll()->indexBy('name');
-        }
-        return $this->workTypes->offsetGet($workTypeName);
+        return null;
     }
 
 
@@ -157,9 +151,6 @@ class Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        if (!$this->workTypes) {
-            $this->workTypes = $this->workTypeMapper->findAll()->shallowClone()->indexBy('id');
-        }
         $config = [
             self::QUIZ_TYPE_PRACTICE      => 11,
             self::QUIZ_TYPE_ASSIGNMENT    => 11,

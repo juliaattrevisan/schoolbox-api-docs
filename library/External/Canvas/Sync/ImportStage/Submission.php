@@ -224,10 +224,13 @@ class Submission extends SectionAssignment
     private function syncFeedback(SubmissionBox $submissionBox, User $reviewer, User $reviewee, array $canvasSubmission, GenericCollection $existingFeedbacks, IMarkScheme $markScheme): SubmissionBox\ReturnedWork
     {
         $normMark = $canvasSubmission['norm_mark'];
-        if ($submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_TOTAL) {
-            $normMark = ($canvasSubmission['mark'] / $submissionBox->getMaxMark()) * 100;
+        if ($submissionBox->getMaxMark()) {
+            $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
         }
-        $readableMark = $markScheme->getHumanReadableMark($normMark);
+        $readableMark = $canvasSubmission['mark'];
+        if ($submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
+            $readableMark = $markScheme->getHumanReadableMark($normMark);
+        }
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
 

@@ -7,14 +7,28 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge\Mtc;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
-use Schoolbox\Mapper\Exception as MapperException;
-
 
 class Assignment extends \External\Canvas\Sync\Bridge\Assignment
 {
-    /** @var null|WorkType\Model */
-    private $quizWorkType;
+    /**
+     * @inheritDoc
+     */
+    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
+    {
+        parent::__construct($markTypes, $workTypes);
+        // reorder $workTypes
+        $this->workTypes->indexBy('name');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
+    {
+        return $this->workTypes->offsetGet($workTypeName);
+    }
 
     /**
      * Returns the work type to assign to this quiz type
@@ -24,13 +38,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        if (!isset($this->quizWorkType)) {
-            try {
-                $this->quizWorkType = $this->workTypeMapper->findOneByColumn('name', 'Quiz');
-            } catch (MapperException $e) {
-                $this->quizWorkType = null;
-            }
-        }
-        return $this->quizWorkType;
+        return $this->workTypes->offsetGet('Quiz');
     }
 }
