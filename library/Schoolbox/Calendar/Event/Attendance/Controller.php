@@ -193,7 +193,10 @@ class Controller extends Base
             /* Check if there are any free slots; if not, throw the usual message
              */
             if ($event->getMaxAttendees() !== null) {
-                $numGuests = $this->attendanceMapper->countByColumn('event_id', $event->getId());
+                $numGuests = $this->attendanceMapper->countByColumnList([
+                    'event_id' => $event->getId(),
+                    'status' => [Model::STATUS_PENDING, Model::STATUS_ACCEPTED]
+                ]);
 
                 if ($numGuests >= $event->getMaxAttendees()) {
                     throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
