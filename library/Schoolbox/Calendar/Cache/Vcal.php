@@ -147,6 +147,16 @@ class Vcal
         return $document;
     }
 
+    /**
+     * Checks whether cache exists for this calendar config
+     * @param CalendarConfig $config
+     * @return bool
+     */
+    public function keyExists(CalendarConfig $config): bool
+    {
+        $cacheKey = $this->determineCacheKey($config);
+        return (bool)$this->redis->exists($cacheKey);
+    }
 
     /**
      * Determine the cache key to read/write.

@@ -198,4 +198,28 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     {
         return $this->groups;
     }
+
+
+    /**
+     * This function replaces tokens in the URL with user parameters, to allow personalisation of VCAL URL
+     * @param \Schoolbox\User $user
+     */
+    public function tokenReplaceUrl(\Schoolbox\User $user): void
+    {
+        $urlTokens = [
+            '[id]',
+            '[externalId]',
+            '[username]' ,
+            '[email]' ,
+        ];
+
+        $urlReplacement = [
+            $user->getId(),
+            $user->getExternalId(),
+            $user->getUsername(),
+            $user->getEmail()
+        ];
+
+        $this->url = str_ireplace($urlTokens, $urlReplacement, $this->url);
+    }
 }

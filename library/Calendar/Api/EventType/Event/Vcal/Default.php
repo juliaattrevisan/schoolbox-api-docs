@@ -9,6 +9,8 @@ use Calendar\Event\Type\Day\Event;
 use Sabre\VObject\Component\VCalendar;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
+use Sabre\VObject\InvalidDataException;
+use Sabre\VObject\ParseException;
 
 /**
  * Class Calendar_Api_EventType_Event_Vcal_Default
@@ -164,17 +166,18 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         ) {
             // Hit up the cache
             $cache     = new Vcal(Alaress\Redis::getClientInstance());
-            $allEvents = $cache->read($decodedConfig);
 
-            // Cache doesn't hold this VCal - happens when URL has tokens
-            if (!$allEvents) {
+            $decodedConfig->tokenReplaceUrl($this->getUser());
+            // In general, calendar config is cached when saved from the admin page.
+            // However, when tokens are in the URL, a cache may not exist for the replaced URL
+            if (!$cache->keyExists($decodedConfig)) {
                 try {
                     $cache->write($decodedConfig);
-                    $allEvents = $cache->read($decodedConfig);
-                } catch (Exception $e) {
-                    // ignore
+                } catch (InvalidDataException|ParseException $e) {
+                    trigger_error('Failed to write calendar cache: ' . $e->getMessage() . $e->getTraceAsString(), E_USER_WARNING);
                 }
             }
+            $allEvents = $cache->read($decodedConfig);
 
             if ($allEvents instanceof VCalendar) {
                 $start = new DateTime('@' . $startTimestamp);
@@ -212,7 +215,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param \Sabre\VObject\Component\VEvent    $currentEvent
      * @param Calendar_Api_Config_Connector_Vcal $decodedConfig
      *
-     * @return Calendar_Event_Type_Day
+     * @return Event
+     * @throws \Sabre\VObject\InvalidDataException
      */
     protected function buildCalendarEventFromVevent(
         Sabre\VObject\Component\VEvent $currentEvent,
@@ -304,29 +308,5 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setConnectorId($this->getConnectorId());
 
         return $event;
-    }
-
-    /**
-     * This function replaces tokens in the URL with user parameters, to allow personalisation of VCAL URL
-     * @param  string  $url
-     * @return string
-     */
-    private function tokenReplaceUrl(string $url): string
-    {
-        $urlTokens = [
-            '[id]',
-            '[externalId]',
-            '[username]' ,
-            '[email]' ,
-        ];
-
-        $urlReplacement = [
-            $this->getUser()->getId(),
-            $this->getUser()->getExternalId(),
-            $this->getUser()->getUsername(),
-            $this->getUser()->getEmail()
-        ];
-
-        return str_ireplace($urlTokens, $urlReplacement, $url);
     }
 }
