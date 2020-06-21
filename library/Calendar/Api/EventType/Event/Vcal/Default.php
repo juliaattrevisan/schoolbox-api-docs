@@ -152,8 +152,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             return new Collection();
         }
 
-        $decodedConfig->setUrl($this->tokenReplaceUrl($decodedConfig->getUrl()));
-
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
