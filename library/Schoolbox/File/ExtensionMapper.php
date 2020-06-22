@@ -55,7 +55,7 @@ class ExtensionMapper extends Mapper {
     public function findExtensionFromMimeType(string $mimeType): string
     {
         $query = "
-            SELECT extension 
+            SELECT extension
             FROM {$this->table} e
             INNER JOIN allowedFileTypes aft ON e.fileTypeID = aft.fileTypeID
             WHERE aft.mime = :mimeType
@@ -69,7 +69,7 @@ class ExtensionMapper extends Mapper {
 
         $result = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        if (\count($result)) {
+        if ($result && \count($result)) {
             return $result['extension'];
         }
 
