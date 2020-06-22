@@ -33,6 +33,38 @@ component_config_definition (`component_definition_id`, `key`, `default_value`, 
     )
 );
 
+-- Give an instance of showComponentTitle to every homepage component
+-- This enables the Inversion sql to update components' configurations
+-- where their compactMode instance values were different to their default
+-- values prior to the existence of a showComponentTitle instance
+--
+-- It was trying to update instances of showComponentTitle that don't exist
+-- so the outcome was that components were showing the default value rather
+-- than the inverted value of compactMode
+
+-- Take a look at which component instances are affected
+
+-- SELECT
+-- ccd.id,
+-- ci.id,
+-- ccd.default_value
+-- FROM component_config_definition ccd
+-- INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+-- INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+-- WHERE `key` = 'showComponentTitle' AND cd.module = 'homepage';
+
+INSERT INTO component_config_instance
+(component_config_definition_id, component_instance_id, `value`)
+(
+    SELECT
+        ccd.id,
+        ci.id,
+        ccd.default_value
+    FROM component_config_definition ccd
+             INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+    WHERE `key` = 'showComponentTitle' AND cd.module = 'homepage'
+);
 
 
 -- Invert special usages of CompactMode in particular components:
