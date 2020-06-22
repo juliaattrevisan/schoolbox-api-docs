@@ -58,6 +58,7 @@
             this.termEndDate = this.config.termDates.current.end;
             this.allTerms = this.buildAllTermsList();
             this.eventTypeResources = this.buildEventTypeResourcesList();
+            this.inContext = this.config.inContext;
         },
         data() {
             return {
@@ -74,6 +75,7 @@
                 defaultBgColour: '#0066b0',
                 maxDate: null,
                 minDate: null,
+                inContext: null,
                 eventSources: {
                     events: {
                         id: 'events',
@@ -216,6 +218,7 @@
                         start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                         end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         filters: self.selectedFilters,
+                        inContext: self.inContext,
                     },
                     paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
                 };
@@ -342,6 +345,7 @@
             onFilterChange(selectedFilters) {
                 this.selectedFilters = selectedFilters;
                 this.$refs.fullCalendar.getApi().refetchEvents();
+                this.inContext = false;
             },
 
             /**

@@ -102,7 +102,7 @@ Usage:
         {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
         {% if assessmentCalendarUrl %}
             <li>
-                <a href="{{ assessmentCalendarUrl }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
+                <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
             </li>
         {% endif %}
 

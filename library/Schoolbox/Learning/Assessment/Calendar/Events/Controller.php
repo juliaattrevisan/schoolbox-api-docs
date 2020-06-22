@@ -159,10 +159,10 @@ class Controller extends Base
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
         $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
 
-
         // Store the filters this user selected
-        $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
-
+        if (!$this->request->query->get('inContext') || $this->request->query->get('inContext') !== 'true') {
+            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+        }
 
         // User must have provided a start and end date: error out otherwise
         $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);

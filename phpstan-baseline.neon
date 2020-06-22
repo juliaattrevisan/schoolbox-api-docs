@@ -2296,16 +2296,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Breadcrumb/Factory.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\:\\:getStart\\(\\)\\.$#"
-			count: 4
-			path: library/Schoolbox/Learning/Assessment/Calendar/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\:\\:getDisplayFinish\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Calendar/Controller.php
-
-		-
 			message: "#^Variable \\$end in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
