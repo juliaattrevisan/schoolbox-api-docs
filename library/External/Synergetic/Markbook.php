@@ -549,7 +549,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $classCodes  = array_column($this->externalUser->getSubjectList($student), 'code');
 
         // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
-        $markbookFolderCodes = array_intersect($folderCodes, $classCodes);
+        $markbookFolderCodes = array_intersect(
+            $this->normalizeClassCodes($folderCodes),
+            $this->normalizeClassCodes($classCodes)
+        );
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
@@ -561,7 +564,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (!in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
+            if (!in_array(
+                $this->normalizeClassCode($assessmentRemote['ClassCode']),
+                $markbookFolderCodes,
+                true
+            )) {
                 continue;
             }
 
@@ -832,12 +839,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
         $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
-        $codesNotInRemote     = array_diff($folderCodes, $remoteFolderCodes);
+        $codesNotInRemote     = array_diff(
+            $this->normalizeClassCodes($folderCodes),
+            $this->normalizeClassCodes($remoteFolderCodes)
+        );
         $resultType           = $this->getResultType($activity);
-
-        $isCreated = false;
+        $isCreated            = false;
         foreach ($codesNotInRemote as $folderCode) {
-
             if ($this->insertStaffMarkbook(
                 $activity,
                 $owner,
@@ -1051,5 +1059,35 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'resultDate'       => $activity->getDueAt()->getDatabase(),
             'markerExternalId' => $marker->getExternalId(),
         ];
+    }
+
+
+    /**
+     * Normalizes a class code to a lower case value.
+     *
+     * Required as no other class code comparisons within Schoolbox are
+     * case-sensitive.
+     *
+     * @param string $classCode
+     * @return string
+     */
+    private function normalizeClassCode(string $classCode): string
+    {
+        return mb_strtolower($classCode);
+    }
+
+
+    /**
+     * Normalizes a list of class codes to lower case values.
+     *
+     * Required as no other class code comparisons within Schoolbox are
+     * case-sensitive.
+     *
+     * @param array&string[] $classCodes
+     * @return array
+     */
+    private function normalizeClassCodes(array $classCodes): array
+    {
+        return array_map([$this, 'normalizeClassCode'], $classCodes);
     }
 }
