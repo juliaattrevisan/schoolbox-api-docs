@@ -564,7 +564,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (!in_array($assessmentRemote['ClassCode'], $markbookFolderCodes, true)) {
+            if (!in_array(
+                $this->normalizeClassCode($assessmentRemote['ClassCode']),
+                $markbookFolderCodes,
+                true
+            )) {
                 continue;
             }
 
@@ -1059,6 +1063,21 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
+     * Normalizes a class code to a lower case value.
+     *
+     * Required as no other class code comparisons within Schoolbox are
+     * case-sensitive.
+     *
+     * @param string $classCode
+     * @return string
+     */
+    private function normalizeClassCode(string $classCode): string
+    {
+        return mb_strtolower($classCode);
+    }
+
+
+    /**
      * Normalizes a list of class codes to lower case values.
      *
      * Required as no other class code comparisons within Schoolbox are
@@ -1069,6 +1088,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function normalizeClassCodes(array $classCodes): array
     {
-        return array_map('mb_strtolower', $classCodes);
+        return array_map([$this, 'normalizeClassCode'], $classCodes);
     }
 }
