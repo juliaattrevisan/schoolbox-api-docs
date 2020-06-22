@@ -832,12 +832,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
         $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
-        $codesNotInRemote     = array_diff($folderCodes, $remoteFolderCodes);
+        $codesNotInRemote     = array_diff(
+            array_map('mb_strtolower', $folderCodes),
+            array_map('mb_strtolower', $remoteFolderCodes)
+        );
         $resultType           = $this->getResultType($activity);
-
-        $isCreated = false;
+        $isCreated            = false;
         foreach ($codesNotInRemote as $folderCode) {
-
             if ($this->insertStaffMarkbook(
                 $activity,
                 $owner,
