@@ -76,10 +76,11 @@ class AssignmentDates
      *
      * For this current work, visibility in schoolbox is more important than the ability to submit
      *
-     * @param $publishDate
-     * @param $openDate
-     * @param $dueDate
-     * @param $closeDate
+     * @param string $publishDate
+     * @param string $openDate
+     * @param string $dueDate
+     * @param string $closeDate
+     * @param LoggerInterface $log
      * @return array
      */
     public function normaliseDates(string $publishDate, string $openDate, string $dueDate, string $closeDate, LoggerInterface $log): array

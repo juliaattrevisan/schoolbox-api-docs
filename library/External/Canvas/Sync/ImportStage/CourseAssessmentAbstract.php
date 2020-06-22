@@ -9,7 +9,9 @@ namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use HTMLPurifier;
 use Psr\Log\LoggerInterface;
@@ -18,6 +20,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use PDO;
 
 /**
  * Common implementation to import Canvas Course Assignments+Quizzes.
@@ -47,19 +50,24 @@ abstract class CourseAssessmentAbstract
     /** @var Assessment\Mapper */
     protected $assessmentMapper;
 
+    /** @var Bridge\Course */
+    protected $courseBridge;
+
     /**
      * @param IConnector        $canvasDb
      * @param IConnector        $schoolboxDb
      * @param Assessment\Mapper $assessmentMapper
      * @param LoggerInterface   $log
      * @param IConfigLoader     $config
+     * @param Bridge\Course     $courseBridge
      */
     public function __construct(
         IConnector $canvasDb,
         IConnector $schoolboxDb,
         Assessment\Mapper $assessmentMapper,
         LoggerInterface $log,
-        IConfigLoader $config
+        IConfigLoader $config,
+        Bridge\Course $courseBridge
     ) {
         $this->canvasDb         = $canvasDb;
         $this->schoolboxDb      = $schoolboxDb;
@@ -72,6 +80,7 @@ abstract class CourseAssessmentAbstract
         $htmlPurifierConfig->set('URI.Base', $config->get(ConfigMapper::_CANVAS_URL));
         $htmlPurifierConfig->set('URI.MakeAbsolute', true);
         $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);
+        $this->courseBridge = $courseBridge;
     }
 
     /**
@@ -119,5 +128,34 @@ abstract class CourseAssessmentAbstract
         ]);
 
         return $assessment;
+    }
+
+    /**
+     * Returns the canvas ids of the Canvas courses to import
+     *
+     * Course must:
+     *   * Have workflow_state 'available' or 'completed'
+     *   * Have 1+ CourseSections where the Sections:
+     *    * Has a SisSourceId LIKE 'Y2019C%NOT', ... where year is from 2019 to current calendar year + 1
+     *
+     * @return int[]
+     * @throws Database\Exception
+     * @throws InvalidColumnException
+     */
+    protected function getCanvasCourseIdsToImport(): array
+    {
+        $pb          = $this->courseBridge->getCanvasCoursesToImport();
+        $whereClause = $pb->getWhere()[0];
+        $sql         = "
+            SELECT DISTINCT c.canvas_id
+            FROM course_dim c
+            JOIN course_section_dim cs ON cs.course_id = c.id
+            JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
+             WHERE {$whereClause}
+        ";
+        $canvasIds   = $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        return array_map(static function (string $canvasId) {
+            return (int)$canvasId;
+        }, $canvasIds);
     }
 }

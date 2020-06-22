@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Database;
@@ -28,6 +29,7 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use function array_key_exists;
 use function implode;
 
@@ -117,6 +119,11 @@ class Submission extends SectionAssignment
      */
     public function synchronise(): void
     {
+        if (!$this->courseSectionBridge->syncCanvasMarks()) {
+            $this->log->info('Skipping syncing Canvas Submissions');
+            return;
+        }
+
         $this->log->notice("Synchronising Canvas Submissions");
 
         $this->resetCounts();
@@ -124,6 +131,7 @@ class Submission extends SectionAssignment
         $sectionSisSourceIds   = $this->courseSectionBridge->getMappedSisSourceIds();
         $coursesSectionData    = $this->loadCanvasSectionStudentData($sectionSisSourceIds);
         $coursesAssessmentData = $this->loadCanvasAssessmentAndOverrideData($sectionSisSourceIds);
+        $markSchemaFactory = new MarkSchemeFactory();
 
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
@@ -159,8 +167,9 @@ class Submission extends SectionAssignment
                     ]);
                     $syncedFeedbackIds = [];
 
+                    $markScheme = $markSchemaFactory->spawnMarkSchemeFor($assessmentImpl);
+
                     foreach ($assessmentImpl->getPlans() as $plan) {
-                        /** @var Participant\Plan\Model $plan */
                         foreach ($plan->getParticipants() as $participant) {
                             foreach ($canvasSubmissions as $canvasSubmission) {
                                 if ($canvasSubmission['reviewee_id'] !== $participant->getUser()->getExternalId()) {
@@ -182,9 +191,8 @@ class Submission extends SectionAssignment
                                 }
                                 $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()} [{$reviewee->getId()}]");
 
-                                /** @var SubmissionBox\ReturnedWork $feedback */
                                 $feedback            = $this->syncFeedback(
-                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks
+                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks, $markScheme
                                 );
                                 $syncedFeedbackIds[] = $feedback->getId();
                                 $this->syncMarkCount++;
@@ -213,16 +221,25 @@ class Submission extends SectionAssignment
      * @return SubmissionBox\ReturnedWork
      * @throws Mapper\Exception
      */
-    private function syncFeedback(SubmissionBox $submissionBox, User $reviewer, User $reviewee, array $canvasSubmission, GenericCollection $existingFeedbacks): SubmissionBox\ReturnedWork
+    private function syncFeedback(SubmissionBox $submissionBox, User $reviewer, User $reviewee, array $canvasSubmission, GenericCollection $existingFeedbacks, IMarkScheme $markScheme): SubmissionBox\ReturnedWork
     {
+        $normMark = $canvasSubmission['norm_mark'];
+        if ($submissionBox->getMaxMark()) {
+            $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
+        }
+        $readableMark = $canvasSubmission['mark'];
+        if ($submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
+            $readableMark = $markScheme->getHumanReadableMark($normMark);
+        }
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
+
             // check whether the rest are the same
             if ($existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
                 && $existingFeedback->getComment() == $canvasSubmission['comment']
-                && $existingFeedback->getHumanReadableMark() == $canvasSubmission['mark']
-                && $existingFeedback->getNormalizedMark() == $canvasSubmission['norm_mark']
+                && $existingFeedback->getHumanReadableMark() == $readableMark
+                && $existingFeedback->getNormalizedMark() == $normMark
             ) {
                 return $existingFeedback;
             }
@@ -235,8 +252,8 @@ class Submission extends SectionAssignment
                  ->setOwner($reviewee)
                  ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
                  ->setComment($canvasSubmission['comment'])
-                 ->setHumanReadableMark($canvasSubmission['mark'])
-                 ->setNormalizedMark($canvasSubmission['norm_mark'])
+                 ->setHumanReadableMark($readableMark)
+                 ->setNormalizedMark($normMark)
                  ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
                  ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
                  ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']));

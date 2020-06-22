@@ -80,7 +80,7 @@ class AssignmentOverride
      *
      * @param int         $overrideCanvasId
      * @param int         $assessmentImplId
-     * @param string|null $planTable
+     * @param string      $planTable
      * @return Builder
      * @throws InvalidColumnException
      */
@@ -96,7 +96,7 @@ class AssignmentOverride
     /**
      * Returns a predicate that will match any Schoolbox plan that was imported from Canvas
      *
-     * @param string|null $planTable
+     * @param string $planTable
      * @return Builder
      * @throws InvalidColumnException
      */
