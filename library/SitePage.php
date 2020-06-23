@@ -50,14 +50,14 @@ class SitePage extends Page
     /**
      * Constructor
      *
-     * @param bool                             $login
      * @param \Aura\Di\ContainerInterface|null $di
      */
-    public function __construct($login = true, ?Aura\Di\ContainerInterface $di = null)
+    public function __construct(?Aura\Di\ContainerInterface $di = null)
     {
         parent::__construct();
 
         // TODO SA-8354: ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
+        // We're almost there: only one use in \Survey_Answer_Signature::resultsForQuestion doesn't need this
         if ($di) {
             $this->di = $di;
             $this->config = $di->get('config');
@@ -68,10 +68,6 @@ class SitePage extends Page
 
         if(isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
-        }
-
-        if ($login) {
-            $this->initSession();
         }
 
         $this->setSite();

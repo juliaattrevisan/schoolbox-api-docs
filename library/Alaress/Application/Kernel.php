@@ -491,13 +491,8 @@ abstract class Kernel
             'setIsXhrSpec'  => $di->lazyNew(IsXhr::class)
         );
 
-//        // inject web params (yep, even Sitepage!)
-//        $di->set('layoutEngine', $di->lazy(function () use ($di) {
-//            return new SitePage(false, $di);
-//        }));
-
-        $di->set('sitePage', $di->lazy(function () use ($di) {
-            return new SitePage(true, $di);
+        $di->set('sitePage', $di->lazy(function() use ($di) {
+            return new SitePage($di);
         }));
 
 
