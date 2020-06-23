@@ -23,7 +23,10 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
-new SitePage;
+
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 if (is_numeric($_GET['id'])) {
     $access      = Access::getInstance();

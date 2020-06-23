@@ -2,7 +2,9 @@
 /* Script to automatically login to synergetic portal based on existing login creditials */
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$page = new SitePage;
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $user = $_SESSION['user'];
 $url = new \Zend\Uri\Uri(Config::get('external_portal'));
 
@@ -92,14 +94,14 @@ echo "<body>";
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
 if(is_array($formArray)) {
 	foreach($formArray as $key => $value)
-	{	
+	{
 		if($key == "submit")
 			{
 			echo "<br><br><br><br><br><br><br><br><div align='center'>Please $value to continue<br>";
 			echo "<input name='$key' type='submit' value='$value'></div>";
 			$nojs = 1;
 			}
-		else	
+		else
 			echo "<input name='$key' type='hidden' value='$value'>";
 	}
 }

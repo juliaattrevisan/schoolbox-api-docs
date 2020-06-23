@@ -12,7 +12,10 @@
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $groupHandler = new Group();
 
 if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
@@ -24,7 +27,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     );
 
     $categoryHandler->update($newCategory);
-    $page->backToTheFuture(1);
+    SitePage::backToTheFuture(1);
 } else {
     error(126);
 }

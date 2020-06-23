@@ -10,8 +10,9 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 
-$page = new SitePage();
-$page->setDi($kernel->getDependencyInjector());
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 $folderMapper = FolderMapper::getInstance();
 

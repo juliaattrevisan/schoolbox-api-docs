@@ -45,7 +45,9 @@ $type = $_GET['type'];
 $id   = $_GET['id'];
 
 if (isset($type) && isset($id)) {
-    $page         = new SitePage;
+    /** @var SitePage $page */
+    $page = $kernel->get('sitePage');
+    $page->initSession();
     $groupHandler = new Group;
 
     // ----------------------------------------------------------------------------------------------------------------

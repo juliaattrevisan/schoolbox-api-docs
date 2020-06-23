@@ -15,7 +15,9 @@ if ($ajax) {
     header("Content-Type: application/json");
 }
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $page->setAjax($ajax);
 
 /** @var \Schoolbox\User $user */

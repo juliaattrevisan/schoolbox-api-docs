@@ -27,7 +27,10 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $page->setDi($kernel->getDependencyInjector());
 
 $eventMapper = EventMapper::getInstance();

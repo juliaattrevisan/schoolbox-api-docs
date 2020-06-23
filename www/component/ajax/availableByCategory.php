@@ -15,7 +15,9 @@ $kernel = new Kernel();
 
 /* Start a session
  */
-$page         = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $groupHandler = new Group();
 $allElements  = [];
 

@@ -15,7 +15,9 @@ $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 if (is_numeric($_GET['id'])) {
     // ensure session
-    new SitePage;
+    /** @var SitePage $page */
+    $page = $kernel->get('sitePage');
+    $page->initSession();
 
     $fileMapper = Schoolbox\Resource\My\File\Mapper::getInstance();
 

@@ -3,7 +3,10 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page          = new SitePage;
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();
 $return        = array();
 /** @var \Schoolbox\Comms\News\Audience\ArticleResolver $articleResolver */
