@@ -151,7 +151,7 @@ class IndicatorUsage
              * set its min value to be the same as its max (addresses 1-element lists)
              */
             if ($isFirstElement || $isLastElement) {
-                $temp[$i]->setMinValue($temp[$i]->getMaxValue());
+                $descriptor->setMinValue($descriptor->getMaxValue());
             }
 
             /* Map it all back to each of the non-null descriptors in $this->descriptor
@@ -163,7 +163,7 @@ class IndicatorUsage
             if ($nextDescriptor) {
                 if ($nextDescriptor->getMaxValue() > $descriptor->getMaxValue()) {
                     $numAscending++;
-                    $temp[$i]->setDirectionAscending();
+                    $descriptor->setDirectionAscending();
 
                     /* Since we're ascending we need to recall what we previously saw
                      * But don't let it exceed the current element's maximum
@@ -173,20 +173,18 @@ class IndicatorUsage
                     if ($previousDescriptor) {
                         $newValue = $previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT;
 
-                        $temp[$i]->setMinValue($newValue > $temp[$i]->getMaxValue() ? $temp[$i]->getMaxValue() : $newValue);
+                        $descriptor->setMinValue($newValue > $descriptor->getMaxValue() ? $descriptor->getMaxValue() : $newValue);
                     }
-                }
-
-                if ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
+                } elseif ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
                     $numDescending++;
-                    $temp[$i]->setDirectionDescending();
-                    $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
+                    $descriptor->setDirectionDescending();
+                    $descriptor->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
                 }
             } elseif ($previousDescriptor) {
 
                 /* Last element in the list
                  */
-                $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
+                $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
             }
 
             /* Assume default direction "ascending"
@@ -194,10 +192,10 @@ class IndicatorUsage
              * this is the overall trend for the data set, ignoring wonky data
              */
             if ($numDescending > $numAscending) {
-                $temp[$i]->setDirectionDescending();
+                $descriptor->setDirectionDescending();
             }
 
-            $previousDescriptor = $temp[$i];
+            $previousDescriptor = $descriptor;
         }
 
 print_r($this->descriptors);
