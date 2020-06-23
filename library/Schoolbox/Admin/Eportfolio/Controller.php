@@ -219,9 +219,8 @@ class Controller extends Base
             }
 
             // We now had a list of destination users, lets make this party happen
-
-            $page = new SitePage(false);
-            $page->setDi($this->getDi());
+            /** @var SitePage $page */
+            $page = $this->getDi()->get('sitePage');
 
             // Preload the component list for each page
 
