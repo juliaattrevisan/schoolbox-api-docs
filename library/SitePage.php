@@ -327,7 +327,10 @@ class SitePage extends Page
     }
 
     /**
+     * Initialises a session, redirecting to the login page if there is no
+     * active session.
      *
+     * @deprecated this is definitely not a responsibility of SitePage
      */
     public function initSession()
     {
