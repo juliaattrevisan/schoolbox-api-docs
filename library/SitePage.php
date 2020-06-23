@@ -268,7 +268,7 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
-            $this->saveHistory();
+            self::saveHistory();
             /** @var Output\ThemedHtml $renderer */
             $renderer = $this->getDi()->get('webOutput:html');
             $renderer
@@ -406,7 +406,7 @@ class SitePage extends Page
     /**
      * @param string $override
      */
-    public function saveHistory($override = '')
+    public static function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
