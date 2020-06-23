@@ -154,9 +154,14 @@ class IndicatorUsage
                     $temp[$i]->setDirectionAscending();
 
                     /* Since we're ascending we need to recall what we previously saw
+                     * But don't let it exceed the current element's maximum
+                     *
+                     * Occurs when previous descriptor value is the same as the current descriptor value
                      */
                     if ($previousDescriptor) {
-                        $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + $increment);
+                        $newValue = $previousDescriptor->getMaxValue() + $increment;
+
+                        $temp[$i]->setMinValue($newValue > $temp[$i]->getMaxValue() ? $temp[$i]->getMaxValue() : $newValue);
                     }
                 }
 
@@ -173,9 +178,9 @@ class IndicatorUsage
             }
 
             /* Assume default direction "ascending"
-            * Overwrite it with a different direction for the data set;
-            * this is the overall trend for the data set, ignoring wonky data
-            */
+             * Overwrite it with a different direction for the data set;
+             * this is the overall trend for the data set, ignoring wonky data
+             */
             if ($numDescending > $numAscending) {
                 $temp[$i]->setDirectionDescending();
             }
@@ -183,6 +188,7 @@ class IndicatorUsage
             $previousDescriptor = $temp[$i];
         }
 
+//print_r($this->descriptors);
 
 
         // The rules for min-max values, from SA-6627:
