@@ -182,9 +182,11 @@ class IndicatorUsage
                 }
             } elseif ($previousDescriptor) {
 
-                /* Last element in the list
+                /* Last element in the list in ascending order
                  */
-                $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
+                if ($previousDescriptor->getMinValue() < $descriptor->getMaxValue()) {
+                    $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
+                }
             }
 
             /* Assume default direction "ascending"
@@ -197,9 +199,6 @@ class IndicatorUsage
 
             $previousDescriptor = $descriptor;
         }
-
-print_r($this->descriptors);
-
 
         // The rules for min-max values, from SA-6627:
         // * The highest possible value for a descriptor is the points value
