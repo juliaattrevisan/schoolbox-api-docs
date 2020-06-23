@@ -12,6 +12,10 @@ namespace SocialStream;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+/** @var \SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);
 $start = intval($_GET['start']);
@@ -22,7 +26,7 @@ $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instance
  */
 if ($instance) {
 	$thread = new Threads($instance, $homepageId, $start, $offset);
-	$output = $thread->generate()->render();
+	$output = $thread->generate($page)->render();
 
 	echo $output;
 }
