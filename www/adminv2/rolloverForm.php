@@ -89,9 +89,7 @@ function rollover($categoryId)
 {
 
     // send the user back to the rollover page, and then process the rollover request
-    /** @var SitePage $page */
-$page = $kernel->get('sitePage');
-    $page->localRedir('/adminv2/rollover', true);
+    SitePage::localRedir('/adminv2/rollover', true);
 
     // post-client processing
     $cats = traverse($categoryId);
