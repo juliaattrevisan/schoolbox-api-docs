@@ -200,7 +200,7 @@ class IndicatorUsage
             $previousDescriptor = $temp[$i];
         }
 
-//print_r($this->descriptors);
+print_r($this->descriptors);
 
 
         // The rules for min-max values, from SA-6627:
