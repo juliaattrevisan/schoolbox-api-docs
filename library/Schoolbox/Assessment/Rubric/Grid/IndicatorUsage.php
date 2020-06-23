@@ -96,16 +96,26 @@ class IndicatorUsage
      */
     public function applyDescriptorMinValues(bool $useValueRanges): void
     {
-
-        new \Alaress_Probe($this->descriptors);
+        $increment = 1;
 
         /* Filter out null-valued descriptors
          * These don't contribute to ranged values and are skipped
          */
+        $temp = [];
+
+        foreach ($this->descriptors as $descriptor) {
+            if (null !== $descriptor->getMaxValue()) {
+                $temp[] = $descriptor;
+            }
+        }
 
         /* Traverse the remaining set of data to infer a general direction
          * That is, whether the descriptor values are ascending or descending overall
          */
+        $numAscending = 0;
+        $numDescending = 0;
+
+        $n = \count($temp);
 
         /* Traverse each element in order and look ahead to see what the next
          * descriptor value might be and infer a local direction in each descriptor
@@ -114,11 +124,52 @@ class IndicatorUsage
          *
          * Catalog a min/max value accordingly so we can easily map it back
          */
+        $previousDescriptor = null;
 
-        /* Map it all back to each of the non-null descriptors in $this->descriptor
-         * That should total three linear traversals at most,
-         * instead of multiple nested traversals for each descriptor - one left, and one right
-         */
+        for ($i = 0; $i < $n; $i++) {
+            $descriptor = $temp[$i];
+            $nextDescriptor = $temp[$i+1];
+
+            /* Map it all back to each of the non-null descriptors in $this->descriptor
+             * That should total three linear traversals at most,
+             * instead of multiple nested traversals for each descriptor - one left, and one right
+             *
+             * Objects were passed by reference in $temp so I don't even need to do much more
+             */
+            if ($nextDescriptor) {
+                if ($nextDescriptor->getMaxValue() > $descriptor->getMaxValue()) {
+                    $numAscending++;
+                    $temp[$i]->setDirectionAscending();
+
+                    /* Since we're ascending we need to recall what we previously saw
+                     */
+                    if ($previousDescriptor) {
+                        $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + $increment);
+                    }
+                }
+
+                if ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
+                    $numDescending++;
+                    $temp[$i]->setDirectionDescending();
+                    $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + $increment);
+                }
+            } else {
+
+                /* Last element in the list
+                 */
+                $temp[$i]->setMinValue($temp[$i]->getMaxValue());
+
+                /* Assume default direction "ascending"
+                 * Overwrite it with a different direction for the data set;
+                 * this is the overall trend for the data set, ignoring wonky data
+                 */
+                if ($numDescending > $numAscending) {
+                    $temp[$i]->setDirectionDescending();
+                }
+            }
+
+            $previousDescriptor = $temp[$i];
+        }
 
 
 
@@ -145,118 +196,118 @@ class IndicatorUsage
         // * If the points values both ascend and descend: the min values are
         //   undefined
 
-        // Currently, step value is always 1: let this be able to change though
-        $step = 1;
-        $keys = $this->descriptors->keys();
-
-        foreach ($keys as $i => $current) {
-            $descriptor = $this->descriptors[$current];
-            if (!$descriptor) {
-                // something's wrong
-                continue;
-            }
-
-            $maxValue = $descriptor->getMaxValue();
-
-            // Not using value ranges? min = max
-            if (!$useValueRanges) {
-                $descriptor->setMinValue($maxValue);
-                continue;
-            }
-
-            // If current is null: min is null too
-            if (null === $maxValue) {
-                $descriptor->setMinValue(null);
-                continue;
-            }
-
-            $leftMaxValue       = null;
-            $isLeftValueLesser  = false;
-            $rightMaxValue      = null;
-            $isRightValueLesser = false;
-
-            // What's the nearest non-null value to the left of this?
-            $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
-            if ($previousNonNullDescriptor) {
-                $leftMaxValue      = $previousNonNullDescriptor->getMaxValue();
-                $isLeftValueLesser = ($leftMaxValue < $maxValue);
-            }
-
-            // And what's the nearest non-null value to the right?
-            $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
-            if ($nextNonNullDescriptor) {
-                $rightMaxValue      = $nextNonNullDescriptor->getMaxValue();
-                $isRightValueLesser = ($rightMaxValue < $maxValue);
-            }
-
-            // Set the min value based on the left and right values
-            if ($isLeftValueLesser || $isRightValueLesser) {
-                // Either the left or right value is less than this value:
-                // that means the min value is dependent on the left or right.
-
-                if ($isLeftValueLesser && $isRightValueLesser) {
-                    // It should never happen that both left and right value
-                    // are less than this value: that means that I created a
-                    // descriptor sequence that both ascends and descends,
-                    // which is invalid.
-                    // Nonetheless: attempt to handle this case by using the
-                    // greater of left and right.
-                    if ($leftMaxValue > $rightMaxValue) {
-                        $floorValue = $leftMaxValue;
-                        $descriptor->setDirectionAscending();
-                    } else {
-                        $floorValue = $rightMaxValue;
-                        $descriptor->setDirectionDescending();
-                    }
-                } elseif ($isLeftValueLesser) {
-                    // Left value is less than this value: use left value as
-                    // the floor value for this descriptor's min value.
-                    $floorValue = $leftMaxValue;
-                    $descriptor->setDirectionAscending();
-                } else {
-                    // Right value is less than this value: use left value as
-                    // the floor value for this descriptor's min value.
-                    $floorValue = $rightMaxValue;
-                    $descriptor->setDirectionDescending();
-                }
-
-                // Don't allow to be greater than max
-                // (in case validation allowed decimals for ranged)
-                $minValue = min($floorValue + $step, $maxValue);
-            } else {
-                // Neither left or right value are less than this value:
-                // this is not a ranged descriptor.
-                $minValue = $maxValue;
-            }
-
-            $descriptor->setMinValue($minValue);
-        }
+//        // Currently, step value is always 1: let this be able to change though
+//        $step = 1;
+//        $keys = $this->descriptors->keys();
+//
+//        foreach ($keys as $i => $current) {
+//            $descriptor = $this->descriptors[$current];
+//            if (!$descriptor) {
+//                // something's wrong
+//                continue;
+//            }
+//
+//            $maxValue = $descriptor->getMaxValue();
+//
+//            // Not using value ranges? min = max
+//            if (!$useValueRanges) {
+//                $descriptor->setMinValue($maxValue);
+//                continue;
+//            }
+//
+//            // If current is null: min is null too
+//            if (null === $maxValue) {
+//                $descriptor->setMinValue(null);
+//                continue;
+//            }
+//
+//            $leftMaxValue       = null;
+//            $isLeftValueLesser  = false;
+//            $rightMaxValue      = null;
+//            $isRightValueLesser = false;
+//
+//            // What's the nearest non-null value to the left of this?
+//            $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
+//            if ($previousNonNullDescriptor) {
+//                $leftMaxValue      = $previousNonNullDescriptor->getMaxValue();
+//                $isLeftValueLesser = ($leftMaxValue < $maxValue);
+//            }
+//
+//            // And what's the nearest non-null value to the right?
+//            $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
+//            if ($nextNonNullDescriptor) {
+//                $rightMaxValue      = $nextNonNullDescriptor->getMaxValue();
+//                $isRightValueLesser = ($rightMaxValue < $maxValue);
+//            }
+//
+//            // Set the min value based on the left and right values
+//            if ($isLeftValueLesser || $isRightValueLesser) {
+//                // Either the left or right value is less than this value:
+//                // that means the min value is dependent on the left or right.
+//
+//                if ($isLeftValueLesser && $isRightValueLesser) {
+//                    // It should never happen that both left and right value
+//                    // are less than this value: that means that I created a
+//                    // descriptor sequence that both ascends and descends,
+//                    // which is invalid.
+//                    // Nonetheless: attempt to handle this case by using the
+//                    // greater of left and right.
+//                    if ($leftMaxValue > $rightMaxValue) {
+//                        $floorValue = $leftMaxValue;
+//                        $descriptor->setDirectionAscending();
+//                    } else {
+//                        $floorValue = $rightMaxValue;
+//                        $descriptor->setDirectionDescending();
+//                    }
+//                } elseif ($isLeftValueLesser) {
+//                    // Left value is less than this value: use left value as
+//                    // the floor value for this descriptor's min value.
+//                    $floorValue = $leftMaxValue;
+//                    $descriptor->setDirectionAscending();
+//                } else {
+//                    // Right value is less than this value: use left value as
+//                    // the floor value for this descriptor's min value.
+//                    $floorValue = $rightMaxValue;
+//                    $descriptor->setDirectionDescending();
+//                }
+//
+//                // Don't allow to be greater than max
+//                // (in case validation allowed decimals for ranged)
+//                $minValue = min($floorValue + $step, $maxValue);
+//            } else {
+//                // Neither left or right value are less than this value:
+//                // this is not a ranged descriptor.
+//                $minValue = $maxValue;
+//            }
+//
+//            $descriptor->setMinValue($minValue);
+//        }
     }
 
 
-    /**
-     * @param int   $currentKey
-     * @param array $keys
-     * @param int   $increment
-     * @return null|Descriptor
-     */
-    private function retrieveAdjacentNonNullDescriptor(int $currentKey, array $keys, int $increment): ?Descriptor
-    {
-        $adjacentNonNullDescriptor = null;
-        $adjacentKey               = $currentKey + $increment;
-        while (null === $adjacentNonNullDescriptor) {
-            if (!array_key_exists($adjacentKey, $keys)) {
-                break;
-            }
-            $adjacentDescriptor = $this->descriptors[$keys[$adjacentKey]] ?? null;
-            if ($adjacentDescriptor && null !== $adjacentDescriptor->getMaxValue()) {
-                $adjacentNonNullDescriptor = $adjacentDescriptor;
-                break;
-            }
-            $adjacentKey += $increment;
-        }
-        return $adjacentNonNullDescriptor;
-    }
+//    /**
+//     * @param int   $currentKey
+//     * @param array $keys
+//     * @param int   $increment
+//     * @return null|Descriptor
+//     */
+//    private function retrieveAdjacentNonNullDescriptor(int $currentKey, array $keys, int $increment): ?Descriptor
+//    {
+//        $adjacentNonNullDescriptor = null;
+//        $adjacentKey               = $currentKey + $increment;
+//        while (null === $adjacentNonNullDescriptor) {
+//            if (!array_key_exists($adjacentKey, $keys)) {
+//                break;
+//            }
+//            $adjacentDescriptor = $this->descriptors[$keys[$adjacentKey]] ?? null;
+//            if ($adjacentDescriptor && null !== $adjacentDescriptor->getMaxValue()) {
+//                $adjacentNonNullDescriptor = $adjacentDescriptor;
+//                break;
+//            }
+//            $adjacentKey += $increment;
+//        }
+//        return $adjacentNonNullDescriptor;
+//    }
 
 
     /**
