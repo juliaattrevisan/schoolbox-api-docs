@@ -130,6 +130,13 @@ class IndicatorUsage
             $descriptor = $temp[$i];
             $nextDescriptor = $temp[$i+1] ?? null;
 
+            /* If you aren't using mark ranges, min = max and get out of here
+             */
+            if (!$useValueRanges) {
+                $descriptor->setMinValue($descriptor->getMaxValue());
+                continue;
+            }
+
             /* Useful flags
              */
             $isFirstElement = 0 === $i;
