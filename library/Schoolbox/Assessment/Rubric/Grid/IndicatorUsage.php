@@ -130,6 +130,18 @@ class IndicatorUsage
             $descriptor = $temp[$i];
             $nextDescriptor = $temp[$i+1] ?? null;
 
+            /* Useful flags
+             */
+            $isFirstElement = 0 === $i;
+            $isLastElement = $i === $n-1;
+
+            /* If this was the first element in the list, or the last element in the list,
+             * set its min value to be the same as its max
+             */
+            if ($isFirstElement || $isLastElement) {
+                $temp[$i]->setMinValue($temp[$i]->getMaxValue());
+            }
+
             /* Map it all back to each of the non-null descriptors in $this->descriptor
              * That should total three linear traversals at most,
              * instead of multiple nested traversals for each descriptor - one left, and one right
@@ -153,19 +165,15 @@ class IndicatorUsage
                     $temp[$i]->setDirectionDescending();
                     $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + $increment);
                 }
-            } else {
+            } elseif ($numDescending > $numAscending) {
 
                 /* Last element in the list
-                 */
-                $temp[$i]->setMinValue($temp[$i]->getMaxValue());
-
-                /* Assume default direction "ascending"
+                 *
+                 * Assume default direction "ascending"
                  * Overwrite it with a different direction for the data set;
                  * this is the overall trend for the data set, ignoring wonky data
                  */
-                if ($numDescending > $numAscending) {
-                    $temp[$i]->setDirectionDescending();
-                }
+                $temp[$i]->setDirectionDescending();
             }
 
             $previousDescriptor = $temp[$i];
