@@ -136,7 +136,7 @@ class IndicatorUsage
             $isLastElement = $i === $n-1;
 
             /* If this was the first element in the list, or the last element in the list,
-             * set its min value to be the same as its max
+             * set its min value to be the same as its max (addresses 1-element lists)
              */
             if ($isFirstElement || $isLastElement) {
                 $temp[$i]->setMinValue($temp[$i]->getMaxValue());
@@ -165,14 +165,18 @@ class IndicatorUsage
                     $temp[$i]->setDirectionDescending();
                     $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + $increment);
                 }
-            } elseif ($numDescending > $numAscending) {
+            } elseif ($previousDescriptor) {
 
                 /* Last element in the list
-                 *
-                 * Assume default direction "ascending"
-                 * Overwrite it with a different direction for the data set;
-                 * this is the overall trend for the data set, ignoring wonky data
                  */
+                $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + $increment);
+            }
+
+            /* Assume default direction "ascending"
+            * Overwrite it with a different direction for the data set;
+            * this is the overall trend for the data set, ignoring wonky data
+            */
+            if ($numDescending > $numAscending) {
                 $temp[$i]->setDirectionDescending();
             }
 
