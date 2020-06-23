@@ -21,7 +21,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $recaptcha = new ReCaptcha(Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key'));
 
 if (!isset($_SESSION['id']) && !$recaptcha->verify($_POST['g-recaptcha-response'])) {
-    $page = new SitePage(false);
     error(105, "The Human Checker (reCAPTCHA) failed.");
 }
 

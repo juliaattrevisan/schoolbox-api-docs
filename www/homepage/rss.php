@@ -21,5 +21,4 @@ $url = $catID
     ? $router->generate('commsNewsFeed.getFeedForFolder', ['folderId' => $catID])
     : $router->generate('commsNewsFeed.getFeedForUser', ['key' => $token]);
 
-$page = new SitePage(false);
-$page->localRedir($url, false, 308);
+SitePage::localRedir($url, false, 308);

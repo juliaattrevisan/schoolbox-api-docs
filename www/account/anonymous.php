@@ -2,7 +2,9 @@
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$page = new SitePage(false);
+
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
 
 $internalUrl = $_GET['page'] ?: '/';
 if (Config::get('login_anonymous') && !$_SESSION['user']) {
