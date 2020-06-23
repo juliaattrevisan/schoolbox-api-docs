@@ -212,11 +212,11 @@ class Kernel extends WebKernelAbstract
             $di->set('sentry', $sentryClient);
         }
 
-        $di->set('layoutEngine', $di->lazy(function () use ($di) {
-            $sitepage = new SitePage(false);
-            $sitepage->setDi($di);
-            return $sitepage;
-        }));
+//        $di->set('layoutEngine', $di->lazy(function () use ($di) {
+//            $sitepage = new SitePage(false);
+//            $sitepage->setDi($di);
+//            return $sitepage;
+//        }));
 
         $di->set(
             'templateEngine',

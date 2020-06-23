@@ -601,7 +601,7 @@ class Kernel extends WebKernelAbstract
             // Let's just say 403 Forbidden for now
             // TODO replace the call to Sitepage::error() method
             /** @var \SitePage $page */
-            $page = $di->get('layoutEngine');
+            $page = $di->get('sitePage');
             $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Your request has been blocked as a proactive security measure. Please review your browser plugins and disable any that you do not need, and try again; if you continue to receive this message, please report the issue to ' . $config->get('feedback_text') . '.', 403);
         }
     }
