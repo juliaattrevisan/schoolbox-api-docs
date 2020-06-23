@@ -96,6 +96,32 @@ class IndicatorUsage
      */
     public function applyDescriptorMinValues(bool $useValueRanges): void
     {
+
+        new \Alaress_Probe($this->descriptors);
+
+        /* Filter out null-valued descriptors
+         * These don't contribute to ranged values and are skipped
+         */
+
+        /* Traverse the remaining set of data to infer a general direction
+         * That is, whether the descriptor values are ascending or descending overall
+         */
+
+        /* Traverse each element in order and look ahead to see what the next
+         * descriptor value might be and infer a local direction in each descriptor
+         * This will be used to order select dropdowns' values in grid-markable
+         * as well as whatever it used to do with retrieveLeftValue retrieveRightValue
+         *
+         * Catalog a min/max value accordingly so we can easily map it back
+         */
+
+        /* Map it all back to each of the non-null descriptors in $this->descriptor
+         * That should total three linear traversals at most,
+         * instead of multiple nested traversals for each descriptor - one left, and one right
+         */
+
+
+
         // The rules for min-max values, from SA-6627:
         // * The highest possible value for a descriptor is the points value
         //   supplied for that descriptor at rubric creation time
@@ -122,6 +148,7 @@ class IndicatorUsage
         // Currently, step value is always 1: let this be able to change though
         $step = 1;
         $keys = $this->descriptors->keys();
+
         foreach ($keys as $i => $current) {
             $descriptor = $this->descriptors[$current];
             if (!$descriptor) {
