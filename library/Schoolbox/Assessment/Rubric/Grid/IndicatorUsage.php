@@ -18,6 +18,12 @@ use Schoolbox\GenericCollection;
  */
 class IndicatorUsage
 {
+
+    /**
+     * Presume mark ranges step in these amounts
+     */
+    private const MARK_RANGE_INCREMENT = 1;
+
     /**
      * @var Indicator
      */
@@ -96,7 +102,6 @@ class IndicatorUsage
      */
     public function applyDescriptorMinValues(bool $useValueRanges): void
     {
-        $increment = 1;
 
         /* Filter out null-valued descriptors
          * These don't contribute to ranged values and are skipped
@@ -166,7 +171,7 @@ class IndicatorUsage
                      * Occurs when previous descriptor value is the same as the current descriptor value
                      */
                     if ($previousDescriptor) {
-                        $newValue = $previousDescriptor->getMaxValue() + $increment;
+                        $newValue = $previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT;
 
                         $temp[$i]->setMinValue($newValue > $temp[$i]->getMaxValue() ? $temp[$i]->getMaxValue() : $newValue);
                     }
@@ -175,13 +180,13 @@ class IndicatorUsage
                 if ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
                     $numDescending++;
                     $temp[$i]->setDirectionDescending();
-                    $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + $increment);
+                    $temp[$i]->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
                 }
             } elseif ($previousDescriptor) {
 
                 /* Last element in the list
                  */
-                $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + $increment);
+                $temp[$i]->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
             }
 
             /* Assume default direction "ascending"
