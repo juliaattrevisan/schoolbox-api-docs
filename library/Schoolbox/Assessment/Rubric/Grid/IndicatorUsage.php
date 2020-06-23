@@ -128,7 +128,7 @@ class IndicatorUsage
 
         for ($i = 0; $i < $n; $i++) {
             $descriptor = $temp[$i];
-            $nextDescriptor = $temp[$i+1];
+            $nextDescriptor = $temp[$i+1] ?? null;
 
             /* Map it all back to each of the non-null descriptors in $this->descriptor
              * That should total three linear traversals at most,
