@@ -117,8 +117,7 @@ class IndicatorUsage
         /* Traverse the remaining set of data to infer a general direction
          * That is, whether the descriptor values are ascending or descending overall
          */
-        $numAscending = 0;
-        $numDescending = 0;
+        $pureDescriptorValues = [];
 
         $n = \count($temp);
 
@@ -133,6 +132,13 @@ class IndicatorUsage
             $nextDescriptor = $temp[$i+1] ?? null;
             $descriptor = $temp[$i];
             $previousDescriptor = $temp[$i-1] ?? null;
+
+            /* Remember the current descriptor's value
+             * We'll end up using this to determine the data set's overall directionality
+             * which will let us make some bold assumptions for where to mangle the minValue()
+             * to fulfil SA-7628
+             */
+
 
             /* If you aren't using mark ranges, min = max and get out of here
              */
@@ -161,8 +167,6 @@ class IndicatorUsage
              */
             if ($nextDescriptor) {
                 if ($nextDescriptor->getMaxValue() > $descriptor->getMaxValue()) {
-                    $numAscending++;
-                    $descriptor->setDirectionAscending();
 
                     /* Since we're ascending we need to recall what we previously saw
                      * But don't let it exceed the current element's maximum
@@ -175,8 +179,6 @@ class IndicatorUsage
                         $descriptor->setMinValue($newValue > $descriptor->getMaxValue() ? $descriptor->getMaxValue() : $newValue);
                     }
                 } elseif ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
-                    $numDescending++;
-                    $descriptor->setDirectionDescending();
                     $descriptor->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
                 }
             } elseif ($previousDescriptor) {
@@ -184,23 +186,23 @@ class IndicatorUsage
                 /* Last element in the list in ascending order
                  */
                 if ($previousDescriptor->getMinValue() < $descriptor->getMaxValue()) {
-                    $numAscending++;
-                    $descriptor->setDirectionAscending();
                     $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
-                } else {
-                    $numDescending++;
-                    $descriptor->setDirectionDescending();
                 }
             }
         }
 
-        /* Assume default direction "ascending"
-         * Overwrite it with a different direction for the data set;
-         * this is the overall trend for the data set, ignoring wonky data
+        /* Make a big assumption about $pureDescriptorValues and descriptor directionality overall
+         * If sort($pureDescriptorValues) === $pureDescriptorValues, then $pureDescriptorValues
+         * was in ascending order
+         *
+         * Otherwise, it's in descending order, or a bed of chaos like [0,11,4,76,3,21,5] which has no
+         * meaning in the current usage of rubrics (it's an illegal use case despite being catalogued and
+         * unit tested in back end). For both, assume it can be classified as descending.
          */
-//        if ($numDescending > $numAscending) {
-//            $descriptor->setDirectionDescending();
-//        }
+
+        /* Assign this directionality to every descriptor in the set
+         */
+
 
         new \Alaress_Probe($this->descriptors);
 
