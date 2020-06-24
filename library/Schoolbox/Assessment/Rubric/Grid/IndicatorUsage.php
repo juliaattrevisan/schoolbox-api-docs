@@ -20,6 +20,13 @@ class IndicatorUsage
 {
 
     /**
+     * Descriptor directionality across the entire set
+     */
+    private const ORDER_DESCENDING = 0;
+    private const ORDER_ASCENDING = 1;
+
+
+    /**
      * Presume mark ranges step in these amounts
      */
     private const MARK_RANGE_INCREMENT = 1;
@@ -107,19 +114,38 @@ class IndicatorUsage
          * These don't contribute to ranged values and are skipped
          */
         $temp = [];
+        $pureDescriptorValues = [];
 
         foreach ($this->descriptors as $descriptor) {
             if (null !== $descriptor->getMaxValue()) {
                 $temp[] = $descriptor;
+
+                /* Remember the current descriptor's value
+                 *
+                 * We'll end up using this to determine the data set's overall directionality
+                 * which will let us make some bold assumptions for where to mangle the minValue()
+                 * to fulfil SA-7628
+                 */
+                $pureDescriptorValues[] = $descriptor->getMaxValue();
             }
         }
 
-        /* Traverse the remaining set of data to infer a general direction
-         * That is, whether the descriptor values are ascending or descending overall
+        /* Make a big assumption about $pureDescriptorValues and descriptor directionality overall
+         * If sort($pureDescriptorValues) === $pureDescriptorValues, then $pureDescriptorValues
+         * was in ascending order
+         *
+         * Otherwise, it's in descending order, or a bed of chaos like [0,11,4,76,3,21,5] which has no
+         * meaning in the current usage of rubrics (it's an illegal use case despite being catalogued and
+         * unit tested in back end). For both, assume it can be classified as descending.
          */
-        $pureDescriptorValues = [];
+        $pureDescriptorValuesTest = $pureDescriptorValues;
+        sort($pureDescriptorValuesTest);
 
-        $n = \count($temp);
+        $direction = self::ORDER_DESCENDING;
+
+        if ($pureDescriptorValues === $pureDescriptorValuesTest) {
+            $direction = self::ORDER_ASCENDING;
+        }
 
         /* Traverse each element in order and look ahead to see what the next
          * descriptor value might be and infer a local direction in each descriptor
@@ -128,17 +154,12 @@ class IndicatorUsage
          *
          * Catalog a min/max value accordingly so we can easily map it back
          */
+        $n = \count($temp);
+
         for ($i = 0; $i < $n; $i++) {
             $nextDescriptor = $temp[$i+1] ?? null;
             $descriptor = $temp[$i];
             $previousDescriptor = $temp[$i-1] ?? null;
-
-            /* Remember the current descriptor's value
-             * We'll end up using this to determine the data set's overall directionality
-             * which will let us make some bold assumptions for where to mangle the minValue()
-             * to fulfil SA-7628
-             */
-
 
             /* If you aren't using mark ranges, min = max and get out of here
              */
@@ -189,22 +210,15 @@ class IndicatorUsage
                     $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
                 }
             }
+
+            /* Assign this directionality to every descriptor in the set
+             */
+            $descriptor->setDirectionAscending();
+
+            if ($direction === self::ORDER_DESCENDING) {
+                $descriptor->setDirectionDescending();
+            }
         }
-
-        /* Make a big assumption about $pureDescriptorValues and descriptor directionality overall
-         * If sort($pureDescriptorValues) === $pureDescriptorValues, then $pureDescriptorValues
-         * was in ascending order
-         *
-         * Otherwise, it's in descending order, or a bed of chaos like [0,11,4,76,3,21,5] which has no
-         * meaning in the current usage of rubrics (it's an illegal use case despite being catalogued and
-         * unit tested in back end). For both, assume it can be classified as descending.
-         */
-
-        /* Assign this directionality to every descriptor in the set
-         */
-
-
-        new \Alaress_Probe($this->descriptors);
 
 
         // The rules for min-max values, from SA-6627:
