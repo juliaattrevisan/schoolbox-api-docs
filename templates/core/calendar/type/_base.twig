@@ -92,7 +92,7 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
     {% block deleteUrls %}
-        <input type="hidden" id="delete-single-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}">
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr ?? '' }}">
         {% if event.seriesId() %}
             <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}&efficacy=self">
             <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.eventId}) }}{{ returnStr }}&efficacy=series">

@@ -53,6 +53,16 @@ class Event extends Day\Event
     protected $hasAttendance = false;
 
     /**
+     * @var string URL of the attendance link
+     */
+    private $attendanceLink;
+
+    /**
+     * @var string how the attendance link should be opened
+     */
+    private $attendanceLinkTarget;
+
+    /**
      * A list of periods for which attendance may be marked for this timetabled
      * class.
      *
@@ -62,15 +72,6 @@ class Event extends Day\Event
      * @var array
      */
     protected $attendancePeriods = [];
-
-    /**
-     * The timetable day's file type.
-     *
-     * Another piece of what's required for rendering an attendance link now.
-     *
-     * @var string
-     */
-    private $fileType;
 
     /**
      * @return string
@@ -195,35 +196,36 @@ class Event extends Day\Event
         return $this->attendancePeriods;
     }
 
-
     /**
-     * @param array $attendancePeriods
-     * @return static
+     * @param string $attendanceLink
      */
-    public function setAttendancePeriods(array $attendancePeriods): self
+    public function setAttendanceLink(string $attendanceLink): void
     {
-        $this->attendancePeriods = $attendancePeriods;
-        return $this;
+        $this->attendanceLink = $attendanceLink;
     }
 
-
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFileType(): string
+    public function getAttendanceLink(): ?string
     {
-        return $this->fileType;
+        return $this->attendanceLink;
     }
 
+    /**
+     * @param string $attendanceLinkTarget
+     */
+    public function setAttendanceLinkTarget(string $attendanceLinkTarget): void
+    {
+        $this->attendanceLinkTarget = $attendanceLinkTarget;
+    }
 
     /**
-     * @param string $fileType
-     * @return static
+     * @return string|null
      */
-    public function setFileType(string $fileType): self
+    public function getAttendanceLinkTarget(): ?string
     {
-        $this->fileType = $fileType;
-        return $this;
+        return $this->attendanceLinkTarget;
     }
 
 

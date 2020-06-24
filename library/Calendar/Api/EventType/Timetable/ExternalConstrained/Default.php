@@ -54,6 +54,8 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
             $stack = new Collection();
             return $stack;
         }
+        $externalAttendanceLink = new External_AttendanceLink();
+        $externalAttendanceLink->init($this->configLoader, $this->getUser()->getRole()->isStaff());
 
         $currentTimestamp = $startTimestamp;
 
@@ -95,6 +97,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $campusId  = $campus->getId();
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
+                $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
 
                 if ($elapsedTime >= (-$attendanceWindow) && $elapsedTime < $expensiveWindow) {
                     // if the day we're looking at is
@@ -104,7 +107,6 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 } else {
-                    $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
 
                     if ($dayNumber <= 0) {
                         continue;
@@ -176,15 +178,29 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         // Setup attendance button
                         // The attendance link will only be shown if this period
                         // has periods to mark.
-                        $hasAttendancePeriods = !empty($period['AttendancePeriods']);
-                        $event->setHasAttendance(!empty($period['AttendanceEnabled']) && $hasAttendancePeriods);
-                        $event->setCode($period['code']);
-                        $event->setCampus($period['campus']);
-                        $event->setPeriod($period['periodNumber']);
-                        $event->setAttendancePeriods($period['AttendancePeriods'] ?? []);
-                        $event->setPeriodName($period['periodName']);
-                        $event->setFileType($period['FileType'] ?? '');
+                        $event->setHasAttendance(false);
 
+                        if ($externalAttendanceLink->isEnabled($period['code'], $period['AttendanceEnabled'], $event->getStartTime())) {
+                            $attendanceLink = $externalAttendanceLink->getAttendanceLink(
+                                $period['code'],
+                                $period['campus'],
+                                $period['FileType'] ?? '',
+                                $period['AttendancePeriods'] ?? [],
+                                $period['periodNumber'],
+                                $event->getStartTime(),
+                                $this->getUser()->getCampusCollection(),
+                                $campusId, $this->getUser()->getExternalId(),
+                                $dayNumber
+                            );
+                            if (!empty($attendanceLink)) {
+                                $event->setHasAttendance(true);
+                                $event->setAttendanceLink($attendanceLink);
+                                $event->setAttendanceLinkTarget($externalAttendanceLink->getAttendanceLinkTarget());
+                            }
+                        }
+
+                        $event->setPeriod($period['periodNumber']);
+                        $event->setPeriodName($period['periodName']);
                         // Load the color for this timetabled class
                         if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
                             // not enough colors: loop around to index 0.

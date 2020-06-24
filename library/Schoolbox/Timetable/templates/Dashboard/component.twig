@@ -66,7 +66,7 @@ Data:
                         {% for period in timetable.periods %}
                         <td style="width:{{ periodWidth }}%">
                             <div{% if period.isCurrent %} class="timetable-subject-active"{% endif %} >
-                                {% for class in period.classes %}
+                                {% for class in period.classes ?? [] %}
                                 <div class="timetable-subject" style="background:{{ class.colour|purify }};" data-timetable-subject>
                                     {% set cssClass = class.cancelled ? 'strike' : '' %}
                                     {% if class.url %}
@@ -79,7 +79,7 @@ Data:
 
                                     {% if class.room %}<div>{{ class.room }}</div>{% endif %}
 
-                                    {% if class.attendance.link %}
+                                    {% if class.attendance.link ?? false %}
                                         <br />
                                         <span class="{{ attendanceIcon.icon(externalType, class.attendance.marked) }}">
                                             <a href="{{ class.attendance.link }}" title="Mark Attendance" target="{{ class.attendance.target }}">Mark Attendance</a>
