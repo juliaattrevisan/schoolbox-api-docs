@@ -238,16 +238,18 @@ class IndicatorUsage
          * First element in a set of ascending descriptors has a minimum value of 1 unless that descriptor has
          * null value or its maximum value is 0.
          */
-        if ($direction === self::ORDER_DESCENDING) {
-            $specialDescriptor = $this->descriptors->last();
-        } else {
-            $specialDescriptor = $this->descriptors->first();
-        }
+        if ($useValueRanges) {
+            if ($direction === self::ORDER_DESCENDING) {
+                $specialDescriptor = $this->descriptors->last();
+            } else {
+                $specialDescriptor = $this->descriptors->first();
+            }
 
-        /* Shank it in. Though, this changes behaviour for Everyone and Everything using mark ranges.
-         */
-        if ($specialDescriptor->getMaxValue() > 0) {
-            $specialDescriptor->setMinValue(self::MIN_VALUE);
+            /* Shank it in. Though, this changes behaviour for Everyone and Everything using mark ranges.
+             */
+            if ($specialDescriptor->getMaxValue() > 0) {
+                $specialDescriptor->setMinValue(self::MIN_VALUE);
+            }
         }
     }
 
