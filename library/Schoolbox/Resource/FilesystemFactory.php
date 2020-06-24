@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource;
 
 use Aws\S3\S3Client;
+use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -62,22 +63,7 @@ class FilesystemFactory
                 break;
             case self::FILE_SYSTEM_ADAPTER_AWS_S3:
                 // Use AWS S3 for storage
-                $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
-                $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
-                $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
-                $otfs_s3_version     = trim($config->get('otfs_s3_version') ?? "");
-                $otfs_s3_bucket      = trim($config->get('otfs_s3_bucket') ?? "");
-
-                $client = S3Client::factory([
-                    'credentials' => [
-                        'key'    => $otfs_s3_cred_key,
-                        'secret' => $otfs_s3_cred_secret,
-                    ],
-                    'region'      => $otfs_s3_region,
-                    'version'     => $otfs_s3_version,
-                ]);
-
-                $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket), $fsConfig);
+                $fs_storage = $this->buildAwsS3FileSystem($fsConfig);
                 break;
             default:
                 throw new UnexpectedValueException("Unrecognised filesystem adapter: '$adapter'");
@@ -87,5 +73,32 @@ class FilesystemFactory
             Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
             Manager::FS_STORAGE => $fs_storage
         ]);
+    }
+
+
+    /**
+     * @param array|null $fsConfig
+     * @return Filesystem
+     * @throws InvalidArgumentException
+     */
+    public function buildAwsS3FileSystem(array $fsConfig = null): Filesystem
+    {
+        $config              = new \Schoolbox\Config\Loader();
+        $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
+        $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
+        $otfs_s3_version     = trim($config->get('otfs_s3_version') ?? "");
+        $otfs_s3_bucket      = trim($config->get('otfs_s3_bucket') ?? "");
+
+        $client = new S3Client([
+            'credentials' => [
+                'key'    => $otfs_s3_cred_key,
+                'secret' => $otfs_s3_cred_secret,
+            ],
+            'region'      => $otfs_s3_region,
+            'version'     => $otfs_s3_version,
+        ]);
+
+        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket), $fsConfig);
     }
 }

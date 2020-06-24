@@ -10,12 +10,25 @@ namespace Schoolbox\Admin\Home;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
+use Alaress_Byte_Format;
+use Alaress_Date_Format;
+use Aws\CloudWatch\CloudWatchClient;
+use Aws\S3\S3Client;
 use InvalidArgumentException;
 use Schoolbox\Database;
 use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Resource\Storage\S3\DisasterRecovery;
+use function array_column;
+use function array_map;
+use function array_merge;
+use function array_sum;
+use function preg_filter;
+use function str_replace;
+use function strpos;
+use function trim;
 
 class Controller extends Base
 {
@@ -217,7 +230,7 @@ class Controller extends Base
 
             if ($action != '') {
 
-                $date = new \Alaress_Date_Format($log['occurred'], \Alaress_Date_Format::DATABASE_FORMAT);
+                $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 $logs[] = [
                     'date' => $date->getShort(),
@@ -236,11 +249,11 @@ class Controller extends Base
                 'template' => '@adminHome/index.twig',
                 'data' => array(
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                    'disk_used' => \Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
-                    'disk_total' => \Alaress_Byte_Format::bytesToString($disk_total),
-                    'disk_percentage' => \Alaress_Byte_Format::bytesToString($disk_percentage),
-                    'memory_used' => \Alaress_Byte_Format::bytesToString($memory_used),
-                    'memory_total' => \Alaress_Byte_Format::bytesToString($memory_total),
+                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                    'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
+                    'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
+                    'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
+                    'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
                     'memory_percentage' => $memory_percentage,
                     'memory_gradient' => $memory_gradient,
                     'external_db' => $external_db,
@@ -258,7 +271,7 @@ class Controller extends Base
                     'logs' => $logs,
                     'kamiEnabled' => $this->kamiConnector->isEnabled(),
                     'kamiOnline' => $this->kamiConnector->isOnline(),
-
+                    'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
                 ),
             )
         );
@@ -290,5 +303,167 @@ class Controller extends Base
                 )
             )
         );
+    }
+
+
+    /**
+     * Displays the 'Disaster Recovery Backups' page
+     *
+     * @since        20.1
+     * @api          /adminv2/home/disaster-recovery
+     * @noinspection PhpUnused
+     * @throws InvalidArgumentException
+     */
+    public function getDisasterRecovery(): void
+    {
+        // Data only fetched if feature is enabled
+        $isEnabled = $this->getDisasterRecoveryBackupsEnabled();
+        if ($isEnabled) {
+            $enabledData = $this->buildDisasterRecoveryContext();
+        } else {
+            $enabledData = [];
+        }
+
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminHome/disaster-recovery.twig',
+                'data'     => array_merge(
+                    [
+                        'pageCurrent' => 'home',
+                        'enabled'     => $isEnabled,
+                    ],
+                    $enabledData
+                ),
+            ]
+        );
+    }
+
+
+    /**
+     * Builds the context data for the Disaster Report
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    private function buildDisasterRecoveryContext(): array
+    {
+        $enabledData = [];
+
+        $enabledData['mostRecentSyncStatus'] = $this->getConfigLoader()->get(DisasterRecovery::CONFIG_DR_SYNC_STATUS);
+        $enabledData['fqdn']                 = "{$this->getConfigLoader()->get('site_hostname')}.{$this->getConfigLoader()->get('site_domain')}";
+        try {
+            $domainTtl                = (new TtlFetcher())->getTtl($enabledData['fqdn']);
+            $enabledData['domainTtl'] = $domainTtl;
+        } catch (\UnexpectedValueException $e) {
+            // We want to know about this, but continue to render the rest of the page.
+            $this->captureException($e);
+        }
+
+        $s3AccessKey = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
+        $s3Region    = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
+        $s3Version   = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
+        $s3Bucket    = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
+
+        $s3CredentialsMissing =
+            $s3AccessKey === '' ||
+            $s3SecretKey === '' ||
+            $s3Region === '' ||
+            $s3Version === '' ||
+            $s3Bucket === '';
+
+        if ($s3CredentialsMissing) {
+            /** @noinspection UnsupportedStringOffsetOperationsInspection */
+            $enabledData['errors'][] = 'AWS S3 credentials are invalid';
+            return $enabledData;
+        }
+
+        $s3Client = new S3Client([
+            'credentials' => [
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
+            ],
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+        ]);
+
+        $cloudWatchClient = new CloudWatchClient([
+            'credentials' => [
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
+            ],
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+        ]);
+
+        $bucketSize  = (new CloudWatchMetrics($cloudWatchClient))->getBucketSize($s3Bucket);
+        $objectCount = (new CloudWatchMetrics($cloudWatchClient))->getNumberOfObjects($s3Bucket);
+
+        $objects = $s3Client->getIterator('ListObjects', [
+            'Bucket' => $s3Bucket,
+            'Prefix' => DisasterRecovery::PREFIX_BACKUPS,
+        ]);
+
+        $backupFileCount = 0;
+        $backupFileUsage = 0;
+        $files           = [];
+        foreach ($objects as $object) {
+            $backupFileCount++;
+            $backupFileUsage += $object['Size'];
+            $date            = preg_filter('/backups\/(\d{4}-\d{2}-\d{2})\/.+/', '$1', $object['Key']);
+
+            if (strpos($object['Key'], "conf_{$date}.php") !== false) {
+                $files[$date]['conf'] = $object['Size'];
+            } elseif (strpos($object['Key'], "etc_{$date}.tar.gz") !== false) {
+                $files[$date]['etc'] = $object['Size'];
+            } elseif (strpos($object['Key'], "redis_{$date}.rdb.gz") !== false) {
+                $files[$date]['redis'] = $object['Size'];
+            } elseif (strpos($object['Key'], "{$date}.sql.gz") !== false) {
+                $files[$date]['mariaDb'] = $object['Size'];
+            }
+        }
+        foreach ($files as $date => $dateFiles) {
+            $files[$date]['total'] =
+                ($dateFiles['conf'] ?? 0) +
+                ($dateFiles['etc'] ?? 0) +
+                ($dateFiles['redis'] ?? 0) +
+                ($dateFiles['mariaDb'] ?? 0);
+        }
+
+        $fileTotals = [
+            'conf'    => Alaress_Byte_Format::bytesToString(array_sum(array_column($files, 'conf'))),
+            'etc'     => Alaress_Byte_Format::bytesToString(array_sum(array_column($files, 'etc'))),
+            'redis'   => Alaress_Byte_Format::bytesToString(array_sum(array_column($files, 'redis'))),
+            'mariaDb' => Alaress_Byte_Format::bytesToString(array_sum(array_column($files, 'mariaDb'))),
+            'total'   => Alaress_Byte_Format::bytesToString(array_sum(array_column($files, 'total'))),
+        ];
+
+        foreach ($files as $date => $dateFiles) {
+            $files[$date] = array_map(static function (string $size): string {
+                return Alaress_Byte_Format::bytesToString($size);
+            }, $dateFiles);
+        }
+
+        $enabledData['backupFiles']      = $files;
+        $enabledData['backupFileTotals'] = $fileTotals;
+
+
+        // Count of storage files is equal to total objects minus backups
+        $enabledData['bucketSize']       = Alaress_Byte_Format::bytesToString($bucketSize);
+        $enabledData['storageFileCount'] = $objectCount - $backupFileCount;
+        $enabledData['storageFileUsage'] = Alaress_Byte_Format::bytesToString($bucketSize - $backupFileUsage);
+
+        return $enabledData;
+    }
+
+
+    /**
+     * Returns whether the disaster recovery backups feature is running on this instance
+     *
+     * @return bool
+     */
+    private function getDisasterRecoveryBackupsEnabled(): bool
+    {
+        return $this->getConfigLoader()->get('aws_s3_dr_backup_enabled');
     }
 }

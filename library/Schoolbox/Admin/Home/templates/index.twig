@@ -177,6 +177,17 @@
                         </div>
                     </li>
                 {% endif %}
+                {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
+                {% if drRoute %}
+                <li>
+                    <div class="small-5 columns content">
+                        <a href="{{ drRoute }}">Disaster Recovery</a>
+                    </div>
+                    <div class="small-7 columns content">
+                        <span class="full-width {% if backupsEnabled %}success{% else%}highlight{% endif %} label">{% if backupsEnabled %}Enabled{% else%}Disabled{% endif %}</span>
+                    </div>
+                </li>
+                {% endif %}
             </ul>
         </section>
 

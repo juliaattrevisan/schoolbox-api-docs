@@ -17,6 +17,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 class Module extends BaseModule
 {
@@ -29,6 +30,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addGetRoute($router, 'getHealthcheck', $basePath, "/healthcheck");
+        $this->addGetRoute($router, 'getDisasterRecovery', $basePath, "/disaster-recovery");
     }
 
     /**
@@ -37,7 +39,13 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer) {
 
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
+             ->addRoutePermission($authorizer, 'getDisasterRecovery',
+                 new Rule\All(
+                     new Rule\IsSuperuser(),
+                     new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
+                 )
+             );
     }
 
     /**
