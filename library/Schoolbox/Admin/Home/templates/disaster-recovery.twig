@@ -35,7 +35,7 @@ Data:
         {% endif %}
 
         <div data-alert class="alert-box success">
-            This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize }}</strong> of cloud storage.
+            This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize|default('unknown amount') }}</strong> of cloud storage.
         </div>
 
         <h2>Summary</h2>
