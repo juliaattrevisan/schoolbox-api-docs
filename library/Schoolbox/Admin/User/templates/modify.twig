@@ -56,6 +56,19 @@
 
 {% endif %}
 
+
+{# Put token here for now #}
+{% if token is defined %}
+    <div class="row">
+        <div class="small-12 island">
+            <div class="alert-box">
+                User Auth Token: {{ token }}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
 {# User detail section #}
 
 <div class="row">

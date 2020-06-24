@@ -342,6 +342,7 @@ class Controller extends Base
                 ]),
                 'portraitZone' => $portraitZone,
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
+                'token'        => 'TODO',
             ],
             'title' => 'Admin - Users'
         ]);
