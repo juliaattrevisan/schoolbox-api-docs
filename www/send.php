@@ -21,6 +21,10 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
+$user = $_SESSION['user'];
+if (!$user) {
+    SitePage::localRedir('/');
+}
 
 if (is_numeric($_GET['id'])) {
     $page        = new SitePage;
