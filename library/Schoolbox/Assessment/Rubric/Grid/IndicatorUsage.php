@@ -129,11 +129,10 @@ class IndicatorUsage
          *
          * Catalog a min/max value accordingly so we can easily map it back
          */
-        $previousDescriptor = null;
-
         for ($i = 0; $i < $n; $i++) {
-            $descriptor = $temp[$i];
             $nextDescriptor = $temp[$i+1] ?? null;
+            $descriptor = $temp[$i];
+            $previousDescriptor = $temp[$i-1] ?? null;
 
             /* If you aren't using mark ranges, min = max and get out of here
              */
@@ -196,8 +195,6 @@ class IndicatorUsage
             if ($numDescending > $numAscending) {
                 $descriptor->setDirectionDescending();
             }
-
-            $previousDescriptor = $descriptor;
         }
 
         // The rules for min-max values, from SA-6627:
