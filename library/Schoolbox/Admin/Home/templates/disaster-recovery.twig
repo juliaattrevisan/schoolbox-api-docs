@@ -10,6 +10,7 @@ Data:
     backupFileTotals     null|array     Indexed by 'conf','etc','redis','mariaDb'
     storageFileCount     null|int
     storageFileUsage     null|string
+    errors               null|string[]  Any errors we we should display to user
 #}
 
 {{ renderAdminNavigation(pageCurrent) }}
@@ -36,6 +37,12 @@ Data:
                     Updates to DNS records to switch Internet traffic to your Disaster Recovery instance may take a long time to propagate.
                 </div>
             {% endif %}
+
+            {% for errorMsg in errors %}
+                <div data-alert class="alert-box alert">
+                    {{ errorMsg }}
+                </div>
+            {% endfor %}
 
             <h2>Summary</h2>
             <table>

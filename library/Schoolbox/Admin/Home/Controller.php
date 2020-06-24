@@ -373,6 +373,8 @@ class Controller extends Base
             $s3Bucket === '';
 
         if ($s3CredentialsMissing) {
+            /** @noinspection UnsupportedStringOffsetOperationsInspection */
+            $enabledData['errors'][] = 'AWS S3 credentials are invalid';
             return $enabledData;
         }
 
