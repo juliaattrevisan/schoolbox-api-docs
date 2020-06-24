@@ -14,10 +14,18 @@ Data:
 
 {{ renderAdminNavigation(pageCurrent) }}
 
-<sec class="row">
+<div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Cloud Disaster Recovery Service</h2>
-        {% if enabled %}
+        {% if not enabled %}
+            <div data-alert class="alert-box highlight">
+                This feature is not enabled for this instance. Please contact your account manager for more information.
+            </div>
+        {% else %}
+            <div data-alert class="alert-box success">
+                This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize|default('unknown amount') }}</strong> of cloud storage.
+            </div>
+
             {% if domainTtl is null %}
                 <div data-alert class="alert-box warning">
                     Unable to determine time-to-live of DNS record for {{ fqdn }}.<br>
@@ -28,35 +36,26 @@ Data:
                     Updates to DNS records to switch Internet traffic to your Disaster Recovery instance may take a long time to propagate.
                 </div>
             {% endif %}
-        {% else %}
-            <div data-alert class="alert-box highlight">
-                This feature is not enabled for this instance. Please contact your account manager for more information.
-            </div>
-        {% endif %}
 
-        <div data-alert class="alert-box success">
-            This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize|default('unknown amount') }}</strong> of cloud storage.
-        </div>
+            <h2>Summary</h2>
+            <table>
+                <tbody>
+                <tr><th>Domain TTL (seconds)</th><td>{{ domainTtl is null ? '-' : domainTtl|number_format }}</td></tr>
+                <tr><th>Most Recent Sync status</th><td>{{ mostRecentSyncStatus|default('-') }}</td></tr>
+                </tbody>
+            </table>
 
-        <h2>Summary</h2>
-        <table>
-            <tbody>
-            <tr><th>Domain TTL (seconds)</th><td>{{ domainTtl is null ? '-' : domainTtl|number_format }}</td></tr>
-            <tr><th>Most Recent Sync status</th><td>{{ mostRecentSyncStatus|default('-') }}</td></tr>
-            </tbody>
-        </table>
-
-        <h2>File Storage</h2>
-        <table>
-            <tbody>
+            <h2>File Storage</h2>
+            <table>
+                <tbody>
                 <tr><th>File Count</th><td>{{ storageFileCount is null ? '-' : storageFileCount|number_format }}</td></tr>
                 <tr><th>Disk Usage</th><td>{{ storageFileUsage|default('-') }}</td></tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-        <h2>Databases & Host Configuration backups</h2>
-        <table>
-            <thead>
+            <h2>Databases & Host Configuration backups</h2>
+            <table>
+                <thead>
                 <tr>
                     <th>Date</th>
                     <th>Conf</th>
@@ -65,20 +64,20 @@ Data:
                     <th>MariaDB</th>
                     <th>Total</th>
                 </tr>
-            </thead>
-            <tbody>
-            {% for date, fileSizes in backupFiles %}
-                <tr>
-                    <td>{{ date|default('Unknown') }}</td>
-                    <td>{{ fileSizes.conf|default('-') }}</td>
-                    <td>{{ fileSizes.etc|default('-') }}</td>
-                    <td>{{ fileSizes.redis|default('-') }}</td>
-                    <td>{{ fileSizes.mariaDb|default('-') }}</td>
-                    <td>{{ fileSizes.total|default('-') }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-            <tfoot>
+                </thead>
+                <tbody>
+                {% for date, fileSizes in backupFiles %}
+                    <tr>
+                        <td>{{ date|default('Unknown') }}</td>
+                        <td>{{ fileSizes.conf|default('-') }}</td>
+                        <td>{{ fileSizes.etc|default('-') }}</td>
+                        <td>{{ fileSizes.redis|default('-') }}</td>
+                        <td>{{ fileSizes.mariaDb|default('-') }}</td>
+                        <td>{{ fileSizes.total|default('-') }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
                 <tr>
                     <td>Total</td>
                     <td>{{ backupFileTotals.conf|default('-') }}</td>
@@ -87,7 +86,8 @@ Data:
                     <td>{{ backupFileTotals.mariaDb|default('-') }}</td>
                     <td>{{ backupFileTotals.total|default('-') }}</td>
                 </tr>
-            </tfoot>
-        </table>
+                </tfoot>
+            </table>
+        {% endif %}
     </div>
-</sec>
+</div>
