@@ -43,9 +43,16 @@
         {# Selected value: if not provided, use max #}
         {% set selectedValue = isDescriptorSelected ? indicatorMark.value : descriptor.maxValue %}
 
-        {% for i in descriptor.minValue..descriptor.maxValue %}
-            <option value="{{ i }}" {% if i == selectedValue %}selected{% endif %}>{{ i }}</option>
-        {% endfor %}
+
+        {% if descriptor.isDirectionDescending %}
+            {% for i in descriptor.maxValue..descriptor.minValue %}
+                <option value="{{ i }}" {% if i == selectedValue %}selected{% endif %}>{{ i }}</option>
+            {% endfor %}
+        {% else %}
+            {% for i in descriptor.minValue..descriptor.maxValue %}
+                <option value="{{ i }}" {% if i == selectedValue %}selected{% endif %}>{{ i }}</option>
+            {% endfor %}
+        {% endif %}
     </select>
 {% endif %}
 
