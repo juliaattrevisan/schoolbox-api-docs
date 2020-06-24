@@ -199,7 +199,7 @@ class IndicatorUsage
                     if ($previousDescriptor) {
                         $newValue = $previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT;
 
-                        $descriptor->setMinValue($newValue > $descriptor->getMaxValue() ? $descriptor->getMaxValue() : $newValue);
+                        $descriptor->setMinValue(min($newValue, $descriptor->getMaxValue()));
                     }
                 } elseif ($nextDescriptor->getMaxValue() < $descriptor->getMaxValue()) {
                     $descriptor->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
