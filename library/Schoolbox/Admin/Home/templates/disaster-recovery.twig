@@ -23,9 +23,11 @@ Data:
                 This feature is not enabled for this instance. Please contact your account manager for more information.
             </div>
         {% else %}
+            {% if not errors|default([])|length %}
             <div data-alert class="alert-box success">
                 This feature is <strong>active</strong> and currently using a total of <strong>{{ bucketSize|default('unknown amount') }}</strong> of cloud storage.
             </div>
+            {% endif %}
 
             {% if domainTtl is null %}
                 <div data-alert class="alert-box warning">
