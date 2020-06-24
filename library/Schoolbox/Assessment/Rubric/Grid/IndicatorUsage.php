@@ -184,18 +184,26 @@ class IndicatorUsage
                 /* Last element in the list in ascending order
                  */
                 if ($previousDescriptor->getMinValue() < $descriptor->getMaxValue()) {
+                    $numAscending++;
+                    $descriptor->setDirectionAscending();
                     $descriptor->setMinValue($previousDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
+                } else {
+                    $numDescending++;
+                    $descriptor->setDirectionDescending();
                 }
             }
-
-            /* Assume default direction "ascending"
-             * Overwrite it with a different direction for the data set;
-             * this is the overall trend for the data set, ignoring wonky data
-             */
-            if ($numDescending > $numAscending) {
-                $descriptor->setDirectionDescending();
-            }
         }
+
+        /* Assume default direction "ascending"
+         * Overwrite it with a different direction for the data set;
+         * this is the overall trend for the data set, ignoring wonky data
+         */
+//        if ($numDescending > $numAscending) {
+//            $descriptor->setDirectionDescending();
+//        }
+
+        new \Alaress_Probe($this->descriptors);
+
 
         // The rules for min-max values, from SA-6627:
         // * The highest possible value for a descriptor is the points value
