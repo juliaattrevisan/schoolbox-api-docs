@@ -424,14 +424,14 @@ class IndicatorUsageTest extends TestCase
         yield 'Null 5 (null)' => [$indicatorUsage10, $level5->getId(), null, null];
 
 
-        // Only one descriptor: [5] => [5]
+        // Only one descriptor: [5] => [5,4,3,2,1] to support IB International Baccalaureate
         $indicatorUsage11 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(5);
 
         $indicatorUsage11->getDescriptors()[$level1->getId()] = $descriptor1;
 
-        yield 'Single Descriptor' => [$indicatorUsage11, $level1->getId(), 5, 5];
+        yield 'Single Descriptor' => [$indicatorUsage11, $level1->getId(), 1, 5];
     }
 
 
