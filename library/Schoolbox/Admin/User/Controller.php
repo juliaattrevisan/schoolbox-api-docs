@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Scrub;
@@ -310,6 +311,7 @@ class Controller extends Base
         }
 
 
+        $jwtBuilder = new Jwt($this->getConfigLoader());
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -342,7 +344,7 @@ class Controller extends Base
                 ]),
                 'portraitZone' => $portraitZone,
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
-                'token'        => 'TODO',
+                'token'        => $jwtBuilder->generate($user),
             ],
             'title' => 'Admin - Users'
         ]);
