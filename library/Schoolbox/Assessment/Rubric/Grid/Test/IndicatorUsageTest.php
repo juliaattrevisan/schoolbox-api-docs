@@ -355,6 +355,7 @@ class IndicatorUsageTest extends TestCase
 
 
         // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 3..1, 0] (use highest max below this max)
+
         $indicatorUsage8 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.1')->setMaxValue(0);
@@ -370,8 +371,8 @@ class IndicatorUsageTest extends TestCase
         $indicatorUsage8->getDescriptors()[$level5->getId()] = $descriptor5;
 
         yield 'Asc+Desc 0 (start)' => [$indicatorUsage8, $level1->getId(), 0, 0];
-        yield 'Asc+Desc 4'         => [$indicatorUsage8, $level2->getId(), 1, 4];
-        yield 'Asc+Desc 8'         => [$indicatorUsage8, $level3->getId(), 5, 8];
+        yield 'Asc+Desc 4'         => [$indicatorUsage8, $level2->getId(), 4, 1];
+        yield 'Asc+Desc 8'         => [$indicatorUsage8, $level3->getId(), 8, 4];
         yield 'Asc+Desc 3'         => [$indicatorUsage8, $level4->getId(), 3, 1];
         yield 'Asc+Desc 0 (end)'   => [$indicatorUsage8, $level5->getId(), 0, 0];
 

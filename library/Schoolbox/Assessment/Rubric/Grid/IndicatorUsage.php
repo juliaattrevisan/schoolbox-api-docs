@@ -220,7 +220,6 @@ class IndicatorUsage
             }
         }
 
-
         // The rules for min-max values, from SA-6627:
         // * The highest possible value for a descriptor is the points value
         //   supplied for that descriptor at rubric creation time
