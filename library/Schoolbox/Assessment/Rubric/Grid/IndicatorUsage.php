@@ -135,16 +135,18 @@ class IndicatorUsage
          * was in ascending order
          *
          * Otherwise, it's in descending order, or a bed of chaos like [0,11,4,76,3,21,5] which has no
-         * meaning in the current usage of rubrics (it's an illegal use case despite being catalogued and
-         * unit tested in back end). For both, assume it can be classified as descending.
+         * meaning in the current usage of mark-range rubrics (it's an illegal use case despite being catalogued
+         * and unit tested in back end). For both, assume it can be classified as descending.
          */
-        $pureDescriptorValuesTest = $pureDescriptorValues;
-        sort($pureDescriptorValuesTest);
-
         $direction = self::ORDER_DESCENDING;
 
-        if ($pureDescriptorValues === $pureDescriptorValuesTest) {
-            $direction = self::ORDER_ASCENDING;
+        if ($useValueRanges) {
+            $pureDescriptorValuesTest = $pureDescriptorValues;
+            sort($pureDescriptorValuesTest);
+
+            if ($pureDescriptorValues === $pureDescriptorValuesTest) {
+                $direction = self::ORDER_ASCENDING;
+            }
         }
 
         /* Traverse each element in order and look ahead to see what the next
