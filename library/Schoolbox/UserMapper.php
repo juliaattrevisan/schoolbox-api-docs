@@ -239,7 +239,10 @@ class UserMapper extends Mapper
      */
     public function blockAlaressUserDeletion(User $user): bool
     {
-        return $user->getUsername() !== self::USERNAME_ALARESS_ADMIN;
+        if ($user->getUsername() === self::USERNAME_ALARESS_ADMIN) {
+            throw new UnexpectedValueException(sprintf('The %s user may not be deleted', self::USERNAME_ALARESS_ADMIN));
+        }
+        return true;
     }
 
 
