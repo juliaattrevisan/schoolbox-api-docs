@@ -58,11 +58,24 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
     $instance = $cim->findByInstanceId($_POST['componentID']);
 
     $ccm    = Component_ConfigMapper::getInstance();
-    $config = new Component_Config();
-    $config
-        ->setInstanceId($instance->getId())
-        ->setConfigDefinitionId($instance->getConfig('textbox')->getBy('key', 'textbox')->getId())
-        ->setValue($textbox->getId());
+
+    /* Update config
+     */
+    $componentConfigDefinitionId = $instance->getConfig()->getBy('key', 'textbox')->getId();
+
+    try {
+        $config = $ccm->findOneByColumnList([
+            'component_instance_id'          => $instance->getId(),
+            'component_config_definition_id' => $componentConfigDefinitionId
+        ]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        $config = (new Component_Config())
+            ->setInstanceId($instance->getId())
+            ->setConfigDefinitionId($componentConfigDefinitionId);
+    }
+
+    $config->setValue($textbox->getId());
+
     $ccm->save($config);
 
     SitePage::localRedir('/homepage/' . $_POST['originID']);
