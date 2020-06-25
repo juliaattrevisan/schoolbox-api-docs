@@ -9,6 +9,7 @@
 //rather than just octet stream
 
 //includes
+use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Error\Mapper;
@@ -21,9 +22,9 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
+new SitePage;
 
 if (is_numeric($_GET['id'])) {
-    $page        = new SitePage;
     $access      = Access::getInstance();
     $fileHandler = false;
     $fileMapper  = Schoolbox\Resource\File\Mapper::getInstance();

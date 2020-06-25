@@ -8,12 +8,13 @@
  */
 
 use League\Flysystem;
+use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel = new Kernel();
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
