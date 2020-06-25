@@ -240,9 +240,9 @@ class IndicatorUsage
          */
         if ($useValueRanges) {
             if ($direction === self::ORDER_DESCENDING) {
-                $specialDescriptor = $this->descriptors->last();
+                $specialDescriptor = $temp[\count($temp)-1];
             } else {
-                $specialDescriptor = $this->descriptors->first();
+                $specialDescriptor = $temp[0];
             }
 
             /* Shank it in. Though, this changes behaviour for Everyone and Everything using mark ranges.
