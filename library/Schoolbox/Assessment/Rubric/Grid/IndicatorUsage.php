@@ -31,6 +31,14 @@ class IndicatorUsage
      */
     private const MARK_RANGE_INCREMENT = 1;
 
+
+    /**
+     * Lowest value in a mark range for specific elements of the descriptor set
+     * Used to support IB International Baccalaureate metrics SA-7628
+     */
+    private const MIN_VALUE = 1;
+
+
     /**
      * @var Indicator
      */
@@ -219,6 +227,28 @@ class IndicatorUsage
 
             if ($direction === self::ORDER_DESCENDING) {
                 $descriptor->setDirectionDescending();
+            }
+        }
+
+        /* Support IB International Baccalaureate metrics
+         *
+         * Last element in a set of descending descriptors has a minimum value of 1 unless that descriptor has
+         * null value or its maximum value is 0.
+         *
+         * First element in a set of ascending descriptors has a minimum value of 1 unless that descriptor has
+         * null value or its maximum value is 0.
+         */
+        if ($useValueRanges && \count($temp)) {
+            if ($direction === self::ORDER_DESCENDING) {
+                $specialDescriptor = $temp[\count($temp)-1];
+            } else {
+                $specialDescriptor = $temp[0];
+            }
+
+            /* Shank it in. Though, this changes behaviour for Everyone and Everything using mark ranges.
+             */
+            if ($specialDescriptor->getMaxValue() > 0) {
+                $specialDescriptor->setMinValue(self::MIN_VALUE);
             }
         }
     }
