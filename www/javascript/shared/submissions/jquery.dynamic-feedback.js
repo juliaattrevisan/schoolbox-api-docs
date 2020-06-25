@@ -145,7 +145,7 @@
 
             /* Translate Enter key to blur
              */
-            $.each($('[data-mark-input'), function(index, element) {
+            $.each($('[data-mark-input]'), function(index, element) {
                 $(element).on('keydown', function(event) {
                     if (event.which == 13) {
                         event.preventDefault();
