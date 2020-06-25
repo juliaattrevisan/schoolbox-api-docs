@@ -58,7 +58,7 @@
         },
         data() {
             return {
-                event: {},
+                event: {}
             }
         },
         beforeMount() {
@@ -143,7 +143,11 @@
 
                         /* Remaining attendee places
                          */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees
+                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
+
+                        /* Your current status
+                         */
+                        status: data?.attendance?.attendanceStatus
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -207,37 +211,47 @@
                     //     canModify: true
                     // });
 
-                    this.jQuery.fn.rsvp({
-                        rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                        isInvited: attendanceStatus !== null ? 'true' : 'false',
-                        onUpdate: function(config, responseText) {
-                            config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
-
-                            /* Inspect the responseText payload to evaluate current status
-                             */
-                            if (responseText.isInvited) {
-                                switch (responseText.guests[responseText.user.id].status) {
-                                    case ATTENDANCE_STATUS_ACCEPTED:
-                                        config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
-                                        break;
-
-                                    case ATTENDANCE_STATUS_DECLINED:
-                                        config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                            }
-
-                            /* I am disgusted that this was a way of doing it
-                             */
-                            eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
-                            eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
-
-                            self.event.setExtendedProp('data', eventExtendedProps.data);
-                        }
-                    });
+                    //
+                    // this.jQuery.fn.rsvp({
+                    //     rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
+                    //     isInvited: attendanceStatus !== null ? 'true' : 'false',
+                    //     onUpdate: function(config, responseText) {
+                    //         config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
+                    //
+                    //         /* Inspect the responseText payload to evaluate current status
+                    //          */
+                    //         if (responseText.isInvited) {
+                    //             switch (responseText.guests[responseText.user.id].status) {
+                    //                 case ATTENDANCE_STATUS_ACCEPTED:
+                    //                     config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
+                    //
+                    //                     console.log(config.rsvpAttendanceForm.attr('id'), config.rsvpAttendanceForm.find('[data-rsvp="accept"]'));
+                    //                     break;
+                    //
+                    //                 case ATTENDANCE_STATUS_DECLINED:
+                    //                     config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
+                    //
+                    //                     console.log(config.rsvpAttendanceForm.attr('id'), config.rsvpAttendanceForm.find('[data-rsvp="decline"]'));
+                    //                     break;
+                    //
+                    //                 default:
+                    //                     break;
+                    //             }
+                    //         }
+                    //
+                    //         /* I am disgusted that this was a way of doing it
+                    //          */
+                    //          eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
+                    //          eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
+                    //
+                    //         console.log(self.event);
+                    //
+                    //         self.event.title ='mog';
+                    //
+                    //         console.log(self.event);
+                    //         // self.event.setExtendedProp('data', eventExtendedProps.data);
+                    //     }
+                    // });
                 });
             },
 
@@ -255,6 +269,51 @@
             },
 
             /**
+             * Accept an invitation
+             */
+            rsvpAccept() {
+                let self = this;
+
+                let request = {
+                    url: self.rsvpAcceptPath,
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                axios.request(request)
+                       .then(function (response) {
+                           self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_ACCEPTED;
+
+                           /* Update data with the result from async request
+                            */
+                           self.event.setExtendedProp('data', self.event.extendedProps.data);
+                       });
+            },
+
+            /**
+             * Decline an invitation
+             */
+            rsvpDecline() {
+                let self = this;
+
+                let request = {
+                    url: self.rsvpDeclinePath,
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                axios.request(request)
+                        .then(function (response) {
+                            self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_DECLINED;
+
+                            /* Update data with the result from async request
+                             */
+                            self.event.setExtendedProp('data', self.event.extendedProps.data);
+                        });
+            },
+
+
+            /**
              * Update whether the form can be submitted.
              *
              * It can be submitted if the title contains at least one non-space
@@ -263,6 +322,7 @@
             updateFormSubmittable() {
                 this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
             },
+
 
             /**
              * Persist changes to the event.
@@ -671,12 +731,12 @@
                     <section>
                         <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
+                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
+                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
                             </span>
-                        </span>
+-                        </span>
 
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
