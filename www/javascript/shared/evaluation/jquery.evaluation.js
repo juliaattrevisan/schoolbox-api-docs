@@ -118,7 +118,9 @@
                  * and hide that Saving box
                  */
                 if (!errors) {
-                    location.href = href;
+                    if (href.length > 0) {
+                        location.href = href;
+                    }
                 }
                 else {
                     // Scroll to first visible element with an error

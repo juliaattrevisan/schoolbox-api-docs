@@ -44,6 +44,9 @@
 				config.element.countdown(endTime)
 					.on('update.countdown', function(event) {
 						$(this).html(event.strftime('%H : %M : %S'));
+						if (event.offset.seconds === 2 && event.offset.minutes === 0 && event.offset.hours === 0) {
+                            $.fn.evaluation.saveAll('');
+                        }
 					})
 					.on('finish.countdown', function() {
 						window.location = config.endUrl;
