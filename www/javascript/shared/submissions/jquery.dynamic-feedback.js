@@ -142,6 +142,18 @@
                     timeoutUpdate.apply(kamiViewport);
                 }
             });
+
+            /* Translate Enter key to blur
+             */
+            $.each($('[data-mark-input]'), function(index, element) {
+                $(element).on('keydown', function(event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+
+                        $(element).blur();
+                    }
+                });
+            });
         }
 
 
