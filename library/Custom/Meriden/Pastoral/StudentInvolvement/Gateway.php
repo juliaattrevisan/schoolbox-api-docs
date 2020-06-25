@@ -31,7 +31,7 @@ class Gateway
     /**
      * Subjects excluded from a student's list of subjects.
      */
-    private const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
+    private const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0103'];
 
     private const ACTIVITY_TYPE_AWARD = 'C';
     private const ACTIVITY_TYPE_COCURRICULAR = 'B';
