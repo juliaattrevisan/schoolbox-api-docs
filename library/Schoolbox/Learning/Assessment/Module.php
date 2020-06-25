@@ -119,6 +119,7 @@ class Module extends BaseModule
             $isSuper,
             new Rule\All(
                 $canWrite,
+                new AssessmentNotDeleted(),
                 new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
@@ -142,15 +143,15 @@ class Module extends BaseModule
 
         $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,         $preloadAssessment);
         $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,         $preloadAssessment); // a || c
-        $this->register('POST',  "$assWeight",                       'updateWeight',             $canModify,         $preloadAssessment); // a || c
-        $this->register('POST',  "$assVisibility",                   'updateVisibility',         $canModify,         $preloadAssessment); // a || c
+        $this->register('POST',  "$assWeight",                       'updateWeight',             $canModify,        $preloadAssessment); // a || c
+        $this->register('POST',  "$assVisibility",                   'updateVisibility',         $canModify,        $preloadAssessment); // a || c
         $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,         $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessment); // a || c
         $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,        $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/status",                 'getStatus',                $canViewStatus,    $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/overview",               'getOverview',              $canWrite,         $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canWrite,         $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,         $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview",               'getOverview',              $canViewStatus,    $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canViewStatus,    $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canViewStatus,    $preloadAssessment); // a || c
 
         $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,   $preloadParticipant); // s || p
         $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,        $preloadParticipant); // p
