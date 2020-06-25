@@ -633,7 +633,7 @@ class SitePage extends Page
         try {
             $this->getDi()->get('webFactory');
             throw new Unauthenticated();
-        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+        } catch (\Aura\Di\Exception\ServiceNotFound|RuntimeException $e) {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
                 if ($parts['path'] != '/') {
