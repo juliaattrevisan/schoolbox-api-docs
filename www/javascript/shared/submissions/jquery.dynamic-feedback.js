@@ -147,7 +147,7 @@
              */
             $.each($('[data-mark-input]'), function(index, element) {
                 $(element).on('keydown', function(event) {
-                    if (event.which == 13) {
+                    if (event.keyCode === 13) {
                         event.preventDefault();
 
                         $(element).blur();
