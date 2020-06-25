@@ -312,7 +312,7 @@ class IndicatorUsageTest extends TestCase
         $indicatorUsage5->getDescriptors()[$level3->getId()] = $descriptor3;
 
         yield 'Ascending skip-null-start null' => [$indicatorUsage5, $level1->getId(), null, null];
-        yield 'Ascending skip-null-start 5'    => [$indicatorUsage5, $level2->getId(), 5, 5];
+        yield 'Ascending skip-null-start 5'    => [$indicatorUsage5, $level2->getId(), 1, 5];
         yield 'Ascending skip-null-start 10'   => [$indicatorUsage5, $level3->getId(), 6, 10];
 
 
