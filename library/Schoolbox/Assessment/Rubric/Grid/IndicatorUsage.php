@@ -238,7 +238,7 @@ class IndicatorUsage
          * First element in a set of ascending descriptors has a minimum value of 1 unless that descriptor has
          * null value or its maximum value is 0.
          */
-        if ($useValueRanges) {
+        if ($useValueRanges && \count($temp)) {
             if ($direction === self::ORDER_DESCENDING) {
                 $specialDescriptor = $temp[\count($temp)-1];
             } else {
