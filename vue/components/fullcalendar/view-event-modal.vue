@@ -283,6 +283,8 @@
                 axios.request(request)
                        .then(function (response) {
                            self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_ACCEPTED;
+                           self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
+                           self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
 
                            /* Update data with the result from async request
                             */
@@ -305,6 +307,8 @@
                 axios.request(request)
                         .then(function (response) {
                             self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_DECLINED;
+                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
+                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
 
                             /* Update data with the result from async request
                              */
