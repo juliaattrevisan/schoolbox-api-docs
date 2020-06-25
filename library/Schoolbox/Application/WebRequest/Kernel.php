@@ -126,7 +126,42 @@ class Kernel extends WebKernelAbstract
                 $this->outputSitepageContent($_GET['page'] ?? null);
             }
         } catch (Unauthenticated $e) {
-            $this->redirectToLogin($path, $e);
+            // Unauthenticated response - redirect to a login page.
+            // Preserve GET params that aren't "page" or "samlAuth", so the user
+            // can get redirected back to what they requested when they log in.
+            /** @var Request $request */
+            $request  = $this->di->get('webFactory')->newRequest();
+            $uri      = new Uri($path);
+            $query    = [];
+            foreach ($request->query as $key => $value) {
+                if (!in_array($key, ['page', 'samlAuth'])) {
+                    $query[$key] = $value;
+                }
+            }
+            $uri->setQuery($query);
+
+            // Start constructing a response
+            /** @var Response $response */
+            $response = $this->di->get('webFactory')->newResponse();
+            if ((new IsXhr())->isSatisfiedBy($request)) {
+                // Fabricate an AJAX response. Don't redirect
+                // TODO replace this with standard outputError (ApiProblem style payload)
+                $response->status->setCode(401);
+                $response->content->set([
+                    'format' => 'json',
+                    'data'   => ['error' => 'Unauthenticated'],
+                ]);
+                $output = $this->di->get("webOutput:json");
+            } else {
+                /** @var \Alaress\Session\Session $session */
+                $session = $this->di->get('session');
+                $session
+                    ->getSegment(LoginController::class)
+                    ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
+                $output = $this->di->get("webOutput:noContent");
+                $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
+            }
+            $output->output($response);
 
         } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
@@ -355,55 +390,6 @@ class Kernel extends WebKernelAbstract
         $sitePage = $this->di->get('sitePage');
         $sitePage->loadContent($pageName);
         $sitePage->outputPage();
-    }
-
-
-    /**
-     * Redirects to login
-     * @param $path
-     * @param $e
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode
-     */
-    public function redirectToLogin($path, $e): void
-    {
-        // Unauthenticated response - redirect to a login page.
-        // Preserve GET params that aren't "page" or "samlAuth", so the user
-        // can get redirected back to what they requested when they log in.
-        /** @var Request $request */
-        $request = $this->di->get('webFactory')->newRequest();
-        $uri     = new Uri($path);
-        $query   = [];
-        foreach ($request->query as $key => $value) {
-            if (!in_array($key, ['page', 'samlAuth'])) {
-                $query[$key] = $value;
-            }
-        }
-        $uri->setQuery($query);
-
-        // Start constructing a response
-        /** @var Response $response */
-        $response = $this->di->get('webFactory')->newResponse();
-        if ((new IsXhr())->isSatisfiedBy($request)) {
-            // Fabricate an AJAX response. Don't redirect
-            // TODO replace this with standard outputError (ApiProblem style payload)
-            $response->status->setCode(401);
-            $response->content->set([
-                'format' => 'json',
-                'data'   => ['error' => 'Unauthenticated'],
-            ]);
-            $output = $this->di->get("webOutput:json");
-        } else {
-            /** @var \Alaress\Session\Session $session */
-            $session = $this->di->get('session');
-            $session
-                ->getSegment(LoginController::class)
-                ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
-            $output = $this->di->get("webOutput:noContent");
-            $response->redirect->to($this->di->get('router')->generate('login.getLogin') . '?page=' . urlencode($uri));
-        }
-        $output->output($response);
-        exit;
     }
 
 

@@ -11,7 +11,7 @@
 //includes
 use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
-use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
@@ -22,12 +22,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
-try {
-    $page = new SitePage;
-} catch (Unauthenticated $e) {
-    $parts = parse_url($_SERVER['REQUEST_URI']);
-    $kernel->redirectToLogin($parts['path'], $ex);
-}
+new SitePage;
 
 if (is_numeric($_GET['id'])) {
     $access      = Access::getInstance();

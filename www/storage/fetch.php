@@ -7,15 +7,15 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
-use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
+
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $page = new SitePage;
@@ -56,9 +56,8 @@ try {
         fpassthru($resource->readStream());
         exit;
     }
-} catch (Unauthenticated $ex) {
-    $parts = parse_url($_SERVER['REQUEST_URI']);
-    $kernel->redirectToLogin($parts['path'], $ex);
-} catch (Exception $e) {
-    error(Error\Mapper::ERROR_FILE_NOT_FOUND);
 }
+catch (Exception $ex) {}
+//
+// File not found error
+error(Error\Mapper::ERROR_FILE_NOT_FOUND);

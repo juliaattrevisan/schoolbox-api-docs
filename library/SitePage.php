@@ -630,7 +630,20 @@ class SitePage extends Page
      */
     public function goLoginPage()
     {
-        throw new Unauthenticated();
+        try {
+            $this->getDi()->get('webFactory');
+            throw new Unauthenticated();
+        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+            $parts = parse_url($_SERVER['REQUEST_URI']);
+            if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
+                if ($parts['path'] != '/') {
+                    $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
+                } else {
+                    $this->localRedir('/login/');
+                }
+            }
+            exit;
+        }
     }
 
     /**
