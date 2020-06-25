@@ -187,22 +187,22 @@ class UserMapper extends Mapper
      * - change of username
      * - soft-deletion via an update
      *
-     * @param User $current
+     * @param User $user
      * @return bool
      * @throws UnexpectedValueException
      * @throws \PDOException
      */
-    public function undoAlaressUserModification(User $current): bool
+    public function undoAlaressUserModification(User $user): bool
     {
-        if ($current->getId()) {
+        if ($user->getId()) {
             // Unfortunately pre-saves do not have access to previous state.
             $previous = $this->findColumnsByPredicates(
                 ['username'],
-                $this->getPredicateBuilder()->equals('id', $current->getId())
+                $this->getPredicateBuilder()->equals('id', $user->getId())
             );
             $previousUsername = $previous[0]['username'] ?? null;
             if ($previousUsername === self::USERNAME_ALARESS_ADMIN) {
-                $current
+                $user
                     ->setDeletedAt(null)
                     ->setUsername(self::USERNAME_ALARESS_ADMIN)
                     ->setSuperuser(true);
