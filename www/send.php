@@ -9,8 +9,9 @@
 //rather than just octet stream
 
 //includes
+use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
-use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
@@ -21,13 +22,14 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel();
-$user = $_SESSION['user'];
-if (!$user) {
-    SitePage::localRedir('/');
+try {
+    $page = new SitePage;
+} catch (Unauthenticated $e) {
+    $parts = parse_url($_SERVER['REQUEST_URI']);
+    $kernel->redirectToLogin($parts['path'], $ex);
 }
 
 if (is_numeric($_GET['id'])) {
-    $page        = new SitePage;
     $access      = Access::getInstance();
     $fileHandler = false;
     $fileMapper  = Schoolbox\Resource\File\Mapper::getInstance();
