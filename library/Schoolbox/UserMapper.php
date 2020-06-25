@@ -37,7 +37,7 @@ class UserMapper extends Mapper
 {
 
     // The username of the special 'Alaress Admin' user used by Schoolbox staff
-    private const USERNAME_ALARESS_ADMIN = 'alaress';
+    public const USERNAME_ALARESS_ADMIN = 'alaress';
 
     /**
      * If in use (ie not null), this should mirror all non-softDeleted users in DB.
