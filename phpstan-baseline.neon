@@ -406,11 +406,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
 
 		-
-			message: "#^Return typehint of method Calendar_Api_EventType_Event_Vcal_Default\\:\\:buildCalendarEventFromVevent\\(\\) has invalid type Calendar_Event_Type_Day\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
-
-		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$CATEGORIES\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Event/Vcal/Default.php
