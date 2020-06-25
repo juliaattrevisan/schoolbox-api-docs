@@ -156,8 +156,8 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'undoAlaressUserModification']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
@@ -180,52 +180,33 @@ class UserMapper extends Mapper
 
 
     /**
-     * Post-Save callback to ensure the Alaress Admin superuser account is not broken
+     * Pre-save callback to ensure the Alaress Admin superuser account is not broken
      *
      * Undoes:
      * - removal of superuser perms
      * - change of username
      * - soft-deletion via an update
      *
-     * @param User      $current
-     * @param User|null $previous
+     * @param User $current
      * @return bool
-     * @throws Mapper\Exception
      * @throws UnexpectedValueException
      * @throws \PDOException
      */
-    public function undoAlaressUserModification(User $current, User $previous = null): bool
+    public function undoAlaressUserModification(User $current): bool
     {
-        // Was this a create, an update to a non-alaress user?
-        if (!$previous || $previous->getUsername() !== self::USERNAME_ALARESS_ADMIN) {
-            // Both these actions are fine
-            return true;
-        }
-        $alaressUser = $current;
-        $changed     = false;
-        // Was the user logically deleted via an update?
-        if ($alaressUser->isDeleted()) {
-            $alaressUser->setDeletedAt();
-            $changed = true;
-        }
-        // Was the username changed?
-        if ($alaressUser->getUsername() !== self::USERNAME_ALARESS_ADMIN) {
-            $alaressUser->setUsername(self::USERNAME_ALARESS_ADMIN);
-            $changed = true;
-        }
-        // Was superuser status removed?
-        if (!$alaressUser->isSuperuser()) {
-            $alaressUser->setSuperuser(true);
-            $changed = true;
-        }
-        // Was account disabled?
-        if (!$alaressUser->getEnabled()) {
-            $alaressUser->setEnabled(true);
-            $changed = true;
-        }
-
-        if ($changed) {
-            $this->save($alaressUser);
+        if ($current->getId()) {
+            // Unfortunately pre-saves do not have access to previous state.
+            $previous = $this->findColumnsByPredicates(
+                ['username'],
+                $this->getPredicateBuilder()->equals('id', $current->getId())
+            );
+            $previousUsername = $previous[0]['username'] ?? null;
+            if ($previousUsername === self::USERNAME_ALARESS_ADMIN) {
+                $current
+                    ->setDeletedAt(null)
+                    ->setUsername(self::USERNAME_ALARESS_ADMIN)
+                    ->setSuperuser(true);
+            }
         }
         return true;
     }
