@@ -6,7 +6,6 @@
  */
 declare(strict_types=1);
 
-use Alaress\Web\Router\RouterFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 
@@ -22,7 +21,6 @@ class External_Tass_AttendanceLink implements External_AttendanceLinkInterface
      */
     private $isStaff;
     private $prodMenu;
-    private $router;
 
     /**
      * @inheritDoc
@@ -57,13 +55,9 @@ class External_Tass_AttendanceLink implements External_AttendanceLinkInterface
             'daycode'     => $dayNumber,
         ];
 
-        try {
-            $deepLink = urlencode(http_build_query($deepLinkParams));
-            return "{$this->router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}&prod_menu={$this->prodMenu}";
-        } catch (\Throwable $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-            return '';
-        }
+        $deepLink = urlencode(http_build_query($deepLinkParams));
+//      return "{$this->router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}&prod_menu={$this->prodMenu}";
+        return "/modules/tassportal/teacherkiosk?deep_link={$deepLink}&prod_menu={$this->prodMenu}";
     }
 
     /**
@@ -83,7 +77,6 @@ class External_Tass_AttendanceLink implements External_AttendanceLinkInterface
         $this->externalAttendanceDays = $config->get('external_attendance_days');
         $this->prodMenu               = $config->get('external_tass_attendance_show_prod_menu') ? 'Y' : 'N';
         $this->isStaff                = $isStaff;
-        $this->router                 = (new RouterFactory())->newInstance();
     }
 
     /**
