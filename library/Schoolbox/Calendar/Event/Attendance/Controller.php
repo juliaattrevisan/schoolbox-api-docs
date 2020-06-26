@@ -194,7 +194,7 @@ class Controller extends Base
             if ($event->getMaxAttendees() !== null) {
                 $numGuests = $this->attendanceMapper->countByColumnList([
                     'event_id' => $event->getId(),
-                    'status' => [Model::STATUS_PENDING, Model::STATUS_ACCEPTED]
+                    'status' => [Model::STATUS_ACCEPTED]
                 ]);
 
                 if ($numGuests >= $event->getMaxAttendees()) {

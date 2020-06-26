@@ -87,7 +87,7 @@ class PayloadAnalysis
      */
     public function getNumAttendees(): int
     {
-        return $this->getNumPending() + $this->getNumAccepted();
+        return $this->getNumAccepted();
     }
 
 
