@@ -147,6 +147,7 @@
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
+                        target: data?.classAttendance?.target,
                     },
                     task: {
                         isTask: this.helper.isTask(event),
@@ -688,7 +689,8 @@
                         </span>
                         <span v-if="eventExtendedProps.classAttendance.url">
                             <a class="button"
-                               :href="eventExtendedProps.classAttendance.url">Mark Attendance</a>
+                               :href="eventExtendedProps.classAttendance.url"
+                               :target="eventExtendedProps.classAttendance.target">Mark Attendance</a>
                         </span>
                         <span v-if="eventExtendedProps.links.modify">
                             <a class="button"

@@ -13,22 +13,6 @@ class Javascript extends Base
 {
     public function render(): string
     {
-        // Output attendance URL button
-        $attendanceUrl = null;
-        if ($this->showAttendanceLink()) {
-            $encodedClass  = urlencode(urlencode(urlencode($this->getEvent()->getCode())));
-            $classLink     = $this->getEvent()->getCampus() ? $this->getEvent()->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
-            $attendanceUrl = sprintf(
-                "/modules/attendance/modify/%s/%s/%s/%s/%s",
-                $classLink,
-                $this->getEvent()->getStartTime()->getDatabaseDate(),
-                implode(',', $this->getEvent()->getAttendancePeriods()),
-                $this->getEvent()->getTimetableCode(),
-                $this->getEvent()->getFileType()
-            );
-        }
-
-
         /* Congeal all that stuff
          */
         $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
@@ -98,7 +82,8 @@ class Javascript extends Base
                     'visible' => $this->getEvent()->getPeriodCancelled() ? 'strike' : '',
                 ],
                 'classAttendance' => [
-                    'url' => $attendanceUrl,
+                    'url'    => $this->getEvent()->getAttendanceLink(),
+                    'target' => $this->getEvent()->getAttendanceLinkTarget(),
                 ],
             ],
         ];

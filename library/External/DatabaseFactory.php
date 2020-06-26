@@ -82,6 +82,20 @@ class External_DatabaseFactory
         return $this->buildConnector('Attendance', $databaseName);
     }
 
+    /**
+     * Builds an attendance link connector.
+     *
+     * @param string $databaseName
+     * @return External_AttendanceLink
+     * @throws LogicException If cannot build connector
+     */
+    public function buildAttendanceLinkConnector(string $databaseName = '')
+    {
+        if (Config::get('external_attendance')) {
+            return $this->buildConnector('AttendanceLink', $databaseName);
+        }
+        return $this->buildConnector('AttendanceLink', 'Offline');
+    }
 
     /**
      * Builds a class connector.

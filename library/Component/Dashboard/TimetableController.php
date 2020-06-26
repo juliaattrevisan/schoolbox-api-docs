@@ -5,7 +5,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Router\Router;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -64,6 +63,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->externalTimetable = $externalTimetable;
     }
 
+    /** @var External_AttendanceLink */
+    private $externalAttendanceLink;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -81,6 +82,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $timetableHandler = $this->externalTimetable;
+        $this->externalAttendanceLink = new External_AttendanceLink();
+        $this->externalAttendanceLink->init($this->getConfigLoader(), $this->getUser()->getRole()->isStaff());
 
         // Get current day and period. Don't output a timetable if it has the same code as another that has already been added
 
@@ -169,89 +172,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
 
     /**
-     * Returns a link the user can follow to mark attendance in their SIS
-     *
-     * @param array               $class
-     * @param Alaress_Date_Format $now
-     * @param array               $period
-     * @param array               $campusList
-     * @param int                 $campusId
-     * @return string
-     */
-    private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
-    {
-        switch ($this->getConfigLoader()->get('external_type')) {
-            case 'synergetic':
-                if (!$class['AttendanceEnabled'] || empty($class['AttendancePeriods'])) {
-                    return '';
-                }
-                $encodedClass = urlencode(urlencode(urlencode($class['code'])));
-                $periodLink   = implode(',', $class['AttendancePeriods']);
-                $classLink    = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
-                return "/modules/attendance/modify/{$classLink}/{$now->getDatabaseDate()}/{$periodLink}/{$campusList[$campusId]->getExtTimetableCode()}/{$class['FileType']}";
-            case 'tass':
-                /** @noinspection PhpUnusedLocalVariableInspection */
-                [$year, $subject, $class] = explode('-', $class['code']);
-                [$cmpCode, $timetableCode] = explode('-', $campusList[$campusId]->getExtTimetableCode());
-
-                /* Example given by BTAC = [
-                        "target":      "teacher.rollcall",
-                        "ttid":        "23",
-                        "yeargroups":  "10",
-                        "classes":     "1",
-                        "tchcode":     "VPE",
-                        "subjectcode": "1111",
-                        "date":        "01/05/2018",
-                        "periodcode":  "3",
-                        "daycode":     "7"
-                    ]
-                 */
-                $deepLinkParams = [
-                    'target'      => 'teacher.rollcall',
-                    'ttid'        => $timetableCode,
-                    'yeargroups'  => $year,
-                    'classes'     => $class,
-                    'tchcode'     => $this->getUser()->getExternalId(),
-                    'subjectcode' => $subject,
-                    'date'        => $now->getUsingFormat('d/m/Y'),
-                    'periodcode'  => $period['periodNumber'],
-                    'daycode'     => $this->dayNumber[$campusId],
-                ];
-
-                try {
-                    /** @var Router $router */
-                    $router   = $this->getSitePage()->getDi()->get('router');
-                    $deepLink = urlencode(http_build_query($deepLinkParams));
-                    $prodMenu = $this->getConfigLoader()->get('external_tass_attendance_show_prod_menu') ? 'Y' : 'N';
-                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}&prod_menu={$prodMenu}";
-                } catch (\Throwable $e) {
-                    \trigger_error($e->getMessage(), E_USER_WARNING);
-                    return '';
-                }
-            default:
-                return '';
-        }
-    }
-
-
-    /**
-     * Returns how the attendance link should be opened.
-     *
-     * @return string One of ['_self', '_blank']
-     */
-    private function getAttendanceLinkTarget(): string
-    {
-        switch ($this->getConfigLoader()->get('external_type')) {
-            case 'tass':
-                return '_blank';
-            case 'synergetic':
-            default:
-                return '_self';
-        }
-    }
-
-
-    /**
      * Builds twig context data for a single timetable
      *
      * @param Campus[]            $campusList
@@ -276,7 +196,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             if (1 !== (int)$period['periodSequence']) {
                 continue;
             }
-            $timetableContext['periods'][] = $this->buildPeriodContext($campusList, $campusId, $currentPeriod, $period, $now);
+            $timetableContext['periods'][] = $this->buildPeriodContext($campusId, $currentPeriod, $period, $now);
         }
         return $timetableContext;
     }
@@ -285,14 +205,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /**
      * Build twig data for a single period in a timetable
      *
-     * @param array               $campusList
      * @param int                 $campusId
      * @param null|array          $currentPeriod NULL if there is no current period for the campus at this time.
      * @param string[][][]        $period
      * @param Alaress_Date_Format $now
      * @return array
      */
-    private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
+    private function buildPeriodContext(int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
         // Always highlight the current cell, regardless of whether it contains any classes
          $isCurrent = $currentPeriod
@@ -308,7 +227,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         if (is_array($period['class'])) {
             foreach ($period['class'] as $class) {
-                $periodContext['classes'][] = $this->buildClassContext($campusList, $campusId, $period, $now, $class);
+                $periodContext['classes'][] = $this->buildClassContext($campusId, $period, $now, $class);
             }
         }
         return $periodContext;
@@ -318,14 +237,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /**
      * Builds data for a single class suitable for sending off to twig
      *
-     * @param array               $campusList
      * @param int                 $campusId
      * @param array               $period
      * @param Alaress_Date_Format $now
      * @param array               $class
      * @return array
      */
-    private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
+    private function buildClassContext(int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
         $classDescription = $class['description'] ?? '';
         $classLink = '';
@@ -348,12 +266,21 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         ];
 
         // Optionally link to Attendance Records
-        if ('' !== $class['code'] && $this->getConfigLoader()->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
-
+        if ($this->externalAttendanceLink->isEnabled($class['code'], $class['AttendanceEnabled'], $now)) {
             $classContext['attendance'] = [
-                'link'    => $this->getAttendanceLink($class, $now, $period, $campusList, $campusId),
-                'marked'  => (bool)$class['AttendanceMarked'],
-                'target'  => $this->getAttendanceLinkTarget(),
+                'link'   => $this->externalAttendanceLink->getAttendanceLink(
+                    $class['code'],
+                    $class['campus'],
+                    $class['FileType'],
+                    $class['AttendancePeriods'] ?? [],
+                    $period['periodNumber'],
+                    $now,
+                    $this->getUser()->getCampusCollection(),
+                    $campusId,
+                    $this->getUser()->getExternalId(),
+                    $this->dayNumber[$campusId]),
+                'marked' => (bool)$class['AttendanceMarked'],
+                'target' => $this->externalAttendanceLink->getAttendanceLinkTarget(),
             ];
         }
         return $classContext;
