@@ -13,7 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\Event\Attendance\ListPayload;
+use Schoolbox\Calendar\Event\Attendance\Payload;
 use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
@@ -146,7 +146,7 @@ class Controller extends Base
             $attendanceStatus = null;
         }
 
-        $payload = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+        $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/event.twig', [
             'event' => $event,
@@ -165,7 +165,7 @@ class Controller extends Base
              * Current attendee info and your current rsvp status
              */
             'attendance' => [
-                'guests' => $payload,
+                'payload' => $payload,
                 'status' => [
                     'current' => Attendance\Model::CLASSES[$attendanceStatus],
                 ],

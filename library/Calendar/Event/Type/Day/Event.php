@@ -109,6 +109,13 @@ class Event extends EventBase
 
 
     /**
+     * Whether the current user is invited to attend an event
+     *
+     * @var int|null
+     */
+    protected $attendanceStatus;
+
+    /**
      * Can someone attend this event
      *
      * @return bool
@@ -409,6 +416,24 @@ class Event extends EventBase
     public function setNumAttendees(?int $numAttendees): EventInterface
     {
         $this->numAttendees = $numAttendees;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getAttendanceStatus(): ?int
+    {
+        return $this->attendanceStatus;
+    }
+
+    /**
+     * @param int|null $attendanceStatus
+     * @return $this
+     */
+    public function setAttendanceStatus(?int $attendanceStatus): EventInterface
+    {
+        $this->attendanceStatus = $attendanceStatus;
         return $this;
     }
 

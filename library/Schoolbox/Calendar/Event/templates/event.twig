@@ -42,23 +42,23 @@
         /* Attendance list modification
          */
         $.fn.attendance({
-            canModify: {{ attendance.guests.canModify ? 'true' : 'false' }}
+            canModify: {{ canModify ? 'true' : 'false' }}
         });
 
         /* Initial conditions
          */
-        const onList = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id}}') + '"]').length > 0;
+        const isInvited = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id }}') + '"]').length > 0;
 
         $.fn.rsvpToggle({
-            available: $('#rsvpAttendanceForm').attr('data-guests-available'),
-            onList: onList
+            available: {{ attendance.payload.attendees.available is null ? 'null' : attendance.payload.attendees.available }},
+            isInvited: isInvited
         });
 
         /* Apply listeners to RSVP buttons to post and reload
          * That'll reload with the most recent state of affairs
          */
         $.fn.rsvp({
-            onList: onList
+            isInvited: isInvited
         });
     });
 </script>

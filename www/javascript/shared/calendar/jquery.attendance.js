@@ -195,13 +195,13 @@
          */
         function onAfterAttendanceChange(responseText) {
             config.attendanceList.find('article').html(responseText.fragment);
-            config.available.html(responseText.available ? responseText.available : 'No');
+            config.available.html(responseText.attendees.available ? responseText.attendees.available : 'No');
 
-            toggleCreateAttendance(responseText.available);
+            toggleCreateAttendance(responseText.attendees.available);
 
             $.fn.rsvpToggle({
-                available: responseText.available,
-                onList: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
+                available: responseText.attendees.available,
+                isInvited: config.attendanceList.find('[data-guest="' + config.currentUserId + '"]').length
             });
         }
     }
@@ -223,14 +223,21 @@
 
         let config = init(options, $(this));
 
-        const onList = config.onList;
+        const isInvited = config.isInvited;
         const noLimit = config.available === undefined || config.available === null;
         const hasAvailablePlaces = config.available > 0;
 
-        if (onList || noLimit || hasAvailablePlaces) {
+        if (isInvited || noLimit || hasAvailablePlaces) {
             config.rsvpAttendanceForm.show();
         } else {
             config.rsvpAttendanceForm.hide();
+        }
+
+        /* If you were on the list, but you removed yourself,
+         * reset your button styles
+         */
+        if (!isInvited) {
+            config.rsvpAttendanceForm.find('[data-rsvp]').removeClass();
         }
 
         /**
@@ -254,7 +261,7 @@
 
                 /* Whether you're already invited
                  */
-                onList: false
+                isInvited: false
             };
 
             return $.extend(defaults, options);
@@ -276,12 +283,25 @@
          * That'll reload with the most recent state of affairs
          */
         $.each(config.rsvpAttendanceForm.find('[data-rsvp]'), function(index, element) {
-            $(element).on('click', function(event) {
+
+            /* Don't stack multiple listeners every time the plugin runs
+             */
+            if ($(element).attr('data-listening') !== undefined) {
+                return;
+            }
+
+            /* Set flag to know that we've been here and done this already
+             */
+            $(element).attr('data-listening', true);
+
+            /* The guts
+             */
+            $(element).on('click', function (event) {
                 event.preventDefault();
 
                 /* Special case: if you're not in the list and you're declining, exit early
                  */
-                if ($(this).attr('data-rsvp') === 'decline' && !config.onList) {
+                if ($(this).attr('data-rsvp') === 'decline' && !config.isInvited) {
                     return;
                 }
 
@@ -296,20 +316,21 @@
                     method: 'post',
                     dataType: 'json',
                     data: {},
-                    success: function(responseText) {
+                    success: function (responseText) {
                         config.toast.toastTimeout({
                             text: 'Invitation successfully updated',
                             css: 'success'
                         });
 
-                        if (config.reload) {
-                            window.location.reload();
-                        }
+                        config.onUpdate(config, responseText);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         let responseText = $.parseJSON(xhr.responseText)
 
-                        config.toast.toastTimeout({text: 'Unable to update invitation. ' + responseText.message, css: 'alert'});
+                        config.toast.toastTimeout({
+                            text: 'Unable to update invitation. ' + responseText.message,
+                            css: 'alert'
+                        });
                     }
                 });
             });
@@ -341,11 +362,15 @@
 
                 /* Whether you're already invited
                  */
-                onList: false,
+                isInvited: false,
 
-                /* Reload window.location.href when successfully updated rsvp
+                /* A callback after invitation was successfully updated
+                 * Applies to both accept and decline scenarios
+                 * By default, reloads
                  */
-                reload: true
+                onUpdate: function(config, responseText) {
+                    window.location.reload()
+                }
             };
 
             return $.extend(defaults, options);

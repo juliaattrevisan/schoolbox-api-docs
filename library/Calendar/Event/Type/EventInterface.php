@@ -253,4 +253,17 @@ interface EventInterface
      * @return $this
      */
     public function setNumAttendees(?int $numAttendees): EventInterface;
+
+
+    /**
+     * @return int|null
+     */
+    public function getAttendanceStatus(): ?int;
+
+
+    /**
+     * @param int|null $attendanceStatus
+     * @return $this
+     */
+    public function setAttendanceStatus(?int $attendanceStatus): EventInterface;
 }

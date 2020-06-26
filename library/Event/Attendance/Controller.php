@@ -260,11 +260,11 @@ class Event_Attendance_Controller extends Controller
                         $this->getPage()->parse('pending_attendee_block', 'pending_attendee', true);
 
                         $pendingAttendeeCount++;
-                    } elseif ($attendee['status'] == Event\Attendance\Model::STATUS_APPROVED) {
+                    } elseif ($attendee['status'] == Event\Attendance\Model::STATUS_ACCEPTED) {
                         $this->getPage()->parse('approved_attendee_block', 'approved_attendee', true);
 
                         $approvedAttendeeCount++;
-                    } elseif ($attendee['status'] == Event\Attendance\Model::STATUS_REJECTED) {
+                    } elseif ($attendee['status'] == Event\Attendance\Model::STATUS_DECLINED) {
                         $this->getPage()->parse('rejected_attendee_block', 'rejected_attendee', true);
 
                         $rejectedAttendeeCount++;
@@ -317,7 +317,7 @@ class Event_Attendance_Controller extends Controller
                 $attendance = $this->getCalendarHandler()->getAttendance($attendance['id']);
 
                 if (isset($data['approve'])) {
-                    $attendance['status'] = \Schoolbox\Calendar\Event\Attendance\Model::STATUS_APPROVED;
+                    $attendance['status'] = \Schoolbox\Calendar\Event\Attendance\Model::STATUS_ACCEPTED;
 
                     /* Check if Border Leave is enabled first, before doing this
                      */
@@ -325,7 +325,7 @@ class Event_Attendance_Controller extends Controller
                         $this->createLeaveRequest($event, $attendance);
                     }
                 } elseif (isset($data['reject'])) {
-                    $attendance['status'] = Event\Attendance\Model::STATUS_REJECTED;
+                    $attendance['status'] = Event\Attendance\Model::STATUS_DECLINED;
                 }
 
                 $this->getCalendarHandler()->updateAttendance($attendance);

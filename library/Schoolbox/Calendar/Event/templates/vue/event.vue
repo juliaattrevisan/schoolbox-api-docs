@@ -195,7 +195,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.guests.available">
+                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.payload.attendees.available">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
@@ -207,10 +207,10 @@
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.attendance.guests.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.attendance.guests.available != null">
-                                <span id="attendance-guests-available" :data-available="this.event.attendance.guests.available">
-                                    <template v-if="this.event.attendance.guests.available > 0">{{ this.event.attendance.guests.available }}</template>
+                        <div class="content" v-if="this.event.attendance.payload.attendees.available != null || this.event.canModify">
+                            <span class="meta" v-if="this.event.attendance.payload.attendees.available != null">
+                                <span id="attendance-guests-available" :data-available="this.event.attendance.payload.attendees.available">
+                                    <template v-if="this.event.attendance.payload.attendees.available > 0">{{ this.event.attendance.payload.attendees.available }}</template>
                                     <template v-else>No</template>
                                 </span> available place(s) remaining
                             </span>
@@ -220,7 +220,7 @@
                             </form>
                         </div>
 
-                        <article v-html="this.event.attendance.guests.fragment"></article>
+                        <article v-html="this.event.attendance.payload.fragment"></article>
                     </section>
                 </div>
             </div>

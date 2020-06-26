@@ -119,6 +119,8 @@
 
 // RSVP Buttons
 .rsvp {
+
+  // Enforce css specificity
   &.flex-list.buttons a {
     &.accepted {
       background-color: tint($success-color, 74%);
@@ -129,5 +131,15 @@
       background-color: tint($alert-color, 74%);
       color: $alert-color;
     }
+  }
+
+  // For the modal, the rsvp buttons are not in a flex-list element;
+  // they're in component actions style, which is different
+  .accepted {
+    color: $success-color;
+  }
+
+  .declined {
+    color: $alert-color;
   }
 }

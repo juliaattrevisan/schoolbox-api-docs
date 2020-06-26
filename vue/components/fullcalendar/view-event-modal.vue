@@ -12,9 +12,6 @@
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
 
-    const ATTENDANCE_ACTION_ADD = 'add';
-    const ATTENDANCE_ACTION_REMOVE = 'remove';
-
     /* Inline alteration of attendees on event modal
      */
     const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
@@ -24,6 +21,12 @@
     const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
     const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
+    /* RSVP Status consts synonymous with Attendance/Model consts
+     */
+    const ATTENDANCE_STATUS_PENDING = 1;
+    const ATTENDANCE_STATUS_ACCEPTED = 2;
+    const ATTENDANCE_STATUS_DECLINED = 3;
+
     export default {
         name: "view-event-modal",
         props: {
@@ -32,8 +35,6 @@
             eventModifyFormActionUrl: {},
             eventDeleteUrl: {},
             eventUpdateUrl: {},
-            attendanceListUrl: {},
-            attendanceToggleUrl: {},
             formatDisplayDate: {},
             formatDisplayTime: {},
             formatDisplayDatetime: {},
@@ -43,6 +44,17 @@
             MetaItem,
             MetaList,
             RevealModal
+        },
+        created() {
+
+            /* RSVP Status consts synonymous with Attendance/Model consts
+             *
+             * Expost consts in vue land
+             * https://stackoverflow.com/questions/42662144/how-could-i-use-const-in-vue-template
+             */
+            this.ATTENDANCE_STATUS_PENDING = ATTENDANCE_STATUS_PENDING;
+            this.ATTENDANCE_STATUS_ACCEPTED = ATTENDANCE_STATUS_ACCEPTED;
+            this.ATTENDANCE_STATUS_DECLINED = ATTENDANCE_STATUS_DECLINED;
         },
         data() {
             return {
@@ -131,22 +143,7 @@
 
                         /* Remaining attendee places
                          */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
-
-                        // Massage attendance data into something resembling usability
-                        isAttendable: data?.attendance?.icon,
-                        status: data?.attendance?.status,
-                        actions: {
-                            toggle: {
-                                isAvailable: Boolean(data?.attendance?.requestButton),
-                                href: this.attendanceToggleUrl,
-                                text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
-                            },
-                            list: {
-                                isAvailable: Boolean(data?.attendance?.listButton),
-                                href: this.attendanceListUrl + String(metadata?.eventId),
-                            },
-                        },
+                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -194,10 +191,12 @@
              * really odd behaviour occurs. Things about elements not existing or
              * certain javascript not executing are really cryptic to figure out
              *
-             * @param eventId
-             * @returns {boolean}
+             * @param eventId int
+             * @param attendanceStatus bool
              */
-            attendanceSelectize(eventId) {
+            jqueryPlugins(eventExtendedProps, eventId, attendanceStatus) {
+                let self = this;
+
                 this.$nextTick(() => {
 
                     // SA-10476
@@ -207,12 +206,37 @@
                     //     canModify: true
                     // });
 
-                    // SA-10475
-                    // this.jQuery.fn.rsvp({
-                    //     rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                    //     onList: false,
-                    //     reload: false
-                    // });
+                    this.jQuery.fn.rsvp({
+                        rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
+                        isInvited: attendanceStatus !== null ? 'true' : 'false',
+                        onUpdate: function(config, responseText) {
+                            config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
+
+                            /* Inspect the responseText payload to evaluate current status
+                             */
+                            if (responseText.isInvited) {
+                                switch (responseText.guests[responseText.user.id].status) {
+                                    case ATTENDANCE_STATUS_ACCEPTED:
+                                        config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
+                                        break;
+
+                                    case ATTENDANCE_STATUS_DECLINED:
+                                        config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            /* I am disgusted that this was a way of doing it
+                             */
+                            eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
+                            eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
+
+                            self.event.setExtendedProp('data', eventExtendedProps.data);
+                        }
+                    });
                 });
             },
 
@@ -286,8 +310,10 @@
 
                 /* Set up the selectize for adding more guests
                  */
-                if (this.event.extendedProps.data.meta.eventId !== undefined) {
-                    this.attendanceSelectize(this.event.extendedProps.data.meta.eventId);
+                const data = this.event.extendedProps.data;
+
+                if (data.meta.eventId !== undefined) {
+                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data.attendance.attendanceStatus);
                 }
             },
 
@@ -507,38 +533,6 @@
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
-
-            /**
-             * Toggle your attendance on/off for an event.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             */
-            toggleAttendance() {
-                let self      = this,
-                    eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                self.$refs.modal.close();
-                if (typeof eventData?.attendance === 'object') {
-                    let nextAction = eventData.attendance.nextAction,
-                        data = {
-                            status:      nextAction,
-                            'event[id]': self.eventExtendedProps.eventId,
-                        };
-
-                    axios
-                        .post(self.eventExtendedProps.attendance.actions.toggle.href, qs.stringify(data))
-                        .then(function () {
-                            eventData.attendance.nextAction = nextAction === ATTENDANCE_ACTION_ADD
-                                ? ATTENDANCE_ACTION_REMOVE
-                                : ATTENDANCE_ACTION_ADD
-                            ;
-                            eventData.attendance.status = nextAction === ATTENDANCE_ACTION_ADD
-                                ? 'Pending'
-                                : ''
-                            ;
-                            self.event.setExtendedProp('data', eventData);
-                        });
-                }
-            },
         },
     }
 </script>
@@ -631,9 +625,6 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
-                    Attendance: {{ eventExtendedProps.attendance.status }}
-                </meta-item>
                 <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.max != null">
                     <template v-if="eventExtendedProps.attendance.available > 0">
                         {{ eventExtendedProps.attendance.available }} places remaining
@@ -669,33 +660,22 @@
              -->
             <template v-else></template>
 
-            <!--
-            <div v-if="eventExtendedProps.attendance.isAttendable">
-                <dl>
-                    <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
-                    <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
-                </dl>
-            </div>
-            -->
             <template v-if="eventExtendedProps.folder.id ||
             eventExtendedProps.links.view ||
-            eventExtendedProps.attendance.actions.list.isAvailable ||
-            eventExtendedProps.attendance.actions.toggle.isAvailable ||
             eventExtendedProps.links.modify ||
             eventExtendedProps.links.delete ||
             eventExtendedProps.classAttendance.url ||
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-<!-- SA-10475 -->
-<!--                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId">-->
-<!--                            <span>-->
-<!--                                <a :href="rsvpAcceptPath" class="button" data-rsvp="accept">Yes</a>-->
-<!--                            </span>-->
-<!--                            <span>-->
-<!--                                <a :href="rsvpDeclinePath" class="button" data-rsvp="decline">No</a>-->
-<!--                            </span>-->
-<!--                        </span>-->
+                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
+                            <span>
+                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
+                            </span>
+                            <span>
+                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
+                            </span>
+                        </span>
 
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
@@ -705,15 +685,6 @@
                         <span v-if="eventExtendedProps.links.view">
                             <a class="button"
                                :href="eventExtendedProps.links.view">View More Details</a>
-                        </span>
-                        <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
-                            <a class="button"
-                               @click.prevent="toggleAttendance"
-                               href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
-                        </span>
-                        <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
-                            <a class="button"
-                               :href="attendanceListUrl + String(eventExtendedProps.eventId)">View Attendees</a>
                         </span>
                         <span v-if="eventExtendedProps.classAttendance.url">
                             <a class="button"

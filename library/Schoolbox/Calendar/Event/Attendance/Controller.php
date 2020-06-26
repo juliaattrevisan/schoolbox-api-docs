@@ -10,7 +10,6 @@ namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
@@ -86,7 +85,7 @@ class Controller extends Base
      */
     public function getCurrent(Event $event): void
     {
-        $data = (new ListPayload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+        $data = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
@@ -107,6 +106,7 @@ class Controller extends Base
     public function postCreate(Event $event): void
     {
         $guests = $this->attendanceMapper->findAttendances($event);
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         $newGuests = explode(',', $this->request->post['guests'] ?? '');
         $oldGuests = array_column($guests, 'id');
@@ -125,7 +125,7 @@ class Controller extends Base
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
-        if ($event->getMaxAttendees() && \count($guests) >= $event->getMaxAttendees()) {
+        if ($analysis->getNumAvailable() <= 0) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
         }
 
@@ -192,7 +192,10 @@ class Controller extends Base
             /* Check if there are any free slots; if not, throw the usual message
              */
             if ($event->getMaxAttendees() !== null) {
-                $numGuests = $this->attendanceMapper->countByColumn('event_id', $event->getId());
+                $numGuests = $this->attendanceMapper->countByColumnList([
+                    'event_id' => $event->getId(),
+                    'status' => [Model::STATUS_ACCEPTED]
+                ]);
 
                 if ($numGuests >= $event->getMaxAttendees()) {
                     throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
@@ -206,7 +209,7 @@ class Controller extends Base
 
         /* Then update its status and user details if necessary
          */
-        $attendance->setStatus(Model::STATUS_APPROVED);
+        $attendance->setStatus(Model::STATUS_ACCEPTED);
 
         $this->attendanceMapper->save($attendance);
 
@@ -240,7 +243,7 @@ class Controller extends Base
 
             /* Then update its status
              */
-            $attendance->setStatus(Model::STATUS_REJECTED);
+            $attendance->setStatus(Model::STATUS_DECLINED);
 
             $this->attendanceMapper->save($attendance);
         } catch (MapperException $e) {

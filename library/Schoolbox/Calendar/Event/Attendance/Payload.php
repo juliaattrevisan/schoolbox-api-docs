@@ -18,7 +18,7 @@ use Schoolbox\User;
 use UnexpectedValueException;
 
 /**
- * Class ListPayload
+ * Class Payload
  *
  * Generate a list of people invited to attend $event
  * Also calculate a count of how many places are remaining
@@ -27,7 +27,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Calendar\Event\Attendance
  */
-class ListPayload
+class Payload
 {
 
     /**
@@ -43,7 +43,7 @@ class ListPayload
 
 
     /**
-     * ListPayload constructor.
+     * Payload constructor.
      *
      * @param Container $di
      * @param Mapper    $attendanceMapper
@@ -78,45 +78,57 @@ class ListPayload
          */
         $guests = $this->attendanceMapper->findAttendances($event);
 
-        /* Number of available places
-         * Could be null, 0, or many
+        /* Do some counts and analysis on the $guest data
          */
-        $available = null;
-
-        if (null !== $event->getMaxAttendees()) {
-            $available = $event->getMaxAttendees() - \count($guests);
-
-            if ($available < 0) {
-                $available = 0;
-            }
-        }
-
-        /* Other counts
-         */
-        $pending = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_PENDING;
-        }));
-
-        $accepted = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_APPROVED;
-        }));
-
-        $declined = \count(array_filter($guests, static function($element) {
-            return $element['status'] === Model::STATUS_REJECTED;
-        }));
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         return [
-            'available' => $available,
+
+            /* The current user
+             */
+            'user' => $user,
+
+            /* Convenient counts
+             */
+            'attendees' => [
+
+                /* Maximum number of people you can invite
+                 */
+                'max' => $event->getMaxAttendees(),
+
+                /* Number of people currently invited who have, or could, Accept their invitation
+                 */
+                'num' => $analysis->getNumAttendees(),
+
+                /* The number of empty spots that can be filled
+                 */
+                'available' => $analysis->getNumAvailable(),
+            ],
+
+            /* A list of invited users index by their user id
+             */
             'guests' => $guests,
+
+            /* Whether the current user is currently invited
+             * i.e. currently on the attendance list
+             */
+            'isInvited' => isset($guests[$user->getId()]),
+
+            /* Whether the current user can modify the event
+             */
             'canModify' => $canModify,
+
+            /* html chunk containing a list of invited users and their associated buttons
+             * and icons representing their current rsvp state
+             */
             'fragment' => $this->di
                 ->get('webOutput:nochrome')
                 ->setTemplate('@calendarEventAttendance/current.twig')
                 ->setData([
                     'counts' => [
-                        'pending' => $pending,
-                        'accepted' => $accepted,
-                        'declined' => $declined
+                        'pending' => $analysis->getNumPending(),
+                        'accepted' => $analysis->getNumAccepted(),
+                        'declined' => $analysis->getNumDeclined()
                     ],
                     'canModify' => $canModify,
                     'event' => $event,

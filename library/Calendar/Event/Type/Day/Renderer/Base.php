@@ -75,9 +75,9 @@ abstract class Base extends RendererBase
         if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
             if ($attendance['status'] == Event\Attendance\Model::STATUS_PENDING) {
                 return 'Pending';
-            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_APPROVED) {
+            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_ACCEPTED) {
                 return 'Approved';
-            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_REJECTED) {
+            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_DECLINED) {
                 return 'Rejected';
             }
         }
