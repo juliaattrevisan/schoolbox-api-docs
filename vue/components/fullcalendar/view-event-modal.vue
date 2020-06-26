@@ -230,53 +230,28 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
-
-                let request = {
-                    url: self.rsvpAcceptPath,
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                toast.toastActivate({
-                    text: 'Updating invitation...'
-                });
-
-                axios.request(request)
-                        .then(function (response) {
-                            self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_ACCEPTED;
-                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
-                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
-
-                            /* Update data with the result from async request
-                            */
-                            self.event.setExtendedProp('data', self.event.extendedProps.data);
-
-                            toast.toastTimeout({
-                                text: 'Invitation successfully updated',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to update invitation. ' + error.response.data.message,
-                                    css: 'alert'
-                                });
-                            }
-                        });
+                this.rsvp(ATTENDANCE_STATUS_ACCEPTED, this.rsvpAcceptPath);
             },
 
             /**
              * Decline an invitation
              */
             rsvpDecline() {
+                this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
+            },
+
+            /**
+             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+             *
+             * @param status
+             * @param endpoint
+             */
+            rsvp(status, endpoint) {
                 let self = this;
                 let toast = this.jQuery('[data-toast]');
 
                 let request = {
-                    url: self.rsvpDeclinePath,
+                    url: endpoint,
                     method: 'post',
                     responseType: 'json'
                 }
@@ -287,7 +262,7 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_DECLINED;
+                            self.event.extendedProps.data.attendance.attendanceStatus = status;
                             self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
                             self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
 
