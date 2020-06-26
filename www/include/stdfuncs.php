@@ -131,7 +131,8 @@ REGEXP;
         if (count($parts) === 1) {
             $filename = $m['basename'];
         } else {
-            $ret[$map[PATHINFO_EXTENSION]] = array_pop($parts);
+            preg_match('/\w+/', array_pop($parts), $match);
+            $ret[$map[PATHINFO_EXTENSION]] = $match[0] ?? '';
             $filename                      = implode('.', $parts);
         }
         if (strlen($filename)) {
