@@ -776,7 +776,7 @@
                             <span>
                                 <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
                             </span>
--                        </span>
+                        </span>
 
                         <!-- Various buttons -->
                         <span v-if="eventExtendedProps.folder.id">
