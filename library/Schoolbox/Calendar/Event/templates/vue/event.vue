@@ -287,12 +287,6 @@
 
             <h2 class="subheader">Guests</h2>
 
-            <p class="content"><strong>
-                {{ this.event.attendance.payload.attendees.accepted }} accepted,
-                {{ this.event.attendance.payload.attendees.declined }} declined,
-                {{ this.event.attendance.payload.attendees.pending }} pending
-            </strong></p>
-
             <div class="row">
                 <div id="rsvpAttendanceForm" class="small-12 columns" :data-guests-available="this.numAvailable">
                     <section class="content no-margin">
@@ -318,6 +312,12 @@
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>
+
+                        <p class="content"><strong>
+                            {{ this.event.attendance.payload.attendees.accepted }} accepted,
+                            {{ this.event.attendance.payload.attendees.declined }} declined,
+                            {{ this.event.attendance.payload.attendees.pending }} pending
+                        </strong></p>
 
                         <ul class="action-list attendance-guest-list">
                             <li class="actions-small-1" v-for="(guest, index) in guests">
