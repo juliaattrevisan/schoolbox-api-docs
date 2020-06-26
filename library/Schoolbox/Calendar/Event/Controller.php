@@ -167,7 +167,7 @@ class Controller extends Base
             'attendance' => [
                 'payload' => $payload,
                 'status' => [
-                    'current' => Attendance\Model::CLASSES[$attendanceStatus],
+                    'current' => $attendanceStatus,
                 ],
             ],
         ])->setTitle($event->getTitle()));

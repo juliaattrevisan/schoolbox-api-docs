@@ -2,6 +2,7 @@
     import moment           from 'moment';
     import audiencesModal   from './audiencesModal';
     import qs               from 'qs';
+    import axios from "axios";
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
@@ -22,37 +23,48 @@
     const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
     const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
+    /* RSVP Status consts synonymous with Attendance/Model consts
+     */
+    const ATTENDANCE_STATUS_PENDING = 1;
+    const ATTENDANCE_STATUS_ACCEPTED = 2;
+    const ATTENDANCE_STATUS_DECLINED = 3;
+
     export default {
+
+        /* All props form a one-way-down binding between the child property and the parent one:
+         * when the parent property updates, it will flow down to the child, but not the other way around
+         * https://vuejs.org/v2/guide/components-props.html
+         */
         props: ['event'],
         name: "event-details",
-        components: {audiencesModal},
+        components: {
+            audiencesModal
+        },
+        created() {
+
+            /* RSVP Status consts synonymous with Attendance/Model consts
+             *
+             * Expost consts in vue land
+             * https://stackoverflow.com/questions/42662144/how-could-i-use-const-in-vue-template
+             */
+            this.ATTENDANCE_STATUS_PENDING = ATTENDANCE_STATUS_PENDING;
+            this.ATTENDANCE_STATUS_ACCEPTED = ATTENDANCE_STATUS_ACCEPTED;
+            this.ATTENDANCE_STATUS_DECLINED = ATTENDANCE_STATUS_DECLINED;
+        },
         data() {
             return {
+                currentAttendanceStatus: this.event.attendance.status.current,
+                numAvailable: this.event.attendance.payload.attendees.available,
+
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
                 isCampusEvent: this.event.level === 'campus'
             }
         },
-        methods: {
-
-            /**
-             * Generate a path via const
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            showAudiencesModal() {
-                this.$refs.audiencesModal.open();
-            }
-        },
         computed: {
+            window: () => window,
+            jQuery: () => window.jQuery,
+
             dateTimeDisplay: function() {
                 if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
 
@@ -143,6 +155,84 @@
             rsvpDeclinePath: function() {
                 return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
             }
+        },
+        methods: {
+
+            /**
+             * Generate a path via const
+             */
+            generateUrlFromConst(str, eventId, returnUrl) {
+                let url = str.replace('{eventId}', eventId);
+
+                if (returnUrl !== undefined) {
+                    url += '?returnUrl=' + returnUrl;
+                }
+
+                return url;
+            },
+
+            /**
+             * Accept an invitation
+             */
+            rsvpAccept() {
+                this.rsvp(ATTENDANCE_STATUS_ACCEPTED, this.rsvpAcceptPath);
+            },
+
+            /**
+             * Decline an invitation
+             */
+            rsvpDecline() {
+                this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
+            },
+
+            /**
+             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+             *
+             * @param status
+             * @param endpoint
+             */
+            rsvp(status, endpoint) {
+                let self = this;
+                let attendanceList = this.jQuery('#attendance-guests');
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: endpoint,
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+                            attendanceList.find('article').html(response.data.fragment);
+
+                            /* Update data with the result from async request
+                             */
+                            self.currentAttendanceStatus = status;
+                            self.numAvailable = response.data.attendees.available
+
+                            toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to update invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
+                        });
+            },
+
+            showAudiencesModal() {
+                this.$refs.audiencesModal.open();
+            }
         }
     }
 </script>
@@ -195,22 +285,22 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.payload.attendees.available">
+                <div id="rsvpAttendanceForm" class="small-12 columns" :data-guests-available="this.numAvailable">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" data-rsvp="accept" :class="this.event.attendance.status.current === 'accepted' ? 'accepted' : ''">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" data-rsvp="decline" :class="this.event.attendance.status.current === 'declined' ? 'declined' : ''">No</a></li>
+                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" data-rsvp="accept" :class="{ accepted: this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED }">Yes</a></li>
+                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" data-rsvp="decline" :class="{ declined: this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED }">No</a></li>
                         </ul>
                     </section>
                 </div>
                 <div id="attendance-guests" class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.attendance.payload.attendees.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.attendance.payload.attendees.available != null">
-                                <span id="attendance-guests-available" :data-available="this.event.attendance.payload.attendees.available">
-                                    <template v-if="this.event.attendance.payload.attendees.available > 0">{{ this.event.attendance.payload.attendees.available }}</template>
+                        <div class="content" v-if="this.numAvailable != null || this.event.canModify">
+                            <span class="meta" v-if="this.numAvailable != null">
+                                <span id="attendance-guests-available" :data-available="this.numAvailable">
+                                    <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
                                     <template v-else>No</template>
                                 </span> available place(s) remaining
                             </span>
