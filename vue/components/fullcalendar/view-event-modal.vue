@@ -273,6 +273,7 @@
              */
             rsvpAccept() {
                 let self = this;
+                let toast = this.jQuery('[data-toast]');
 
                 let request = {
                     url: self.rsvpAcceptPath,
@@ -280,16 +281,33 @@
                     responseType: 'json'
                 }
 
-                axios.request(request)
-                       .then(function (response) {
-                           self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_ACCEPTED;
-                           self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
-                           self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
+                toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
 
-                           /* Update data with the result from async request
+                axios.request(request)
+                        .then(function (response) {
+                            self.event.extendedProps.data.attendance.attendanceStatus = ATTENDANCE_STATUS_ACCEPTED;
+                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
+                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
+
+                            /* Update data with the result from async request
                             */
-                           self.event.setExtendedProp('data', self.event.extendedProps.data);
-                       });
+                            self.event.setExtendedProp('data', self.event.extendedProps.data);
+
+                            toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to update invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
+                        });
             },
 
             /**
@@ -297,12 +315,17 @@
              */
             rsvpDecline() {
                 let self = this;
+                let toast = this.jQuery('[data-toast]');
 
                 let request = {
                     url: self.rsvpDeclinePath,
                     method: 'post',
                     responseType: 'json'
                 }
+
+                toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
 
                 axios.request(request)
                         .then(function (response) {
@@ -313,6 +336,19 @@
                             /* Update data with the result from async request
                              */
                             self.event.setExtendedProp('data', self.event.extendedProps.data);
+
+                            toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to update invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
                         });
             },
 
