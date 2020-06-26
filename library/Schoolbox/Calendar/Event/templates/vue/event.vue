@@ -308,7 +308,7 @@
                                 </span> available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="this.event.canModify">
+                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="this.event.canModify && this.numAvailable">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>
