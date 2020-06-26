@@ -210,48 +210,6 @@
                     //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
                     //     canModify: true
                     // });
-
-                    //
-                    // this.jQuery.fn.rsvp({
-                    //     rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                    //     isInvited: attendanceStatus !== null ? 'true' : 'false',
-                    //     onUpdate: function(config, responseText) {
-                    //         config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
-                    //
-                    //         /* Inspect the responseText payload to evaluate current status
-                    //          */
-                    //         if (responseText.isInvited) {
-                    //             switch (responseText.guests[responseText.user.id].status) {
-                    //                 case ATTENDANCE_STATUS_ACCEPTED:
-                    //                     config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
-                    //
-                    //                     console.log(config.rsvpAttendanceForm.attr('id'), config.rsvpAttendanceForm.find('[data-rsvp="accept"]'));
-                    //                     break;
-                    //
-                    //                 case ATTENDANCE_STATUS_DECLINED:
-                    //                     config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
-                    //
-                    //                     console.log(config.rsvpAttendanceForm.attr('id'), config.rsvpAttendanceForm.find('[data-rsvp="decline"]'));
-                    //                     break;
-                    //
-                    //                 default:
-                    //                     break;
-                    //             }
-                    //         }
-                    //
-                    //         /* I am disgusted that this was a way of doing it
-                    //          */
-                    //          eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
-                    //          eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
-                    //
-                    //         console.log(self.event);
-                    //
-                    //         self.event.title ='mog';
-                    //
-                    //         console.log(self.event);
-                    //         // self.event.setExtendedProp('data', eventExtendedProps.data);
-                    //     }
-                    // });
                 });
             },
 
