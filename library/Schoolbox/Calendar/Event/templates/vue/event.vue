@@ -35,7 +35,9 @@
          * when the parent property updates, it will flow down to the child, but not the other way around
          * https://vuejs.org/v2/guide/components-props.html
          */
-        props: ['event'],
+        props: [
+            'event'
+        ],
         name: "event-details",
         components: {
             audiencesModal
@@ -55,6 +57,7 @@
             return {
                 currentAttendanceStatus: this.event.attendance.status.current,
                 numAvailable: this.event.attendance.payload.attendees.available,
+                guests: this.event.attendance.payload.guests,
 
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
@@ -284,6 +287,12 @@
 
             <h2 class="subheader">Guests</h2>
 
+            <p class="content"><strong>
+                {{ this.event.attendance.payload.attendees.accepted }} accepted,
+                {{ this.event.attendance.payload.attendees.declined }} declined,
+                {{ this.event.attendance.payload.attendees.pending }} pending
+            </strong></p>
+
             <div class="row">
                 <div id="rsvpAttendanceForm" class="small-12 columns" :data-guests-available="this.numAvailable">
                     <section class="content no-margin">
@@ -299,7 +308,7 @@
                     <section>
                         <div class="content" v-if="this.numAvailable != null || this.event.canModify">
                             <span class="meta" v-if="this.numAvailable != null">
-                                <span id="attendance-guests-available" :data-available="this.numAvailable">
+                                <span id="attendance-guests-available">
                                     <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
                                     <template v-else>No</template>
                                 </span> available place(s) remaining
@@ -310,7 +319,24 @@
                             </form>
                         </div>
 
-                        <article v-html="this.event.attendance.payload.fragment"></article>
+                        <ul class="action-list attendance-guest-list">
+                            <li class="actions-small-1" v-for="(guest, index) in guests">
+                                <div class="compact card small-11">
+                                    <a :href="'/search/user/' + guest.id" title="View Profile">
+                                        <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
+
+                                        <p :class="{
+                                            pending: guest.status === ATTENDANCE_STATUS_PENDING,
+                                            accepted: guest.status === ATTENDANCE_STATUS_ACCEPTED,
+                                            declined: guest.status === ATTENDANCE_STATUS_DECLINED
+                                        }">{{ guest.name }}<span class="status-icon"></span></p>
+                                    </a>
+                                </div>
+                                <nav>
+                                    <a class="icon-close no-text" title="Remove guest"></a>
+                                </nav>
+                            </li>
+                        </ul>
                     </section>
                 </div>
             </div>

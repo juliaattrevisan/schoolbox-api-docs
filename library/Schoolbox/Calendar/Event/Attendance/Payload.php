@@ -103,6 +103,12 @@ class Payload
                 /* The number of empty spots that can be filled
                  */
                 'available' => $analysis->getNumAvailable(),
+
+                /* Misc details
+                 */
+                'pending' => $analysis->getNumPending(),
+                'accepted' => $analysis->getNumAccepted(),
+                'declined' => $analysis->getNumDeclined(),
             ],
 
             /* A list of invited users index by their user id
