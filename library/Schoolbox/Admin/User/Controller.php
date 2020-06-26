@@ -340,7 +340,8 @@ class Controller extends Base
                     'order' => ['time' => 'desc'],
                     'limit' => 10
                 ]),
-                'portraitZone' => $portraitZone
+                'portraitZone' => $portraitZone,
+                'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
             ],
             'title' => 'Admin - Users'
         ]);
@@ -376,7 +377,8 @@ class Controller extends Base
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
-                'portraitZone' => $portraitZone->getTwigContext()
+                'portraitZone' => $portraitZone->getTwigContext(),
+                'isSchoolboxAdmin' => false,
             ],
             'title' => 'Admin - Users'
         ]);

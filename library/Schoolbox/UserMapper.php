@@ -35,6 +35,10 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
+
+    // The username of the special 'Alaress Admin' user used by Schoolbox staff
+    public const USERNAME_ALARESS_ADMIN = 'alaress';
+
     /**
      * If in use (ie not null), this should mirror all non-softDeleted users in DB.
      * If we save, delete, soft-delete, or restore a user, we must update the
@@ -152,10 +156,13 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockAlaressUserDeletion']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
@@ -169,6 +176,54 @@ class UserMapper extends Mapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
+    }
+
+
+    /**
+     * Pre-save callback to ensure the Alaress Admin superuser account is not broken
+     *
+     * Undoes:
+     * - removal of superuser perms
+     * - change of username
+     * - soft-deletion via an update
+     *
+     * @param User $user
+     * @return bool
+     * @throws UnexpectedValueException
+     * @throws \PDOException
+     */
+    public function undoAlaressUserModification(User $user): bool
+    {
+        if ($user->getId()) {
+            // Unfortunately pre-saves do not have access to previous state.
+            $previous = $this->findColumnsByPredicates(
+                ['username'],
+                $this->getPredicateBuilder()->equals('id', $user->getId())
+            );
+            $previousUsername = $previous[0]['username'] ?? null;
+            if ($previousUsername === self::USERNAME_ALARESS_ADMIN) {
+                $user
+                    ->setDeletedAt(null)
+                    ->setUsername(self::USERNAME_ALARESS_ADMIN)
+                    ->setSuperuser(true);
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Pre-soft-delete callback to ensure the Alaress Admin user is not deleted
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function blockAlaressUserDeletion(User $user): bool
+    {
+        if ($user->getUsername() === self::USERNAME_ALARESS_ADMIN) {
+            throw new UnexpectedValueException(sprintf('The %s user may not be deleted', self::USERNAME_ALARESS_ADMIN));
+        }
+        return true;
     }
 
 

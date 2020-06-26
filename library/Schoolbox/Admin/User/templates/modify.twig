@@ -26,7 +26,14 @@
                 {% endif %}
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
-            <li><a class="icon-delete" title="Delete User" data-delete data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a></li>
+            <li>
+                {% if not isSchoolboxAdmin %}
+                    <a class="icon-delete"
+                       title="Delete User"
+                       data-delete
+                       data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
+                {% endif %}
+            </li>
         </ul>
     </div>
 
@@ -144,7 +151,12 @@
                     <div class="small-12 medium-4 island">
                         <div>
                             <label for="username" class="required">Username</label>
-                            <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                            <input id="username"
+                                   type="text"
+                                   class="required"
+                                   name="modusername"
+                                   {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
+                                   value="{{ user.username }}" />
                         </div>
 
                         <div>
@@ -258,8 +270,23 @@
                         <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
                         <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
-                        <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
-                        <label for="superuser" class="checkbox-label">Superuser</label>
+                        {% if isSchoolboxAdmin %}
+                            <input type="hidden" name="superuser" value="{{ user.isSuperuser ? '1' : '0' }}" />
+                            <input id="superuser"
+                                   type="checkbox"
+                                   name="superuser"
+                                   value="1"
+                                   disabled
+                                   {% if user.isSuperuser %}checked{% endif %}
+                            />
+                            <label for="superuser"
+                                   class="checkbox-label"
+                                   title="This user's superuser status may not be changed"
+                            >Superuser</label>
+                        {% else %}
+                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
+                            <label for="superuser" class="checkbox-label">Superuser</label>
+                        {% endif %}
 
                         {% if method=='Update' %}
                             {# Only modify user screen has the enabled checkbox #}
