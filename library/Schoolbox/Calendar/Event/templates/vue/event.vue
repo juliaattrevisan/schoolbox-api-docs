@@ -339,7 +339,7 @@
              * Decide whether you can RSVP to an invitation or, alternatively,
              * insert yourself into the guest list (same approach either way)
              */
-            canRsvp(id) {
+            canRsvp() {
 
                 /* If you've not responded at all, or are currently Pending
                  */
