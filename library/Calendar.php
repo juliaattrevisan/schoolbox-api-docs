@@ -644,11 +644,11 @@ class Calendar extends DeprecatedModel
             LEFT JOIN user             ON event.author_id = user.id
             LEFT JOIN luEventType      ON type = eventTypeID
             LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = %s
-            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = %s
+            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = %d
+            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = %d
             LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
-            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %s
-            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %s
+            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %d
+            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %d
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
             WHERE
                 event.deleted_at is NULL AND
