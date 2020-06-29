@@ -450,7 +450,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns">
+                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp()">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
