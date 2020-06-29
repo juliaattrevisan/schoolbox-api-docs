@@ -22,10 +22,13 @@ use Aura\Web\Request;
 use Aura\Web\Response;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -121,7 +124,7 @@ class Kernel extends WebKernelAbstract
 
         try {
             if ($route instanceof Route) {
-                $this->outputAuraContent($route);
+                $this->outputAuraContent($route, $server);
             } else {
                 $this->outputSitepageContent($_GET['page'] ?? null);
             }
@@ -216,8 +219,9 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Aura-based content.
      *
-     * @param Route  $route the route to render: the controller and action are
+     * @param Route $route  the route to render: the controller and action are
      *                      extracted from its name.
+     * @param array $server Vars from $_SERVER
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
@@ -225,7 +229,7 @@ class Kernel extends WebKernelAbstract
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Throwable
      */
-    private function outputAuraContent(Route $route): void
+    private function outputAuraContent(Route $route, array $server): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -239,17 +243,49 @@ class Kernel extends WebKernelAbstract
         $module = $this->di->get('module:' . $controllerName);
         $module->initControllerDependencies();
 
-        /** @var \Alaress\Session\Session $session */
-        $session = $this->di->get('session');
+        // User is from:
+        // * Authorization header
+        // * Session, if not in auth header
 
-        // Do authorization here
-        // TODO Inject user getter into authorizer, and use it to determine:
-        // * if user is there
-        // * if user session is timed out or not
-        /** @var \Schoolbox\User $user */
-        $user = $session->getAuthUser();
-        if ($session->isAuthSessionAlive()) {
-            $session->updateLastTime();
+        // Put JWT auth here
+        $session    = null;
+        $authHeader = $server['HTTP_AUTHORIZATION'] ?? null;
+        if (isset($authHeader)) {
+            if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
+                [, $token]  = $matches;
+                /** @var Jwt $tokenValidator */
+                $tokenValidator = $this->get('user.tokenBuilder');
+                $claims         = $tokenValidator->decode($token);
+                // Put something in the session about a claimed username
+                // If the claimed username is valid, either:
+                // * Put the user in a temporary $_SESSION var
+                // ** Fetch that user when calling getUser or performing auth
+                // ** Unset that var once processing completes
+                // * Override the current session var?
+                if ($claims['sub']) {
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $this->di->get('mapperFactory');
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $mapperFactory->get(UserMapper::class);
+                    $user       = $userMapper->findByUsername($claims['sub']);
+                    if (!$user) {
+                        throw new Unauthenticated('User in token not found');
+                    }
+                }
+            }
+        } else {
+            /** @var \Alaress\Session\Session $session */
+            $session = $this->di->get('session');
+
+            // Do authorization here
+            // TODO Inject user getter into authorizer, and use it to determine:
+            // * if user is there
+            // * if user session is timed out or not
+            /** @var \Schoolbox\User $user */
+            $user = $session->getAuthUser();
+            if ($session->isAuthSessionAlive()) {
+                $session->updateLastTime();
+            }
         }
 
         /** @var \Aura\Web\Response $response */
@@ -362,7 +398,7 @@ class Kernel extends WebKernelAbstract
         $redirect             = $controller->getResponse()->headers->get('location');
         $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
         $isJson               = $output instanceof Json;
-        if (!($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
+        if ($session && !($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
 
