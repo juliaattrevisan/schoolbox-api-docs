@@ -218,10 +218,12 @@
 
                 axios.request(request)
                         .then(function (response) {
+                            console.log(response);
 
                             /* Update data with the result from async request
                              */
                             self.$delete(self.guests, id);
+                            self.numAvailable = response.data.attendees.available
 
                             toast.toastTimeout({
                                 text: name + ' has been uninvited',
