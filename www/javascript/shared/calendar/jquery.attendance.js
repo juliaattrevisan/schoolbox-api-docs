@@ -141,51 +141,6 @@
             });
         }
 
-
-        /**
-         * Asynchronously remove people's invites
-         *
-         * @param selectize
-         */
-        function setupOnRemoveAttendee(selectize) {
-            config.attendanceList.on('click', '[data-guest-delete]', function(event) {
-                event.preventDefault();
-
-                let element = $(this);
-
-                /* User's name
-                 */
-                let name = element.attr('data-guest-name');
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
-                config.toast.toastActivate({
-                    text: 'Uninviting ' + name + '...'
-                });
-
-                $.ajax({
-                    url: element.attr('href'),
-                    method: 'post',
-                    dataType: 'json',
-                    data: {guest: element.attr('data-guest-delete')},
-                    success: function(responseText) {
-                        config.toast.toastTimeout({
-                            text: name + ' has been uninvited',
-                            css: 'success'
-                        });
-
-                        /* Update pieces
-                         */
-                        onAfterAttendanceChange(responseText);
-                    },
-                    error: function(xhr, status, error) {
-                        config.toast.toastTimeout({text: 'Unable to uninvite ' + name + '; please try again', css: 'alert'});
-                    }
-                });
-            });
-        }
-
-
         /**
          * Facade for what to do when the attendance list changes
          *
