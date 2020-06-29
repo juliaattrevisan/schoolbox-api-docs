@@ -248,6 +248,7 @@ class Kernel extends WebKernelAbstract
         // * Session, if not in auth header
 
         // Put JWT auth here
+        $user       = null;
         $session    = null;
         $authHeader = $server['HTTP_AUTHORIZATION'] ?? null;
         if (isset($authHeader)) {
@@ -315,6 +316,7 @@ class Kernel extends WebKernelAbstract
 
         /** @var \Alaress\Web\Controller\Base $controller */
         $controller = $this->di->get('controller:' . $controllerName);
+        $controller->setUser($user);
 
         // Authorize, throwing whatever exceptions might be thrown.
         /** @var \Alaress\Authorizer\Authorizer $auth */
