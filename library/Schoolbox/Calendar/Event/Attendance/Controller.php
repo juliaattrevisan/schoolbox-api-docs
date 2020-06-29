@@ -179,6 +179,15 @@ class Controller extends Base
      */
     public function postAccept(Event $event): void
     {
+        $guests = $this->attendanceMapper->findAttendances($event);
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
+
+        /* Don't exceed the maximum number of guests, if one was specified
+         */
+        if ($analysis->getNumAvailable() <= 0) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
+        }
+
         /* Check if they're already on the list - if so, shank down their existing record
          * Otherwise, spawn a new record for them if the maximum guests haven't been reached
          */
@@ -188,20 +197,6 @@ class Controller extends Base
                 'user_id'  => $this->getUser()->getId()
             ]);
         } catch (MapperException $e) {
-
-            /* Check if there are any free slots; if not, throw the usual message
-             */
-            if ($event->getMaxAttendees() !== null) {
-                $numGuests = $this->attendanceMapper->countByColumnList([
-                    'event_id' => $event->getId(),
-                    'status' => [Model::STATUS_ACCEPTED]
-                ]);
-
-                if ($numGuests >= $event->getMaxAttendees()) {
-                    throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
-                }
-            }
-
             $attendance = $this->attendanceMapper->createModel()
                 ->setEvent($event)
                 ->setUser($this->getUser());
