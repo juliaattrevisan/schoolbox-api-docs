@@ -56,6 +56,7 @@
         },
         data() {
             return {
+                canModify: this.event.attendance.payload.canModify,
                 currentAttendanceStatus: this.event.attendance.status.current,
                 numAvailable: this.event.attendance.payload.attendees.available,
                 numPending: this.event.attendance.payload.attendees.pending,
@@ -395,6 +396,17 @@
                 }
             },
 
+
+            /**
+             * Whether you can delete an invitation
+             *
+             * @returns {default.event.attendance.payload.canModify}
+             */
+            canRsvpDelete() {
+                return this.canModify;
+            },
+
+
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
             }
@@ -455,8 +467,8 @@
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ accepted: this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED }">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ declined: this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED }">No</a></li>
+                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept()" :class="{ accepted: this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED }">Yes</a></li>
+                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline()" :class="{ declined: this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED }">No</a></li>
                         </ul>
                     </section>
                 </div>
@@ -495,7 +507,7 @@
                                     </a>
                                 </div>
                                 <nav>
-                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
+                                    <a class="icon-close no-text" v-if="canRsvpDelete()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
                                 </nav>
                             </li>
                         </ul>
