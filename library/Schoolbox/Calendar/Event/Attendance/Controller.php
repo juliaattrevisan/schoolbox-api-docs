@@ -70,11 +70,7 @@ class Controller extends Base
 
 
     /**
-     * Generate an html fragment containing the current list of attendees
-     *
-     * Ideally this would be managed in vue somehow, but we have to build a vue-compatible
-     * toast that behaves synonymously with our jquery toast; plus, selectize and confirmDialog
-     * wrangling is a thing we have yet to defeat
+     * Generate a payload containing the current state of affairs
      *
      * @param Event $event
      * @throws MapperException
@@ -136,7 +132,7 @@ class Controller extends Base
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
@@ -208,7 +204,7 @@ class Controller extends Base
 
         $this->attendanceMapper->save($attendance);
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
@@ -246,7 +242,7 @@ class Controller extends Base
             // noop
         }
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
