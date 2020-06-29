@@ -199,7 +199,7 @@
             /**
              * Remove an invitation
              */
-            rsvpDelete(id) {
+            rsvpDelete(id, name) {
                 let self = this;
                 let toast = this.jQuery('[data-toast]');
 
@@ -210,6 +210,8 @@
                     responseType: 'json'
                 }
 
+                /* A toast - to your valour, my sword, and our victory together
+                 */
                 toast.toastActivate({
                     text: 'Removing invitation...'
                 });
@@ -222,14 +224,14 @@
                             self.$delete(self.guests, id);
 
                             toast.toastTimeout({
-                                text: 'Invitation removed',
+                                text: name + ' has been uninvited',
                                 css: 'success'
                             });
                         })
                         .catch(error => {
                             if (error.response) {
                                 toast.toastTimeout({
-                                    text: 'Unable to remove invitation. ' + error.response.data.message,
+                                    text: 'Unable to uninvite ' + name + '; please try again.',
                                     css: 'alert'
                                 });
                             }
@@ -253,6 +255,8 @@
                     responseType: 'json'
                 }
 
+                /* A toast - to your valour, my sword, and our victory together
+                 */
                 toast.toastActivate({
                     text: 'Updating invitation...'
                 });
@@ -381,7 +385,7 @@
                                     </a>
                                 </div>
                                 <nav>
-                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(index)" title="Remove guest"></a>
+                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(index, guest.name)" title="Remove guest"></a>
                                 </nav>
                             </li>
                         </ul>
