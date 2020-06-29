@@ -350,20 +350,22 @@
              * Decide whether you can RSVP to an invitation or, alternatively,
              * insert yourself into the guest list (same approach either way)
              *
+             * @param currentAttendanceStatus  your current attendance status, int|null
+             * @param numAvailable             the quantity of free spaces available
              * @return boolean
              */
-            canRsvp() {
+            canRsvp(currentAttendanceStatus, numAvailable) {
 
                 /* If you've not responded at all, or are currently Pending
                  */
-                if (this.currentAttendanceStatus === null || this.currentAttendanceStatus === ATTENDANCE_STATUS_PENDING) {
+                if (currentAttendanceStatus === null || currentAttendanceStatus === ATTENDANCE_STATUS_PENDING) {
 
                     /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
                      * then you haven't yet responded and are able to insert yourself into the list
                      *
                      * The buttons should be shown
                      */
-                    if (this.numAvailable > 0) {
+                    if (numAvailable > 0) {
                         return true;
                     }
 
@@ -377,7 +379,7 @@
 
                 /* If you've currently Accepted
                  */
-                if (this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED) {
+                if (currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED) {
 
                     /* If your currentAttendanceStatus is Accepted, you can always decline
                      * freeing up a spot for someone else to occupy
@@ -389,14 +391,14 @@
 
                 /* If you've currently Declined
                  */
-                if (this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED) {
+                if (currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED) {
 
                     /* If your currentAttendanceStatus is Declined and there are available spaces
                      * then you can change your mind and accept the invitation
                      *
                      * The buttons should be shown
                      */
-                    if (this.numAvailable > 0) {
+                    if (numAvailable > 0) {
                         return true;
                     }
 
@@ -480,7 +482,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp()">
+                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp(this.currentAttendanceStatus, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
