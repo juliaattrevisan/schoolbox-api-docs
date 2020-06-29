@@ -63,7 +63,7 @@ class Jwt
      * @param string $jwt
      * @return array
      */
-    public function validate(string $jwt): array
+    public function decode(string $jwt): array
     {
         return (array)JwtLibrary::decode(
             $jwt,
