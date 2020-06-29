@@ -272,6 +272,14 @@
                             self.currentAttendanceStatus = status;
                             self.numAvailable = response.data.attendees.available
 
+                            /* You're now in the data stack
+                             */
+                            self.guests.push({
+                                id: response.data.user.id,
+                                name: response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname,
+                                status: status
+                            });
+
                             toast.toastTimeout({
                                 text: 'Invitation successfully updated',
                                 css: 'success'
