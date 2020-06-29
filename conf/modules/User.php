@@ -11,6 +11,7 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Aura\Di\ContainerInterface as DependencyInjector;
+use Schoolbox\User\Jwt\Module as JwtModule;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
@@ -50,5 +51,9 @@ class User implements ModuleConfigInterface
          */
         $module = new ResetPasswordModule($di);
         $module->init('/passwordReset');
+
+        // JWT
+        $module = new JwtModule($di);
+        $module->init('/user/jwt');
     }
 }
