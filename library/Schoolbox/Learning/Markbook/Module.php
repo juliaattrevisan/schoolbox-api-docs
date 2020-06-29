@@ -60,14 +60,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
-                    static function (array $params) {
-                        return $params['folderId'];
-                    },
-                    Access::getInstance()
-                )
+                new isInstructor(Access::getInstance())
             )
         );
 
