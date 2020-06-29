@@ -2,6 +2,11 @@
 
 namespace Schoolbox\Usage\Specific;
 
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, null, 403 );
+}
+
 $usage = new AjaxFlot($_GET['userId']);
 
 switch($_GET['type']) {

@@ -6,6 +6,11 @@ use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Collection;
 
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, null, 403 );
+}
+
 /* Use $_POST['action'] to separate screens
  */
 if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {

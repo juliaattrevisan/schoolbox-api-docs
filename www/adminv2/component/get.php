@@ -16,6 +16,12 @@ if (!isset($this)) {
     httpError(400, 101); // resource not available
 }
 
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, null, 403 );
+}
+
+
 $this->setLite(true);
 
 $context = $this->arg[0];
