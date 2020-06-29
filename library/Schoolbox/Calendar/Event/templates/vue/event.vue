@@ -340,51 +340,59 @@
              */
             canRsvp(id) {
 
-                /* If your currentAttendanceStatus is null and there are available spaces,
-                 * then you haven't yet responded and are able to insert yourself into the list
-                 *
-                 * The buttons should be shown
+                /* If you've not responded at all, or are currently Pending
                  */
+                if (this.currentAttendanceStatus === null || this.currentAttendanceStatus === ATTENDANCE_STATUS_PENDING) {
 
-                /* If your currentAttendanceStatus is null and there aren't available spaces
-                 * then you can't insert yourself into the list
-                 *
-                 * The buttons should be hidden
-                 */
-
-                /* If your currentAttendanceStatus is Accepted, you can always decline
-                 * freeing up a spot for someone else to occupy
-                 *
-                 * The buttons should be shown
-                 */
-
-                /* If your currentAttendanceStatus is Declined and there are available spaces
-                 * then you can change your mind and accept the invitation
-                 *
-                 * The buttons should be shown
-                 */
-
-                /* If your currentAttendanceStatus is Declined and there aren't available spaces
-                 * then you can't change your mind; embrace it
-                 *
-                 * The buttons should be hidden
-                 */
-            },
-
-            /**
-             * Decide whether $id is currently on the guest list, regardless of status
-             *
-             * @param id
-             * @returns {boolean}
-             */
-            isInvited(id) {
-                for (let i = 0; i < this.guests.length; i++) {
-                    if (this.guests[i].id === id) {
+                    /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
+                     * then you haven't yet responded and are able to insert yourself into the list
+                     *
+                     * The buttons should be shown
+                     */
+                    if (this.numAvailable > 0) {
                         return true;
                     }
+
+                    /* If your currentAttendanceStatus is null, or Pending, and there aren't available spaces
+                     * then you can't insert yourself into the list, nor accept/decline
+                     *
+                     * The buttons should be hidden
+                     */
+                    return false;
                 }
 
-                return false;
+                /* If you've currently Accepted
+                 */
+                if (this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED) {
+
+                    /* If your currentAttendanceStatus is Accepted, you can always decline
+                     * freeing up a spot for someone else to occupy
+                     *
+                     * The buttons should be shown
+                     */
+                    return true;
+                }
+
+                /* If you've currently Declined
+                 */
+                if (this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED) {
+
+                    /* If your currentAttendanceStatus is Declined and there are available spaces
+                     * then you can change your mind and accept the invitation
+                     *
+                     * The buttons should be shown
+                     */
+                    if (this.numAvailable > 0) {
+                        return true;
+                    }
+
+                    /* If your currentAttendanceStatus is Declined and there aren't available spaces
+                     * then you can't change your mind; embrace it
+                     *
+                     * The buttons should be hidden
+                     */
+                    return false;
+                }
             },
 
             showAudiencesModal() {
