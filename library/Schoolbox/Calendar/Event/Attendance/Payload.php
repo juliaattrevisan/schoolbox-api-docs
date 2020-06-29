@@ -118,24 +118,6 @@ class Payload
             /* Whether the current user can modify the event
              */
             'canModify' => $canModify,
-
-            /* html chunk containing a list of invited users and their associated buttons
-             * and icons representing their current rsvp state
-             */
-            'fragment' => $this->di
-                ->get('webOutput:nochrome')
-                ->setTemplate('@calendarEventAttendance/current.twig')
-                ->setData([
-                    'counts' => [
-                        'pending' => $analysis->getNumPending(),
-                        'accepted' => $analysis->getNumAccepted(),
-                        'declined' => $analysis->getNumDeclined()
-                    ],
-                    'canModify' => $canModify,
-                    'event' => $event,
-                    'guests' => $guests,
-                    'status' => Model::CLASSES
-                ])->getAsString()
         ];
     }
 }

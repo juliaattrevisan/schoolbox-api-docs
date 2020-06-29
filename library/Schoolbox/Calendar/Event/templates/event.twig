@@ -44,21 +44,5 @@
         $.fn.attendance({
             canModify: {{ canModify ? 'true' : 'false' }}
         });
-
-        /* Initial conditions
-         */
-        const isInvited = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id }}') + '"]').length > 0;
-
-        {#$.fn.rsvpToggle({#}
-        {#    available: {{ attendance.payload.attendees.available is null ? 'null' : attendance.payload.attendees.available }},#}
-        {#    isInvited: isInvited#}
-        {#});#}
-
-        /* Apply listeners to RSVP buttons to post and reload
-         * That'll reload with the most recent state of affairs
-         */
-        // $.fn.rsvp({
-        //     isInvited: isInvited
-        // });
     });
 </script>
