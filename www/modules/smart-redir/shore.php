@@ -1,6 +1,6 @@
 <?php
 
-//A Semi-Smart Autologon Script 
+//A Semi-Smart Autologon Script
 //It remains to be seen who falls for it
 //010405, time to pull an April Fools!!!
 //lwcawood
@@ -203,9 +203,9 @@ case "librarywebs";
 	$action = "http://online.librarywebs.net/Login.aspx";
 	$method = "post";
 	$formArray = array('inputUsername' => 'shore',
-			   'inputPassword' => 'school',	
+			   'inputPassword' => 'school',
 			   '__VIEWSTATE' => 'dDwxOTM2NjQ0MDE7dDw7bDxpPDE+Oz47bDx0PDtsPGk8MT47aTwzPjs+O2w8dDw7bDxpPDc+Oz47bDx0PHA8cDxsPFZpc2libGU7PjtsPG88dD47Pj47Pjs7Pjs+Pjt0PHA8cDxsPFZpc2libGU7PjtsPG88Zj47Pj47Pjs7Pjs+Pjs+PjtsPGJ0bkxvZ2luOz4+xKZzwlFnHiKtVcQeIqLtTbbykaA=',
-			  'btnLogin'	=> '', 
+			  'btnLogin'	=> '',
 			);
 
 break;
@@ -251,7 +251,7 @@ case "britannica":
 	$method="POST";
 	$formArray['username']="shoreschool";
 	$formArray['password']="northsydney";
-	$formArray['target'] = '/';	
+	$formArray['target'] = '/';
 break;
 
 case "onguard":
@@ -271,6 +271,16 @@ case "studyskills":
 	$formArray['username']	= 'forshoreonly';
 	$formArray['password']	= '35results';
 break;
+
+case "dramaonline":
+    $form = "form";
+    $action = "https://www.dramaonlinelibrary.com:443/LOGIN";
+    $method="POST";
+    $formArray['dest'] = 'https://www.dramaonlinelibrary.com/series/national-theatre-collection-iid-190464';
+    $formArray['user']	= 'SHORE';
+    $formArray['pass']	= 'Dr@maOnline';
+    break;
+
 
 default:
 	echo "Did not recognise the site";
@@ -297,14 +307,14 @@ echo "<body>";
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
 if(is_array($formArray)) {
 	foreach($formArray as $key => $value)
-	{	
+	{
 		if($key == "submit")
 			{
 			echo "<br><br><br><br><br><br><br><br><div align='center'>Please $value to continue<br>";
 			echo "<input name='$key' type='submit' value='$value'></div>";
 			$nojs = 1;
 			}
-		else	
+		else
 			echo "<input name='$key' type='hidden' value='$value'>";
 	}
 }
