@@ -149,8 +149,6 @@
          * @param responseText object A json response payload
          */
         function onAfterAttendanceChange(responseText) {
-            config.attendanceList.find('article').html(responseText.fragment);
-
             toggleCreateAttendance(responseText.attendees.available);
         }
     }

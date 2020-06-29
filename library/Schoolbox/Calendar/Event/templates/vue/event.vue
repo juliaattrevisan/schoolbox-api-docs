@@ -287,7 +287,6 @@
              */
             rsvp(status, endpoint) {
                 let self = this;
-                let attendanceList = this.jQuery('#attendance-guests');
                 let toast = this.jQuery('[data-toast]');
 
                 let request = {
@@ -304,8 +303,6 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            attendanceList.find('article').html(response.data.fragment);
-
                             let userId = response.data.user.id;
                             let fullname = response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname;
                             let found = false;
@@ -493,7 +490,7 @@
                         </ul>
                     </section>
                 </div>
-                <div id="attendance-guests" class="small-12 columns">
+                <div class="small-12 columns">
                     <section>
                         <div class="content" v-if="this.numAvailable != null || this.event.canModify">
                             <span class="meta" v-if="this.numAvailable != null">
