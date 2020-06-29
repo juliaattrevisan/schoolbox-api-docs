@@ -17,7 +17,7 @@ use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
-    protected $basename = 'userJwt';
+    protected $basename = 'userToken';
 
     /**
      * @inheritdoc
