@@ -25,7 +25,7 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // Routes:
-        // getJwt, getJwtForUser
+        // getTokenForSelf, getTokenForUser
         $isLoggedIn = new Rule\LazyCallback(function () {
             return new Rule\IsLoggedIn();
         });
@@ -39,8 +39,8 @@ class Module extends BaseModule
             return $this->preloadUser($params);
         };
 
-        $this->register('GET', '', 'getJwtForSelf', $isLoggedIn);
-        $this->register('GET', '/{userId}', 'getJwtForUser', $isUserOrSuperUser, $preloadUser);
+        $this->register('GET', '', 'getTokenForSelf', $isLoggedIn);
+        $this->register('GET', '/{userId}', 'getTokenForUser', $isUserOrSuperUser, $preloadUser);
     }
 
 

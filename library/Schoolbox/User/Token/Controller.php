@@ -37,9 +37,9 @@ class Controller extends Base
      *
      * @api /user/token
      */
-    public function getJwtForSelf()
+    public function getTokenForSelf()
     {
-        $this->getJwtForUser($this->getUser());
+        $this->getTokenForUser($this->getUser());
     }
 
     /**
@@ -48,7 +48,7 @@ class Controller extends Base
      * @api /user/token/{userId}
      * @param User $user
      */
-    public function getJwtForUser(User $user): void
+    public function getTokenForUser(User $user): void
     {
         // JSON response:
         // generate from JWT generator
