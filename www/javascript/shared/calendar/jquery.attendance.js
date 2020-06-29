@@ -14,27 +14,27 @@
 
         /* Set up selectizes if you have perms
          */
-        if (config.canModify) {
-
-            /* Initial conditions
-             */
-            toggleCreateAttendance(config.available.attr('data-available'));
-
-            /* Selectize for adding/removing people
-             */
-            const selectize = config.createAttendanceSelector.selectizeSelector({
-                ajax: {
-                    url: '/ajax/user.php',
-                    type: 'get',
-                    data: {groupID: 0, showCampus: true},
-                    dataType: 'json'
-                },
-                multiple: false
-            });
-
-            setupOnAddAttendee(selectize);
-            setupOnRemoveAttendee(selectize);
-        }
+        // if (config.canModify) {
+        //
+        //     /* Initial conditions
+        //      */
+        //     toggleCreateAttendance(config.available.attr('data-available'));
+        //
+        //     /* Selectize for adding/removing people
+        //      */
+        //     const selectize = config.createAttendanceSelector.selectizeSelector({
+        //         ajax: {
+        //             url: '/ajax/user.php',
+        //             type: 'get',
+        //             data: {groupID: 0, showCampus: true},
+        //             dataType: 'json'
+        //         },
+        //         multiple: false
+        //     });
+        //
+        //     setupOnAddAttendee(selectize);
+        //     setupOnRemoveAttendee(selectize);
+        // }
 
 
         /**

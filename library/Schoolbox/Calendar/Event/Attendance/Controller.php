@@ -156,7 +156,7 @@ class Controller extends Base
     {
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id' => $this->request->post['guest']
+            'user_id' => $this->request->post['userId']
         ]);
 
         /* Regenerate a new html fragment for the people currently invited

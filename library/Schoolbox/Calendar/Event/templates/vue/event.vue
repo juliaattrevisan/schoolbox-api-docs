@@ -22,6 +22,7 @@
      */
     const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
     const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
+    const URL_ATTENDANCE_RSVP_DELETE = '/calendar/event/attendance/{eventId}/delete';
 
     /* RSVP Status consts synonymous with Attendance/Model consts
      */
@@ -157,7 +158,14 @@
              */
             rsvpDeclinePath: function() {
                 return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
-            }
+            },
+
+            /**
+             * RSVP Delete
+             */
+            rsvpDeletePath: function() {
+                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
+            },
         },
         methods: {
 
@@ -186,6 +194,46 @@
              */
             rsvpDecline() {
                 this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
+            },
+
+            /**
+             * Remove an invitation
+             */
+            rsvpDelete(id) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: this.rsvpDeletePath,
+                    data:  qs.stringify({userId: id}),
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                toast.toastActivate({
+                    text: 'Removing invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+
+                            /* Update data with the result from async request
+                             */
+                            self.$delete(self.guests, id);
+
+                            toast.toastTimeout({
+                                text: 'Invitation removed',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to remove invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
+                        });
             },
 
             /**
@@ -333,7 +381,7 @@
                                     </a>
                                 </div>
                                 <nav>
-                                    <a class="icon-close no-text" title="Remove guest"></a>
+                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(index)" title="Remove guest"></a>
                                 </nav>
                             </li>
                         </ul>
