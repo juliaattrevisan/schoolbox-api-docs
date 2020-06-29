@@ -171,7 +171,7 @@ class Connection
             $this->stream->removeListener('error', $onError);
             $onConnect();
         });
-        $this->stream->once('error', static function (BaseFrame $frame) use ($onConnect, $onError) {
+        $this->stream->once('error', function (BaseFrame $frame) use ($onConnect, $onError) {
             $this->stream->removeListener('connect', $onConnect);
             $onError($frame);
         });
