@@ -58,6 +58,9 @@
             return {
                 currentAttendanceStatus: this.event.attendance.status.current,
                 numAvailable: this.event.attendance.payload.attendees.available,
+                numPending: this.event.attendance.payload.attendees.pending,
+                numAccepted: this.event.attendance.payload.attendees.accepted,
+                numDeclined: this.event.attendance.payload.attendees.declined,
                 guests: this.event.attendance.payload.guests,
 
                 isPersonalEvent: this.event.level === 'personal',
@@ -241,6 +244,9 @@
                             /* Update data with the result from async request
                              */
                             self.numAvailable = response.data.attendees.available
+                            self.numPending = response.data.attendees.pending;
+                            self.numAccepted = response.data.attendees.accepted;
+                            self.numDeclined = response.data.attendees.declined;
 
                             toast.toastTimeout({
                                 text: name + ' has been uninvited',
@@ -292,6 +298,9 @@
                              */
                             self.currentAttendanceStatus = status;
                             self.numAvailable = response.data.attendees.available;
+                            self.numPending = response.data.attendees.pending;
+                            self.numAccepted = response.data.attendees.accepted;
+                            self.numDeclined = response.data.attendees.declined;
 
                             for (let i = 0; i < self.guests.length; i++) {
                                 if (self.guests[i].id === userId) {
@@ -405,9 +414,9 @@
                         </div>
 
                         <p class="content"><strong>
-                            {{ this.event.attendance.payload.attendees.accepted }} accepted,
-                            {{ this.event.attendance.payload.attendees.declined }} declined,
-                            {{ this.event.attendance.payload.attendees.pending }} pending
+                            {{ numAccepted }} accepted,
+                            {{ numDeclined }} declined,
+                            {{ numPending }} pending
                         </strong></p>
 
                         <ul class="action-list attendance-guest-list" v-if="guests">
