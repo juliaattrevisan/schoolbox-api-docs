@@ -267,16 +267,24 @@
                         .then(function (response) {
                             attendanceList.find('article').html(response.data.fragment);
 
+                            let userId = response.data.user.id.toString();
+                            let fullname = response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname;
+
                             /* Update data with the result from async request
                              */
                             self.currentAttendanceStatus = status;
                             self.numAvailable = response.data.attendees.available
 
-                            /* You're now in the data stack
+                            /* If you're already in the stack, repeal and replace your invitation
+                             * with the updated version. Otherwise just insert yourself as usual
                              */
-                            self.guests.push({
-                                id: response.data.user.id,
-                                name: response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname,
+                            if (Object.keys(self.guests).includes(userId)) {
+                                self.$delete(self.guests, userId);
+                            }
+
+                            self.$set(self.guests, userId, {
+                                id: userId,
+                                name: fullname,
                                 status: status
                             });
 
