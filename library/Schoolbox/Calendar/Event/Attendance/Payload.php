@@ -115,11 +115,6 @@ class Payload
              */
             'guests' => $guests,
 
-            /* Whether the current user is currently invited
-             * i.e. currently on the attendance list
-             */
-            'isInvited' => isset($guests[$user->getId()]),
-
             /* Whether the current user can modify the event
              */
             'canModify' => $canModify,

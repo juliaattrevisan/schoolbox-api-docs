@@ -218,17 +218,28 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.user.id.toString();
+                            let userId = response.data.user.id;
 
-                            /* If you remove yourself from the list, reset your currentAttendanceStatus
-                             */
-                            if (Object.keys(self.guests).includes(userId)) {
-                                self.currentAttendanceStatus = null;
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === id) {
+
+                                    /* Remove invitation from list
+                                     */
+                                    self.guests.splice(i, 1);
+
+                                    /* If you removed yourself from the list,
+                                     * reset your currentAttendanceStatus to null
+                                     */
+                                    if (id === userId) {
+                                        self.currentAttendanceStatus = null;
+                                    }
+
+                                    break;
+                                }
                             }
 
                             /* Update data with the result from async request
                              */
-                            self.$delete(self.guests, id);
                             self.numAvailable = response.data.attendees.available
 
                             toast.toastTimeout({
@@ -273,26 +284,30 @@
                         .then(function (response) {
                             attendanceList.find('article').html(response.data.fragment);
 
-                            let userId = response.data.user.id.toString();
+                            let userId = response.data.user.id;
                             let fullname = response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname;
+                            let found = false;
 
                             /* Update data with the result from async request
                              */
                             self.currentAttendanceStatus = status;
-                            self.numAvailable = response.data.attendees.available
+                            self.numAvailable = response.data.attendees.available;
 
-                            /* If you're already in the stack, repeal and replace your invitation
-                             * with the updated version. Otherwise just insert yourself as usual
-                             */
-                            if (Object.keys(self.guests).includes(userId)) {
-                                self.$delete(self.guests, userId);
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === userId) {
+                                    self.guests[i].status = status;
+                                    found = true;
+                                    break;
+                                }
                             }
 
-                            self.$set(self.guests, userId, {
-                                id: userId,
-                                name: fullname,
-                                status: status
-                            });
+                            if (!found) {
+                                self.guests.push({
+                                    id: userId,
+                                    name: fullname,
+                                    status: status
+                                });
+                            }
 
                             toast.toastTimeout({
                                 text: 'Invitation successfully updated',
@@ -395,7 +410,7 @@
                             {{ this.event.attendance.payload.attendees.pending }} pending
                         </strong></p>
 
-                        <ul class="action-list attendance-guest-list">
+                        <ul class="action-list attendance-guest-list" v-if="guests">
                             <li class="actions-small-1" v-for="(guest, index) in guests">
                                 <div class="compact card small-11">
                                     <a :href="'/search/user/' + guest.id" title="View Profile">
@@ -409,7 +424,7 @@
                                     </a>
                                 </div>
                                 <nav>
-                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(index, guest.name)" title="Remove guest"></a>
+                                    <a class="icon-close no-text" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
                                 </nav>
                             </li>
                         </ul>
