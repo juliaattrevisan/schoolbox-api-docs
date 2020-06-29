@@ -175,6 +175,14 @@
 
             /**
              * Generate a path via const
+             *
+             * Provision of the returnUrl allows us to return to the place
+             * from whence thou cam'st
+             *
+             * @param str        the path where we need to replace a var
+             * @param eventId    the event's id
+             * @param returnUrl  a url to visit after saving
+             * @return string
              */
             generateUrlFromConst(str, eventId, returnUrl) {
                 let url = str.replace('{eventId}', eventId);
@@ -186,12 +194,14 @@
                 return url;
             },
 
+
             /**
              * Accept an invitation
              */
             rsvpAccept() {
                 this.rsvp(ATTENDANCE_STATUS_ACCEPTED, this.rsvpAcceptPath);
             },
+
 
             /**
              * Decline an invitation
@@ -200,8 +210,12 @@
                 this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
             },
 
+
             /**
              * Remove an invitation
+             *
+             * @param id    the user's id
+             * @param name  the user's name
              */
             rsvpDelete(id, name) {
                 let self = this;
@@ -264,11 +278,12 @@
                         });
             },
 
+
             /**
              * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
              *
-             * @param status
-             * @param endpoint
+             * @param status    the new status
+             * @param endpoint  the endpoint to send this new status
              */
             rsvp(status, endpoint) {
                 let self = this;
@@ -338,6 +353,8 @@
             /**
              * Decide whether you can RSVP to an invitation or, alternatively,
              * insert yourself into the guest list (same approach either way)
+             *
+             * @return boolean
              */
             canRsvp() {
 
@@ -394,6 +411,10 @@
                      */
                     return false;
                 }
+
+                /* RSVP Buttons disabled by default
+                 */
+                return false;
             },
 
 
