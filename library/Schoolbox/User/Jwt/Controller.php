@@ -11,6 +11,7 @@ namespace Schoolbox\User\Jwt;
 
 use Alaress\Web\Controller\Base;
 use External_User;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
@@ -18,48 +19,48 @@ use User\Logger;
 class Controller extends Base
 {
     /**
-     * @var UserAccessMapper
+     * @var Jwt
      */
-    protected $userAccessMapper;
+    private $jwtBuilder;
+
 
     /**
-     * @var External_User
+     * Constructor
+     *
+     * @param Jwt $jwtBuilder
      */
-    private $externalHandler;
-
-    /** @var Logger\Mapper */
-    private $assumeUserLogMapper;
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param External_User    $externalHandler
-     * @param Logger\Mapper    $assumeUserLogMapper
-     */
-    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler, Logger\Mapper $assumeUserLogMapper)
+    public function __construct(Jwt $jwtBuilder)
     {
-        $this->userAccessMapper    = $userAccessMapper;
-        $this->externalHandler     = $externalHandler;
-        $this->assumeUserLogMapper = $assumeUserLogMapper;
+        $this->jwtBuilder = $jwtBuilder;
     }
 
 
     /**
-     * Function to transfer to another user (impersonate), stores your previous session for later return
+     * Retrieve a JWT for the current user.
      *
      * @api /user/jwt
-     * @param User $user
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function getJwtForSelf()
     {
         $this->getJwtForUser($this->getUser());
     }
 
+    /**
+     * Retrieve a JWT for a specified user.
+     *
+     * @api /user/jwt/{userId}
+     * @param User $user
+     */
     public function getJwtForUser(User $user): void
     {
         // JSON response:
         // generate from JWT generator
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                [
+                    'token' => $this->jwtBuilder->generate($user)
+                ]
+            )
+        );
     }
 }

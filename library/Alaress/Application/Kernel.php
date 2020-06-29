@@ -37,6 +37,7 @@ use GuzzleHttp;
 use Predis;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
@@ -1421,6 +1422,16 @@ abstract class Kernel
                     $mapperFactory->get(AssessmentMapper::class)
                 );
             }
+        );
+
+
+        // User JWT generator
+        $di->set(
+            'user.jwtBuilder',
+            $di->lazyNew(
+                Jwt::class,
+                ['configLoader' => $di->get('config')]
+            )
         );
 
 

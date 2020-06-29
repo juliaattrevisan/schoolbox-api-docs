@@ -43,7 +43,7 @@ class Module extends BaseModule
             return $this->preloadUser($params);
         };
 
-        $this->register('GET', '/', 'getJwtForSelf', $isLoggedIn);
+        $this->register('GET', '', 'getJwtForSelf', $isLoggedIn);
         $this->register('GET', '/{userId}', 'getJwtForUser', $isUserOrSuperUser, $preloadUser);
     }
 
@@ -73,11 +73,12 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'externalHandler'     => $injector->lazyGet('externalUser'),
-            'assumeUserLogMapper' => $this->getMapperFactory()->getLazy(Logger\Mapper::class),
-        ]));
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                ['jwtBuilder' => $injector->lazyGet('user.jwtBuilder'),]
+            )
+        );
     }
-
 }
