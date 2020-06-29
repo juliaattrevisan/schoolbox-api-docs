@@ -121,7 +121,7 @@ class Controller extends Base
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
-        if ($analysis->getNumAvailable() <= 0) {
+        if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
         }
 
@@ -180,7 +180,7 @@ class Controller extends Base
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
-        if ($analysis->getNumAvailable() <= 0) {
+        if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
         }
 
