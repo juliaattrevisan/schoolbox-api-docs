@@ -218,7 +218,13 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            console.log(response);
+                            let userId = response.data.user.id.toString();
+
+                            /* If you remove yourself from the list, reset your currentAttendanceStatus
+                             */
+                            if (Object.keys(self.guests).includes(userId)) {
+                                self.currentAttendanceStatus = null;
+                            }
 
                             /* Update data with the result from async request
                              */
