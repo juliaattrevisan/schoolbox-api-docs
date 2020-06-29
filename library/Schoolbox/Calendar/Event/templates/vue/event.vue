@@ -333,6 +333,60 @@
                         });
             },
 
+
+            /**
+             * Decide whether you can RSVP to an invitation or, alternatively,
+             * insert yourself into the guest list (same approach either way)
+             */
+            canRsvp(id) {
+
+                /* If your currentAttendanceStatus is null and there are available spaces,
+                 * then you haven't yet responded and are able to insert yourself into the list
+                 *
+                 * The buttons should be shown
+                 */
+
+                /* If your currentAttendanceStatus is null and there aren't available spaces
+                 * then you can't insert yourself into the list
+                 *
+                 * The buttons should be hidden
+                 */
+
+                /* If your currentAttendanceStatus is Accepted, you can always decline
+                 * freeing up a spot for someone else to occupy
+                 *
+                 * The buttons should be shown
+                 */
+
+                /* If your currentAttendanceStatus is Declined and there are available spaces
+                 * then you can change your mind and accept the invitation
+                 *
+                 * The buttons should be shown
+                 */
+
+                /* If your currentAttendanceStatus is Declined and there aren't available spaces
+                 * then you can't change your mind; embrace it
+                 *
+                 * The buttons should be hidden
+                 */
+            },
+
+            /**
+             * Decide whether $id is currently on the guest list, regardless of status
+             *
+             * @param id
+             * @returns {boolean}
+             */
+            isInvited(id) {
+                for (let i = 0; i < this.guests.length; i++) {
+                    if (this.guests[i].id === id) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
             }
