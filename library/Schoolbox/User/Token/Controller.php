@@ -33,9 +33,9 @@ class Controller extends Base
 
 
     /**
-     * Retrieve a JWT for the current user.
+     * Retrieve an auth token for the current user.
      *
-     * @api /user/jwt
+     * @api /user/token
      */
     public function getJwtForSelf()
     {
@@ -43,9 +43,9 @@ class Controller extends Base
     }
 
     /**
-     * Retrieve a JWT for a specified user.
+     * Retrieve an auth token for a specified user.
      *
-     * @api /user/jwt/{userId}
+     * @api /user/token/{userId}
      * @param User $user
      */
     public function getJwtForUser(User $user): void
