@@ -6,18 +6,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\User\Jwt;
+namespace Schoolbox\User\Token;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
-use User\Logger;
 
 class Module extends BaseModule
 {

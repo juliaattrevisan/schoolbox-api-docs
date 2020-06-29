@@ -7,14 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\User\Jwt;
+namespace Schoolbox\User\Token;
 
 use Alaress\Web\Controller\Base;
-use External_User;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
-use User\Logger;
 
 class Controller extends Base
 {
@@ -58,7 +55,7 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput(
                 [
-                    'token' => $this->tokenBuilder->generate($user)
+                    'token' => $this->tokenBuilder->generate($user),
                 ]
             )
         );

@@ -11,11 +11,11 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Aura\Di\ContainerInterface as DependencyInjector;
-use Schoolbox\User\Jwt\Module as JwtModule;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
 use Schoolbox\User\Profile\DocumentManagement\Module as UserProfileDocumentManagementModule;
+use Schoolbox\User\Token\Module as UserTokenModule;
 
 class User implements ModuleConfigInterface
 {
@@ -52,8 +52,8 @@ class User implements ModuleConfigInterface
         $module = new ResetPasswordModule($di);
         $module->init('/passwordReset');
 
-        // JWT
-        $module = new JwtModule($di);
-        $module->init('/user/jwt');
+        // Token
+        $module = new UserTokenModule($di);
+        $module->init('/user/token');
     }
 }
