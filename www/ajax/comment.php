@@ -128,7 +128,7 @@ else {
 
             if (isset($_POST['deleteComment']) && $_POST['deleteComment'] == true) {
                 if (isset($comment)) {
-                    if ($cMap->softDelete($comment)) {
+                    if ($cMap->delete($comment)) {
                         respond(204, '');
                     } else {
                         respond(410, 'Comment has already been deleted.');
@@ -139,7 +139,6 @@ else {
             if (isset($_POST['commentBody']) && strlen($_POST['commentBody'])) {
                 // update the comment body and set the modified timestamp
                 $comment->setBody($_POST['commentBody']);
-                $comment->setModified(new Alaress_Date_Format(time(), 'U'));
             } else {
                 respond(400, 'Comment cannot be blank.');
             }
