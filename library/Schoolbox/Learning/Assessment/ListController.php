@@ -306,7 +306,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateWeight(IAssessable $assessment): void
     {
-        $weight = (int) $this->getRequest()->post['weight'];
+        $weight = (float) $this->getRequest()->post['weight'];
         if ($weight < 0) {
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid weight value']));
