@@ -59,7 +59,7 @@ class Mapper extends BaseMapper
         $this->uses('open_date', self::TYPE_DATETIME);
         $this->uses('due_date', self::TYPE_DATETIME);
         $this->uses('close_date', self::TYPE_DATETIME);
-        $this->uses('weight', self::TYPE_INTEGER);
+        $this->uses('weight', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('work_type_id', WorkTypeMapper::class, 'id', self::TYPE_MODEL, null, 'workType', 'work_type');
         $this->uses('default_open_span', self::TYPE_INTEGER);

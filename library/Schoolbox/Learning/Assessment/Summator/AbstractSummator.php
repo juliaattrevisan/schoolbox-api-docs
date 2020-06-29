@@ -108,7 +108,7 @@ abstract class AbstractSummator implements ISummator
 
     /**
      * @param float $val
-     * @param int $assessableWeight
+     * @param float $assessableWeight
      * @return void
      */
     protected abstract function aggregate($val, $assessableWeight);

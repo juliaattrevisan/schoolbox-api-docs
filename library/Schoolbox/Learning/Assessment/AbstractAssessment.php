@@ -69,7 +69,7 @@ abstract class AbstractAssessment implements IAssessable
     private $closeAt;
 
     /**
-     * @var int
+     * @var float
      */
     private $weight;
 
@@ -803,7 +803,7 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int
+     * @return float
      */
     public function getWeight()
     {
