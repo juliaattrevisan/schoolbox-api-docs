@@ -287,6 +287,76 @@
 
 
             /**
+             * Decide whether you can RSVP to an invitation or, alternatively,
+             * insert yourself into the guest list (same approach either way)
+             *
+             * @param currentAttendanceStatus  your current attendance status, int|null
+             * @param numAvailable             the quantity of free spaces available
+             * @return boolean
+             */
+            canRsvp(currentAttendanceStatus, numAvailable) {
+
+                /* If you've not responded at all, or are currently Pending
+                 */
+                if (currentAttendanceStatus === null || currentAttendanceStatus === ATTENDANCE_STATUS_PENDING) {
+
+                    /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
+                     * then you haven't yet responded and are able to insert yourself into the list
+                     *
+                     * The buttons should be shown
+                     */
+                    if (numAvailable > 0) {
+                        return true;
+                    }
+
+                    /* If your currentAttendanceStatus is null, or Pending, and there aren't available spaces
+                     * then you can't insert yourself into the list, nor accept/decline
+                     *
+                     * The buttons should be hidden
+                     */
+                    return false;
+                }
+
+                /* If you've currently Accepted
+                 */
+                if (currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED) {
+
+                    /* If your currentAttendanceStatus is Accepted, you can always decline
+                     * freeing up a spot for someone else to occupy
+                     *
+                     * The buttons should be shown
+                     */
+                    return true;
+                }
+
+                /* If you've currently Declined
+                 */
+                if (currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED) {
+
+                    /* If your currentAttendanceStatus is Declined and there are available spaces
+                     * then you can change your mind and accept the invitation
+                     *
+                     * The buttons should be shown
+                     */
+                    if (numAvailable > 0) {
+                        return true;
+                    }
+
+                    /* If your currentAttendanceStatus is Declined and there aren't available spaces
+                     * then you can't change your mind; embrace it
+                     *
+                     * The buttons should be hidden
+                     */
+                    return false;
+                }
+
+                /* RSVP Buttons disabled by default
+                 */
+                return false;
+            },
+
+
+            /**
              * Update whether the form can be submitted.
              *
              * It can be submitted if the title contains at least one non-space
@@ -702,12 +772,12 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
+                        <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
+                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: eventExtendedProps.attendance.status === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
+                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: eventExtendedProps.attendance.status === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
                             </span>
                         </span>
 
