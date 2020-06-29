@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -211,8 +211,8 @@ class Comment implements ISoftDeletable
 	 * @return boolean
 	 */
 	public function isDeleted() {
-		return !!$this->deleted;
-	}
+        return ($this->getDeleted() instanceof Alaress_Date_Format && !$this->getDeleted()->isNull());
+    }
 
 	/**
 	 * Returns the most relevant of modified- and created-dates.
