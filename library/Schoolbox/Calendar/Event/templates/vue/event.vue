@@ -56,7 +56,6 @@
         },
         data() {
             return {
-                canModify: this.event.attendance.payload.canModify,
                 currentAttendanceStatus: this.event.attendance.status.current,
                 numAvailable: this.event.attendance.payload.attendees.available,
                 numPending: this.event.attendance.payload.attendees.pending,
@@ -416,12 +415,13 @@
 
 
             /**
-             * Whether you can delete an invitation
+             * Whether you can edit this event,
+             * including whether you can delete an invitation
              *
-             * @returns {default.event.attendance.payload.canModify}
+             * @returns boolean
              */
-            canRsvpDelete() {
-                return this.canModify;
+            canModify() {
+                return this.event.canModify;
             },
 
 
@@ -434,7 +434,7 @@
 
 <template>
     <div>
-        <div class="small-12 columns" v-if="this.event.canModify">
+        <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
                 <nav><a :href="modifyPath" class="icon-modify" title="Modify Event"></a></nav>
             </div>
@@ -492,7 +492,7 @@
                 </div>
                 <div class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.numAvailable != null || this.event.canModify">
+                        <div class="content" v-if="this.numAvailable != null || canModify()">
                             <span class="meta" v-if="this.numAvailable != null">
                                 <span id="attendance-guests-available">
                                     <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
@@ -500,7 +500,7 @@
                                 </span> available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="this.event.canModify && this.numAvailable">
+                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>
@@ -525,7 +525,7 @@
                                     </a>
                                 </div>
                                 <nav>
-                                    <a class="icon-close no-text" v-if="canRsvpDelete()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
+                                    <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
                                 </nav>
                             </li>
                         </ul>
