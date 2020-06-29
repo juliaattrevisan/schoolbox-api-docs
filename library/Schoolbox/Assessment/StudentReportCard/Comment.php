@@ -8,16 +8,23 @@
 
 namespace Schoolbox\Assessment\StudentReportCard;
 
-
 use Schoolbox\ISoftDeletable;
+use Schoolbox\IModel;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class Comment implements ISoftDeletable
+class Comment implements IModel, ISoftDeletable
 {
-
-	/** @var int $id */
-	protected $id;
+    use Id;
+    use DeletedAtDate;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use CreateCollection;
 
 	/** @var User $commenter */
 	protected $commenter;
@@ -31,26 +38,11 @@ class Comment implements ISoftDeletable
 	/** @var string $body */
 	protected $body;
 
-	/** @var \Alaress_Date_Format $created */
-	protected $created;
-
-	/** @var \Alaress_Date_Format $modified */
-	protected $modified;
-
-	/** @var \Alaress_Date_Format $deleted */
-	protected $deleted;
-
 	/** @var bool $parent_visibility */
 	protected $parent_visibility;
 
 	/** @var bool $student_visibility */
 	protected $student_visibility;
-
-
-	public function __construct() {
-		$this->created = new \Alaress_Date_Format();
-	}
-
 
 	/**
 	 * @param string $body
@@ -92,63 +84,6 @@ class Comment implements ISoftDeletable
 	 */
 	public function getCommenter() {
 		return $this->commenter;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $created
-	 */
-	public function setCreated($created) {
-
-		$this->created = $created;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreated() {
-		return $this->created;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $deleted_date
-	 */
-	public function setDeleted($deleted_date) {
-		$this->deleted = $deleted_date;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDeleted() {
-		return $this->deleted;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $modified_date
-	 */
-	public function setModified($modified_date) {
-		$this->modified = $modified_date;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getModified() {
-		return $this->modified;
-	}
-
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
 	}
 
 	/**
@@ -206,25 +141,4 @@ class Comment implements ISoftDeletable
 	public function isVisibleToStudent() {
 		return !!$this->student_visibility;
 	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isDeleted() {
-        return ($this->getDeleted() instanceof Alaress_Date_Format && !$this->getDeleted()->isNull());
-    }
-
-	/**
-	 * Returns the most relevant of modified- and created-dates.
-	 *
-	 * @return \Alaress_Date_Format
-	 */
-	public function getRelevantDate() {
-		if($this->modified) {
-			return $this->modified;
-		}
-		return $this->created;
-	}
-
-
 }

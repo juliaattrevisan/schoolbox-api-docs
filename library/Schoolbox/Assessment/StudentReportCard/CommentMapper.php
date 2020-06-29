@@ -16,119 +16,22 @@ class CommentMapper extends Mapper
 
     protected function mapping()
     {
-
         // register table and model
         $this->hasTable('reportcard_comment');
         $this->hasModel(Comment::class);
 
-        // register mapping
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'category_id',
-                'property' => 'category',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'category',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'commenter_id',
-                'property' => 'commenter',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'commenter',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'student_id',
-                'property' => 'student',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'student',
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'body',
-                'property' => 'body',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'created',
-                'property'          => 'created',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'modified',
-                'property' => 'modified',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted',
-                'property' => 'deleted',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'student_visibility',
-                'property' => 'studentVisibility',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'parent_visibility',
-                'property' => 'parentVisibility',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('body', self::TYPE_STRING);
+        $this->uses('student_visibility',self::TYPE_BOOLEAN );
+        $this->uses('parent_visibility',self::TYPE_BOOLEAN );
+        $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
+        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
 
-        // register joins
-        $this->hasJoin(
-            'category', array(
-            'mapper'         => '\\Schoolbox\\Resource\\Folder\\Mapper',
-            'this_key'       => 'category_id',
-            'other_key'      => 'id',
-            'this_property'  => 'category',
-            'other_property' => 'id'
-        )
-        );
-        $this->hasJoin(
-            'commenter', array(
-            'mapper'         => '\\Schoolbox\\UserMapper',
-            'this_key'       => 'commenter_id',
-            'other_key'      => 'id',
-            'this_property'  => 'commenter',
-            'other_property' => 'id'
-        )
-        );
-        $this->hasJoin(
-            'student', array(
-            'mapper'         => '\\Schoolbox\\UserMapper',
-            'this_key'       => 'student_id',
-            'other_key'      => 'id',
-            'this_property'  => 'student',
-            'other_property' => 'id'
-        )
-        );
 
-        $this->hasSoftDeleteDateField('deleted');
-
+        $this->joins('category_id', \Schoolbox\Resource\Folder\Mapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('commenter_id', \Schoolbox\UserMapper::class, 'id', null, null, 'commenter', 'commenter');
+        $this->joins('student_id', \Schoolbox\UserMapper::class, 'id', null, null, 'student', 'student');
     }
 
     public function findByColumn($columnName, $columnValue, $options = array())
