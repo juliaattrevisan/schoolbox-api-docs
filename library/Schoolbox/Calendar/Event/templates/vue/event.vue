@@ -350,11 +350,18 @@
              * Decide whether you can RSVP to an invitation or, alternatively,
              * insert yourself into the guest list (same approach either way)
              *
-             * @param currentAttendanceStatus  your current attendance status, int|null
-             * @param numAvailable             the quantity of free spaces available
+             * @param currentAttendanceStatus int|null your current attendance status,
+             * @param maxAttendees            int|null maximum number of people who can attend,
+             * @param numAvailable            int      the quantity of free spaces available,
              * @return boolean
              */
-            canRsvp(currentAttendanceStatus, numAvailable) {
+            canRsvp(currentAttendanceStatus, maxAttendees, numAvailable) {
+
+                /* No limit; can always rsvp
+                 */
+                if (maxAttendees === null) {
+                    return true;
+                }
 
                 /* If you've not responded at all, or are currently Pending
                  */
@@ -482,7 +489,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp(this.currentAttendanceStatus, this.numAvailable)">
+                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 

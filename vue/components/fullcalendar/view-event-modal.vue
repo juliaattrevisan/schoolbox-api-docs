@@ -290,11 +290,18 @@
              * Decide whether you can RSVP to an invitation or, alternatively,
              * insert yourself into the guest list (same approach either way)
              *
-             * @param currentAttendanceStatus  your current attendance status, int|null
-             * @param numAvailable             the quantity of free spaces available
+             * @param currentAttendanceStatus int|null your current attendance status,
+             * @param maxAttendees            int|null maximum number of people who can attend,
+             * @param numAvailable            int      the quantity of free spaces available,
              * @return boolean
              */
-            canRsvp(currentAttendanceStatus, numAvailable) {
+            canRsvp(currentAttendanceStatus, maxAttendees, numAvailable) {
+
+                /* No limit; can always rsvp
+                 */
+                if (maxAttendees === null) {
+                    return true;
+                }
 
                 /* If you've not responded at all, or are currently Pending
                  */
@@ -772,7 +779,7 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-                        <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.available)" :class="'rsvp'">
+                        <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
                                 <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: eventExtendedProps.attendance.status === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
                             </span>
