@@ -77,7 +77,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['jwtBuilder' => $injector->lazyGet('user.jwtBuilder'),]
+                ['tokenBuilder' => $injector->lazyGet('user.tokenBuilder'),]
             )
         );
     }

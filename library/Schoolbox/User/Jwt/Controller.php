@@ -21,17 +21,17 @@ class Controller extends Base
     /**
      * @var Jwt
      */
-    private $jwtBuilder;
+    private $tokenBuilder;
 
 
     /**
      * Constructor
      *
-     * @param Jwt $jwtBuilder
+     * @param Jwt $tokenBuilder
      */
-    public function __construct(Jwt $jwtBuilder)
+    public function __construct(Jwt $tokenBuilder)
     {
-        $this->jwtBuilder = $jwtBuilder;
+        $this->tokenBuilder = $tokenBuilder;
     }
 
 
@@ -58,7 +58,7 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput(
                 [
-                    'token' => $this->jwtBuilder->generate($user)
+                    'token' => $this->tokenBuilder->generate($user)
                 ]
             )
         );

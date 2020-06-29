@@ -1425,9 +1425,9 @@ abstract class Kernel
         );
 
 
-        // User JWT generator
+        // User token generator
         $di->set(
-            'user.jwtBuilder',
+            'user.tokenBuilder',
             $di->lazyNew(
                 Jwt::class,
                 ['configLoader' => $di->get('config')]
