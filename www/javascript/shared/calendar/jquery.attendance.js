@@ -150,7 +150,6 @@
          */
         function onAfterAttendanceChange(responseText) {
             config.attendanceList.find('article').html(responseText.fragment);
-            config.available.html(responseText.attendees.available ? responseText.attendees.available : 'No');
 
             toggleCreateAttendance(responseText.attendees.available);
         }
