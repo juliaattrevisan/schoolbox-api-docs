@@ -274,7 +274,6 @@
                         <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
                         {% if isSchoolboxAdmin %}
-                            <input type="hidden" name="superuser" value="{{ user.isSuperuser ? '1' : '0' }}" />
                             <input id="superuser"
                                    type="checkbox"
                                    name="superuser"
@@ -294,7 +293,6 @@
                         {% if method=='Update' %}
                             {# Only modify user screen has the enabled checkbox #}
                             {% if isSchoolboxAdmin %}
-                                <input type="hidden" name="account_enabled" value="{{ user.enabled ? '1' : '0' }}" />
                                 <input id="account_enabled"
                                        type="checkbox"
                                        name="account_enabled"
