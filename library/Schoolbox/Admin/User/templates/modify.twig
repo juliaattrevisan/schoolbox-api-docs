@@ -27,7 +27,10 @@
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
             <li>
-                {% if not isSchoolboxAdmin %}
+                {% if isSchoolboxAdmin %}
+                    <a class="icon-delete menu_disabled"
+                       title="This user may not be deleted">Delete User</a>
+                {% else %}
                     <a class="icon-delete"
                        title="Delete User"
                        data-delete
@@ -271,7 +274,9 @@
                         <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
                         {% if isSchoolboxAdmin %}
-                            <input type="hidden" name="superuser" value="{{ user.isSuperuser ? '1' : '0' }}" />
+                            {% if user.isSuperuser %}
+                                <input type="hidden" name="superuser" value="1" />
+                            {% endif %}
                             <input id="superuser"
                                    type="checkbox"
                                    name="superuser"
@@ -290,9 +295,25 @@
 
                         {% if method=='Update' %}
                             {# Only modify user screen has the enabled checkbox #}
-                            <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
-                                   {% if user.enabled %}checked{% endif %} />
-                            <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                            {% if isSchoolboxAdmin %}
+                                {% if user.enabled %}
+                                    <input type="hidden" name="account_enabled" value="1" />
+                                {% endif %}
+                                <input id="account_enabled"
+                                       type="checkbox"
+                                       name="account_enabled"
+                                       value="1"
+                                       disabled
+                                       {% if user.enabled %}checked{% endif %} />
+                                <label for="account_enabled"
+                                       class="checkbox-label"
+                                       title="This user's account must always be enabled"
+                                >Account Enabled</label>
+                            {% else %}
+                                <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
+                                       {% if user.enabled %}checked{% endif %} />
+                                <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
