@@ -535,6 +535,7 @@
                     duration: { days: config.days },
                 }
             }"
+            :header="false"
             :event-time-format="helper.eventTimeFormat"
             :content-height="this.contentHeight"
             default-view="list"
