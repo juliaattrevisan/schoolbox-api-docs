@@ -28,7 +28,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             [
                 'component' => $this,
             ],
-            !$this->getConfig('compactMode'),
+            false,
             false
         );
     }
