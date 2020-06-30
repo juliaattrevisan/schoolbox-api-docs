@@ -404,7 +404,7 @@
              * @return boolean
              */
             isLimitedAttendance: function(max) {
-                return max === null;
+                return max !== null;
             },
 
 
