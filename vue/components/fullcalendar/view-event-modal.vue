@@ -299,13 +299,13 @@
 
                 /* No limit; can always rsvp
                  */
-                if (maxAttendees === null) {
+                if (!this.isLimitedAttendance(maxAttendees)) {
                     return true;
                 }
 
                 /* If you've not responded at all, or are currently Pending
                  */
-                if (currentAttendanceStatus === null || currentAttendanceStatus === ATTENDANCE_STATUS_PENDING) {
+                if (currentAttendanceStatus === null || this.isPending(currentAttendanceStatus)) {
 
                     /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
                      * then you haven't yet responded and are able to insert yourself into the list
@@ -326,7 +326,7 @@
 
                 /* If you've currently Accepted
                  */
-                if (currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED) {
+                if (this.isAccepted(currentAttendanceStatus)) {
 
                     /* If your currentAttendanceStatus is Accepted, you can always decline
                      * freeing up a spot for someone else to occupy
@@ -338,7 +338,7 @@
 
                 /* If you've currently Declined
                  */
-                if (currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED) {
+                if (this.isDeclined(currentAttendanceStatus)) {
 
                     /* If your currentAttendanceStatus is Declined and there are available spaces
                      * then you can change your mind and accept the invitation
@@ -369,6 +369,17 @@
              * @param currentAttendanceStatus int|null
              * @return boolean
              */
+            isPending: function(currentAttendanceStatus) {
+                return currentAttendanceStatus === ATTENDANCE_STATUS_PENDING;
+            },
+
+
+            /**
+             * Find out whether you've Accepted the event's invitation
+             *
+             * @param currentAttendanceStatus int|null
+             * @return boolean
+             */
             isAccepted: function(currentAttendanceStatus) {
                 return currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED;
             },
@@ -388,6 +399,9 @@
             /**
              * Find out whether this event's max_attendees setting means there are a limited
              * number of people who can attend; null means unlimited, 0 prohibits acceptance
+             *
+             * @param max int|null
+             * @return boolean
              */
             isLimitedAttendance: function(max) {
                 return max === null;
