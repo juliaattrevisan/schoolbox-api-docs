@@ -35,6 +35,7 @@
             RevealModal
         },
         created() {
+            this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
@@ -149,27 +150,6 @@
                         path: data?.links?.path
                     },
                 };
-            },
-
-            /**
-             * Create new attendances
-             */
-            createAttendancePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Accept
-             */
-            rsvpAcceptPath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Decline
-             */
-            rsvpDeclinePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             }
         },
         methods: {
@@ -202,14 +182,14 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, this.rsvpAcceptPath);
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
             },
 
             /**
              * Decline an invitation
              */
             rsvpDecline() {
-                this.rsvp(ATTENDANCE_STATUS.DECLINED, this.rsvpDeclinePath);
+                this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
             },
 
             /**
@@ -234,12 +214,13 @@
 
                 axios.request(request)
                         .then(function (response) {
+
+                            /* Update data with the result from async request
+                             */
                             self.event.extendedProps.data.attendance.attendanceStatus = status;
                             self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
                             self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
 
-                            /* Update data with the result from async request
-                             */
                             self.event.setExtendedProp('data', self.event.extendedProps.data);
 
                             toast.toastTimeout({
@@ -676,10 +657,10 @@
                     <section>
                         <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
+                                <a :href="ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
+                                <a :href="ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 

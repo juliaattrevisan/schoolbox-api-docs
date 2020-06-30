@@ -15,6 +15,7 @@ export const ENDPOINTS = Object.freeze({
     URL_ATTENDANCE_RSVP_DECLINE: '/calendar/event/attendance/{eventId}/decline',
     URL_ATTENDANCE_RSVP_DELETE: '/calendar/event/attendance/{eventId}/delete',
 
+
     /**
      * Generate a path via const
      *
@@ -34,5 +35,53 @@ export const ENDPOINTS = Object.freeze({
         }
 
         return url;
+    },
+
+
+    /**
+     * Onwards to the modify screen
+     */
+    modifyPath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, eventId, btoa(window.location.pathname));
+    },
+
+
+    /**
+     * Create new attendances
+     */
+    createAttendancePath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, eventId, btoa(window.location.pathname));
+    },
+
+
+    /**
+     * Delete attendances
+     */
+    deleteAttendancePath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, eventId, btoa(window.location.pathname));
+    },
+
+
+    /**
+     * RSVP Accept
+     */
+    rsvpAcceptPath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, eventId, btoa(window.location.pathname));
+    },
+
+
+    /**
+     * RSVP Decline
+     */
+    rsvpDeclinePath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, eventId, btoa(window.location.pathname));
+    },
+
+
+    /**
+     * RSVP Delete
+     */
+    rsvpDeletePath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, eventId, btoa(window.location.pathname));
     }
 });

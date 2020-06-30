@@ -27,6 +27,7 @@
             audiencesModal
         },
         created() {
+            this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
@@ -105,48 +106,6 @@
                 let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
 
                 return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
-            },
-
-            /**
-             * Onwards to the modify screen
-             */
-            modifyPath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * Create new attendances
-             */
-            createAttendancePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * Delete attendances
-             */
-            deleteAttendancePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Accept
-             */
-            rsvpAcceptPath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Decline
-             */
-            rsvpDeclinePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Delete
-             */
-            rsvpDeletePath: function() {
-                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
             }
         },
         methods: {
@@ -155,7 +114,7 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, this.rsvpAcceptPath);
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
             },
 
 
@@ -163,7 +122,7 @@
              * Decline an invitation
              */
             rsvpDecline() {
-                this.rsvp(ATTENDANCE_STATUS.DECLINED, this.rsvpDeclinePath);
+                this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
             },
 
 
@@ -178,7 +137,7 @@
                 let toast = this.jQuery('[data-toast]');
 
                 let request = {
-                    url: this.rsvpDeletePath,
+                    url: ENDPOINTS.rsvpDeletePath(this.event.id),
                     data:  qs.stringify({userId: id}),
                     method: 'post',
                     responseType: 'json'
@@ -325,7 +284,7 @@
     <div>
         <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
-                <nav><a :href="modifyPath" class="icon-modify" title="Modify Event"></a></nav>
+                <nav><a :href="ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
@@ -374,8 +333,8 @@
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
+                            <li><a :href="ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                            <li><a :href="ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                         </ul>
                     </section>
                 </div>
@@ -389,7 +348,7 @@
                                 </span> available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
+                            <form :id="'createAttendanceForm'" :action="ENDPOINTS.createAttendancePath(this.event.id)" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>
