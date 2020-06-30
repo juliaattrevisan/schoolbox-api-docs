@@ -178,6 +178,27 @@
                 });
             },
 
+
+            /**
+             * Decide whether the modal has component actions or not
+             *
+             * Show the bar if you can do anything with its contents
+             * Otherwise, hide it
+             *
+             * @param eventExtendedProps object
+             * @return boolean
+             */
+            hasComponentActions(eventExtendedProps) {
+                return eventExtendedProps.folder.id ||
+                    eventExtendedProps.links.view ||
+                    eventExtendedProps.links.modify ||
+                    eventExtendedProps.links.delete ||
+                    eventExtendedProps.classAttendance.url ||
+                    eventExtendedProps.booking.actions.length > 0 ||
+                    this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)
+            },
+
+
             /**
              * Accept an invitation
              */
@@ -643,14 +664,7 @@
              -->
             <template v-else></template>
 
-            <template v-if="eventExtendedProps.folder.id ||
-                eventExtendedProps.links.view ||
-                eventExtendedProps.links.modify ||
-                eventExtendedProps.links.delete ||
-                eventExtendedProps.classAttendance.url ||
-                eventExtendedProps.booking.actions.length > 0 ||
-                this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)
-                ">
+            <template v-if="this.hasComponentActions(eventExtendedProps)">
                 <div class="component-action">
                     <section>
                         <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
