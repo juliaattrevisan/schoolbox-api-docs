@@ -75,8 +75,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
-                        deleteLink = this.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
+                        modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
+                        deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
                     }
                 }
 
@@ -155,21 +155,21 @@
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Accept
              */
             rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Decline
              */
             rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             }
         },
         methods: {
@@ -196,19 +196,6 @@
                     //     canModify: true
                     // });
                 });
-            },
-
-            /**
-             * Generate a path via const
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
             },
 
             /**

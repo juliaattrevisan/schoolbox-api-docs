@@ -111,67 +111,45 @@
              * Onwards to the modify screen
              */
             modifyPath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Delete attendances
              */
             deleteAttendancePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Accept
              */
             rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Decline
              */
             rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Delete
              */
             rsvpDeletePath: function() {
-                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
+                return ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
             }
         },
         methods: {
-
-            /**
-             * Generate a path via const
-             *
-             * Provision of the returnUrl allows us to return to the place
-             * from whence thou cam'st
-             *
-             * @param str        the path where we need to replace a var
-             * @param eventId    the event's id
-             * @param returnUrl  a url to visit after saving
-             * @return string
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
 
             /**
              * Accept an invitation
