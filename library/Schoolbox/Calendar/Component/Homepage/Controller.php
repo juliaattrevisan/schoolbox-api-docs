@@ -27,7 +27,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             '@calendar/component.twig',
             [
                 'component' => $this,
-                'user'      => null,
+                'user'      => $this->getUser(),
                 'folder'    => $this->getContext(),
             ],
             !$this->getConfig('compactMode')
