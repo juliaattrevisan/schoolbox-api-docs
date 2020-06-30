@@ -45,16 +45,6 @@
             audiencesModal
         },
         created() {
-
-            /* RSVP Status consts synonymous with Attendance/Model consts
-             *
-             * Expost consts in vue land
-             * https://stackoverflow.com/questions/42662144/how-could-i-use-const-in-vue-template
-             */
-            this.ATTENDANCE_STATUS_PENDING = ATTENDANCE_STATUS_PENDING;
-            this.ATTENDANCE_STATUS_ACCEPTED = ATTENDANCE_STATUS_ACCEPTED;
-            this.ATTENDANCE_STATUS_DECLINED = ATTENDANCE_STATUS_DECLINED;
-
             this.canRsvp = checks.canRsvp;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
