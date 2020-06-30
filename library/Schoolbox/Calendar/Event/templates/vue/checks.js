@@ -15,7 +15,7 @@ export default {
      */
     canRsvp(currentAttendanceStatus, maxAttendees, numAvailable) {
 
-        /* No limit; can always rsvp
+        /* No limit; you can always rsvp
          */
         if (!this.isLimitedAttendance(maxAttendees)) {
             return true;
@@ -26,7 +26,8 @@ export default {
         if (!this.isInvited(currentAttendanceStatus) || this.isPending(currentAttendanceStatus)) {
 
             /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
-             * then you haven't yet responded and are able to insert yourself into the list
+             * then you haven't yet responded and are able to insert yourself into the list or
+             * accept/decline the invitation respectively
              *
              * The buttons should be shown
              */
