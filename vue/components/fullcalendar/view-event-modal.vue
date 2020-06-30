@@ -666,7 +666,7 @@
              -->
             <template v-else></template>
 
-            <template v-if="this.hasComponentActions()">
+            <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
                         <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
