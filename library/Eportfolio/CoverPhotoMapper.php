@@ -70,7 +70,7 @@ class CoverPhotoMapper extends Schoolbox\Mapper {
 		$statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
-            WHERE uid = :userId
+            WHERE uid = :userId AND deleted_at IS NULL;
             ORDER BY created_at DESC
             LIMIT 1
         ");
