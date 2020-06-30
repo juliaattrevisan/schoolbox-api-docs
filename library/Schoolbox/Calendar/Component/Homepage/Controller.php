@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Homepage calendar component.
@@ -26,9 +27,10 @@ class Controller extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@calendar/component/homepage.twig',
             [
-                'component' => $this,
-                'user'      => $this->getUser(),
-                'folder'    => $this->getContext(),
+                'component'      => $this,
+                'user'           => $this->getUser(),
+                'folder'         => $this->getContext(),
+                'canCreateEvent' => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
             ],
             !$this->getConfig('compactMode')
         );
