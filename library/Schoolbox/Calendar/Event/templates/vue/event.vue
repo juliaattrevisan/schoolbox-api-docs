@@ -4,9 +4,11 @@
     import qs               from 'qs';
     import axios            from "axios";
 
-    import {ATTENDANCE_STATUS} from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/attendance-status';
-    import {ENDPOINTS}         from './endpoints';
-    import checks              from './checks';
+    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+     */
+    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+    import checks              from '@schoolboxCalendarEvent/checks';
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM

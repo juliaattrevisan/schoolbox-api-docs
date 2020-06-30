@@ -6,9 +6,11 @@
     import qs                 from 'qs';
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
-    import {ATTENDANCE_STATUS} from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/attendance-status';
-    import {ENDPOINTS}         from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/endpoints';
-    import checks              from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/checks';
+    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+     */
+    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+    import checks              from '@schoolboxCalendarEvent/checks';
 
     const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
