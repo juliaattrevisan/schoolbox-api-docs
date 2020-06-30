@@ -293,9 +293,24 @@
 
                         {% if method=='Update' %}
                             {# Only modify user screen has the enabled checkbox #}
-                            <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
-                                   {% if user.enabled %}checked{% endif %} />
-                            <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                            {% if isSchoolboxAdmin %}
+                                <input type="hidden" name="account_enabled" value="{{ user.enabled ? '1' : '0' }}" />
+                                <input id="account_enabled"
+                                       type="checkbox"
+                                       name="account_enabled"
+                                       data-role="enabled"
+                                       value="1"
+                                       disabled
+                                       {% if user.enabled %}checked{% endif %} />
+                                <label for="account_enabled"
+                                       class="checkbox-label"
+                                       title="This user's account must always be enabled"
+                                >Account Enabled</label>
+                            {% else %}
+                                <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
+                                       {% if user.enabled %}checked{% endif %} />
+                                <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
