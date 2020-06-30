@@ -183,6 +183,7 @@ class UserMapper extends Mapper
      * Pre-save callback to ensure the Alaress Admin superuser account is not broken
      *
      * Undoes:
+     * - marking as disabled
      * - removal of superuser perms
      * - change of username
      * - soft-deletion via an update
@@ -203,6 +204,7 @@ class UserMapper extends Mapper
             $previousUsername = $previous[0]['username'] ?? null;
             if ($previousUsername === self::USERNAME_ALARESS_ADMIN) {
                 $user
+                    ->setEnabled(true)
                     ->setDeletedAt(null)
                     ->setUsername(self::USERNAME_ALARESS_ADMIN)
                     ->setSuperuser(true);
