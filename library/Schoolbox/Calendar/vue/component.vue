@@ -1,24 +1,19 @@
 <script>
-    import FullCalendar   from '@fullcalendar/vue'
-    import ViewEventModal from '@schoolbox/fullcalendar/view-event-modal';
-    import interactionPlugin from "@fullcalendar/interaction";
-    import listPlugin from "@fullcalendar/list";
-    import momentPlugin, {toDuration} from "@fullcalendar/moment";
-    import axios from "axios";
-    import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
+    import FullCalendar       from '@fullcalendar/vue'
+    import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+    import interactionPlugin  from "@fullcalendar/interaction";
+    import listPlugin         from "@fullcalendar/list";
+    import momentPlugin       from "@fullcalendar/moment";
+    import axios              from "axios";
+    import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
-    const URL_STATE_CHANGE = '/calendar/changeState';
-
     const URL_EVENT_SOURCE = '/calendar/ajax/full';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    const URL_EVENT_FILTER = '/calendar/ajax/filter';
-    const URL_EVENT_CREATE = '/calendar/ajax/create';
 
     /* TODO: Events should already know about and come with their own modify link;
      * we shouldn't be inferring and building it out here
      */
-    const URL_EVENT_CREATE_FORM = '/calendar/event/create';
     const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
@@ -27,15 +22,10 @@
     const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
     const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
-    const FORMAT_FORM_DATE = 'DD-MM-YYYY';
-    const FORMAT_FLATPICKR_DATE = 'DD/MM/YYYY';
-    const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
-
     // TODO let display formats be configurable
     const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
     const FORMAT_DISPLAY_TIME = 'h:mma';
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
-    const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
     export default {
         components: {
@@ -61,25 +51,19 @@
             config: () => window.fullCalendarConfig,
             urls() {
                 return {
-                    createForm: URL_EVENT_CREATE_FORM,
                     modifyForm: URL_EVENT_MODIFY_FORM,
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    create: URL_EVENT_CREATE,
                     update: URL_EVENT_UPDATE,
                     delete: URL_EVENT_DELETE,
-                    export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
                 };
             },
             formats() {
                 return {
-                    formDate: FORMAT_FORM_DATE,
-                    formDatetime: FORMAT_FORM_DATETIME,
                     displayDate: FORMAT_DISPLAY_DATE,
                     displayTime: FORMAT_DISPLAY_TIME,
                     displayDatetime: FORMAT_DISPLAY_DATETIME,
-                    displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
                 };
             },
         },
@@ -93,16 +77,16 @@
              *                  false once they are finished.
              */
             onLoading(isLoading) {
-                // TODO this method should be unnecessary
-                // I should just be able to reference this in the `<full-calendar>`
-                // tag as `@loading="helper.onLoading"`, but `this` within that
-                // call is null.
-                // Even `@loading="helper.onLoading.bind(helper)"` fails, the method
-                // doesn't get called at all.
+                // TODO replace with a more component-appropriate display
                 this.helper.onLoading(isLoading);
             },
 
+            /**
+             * Callback for determining content height of the component.
+             */
             contentHeight() {
+                // TODO figure out a more appropriate calculation
+                // (This is the same calculation the full calendar uses)
                 return this.helper.contentHeight();
             },
 
@@ -115,7 +99,7 @@
              */
             events(fetchInfo, callback) {
                 var self = this;
-                // this will have to have a folder ID attached
+                // TODO add folder ID to params
                 axios.get(
                     URL_EVENT_SOURCE,
                     {
@@ -147,10 +131,7 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
-                if (!this.helper.eventRender(eventRenderInfo)) {
-                    return false;
-                }
-                return true;
+                return this.helper.eventRender(eventRenderInfo);
             },
 
             /**
@@ -190,23 +171,6 @@
             },
 
             /**
-             * Callback for adding an event to the calendar.
-             * @see https://fullcalendar.io/docs/Calendar-addEvent
-             *
-             * @param event
-             */
-            addEvent(event) {
-                this.$refs.fullCalendar.getApi().addEvent(event);
-            },
-
-            /**
-             * Check if current display is list
-             */
-            currentViewIsList() {
-                return this.currentDisplay === 'list';
-            },
-
-            /**
              * Callback for reloading the calendar's events. May be used when
              * a series of events is deleted, as the calendar no longer knows
              * whether an event should be rendered even if it wasn't deleted.
@@ -229,7 +193,6 @@
             :event-delete-url="urls.delete"
             :event-update-url="urls.update"
             :attendance-list-url="urls.attendanceList"
-            :attendance-toggle-url="urls.attendanceToggle"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
