@@ -24,9 +24,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@calendar/component/dashboard.twig',
+            '@calendar/component.twig',
             [
                 'component' => $this,
+                'user'      => $this->getUser(),
+                'folder'    => null,
             ],
             false,
             false

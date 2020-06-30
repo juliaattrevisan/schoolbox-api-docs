@@ -1,7 +1,8 @@
 {% autoescape 'js' %}
     <script type="text/javascript">
         window.fullCalendarConfig = {
-            userId: Number('{{ USER.id }}'),
+            userId: Number('{{ user.id }}') || null,
+            folderId: Number('{{ folder.id }}') || null,
             // Days: 0 = max, must be at least 1.
             // Allegedly may be up to 1 year (or "all": wtf?),
             // but surely don't show all events for all time?

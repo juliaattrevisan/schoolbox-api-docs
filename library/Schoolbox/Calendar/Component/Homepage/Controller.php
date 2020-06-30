@@ -24,12 +24,13 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@calendar/component/dashboard.twig',
+            '@calendar/component.twig',
             [
                 'component' => $this,
+                'user'      => null,
+                'folder'    => $this->getContext(),
             ],
-            !$this->getConfig('compactMode'),
-            false
+            !$this->getConfig('compactMode')
         );
     }
 }
