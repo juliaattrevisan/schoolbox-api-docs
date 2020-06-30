@@ -4,19 +4,14 @@
     import qs               from 'qs';
     import axios            from "axios";
 
-    import {ENDPOINTS}      from './endpoints';
-    import checks           from './checks';
+    import {ATTENDANCE_STATUS} from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/attendance-status';
+    import {ENDPOINTS}         from './endpoints';
+    import checks              from './checks';
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
-
-    /* RSVP Status consts synonymous with Attendance/Model consts
-     */
-    const ATTENDANCE_STATUS_PENDING = 1;
-    const ATTENDANCE_STATUS_ACCEPTED = 2;
-    const ATTENDANCE_STATUS_DECLINED = 3;
 
     export default {
 
@@ -182,7 +177,7 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS_ACCEPTED, this.rsvpAcceptPath);
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, this.rsvpAcceptPath);
             },
 
 
@@ -190,7 +185,7 @@
              * Decline an invitation
              */
             rsvpDecline() {
-                this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
+                this.rsvp(ATTENDANCE_STATUS.DECLINED, this.rsvpDeclinePath);
             },
 
 

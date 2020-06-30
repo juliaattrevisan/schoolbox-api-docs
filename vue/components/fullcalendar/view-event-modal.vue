@@ -6,20 +6,15 @@
     import qs                 from 'qs';
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
-    import {ENDPOINTS}        from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/endpoints';
-    import checks             from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/checks';
+    import {ATTENDANCE_STATUS} from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/attendance-status';
+    import {ENDPOINTS}         from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/endpoints';
+    import checks              from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/checks';
 
     const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
 
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
-
-    /* RSVP Status consts synonymous with Attendance/Model consts
-     */
-    const ATTENDANCE_STATUS_PENDING = 1;
-    const ATTENDANCE_STATUS_ACCEPTED = 2;
-    const ATTENDANCE_STATUS_DECLINED = 3;
 
     export default {
         name: "view-event-modal",
@@ -220,14 +215,14 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS_ACCEPTED, this.rsvpAcceptPath);
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, this.rsvpAcceptPath);
             },
 
             /**
              * Decline an invitation
              */
             rsvpDecline() {
-                this.rsvp(ATTENDANCE_STATUS_DECLINED, this.rsvpDeclinePath);
+                this.rsvp(ATTENDANCE_STATUS.DECLINED, this.rsvpDeclinePath);
             },
 
             /**
