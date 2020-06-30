@@ -38,16 +38,27 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Constructor
      *
+     *
      * @param SitePage             $page
      * @param User                 $user
-     * @param string               $date
+     * @param                      $date
      * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
+     * @param int|null             $folderId
      */
-    public function __construct(SitePage $page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
-    {
-        $this->api           = $factory->produceForUser($user, $viewer);
+    public function __construct(
+        SitePage $page,
+        User $user,
+        $date,
+        User $viewer,
+        Calendar_Api_Factory $factory,
+        ModuleChecker $moduleChecker,
+        ?int $folderId = null
+    ) {
+        $this->api           = isset($folderId)
+            ? $factory->produceForFolderId($folderId, $user, $viewer)
+            : $factory->produceForUser($user, $viewer);
         $this->moduleChecker = $moduleChecker;
         $this->user          = $user;
         $this->viewer        = $viewer;
