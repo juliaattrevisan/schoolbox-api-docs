@@ -287,7 +287,7 @@
     <div>
         <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
-                <nav><a :href="ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
+                <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
@@ -336,8 +336,8 @@
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
-                            <li><a :href="ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
+                            <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                            <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                         </ul>
                     </section>
                 </div>
@@ -350,7 +350,7 @@
                                 available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="ENDPOINTS.createAttendancePath(this.event.id)" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
+                            <form :id="'createAttendanceForm'" :action="this.ENDPOINTS.createAttendancePath(this.event.id)" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
                             </form>
                         </div>
