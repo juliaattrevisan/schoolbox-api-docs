@@ -364,6 +364,28 @@
 
 
             /**
+             * Find out whether you've Accepted the event's invitation
+             *
+             * @param currentAttendanceStatus int|null
+             * @return boolean
+             */
+            isAccepted: function(currentAttendanceStatus) {
+                return currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED;
+            },
+
+
+            /**
+             * Find out whether you've Declined the event's invitation
+             *
+             * @param currentAttendanceStatus int|null
+             * @return boolean
+             */
+            isDeclined: function(currentAttendanceStatus) {
+                return currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED;
+            },
+
+
+            /**
              * Update whether the form can be submitted.
              *
              * It can be submitted if the title contains at least one non-space
@@ -781,10 +803,10 @@
                     <section>
                         <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: eventExtendedProps.attendance.status === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
+                                <a :href="rsvpAcceptPath" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: eventExtendedProps.attendance.status === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
+                                <a :href="rsvpDeclinePath" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 

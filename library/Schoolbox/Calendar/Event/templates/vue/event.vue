@@ -168,7 +168,7 @@
              */
             rsvpDeletePath: function() {
                 return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
-            },
+            }
         },
         methods: {
 
@@ -434,6 +434,27 @@
             },
 
 
+            /**
+             * Find out whether you've Accepted the event's invitation
+             *
+             * @param currentAttendanceStatus int|null
+             * @return boolean
+             */
+            isAccepted: function(currentAttendanceStatus) {
+                return currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED;
+            },
+
+
+            /**
+             * Find out whether you've Declined the event's invitation
+             *
+             * @param currentAttendanceStatus int|null
+             * @return boolean
+             */
+            isDeclined: function(currentAttendanceStatus) {
+                return currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED;
+            },
+
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
             }
@@ -494,8 +515,8 @@
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept()" :class="{ accepted: this.currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED }">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline()" :class="{ declined: this.currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED }">No</a></li>
+                            <li><a :href="rsvpAcceptPath" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                            <li><a :href="rsvpDeclinePath" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                         </ul>
                     </section>
                 </div>
