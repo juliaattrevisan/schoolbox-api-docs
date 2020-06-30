@@ -29,6 +29,7 @@
         created() {
             this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
+            this.isInvited = checks.isInvited;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
             this.isDeclined = checks.isDeclined;

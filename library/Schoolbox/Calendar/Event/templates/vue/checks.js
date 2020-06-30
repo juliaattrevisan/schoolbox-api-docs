@@ -23,7 +23,7 @@ export default {
 
         /* If you've not responded at all, or are currently Pending
          */
-        if (currentAttendanceStatus === null || this.isPending(currentAttendanceStatus)) {
+        if (!this.isInvited(currentAttendanceStatus) || this.isPending(currentAttendanceStatus)) {
 
             /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
              * then you haven't yet responded and are able to insert yourself into the list
@@ -78,6 +78,18 @@ export default {
         /* RSVP Buttons disabled by default
          */
         return false;
+    },
+
+
+    /**
+     * If your currentAttendanceStatus is null, you aren't invited/on the list
+     * Conversely, if your currentAttendanceStatus is not null, you are invited/on the list
+     *
+     * @param currentAttendanceStatus
+     * @returns boolean
+     */
+    isInvited: function(currentAttendanceStatus) {
+        return currentAttendanceStatus !== null;
     },
 
 
