@@ -24,7 +24,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@calendar/component.twig',
+            '@calendar/component/homepage.twig',
             [
                 'component' => $this,
                 'user'      => $this->getUser(),
