@@ -3,27 +3,14 @@
     import audiencesModal   from './audiencesModal';
     import qs               from 'qs';
     import axios            from "axios";
+
+    import {ENDPOINTS}      from './endpoints';
     import checks           from './checks';
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
-
-    /* Event Modify screen
-     */
-    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-
-    /* Inline alteration of attendees on event detail screen
-     */
-    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-    const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
-
-    /* RSVP Status mutation routes
-     */
-    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
-    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
-    const URL_ATTENDANCE_RSVP_DELETE = '/calendar/event/attendance/{eventId}/delete';
 
     /* RSVP Status consts synonymous with Attendance/Model consts
      */
@@ -129,42 +116,42 @@
              * Onwards to the modify screen
              */
             modifyPath: function() {
-                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * Delete attendances
              */
             deleteAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Accept
              */
             rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Decline
              */
             rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Delete
              */
             rsvpDeletePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, this.event.id, btoa(window.location.pathname));
             }
         },
         methods: {
@@ -409,7 +396,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
+                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 

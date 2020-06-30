@@ -5,6 +5,8 @@
     import axios              from 'axios';
     import qs                 from 'qs';
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+
+    import {ENDPOINTS}        from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/endpoints';
     import checks             from '@schoolbox/../../library/Schoolbox/Calendar/Event/templates/vue/checks';
 
     const EFFICACY_SELF = 'self';
@@ -12,15 +14,6 @@
 
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
-
-    /* Inline alteration of attendees on event modal
-     */
-    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-
-    /* RSVP Status mutation routes
-     */
-    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
-    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
 
     /* RSVP Status consts synonymous with Attendance/Model consts
      */
@@ -167,21 +160,21 @@
              * Create new attendances
              */
             createAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Accept
              */
             rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             },
 
             /**
              * RSVP Decline
              */
             rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
+                return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             }
         },
         methods: {
