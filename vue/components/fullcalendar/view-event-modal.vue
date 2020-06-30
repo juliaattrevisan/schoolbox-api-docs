@@ -613,12 +613,8 @@
                     </a>
                 </meta-item>
                 <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.max)">
-                    <template v-if="eventExtendedProps.attendance.available > 0">
-                        {{ eventExtendedProps.attendance.available }} places remaining
-                    </template>
-                    <template v-else>
-                        No places remaining
-                    </template>
+                    <template v-if="eventExtendedProps.attendance.available > 0">{{ eventExtendedProps.attendance.available }}</template>
+                    <template v-else>No</template> available place(s) remaining
                 </meta-item>
 <!-- SA-10476 -->
 <!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->

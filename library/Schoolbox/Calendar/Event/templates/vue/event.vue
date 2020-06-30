@@ -340,12 +340,11 @@
                 </div>
                 <div class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.numAvailable != null || canModify()">
-                            <span class="meta" v-if="this.numAvailable != null">
-                                <span id="attendance-guests-available">
-                                    <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
-                                    <template v-else>No</template>
-                                </span> available place(s) remaining
+                        <div class="content" v-if="this.isLimitedAttendance(this.event.maxAttendees) || canModify()">
+                            <span class="meta">
+                                <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
+                                <template v-else>No</template>
+                                available place(s) remaining
                             </span>
 
                             <form :id="'createAttendanceForm'" :action="ENDPOINTS.createAttendancePath(this.event.id)" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
