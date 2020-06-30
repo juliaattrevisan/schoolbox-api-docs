@@ -35,6 +35,7 @@ class MultibytePathInfoTest extends TestCase
             ['/foo/_אַהֲוָא.jpeg', '/foo', '_אַהֲוָא.jpeg', 'jpeg', '_אַהֲוָא'],
             ['/foo/bar/_אַהֲוָא.jpeg', '/foo/bar', '_אַהֲוָא.jpeg', 'jpeg', '_אַהֲוָא'],
             ['/foo/bar/', '/foo', 'bar', null, 'bar'],
+            ['clone_adobeppcc.jpg?itok=AlstqiJ0', null, 'clone_adobeppcc.jpg?itok=AlstqiJ0', 'jpg', 'clone_adobeppcc']
         ];
     }
 

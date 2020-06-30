@@ -95,6 +95,11 @@ function score2pascal($score, $delim = '_') {
 /**
  * This function exists because pathinfo() breaks non-latin things
  *
+ * @deprecated replace with a modern URI parser.
+ *             This method is used to break down file basenames into filename
+ *             and extension: that should be the responsibility of a dedicated
+ *             URI parsing class.
+ *
  * @see http://php.net/manual/en/function.pathinfo.php#107461
  *
  * @param string $filepath
@@ -131,7 +136,8 @@ REGEXP;
         if (count($parts) === 1) {
             $filename = $m['basename'];
         } else {
-            $ret[$map[PATHINFO_EXTENSION]] = array_pop($parts);
+            preg_match('/\w+/', array_pop($parts), $match);
+            $ret[$map[PATHINFO_EXTENSION]] = $match[0] ?? '';
             $filename                      = implode('.', $parts);
         }
         if (strlen($filename)) {
