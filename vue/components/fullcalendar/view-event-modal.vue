@@ -644,11 +644,13 @@
             <template v-else></template>
 
             <template v-if="eventExtendedProps.folder.id ||
-            eventExtendedProps.links.view ||
-            eventExtendedProps.links.modify ||
-            eventExtendedProps.links.delete ||
-            eventExtendedProps.classAttendance.url ||
-            eventExtendedProps.booking.actions.length > 0">
+                eventExtendedProps.links.view ||
+                eventExtendedProps.links.modify ||
+                eventExtendedProps.links.delete ||
+                eventExtendedProps.classAttendance.url ||
+                eventExtendedProps.booking.actions.length > 0 ||
+                this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)
+                ">
                 <div class="component-action">
                     <section>
                         <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
