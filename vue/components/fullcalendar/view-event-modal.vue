@@ -211,7 +211,9 @@
              * Decline an invitation
              */
             rsvpDecline() {
-                this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                if (this.isInvited(this.eventExtendedProps.attendance.status)) {
+                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                }
             },
 
             /**
