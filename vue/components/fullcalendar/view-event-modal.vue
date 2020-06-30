@@ -186,17 +186,16 @@
              * Show the bar if you can do anything with its contents
              * Otherwise, hide it
              *
-             * @param eventExtendedProps object
              * @return boolean
              */
-            hasComponentActions(eventExtendedProps) {
-                return eventExtendedProps.folder.id ||
-                    eventExtendedProps.links.view ||
-                    eventExtendedProps.links.modify ||
-                    eventExtendedProps.links.delete ||
-                    eventExtendedProps.classAttendance.url ||
-                    eventExtendedProps.booking.actions.length > 0 ||
-                    this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)
+            hasComponentActions() {
+                return this.eventExtendedProps.folder.id ||
+                    this.eventExtendedProps.links.view ||
+                    this.eventExtendedProps.links.modify ||
+                    this.eventExtendedProps.links.delete ||
+                    this.eventExtendedProps.classAttendance.url ||
+                    this.eventExtendedProps.booking.actions.length > 0 ||
+                    this.canRsvp(this.eventExtendedProps.attendance.status, this.eventExtendedProps.attendance.max, this.eventExtendedProps.attendance.available)
             },
 
 
@@ -667,7 +666,7 @@
              -->
             <template v-else></template>
 
-            <template v-if="this.hasComponentActions(eventExtendedProps)">
+            <template v-if="this.hasComponentActions()">
                 <div class="component-action">
                     <section>
                         <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
