@@ -16,6 +16,7 @@ use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -219,6 +220,11 @@ class Controller extends Base
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
             $this->response->content->set($this->buildJsonOutput('User not found'));
+            return false;
+        } catch (SchoolboxPasswordExpiredException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(400);
+            $this->response->content->set($this->buildJsonOutput('Password has expired'));
             return false;
         }
         return true;
