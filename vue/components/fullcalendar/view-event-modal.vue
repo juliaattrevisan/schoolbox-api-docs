@@ -386,6 +386,15 @@
 
 
             /**
+             * Find out whether this event's max_attendees setting means there are a limited
+             * number of people who can attend; null means unlimited, 0 prohibits acceptance
+             */
+            isLimitedAttendance: function(max) {
+                return max === null;
+            },
+
+
+            /**
              * Update whether the form can be submitted.
              *
              * It can be submitted if the title contains at least one non-space
@@ -758,7 +767,7 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.max != null">
+                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.max)">
                     <template v-if="eventExtendedProps.attendance.available > 0">
                         {{ eventExtendedProps.attendance.available }} places remaining
                     </template>

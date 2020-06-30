@@ -455,6 +455,7 @@
                 return currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED;
             },
 
+
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
             }
