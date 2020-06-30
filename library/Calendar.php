@@ -681,12 +681,14 @@ class Calendar extends DeprecatedModel
 
         $countStack = [];
 
-        foreach ($attendanceCounts as $attendanceCount) {
-            $countStack[$attendanceCount['event_id']] = [
-                'num_attendees' => $attendanceCount['num_attendees'],
-                'attendance_status' => $attendanceCount['attendance_status']
-            ];
-        }
+        if (is_array($attendanceCounts) && \count($attendanceCounts)) {
+            foreach ($attendanceCounts as $attendanceCount) {
+                $countStack[$attendanceCount['event_id']] = [
+                    'num_attendees'     => $attendanceCount['num_attendees'],
+                    'attendance_status' => $attendanceCount['attendance_status']
+                ];
+            }
+    }
 
         /* Standardised output
          */
