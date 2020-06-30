@@ -6,6 +6,7 @@
     import momentPlugin, {toDuration} from "@fullcalendar/moment";
     import axios from "axios";
     import qs from "qs";
+    import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -152,58 +153,58 @@
                 // Fail callback: consider a message saying something failed
             },
 
-            /**
-             * Callback for when the calendar view changes: preserve the
-             * newly selected view for this user.
-             * @see https://fullcalendar.io/docs/viewSkeletonRender
-             *
-             * @param info
-             */
-            viewSkeletonRender(info) {
-
-                let self = this,
-                        customGroup = document.querySelector('.fc-custom-group');
-
-                self.currentDisplay = info.view.type;
-
-                document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach(function (element) {
-                    if (self.currentViewIsList()) {
-                        element.classList.add('hide');
-                        if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
-                            customGroup.classList.remove('hide')
-                        }
-                    } else {
-                        element.classList.remove('hide');
-                        if (customGroup?.classList) {
-                            customGroup.classList.add('hide');
-                        }
-                    }
-                });
-
-                if (self.currentViewIsList()) {
-                    self.registerListCustomInputFields();
-
-                    /**
-                     * Re-initialise datepicker upon date update on list view.
-                     * Without this, date picker fields just turns into a normal text field.
-                     */
-                    let attachAlaressDatePicker = function () {
-                        var $dateinput = $(this);
-                        if ($dateinput.attr('data-datepicker-id') === undefined) {
-                            $dateinput.alaressDateTimePicker();
-                        }
-                    };
-
-                    $(function () {
-                        $('[data-datepicker]').each(attachAlaressDatePicker);
-                    });
-                }
-
-                axios.post(
-                        URL_STATE_CHANGE,
-                        qs.stringify({calendarView: info.view.type})
-                );
-            },
+            // /**
+            //  * Callback for when the calendar view changes: preserve the
+            //  * newly selected view for this user.
+            //  * @see https://fullcalendar.io/docs/viewSkeletonRender
+            //  *
+            //  * @param info
+            //  */
+            // viewSkeletonRender(info) {
+            //
+            //     let self = this,
+            //             customGroup = document.querySelector('.fc-custom-group');
+            //
+            //     self.currentDisplay = info.view.type;
+            //
+            //     document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach(function (element) {
+            //         if (self.currentViewIsList()) {
+            //             element.classList.add('hide');
+            //             if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
+            //                 customGroup.classList.remove('hide')
+            //             }
+            //         } else {
+            //             element.classList.remove('hide');
+            //             if (customGroup?.classList) {
+            //                 customGroup.classList.add('hide');
+            //             }
+            //         }
+            //     });
+            //
+            //     if (self.currentViewIsList()) {
+            //         self.registerListCustomInputFields();
+            //
+            //         /**
+            //          * Re-initialise datepicker upon date update on list view.
+            //          * Without this, date picker fields just turns into a normal text field.
+            //          */
+            //         let attachAlaressDatePicker = function () {
+            //             var $dateinput = $(this);
+            //             if ($dateinput.attr('data-datepicker-id') === undefined) {
+            //                 $dateinput.alaressDateTimePicker();
+            //             }
+            //         };
+            //
+            //         $(function () {
+            //             $('[data-datepicker]').each(attachAlaressDatePicker);
+            //         });
+            //     }
+            //
+            //     axios.post(
+            //             URL_STATE_CHANGE,
+            //             qs.stringify({calendarView: info.view.type})
+            //     );
+            // },
 
             /**
              * Event render callback: manually tweaks the event's rendering, and
@@ -217,90 +218,7 @@
                 if (!this.helper.eventRender(eventRenderInfo)) {
                     return false;
                 }
-
-
-                // Extra condition for rendering events on this calendar:
-                // All of the event's attributes must match at least one
-                // selected filter: if it doesn't, don't render it.
-                let self            = this,
-                        calEvent        = eventRenderInfo.event,
-                        eventAttributes = {},
-                        isEventRendered = true;
-
-                // Build a list of filters from the event
-                calEvent.classNames.forEach(function (className) {
-                    let match = className.match(/^([a-z]+)(\d+)/i);
-                    if (match) {
-                        let attributeGroup = match[1],
-                                id             = Number(match[2]);
-                        if (!eventAttributes[attributeGroup]) {
-                            eventAttributes[attributeGroup] = [];
-                        }
-                        eventAttributes[attributeGroup].push(id);
-                    }
-                });
-
-
-                // All of the event's attributes must match at least one
-                // selected filter.
-                // If it doesn't, don't render it.
-                Object.keys(eventAttributes).forEach(function (attributeGroup) {
-                    let ids                = eventAttributes[attributeGroup],
-                            eventMatchesFilter = false;
-                    ids.forEach(function (id) {
-                        // Check id against the list of selected filters.
-                        let keyspace = [];
-                        switch (attributeGroup) {
-                            case 'source':
-                                // Sources have multiple IDs per selection:
-                                // this event needs to only match one of them.
-                                keyspace = (self.config.selectedFilters?.source || []).flat();
-                                break;
-
-                            case 'type':
-                                keyspace = self.config.selectedFilters?.eventType || [];
-                                break;
-
-                            case 'group':
-                                keyspace = self.config.selectedFilters?.group || [];
-                                break;
-
-                            case 'campus':
-                                keyspace = self.config.selectedFilters?.campus || [];
-                                break;
-
-                            default:
-                                // Ignore this one
-                                return;
-                        }
-                        if (keyspace.includes(id)) {
-                            eventMatchesFilter = true;
-                        }
-                    });
-                    if (!eventMatchesFilter) {
-                        isEventRendered = false;
-                    }
-                });
-
-                return isEventRendered;
-            },
-
-            /**
-             * Click a date on the calendar callback: opens the create event
-             * modal for the clicked date.
-             * @see https://fullcalendar.io/docs/dateClick
-             *
-             * @param dateClickInfo
-             */
-            onDateClick(dateClickInfo) {
-                let [firstEventType] = this.config.eventTypes;
-                this.$refs.createEvent.open({
-                    date:        dateClickInfo.date,
-                    allDay:      dateClickInfo.allDay,
-                    title:       '',
-                    detail:      '',
-                    type:        firstEventType ? firstEventType.id : null,
-                });
+                return true;
             },
 
             /**
@@ -316,44 +234,44 @@
                 this.$refs.event.open(eventInfo.event);
             },
 
-            /**
-             * Resize event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventResize
-             *
-             * @param eventResizeInfo
-             */
-            onEventResize(eventResizeInfo) {
-                // TODO this needs to consider events in series
-                let event = eventResizeInfo.event,
-                        data  = {
-                            eventId: event?.extendedProps?.data?.meta?.eventId,
-                            resize:  true,
-                            start:   this.toMoment(event.start).format(),
-                            end:     this.toMoment(event.end).format(),
-                        };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
-
-            /**
-             * Drop event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventDrop
-             *
-             * @param eventDropInfo
-             */
-            onEventDrop(eventDropInfo) {
-                let event = eventDropInfo.event,
-                        delta = toDuration(eventDropInfo.delta),
-                        data  = {
-                            eventId:     event?.extendedProps?.data?.meta?.eventId,
-                            minuteDelta: delta.asMinutes(),
-                            allDay:      event.allDay,
-                        };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
+            // /**
+            //  * Resize event callback: persist the change to the event's start
+            //  * and end dates.
+            //  * @see https://fullcalendar.io/docs/eventResize
+            //  *
+            //  * @param eventResizeInfo
+            //  */
+            // onEventResize(eventResizeInfo) {
+            //     // TODO this needs to consider events in series
+            //     let event = eventResizeInfo.event,
+            //             data  = {
+            //                 eventId: event?.extendedProps?.data?.meta?.eventId,
+            //                 resize:  true,
+            //                 start:   this.toMoment(event.start).format(),
+            //                 end:     this.toMoment(event.end).format(),
+            //             };
+            //     // Apply and then remove the "loading" class
+            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+            // },
+            //
+            // /**
+            //  * Drop event callback: persist the change to the event's start
+            //  * and end dates.
+            //  * @see https://fullcalendar.io/docs/eventDrop
+            //  *
+            //  * @param eventDropInfo
+            //  */
+            // onEventDrop(eventDropInfo) {
+            //     let event = eventDropInfo.event,
+            //             delta = toDuration(eventDropInfo.delta),
+            //             data  = {
+            //                 eventId:     event?.extendedProps?.data?.meta?.eventId,
+            //                 minuteDelta: delta.asMinutes(),
+            //                 allDay:      event.allDay,
+            //             };
+            //     // Apply and then remove the "loading" class
+            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+            // },
 
             /**
              * Helper function for converting a Date object to a Moment object.
@@ -406,20 +324,6 @@
             },
 
             /**
-             * Callback for when the filters have been updated: rerender events
-             * (thus hiding events which don't match the new filters) and
-             * persist the filters selected.
-             *
-             * @param selectedFilters
-             */
-            updateSelectedFilters(selectedFilters) {
-                // The selected filters in config are read-only and passed by reference.
-                // TODO pass it by value into the filter modal, and update in this method
-                this.$refs.fullCalendar.getApi().rerenderEvents();
-                axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
-            },
-
-            /**
              * Helper for rendering the title of the day view.
              * Without this the calendar renders the date twice for some reason.
              *
@@ -435,247 +339,203 @@
             /**
              * Register customised input fields for list view
              */
-            registerListCustomInputFields() {
-
-                // Make sure that there's only one of the custom input field
-                if (!document.querySelector('.fc-custom-group')) {
-                    // Prepare input fields
-                    let self = this,
-                            container = document.createElement('div'),
-                            startDate = document.createElement('input'),
-                            startDateFieldWrapper = document.createElement('div'),
-                            endDate = document.createElement('input'),
-                            endDateFieldWrapper = document.createElement('div'),
-                            updateRangeButton = document.createElement('input'),
-                            buttonWrapper = document.createElement('div');
-
-                    startDateFieldWrapper.setAttribute('class', 'small-4 columns');
-                    endDateFieldWrapper.setAttribute('class', 'small-4 columns');
-                    buttonWrapper.setAttribute('class', 'small-4 columns');
-
-                    // Start date field
-                    startDate.setAttribute('id', 'start_date');
-                    startDate.setAttribute('name', 'start_date');
-                    startDate.setAttribute('data-datepicker', '');
-                    startDate.setAttribute('data-datepicker-buttontext', '');
-                    startDate.setAttribute('value',
-                            (self.listViewDateRange.start) ? self.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
-                    );
-
-
-                    // End date field
-                    endDate.setAttribute('id', 'end_date');
-                    endDate.setAttribute('name', 'end_date');
-                    endDate.setAttribute('data-datepicker', '');
-                    endDate.setAttribute('data-datepicker-buttontext', '');
-                    endDate.setAttribute('value',
-                            (self.listViewDateRange.end) ? self.listViewDateRange.end : this.toMoment(new Date()).add(self.duration, 'days').format(FORMAT_FLATPICKR_DATE)
-                    );
-
-
-                    // Update button
-                    updateRangeButton.setAttribute('id', 'update_date_range_button');
-                    updateRangeButton.setAttribute('type', 'submit');
-                    updateRangeButton.setAttribute('value', 'Update');
-
-                    if (self.currentViewIsList()) {
-                        container.setAttribute('class', 'fc-custom-group row');
-                    } else {
-                        container.setAttribute('class', 'fc-custom-group row hide');
-                    }
-
-                    // Wrap input fields to columns
-                    startDateFieldWrapper.appendChild(startDate);
-                    endDateFieldWrapper.appendChild(endDate);
-                    buttonWrapper.appendChild(updateRangeButton);
-
-                    // Append fields into the container
-                    container.appendChild(startDateFieldWrapper);
-                    container.appendChild(endDateFieldWrapper);
-                    container.appendChild(buttonWrapper);
-
-                    document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
-
-                    // Register an event listener when update button is clicked.
-                    document.querySelector('#update_date_range_button').addEventListener('click', function () {
-                        if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                            let startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE),
-                                    endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
-
-                            if (startDateValue.isValid() && endDateValue.isValid()) {
-                                self.listViewDateRange.start = document.querySelector('#start_date').value;
-                                self.listViewDateRange.end = document.querySelector('#end_date').value;
-
-                                self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
-                                self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
-                            }
-                        }
-                    });
-                }
-            },
-
-            /**
-             * Update list view's start and end dates on date navigation
-             * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
-             * I'm not sure if we can use it..
-             */
-            updateListViewDateRangeField(start, end = null)
-            {
-                this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
-                this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
-
-                let startDate = this.jQuery('#start_date'),
-                        endDate   = this.jQuery('#end_date');
-
-                // .val() is needed so that we'll have the value visible in the
-                // input field.
-                // data-default-date is needed so that when flatpickr gets
-                // initialised, the selected value will be the same as the one
-                // that's provided in the input field.
-                // The change event is required so that the date picker popup is
-                // updated with the new date.
-                startDate
-                        .val(this.listViewDateRange.start)
-                        .attr('data-default-date', this.listViewDateRange.start)
-                        .trigger('change');
-                endDate
-                        .val(this.listViewDateRange.end)
-                        .attr('data-default-date', this.listViewDateRange.end)
-                        .trigger('change');
-            },
-
-            /**
-             * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
-             */
-            clickPrev() {
-                let api = this.$refs.fullCalendar.getApi();
-                api.prev();
-
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-                this.updateListViewDateRangeField(api.getDate(), api.getDate());
-            },
-
-            /**
-             * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
-             */
-            clickNext() {
-                let api = this.$refs.fullCalendar.getApi();
-                api.next();
-
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-                this.updateListViewDateRangeField(api.getDate(), api.getDate());
-            },
-
-            /**
-             * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
-             */
-            clickToday() {
-                let api = this.$refs.fullCalendar.getApi();
-                api.today();
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-
-                this.updateListViewDateRangeField(api.getDate());
-            },
-
-            /**
-             * Additional customisation for quick month switch button.
-             * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
-             */
-            onQuickSwitch(value) {
-                this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
-
-                this.updateListViewDateRangeField(
-                        value.selectedDate,
-                        value.selectedDate,
-                );
-            },
+            // registerListCustomInputFields() {
+            //
+            //     // Make sure that there's only one of the custom input field
+            //     if (!document.querySelector('.fc-custom-group')) {
+            //         // Prepare input fields
+            //         let self = this,
+            //                 container = document.createElement('div'),
+            //                 startDate = document.createElement('input'),
+            //                 startDateFieldWrapper = document.createElement('div'),
+            //                 endDate = document.createElement('input'),
+            //                 endDateFieldWrapper = document.createElement('div'),
+            //                 updateRangeButton = document.createElement('input'),
+            //                 buttonWrapper = document.createElement('div');
+            //
+            //         startDateFieldWrapper.setAttribute('class', 'small-4 columns');
+            //         endDateFieldWrapper.setAttribute('class', 'small-4 columns');
+            //         buttonWrapper.setAttribute('class', 'small-4 columns');
+            //
+            //         // Start date field
+            //         startDate.setAttribute('id', 'start_date');
+            //         startDate.setAttribute('name', 'start_date');
+            //         startDate.setAttribute('data-datepicker', '');
+            //         startDate.setAttribute('data-datepicker-buttontext', '');
+            //         startDate.setAttribute('value',
+            //                 (self.listViewDateRange.start) ? self.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+            //         );
+            //
+            //
+            //         // End date field
+            //         endDate.setAttribute('id', 'end_date');
+            //         endDate.setAttribute('name', 'end_date');
+            //         endDate.setAttribute('data-datepicker', '');
+            //         endDate.setAttribute('data-datepicker-buttontext', '');
+            //         endDate.setAttribute('value',
+            //                 (self.listViewDateRange.end) ? self.listViewDateRange.end : this.toMoment(new Date()).add(self.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+            //         );
+            //
+            //
+            //         // Update button
+            //         updateRangeButton.setAttribute('id', 'update_date_range_button');
+            //         updateRangeButton.setAttribute('type', 'submit');
+            //         updateRangeButton.setAttribute('value', 'Update');
+            //
+            //         if (self.currentViewIsList()) {
+            //             container.setAttribute('class', 'fc-custom-group row');
+            //         } else {
+            //             container.setAttribute('class', 'fc-custom-group row hide');
+            //         }
+            //
+            //         // Wrap input fields to columns
+            //         startDateFieldWrapper.appendChild(startDate);
+            //         endDateFieldWrapper.appendChild(endDate);
+            //         buttonWrapper.appendChild(updateRangeButton);
+            //
+            //         // Append fields into the container
+            //         container.appendChild(startDateFieldWrapper);
+            //         container.appendChild(endDateFieldWrapper);
+            //         container.appendChild(buttonWrapper);
+            //
+            //         document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
+            //
+            //         // Register an event listener when update button is clicked.
+            //         document.querySelector('#update_date_range_button').addEventListener('click', function () {
+            //             if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
+            //                 let startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE),
+            //                         endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
+            //
+            //                 if (startDateValue.isValid() && endDateValue.isValid()) {
+            //                     self.listViewDateRange.start = document.querySelector('#start_date').value;
+            //                     self.listViewDateRange.end = document.querySelector('#end_date').value;
+            //
+            //                     self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+            //                     self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
+            //                 }
+            //             }
+            //         });
+            //     }
+            // },
+            //
+            // /**
+            //  * Update list view's start and end dates on date navigation
+            //  * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
+            //  * I'm not sure if we can use it..
+            //  */
+            // updateListViewDateRangeField(start, end = null)
+            // {
+            //     this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
+            //     this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
+            //
+            //     let startDate = this.jQuery('#start_date'),
+            //             endDate   = this.jQuery('#end_date');
+            //
+            //     // .val() is needed so that we'll have the value visible in the
+            //     // input field.
+            //     // data-default-date is needed so that when flatpickr gets
+            //     // initialised, the selected value will be the same as the one
+            //     // that's provided in the input field.
+            //     // The change event is required so that the date picker popup is
+            //     // updated with the new date.
+            //     startDate
+            //             .val(this.listViewDateRange.start)
+            //             .attr('data-default-date', this.listViewDateRange.start)
+            //             .trigger('change');
+            //     endDate
+            //             .val(this.listViewDateRange.end)
+            //             .attr('data-default-date', this.listViewDateRange.end)
+            //             .trigger('change');
+            // },
+            //
+            // /**
+            //  * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
+            //  */
+            // clickPrev() {
+            //     let api = this.$refs.fullCalendar.getApi();
+            //     api.prev();
+            //
+            //     this.$refs.flatPickr.updateActiveDate(api.getDate());
+            //     this.updateListViewDateRangeField(api.getDate(), api.getDate());
+            // },
+            //
+            // /**
+            //  * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
+            //  */
+            // clickNext() {
+            //     let api = this.$refs.fullCalendar.getApi();
+            //     api.next();
+            //
+            //     this.$refs.flatPickr.updateActiveDate(api.getDate());
+            //     this.updateListViewDateRangeField(api.getDate(), api.getDate());
+            // },
+            //
+            // /**
+            //  * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
+            //  */
+            // clickToday() {
+            //     let api = this.$refs.fullCalendar.getApi();
+            //     api.today();
+            //     this.$refs.flatPickr.updateActiveDate(api.getDate());
+            //
+            //     this.updateListViewDateRangeField(api.getDate());
+            // },
+            //
+            // /**
+            //  * Additional customisation for quick month switch button.
+            //  * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
+            //  */
+            // onQuickSwitch(value) {
+            //     this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            //
+            //     this.updateListViewDateRangeField(
+            //             value.selectedDate,
+            //             value.selectedDate,
+            //     );
+            // },
         },
-        mounted() {
-            this.registerListCustomInputFields();
-
-            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-            let quickSwitchIcon = document.createElement('a');
-            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
-
-            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
-        }
+        // mounted() {
+        //     this.registerListCustomInputFields();
+        //
+        //     // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+        //     let quickSwitchIcon = document.createElement('a');
+        //     quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+        //     quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+        //
+        //     document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+        // }
     }
 </script>
 
 <template>
     <div>
-        <view-event-modal ref="event"
-                          :to-moment="toMoment"
-                          :event-modify-form-url="urls.modifyForm"
-                          :event-modify-form-action-url="urls.modifyFormAction"
-                          :event-delete-url="urls.delete"
-                          :event-update-url="urls.update"
-                          :attendance-list-url="urls.attendanceList"
-                          :attendance-toggle-url="urls.attendanceToggle"
-                          :format-display-date="formats.displayDate"
-                          :format-display-time="formats.displayTime"
-                          :format-display-datetime="formats.displayDatetime"
-                          :return-url="returnUrl()"
-                          @eventModified="reloadEvents"
-                          @eventDeleted="reloadEvents" />
+        <view-event-modal
+            ref="event"
+            :to-moment="toMoment"
+            :event-modify-form-url="urls.modifyForm"
+            :event-modify-form-action-url="urls.modifyFormAction"
+            :event-delete-url="urls.delete"
+            :event-update-url="urls.update"
+            :attendance-list-url="urls.attendanceList"
+            :attendance-toggle-url="urls.attendanceToggle"
+            :format-display-date="formats.displayDate"
+            :format-display-time="formats.displayTime"
+            :format-display-datetime="formats.displayDatetime"
+            :return-url="returnUrl()"
+            @eventModified="reloadEvents"
+            @eventDeleted="reloadEvents"
+        />
 
         <full-calendar
-                ref="fullCalendar"
-                :plugins="calendarPlugins"
-                :views="{
-                    day: {
-                        titleFormat: dayTitleFormat,
-                        columnHeader: false
-                    },
-                    week: {
-                        columnHeaderFormat: formats.displayWeekDay
-                    },
-                    list: {
-                        buttonText: 'List',
-                        duration: { days: this.duration },
-
-                    }
-                }"
-                :event-time-format="helper.eventTimeFormat"
-                :content-height="this.contentHeight"
-                :custom-buttons="{
-                    customExport: {
-                        text: 'Export',
-                        click: onExportClick
-                    },
-                    customFilters: {
-                        text: 'Filters',
-                        click: onFilterClick
-                    },
-                    quickSwitchButton: {
-                        text: ' ',
-                    },
-                    customPrev: {
-                        icon: 'chevron-left',
-                        click: this.clickPrev.bind(this),
-                    },
-                    customNext: {
-                        icon: 'chevron-right',
-                        click: this.clickNext.bind(this),
-                    },
-                    customToday: {
-                        text: 'Today',
-                        click: this.clickToday.bind(this),
-                    },
-                }"
-                default-view="listWeek"
-                :scroll-time="config.dateDisplayFormats.calendarStartTime"
-                :event-limit="config.eventLimit"
-                :first-day="config.firstDay"
-                :events="events"
-                :event-render="eventRender"
-                :view-skeleton-render="viewSkeletonRender"
-                @loading="onLoading"
-                @dateClick="onDateClick"
-                @eventClick="onEventClick"
-                @eventResize="onEventResize"
-                @eventDrop="onEventDrop"
+            ref="fullCalendar"
+            :plugins="calendarPlugins"
+            :event-time-format="helper.eventTimeFormat"
+            :content-height="this.contentHeight"
+            default-view="listWeek"
+            :events="events"
+            :event-render="eventRender"
+            @loading="onLoading"
+            @eventClick="onEventClick"
         />
     </div>
 </template>
