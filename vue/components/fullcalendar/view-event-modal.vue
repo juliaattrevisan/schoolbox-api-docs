@@ -651,12 +651,12 @@
             eventExtendedProps.booking.actions.length > 0">
                 <div class="component-action">
                     <section>
-                        <span v-if="canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
+                        <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
-                                <a :href="ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
+                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
+                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 
