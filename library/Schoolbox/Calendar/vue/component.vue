@@ -529,9 +529,15 @@
         <full-calendar
             ref="fullCalendar"
             :plugins="calendarPlugins"
+            :views="{
+                list: {
+                    type: 'list',
+                    duration: { days: config.days },
+                }
+            }"
             :event-time-format="helper.eventTimeFormat"
             :content-height="this.contentHeight"
-            default-view="listWeek"
+            default-view="list"
             :events="events"
             :event-render="eventRender"
             @loading="onLoading"
