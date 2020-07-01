@@ -180,7 +180,7 @@ class Controller extends Web\Controller\Base
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
         ];
 
-        $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
+        $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Continuous Report");
 
         $this->getResponse()->content->set($output);
     }
