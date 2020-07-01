@@ -384,7 +384,7 @@
              * Perform async request and load results into component
              */
             search: _.debounce(function(loading, query, vm) {
-                axios.get('/ajax/user.php', {
+                axios.get(ENDPOINTS.URL_SELECTIZE, {
                     params: {
                         query: query,
                         groupID: 0

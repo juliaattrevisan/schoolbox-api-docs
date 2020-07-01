@@ -15,6 +15,9 @@ export const ENDPOINTS = Object.freeze({
     URL_ATTENDANCE_RSVP_DECLINE: '/calendar/event/attendance/{eventId}/decline',
     URL_ATTENDANCE_RSVP_DELETE: '/calendar/event/attendance/{eventId}/delete',
 
+    /* Selectize endpoint
+     */
+     URL_SELECTIZE: '/ajax/user.php',
 
     /**
      * Generate a path via const
