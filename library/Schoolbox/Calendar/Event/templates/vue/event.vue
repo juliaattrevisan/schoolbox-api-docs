@@ -34,7 +34,9 @@
         },
         watch: {
             selected: function() {
-                this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+                if (this.selected.id) {
+                    this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+                }
             }
         },
         created() {
@@ -194,6 +196,7 @@
                                     status: ATTENDANCE_STATUS.PENDING
                                 });
                             }
+
                             toast.toastTimeout({
                                 text: fullname + ' has been invited',
                                 css: 'success'
@@ -206,6 +209,12 @@
                                     css: 'alert'
                                 });
                             }
+                        })
+                        .then(function() {
+
+                            /* Clear selection after async outcome
+                             */
+                            self.selected = [];
                         });
             },
 
