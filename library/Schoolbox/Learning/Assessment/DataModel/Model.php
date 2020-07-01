@@ -82,7 +82,7 @@ class Model implements ISoftDeletable
     /**
      * The comparative amount that this assessment affects a student's grade by.
      *
-     * @var int
+     * @var float
      */
     protected $weight = 0;
 
@@ -511,7 +511,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $weight
+     * @param float $weight
      * @return static
      */
     public function setWeight($weight)

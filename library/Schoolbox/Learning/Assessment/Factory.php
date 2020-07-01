@@ -142,7 +142,7 @@ class Factory
         $this->setWorkType(trim($post['workType']));
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
-        $this->setWeight(intval($post['weight']));
+        $this->setWeight(trim($post['weight']));
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setPublishAt(trim($post['publishDate']));

@@ -110,7 +110,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $max_attempts;
 
     /**
-    * @var int
+    * @var float
     */
     protected $weight = 0;
 
@@ -586,7 +586,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return int
+    * @return float
     */
     public function getWeight()
     {
@@ -594,7 +594,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  int   $weight
+    * @param  float   $weight
     * @return $this
     */
     public function setWeight($weight)
