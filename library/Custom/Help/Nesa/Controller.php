@@ -10,6 +10,7 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
@@ -98,6 +99,7 @@ class Controller extends Base
         $selector = new Selector(
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
+            RubricCapabilityMapper::getInstance(),
             RubricIndicatorMapper::getInstance(),
             RubricDescriptorMapper::getInstance()
         );
