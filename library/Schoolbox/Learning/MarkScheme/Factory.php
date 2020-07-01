@@ -239,7 +239,6 @@ class Factory
     {
         $gradeGroups     = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
 
-        /** @var Group\Model $gradeGroup */
         if ($folder && $folder->getYearLevels()->count() === 1) {
             // If this folder has an effective year level setting
             /** @var YearLevel $yearLevel */
