@@ -10,6 +10,9 @@
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
+    import vSelect from "vue-select";
+    import "vue-select/dist/vue-select.css";
+
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
@@ -26,7 +29,8 @@
         ],
         name: "event-details",
         components: {
-            audiencesModal
+            audiencesModal,
+            vSelect
         },
         created() {
             this.ENDPOINTS = ENDPOINTS;
@@ -45,6 +49,10 @@
                 numAccepted: this.event.attendance.payload.attendees.accepted,
                 numDeclined: this.event.attendance.payload.attendees.declined,
                 guests: this.event.attendance.payload.guests,
+
+                /* Vue Select
+                 */
+                options: [],
 
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
@@ -278,15 +286,93 @@
             },
 
 
+            /**
+             * Start searching for keyword
+             *
+             * @param query
+             * @param loading
+             */
+            onSearch(query, loading) {
+                loading(true);
+                this.search(loading, query, this);
+            },
+
+
+            /**
+             * Perform async request and load results into component
+             */
+            search: _.debounce(function(loading, query, vm) {
+                axios.get('/ajax/user.php', {
+                    params: {
+                        query: query,
+                        groupID: 0
+                    }
+                })
+                .then(function(response) {
+                    vm.options = response.data;
+                    loading(false);
+                });
+            }, 350),
+
+
             showAudiencesModal() {
                 this.$refs.audiencesModal.open();
             }
         }
     }
 </script>
+<style scoped>
+    /* Supposed to work like this, but doesn't.
+     * https://vue-select.org/guide/ajax.html#library-agnostic
+     */
+    .d-center {
+        display: flex;
+        align-items: center;
+    }
 
+    .selected img {
+        width: auto;
+        max-height: 23px;
+        margin-right: 0.5rem;
+    }
+
+    .v-select .dropdown li {
+        border-bottom: 1px solid rgba(112, 128, 144, 0.1);
+    }
+
+    .v-select .dropdown li:last-child {
+        border-bottom: none;
+    }
+
+    .v-select .dropdown li a {
+        padding: 10px 20px;
+        width: 100%;
+        font-size: 1.25em;
+        color: #3c3c3c;
+    }
+
+    .v-select .dropdown-menu .active > a {
+        color: #fff;
+    }
+</style>
 <template>
     <div>
+        <v-select :options="options" @search="onSearch" label="name">
+            <template slot="no-options">
+                Start typing the name of a user
+            </template>
+            <template slot="option" slot-scope="option">
+                <div class="d-center">
+                    {{ option.name }}
+                </div>
+            </template>
+            <template slot="selected-option" slot-scope="option">
+                <div class="selected d-center">
+                    {{ option.name }}
+                </div>
+            </template>
+        </v-select>
+
         <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
                 <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
