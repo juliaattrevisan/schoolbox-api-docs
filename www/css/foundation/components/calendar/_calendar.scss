@@ -176,3 +176,30 @@
   }
 }
 
+// FullCalendar homepage and dashboard components
+.component-container {
+  // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
+  .fc-view-container {
+    background-color: $body-bg;
+  }
+
+  // Make list heading and empty state look like subheaders
+  .fc-widget-header {
+    padding: 0;
+  }
+  .fc-list-heading-main, .fc-list-empty {
+    @extend h2;
+    @extend .subheader;
+  }
+  .fc-list-empty-wrap2 {
+    position: inherit;
+  }
+  .fc-list-empty-wrap1 {
+    width: auto;
+  }
+
+  // The entire event is clickable
+  .fc-list-item {
+    cursor: pointer;
+  }
+}
