@@ -2,7 +2,7 @@
 
 /** @var SitePage $this */
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, null, 403 );
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
 }
 
 if (strlen($_POST['id'])) {
