@@ -11,6 +11,7 @@
 
 namespace Custom\Help\Nesa;
 
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as RubricDescriptorModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
@@ -29,9 +30,14 @@ class Selector
     private $unitSpecificationMapper;
 
     /**
+     * @var RubricCapabilityMapper
+     */
+    private $rubricCapabilityMapper;
+
+    /**
      * @var RubricIndicatorMapper
      */
-    private $criterionMapper;
+    private $rubricIndicatorMapper;
 
     /**
      * @var RubricDescriptorMapper
@@ -43,18 +49,21 @@ class Selector
      *
      * @param int                     $courseSpecificationId The Teacher Course upon which we report
      * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param RubricIndicatorMapper   $criterionMapper
+     * @param RubricCapabilityMapper  $rubricCapabilityMapper
+     * @param RubricIndicatorMapper   $rubricIndicatorMapper
      * @param RubricDescriptorMapper  $rubricDescriptorMapper
      */
     public function __construct(
         int $courseSpecificationId,
         UnitSpecificationMapper $unitSpecificationMapper,
-        RubricIndicatorMapper $criterionMapper,
+        RubricCapabilityMapper $rubricCapabilityMapper,
+        RubricIndicatorMapper $rubricIndicatorMapper,
         RubricDescriptorMapper $rubricDescriptorMapper
     ) {
         $this->courseSpecificationId = $courseSpecificationId;
         $this->unitSpecificationMapper = $unitSpecificationMapper;
-        $this->criterionMapper = $criterionMapper;
+        $this->rubricCapabilityMapper = $rubricCapabilityMapper;
+        $this->rubricIndicatorMapper = $rubricIndicatorMapper;
         $this->rubricDescriptorMapper = $rubricDescriptorMapper;
     }
 
@@ -81,17 +90,9 @@ class Selector
             $parentIds[] = $currentUnitSpecification->getFolder()->getId();
         }
 
-        $allSpecCrits = $this->criterionMapper->findByColumn('parent_id', $parentIds);
-
-        /* Now find all the descriptors contained in the spec
-         */
-        $criterionIds = [];
-
-        foreach ($allSpecCrits as $currentSpecCrit) {
-            $criterionIds[] = $currentSpecCrit->getId();
-        }
-
-        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('rubric_indicator_id', $criterionIds);
+        $allSpecCapabilities = $this->rubricCapabilityMapper->findByColumn('parent_id', $parentIds);
+        $allSpecIndicators   = $this->rubricIndicatorMapper->findByColumn('rubric_capability_id', $allSpecCapabilities->getPropertyValues('id'));
+        $allSpecDescriptors  = $this->rubricDescriptorMapper->findByColumn('rubric_indicator_id', $allSpecIndicators->getPropertyValues('id'));
 
         /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
          * From here we can choose which descriptors we want to include in the report
