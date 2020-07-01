@@ -1,1 +1,1 @@
-alter table assessment modify weight decimal(5,2);
+alter table assessment modify weight decimal(12,2);
