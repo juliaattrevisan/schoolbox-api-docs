@@ -68,10 +68,10 @@ Data:
                                 <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
                                       title="English as an Additional Language">
                                 </span>
-                                <span v-if="student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
+                                <span v-if="!hideMedicalAlerts && student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
                                       :title="specialNeeds">
                                 </span>
-                                <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert"
+                                <span v-if="!hideMedicalAlerts && student.StudentMedicalAlert != ''" class="icon-alert alert"
                                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
                                 </span>
                             </p>
@@ -159,6 +159,7 @@ Data:
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
+            hideMedicalAlerts: Boolean({{ config.protect_medicalspecial }}),
             studentLists: [],
             showSkeletonLoader: true,
             isAllSelected: false,
