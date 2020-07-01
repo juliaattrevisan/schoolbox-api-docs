@@ -170,7 +170,6 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.user.id;
                             let found = false;
 
                             /* Update data with the result from async request
@@ -181,7 +180,7 @@
                             self.numDeclined = response.data.attendees.declined;
 
                             for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === userId) {
+                                if (self.guests[i].id === id) {
                                     self.guests[i].status = ATTENDANCE_STATUS.PENDING;
                                     found = true;
                                     break;
@@ -190,7 +189,7 @@
 
                             if (!found) {
                                 self.guests.push({
-                                    id: userId,
+                                    id: id,
                                     name: fullname,
                                     status: ATTENDANCE_STATUS.PENDING
                                 });
