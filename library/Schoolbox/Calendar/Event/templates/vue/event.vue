@@ -192,7 +192,6 @@
 
                             for (let i = 0; i < self.guests.length; i++) {
                                 if (self.guests[i].id === id) {
-                                    self.guests[i].status = ATTENDANCE_STATUS.PENDING;
                                     found = true;
                                     break;
                                 }
