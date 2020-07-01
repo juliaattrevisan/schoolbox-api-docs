@@ -66,16 +66,35 @@ $app = new class extends CliTool\App {
         $publicKeyName  = 'jwt_public_key';
         $privateKeyName = 'jwt_private_key';
 
-        if (!$this->getOpt(self::OPT_SHORT_FORCE) || !$this->getOpt(self::OPT_LONG_FORCE)) {
-            $selectQuery->execute(['name' => $publicKeyName]);
+        $existingPublicKey = null;
+        $selectQuery->execute(['name' => $publicKeyName]);
+        if ($selectQuery->rowCount() > 0) {
             $existingPublicKey = $selectQuery->fetchColumn();
-            $selectQuery->execute(['name' => $privateKeyName]);
+        }
+
+        $existingPrivateKey = null;
+        $selectQuery->execute(['name' => $privateKeyName]);
+        if ($selectQuery->rowCount()) {
             $existingPrivateKey = $selectQuery->fetchColumn();
+        }
+
+        if (!isset($existingPrivateKey, $existingPublicKey)) {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Cannot create key pair: the configuration options for the key pair (%s, %s) do not exist',
+                    $publicKeyName,
+                    $privateKeyName
+                )
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        if (!$this->getOpt(self::OPT_SHORT_FORCE) || !$this->getOpt(self::OPT_LONG_FORCE)) {
             if (!($existingPublicKey === '' && $existingPrivateKey === '')) {
-                $this->getLogger()->warning(
+                $this->getLogger()->notice(
                     'A key pair already exists. Run with the `-f` option to override the existing key pair.'
                 );
-                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+                exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
 
