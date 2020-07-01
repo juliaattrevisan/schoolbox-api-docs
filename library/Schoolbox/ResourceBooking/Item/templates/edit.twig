@@ -198,7 +198,7 @@
                         <select name="resource_category_id" id="resource_category">
                             <option>-- select --</option>
                             {% for category in categoryList %}
-                                <option {{ category.id == item.category.id ? 'selected' : '' }}
+                                <option {{ item.category and category.id == item.category.id ? 'selected' : '' }}
                                         value="{{ category.id|e('html_attr') }}"
                                         label="{{ category.name|e('html_attr') }}"
                                         >{{ category.name }}</option>
@@ -250,7 +250,7 @@
                             Moderation
                             <select name="resource_moderation_type_id">
                                 {% for moderation in moderationList %}
-                                    <option {{ moderation.id == item.moderationType.id ? 'selected' : '' }}
+                                    <option {{ item.moderationType and moderation.id == item.moderationType.id ? 'selected' : '' }}
                                             value="{{ moderation.id|e('html_attr') }}"
                                             label="{{ moderation.name|e('html_attr') }}"
                                             >{{ moderation.name }}</option>
@@ -270,7 +270,7 @@
                         Minimum Lead Time
                         <span class='hint has-tip tip-top' data-tooltip title="If this is set, somebody reserving this item must give this period of notice before their reservation.">?</span>
                     </legend>
-                    {% set isEmpty = item.minLeadTime.secondTotal == 0 %}
+                    {% set isEmpty = item.minLeadTime.secondTotal ?? 0 == 0 %}
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Days
@@ -302,7 +302,7 @@
                     </legend>
 
                     <div class="small-4 columns">
-                        {% set isEmpty = item.minReservationTime.secondTotal == 0 %}
+                        {% set isEmpty = item.minReservationTime.secondTotal ?? 0 == 0 %}
                         <label class="interval-input">
                             Days
                             <input type="text" value="{{ isEmpty ? '' : item.minReservationTime.dayTotal }}" name="min_reservation_time[day]">
@@ -336,7 +336,7 @@
                         </label>
                     </div>
                     <div class="small-4 columns">
-                        {% set isEmpty = item.maxReservationTime.secondTotal == 0 %}
+                        {% set isEmpty = item.maxReservationTime.secondTotal ?? 0 == 0 %}
                         <label class="interval-input">
                             Days
                             <input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]">
