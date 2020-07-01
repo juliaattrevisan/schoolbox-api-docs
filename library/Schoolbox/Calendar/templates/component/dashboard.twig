@@ -6,6 +6,7 @@
             // Allegedly may be up to 1 year (or "all": wtf?),
             // but surely don't show all events for all time?
             days: Math.min(Math.max(1, Number('{{ component.config.days }}') || 365), 365),
+            dateDisplayFormats: dateDisplayFormats,
         };
     </script>
 {% endautoescape %}

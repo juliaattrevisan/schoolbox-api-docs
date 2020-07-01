@@ -180,6 +180,18 @@
             reloadEvents() {
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+
+            /**
+             * Helper for rendering the list day.
+             *
+             * @param dateObject
+             * @returns {string}
+             */
+            listDayFormat(dateObject) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
+                return this.helper.dayTitleFormat(dateObject);
+            },
         },
     }
 </script>
@@ -209,11 +221,13 @@
                 list: {
                     type: 'list',
                     duration: { days: config.days },
+                    listDayFormat: listDayFormat,
+                    listDayAltFormat: false,
                 }
             }"
             :header="false"
             :event-time-format="helper.eventTimeFormat"
-            :content-height="this.contentHeight"
+            height="auto"
             default-view="list"
             :events="events"
             :event-render="eventRender"
