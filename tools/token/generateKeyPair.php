@@ -89,7 +89,7 @@ $app = new class extends CliTool\App {
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        if (!$this->getOpt(self::OPT_SHORT_FORCE) || !$this->getOpt(self::OPT_LONG_FORCE)) {
+        if (!($this->getOpt(self::OPT_SHORT_FORCE) || $this->getOpt(self::OPT_LONG_FORCE))) {
             if (!($existingPublicKey === '' && $existingPrivateKey === '')) {
                 $this->getLogger()->notice(
                     'A key pair already exists. Run with the `-f` option to override the existing key pair.'
@@ -112,6 +112,7 @@ $app = new class extends CliTool\App {
         // and update
         $updateQuery->execute(['value' => $publicKey, 'name' => 'jwt_public_key']);
         $updateQuery->execute(['value' => $privateKey, 'name' => 'jwt_private_key']);
+        $this->getLogger()->notice('Key pair successfully generated.');
     }
 
 
@@ -144,6 +145,7 @@ DESCRIPTION
 
         By default: this will refuse to override an existing key pair, and will
         exit with an error code if either the public or private key exists.
+
 HELP;
         \fwrite(STDOUT, $help);
     }
