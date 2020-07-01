@@ -31,6 +31,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -77,7 +78,13 @@ class Module extends BaseModule
             )
         );
 
-        $canDeleteFeedback = new Rule\IsSuperuser();
+        $canDeleteFeedback = new Rule\Any(
+                                new Rule\IsSuperuser(),
+                                new Rule\All(
+                                    new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
+                                    new Rule\HasRole(Role::STAFF)
+                                )
+        );
 
         // Preloads
 
