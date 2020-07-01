@@ -321,40 +321,6 @@
         }
     }
 </script>
-<style scoped>
-    /* Supposed to work like this, but doesn't.
-     * https://vue-select.org/guide/ajax.html#library-agnostic
-     */
-    .d-center {
-        display: flex;
-        align-items: center;
-    }
-
-    .selected img {
-        width: auto;
-        max-height: 23px;
-        margin-right: 0.5rem;
-    }
-
-    .v-select .dropdown li {
-        border-bottom: 1px solid rgba(112, 128, 144, 0.1);
-    }
-
-    .v-select .dropdown li:last-child {
-        border-bottom: none;
-    }
-
-    .v-select .dropdown li a {
-        padding: 10px 20px;
-        width: 100%;
-        font-size: 1.25em;
-        color: #3c3c3c;
-    }
-
-    .v-select .dropdown-menu .active > a {
-        color: #fff;
-    }
-</style>
 <template>
     <div>
         <v-select :options="options" @search="onSearch" label="name">
