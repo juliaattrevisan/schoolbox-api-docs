@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -160,7 +161,9 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
             });
 
             // Markbook
-            $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+            $markSchemeFactory = new Factory($this->getConfigLoader());
+            $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+            $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
 
             if (!isset($subjects[$folder->getId()])) {
                 $subjects[$folder->getId()] = [

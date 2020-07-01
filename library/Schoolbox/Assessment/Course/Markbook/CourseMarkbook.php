@@ -8,13 +8,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
@@ -170,6 +172,8 @@ class CourseMarkbook
      */
     private $taskProgress;
 
+    /** @var IConfigLoader */
+    private $config;
 
     /**
      * CourseMarkbook constructor.
@@ -177,7 +181,7 @@ class CourseMarkbook
      * @param CourseSpecification\Model       $courseSpec
      * @param GenericCollection|IAssessable[] $assessables                    Must be indexed by id. (Ensures we don't have duplicates)
      * @param User                            $viewingUser
-     * @param IMarkScheme                     $studentAverageMarkScheme    How should human-readable student aggregate marks be rendered?
+     * @param IConfigLoader                   $config
      * @throws InvalidArgumentException If a caller attempts to build a course-markbook from invalid components.
      * @throws \UnexpectedValueException If we attempt to add an invalid type to a generic collection.
      */
@@ -185,15 +189,16 @@ class CourseMarkbook
         CourseSpecification\Model $courseSpec,
         GenericCollection $assessables,
         User $viewingUser,
-        IMarkScheme $studentAverageMarkScheme
+        IConfigLoader $config
     ) {
+        $this->config = $config;
         // Ensure the data passed in is all valid and makes sense
         $this->validateCourseMarkbookAssessables($courseSpec, $assessables);
 
         // Build this into a form suitable for rendering efficiently
         $this->buildDataStructures($assessables);
         $this->sortDataStructures();
-        $this->collateStatistics($assessables, $viewingUser, $studentAverageMarkScheme);
+        $this->collateStatistics($assessables, $viewingUser);
     }
 
 
@@ -439,14 +444,15 @@ class CourseMarkbook
      *
      * @param GenericCollection|IAssessable[] $assessmentImpls
      * @param User                            $viewingUser
-     * @param IMarkScheme                     $studentAverageMarkScheme
      */
-    private function collateStatistics(GenericCollection $assessmentImpls, User $viewingUser, IMarkScheme $studentAverageMarkScheme): void
+    private function collateStatistics(GenericCollection $assessmentImpls, User $viewingUser): void
     {
         // Individual participant results, respecting assessment's feedback visibility.
         $this->studentMarks    = [];
         $this->studentComments = [];
         $this->taskProgress    = [];
+
+        $courseImplMarkScheme = new Collection();
 
         // Student weighted average across all assessment in a course.
         $this->studentAverageMarks = [];
@@ -468,6 +474,7 @@ class CourseMarkbook
         $assessmentImplMarkContainsDrafts = [];  // indexed by aImpl.id
         $assessmentSpecMarkContainsDrafts = [];  // indexed by aSpec.id
 
+        $markSchemaFactory = new Factory($this->config);
 
         foreach ($assessmentImpls as $aImpl) {
             if (!$aImpl->isFeedbackVisibleToUser($viewingUser)) {
@@ -484,6 +491,13 @@ class CourseMarkbook
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl     = $aImpl->getBaseContext();
             $courseImplId = $unitImpl->getCourse()->getId();
+            $courseImplFolder = $unitImpl->getCourse()->getFolder();
+
+            // find mark scheme for the course impl, if not yet
+            if (!$courseImplMarkScheme->keyExists($courseImplFolder->getId())) {
+                $implMarkScheme = $markSchemaFactory->spawnForFolder($courseImplFolder, $viewingUser->getRole()->isStaff());
+                $courseImplMarkScheme->setOffset($courseImplId, $implMarkScheme);
+            }
 
             foreach ($aImpl->getAllParticipants() as $participant) {
                 if ($participant->isExcluded()) {
@@ -701,7 +715,7 @@ class CourseMarkbook
                     /** @var float $normalised */
                     $this->studentAverageMarks[$courseImplId][$userId][$publishType] = [
                         'norm' => $normalised,
-                        'hr'   => $studentAverageMarkScheme->getHumanReadableMark($normalised),
+                        'hr'   => $courseImplMarkScheme->getOffset($courseImplId)->getHumanReadableMark($normalised),
                     ];
                 }
             }

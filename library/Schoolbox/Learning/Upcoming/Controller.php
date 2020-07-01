@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use function func_get_args;
@@ -34,7 +35,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -95,11 +95,6 @@ class Controller extends Base
      */
     protected $participantDataSource;
 
-    /**
-     * @var GradeGroup\Model
-     */
-    protected $defaultGradeGroup;
-
     /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
@@ -122,7 +117,6 @@ class Controller extends Base
      * @param TermMapper                         $termMapper
      * @param AssessmentMapperProxy              $assessmentDataSource
      * @param ParticipantDataSource              $participantDataSource
-     * @param GradeGroup\Model                   $defaultGradeGroup
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\Selection\Mapper            $filterSelectionMapper
@@ -135,7 +129,6 @@ class Controller extends Base
         TermMapper $termMapper,
         AssessmentMapperProxy $assessmentDataSource,
         ParticipantDataSource $participantDataSource,
-        GradeGroup\Model $defaultGradeGroup,
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\Selection\Mapper $filterSelectionMapper,
@@ -147,7 +140,6 @@ class Controller extends Base
         $this->termMapper            = $termMapper;
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->participantDataSource = $participantDataSource;
-        $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterSelectionMapper = $filterSelectionMapper;
@@ -207,10 +199,9 @@ class Controller extends Base
         $subjects = [];
 
         // Calculate whether we need to load participation so we can calculate class aggregate grades
-        $displayGradesForFolderIds = [];
+        $displayGradesForFolders = [];
         $isStaff                   = $this->getUser()->getRole()->isStaff();
         $isStudentOrParent         = $this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent();
-        $showGrades                = $this->getConfigLoader()->get('show_overall_grade');
 
         foreach ($folders as $folder) {
             // Load teachers for this subject (if this subject has them)
@@ -229,9 +220,9 @@ class Controller extends Base
 
             // We need to fetch assessments so we can show overall grades for each folder if:
             // * viewer is staff/instructor
-            // * viewer is student/parent && 'show_overall_grade' is ON
-            if ($isStaff || $perm >= UserAccess::ACCESS_WRITE || ($isStudentOrParent && $showGrades)) {
-                $displayGradesForFolderIds[] = $folder->getId();
+            // * viewer is student/parent && 'show_overall_grade' is ON .. will be taken care of later
+            if ($isStaff || $perm >= UserAccess::ACCESS_WRITE) {
+                $displayGradesForFolders[] = $folder;
             }
 
             $subjects[$folder->getId()] = [
@@ -243,7 +234,9 @@ class Controller extends Base
 
         $term = $this->termMapper->findForDate($date);
 
-        if (\count($displayGradesForFolderIds)) {
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+
+        if (\count($displayGradesForFolders)) {
 
             $visibility = new Visibility($this->access);
             // Student's work
@@ -261,10 +254,11 @@ class Controller extends Base
                 $workPerFolder[$folderId] = $assessments->indexBy('id');
             }
 
-            foreach ($displayGradesForFolderIds as $folderId) {
-                if ($workPerFolder->keyExists($folderId)) {
-                    $markbook                     = new Markbook($workPerFolder[$folderId], $this->defaultGradeGroup, $this->getUser());
-                    $subjects[$folderId]['grade'] = $markbook->getStudentStatistics()[$student->getId()];
+            foreach ($displayGradesForFolders as $folder) {
+                if ($workPerFolder->keyExists($folder->getId())) {
+                    $markScheme = $markSchemeFactory->spawnForFolder($folder, $isStaff);
+                    $markbook   = new Markbook($workPerFolder[$folder->getId()], $markScheme, $this->getUser());
+                    $subjects[$folder->getId()]['grade'] = $markbook->getStudentStatistics()[$student->getId()];
                 }
             }
         }

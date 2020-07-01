@@ -133,7 +133,6 @@ class Module extends BaseModule
             'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
             'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             'folderMapper'          => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
             'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),

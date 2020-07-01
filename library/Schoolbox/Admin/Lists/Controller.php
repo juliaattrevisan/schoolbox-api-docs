@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -735,6 +736,15 @@ class Controller extends Base
             ]
         ];
 
+        $gradeList   = GradeLevelGroupMapper::getInstance()->findAllForAdminOption();
+        $luGradeList = [];
+        foreach ($gradeList as $grade) {
+            $luGradeList[] = [
+                'key'   => $grade->getId(),
+                'value' => $grade->getName(),
+            ];
+        }
+
         $return['year-levels'] = [
             'title'  => 'Year Levels',
             'delete' => true,
@@ -742,8 +752,22 @@ class Controller extends Base
             'fields' => [
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
-                    'width'     => 12,
+                    'width'     => 4,
                     'maxLength' => 150,
+                    'mandatory' => true,
+                ],
+                'overallGrade' => [
+                    'caption'   => 'Overall Grade',
+                    'tooltip'   => 'Controls the default method for displaying the students overall grade on the grade report for a subject with this year level.',
+                    'lookup'    => $luGradeList,
+                    'width'     => 5,
+                    'mandatory' => true,
+                ],
+                'showOverallGrade' => [
+                    'caption'   => 'Show Overall Grade',
+                    'tooltip'   => 'If checked, the grade average for a subject with this year level will be displayed to students and their parents on the student\'s grades page.',
+                    'checkbox'  => true,
+                    'width'     => 3,
                     'mandatory' => true,
                 ],
             ],
@@ -841,7 +865,6 @@ class Controller extends Base
                             // If we get an object back, we really want its ID
 
                             if (is_object($value)) {
-                                /** @noinspection PhpUndefinedMethodInspection */
                                 $value = $value->getId();
                             }
 

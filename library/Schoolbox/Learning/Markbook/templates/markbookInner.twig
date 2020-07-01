@@ -80,7 +80,7 @@
                         Class Average
                     </th>
                     {% set weightedMean = markbook.weightedMean %}
-                    <th class="{{ urgency.marks(markbook.normalisedMean) }}-bg">
+                    <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg">
                             {{ weightedMean | default('–') }}
                     </th>
                     {% for assessment in markbook.assessments %}
@@ -153,8 +153,8 @@
                     {% set meanNormalised      = markbook.studentStatistics[student.id].meanNormalised %}
                     {% set meanDraftNormalised = markbook.studentStatistics[student.id].meanDraftNormalised %}
 
-                    {% set draftsOffClass      = meanNormalised is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
-                    {% set draftsOnClass       = meanDraftNormalised is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
+                    {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
+                    {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
                     <td class="{{ draftsOffClass }}"
                         {% if draftWeightedMean %}data-student-average{% endif %}

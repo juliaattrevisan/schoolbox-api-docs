@@ -12,12 +12,12 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
+use Schoolbox\Learning\MarkScheme\Factory;
 use function func_get_args;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter;
 use Schoolbox\User;
@@ -29,9 +29,6 @@ class Controller extends Base
 
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
-
-    /** @var GradeGroup\Model */
-    private $defaultGradeGroup;
 
     /** @var Term\Mapper */
     private $termMapper;
@@ -48,7 +45,6 @@ class Controller extends Base
 
     /**
      * @param AssessmentMapperProxy              $assessmentMapperProxy
-     * @param GradeGroup\Model                   $defaultGradeGroup
      * @param Term\Mapper                        $termMapper
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
@@ -56,14 +52,12 @@ class Controller extends Base
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
-        GradeGroup\Model $defaultGradeGroup,
         Term\Mapper $termMapper,
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\IFactoryFactory $filterFactoryFactory
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->termMapper            = $termMapper;
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
@@ -324,8 +318,16 @@ class Controller extends Base
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
+        // TODO: remove this when SA-9384 is implemented
+        /** @var IAssessable $assessment */
+        $assessment = $assessments->first();
+        $folder = $assessment ? $assessment->getContext()->getFolder() : null;
+
         // Build a markbook
-        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+
+        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
         $markbook->sortAssessables();
         return $markbook;
     }

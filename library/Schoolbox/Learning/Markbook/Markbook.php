@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning\Markbook;
 
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -19,7 +18,7 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\StandardDeviation;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User;
@@ -52,11 +51,11 @@ class Markbook
     protected $topLevelAssessments;
 
     /**
-     * The grade group to use when summarising a student's overall grade for these assessments.
+     * The mark scheme to use when summarising a student's overall grade for these assessments.
      *
-     * @var GradeGroup
+     * @var IMarkScheme
      */
-    protected $gradeGroup;
+    protected $defaultMarkScheme;
 
     /**
      * The user viewing the markbook, usually whoever is logged in
@@ -118,14 +117,14 @@ class Markbook
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
      * @param Collection|IAssessable[] $assessments
-     * @param GradeGroup               $gradeGroup
+     * @param IMarkScheme              $defaultMarkScheme
      * @param User                     $viewingUser
      */
-    public function __construct(Collection $assessments, GradeGroup $gradeGroup, User $viewingUser)
+    public function __construct(Collection $assessments, IMarkScheme $defaultMarkScheme, User $viewingUser)
     {
-        $this->assessments = $assessments;
-        $this->gradeGroup  = $gradeGroup;
-        $this->viewingUser = $viewingUser;
+        $this->assessments       = $assessments;
+        $this->defaultMarkScheme = $defaultMarkScheme;
+        $this->viewingUser       = $viewingUser;
         $this->topLevelAssessments = $assessments->filter(function(IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
@@ -222,7 +221,6 @@ class Markbook
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $overallMarkScheme = new LetterGrade($this->gradeGroup);
         $weightedSummator  = new WeightedAverage();
 
         // Not all assessables are used in stats:
@@ -254,7 +252,7 @@ class Markbook
             }
 
             $this->studentStatistics[$student->getId()]['weightedMean'] =
-                $overallMarkScheme->getHumanReadableMark(
+                $this->defaultMarkScheme->getHumanReadableMark(
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
@@ -262,7 +260,7 @@ class Markbook
 
             if ($statsHasDraft) {
                 $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
-                    $overallMarkScheme->getHumanReadableMark(
+                    $this->defaultMarkScheme->getHumanReadableMark(
                         $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, false)
                     );
                 $this->studentStatistics[$student->getId()]['meanDraftNormalised'] =
@@ -280,7 +278,7 @@ class Markbook
             true,
             new Average()
         );
-        $this->weightedMean = $overallMarkScheme->getHumanReadableMark($this->normalisedMean);
+        $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
 
     }
 

@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -15,6 +16,8 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
@@ -46,12 +49,27 @@ class Factory
         MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
     ];
 
+    /** @var Group\Mapper */
+    private $gradeLevelGroupMapper;
+
+    /** @var IConfigLoader|null */
+    private $config;
+
+    /**
+     * @param IConfigLoader|null $config
+     */
+    public function __construct(?IConfigLoader $config = null)
+    {
+        $this->config = $config;
+    }
+
     /**
      * @param IAssessable $assessable
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      * @throws \RangeException
+     * @throws Mapper\Exception
      */
     public function spawnMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
     {
@@ -210,5 +228,52 @@ class Factory
             return self::$markTypesTask;
         }
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
+    }
+
+    /**
+     * @param Folder|null $folder
+     * @param bool   $isStaff If false, showOverallGrade will be taken into account
+     * @return IMarkScheme
+     */
+    public function spawnForFolder(?Folder $folder, bool $isStaff): IMarkScheme
+    {
+        $gradeGroups     = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
+
+        /** @var Group\Model $gradeGroup */
+        if ($folder && $folder->getYearLevels()->count() === 1) {
+            // If this folder has an effective year level setting
+            /** @var YearLevel $yearLevel */
+            $yearLevel        = $folder->getYearLevels()->first();
+            $overAllGrade     = $yearLevel->getOverallGrade();
+            $showOverallGrade = $yearLevel->getShowOverallGrade();
+        } else {
+            // Otherwise fall back to config
+            $overAllGrade     = $this->config->get('overall_grade');
+            $showOverallGrade = $this->config->get('show_overall_grade');
+        }
+
+        // If the grade is hidden
+        if (!$isStaff && !$showOverallGrade) {
+            return new None();
+        }
+
+        $gradeGroup = $gradeGroups->getBy('id', $overAllGrade);
+        if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
+            return new None();
+        } elseif ($gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_PERCENTAGE) {
+            return new Percentage();
+        }
+        return new LetterGrade($gradeGroup);
+    }
+
+    /**
+     * @return Group\Mapper
+     */
+    private function getGradeLevelGroupMapper(): Group\Mapper
+    {
+        if (!$this->gradeLevelGroupMapper) {
+            $this->gradeLevelGroupMapper = Group\Mapper::getInstance();
+        }
+        return $this->gradeLevelGroupMapper;
     }
 }
