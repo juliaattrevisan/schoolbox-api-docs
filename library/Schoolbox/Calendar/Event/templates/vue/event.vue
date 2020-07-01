@@ -32,6 +32,11 @@
             audiencesModal,
             vSelect
         },
+        watch: {
+            selected: function() {
+                this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+            }
+        },
         created() {
             this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
@@ -53,6 +58,7 @@
                 /* Vue Select
                  */
                 options: [],
+                selected: [],
 
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
@@ -136,6 +142,72 @@
                 if (this.isInvited(this.currentAttendanceStatus)) {
                     this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
                 }
+            },
+
+
+            /**
+             * Create an invitation
+             *
+             * @param id        the user's id
+             * @param fullname  the user's name
+             */
+            rsvpCreate(id, fullname) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: ENDPOINTS.createAttendancePath(this.event.id),
+                    data:  qs.stringify({guests: id}),
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                /* A toast - to your valour, my sword, and our victory together
+                 */
+                toast.toastActivate({
+                    text: 'Creating invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+                            let userId = response.data.user.id;
+                            let found = false;
+
+                            /* Update data with the result from async request
+                             */
+                            self.numAvailable = response.data.attendees.available;
+                            self.numPending = response.data.attendees.pending;
+                            self.numAccepted = response.data.attendees.accepted;
+                            self.numDeclined = response.data.attendees.declined;
+
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === userId) {
+                                    self.guests[i].status = ATTENDANCE_STATUS.PENDING;
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                self.guests.push({
+                                    id: userId,
+                                    name: fullname,
+                                    status: ATTENDANCE_STATUS.PENDING
+                                });
+                            }
+                            toast.toastTimeout({
+                                text: fullname + ' has been invited',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to invite ' + fullname + '; please try again.',
+                                    css: 'alert'
+                                });
+                            }
+                        });
             },
 
 
@@ -321,9 +393,10 @@
         }
     }
 </script>
+
 <template>
     <div>
-        <v-select :options="options" @search="onSearch" label="name">
+        <v-select :options="options" @search="onSearch" label="name" v-model="selected">
             <template slot="no-options">
                 Start typing the name of a user
             </template>
