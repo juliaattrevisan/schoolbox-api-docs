@@ -396,22 +396,6 @@
 
 <template>
     <div>
-        <v-select :options="options" @search="onSearch" label="name" v-model="selected">
-            <template slot="no-options">
-                Start typing the name of a user
-            </template>
-            <template slot="option" slot-scope="option">
-                <div class="d-center">
-                    {{ option.name }}
-                </div>
-            </template>
-            <template slot="selected-option" slot-scope="option">
-                <div class="selected d-center">
-                    {{ option.name }}
-                </div>
-            </template>
-        </v-select>
-
         <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
                 <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
@@ -477,9 +461,23 @@
                                 available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="this.ENDPOINTS.createAttendancePath(this.event.id)" :style="{display: 'none'}" method="post" v-if="canModify() && this.numAvailable">
-                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                            </form>
+                            <template v-if="canModify() && this.numAvailable">
+                                <v-select :options="options" @search="onSearch" label="name" v-model="selected">
+                                    <template slot="no-options">
+                                        Start typing the name of a user
+                                    </template>
+                                    <template slot="option" slot-scope="option">
+                                        <div class="d-center">
+                                            {{ option.name }}
+                                        </div>
+                                    </template>
+                                    <template slot="selected-option" slot-scope="option">
+                                        <div class="selected d-center">
+                                            {{ option.name }}
+                                        </div>
+                                    </template>
+                                </v-select>
+                            </template>
                         </div>
 
                         <p class="content"><strong>
