@@ -143,6 +143,7 @@ class Controller extends Base
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
                     'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
+                    'cancelCallbackUrl' => $this->session->getHistory(),
                     'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
                     'validationData'    => [
@@ -697,6 +698,7 @@ class Controller extends Base
                 'data'     => [
                     'item'              => $item,
                     'campusList'        => $this->getCampusList(),
+                    'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
                     'cancelCallbackUrl' => $this->session->getHistory(),
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),

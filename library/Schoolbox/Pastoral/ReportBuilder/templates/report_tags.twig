@@ -43,7 +43,7 @@
                                 </p>
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
-                                    {{ record.type.name }} {% if record.subtype.name != '' %}({{ record.subtype.name }}){% endif %}
+                                    {{ record.type.name }} {% if record.subtype.name ?? '' != '' %}({{ record.subtype.name }}){% endif %}
                                     |
 
                                     {% if showSeverity %}
@@ -56,9 +56,9 @@
 
                                     {# Show audienced roles  #}
                                     {% for access in record.access %}
-                                        {% if access.role.id != '' %}
+                                        {% if access.role %}
                                             {{ access.role.name }}{% if not loop.last %},{% endif %}
-                                        {% elseif access.user.id != '' %}
+                                        {% elseif access.user %}
                                             <a
                                             href="/search/user/{{ access.user.id }}">{{ access.user.fullName }}</a>{% if not loop.last %},{% endif %}
                                         {% endif %}
@@ -98,7 +98,7 @@
                                             <span class="{{ labelClass }} label hide-on-print">{{ record.points }}
                                                 Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
                                             <b class="show-for-print"> {{ record.points }}
-                                                Point{% if record.pointrs < -1 or record.points > 1 %}s{% endif %}</b>
+                                                Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</b>
                                         {% endif %}
                                         {% if record.tags | length > 0 %}
                                             {% for tag in record.tags %}

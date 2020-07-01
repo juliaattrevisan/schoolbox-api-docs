@@ -27,7 +27,7 @@
                     {% set isAccessAdmin = userAccess[group.id].admin ?? false %}
                     {% set isAccessWrite = userAccess[group.id].write ?? false %}
                     {% set isAccessRead = userAccess[group.id].read ?? false %}
-                    {% if (not group.group.private or isAccessWrite or isAccessAdmin) %}
+                    {% if (not (group.group and group.group.private) or isAccessWrite or isAccessAdmin) %}
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
                         </nav>
@@ -39,7 +39,7 @@
                             {% if isAccessAdmin %}
                                 <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
                             {% endif %}
-                            {% if (not group.group.private and (isAccessWrite or isAccessRead)) %}
+                            {% if (not (group.group and group.group.private) and (isAccessWrite or isAccessRead)) %}
                                 <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
                             {% endif %}
                         </ul>

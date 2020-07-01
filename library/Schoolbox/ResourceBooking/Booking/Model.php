@@ -349,8 +349,8 @@ class Model implements ISoftDeletable, JsonSerializable
             'id'       => $this->getId(),
             'resource' => $this->getResource(),
             'event'    => array(
-                'start' => $this->getEvent()->getStartDateTime()->toIso8601String(),
-                'end'   => $this->getEvent()->getEndDateTime()->toIso8601String(),
+                'start' => $this->getEvent()->getStartDateTime() ? $this->getEvent()->getStartDateTime()->toIso8601String() : null,
+                'end'   => $this->getEvent()->getEndDateTime() ? $this->getEvent()->getEndDateTime()->toIso8601String() : null,
             ),
         );
     }

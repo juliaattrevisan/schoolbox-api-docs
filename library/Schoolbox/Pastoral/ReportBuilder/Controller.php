@@ -315,6 +315,7 @@ class Controller extends Base
                     'results' => $records,
                 ],
                 'title' => 'Pastoral Tag Report',
+                'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
             ]
         );
     }
