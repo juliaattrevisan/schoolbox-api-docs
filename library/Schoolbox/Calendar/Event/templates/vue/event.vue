@@ -130,6 +130,18 @@
         methods: {
 
             /**
+             * Update attendance counts from Payload data
+             *
+             * @param payload  Payload instance
+             */
+            updateCountsFromPayload(payload) {
+                this.numAvailable = payload.attendees.available;
+                this.numPending = payload.attendees.pending;
+                this.numAccepted = payload.attendees.accepted;
+                this.numDeclined = payload.attendees.declined;
+            },
+
+            /**
              * Accept an invitation
              */
             rsvpAccept() {
@@ -176,10 +188,7 @@
 
                             /* Update data with the result from async request
                              */
-                            self.numAvailable = response.data.attendees.available;
-                            self.numPending = response.data.attendees.pending;
-                            self.numAccepted = response.data.attendees.accepted;
-                            self.numDeclined = response.data.attendees.declined;
+                            self.updateCountsFromPayload(response.data);
 
                             for (let i = 0; i < self.guests.length; i++) {
                                 if (self.guests[i].id === id) {
@@ -266,10 +275,7 @@
 
                             /* Update data with the result from async request
                              */
-                            self.numAvailable = response.data.attendees.available
-                            self.numPending = response.data.attendees.pending;
-                            self.numAccepted = response.data.attendees.accepted;
-                            self.numDeclined = response.data.attendees.declined;
+                            self.updateCountsFromPayload(response.data);
 
                             toast.toastTimeout({
                                 text: name + ' has been uninvited',
@@ -318,10 +324,7 @@
                             /* Update data with the result from async request
                              */
                             self.currentAttendanceStatus = status;
-                            self.numAvailable = response.data.attendees.available;
-                            self.numPending = response.data.attendees.pending;
-                            self.numAccepted = response.data.attendees.accepted;
-                            self.numDeclined = response.data.attendees.declined;
+                            self.updateCountsFromPayload(response.data);
 
                             for (let i = 0; i < self.guests.length; i++) {
                                 if (self.guests[i].id === userId) {
