@@ -49,3 +49,22 @@
     display: none;
   }
 }
+
+#experimentAttendanceForm {
+  @include placeholder-color($aluminum, $font-weight-normal);
+
+  /* Hide our input field because we're going to simulate it with
+   * a container element instead. This input field is the last
+   * brick in the selectize wall and gets focus when the container
+   * element is clicked
+   */
+  .vs__selected-options {
+    input {
+      &:hover, &:focus {
+        background-color: transparent;
+      }
+
+      border: 0
+    }
+  }
+}

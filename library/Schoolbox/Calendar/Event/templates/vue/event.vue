@@ -483,7 +483,7 @@
                             </span>
 
                             <template v-if="canModify() && this.numAvailable">
-                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <v-select id="createAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                                     <template slot="option" slot-scope="option">
                                         <div class="d-center">
                                             {{ option.name }}
@@ -496,6 +496,20 @@
                                     </template>
                                 </v-select>
                             </template>
+
+                            <h1>Experiment.</h1>
+                            <v-select id="experimentAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <template slot="option" slot-scope="option">
+                                    <span class="d-center">
+                                        {{ option.name }}
+                                    </span>
+                                </template>
+                                <template slot="selected-option" slot-scope="option">
+                                    <span class="selected d-center">
+                                        {{ option.name }}
+                                    </span>
+                                </template>
+                            </v-select>
                         </div>
 
                         <p class="content"><strong>
