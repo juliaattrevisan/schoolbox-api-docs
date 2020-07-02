@@ -70,7 +70,7 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @param $overallGrade
+     * @param mixed $overallGrade
      */
     public function setOverallGrade($overallGrade)
     {
