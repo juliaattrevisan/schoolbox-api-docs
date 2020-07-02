@@ -51,7 +51,6 @@
 }
 
 #experimentAttendanceForm {
-  @include placeholder-color($aluminum, $font-weight-normal);
 
   /* Hide our input field because we're going to simulate it with
    * a container element instead. This input field is the last
@@ -75,4 +74,11 @@
     border: 1px solid $form-border-color;
     border-radius: 0;
   }
+
+  /* That chevron expanderer thing can still go away
+   */
+  .vs__open-indicator {
+    display: none;
+  }
+
 }
