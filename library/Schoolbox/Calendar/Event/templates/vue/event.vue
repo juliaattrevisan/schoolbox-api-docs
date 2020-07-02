@@ -472,10 +472,7 @@
                             </span>
 
                             <template v-if="canModify() && this.numAvailable">
-                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" v-model="selected">
-                                    <template slot="no-options">
-                                        Start typing the name of a user
-                                    </template>
+                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                                     <template slot="option" slot-scope="option">
                                         <div class="d-center">
                                             {{ option.name }}
