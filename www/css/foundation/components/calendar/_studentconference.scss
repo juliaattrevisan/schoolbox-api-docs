@@ -1,0 +1,51 @@
+/* This documentation is out of date
+ * https://vue-select.org/guide/ajax.html#library-agnostic
+ *
+ * A bunch of hipster neckbeards became victim of their own folly
+ * https://github.com/sagalbot/vue-select/issues/490
+ *
+ * You can never fully remove the "Sorry, no matching options" dropdown that spawns
+ * It always occupies a little space underneath when you give focus to the selectize
+ * https://codepen.io/sagalbot/pen/oZmLVN
+ *
+ * This is the form on the event detail screen where you can invite
+ * people to the event
+ */
+#createAttendanceForm {
+  @include placeholder-color($aluminum, $font-weight-normal);
+
+  .vs__dropdown-toggle {
+    border: 0;
+  }
+
+  .vs__search {
+    border: 1px solid $form-border-color;
+    font-size: $paragraph-font-size;
+    margin: 0;
+
+    &:focus {
+      font-size: $paragraph-font-size;
+    }
+  }
+
+  .vs__actions {
+    padding: 0;
+  }
+
+  .vs__spinner {
+    margin-left: 0.5rem;
+    padding: 0;
+  }
+
+  .vs__open-indicator {
+    display: none;
+  }
+
+  .vs__selected {
+    display: none;
+  }
+
+  .vs__clear {
+    display: none;
+  }
+}

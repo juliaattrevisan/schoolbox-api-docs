@@ -35,30 +35,3 @@
 <script src="/javascript/components/eventDetails.bundle.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/javascript/shared/calendar/jquery.attendance.js"></script>
-<script>
-    $(function() {
-
-        /* Attendance list modification
-         */
-        $.fn.attendance({
-            canModify: {{ canModify ? 'true' : 'false' }}
-        });
-
-        /* Initial conditions
-         */
-        const isInvited = $('#attendance-guests').find('[data-guest="' + parseInt('{{ user.id }}') + '"]').length > 0;
-
-        $.fn.rsvpToggle({
-            available: {{ attendance.payload.attendees.available is null ? 'null' : attendance.payload.attendees.available }},
-            isInvited: isInvited
-        });
-
-        /* Apply listeners to RSVP buttons to post and reload
-         * That'll reload with the most recent state of affairs
-         */
-        $.fn.rsvp({
-            isInvited: isInvited
-        });
-    });
-</script>

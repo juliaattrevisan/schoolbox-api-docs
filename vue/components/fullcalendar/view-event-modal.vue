@@ -6,26 +6,17 @@
     import qs                 from 'qs';
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
+    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+     */
+    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+    import checks              from '@schoolboxCalendarEvent/checks';
+
     const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
 
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
-
-    /* Inline alteration of attendees on event modal
-     */
-    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-
-    /* RSVP Status mutation routes
-     */
-    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
-    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
-
-    /* RSVP Status consts synonymous with Attendance/Model consts
-     */
-    const ATTENDANCE_STATUS_PENDING = 1;
-    const ATTENDANCE_STATUS_ACCEPTED = 2;
-    const ATTENDANCE_STATUS_DECLINED = 3;
 
     export default {
         name: "view-event-modal",
@@ -46,19 +37,17 @@
             RevealModal
         },
         created() {
-
-            /* RSVP Status consts synonymous with Attendance/Model consts
-             *
-             * Expost consts in vue land
-             * https://stackoverflow.com/questions/42662144/how-could-i-use-const-in-vue-template
-             */
-            this.ATTENDANCE_STATUS_PENDING = ATTENDANCE_STATUS_PENDING;
-            this.ATTENDANCE_STATUS_ACCEPTED = ATTENDANCE_STATUS_ACCEPTED;
-            this.ATTENDANCE_STATUS_DECLINED = ATTENDANCE_STATUS_DECLINED;
+            this.ENDPOINTS = ENDPOINTS;
+            this.canRsvp = checks.canRsvp;
+            this.isInvited = checks.isInvited;
+            this.isPending = checks.isPending;
+            this.isAccepted = checks.isAccepted;
+            this.isDeclined = checks.isDeclined;
+            this.isLimitedAttendance = checks.isLimitedAttendance;
         },
         data() {
             return {
-                event: {},
+                event: {}
             }
         },
         beforeMount() {
@@ -90,8 +79,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = this.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
-                        deleteLink = this.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
+                        modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
+                        deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
                     }
                 }
 
@@ -143,7 +132,11 @@
 
                         /* Remaining attendee places
                          */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees
+                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
+
+                        /* Your current status
+                         */
+                        status: data?.attendance?.attendanceStatus
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -160,27 +153,6 @@
                         path: data?.links?.path
                     },
                 };
-            },
-
-            /**
-             * Create new attendances
-             */
-            createAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Accept
-             */
-            rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.eventExtendedProps.eventId, btoa(window.location.pathname));
-            },
-
-            /**
-             * RSVP Decline
-             */
-            rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.eventExtendedProps.eventId, btoa(window.location.pathname));
             }
         },
         methods: {
@@ -206,53 +178,91 @@
                     //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
                     //     canModify: true
                     // });
-
-                    this.jQuery.fn.rsvp({
-                        rsvpAttendanceForm: this.jQuery('#rsvpAttendanceForm-' + eventId),
-                        isInvited: attendanceStatus !== null ? 'true' : 'false',
-                        onUpdate: function(config, responseText) {
-                            config.rsvpAttendanceForm.find('[data-rsvp]').removeClass('accepted declined');
-
-                            /* Inspect the responseText payload to evaluate current status
-                             */
-                            if (responseText.isInvited) {
-                                switch (responseText.guests[responseText.user.id].status) {
-                                    case ATTENDANCE_STATUS_ACCEPTED:
-                                        config.rsvpAttendanceForm.find('[data-rsvp="accept"]').addClass('accepted');
-                                        break;
-
-                                    case ATTENDANCE_STATUS_DECLINED:
-                                        config.rsvpAttendanceForm.find('[data-rsvp="decline"]').addClass('declined');
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                            }
-
-                            /* I am disgusted that this was a way of doing it
-                             */
-                            eventExtendedProps.data.attendance.maxAttendees = responseText.attendees.max;
-                            eventExtendedProps.data.attendance.numAttendees = responseText.attendees.num;
-
-                            self.event.setExtendedProp('data', eventExtendedProps.data);
-                        }
-                    });
                 });
             },
 
-            /**
-             * Generate a path via const
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
 
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
+            /**
+             * Decide whether the modal has component actions or not
+             *
+             * Show the bar if you can do anything with its contents
+             * Otherwise, hide it
+             *
+             * @return boolean
+             */
+            hasComponentActions() {
+                return this.eventExtendedProps.folder.id ||
+                    this.eventExtendedProps.links.view ||
+                    this.eventExtendedProps.links.modify ||
+                    this.eventExtendedProps.links.delete ||
+                    this.eventExtendedProps.classAttendance.url ||
+                    this.eventExtendedProps.booking.actions.length > 0 ||
+                    this.canRsvp(this.eventExtendedProps.attendance.status, this.eventExtendedProps.attendance.max, this.eventExtendedProps.attendance.available)
+            },
+
+
+            /**
+             * Accept an invitation
+             */
+            rsvpAccept() {
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
+            },
+
+            /**
+             * Decline an invitation
+             */
+            rsvpDecline() {
+                if (this.isInvited(this.eventExtendedProps.attendance.status)) {
+                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                }
+            },
+
+            /**
+             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+             *
+             * @param status
+             * @param endpoint
+             */
+            rsvp(status, endpoint) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: endpoint,
+                    method: 'post',
+                    responseType: 'json'
                 }
 
-                return url;
+                toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+
+                            /* Update data with the result from async request
+                             */
+                            self.event.extendedProps.data.attendance.attendanceStatus = status;
+                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
+                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
+
+                            self.event.setExtendedProp('data', self.event.extendedProps.data);
+
+                            toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to update invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
+                        });
             },
+
 
             /**
              * Update whether the form can be submitted.
@@ -263,6 +273,7 @@
             updateFormSubmittable() {
                 this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
             },
+
 
             /**
              * Persist changes to the event.
@@ -626,13 +637,9 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.max != null">
-                    <template v-if="eventExtendedProps.attendance.available > 0">
-                        {{ eventExtendedProps.attendance.available }} places remaining
-                    </template>
-                    <template v-else>
-                        No places remaining
-                    </template>
+                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.max)">
+                    <template v-if="eventExtendedProps.attendance.available > 0">{{ eventExtendedProps.attendance.available }}</template>
+                    <template v-else>No</template> available place(s) remaining
                 </meta-item>
 <!-- SA-10476 -->
 <!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->
@@ -661,20 +668,15 @@
              -->
             <template v-else></template>
 
-            <template v-if="eventExtendedProps.folder.id ||
-            eventExtendedProps.links.view ||
-            eventExtendedProps.links.modify ||
-            eventExtendedProps.links.delete ||
-            eventExtendedProps.classAttendance.url ||
-            eventExtendedProps.booking.actions.length > 0">
+            <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <span :id="'rsvpAttendanceForm-' + eventExtendedProps.eventId" :class="'rsvp'">
+                        <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
                             <span>
-                                <a :href="rsvpAcceptPath" :class="{ button: true, accepted: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_ACCEPTED}" data-rsvp="accept">Yes</a>
+                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="rsvpDeclinePath" :class="{ button: true, declined: event.extendedProps.data.attendance.attendanceStatus === ATTENDANCE_STATUS_DECLINED}" data-rsvp="decline">No</a>
+                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 

@@ -628,8 +628,6 @@ class Calendar extends DeprecatedModel
                 detail,
                 attendance,
                 max_attendees,
-                SUM(IF(event_attendance.`status` != 3, 1, 0)) AS num_attendees,
-                MAX(IF(event_attendance.user_id = '{$user->getId()}', event_attendance.`status`, null)) AS attendance_status,
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
@@ -646,11 +644,11 @@ class Calendar extends DeprecatedModel
             LEFT JOIN user             ON event.author_id = user.id
             LEFT JOIN luEventType      ON type = eventTypeID
             LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = %s
-            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = %s
+            LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = %d
+            LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = %d
             LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
-            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %s
-            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %s
+            LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %d
+            LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %d
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
             WHERE
                 event.deleted_at is NULL AND
@@ -664,6 +662,33 @@ class Calendar extends DeprecatedModel
         ", EventModel::ACCESS_PERSONAL, EventModel::ACCESS_GROUP, EventModel::ACCESS_CAMPUS, EventModel::ACCESS_CAMPUS);
 
         $allEvents = $this->db->getAll($query);
+
+        /* Collate attendance details separately to avoid left-join hell
+         *
+         * Left join on events associated with multiple folders also multiplied the aggregation outcome
+         * leading to incorrect tallying of dudes attending. Could have been solved by reverting back
+         * to a subquery like I originally had it, but instead of that, just do one more query and use
+         * it as a lookup indexed by event_id
+         */
+        $attendanceCounts = $this->db->getAll("
+            SELECT
+                event_id,
+                SUM(IF(event_attendance.`status` = 2, 1, 0)) AS num_attendees,
+                MAX(IF(event_attendance.user_id = '{$user->getId()}', event_attendance.`status`, null)) AS attendance_status
+            FROM event_attendance
+            GROUP BY event_id
+        ");
+
+        $countStack = [];
+
+        if (is_array($attendanceCounts) && \count($attendanceCounts)) {
+            foreach ($attendanceCounts as $attendanceCount) {
+                $countStack[$attendanceCount['event_id']] = [
+                    'num_attendees'     => $attendanceCount['num_attendees'],
+                    'attendance_status' => $attendanceCount['attendance_status']
+                ];
+            }
+    }
 
         /* Standardised output
          */
@@ -714,8 +739,8 @@ class Calendar extends DeprecatedModel
                 $event->setAttendance($currentEvent['attendance']);
 
                 $event->setMaxAttendees($currentEvent['max_attendees']);
-                $event->setNumAttendees($currentEvent['num_attendees']);
-                $event->setAttendanceStatus($currentEvent['attendance_status']);
+                $event->setNumAttendees($countStack[$currentEvent['id']]['num_attendees'] ?? 0);
+                $event->setAttendanceStatus($countStack[$currentEvent['id']]['attendance_status']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);

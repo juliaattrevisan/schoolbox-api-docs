@@ -2,57 +2,81 @@
     import moment           from 'moment';
     import audiencesModal   from './audiencesModal';
     import qs               from 'qs';
+    import axios            from "axios";
+
+    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+     */
+    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+    import checks              from '@schoolboxCalendarEvent/checks';
+
+    /* Vue select
+     */
+    import vSelect from "vue-select";
+    import "vue-select/dist/vue-select.css";
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
     const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
 
-    /* Event Modify screen
-     */
-    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-
-    /* Inline alteration of attendees on event detail screen
-     */
-    const URL_ATTENDANCE_CREATE = '/calendar/event/attendance/{eventId}/create';
-    const URL_ATTENDANCE_DELETE = '/calendar/event/attendance/{eventId}/delete';
-
-    /* RSVP Status mutation routes
-     */
-    const URL_ATTENDANCE_RSVP_ACCEPT = '/calendar/event/attendance/{eventId}/accept';
-    const URL_ATTENDANCE_RSVP_DECLINE = '/calendar/event/attendance/{eventId}/decline';
-
     export default {
-        props: ['event'],
+
+        /* All props form a one-way-down binding between the child property and the parent one:
+         * when the parent property updates, it will flow down to the child, but not the other way around
+         * https://vuejs.org/v2/guide/components-props.html
+         */
+        props: [
+            'event'
+        ],
         name: "event-details",
-        components: {audiencesModal},
+        components: {
+            audiencesModal,
+            vSelect
+        },
+        watch: {
+            selected: function() {
+                if (this.selected.id) {
+                    this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+                }
+            }
+        },
+        created() {
+            this.ENDPOINTS = ENDPOINTS;
+            this.canRsvp = checks.canRsvp;
+            this.isInvited = checks.isInvited;
+            this.isPending = checks.isPending;
+            this.isAccepted = checks.isAccepted;
+            this.isDeclined = checks.isDeclined;
+            this.isLimitedAttendance = checks.isLimitedAttendance;
+        },
         data() {
             return {
+                currentAttendanceStatus: this.event.attendance.status.current,
+                numAvailable: this.event.attendance.payload.attendees.available,
+                numPending: this.event.attendance.payload.attendees.pending,
+                numAccepted: this.event.attendance.payload.attendees.accepted,
+                numDeclined: this.event.attendance.payload.attendees.declined,
+                guests: this.event.attendance.payload.guests,
+
+                /* Vue Select
+                 */
+                options: [],
+                selected: [],
+
+                /* These are probably better off as functions inside computed{}
+                 * rather than out here, and should be centralised consts
+                 * instead of happenstance strings but we can deal with it later
+                 */
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
                 isCampusEvent: this.event.level === 'campus'
             }
         },
-        methods: {
-
-            /**
-             * Generate a path via const
-             */
-            generateUrlFromConst(str, eventId, returnUrl) {
-                let url = str.replace('{eventId}', eventId);
-
-                if (returnUrl !== undefined) {
-                    url += '?returnUrl=' + returnUrl;
-                }
-
-                return url;
-            },
-
-            showAudiencesModal() {
-                this.$refs.audiencesModal.open();
-            }
-        },
         computed: {
+            window: () => window,
+            jQuery: () => window.jQuery,
+
             dateTimeDisplay: function() {
                 if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
 
@@ -107,41 +131,284 @@
                 let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
 
                 return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
+            }
+        },
+        methods: {
+
+            /**
+             * Update attendance counts from Payload data
+             *
+             * @param payload  Payload instance
+             */
+            updateCountsFromPayload(payload) {
+                this.numAvailable = payload.attendees.available;
+                this.numPending = payload.attendees.pending;
+                this.numAccepted = payload.attendees.accepted;
+                this.numDeclined = payload.attendees.declined;
             },
 
             /**
-             * Onwards to the modify screen
+             * Accept an invitation
              */
-            modifyPath: function() {
-                return this.generateUrlFromConst(URL_EVENT_MODIFY_FORM, this.event.id, btoa(window.location.pathname));
+            rsvpAccept() {
+                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
             },
 
-            /**
-             * Create new attendances
-             */
-            createAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_CREATE, this.event.id, btoa(window.location.pathname));
-            },
 
             /**
-             * Delete attendances
+             * Decline an invitation
              */
-            deleteAttendancePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_DELETE, this.event.id, btoa(window.location.pathname));
+            rsvpDecline() {
+                if (this.isInvited(this.currentAttendanceStatus)) {
+                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
+                }
             },
 
-            /**
-             * RSVP Accept
-             */
-            rsvpAcceptPath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_ACCEPT, this.event.id, btoa(window.location.pathname));
-            },
 
             /**
-             * RSVP Decline
+             * Create an invitation
+             *
+             * @param id        the user's id
+             * @param fullname  the user's name
              */
-            rsvpDeclinePath: function() {
-                return this.generateUrlFromConst(URL_ATTENDANCE_RSVP_DECLINE, this.event.id, btoa(window.location.pathname));
+            rsvpCreate(id, fullname) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: ENDPOINTS.createAttendancePath(this.event.id),
+                    data:  qs.stringify({guests: id}),
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                /* A toast - to your valour, my sword, and our victory together
+                 */
+                toast.toastActivate({
+                    text: 'Creating invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+                            let found = false;
+
+                            /* Update data with the result from async request
+                             */
+                            self.updateCountsFromPayload(response.data);
+
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === id) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            /* If user $id wasn't already in the list, ram them into the list;
+                             * otherwise, don't accidentally update their rsvp status - just
+                             * walk past it like nothing happened
+                             */
+                            if (!found) {
+                                self.guests.push({
+                                    id: id,
+                                    name: fullname,
+                                    status: ATTENDANCE_STATUS.PENDING
+                                });
+                            }
+
+                            toast.toastTimeout({
+                                text: fullname + ' has been invited',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to invite ' + fullname + '; please try again.',
+                                    css: 'alert'
+                                });
+                            }
+                        })
+                        .then(function() {
+
+                            /* Clear selection after async outcome
+                             */
+                            self.selected = [];
+                        });
+            },
+
+
+            /**
+             * Remove an invitation
+             *
+             * @param id    the user's id
+             * @param name  the user's name
+             */
+            rsvpDelete(id, name) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: ENDPOINTS.rsvpDeletePath(this.event.id),
+                    data:  qs.stringify({userId: id}),
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                /* A toast - to your valour, my sword, and our victory together
+                 */
+                toast.toastActivate({
+                    text: 'Removing invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+                            let userId = response.data.user.id;
+
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === id) {
+
+                                    /* Remove invitation from list
+                                     */
+                                    self.guests.splice(i, 1);
+
+                                    /* If you removed yourself from the list,
+                                     * reset your currentAttendanceStatus to null
+                                     */
+                                    if (id === userId) {
+                                        self.currentAttendanceStatus = null;
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            /* Update data with the result from async request
+                             */
+                            self.updateCountsFromPayload(response.data);
+
+                            toast.toastTimeout({
+                                text: name + ' has been uninvited',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to uninvite ' + name + '; please try again.',
+                                    css: 'alert'
+                                });
+                            }
+                        });
+            },
+
+
+            /**
+             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+             *
+             * @param status    the new status
+             * @param endpoint  the endpoint to send this new status
+             */
+            rsvp(status, endpoint) {
+                let self = this;
+                let toast = this.jQuery('[data-toast]');
+
+                let request = {
+                    url: endpoint,
+                    method: 'post',
+                    responseType: 'json'
+                }
+
+                /* A toast - to your valour, my sword, and our victory together
+                 */
+                toast.toastActivate({
+                    text: 'Updating invitation...'
+                });
+
+                axios.request(request)
+                        .then(function (response) {
+                            let userId = response.data.user.id;
+                            let fullname = response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname;
+                            let found = false;
+
+                            /* Update data with the result from async request
+                             */
+                            self.currentAttendanceStatus = status;
+                            self.updateCountsFromPayload(response.data);
+
+                            for (let i = 0; i < self.guests.length; i++) {
+                                if (self.guests[i].id === userId) {
+                                    self.guests[i].status = status;
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                self.guests.push({
+                                    id: userId,
+                                    name: fullname,
+                                    status: status
+                                });
+                            }
+
+                            toast.toastTimeout({
+                                text: 'Invitation successfully updated',
+                                css: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            if (error.response) {
+                                toast.toastTimeout({
+                                    text: 'Unable to update invitation. ' + error.response.data.message,
+                                    css: 'alert'
+                                });
+                            }
+                        });
+            },
+
+
+            /**
+             * Whether you can edit this event,
+             * including whether you can delete an invitation
+             *
+             * @returns boolean
+             */
+            canModify() {
+                return this.event.canModify;
+            },
+
+
+            /**
+             * Start searching for keyword
+             *
+             * @param query
+             * @param loading
+             */
+            onSearch(query, loading) {
+                loading(true);
+                this.search(loading, query, this);
+            },
+
+
+            /**
+             * Perform async request and load results into component
+             */
+            search: _.debounce(function(loading, query, vm) {
+                axios.get(ENDPOINTS.URL_SELECTIZE, {
+                    params: {
+                        query: query,
+                        groupID: 0
+                    }
+                })
+                .then(function(response) {
+                    vm.options = response.data;
+                    loading(false);
+                });
+            }, 350),
+
+
+            showAudiencesModal() {
+                this.$refs.audiencesModal.open();
             }
         }
     }
@@ -149,9 +416,9 @@
 
 <template>
     <div>
-        <div class="small-12 columns" v-if="this.event.canModify">
+        <div class="small-12 columns" v-if="canModify()">
             <div class="actions-small-2 row">
-                <nav><a :href="modifyPath" class="icon-modify" title="Modify Event"></a></nav>
+                <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
@@ -195,32 +462,65 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" style="display:none" :data-guests-available="this.event.attendance.payload.attendees.available">
+                <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
                         <ul class="flex-list buttons rsvp">
-                            <li><a :href="rsvpAcceptPath" data-rsvp="accept" :class="this.event.attendance.status.current === 'accepted' ? 'accepted' : ''">Yes</a></li>
-                            <li><a :href="rsvpDeclinePath" data-rsvp="decline" :class="this.event.attendance.status.current === 'declined' ? 'declined' : ''">No</a></li>
+                            <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                            <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                         </ul>
                     </section>
                 </div>
-                <div id="attendance-guests" class="small-12 columns">
+                <div class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.event.attendance.payload.attendees.available != null || this.event.canModify">
-                            <span class="meta" v-if="this.event.attendance.payload.attendees.available != null">
-                                <span id="attendance-guests-available" :data-available="this.event.attendance.payload.attendees.available">
-                                    <template v-if="this.event.attendance.payload.attendees.available > 0">{{ this.event.attendance.payload.attendees.available }}</template>
-                                    <template v-else>No</template>
-                                </span> available place(s) remaining
+                        <div class="content" v-if="this.isLimitedAttendance(this.event.maxAttendees) || canModify()">
+                            <span class="meta">
+                                <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
+                                <template v-else>No</template>
+                                available place(s) remaining
                             </span>
 
-                            <form :id="'createAttendanceForm'" :action="createAttendancePath" :style="{display: 'none'}" method="post" v-if="this.event.canModify">
-                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                            </form>
+                            <template v-if="canModify() && this.numAvailable">
+                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                    <template slot="option" slot-scope="option">
+                                        <div class="d-center">
+                                            {{ option.name }}
+                                        </div>
+                                    </template>
+                                    <template slot="selected-option" slot-scope="option">
+                                        <div class="selected d-center">
+                                            {{ option.name }}
+                                        </div>
+                                    </template>
+                                </v-select>
+                            </template>
                         </div>
 
-                        <article v-html="this.event.attendance.payload.fragment"></article>
+                        <p class="content"><strong>
+                            {{ numAccepted }} accepted,
+                            {{ numDeclined }} declined,
+                            {{ numPending }} pending
+                        </strong></p>
+
+                        <ul class="action-list attendance-guest-list" v-if="guests">
+                            <li class="actions-small-1" v-for="(guest, index) in guests">
+                                <div class="compact card small-11">
+                                    <a :href="'/search/user/' + guest.id" title="View Profile">
+                                        <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
+
+                                        <p :class="{
+                                            pending: isPending(guest.status),
+                                            accepted: isAccepted(guest.status),
+                                            declined: isDeclined(guest.status)
+                                        }">{{ guest.name }}<span class="status-icon"></span></p>
+                                    </a>
+                                </div>
+                                <nav>
+                                    <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
+                                </nav>
+                            </li>
+                        </ul>
                     </section>
                 </div>
             </div>
@@ -237,4 +537,3 @@
         ></audiences-modal>
     </div>
 </template>
-

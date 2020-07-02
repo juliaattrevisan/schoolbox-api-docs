@@ -77,10 +77,8 @@ module.exports = {
     resolve: {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
-            '@schoolbox': path.resolve(
-                __dirname,
-                "vue/components"
-            ),
+            '@schoolbox': path.resolve(__dirname, "vue/components"),
+            '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue")
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

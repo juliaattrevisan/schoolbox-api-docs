@@ -103,38 +103,21 @@ class Payload
                 /* The number of empty spots that can be filled
                  */
                 'available' => $analysis->getNumAvailable(),
+
+                /* Misc details
+                 */
+                'pending' => $analysis->getNumPending(),
+                'accepted' => $analysis->getNumAccepted(),
+                'declined' => $analysis->getNumDeclined(),
             ],
 
             /* A list of invited users index by their user id
              */
             'guests' => $guests,
 
-            /* Whether the current user is currently invited
-             * i.e. currently on the attendance list
-             */
-            'isInvited' => isset($guests[$user->getId()]),
-
             /* Whether the current user can modify the event
              */
             'canModify' => $canModify,
-
-            /* html chunk containing a list of invited users and their associated buttons
-             * and icons representing their current rsvp state
-             */
-            'fragment' => $this->di
-                ->get('webOutput:nochrome')
-                ->setTemplate('@calendarEventAttendance/current.twig')
-                ->setData([
-                    'counts' => [
-                        'pending' => $analysis->getNumPending(),
-                        'accepted' => $analysis->getNumAccepted(),
-                        'declined' => $analysis->getNumDeclined()
-                    ],
-                    'canModify' => $canModify,
-                    'event' => $event,
-                    'guests' => $guests,
-                    'status' => Model::CLASSES
-                ])->getAsString()
         ];
     }
 }

@@ -70,11 +70,7 @@ class Controller extends Base
 
 
     /**
-     * Generate an html fragment containing the current list of attendees
-     *
-     * Ideally this would be managed in vue somehow, but we have to build a vue-compatible
-     * toast that behaves synonymously with our jquery toast; plus, selectize and confirmDialog
-     * wrangling is a thing we have yet to defeat
+     * Generate a payload containing the current state of affairs
      *
      * @param Event $event
      * @throws MapperException
@@ -125,7 +121,7 @@ class Controller extends Base
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
-        if ($analysis->getNumAvailable() <= 0) {
+        if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
         }
 
@@ -136,7 +132,7 @@ class Controller extends Base
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
@@ -156,7 +152,7 @@ class Controller extends Base
     {
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id' => $this->request->post['guest']
+            'user_id' => $this->request->post['userId']
         ]);
 
         /* Regenerate a new html fragment for the people currently invited
@@ -179,6 +175,15 @@ class Controller extends Base
      */
     public function postAccept(Event $event): void
     {
+        $guests = $this->attendanceMapper->findAttendances($event);
+        $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
+
+        /* Don't exceed the maximum number of guests, if one was specified
+         */
+        if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
+        }
+
         /* Check if they're already on the list - if so, shank down their existing record
          * Otherwise, spawn a new record for them if the maximum guests haven't been reached
          */
@@ -188,20 +193,6 @@ class Controller extends Base
                 'user_id'  => $this->getUser()->getId()
             ]);
         } catch (MapperException $e) {
-
-            /* Check if there are any free slots; if not, throw the usual message
-             */
-            if ($event->getMaxAttendees() !== null) {
-                $numGuests = $this->attendanceMapper->countByColumnList([
-                    'event_id' => $event->getId(),
-                    'status' => [Model::STATUS_ACCEPTED]
-                ]);
-
-                if ($numGuests >= $event->getMaxAttendees()) {
-                    throw $this->errorMapper->generateException(Error\Mapper::ERROR_EVENT_ATTENDANCE_MAX_REACHED);
-                }
-            }
-
             $attendance = $this->attendanceMapper->createModel()
                 ->setEvent($event)
                 ->setUser($this->getUser());
@@ -213,7 +204,7 @@ class Controller extends Base
 
         $this->attendanceMapper->save($attendance);
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
@@ -251,7 +242,7 @@ class Controller extends Base
             // noop
         }
 
-        /* Regenerate a new html fragment for the people currently invited
+        /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
     }
