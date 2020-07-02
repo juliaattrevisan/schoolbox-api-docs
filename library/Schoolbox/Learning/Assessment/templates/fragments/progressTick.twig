@@ -14,6 +14,8 @@
         student:      student,
         studentId:    student.id
     }) %}
+{% else %}
+    {% set postRoute = null %}
 {% endif %}
 
 {% set participant = assessment.participantIfExtant(student) %}

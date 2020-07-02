@@ -19,6 +19,8 @@ namespace Schoolbox\Learning\Assessment;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\User;
@@ -310,6 +312,12 @@ class Project extends AbstractAssessment implements AssessmentContext
         $mustGiveFeedbackToAll = !$canGiveFeedbackToAny;
 
         foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            // do not check, if the current assessment is a task or does not have weight
+            if ($subParticipant->getAssessable() instanceof Task
+                || ($this->summator instanceof WeightedAverage && 0.0 === $subParticipant->getAssessable()->getWeight())) {
+                continue;
+            }
+
             $hasPublishedSubFeedback = $subParticipant->hasPublishedFeedback();
 
             // Does project require all sub-assessment to be completed, and student hasn't received published feedback ?

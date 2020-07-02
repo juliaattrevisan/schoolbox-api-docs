@@ -47,9 +47,7 @@
 
 {# Instructions for the self-assessment #}
 {% block instructions %}
-    {% if assessment.useRubric %}
-        {% set text = 'rubric and'  %}
-    {% endif %}
+    {% set text = assessment.useRubric ? 'rubric and' : '' %}
 
 
     <ul class="train-line">
