@@ -25,7 +25,8 @@ catch (Exception $e) {
 /** @var Calendar_Api_Factory $factory */
 $factory  = $this->getDi()->get('calendarApiFactory');
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
-    $this,
+    $this->getDi()->get('authorizer'),
+    $this->getDi()->get('router'),
     $user,
     $this->arg[0] ?? '',
     $viewer,

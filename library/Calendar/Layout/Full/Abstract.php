@@ -7,20 +7,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 abstract class Calendar_Layout_Full_Abstract
 {
-    /**
-     * A SitePage instance, used for rendering.
-     *
-     * @var SitePage|null
-     */
-    protected $page         = null;
-
-
     /**
      * A date string, in d-m-Y format.
      *
@@ -89,9 +83,22 @@ abstract class Calendar_Layout_Full_Abstract
 
 
     /**
+     * @var Authorizer
+     */
+    protected $authorizer;
+
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+
+    /**
      * Constructor
      *
-     * @param SitePage             $page
+     * @param Authorizer           $authorizer
+     * @param Router               $router
      * @param User                 $user
      * @param string               $date
      * @param User                 $viewer
@@ -100,7 +107,8 @@ abstract class Calendar_Layout_Full_Abstract
      * @param int|null             $folderId
      */
     public function __construct(
-        SitePage $page,
+        Authorizer $authorizer,
+        Router $router,
         User $user,
         string $date,
         User $viewer,
@@ -114,7 +122,8 @@ abstract class Calendar_Layout_Full_Abstract
         $this->moduleChecker = $moduleChecker;
         $this->user          = $user;
         $this->viewer        = $viewer;
-        $this->page          = $page;
+        $this->authorizer    = $authorizer;
+        $this->router        = $router;
         $this->date          = $date;
     }
 
