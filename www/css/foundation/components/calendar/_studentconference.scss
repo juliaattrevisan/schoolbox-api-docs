@@ -102,5 +102,13 @@
     border-radius: 0;
     font-size: $paragraph-font-size;
     padding: 0.5rem;
+
+    /* Resize this giant x button
+     */
+    .vs__deselect {
+      margin-left: 0.5rem;
+      min-height: 1rem;
+      padding-top: 0.25rem;
+    }
   }
 }
