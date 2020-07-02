@@ -64,7 +64,7 @@
         background-color: transparent;
       }
 
-      border: 0
+      border: 0;
     }
   }
 
@@ -87,6 +87,11 @@
   .vs__search {
     font-size: $paragraph-font-size;
     margin: 0;
+
+    /* Don't occupy your own row; you look like giant padding
+     * Just shrink yourself to fit where you can
+     */
+    width: 0;
 
     &:focus {
       font-size: $paragraph-font-size;
