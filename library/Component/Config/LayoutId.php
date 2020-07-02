@@ -63,7 +63,11 @@ class Component_Config_LayoutId extends Component_Config_Abstract
             $currentUrl = '/adminv2/dashboard#' . $component->getInstance()->getIdentifier();
         } elseif ($component->getInstance()->isHomepageTemplate()) {
             $currentUrl = '/adminv2/homepage#' . $component->getInstance()->getIdentifier();
+        } elseif (!empty($_GET['page'])) {
+            //Try go get return url from this param which is set in configForm.php
+            $currentUrl = $_GET['page'];
         }
+
         $page->setVar([
             'COMPONENT_CONFIG_LAYOUTID' => $layoutId,
             'RETURN_URL_NAME'           => Scrub::text(Redirect::RETURN_URL),
