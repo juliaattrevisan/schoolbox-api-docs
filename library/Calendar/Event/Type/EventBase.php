@@ -18,7 +18,6 @@ use Schoolbox\Calendar\Event as EventModel;
 abstract class EventBase implements EventInterface
 {
     public const RENDER_FORMAT_JSON     = 'javascript';
-    public const RENDER_FORMAT_HTML     = 'html';
     public const RENDER_FORMAT_VCAL     = 'vcal';
     public const RENDER_FORMAT_CSV      = 'csv';
 

@@ -161,7 +161,6 @@ class Event extends EventBase
     {
         return [
             self::RENDER_FORMAT_JSON     => Renderer\Javascript::class,
-            self::RENDER_FORMAT_HTML     => Renderer\Html::class,
             self::RENDER_FORMAT_VCAL     => Renderer\VObject::class,
             self::RENDER_FORMAT_CSV      => Renderer\Csv::class,
             self::RENDER_FORMAT_JSON_PBL => Mggs\Renderer\Javascript::class,
