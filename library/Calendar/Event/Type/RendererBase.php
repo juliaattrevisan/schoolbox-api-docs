@@ -57,19 +57,6 @@ abstract class RendererBase implements RendererInterface
 
 
     /**
-     * Return templating engine
-     *
-     * TODO remove this: eventually Twig representations of events won't be required
-     *
-     * @return Twig_Environment
-     */
-    public function getTemplate(): Twig_Environment
-    {
-        return $this->di->get('templateEngine');
-    }
-
-
-    /**
      * @param \Schoolbox\User $user
      */
     public function setUser($user)
