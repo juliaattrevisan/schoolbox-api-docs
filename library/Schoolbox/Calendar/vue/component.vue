@@ -69,19 +69,6 @@
         },
         methods: {
             /**
-             * Event loading callback: show a spinner whilst events are loading,
-             * remove the spinner once they have finished.
-             * @see https://fullcalendar.io/docs/loading
-             *
-             * @param isLoading True when events start loading,
-             *                  false once they are finished.
-             */
-            onLoading(isLoading) {
-                // TODO replace with a more component-appropriate display
-                this.helper.onLoading(isLoading);
-            },
-
-            /**
              * Callback for determining content height of the component.
              */
             contentHeight() {
@@ -237,7 +224,6 @@
             :events="events"
             :event-render="eventRender"
             no-events-message="Loading events..."
-            @loading="onLoading"
             @eventClick="onEventClick"
         />
     </div>
