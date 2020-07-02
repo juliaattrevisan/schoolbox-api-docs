@@ -121,7 +121,8 @@ class Renderer
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
-            $this->di,
+            $this->di->get('authorizer'),
+            $this->di->get('router'),
             $event,
             $this->user,
             $this->viewer

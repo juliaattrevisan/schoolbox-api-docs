@@ -17,39 +17,43 @@ abstract class RendererBase implements RendererInterface
     /**
      * The user who the event relates to
      *
-     * @var \Schoolbox\User
+     * @var User
      */
     protected $user;
+
 
     /**
      * The user who is viewing this event
      *
-     * @var \Schoolbox\User
+     * @var User
      */
     protected $viewer;
 
+
     /**
-     * DI container
-     *
-     * TODO once template engine is removed, remove this and only inject the authorizer and router
-     * Whilst this is better than including SitePage this is still iffy:
-     * including a service locator introduces unknowable hidden dependencies.
-     *
-     * @var ContainerInterface
+     * @var Authorizer
      */
-    private $di;
+    private $authorizer;
+
+
+    /**
+     * @var Router
+     */
+    private $router;
 
 
     /**
      * Constructor
      *
-     * @param ContainerInterface $di
-     * @param User               $user
-     * @param User               $viewer
+     * @param Authorizer $authorizer
+     * @param Router     $router
+     * @param User       $user
+     * @param User       $viewer
      */
-    public function __construct(ContainerInterface $di, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Router $router, User $user, User $viewer)
     {
-        $this->di         = $di;
+        $this->authorizer = $authorizer;
+        $this->router     = $router;
         $this->user       = $user;
         $this->viewer     = $viewer;
     }
@@ -58,8 +62,6 @@ abstract class RendererBase implements RendererInterface
     /**
      * Helper function - gets whether access to a route is allowed.
      *
-     * TODO inject only what is required for this, not the entire DI
-     *
      * @param string $name
      * @param array  $params
      *
@@ -67,25 +69,9 @@ abstract class RendererBase implements RendererInterface
      */
     public function getRouteIfAuthorized($name, array $params = [])
     {
-        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->viewer)) {
-            return $this->getRouter()->generate($name, $params);
+        if ($this->authorizer->isPathAuthorizedForUser($name, $params, $this->viewer)) {
+            return $this->router->generate($name, $params);
         }
         return false;
-    }
-
-    /**
-     * @return Authorizer
-     */
-    public function getAuthorizer(): Authorizer
-    {
-        return $this->di->get('authorizer');
-    }
-
-    /**
-     * @return Router
-     */
-    public function getRouter(): Router
-    {
-        return $this->di->get('router');
     }
 }
