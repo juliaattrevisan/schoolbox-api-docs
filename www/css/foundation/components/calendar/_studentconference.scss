@@ -8,6 +8,8 @@
  * people to the event
  */
 #createAttendanceForm {
+  @include placeholder-color($aluminum, $font-weight-normal);
+
   .vs__dropdown-toggle {
     border: 0;
   }
