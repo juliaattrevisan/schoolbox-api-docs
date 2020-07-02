@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +8,15 @@
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
+$page = new SitePage;
+
 if(isset($this) || empty($_POST)) {
 	SitePage::localRedir('/adminv2/messages');
+}
+
+if (!$page->getDi()->get('session')->get('user')->isSuperuser()) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
 }
 
 foreach($_POST['role'] as $roleId => $data) {

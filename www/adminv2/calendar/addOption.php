@@ -1,4 +1,10 @@
 <?php
+
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
+}
+
 if (strlen($_POST['id'])) {
 	$bits = explode('_', $_POST['id']);
 
