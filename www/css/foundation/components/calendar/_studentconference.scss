@@ -81,4 +81,14 @@
     display: none;
   }
 
+  /* Stop changing my font size ffs
+   */
+  .vs__search {
+    font-size: $paragraph-font-size;
+    margin: 0;
+
+    &:focus {
+      font-size: $paragraph-font-size;
+    }
+  }
 }
