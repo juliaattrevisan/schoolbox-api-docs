@@ -473,7 +473,8 @@ $renderer = new Renderer(
     $startTimestamp,
     $endTimestamp,
     $user,
-    $kernel->getDependencyInjector(),
+    $kernel->get('authorizer'),
+    $kernel->get('router'),
     $viewer
 );
 

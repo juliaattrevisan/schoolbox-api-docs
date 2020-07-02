@@ -42,7 +42,15 @@ $calendarApi          = new Calendar_Api_EventType_Submission_Schoolbox_ForDueWo
     $visibility,
     $colourManager
 );
-$renderer             = new Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this->getDi(), $viewer);
+$renderer             = new Renderer(
+    $calendarApi,
+    (int)$_GET['start'],
+    (int)$_GET['end'],
+    $user,
+    $this->getDi()->get('authorizer'),
+    $this->getDi()->get('router'),
+    $viewer
+);
 
 // until this script becomes an Aura route, this is really the best we can do...
 /** @var IConfigLoader $config */
