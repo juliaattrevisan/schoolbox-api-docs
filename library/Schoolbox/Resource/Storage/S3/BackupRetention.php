@@ -59,7 +59,8 @@ class BackupRetention
         /** @var Alaress_Date_Format[] $dates */
         $dates = [];
         foreach ($backupDates as $backupDate) {
-            $dates[] = new Alaress_Date_Format($backupDate, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            // For consistency, assume the backup always occurs at the same time of day
+            $dates[] = new Alaress_Date_Format("$backupDate {$this->now->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT)}", Alaress_Date_Format::DATABASE_FORMAT);
         }
 
         usort($dates, static function (Alaress_Date_Format $left, Alaress_Date_Format $right): int {
