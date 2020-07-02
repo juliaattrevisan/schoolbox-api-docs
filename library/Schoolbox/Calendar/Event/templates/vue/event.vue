@@ -452,7 +452,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div id="rsvpAttendanceForm" class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
+                <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
@@ -472,7 +472,7 @@
                             </span>
 
                             <template v-if="canModify() && this.numAvailable">
-                                <v-select :options="options" @search="onSearch" label="name" v-model="selected">
+                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" v-model="selected">
                                     <template slot="no-options">
                                         Start typing the name of a user
                                     </template>
@@ -531,3 +531,44 @@
     </div>
 </template>
 
+<style>
+
+    /* This documentation is out of date
+     * https://vue-select.org/guide/ajax.html#library-agnostic
+     *
+     * A bunch of hipster neckbeards became victim of their own folly
+     * https://github.com/sagalbot/vue-select/issues/490
+     */
+    #createAttendanceForm .vs__dropdown-toggle {
+        border: 0;
+    }
+
+    /* Supposed to work like this, but doesn't.
+     *
+     */
+    /*.d-center {*/
+    /*    display: flex !important;*/
+    /*    align-items: center!important;*/
+    /*    background-color: red;*/
+    /*}*/
+    /*.selected img {*/
+    /*    width: auto !important;*/
+    /*    max-height: 23px !important;*/
+    /*    margin-right: 0.5rem !important;*/
+    /*}*/
+    /*.v-select .dropdown li {*/
+    /*    border-bottom: 1px solid rgba(112, 128, 144, 0.1) !important;*/
+    /*}*/
+    /*.v-select .dropdown li:last-child {*/
+    /*    border-bottom: none !important;*/
+    /*}*/
+    /*.v-select .dropdown li a {*/
+    /*    padding: 10px 20px !important;*/
+    /*    width: 100% !important;*/
+    /*    font-size: 1.25em !important;*/
+    /*    color: #3c3c3c !important;*/
+    /*}*/
+    /*.v-select .dropdown-menu .active > a {*/
+    /*    color: #fff !important;*/
+    /*}*/
+</style>
