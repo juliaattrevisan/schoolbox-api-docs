@@ -7,32 +7,39 @@
  * This is the form on the event detail screen where you can invite
  * people to the event
  */
-#createAttendanceForm .vs__dropdown-toggle {
-  border: 0;
-}
+#createAttendanceForm {
+  .vs__dropdown-toggle {
+    border: 0;
+  }
 
-#createAttendanceForm .vs__search {
-  border: 1px solid $form-border-color;
-  margin: 0;
-}
+  .vs__search {
+    border: 1px solid $form-border-color;
+    font-size: $paragraph-font-size;
+    margin: 0;
 
-#createAttendanceForm .vs__actions {
-  padding: 0;
-}
+    &:focus {
+      font-size: $paragraph-font-size;
+    }
+  }
 
-#createAttendanceForm .vs__spinner {
-  margin-left: 0.5rem;
-  padding: 0;
-}
+  .vs__actions {
+    padding: 0;
+  }
 
-#createAttendanceForm .vs__open-indicator {
-  display: none;
-}
+  .vs__spinner {
+    margin-left: 0.5rem;
+    padding: 0;
+  }
 
-#createAttendanceForm .vs__selected {
-  display: none;
-}
+  .vs__open-indicator {
+    display: none;
+  }
 
-#createAttendanceForm .vs__clear {
-  display: none;
+  .vs__selected {
+    display: none;
+  }
+
+  .vs__clear {
+    display: none;
+  }
 }
