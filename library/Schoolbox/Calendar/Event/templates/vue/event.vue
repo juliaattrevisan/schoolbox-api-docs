@@ -506,7 +506,7 @@
                                 </template>
                                 <template slot="selected-option" slot-scope="option">
                                     <span class="selected d-center">
-                                        {{ option.name }}
+                                        {{ option.first_name }} {{ option.last_name }}
                                     </span>
                                 </template>
                             </v-select>
