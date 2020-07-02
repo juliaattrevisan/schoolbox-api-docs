@@ -157,6 +157,7 @@ class Mapper extends BaseMapper
             $roleId     = $related->getRole()->getId();
             $joinObject = $oldList[$roleId] ?? new RolePermission\Model();
             $joinObject
+                ->setRole($related->getRole())
                 ->setAllowed($related->getAllowed())
                 ->setResource($object);
             $newList->add($joinObject);
