@@ -10,6 +10,8 @@
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
+    /* Vue select
+     */
     import vSelect from "vue-select";
     import "vue-select/dist/vue-select.css";
 
@@ -62,6 +64,10 @@
                 options: [],
                 selected: [],
 
+                /* These are probably better off as functions inside computed{}
+                 * rather than out here, and should be centralised consts
+                 * instead of happenstance strings but we can deal with it later
+                 */
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
                 isCampusEvent: this.event.level === 'campus'
@@ -197,6 +203,10 @@
                                 }
                             }
 
+                            /* If user $id wasn't already in the list, ram them into the list;
+                             * otherwise, don't accidentally update their rsvp status - just
+                             * walk past it like nothing happened
+                             */
                             if (!found) {
                                 self.guests.push({
                                     id: id,
