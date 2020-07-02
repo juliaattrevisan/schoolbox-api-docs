@@ -67,4 +67,12 @@
       border: 0
     }
   }
+
+  /* This container element simulates an input field
+   * Repeal the hipster styles and replace it with our own
+   */
+  .vs__dropdown-toggle {
+    border: 1px solid $form-border-color;
+    border-radius: 0;
+  }
 }
