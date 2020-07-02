@@ -125,11 +125,12 @@ class Mapper extends BaseMapper
      */
     public function findAllForAdminOption()
     {
-        $collection = $this->findAll();
-        $none = (new Model())->setId(self::GRADE_GROUP_ID_NONE)->setName('None');
-        $percentage = (new Model())->setId(self::GRADE_GROUP_ID_PERCENTAGE)->setName('Percentage');
+        $collection = self::createCollection();
+        $none       = (new Model())->setId(self::GRADE_GROUP_ID_NONE)->setName('None');
         $collection->add($none);
+        $percentage = (new Model())->setId(self::GRADE_GROUP_ID_PERCENTAGE)->setName('Percentage');
         $collection->add($percentage);
+        $collection = $collection->merge($this->findAll());
         return $collection;
     }
 }

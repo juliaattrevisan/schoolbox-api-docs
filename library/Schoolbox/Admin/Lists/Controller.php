@@ -761,7 +761,7 @@ class Controller extends Base
                     'tooltip'   => 'Controls the default method for displaying the students overall grade on the grade report for a subject with this year level.',
                     'lookup'    => $luGradeList,
                     'width'     => 5,
-                    'mandatory' => true,
+                    'mandatory' => false,
                 ],
                 'showOverallGrade' => [
                     'caption'   => 'Show Overall Grade',

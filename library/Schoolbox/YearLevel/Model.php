@@ -62,19 +62,19 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getOverallGrade(): int
+    public function getOverallGrade(): ?int
     {
         return $this->overallGrade;
     }
 
     /**
-     * @param int $overallGrade
+     * @param $overallGrade
      */
-    public function setOverallGrade(int $overallGrade)
+    public function setOverallGrade($overallGrade)
     {
-        $this->overallGrade = $overallGrade;
+        $this->overallGrade = is_numeric($overallGrade) ? (int)$overallGrade : null;
     }
 
     /**

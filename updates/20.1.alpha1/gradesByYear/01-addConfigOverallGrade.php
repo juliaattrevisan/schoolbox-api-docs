@@ -38,6 +38,8 @@ $app = new class extends App {
     /** @var IStatement */
     private $insertStatement;
 
+    /** @var IStatement */
+    private $sequenceStatement;
 
     /**
      * @inheritdoc
@@ -51,10 +53,13 @@ $app = new class extends App {
         $defaultGradeGroupQuery = $this->database->executeQuery('SELECT value FROM config WHERE name="default_grade_group"');
         $defaultGradeGroup      = $defaultGradeGroupQuery->fetchColumn();
 
+        $sequenceQuery = $this->database->executeQuery('SELECT sequence+1 FROM config WHERE name="show_overall_grade"');
+        $sequence      = $sequenceQuery->fetchColumn();
+
         $this->prepareStatements();
         $this->database->beginTransaction();
         try {
-            $this->execute($defaultGradeGroup);
+            $this->execute($defaultGradeGroup, $sequence);
             $this->database->commit();
         } catch (\Alaress\Database\Exception $e) {
             $this->log->error($e->getMessage(), ['exception' => $e]);
@@ -68,19 +73,32 @@ $app = new class extends App {
      */
     private function prepareStatements(): void
     {
-        $this->insertStatement = $this->database->prepareQuery("
+        $this->insertStatement = $this->database->prepareQuery('
              INSERT INTO config ( name,  value,  title,  description,  field_id,  options,  type_id,  editable,  hidden,  required,  module,  sequence)
              VALUES             (:name, :value, :title, :description, :field_id, :options, :type_id, :editable, :hidden, :required, :module, :sequence)
-        ");
+        ');
+
+        $this->sequenceStatement = $this->database->prepareQuery('
+             UPDATE config SET sequence = sequence+1 WHERE module = :module AND type_id = :type_id AND sequence >= :sequence
+        ');
     }
 
     /**
      * Executes the app
      * @param string $defaultGradeGroup
+     * @param string $sequence
      * @throws \Alaress\Database\Exception
      */
-    private function execute(string $defaultGradeGroup): void
+    private function execute(string $defaultGradeGroup, string $sequence): void
     {
+        // Shift sequence of existing settings
+        $this->sequenceStatement->execute([
+            'type_id'  => ConfigMapper::TYPE_LMS_POLICY,
+            'module'   => ConfigMapper::MODULE_SETTINGS,
+            'sequence' => $sequence,
+        ]);
+
+        // Insert the new config
         $this->insertStatement->execute([
             'name'        => 'overall_grade',
             'value'       => $defaultGradeGroup,
@@ -95,10 +113,13 @@ $app = new class extends App {
             'type_id'     => ConfigMapper::TYPE_LMS_POLICY,
             'editable'    => 'true',
             'hidden'      => 'false',
-            'required'    => 'false',
+            'required'    => 'true',
             'module'      => ConfigMapper::MODULE_SETTINGS,
-            'sequence'    => 38,
+            'sequence'    => $sequence,
         ]);
+
+        // Update existing default grade group, which will no longer be used for markbooks
+        $this->database->executeQuery('UPDATE config SET title = "Default Grade Group", description = "Default grading scheme for Letter Grade Mark Type" WHERE name = "default_grade_group"');
     }
 };
 

@@ -245,11 +245,11 @@ class Factory
             $yearLevel        = $folder->getYearLevels()->first();
             $overAllGrade     = $yearLevel->getOverallGrade();
             $showOverallGrade = $yearLevel->getShowOverallGrade();
-        } else {
-            // Otherwise fall back to config
-            $overAllGrade     = $this->config->get('overall_grade');
-            $showOverallGrade = $this->config->get('show_overall_grade');
         }
+
+        // Otherwise fall back to config
+        $overAllGrade     = $overAllGrade ?? $this->config->get('overall_grade');
+        $showOverallGrade = $showOverallGrade ?? $this->config->get('show_overall_grade');
 
         // If the grade is hidden
         if (!$isStaff && !$showOverallGrade) {
