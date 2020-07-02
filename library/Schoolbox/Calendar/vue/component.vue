@@ -109,7 +109,7 @@
                     function () {
                         // Update the no events message now we're no longer loading events
                         // (This currently does double-duty as the empty state)
-                        self.$refs.fullCalendar.getApi().setOption('noEventsMessage', 'No upcoming events');
+                        self.$refs.fullCalendar.getApi().setOption('noEventsMessage', 'No events to display');
                     }
                 )
                 // Fail callback: consider a message saying something failed
