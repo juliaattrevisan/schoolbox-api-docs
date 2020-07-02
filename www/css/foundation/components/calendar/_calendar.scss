@@ -183,19 +183,27 @@
     background-color: $body-bg;
   }
 
-  // Make list heading and empty state look like subheaders
+  // Make list heading look like subheaders
   .fc-widget-header {
     padding: 0;
   }
-  .fc-list-heading-main, .fc-list-empty {
+  .fc-list-heading-main {
     @extend h2;
     @extend .subheader;
+  }
+
+  // Make empty state look like a subheader too, and remove absolute positioning
+  .fc-list-empty-wrap1 {
+    width: auto;
   }
   .fc-list-empty-wrap2 {
     position: inherit;
   }
-  .fc-list-empty-wrap1 {
-    width: auto;
+  .fc-list-empty {
+    @extend h2;
+    @extend .subheader;
+    text-align: left;
+    display: block;
   }
 
   // The entire event is clickable

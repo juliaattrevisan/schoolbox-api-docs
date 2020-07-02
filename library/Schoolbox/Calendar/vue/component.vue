@@ -98,8 +98,7 @@
              * @param callback  A function to call with the list of events.
              */
             events(fetchInfo, callback) {
-                var self = this;
-                // TODO add folder ID to params
+                let self = this;
                 axios.get(
                     URL_EVENT_SOURCE,
                     {
@@ -119,7 +118,16 @@
                             return 'start' in v;
                         }));
                     }
-                );
+                ).finally(
+                    function () {
+                        // Update the no events message now we're no longer loading events
+                        // (This currently does double-duty as the empty state)
+                        self.$refs.fullCalendar.getApi().setOption(
+                            'noEventsMessage',
+                            self.helper.dayTitleFormat(fetchInfo.start) + ': No upcoming events'
+                        );
+                    }
+                )
                 // Fail callback: consider a message saying something failed
             },
 
@@ -231,6 +239,7 @@
             default-view="list"
             :events="events"
             :event-render="eventRender"
+            no-events-message="Loading events..."
             @loading="onLoading"
             @eventClick="onEventClick"
         />
