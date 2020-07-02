@@ -8,8 +8,6 @@
  */
 
 use Calendar\Api\ModuleChecker;
-use Schoolbox\Calendar\EventType;
-use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -53,22 +51,6 @@ abstract class Calendar_Layout_Full_Abstract
      * @var array
      */
     protected $selected     = [];
-
-
-    /**
-     * The selected date on this calendar, in timestamp format.
-     *
-     * @var int|null
-     */
-    protected $selectedDate = null;
-
-
-    /**
-     * The start of the current week on this calendar, in timestamp format.
-     *
-     * @var int|null
-     */
-    protected $startOfWeek  = null;
 
 
     /**
@@ -134,8 +116,6 @@ abstract class Calendar_Layout_Full_Abstract
         $this->viewer        = $viewer;
         $this->page          = $page;
         $this->date          = $date;
-        $this->setupTemplateFile();
-        $this->setupBlocks();
     }
 
     /**
@@ -169,154 +149,5 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * @return void
      */
-    abstract protected function setupTemplateFile(): void;
-
-    /**
-     * @return void
-     */
-    abstract protected function setupBlocks(): void;
-
-    /**
-     * @return void
-     */
     abstract protected function render(): void;
-
-    /**
-     * Set up selected day/month/year
-     */
-    protected function setupSelectedDayMonthYear(): void
-    {
-        [$selectedDay, $selectedMonth, $selectedYear] = explode("-", $this->date);
-
-        $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-
-        /* Default url access doesn't have a date portion
-         * i.e. /calendar/week/. In that case, just use now
-         */
-        if ($selectedDate <= 0) {
-            $selectedDate = time();
-        }
-
-        $this->selectedDate = $selectedDate;
-
-        if ($selectedDate <= 0) {
-            $selectedDate = time();
-        }
-
-        $selectedDay   = date("j", $selectedDate);
-        $selectedMonth = date("n", $selectedDate);
-        $selectedYear  = date("Y", $selectedDate);
-
-        $dayOfWeek   = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear));
-        $startOfWeek = mktime(0, 0, 0, $selectedMonth, ($selectedDay - $dayOfWeek), $selectedYear);
-        $endOfWeek   = strtotime("+6 days", $startOfWeek);
-
-        if (date("m", $startOfWeek) != date("m", $endOfWeek)) {
-            $month = date('jS F', $startOfWeek) . ' - ' . date("jS F", $endOfWeek);
-        } else {
-            $month = date("jS", $startOfWeek) . ' - ' . date('jS F', $endOfWeek);
-        }
-
-        $this->page->setVar(
-            [
-                'SELECTED_DAY'   => $selectedDay,
-                'SELECTED_MONTH' => $selectedMonth,
-                'SELECTED_YEAR'  => $selectedYear,
-                'YEAR'           => date("Y", $startOfWeek),
-                'MONTH'          => $month,
-                'DAY'            => $selectedDay,
-            ]
-        );
-
-        $this->startOfWeek = $startOfWeek;
-    }
-
-    /**
-     * Setup movement buttons
-     */
-    protected function setupMovementButtons(): void
-    {
-        // Load sources, types
-        $typeList   = EventTypeMapper::getInstance()->findAll();
-        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
-
-        $categoryList = (new Group())->involvedInCategoryList($this->user->getId());
-        $campusList   = (new Calendar())->getFilterCampusList($this->user->getId());
-
-        // Load what is selected: default to selecting everything
-        /** @var EventType[] $typeList */
-        if (isset($_SESSION['calendarFilter'])) {
-            $selected['group']     = $_SESSION['calendarFilter']['group'] ?? [];
-            $selected['campus']    = $_SESSION['calendarFilter']['campus'] ?? [];
-            $selected['eventType'] = $_SESSION['calendarFilter']['eventType'] ?? [];
-            $selected['source']    = $_SESSION['calendarFilter']['source'] ?? [];
-        } else {
-            // select everything
-            foreach ($categoryList as $cat) {
-                $selected['group'][] = (int)$cat['id'];
-            }
-
-            // select all campuses
-            $selected['campus'] = array_map('intval', $_SESSION['campus']);
-
-            foreach ($typeList as $type) {
-                $selected['eventType'][] = $type->getId();
-            }
-
-            // select all sources
-            foreach ($sourceList as $source) {
-                $selected['source'][] = $source['ids'];
-            }
-        }
-
-        $this->selected = $selected;
-
-        // Shoehorn the above into JSON-encoded vars
-        $this->page->setVar(
-            'GROUPS_JSON',
-            json_encode(
-                array_map(
-                    function ($v) {
-                        $v['id']   = (int)$v['id'];
-                        $v['type'] = (int)$v['type'];
-                        return $v;
-                    },
-                    $categoryList
-                )
-            )
-        );
-        $this->page->setVar(
-            'CAMPUSES_JSON',
-            json_encode(
-                array_map(
-                    function ($v) {
-                        return [
-                            'id'   => (int)$v['CAMPUS_ID'],
-                            'name' => $v['CAMPUS_NAME'],
-                        ];
-                    },
-                    $campusList
-                )
-            )
-        );
-        $this->page->setVar(
-            'EVENT_TYPES_JSON',
-            json_encode(
-                $typeList->map(
-                    function (EventType $v) {
-                        return [
-                            'id'    => $v->getId(),
-                            'name'  => $v->getType(),
-                            'color' => $v->getColor(),
-                        ];
-                    }
-                )
-            )
-        );
-        $this->page->setVar('SOURCES_JSON', json_encode($sourceList));
-
-
-        // Output selected filters as JSON
-        $this->page->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
-    }
 }
