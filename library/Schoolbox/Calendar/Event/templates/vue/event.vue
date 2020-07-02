@@ -543,6 +543,32 @@
         border: 0;
     }
 
+    #createAttendanceForm .vs__search {
+        border: 1px solid #f00;
+        margin: 0;
+    }
+
+    #createAttendanceForm .vs__actions {
+        padding: 0;
+    }
+
+    #createAttendanceForm .vs__spinner {
+        margin-left: 0.5rem;
+        padding: 0;
+    }
+
+    #createAttendanceForm .vs__open-indicator {
+        display: none;
+    }
+
+    #createAttendanceForm .vs__selected {
+        display: none;
+    }
+
+    #createAttendanceForm .vs__clear {
+        display: none;
+    }
+
     /* Supposed to work like this, but doesn't.
      *
      */
