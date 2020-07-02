@@ -3,7 +3,7 @@
  #
  # Currently only displays a rubric grid.
  #}
-{% if assessment.useRubric or participant.assessable.useRubric %}
+{% if assessment.useRubric or (participant and participant.assessable.useRubric) %}
     {% include '@learningAssessment/dueWork/summary/rubric.twig' with {
         assessment: assessment,
         selfAssessmentFeedback: selfAssessmentFeedback,

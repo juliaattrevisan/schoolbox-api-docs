@@ -16,8 +16,8 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
 
 class Controller extends Base
@@ -33,11 +33,6 @@ class Controller extends Base
     private $assessmentMapperProxy;
 
     /**
-     * @var GradeGroup\Model
-     */
-    private $defaultGradeGroup;
-
-    /**
      * @var Term\Mapper
      */
     private $termMapper;
@@ -47,18 +42,15 @@ class Controller extends Base
      *
      * @param Error\Mapper                $errorMapper
      * @param Assessment\MapperProxy      $assessmentMapperProxy
-     * @param GradeGroup\Model            $defaultGradeGroup
      * @param Term\Mapper                 $termMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        GradeGroup\Model $defaultGradeGroup,
         Term\Mapper $termMapper
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
-        $this->defaultGradeGroup          = $defaultGradeGroup;
         $this->termMapper                 = $termMapper;
     }
 
@@ -99,7 +91,8 @@ class Controller extends Base
                                                         });
 
         // Build a markbook
-        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $markbook = new Markbook($assessments, $markSchemeFactory->spawnForFolder($class, $this->getUser()->getRole()->isStaff()), $this->getUser());
 
         // And what is required for a context selector
         $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);

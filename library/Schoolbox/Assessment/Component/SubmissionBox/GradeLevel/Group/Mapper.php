@@ -26,6 +26,10 @@ use Schoolbox\Collection;
  */
 class Mapper extends BaseMapper
 {
+    /** @var int Fake ids for non letter group */
+    public const GRADE_GROUP_ID_NONE = -1;
+    public const GRADE_GROUP_ID_PERCENTAGE = -2;
+
     /**
      * {@inheritdoc}
      */
@@ -113,5 +117,20 @@ class Mapper extends BaseMapper
     public function findAllWithGradeLevels()
     {
         return $this->findAll();
+    }
+
+    /**
+     * Returns options for default grade group
+     * @return GenericCollection
+     */
+    public function findAllForAdminOption()
+    {
+        $collection = self::createCollection();
+        $none       = (new Model())->setId(self::GRADE_GROUP_ID_NONE)->setName('None');
+        $collection->add($none);
+        $percentage = (new Model())->setId(self::GRADE_GROUP_ID_PERCENTAGE)->setName('Percentage');
+        $collection->add($percentage);
+        $collection = $collection->merge($this->findAll());
+        return $collection;
     }
 }

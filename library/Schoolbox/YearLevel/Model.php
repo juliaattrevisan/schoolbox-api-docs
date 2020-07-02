@@ -37,6 +37,12 @@ class Model implements ISoftDeletable, Sequential
     /** @var string */
     private $name;
 
+    /** @var int */
+    private $overallGrade;
+
+    /** @var bool */
+    private $showOverallGrade;
+
     /**
      * @return string
      */
@@ -53,5 +59,37 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->name = $name;
         return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOverallGrade(): ?int
+    {
+        return $this->overallGrade;
+    }
+
+    /**
+     * @param mixed $overallGrade
+     */
+    public function setOverallGrade($overallGrade)
+    {
+        $this->overallGrade = is_numeric($overallGrade) ? (int)$overallGrade : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowOverallGrade(): bool
+    {
+        return $this->showOverallGrade;
+    }
+
+    /**
+     * @param bool $showOverallGrade
+     */
+    public function setShowOverallGrade(bool $showOverallGrade)
+    {
+        $this->showOverallGrade = $showOverallGrade;
     }
 }

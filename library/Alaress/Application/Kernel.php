@@ -37,7 +37,6 @@ use GuzzleHttp;
 use Predis;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
@@ -1282,24 +1281,6 @@ abstract class Kernel
             $di->lazyNew(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
             $di->lazyGet('router')
         ]));
-
-        // Register default grade group
-        $di->set(
-            'defaultGradeGroup',
-            $di->lazy(
-                static function () use ($di, $mapperFactory) {
-                    /** @var IConfigLoader $config */
-                    $config              = $di->get('config');
-                    $defaultGradeGroupId = $config->get('default_grade_group');
-                    if ($defaultGradeGroupId) {
-                        // If configured, return the configured grade group, error out if not found
-                        return $mapperFactory->get(GradeGroup\Mapper::class)->findById($defaultGradeGroupId);
-                    }
-                    // Not set, return empty model to satisfy method signatures (graceful degradation)
-                    return new GradeGroup\Model();
-                }
-            )
-        );
 
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'         => $di->lazyNew(GuzzleHttp\Client::class),

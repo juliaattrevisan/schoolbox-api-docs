@@ -104,7 +104,6 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
-                'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class),// Has a static 'getInstance()' method

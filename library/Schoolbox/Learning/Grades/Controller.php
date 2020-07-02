@@ -15,7 +15,6 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionException;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
@@ -36,6 +35,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Permission\Access\Access;
@@ -52,11 +52,6 @@ class Controller extends Base
      * @var Term\Mapper
      */
     private $termMapper;
-
-    /**
-     * @var GradeGroup\Model
-     */
-    private $defaultGradeGroup;
 
     /**
      * @var Folder\Mapper
@@ -95,7 +90,6 @@ class Controller extends Base
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param Folder\Mapper              $folderMapper
      * @param Term\Mapper                $termMapper
-     * @param GradeGroup\Model           $defaultGradeGroup
      * @param RubricDataSource           $rubricMapper
      * @param FilterSelection\Mapper     $filterSelectionMapper
      * @param Access                     $access
@@ -106,7 +100,6 @@ class Controller extends Base
         AssessmentMapperProxy $assessmentMapperProxy,
         Folder\Mapper $folderMapper,
         Term\Mapper $termMapper,
-        GradeGroup\Model $defaultGradeGroup,
         RubricDataSource $rubricMapper,
         FilterSelection\Mapper $filterSelectionMapper,
         Access $access,
@@ -117,7 +110,6 @@ class Controller extends Base
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->termMapper            = $termMapper;
         $this->folderMapper          = $folderMapper;
-        $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->rubricMapper          = $rubricMapper;
         $this->access                = $access;
         $this->filterFactoryFactory  = $filterFactoryFactory;
@@ -154,6 +146,7 @@ class Controller extends Base
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException If cyclic graph detected during translation
      * @throws UnexpectedValueException If unable to merge project participant collections
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getGrades(User $viewee, Term\Model $term): void
     {
@@ -182,25 +175,26 @@ class Controller extends Base
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder) {
             return $assessmentsPerFolder->keyExists($folder->getId());
-        });
+        })->indexBy('id');
 
         // Load Teachers
-        foreach($folders as $folder) {
+        foreach ($folders as $folder) {
             $folder->loadTeachers();
         }
 
-        $showOverallGrade = $this->getConfigLoader()
-                                 ->get('show_overall_grade');
+        $markSchemeFactory = new Factory($this->getConfigLoader());
 
         /** @var GenericCollection|Markbook[] Indexed by folder.id */
         $markbooks = new GenericCollection(Markbook::class);
         // Generate markbooks for these assessments
-        foreach($assessmentsPerFolder as $folderId => $assessments) {
+        foreach ($assessmentsPerFolder as $folderId => $assessments) {
             $assessment = $assessments->first();
-            if($assessment instanceof IAssessable &&
-                ($showOverallGrade || $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()))
-            ) {
-                $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
+            if ($assessment instanceof IAssessable) {
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder(
+                    $folders->offsetGet($folderId),
+                    $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())
+                );
+                $markbooks->setOffset($folderId, new Markbook($assessments, $overallMarkScheme, $this->getUser()));
             }
         }
 
@@ -212,7 +206,6 @@ class Controller extends Base
             'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
             'folders'          => $folders,
             'markbooks'        => $markbooks,
-            'showOverallGrade' => $showOverallGrade,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'yearUrl'          => $yearUrl,
         ])->setTab('grade'));
@@ -229,6 +222,7 @@ class Controller extends Base
      * @throws ServiceNotFound If unable to find mail handler service
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes): void
     {
@@ -242,8 +236,6 @@ class Controller extends Base
         /** @var IAssessable[][]|GenericCollection[] $assessmentTasks */
         $assessmentTasks = [];
 
-        $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
-
         $folders = $this->folderMapper->createCollection();
 
         $visibility = new Visibility($this->access);
@@ -255,7 +247,7 @@ class Controller extends Base
                 if (!isset($markbooksFolders[$folder->getId()])) {
                     $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
                     $folder->loadTeachers();
-                    $folders->add($folder);
+                    $folders->offsetSet($folder->getId(), $folder);
                 }
 
                 if (
@@ -281,12 +273,16 @@ class Controller extends Base
             $assessments->sortByCallback($assessmentComparator->getCallable());
         }
 
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+
         foreach ($markbooksFolders as $folderId => $assessments) {
             $assessment = $assessments->first();
-            if($assessment instanceof IAssessable &&
-                ($showOverallGrade || $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()))
-            ) {
-                $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
+            if ($assessment instanceof IAssessable) {
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder(
+                    $folders->offsetGet($folderId),
+                    $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())
+                );
+                $markbooks->setOffset($folderId, new Markbook($assessments, $overallMarkScheme, $this->getUser()));
             }
         }
 
@@ -305,10 +301,9 @@ class Controller extends Base
             'folders'         => $folders,
             'assessmentTasks' => $assessmentTasks,
             'markbooks'       => $markbooks,
-            'showOverallGrade' => $showOverallGrade,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
-            'yearUrl'          => $yearUrl
+            'yearUrl'         => $yearUrl
         ]));
     }
 
@@ -361,17 +356,16 @@ class Controller extends Base
             ]
         ];
         $assessments = $this->findByFiltersWithParticipants($filters, $viewee, false);
-        $markbook    = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $isInstructor);
+        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
 
         /* Find the teachers of this particular subject */
         $subject->loadTeachers(true);
 
         // Load conversation history
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
-
-        // Show the Current Grade Average for instructors and for students if the config var is on
-        $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
-        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Get folders for drop-down.
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
@@ -385,7 +379,6 @@ class Controller extends Base
                 'terms'              => $this->termMapper->findAll()->sortBy('start', 'desc'),
                 'subject'            => $subject,
                 'folders'            => $folders,
-                'canSeeGradeAverage' => $canSeeGradeAverage,
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
                 'yearUrl'            => $yearUrl,
@@ -501,7 +494,9 @@ class Controller extends Base
         $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
 
         // Let markbook calculate the statistics
-        $filteredMarkbook = (new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()))->sortAssessables(new AssessmentComparator($viewee));
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $this->getUser()->getRole()->isStaff());
+        $filteredMarkbook = (new Markbook($assessments, $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewee));
 
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
@@ -536,7 +531,8 @@ class Controller extends Base
 
         /* Select the first of any combination of those elements
          */
-        $selectedTab = array_shift(array_keys($tabs));
+        $tabKeys     = array_keys($tabs);
+        $selectedTab = array_shift($tabKeys);
         $tree        = [];
 
         // Layout assessments in a tree for twig to render

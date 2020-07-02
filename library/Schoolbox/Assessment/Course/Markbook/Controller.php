@@ -20,9 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Filter;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Throwable;
 
 class Controller extends WebController\Base
@@ -43,9 +41,6 @@ class Controller extends WebController\Base
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var GradeGroup\Model */
-    private $defaultGradeGroup;
-
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
 
@@ -59,7 +54,6 @@ class Controller extends WebController\Base
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Assessment\MapperProxy             $assessmentMapperProxy
-     * @param GradeGroup\Model                   $defaultGradeGroup
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
      */
@@ -69,7 +63,6 @@ class Controller extends WebController\Base
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Assessment\MapperProxy $assessmentMapperProxy,
-        GradeGroup\Model $defaultGradeGroup,
         CourseImpl\Mapper $courseImplMapper,
         UnitImpl\Mapper $unitImplMapper
     ) {
@@ -78,7 +71,6 @@ class Controller extends WebController\Base
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->courseImplMapper      = $courseImplMapper;
         $this->unitImplMapper        = $unitImplMapper;
     }
@@ -325,7 +317,7 @@ class Controller extends WebController\Base
             $courseSpec,
             $assessments,
             $this->getUser(),
-            new LetterGrade($this->defaultGradeGroup)
+            $this->getConfigLoader()
         );
     }
 

@@ -57,7 +57,7 @@
                                             <option
                                                     {% if record[field_key] == option.key %}selected{% endif %}
                                                     value="{{ option.key }}">
-                                                {{ option.value }}{% if option.deleted %} (deleted){% endif %}
+                                                {{ option.value }}{% if option.deleted ?? false %} (deleted){% endif %}
                                             </option>
                                             {% endif %}
                                         {% endfor %}

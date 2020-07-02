@@ -78,9 +78,10 @@
         td.student-average a.meta {
             color: $white;
         }
-        //td.gradient-off-bg a {
-        //    color: #0066b0;
-        //}
+        td.gradient-none-bg a,
+        td.gradient-off-bg a {
+            color: #0066b0;
+        }
 
         // Various rows and headers
         .course-row {

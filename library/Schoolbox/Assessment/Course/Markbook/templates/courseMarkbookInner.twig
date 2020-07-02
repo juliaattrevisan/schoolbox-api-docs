@@ -175,14 +175,14 @@
                         {% set publishedHrMark   = marks.published.hr | default('–') %}
                         {% set draftHrMark       = marks.any.hr | default('–') %}
 
-                        {% set draftsOffClass = publishedNormMark is null ? 'gradient-off-bg' : urgency.marks(publishedNormMark) ~ '-bg' %}
-                        {% set draftsOnClass = draftNormMark is null ? 'gradient-off-bg' : urgency.marks(draftNormMark) ~ '-bg' %}
+                        {% set draftsOffClass = marks.published is defined and marks.published.hr ? urgency.marks(publishedNormMark) ~ '-bg' : 'gradient-off-bg' %}
+                        {% set draftsOnClass = marks.any is defined and marks.any.hr ? urgency.marks(draftNormMark) ~ '-bg' : 'gradient-off-bg' %}
 
                         <td class="student-average {{ draftsOffClass }}" {% if marks.any is defined %}data-student-average{% endif %} data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                             {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
-                            <a href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
+                            <a class="{{ draftsOffClass }}" href="{{ gradesRoute }}" {% if marks.any is defined %}data-actual-mark{% endif %} title="View students {{ locale.grades.plural }}">{{ publishedHrMark }}</a>
                             {% if marks.any is defined %}
-                                  <a href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
+                                  <a class="{{ draftsOnClass }}" href="{{ gradesRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="meta has-tip tip-right" data-width="105" title="Draft Mark">{{ draftHrMark }}</a>
                             {% endif %}
                         </td>
 
