@@ -55,7 +55,7 @@ class Javascript extends SubmissionRendererJavascript
 
         // Can edit if staff, or student is viewing own work
 
-        return $this->getViewer()->getRole()->isStaff() || $this->getViewer()->getId() === $this->getUser()->getId();
+        return $this->viewer->getRole()->isStaff() || $this->viewer->getId() === $this->user->getId();
     }
 
     /**
@@ -70,7 +70,7 @@ class Javascript extends SubmissionRendererJavascript
 
             $dueDate = $this->pblMapper->findOneByColumnList([
                 'assessment_id' => $this->getEvent()->getAssessment()->getId(),
-                'student_id'    => $this->getUser()->getId(),
+                'student_id'    => $this->user->getId(),
             ])->getOpenDate();
         } catch (MapperException $e) {
             // No override: fall back to the due date of the assessment
@@ -169,11 +169,11 @@ class Javascript extends SubmissionRendererJavascript
     {
         // Add a style for bling (if you're not a parent)
 
-        if ($this->getViewer()->getRole()->isParent()) {
+        if ($this->viewer->getRole()->isParent()) {
             return null;
         }
 
-        $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->getUser());
+        $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->user);
 
         if (!$part) {
             // If there's no participation, there's no bling

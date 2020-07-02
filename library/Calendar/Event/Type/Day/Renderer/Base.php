@@ -72,7 +72,7 @@ abstract class Base extends RendererBase
      */
     public function attendanceStatus()
     {
-        if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
+        if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->viewer->getId())) {
             if ($attendance['status'] == Event\Attendance\Model::STATUS_PENDING) {
                 return 'Pending';
             } else if ($attendance['status'] == Event\Attendance\Model::STATUS_ACCEPTED) {

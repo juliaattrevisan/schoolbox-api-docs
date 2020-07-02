@@ -11,7 +11,6 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\User;
-use Twig_Environment;
 
 abstract class RendererBase implements RendererInterface
 {
@@ -20,14 +19,14 @@ abstract class RendererBase implements RendererInterface
      *
      * @var \Schoolbox\User
      */
-    var $user;
+    protected $user;
 
     /**
      * The user who is viewing this event
      *
      * @var \Schoolbox\User
      */
-    var $viewer;
+    protected $viewer;
 
     /**
      * DI container
@@ -50,43 +49,11 @@ abstract class RendererBase implements RendererInterface
      */
     public function __construct(ContainerInterface $di, User $user, User $viewer)
     {
-        $this->di = $di;
-        $this->setUser($user);
-        $this->setViewer($viewer);
+        $this->di         = $di;
+        $this->user       = $user;
+        $this->viewer     = $viewer;
     }
 
-
-    /**
-     * @param \Schoolbox\User $user
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * @return \Schoolbox\User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param \Schoolbox\User $viewer
-     */
-    public function setViewer($viewer)
-    {
-        $this->viewer = $viewer;
-    }
-
-    /**
-     * @return \Schoolbox\User
-     */
-    public function getViewer()
-    {
-        return $this->viewer;
-    }
 
     /**
      * Helper function - gets whether access to a route is allowed.
@@ -100,7 +67,7 @@ abstract class RendererBase implements RendererInterface
      */
     public function getRouteIfAuthorized($name, array $params = [])
     {
-        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->getViewer())) {
+        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->viewer)) {
             return $this->getRouter()->generate($name, $params);
         }
         return false;

@@ -44,7 +44,7 @@ abstract class Base extends RendererBase
      */
     public function isEditable()
     {
-        return $this->getViewer()->getRole()->isStaff();
+        return $this->viewer->getRole()->isStaff();
     }
 
 
