@@ -1,0 +1,38 @@
+/* This documentation is out of date
+ * https://vue-select.org/guide/ajax.html#library-agnostic
+ *
+ * A bunch of hipster neckbeards became victim of their own folly
+ * https://github.com/sagalbot/vue-select/issues/490
+ *
+ * This is the form on the event detail screen where you can invite
+ * people to the event
+ */
+#createAttendanceForm .vs__dropdown-toggle {
+  border: 0;
+}
+
+#createAttendanceForm .vs__search {
+  border: 1px solid $form-border-color;
+  margin: 0;
+}
+
+#createAttendanceForm .vs__actions {
+  padding: 0;
+}
+
+#createAttendanceForm .vs__spinner {
+  margin-left: 0.5rem;
+  padding: 0;
+}
+
+#createAttendanceForm .vs__open-indicator {
+  display: none;
+}
+
+#createAttendanceForm .vs__selected {
+  display: none;
+}
+
+#createAttendanceForm .vs__clear {
+  display: none;
+}
