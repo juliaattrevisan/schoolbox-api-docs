@@ -20,7 +20,7 @@ $user_mapper = new \Schoolbox\UserMapper();
 $user = $user_mapper->findById($_GET['userId']);
 $viewer = $_SESSION['user'];
 try {
-    Calendar_Layout_Full_Javascript::permissionCheck(
+    Calendar_Layout_Full_Ajax_JSON::permissionCheck(
         $_GET['userId'],
         $_SESSION['user'],
         new Group()
