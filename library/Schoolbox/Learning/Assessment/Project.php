@@ -312,9 +312,8 @@ class Project extends AbstractAssessment implements AssessmentContext
         $mustGiveFeedbackToAll = !$canGiveFeedbackToAny;
 
         foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
-            // do not check, if the current assessment is a task or does not have weight
-            if ($subParticipant->getAssessable() instanceof Task
-                || ($this->summator instanceof WeightedAverage && 0.0 === $subParticipant->getAssessable()->getWeight())) {
+            // do not check, if the current assessment does not contribute to summation
+            if (!$this->summator->contribute($subParticipant->getAssessable())) {
                 continue;
             }
 

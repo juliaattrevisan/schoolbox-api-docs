@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\Summator;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
@@ -122,4 +123,12 @@ abstract class AbstractSummator implements ISummator
      * @return float|null
      */
     protected abstract function finalise();
+
+    /**
+     * @inheritDoc
+     */
+    public function contribute(IAssessable $assessable): bool
+    {
+        return !($assessable instanceof Task);
+    }
 }

@@ -89,12 +89,20 @@ class WeightedAverage extends AbstractSummator
         return 'Weighted Average';
     }
 
-
     /**
      * @inheritdoc
      */
     public function impliesOptionality()
     {
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function contribute(IAssessable $assessable): bool
+    {
+        return parent::contribute($assessable)
+            && 0.0 < $assessable->getWeight();
     }
 }
