@@ -101,14 +101,21 @@
                     }
                 ).then(
                     function (response) {
-                        callback(response.data.filter(function (v) {
-                            return 'start' in v;
-                        }));
+                        // Add ability to limit events:
+                        // need to filter, then sort, then slice
+                        let events = response.data
+                            .filter(v => 'start' in v)
+                            .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                        if (self.config.limit) {
+                            events = events.slice(0, self.config.limit);
+                        }
+                        callback(events);
                     }
                 ).finally(
                     function () {
                         // Update the no events message now we're no longer loading events
                         // (This currently does double-duty as the empty state)
+                        // TODO show/hide an actual empty state
                         self.$refs.fullCalendar.getApi().setOption('noEventsMessage', 'No events to display');
                     }
                 )
