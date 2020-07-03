@@ -15,6 +15,13 @@
     import vSelect from "vue-select";
     import "vue-select/dist/vue-select.css";
 
+    /* Render custom template for Deselect icon/button
+     * It's not well documented, but you can trawl through closed PRs to figger out how
+     * https://github.com/sagalbot/vue-select/issues/994
+     */
+    import Deselect from '@schoolbox/selectize/Deselect';
+    vSelect.props.components.default = () => ({ Deselect });
+
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
