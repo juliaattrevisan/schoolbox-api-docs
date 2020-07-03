@@ -12,8 +12,6 @@
  * people to the event
  */
 #createAttendanceForm {
-  @include placeholder-color($aluminum, $font-weight-normal);
-
   .vs__dropdown-toggle {
     border: 0;
   }
@@ -50,8 +48,16 @@
   }
 }
 
-.experimentAttendanceForm {
-  @include placeholder-color($aluminum, $font-weight-normal);
+/* Schoolboxed styles for vue-select instances
+ * Overrides defaults, forces placeholder styles, fixes crazy padding/margin etc.
+ * Implemented to mimic jquery selectize appearance as closely as possible
+ */
+::-webkit-input-placeholder { color: $aluminum !important }
+:-ms-input-placeholder { color: $aluminum !important }
+:-moz-placeholder { color: $aluminum !important }
+::-moz-placeholder { color: $aluminum !important }
+
+.schoolbox-vue-selectize {
 
   /* Hide our input field because we're going to simulate it with
    * a container element instead. This input field is the last
