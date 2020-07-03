@@ -505,7 +505,31 @@
                             </template>
 
                             <h1>Experiment.</h1>
-                            <v-select id="experimentAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                            <v-select class="experimentAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <template slot="option" slot-scope="option">
+                                    <span class="d-center">
+                                        {{ option.name }}
+                                    </span>
+                                </template>
+                                <template slot="selected-option" slot-scope="option">
+                                    <span class="selected d-center">
+                                        {{ option.first_name }} {{ option.last_name }}
+                                    </span>
+                                </template>
+                            </v-select>
+                            <v-select class="experimentAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <template slot="option" slot-scope="option">
+                                    <span class="d-center">
+                                        {{ option.name }}
+                                    </span>
+                                </template>
+                                <template slot="selected-option" slot-scope="option">
+                                    <span class="selected d-center">
+                                        {{ option.first_name }} {{ option.last_name }}
+                                    </span>
+                                </template>
+                            </v-select>
+                            <v-select class="experimentAttendanceForm" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                                 <template slot="option" slot-scope="option">
                                     <span class="d-center">
                                         {{ option.name }}

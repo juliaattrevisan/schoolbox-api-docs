@@ -50,7 +50,7 @@
   }
 }
 
-#experimentAttendanceForm {
+.experimentAttendanceForm {
   @include placeholder-color($aluminum, $font-weight-normal);
 
   /* Hide our input field because we're going to simulate it with
