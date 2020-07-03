@@ -1,7 +1,8 @@
 {% autoescape 'js' %}
-    <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
-    <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+{#    <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>#}
+{#    <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>#}
     <script type="text/javascript">
+        console.log($.fn.getExportCalendarLink);
         window.fullCalendarConfig = {
             userId: Number('{{ user.id }}') || null,
             folderId: Number('{{ folder.id }}') || null,
@@ -23,15 +24,15 @@
             canCreateEvent: Boolean("{{ canCreateEvent }}"),
         };
 
-        $(function() {
-            // Attach rsvp/unattend functionality to rsvp butttons
-            $('form[data-rsvp-form]').calendarAttendance();
+        {#$(function() {#}
+        {#    // Attach rsvp/unattend functionality to rsvp butttons#}
+        {#    $('form[data-rsvp-form]').calendarAttendance();#}
 
-            $('#component{{ component.id }}').clipboardSelector({
-                userToken: '{{ user.key }}',
-                groupId: Number('{{ folder.id }}'),
-            });
-        });
+        {#    $('#component{{ component.id }}').clipboardSelector({#}
+        {#        userToken: '{{ user.key }}',#}
+        {#        groupId: Number('{{ folder.id }}'),#}
+        {#    });#}
+        {#});#}
     </script>
 {% endautoescape %}
 
