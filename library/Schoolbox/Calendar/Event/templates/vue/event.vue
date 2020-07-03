@@ -53,6 +53,7 @@
         data() {
             return {
                 currentAttendanceStatus: this.event.attendance.status.current,
+                numMax: this.event.attendance.payload.attendees.max,
                 numAvailable: this.event.attendance.payload.attendees.available,
                 numPending: this.event.attendance.payload.attendees.pending,
                 numAccepted: this.event.attendance.payload.attendees.accepted,
@@ -462,7 +463,7 @@
             <h2 class="subheader">Guests</h2>
 
             <div class="row">
-                <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.event.maxAttendees, this.numAvailable)">
+                <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
 
@@ -474,7 +475,7 @@
                 </div>
                 <div class="small-12 columns">
                     <section>
-                        <div class="content" v-if="this.isLimitedAttendance(this.event.maxAttendees) || canModify()">
+                        <div class="content" v-if="this.isLimitedAttendance(this.numMax) || canModify()">
                             <span class="meta">
                                 <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
                                 <template v-else>No</template>
