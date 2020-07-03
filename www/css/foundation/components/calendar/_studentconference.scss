@@ -12,6 +12,11 @@
  * people to the event
  */
 #createAttendanceForm {
+  ::-webkit-input-placeholder { color: $aluminum !important }
+  :-ms-input-placeholder { color: $aluminum !important }
+  :-moz-placeholder { color: $aluminum !important }
+  ::-moz-placeholder { color: $aluminum !important }
+
   .vs__dropdown-toggle {
     border: 0;
   }
@@ -52,12 +57,11 @@
  * Overrides defaults, forces placeholder styles, fixes crazy padding/margin etc.
  * Implemented to mimic jquery selectize appearance as closely as possible
  */
-::-webkit-input-placeholder { color: $aluminum !important }
-:-ms-input-placeholder { color: $aluminum !important }
-:-moz-placeholder { color: $aluminum !important }
-::-moz-placeholder { color: $aluminum !important }
-
 .schoolbox-vue-selectize {
+  ::-webkit-input-placeholder { color: $aluminum !important }
+  :-ms-input-placeholder { color: $aluminum !important }
+  :-moz-placeholder { color: $aluminum !important }
+  ::-moz-placeholder { color: $aluminum !important }
 
   /* Hide our input field because we're going to simulate it with
    * a container element instead. This input field is the last
@@ -91,6 +95,10 @@
   /* Stop changing my font size ffs
    */
   .vs__search {
+    &:focus {
+      font-size: $paragraph-font-size;
+    }
+
     font-size: $paragraph-font-size;
     margin: 0;
 
@@ -98,10 +106,6 @@
      * Just shrink yourself to fit where you can
      */
     width: 0;
-
-    &:focus {
-      font-size: $paragraph-font-size;
-    }
   }
 
   /* Make every brick in the wall a big, beautiful brick
