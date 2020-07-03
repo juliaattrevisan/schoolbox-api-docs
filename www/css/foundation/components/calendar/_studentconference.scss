@@ -12,7 +12,6 @@
  * You can never fully remove the "Sorry, no matching options" dropdown that spawns
  * It always occupies a little space underneath when you give focus to the selectize
  * https://codepen.io/sagalbot/pen/oZmLVN
- *
  */
 .schoolbox-vue-selectize {
   ::-webkit-input-placeholder { color: $aluminum !important }
@@ -32,7 +31,14 @@
       }
 
       border: 0;
+      padding: 0.125rem 0 0.125rem 0.25rem;
     }
+
+    /* Every brick has 2px (0.125rem) margin
+     * selected-options container has 2px padding
+     * This adds up to 4px of whitespace around everything, nice and even
+     */
+    padding: 0.125rem;
   }
 
   /* This container element simulates an input field
@@ -41,6 +47,7 @@
   .vs__dropdown-toggle {
     border: 1px solid $form-border-color;
     border-radius: 0;
+    padding: 0;
   }
 
   /* That chevron expanderer thing can still go away
@@ -73,8 +80,9 @@
     border: 0;
     border-radius: 0;
     font-size: $paragraph-font-size;
+    margin: 0.125rem;
     min-height: 2.25rem;
-    padding: 0 0.5rem;
+    padding: 0.125rem 0.5rem;
 
     /* Resize this giant x button
      */
