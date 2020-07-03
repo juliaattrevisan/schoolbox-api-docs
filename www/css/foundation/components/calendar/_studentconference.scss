@@ -1,4 +1,9 @@
-/* This documentation is out of date
+/* Schoolboxed styles for vue-select instances
+ *
+ * Overrides defaults, forces placeholder styles, fixes crazy padding/margin etc.
+ * Implemented to mimic jquery selectize appearance as closely as possible
+ *
+ * This documentation is out of date
  * https://vue-select.org/guide/ajax.html#library-agnostic
  *
  * A bunch of hipster neckbeards became victim of their own folly
@@ -8,54 +13,6 @@
  * It always occupies a little space underneath when you give focus to the selectize
  * https://codepen.io/sagalbot/pen/oZmLVN
  *
- * This is the form on the event detail screen where you can invite
- * people to the event
- */
-#createAttendanceForm {
-  ::-webkit-input-placeholder { color: $aluminum !important }
-  :-ms-input-placeholder { color: $aluminum !important }
-  :-moz-placeholder { color: $aluminum !important }
-  ::-moz-placeholder { color: $aluminum !important }
-
-  .vs__dropdown-toggle {
-    border: 0;
-  }
-
-  .vs__search {
-    border: 1px solid $form-border-color;
-    font-size: $paragraph-font-size;
-    margin: 0;
-
-    &:focus {
-      font-size: $paragraph-font-size;
-    }
-  }
-
-  .vs__actions {
-    padding: 0;
-  }
-
-  .vs__spinner {
-    margin-left: 0.5rem;
-    padding: 0;
-  }
-
-  .vs__open-indicator {
-    display: none;
-  }
-
-  .vs__selected {
-    display: none;
-  }
-
-  .vs__clear {
-    display: none;
-  }
-}
-
-/* Schoolboxed styles for vue-select instances
- * Overrides defaults, forces placeholder styles, fixes crazy padding/margin etc.
- * Implemented to mimic jquery selectize appearance as closely as possible
  */
 .schoolbox-vue-selectize {
   ::-webkit-input-placeholder { color: $aluminum !important }
@@ -145,5 +102,51 @@
       padding: 0;
       text-shadow: none;
     }
+  }
+}
+
+/* This is the form on the event detail screen where you can invite
+ * people to the event. It has special behaviours so its styling is
+ * somewhat unique compared to the default schoolbox vue-select
+ */
+#createAttendanceForm {
+  ::-webkit-input-placeholder { color: $aluminum !important }
+  :-ms-input-placeholder { color: $aluminum !important }
+  :-moz-placeholder { color: $aluminum !important }
+  ::-moz-placeholder { color: $aluminum !important }
+
+  .vs__dropdown-toggle {
+    border: 0;
+  }
+
+  .vs__search {
+    border: 1px solid $form-border-color;
+    font-size: $paragraph-font-size;
+    margin: 0;
+
+    &:focus {
+      font-size: $paragraph-font-size;
+    }
+  }
+
+  .vs__actions {
+    padding: 0;
+  }
+
+  .vs__spinner {
+    margin-left: 0.5rem;
+    padding: 0;
+  }
+
+  .vs__open-indicator {
+    display: none;
+  }
+
+  .vs__selected {
+    display: none;
+  }
+
+  .vs__clear {
+    display: none;
   }
 }
