@@ -44,6 +44,8 @@
                     start: null,
                     end: null,
                 },
+                eventsLoaded: false,
+                hasEvents: null,
             }
         },
         computed: {
@@ -103,16 +105,21 @@
                     function (response) {
                         // Add ability to limit events:
                         // need to filter, then sort, then slice
+                        self.eventsLoaded = true;
                         let events = response.data
                             .filter(v => 'start' in v)
                             .sort((a, b) => String(a.start).localeCompare(String(b.start)));
-                        if (events.length === 0) {
-                            self.$refs.emptyState.style.removeProperty('display');
-                            // Empty? Don't show the calendar at all
-                            self.$refs.fullCalendar.getApi().destroy();
-                        }
                         if (self.config.limit) {
                             events = events.slice(0, self.config.limit);
+                        }
+
+                        // Empty? Don't show the calendar at all
+                        if (events.length === 0) {
+                            // self.$refs.emptyState.style.removeProperty('display');
+                            // self.$refs.fullCalendar.getApi().destroy();
+                            self.hasEvents = false;
+                        } else {
+                            self.hasEvents = true;
                         }
                         callback(events);
                     }
@@ -228,12 +235,17 @@
             default-view="list"
             :events="events"
             :event-render="eventRender"
-            no-events-message="Loading events..."
+            :no-events-message="null"
             @eventClick="onEventClick"
         />
 
-        <!-- TODO replace with v-if -->
-        <div ref="emptyState" class="empty-state" style="display:none">
+        <!-- Loading state -->
+        <div ref="loadingState" class="empty-state" v-if="!eventsLoaded">
+            <p>Loading events...</p>
+        </div>
+
+        <!-- Empty state: show only if events have loaded, but none are shown -->
+        <div ref="emptyState" class="empty-state" v-if="eventsLoaded && !hasEvents">
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
                 <i class="icon-calendar"></i>
@@ -246,9 +258,8 @@
             <p v-else>There are no upcoming events</p>
         </div>
 
-        <!-- component panel -->
-        <!-- TODO only show if no empty state -->
-        <div class="component-action" v-if="config.folderId">
+        <!-- Component panel: show only for homepage variant, events are loaded and some are shown -->
+        <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
                 <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button">Export Events</a>

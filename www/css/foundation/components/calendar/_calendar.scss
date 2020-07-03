@@ -183,15 +183,9 @@
     background-color: $body-bg;
   }
 
-  // Remove absolute positioning from empty state, so it is placed properly on page
-  // Also make it look as much like an empty state as possible
+  // Remove the empty state: use our own state messages instead
   .fc-list-empty-wrap2 {
-    position: inherit;
-    @extend p;
-    @extend .empty-state;
-  }
-  .fc-list-empty {
-    background-color: inherit !important;
+    display: none;
   }
 
   // The entire event is clickable
