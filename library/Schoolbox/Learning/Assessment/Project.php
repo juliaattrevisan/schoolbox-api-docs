@@ -19,8 +19,6 @@ namespace Schoolbox\Learning\Assessment;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\User;
