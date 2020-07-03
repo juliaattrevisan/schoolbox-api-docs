@@ -251,10 +251,13 @@
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
                 <i class="icon-calendar"></i>
-                <p>
+                <p v-if="config.canCreateEvent">
                     <a :href="config.createEventUrl">Add an event</a>
                     or <a :href="config.importEventsUrl">import events in bulk</a>
                     to show in this component and in group members' calendars.
+                </p>
+                <p v-else>
+                    There are no upcoming events to display at this time.
                 </p>
             </template>
             <p v-else>There are no upcoming events</p>
