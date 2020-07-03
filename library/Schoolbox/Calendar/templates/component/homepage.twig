@@ -13,6 +13,7 @@
             limit: Number('{{ component.config.size }}') || null,
             createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}&level=2&homepageId={{ folder.id }}",
             importEventsUrl: "/calendar/import/{{ folder.id }}",
+            canCreateEvent: Boolean("{{ canCreateEvent }}"),
         };
 
         $(function() {
@@ -35,21 +36,6 @@
             </div>
             <script type="text/javascript" src="/javascript/components/calendarComponent.bundle.js?v={{ config.site_version }}"></script>
         </section>
-
-        {# Add events part #}
-        <div class="component-action">
-            <section>
-                {% if canCreateEvent %}
-                    <a href="{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}&amp;level=2&amp;homepageId={{ folder.id }}" class="button">Add Event</a>
-                {% endif %}
-
-                <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button">Export Events</a>
-
-                {% if canCreateEvent %}
-                    <a href="/calendar/import/{{ folder.id }}" class="button">Import Events</a>
-                {% endif %}
-            </section>
-        </div>
     </div>
 </div>
 

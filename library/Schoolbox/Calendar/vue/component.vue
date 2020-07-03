@@ -108,6 +108,7 @@
                             .sort((a, b) => String(a.start).localeCompare(String(b.start)));
                         if (events.length === 0) {
                             self.$refs.emptyState.style.removeProperty('display');
+                            // Empty? Don't show the calendar at all
                             self.$refs.fullCalendar.getApi().destroy();
                         }
                         if (self.config.limit) {
@@ -231,6 +232,7 @@
             @eventClick="onEventClick"
         />
 
+        <!-- TODO replace with v-if -->
         <div ref="emptyState" class="empty-state" style="display:none">
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
@@ -242,6 +244,16 @@
                 </p>
             </template>
             <p v-else>There are no upcoming events</p>
+        </div>
+
+        <!-- component panel -->
+        <!-- TODO only show if no empty state -->
+        <div class="component-action" v-if="config.folderId">
+            <section>
+                <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
+                <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button">Export Events</a>
+                <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
+            </section>
         </div>
     </div>
 </template>
