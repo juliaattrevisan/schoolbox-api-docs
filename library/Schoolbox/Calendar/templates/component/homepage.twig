@@ -12,6 +12,13 @@
             dateDisplayFormats: dateDisplayFormats,
             limit: Number('{{ component.config.size }}') || null,
             createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}&level=2&homepageId={{ folder.id }}",
+            exportUrl: $.fn.getExportCalendarLink(
+                "{{ user.key }}",
+                {
+                    'export': 'group',
+                    'group': Number('{{ folder.id }}') || null,
+                }
+            ),
             importEventsUrl: "/calendar/import/{{ folder.id }}",
             canCreateEvent: Boolean("{{ canCreateEvent }}"),
         };

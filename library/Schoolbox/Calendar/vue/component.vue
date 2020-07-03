@@ -6,6 +6,7 @@
     import momentPlugin       from "@fullcalendar/moment";
     import axios              from "axios";
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+    import RevealModal        from '@schoolbox/reveal-modal'
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/calendar/ajax/full';
@@ -31,6 +32,7 @@
         components: {
             ViewEventModal,
             FullCalendar,
+            RevealModal,
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -262,10 +264,16 @@
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a id="calendar-export" href="#" data-reveal-id="calendar-export-dialog" class="button">Export Events</a>
+                <a href="#" @click="$refs.exportModal.open" class="button">Export Events</a>
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>
+
+
+        <reveal-modal ref="exportModal">
+            <div>Use the following address to subscribe your favourite calendar application to a live feed.</div>
+            <textarea readonly rows="6" v-text="config.exportUrl"></textarea>
+        </reveal-modal>
     </div>
 </template>
 
