@@ -8,6 +8,8 @@
             days: Math.min(Math.max(1, Number('{{ component.config.days }}') || 365), 365),
             dateDisplayFormats: dateDisplayFormats,
             limit: null,
+            createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}",
+            importEventsUrl: "/calendar/import",
         };
     </script>
 {% endautoescape %}

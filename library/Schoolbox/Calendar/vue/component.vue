@@ -106,19 +106,16 @@
                         let events = response.data
                             .filter(v => 'start' in v)
                             .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                        if (events.length === 0) {
+                            self.$refs.emptyState.style.removeProperty('display');
+                            self.$refs.fullCalendar.getApi().destroy();
+                        }
                         if (self.config.limit) {
                             events = events.slice(0, self.config.limit);
                         }
                         callback(events);
                     }
-                ).finally(
-                    function () {
-                        // Update the no events message now we're no longer loading events
-                        // (This currently does double-duty as the empty state)
-                        // TODO show/hide an actual empty state
-                        self.$refs.fullCalendar.getApi().setOption('noEventsMessage', 'No events to display');
-                    }
-                )
+                );
                 // Fail callback: consider a message saying something failed
             },
 
@@ -233,6 +230,19 @@
             no-events-message="Loading events..."
             @eventClick="onEventClick"
         />
+
+        <div ref="emptyState" class="empty-state" style="display:none">
+            <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
+            <template v-if="config.folderId">
+                <i class="icon-calendar"></i>
+                <p>
+                    <a :href="config.createEventUrl">Add an event</a>
+                    or <a :href="config.importEventsUrl">import events in bulk</a>
+                    to show in this component and in group members' calendars.
+                </p>
+            </template>
+            <p v-else>There are no upcoming events</p>
+        </div>
     </div>
 </template>
 
