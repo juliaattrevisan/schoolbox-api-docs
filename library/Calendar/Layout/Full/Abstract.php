@@ -59,12 +59,17 @@ abstract class Calendar_Layout_Full_Abstract
 
 
     /**
+     * Authorizer, used for determining whether particular links in calendar
+     * events are generated.
+     *
      * @var Authorizer
      */
     protected $authorizer;
 
 
     /**
+     * Router, used for generating links in calendar events.
+     *
      * @var Router
      */
     protected $router;
