@@ -27,7 +27,7 @@ $factory  = $this->getDi()->get('calendarApiFactory');
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this,
     $user,
-    $this->arg[0],
+    $this->arg[0] ?? '',
     $viewer,
     $factory,
     new ModuleChecker(ConfigLoader::getInstance()),
