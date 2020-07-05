@@ -16,14 +16,6 @@ use Schoolbox\UserMapper;
 abstract class Calendar_Layout_Full_Abstract
 {
     /**
-     * A date string, in d-m-Y format.
-     *
-     * @var string
-     */
-    protected $date         = '';
-
-
-    /**
      * Actual calendar API instance, used as a source of events.
      *
      * @var Calendar_Api_EventType_Interface
@@ -81,7 +73,6 @@ abstract class Calendar_Layout_Full_Abstract
      * @param Authorizer           $authorizer
      * @param Router               $router
      * @param User                 $user
-     * @param string               $date
      * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
@@ -91,7 +82,6 @@ abstract class Calendar_Layout_Full_Abstract
         Authorizer $authorizer,
         Router $router,
         User $user,
-        string $date,
         User $viewer,
         Calendar_Api_Factory $factory,
         ModuleChecker $moduleChecker,
@@ -105,7 +95,6 @@ abstract class Calendar_Layout_Full_Abstract
         $this->viewer        = $viewer;
         $this->authorizer    = $authorizer;
         $this->router        = $router;
-        $this->date          = $date;
     }
 
     /**

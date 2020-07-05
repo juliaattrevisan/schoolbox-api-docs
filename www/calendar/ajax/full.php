@@ -28,7 +28,6 @@ $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->getDi()->get('authorizer'),
     $this->getDi()->get('router'),
     $user,
-    $this->arg[0] ?? '',
     $viewer,
     $factory,
     new ModuleChecker(ConfigLoader::getInstance()),
