@@ -24,30 +24,6 @@ abstract class Calendar_Layout_Full_Abstract
 
 
     /**
-     * A list of folders. Currently unused
-     *
-     * @var array
-     */
-    protected $categoryList = [];
-
-
-    /**
-     * The SitePage template to render.
-     *
-     * @var string
-     */
-    protected $templateFile = '';
-
-
-    /**
-     * The selected groups, campuses, event types and sources for this calendar.
-     *
-     * @var array
-     */
-    protected $selected     = [];
-
-
-    /**
      * Actual calendar API instance, used as a source of events.
      *
      * @var Calendar_Api_EventType_Interface
