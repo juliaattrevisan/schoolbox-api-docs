@@ -249,14 +249,27 @@ class CliAssessmentMigrator extends App
             foreach ($implAssessments as $implRow) {
                 $courseImplId     = (int)$implRow['course_implementation_id'];
                 $implAssessmentId = (int)$implRow['assessment_id'];
+                $folderCodes      = $implRow['folder_codes'];
 
+                if ($folderCodes === '') {
+                    $this->getLogger()->debug(
+                        sprintf(
+                            '.... Impl assessment #%d is in non-class or archived class folder #%d (%s): skipping',
+                            $implAssessmentId,
+                            $implRow['class_folder_id'],
+                            $implRow['class_folder_name']
+                        )
+                    );
+                    continue;
+                }
 
                 $this->getLogger()->info(
                     sprintf(
-                        '.... Moving impl assessment #%d in class #%d (%s) to new unit impl',
+                        '.... Moving impl assessment #%d in class #%d (%s (%s)) to new unit impl',
                         $implAssessmentId,
                         $implRow['class_folder_id'],
-                        $implRow['class_folder_name']
+                        $implRow['class_folder_name'],
+                        $folderCodes
                     )
                 );
                 if (!isset($unitImplIds[$courseImplId])) {
@@ -378,9 +391,9 @@ class CliAssessmentMigrator extends App
             SELECT DISTINCT
                 var.assessment_id,
                 var.course_implementation_id,
-                f.id                        AS class_folder_id,
-                f.name                      AS class_folder_name,
-                COALESCE(COUNT(fc.code), 0) AS folder_code_count
+                f.id   AS class_folder_id,
+                f.name AS class_folder_name,
+                COALESCE(GROUP_CONCAT(DISTINCT fc.code ORDER BY fc.code SEPARATOR ','), '') AS folder_codes
             FROM v_assessment_relation var
             INNER JOIN folder                                  f   ON var.folder_id     = f.id
             LEFT  JOIN folder_code                             fc  ON f.id              = fc.folder_id AND fc.deleted_at IS NULL
@@ -392,6 +405,7 @@ class CliAssessmentMigrator extends App
             AND   var.course_implementation_id    IS NOT NULL
             AND   var.project_assessment_id       IS NULL
             GROUP BY var.assessment_id, var.course_implementation_id, f.id, f.name
+            ORDER BY var.assessment_id DESC
         ");
 
         // Does the unit implementation already exist?
