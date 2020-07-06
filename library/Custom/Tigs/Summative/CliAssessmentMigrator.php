@@ -405,7 +405,7 @@ class CliAssessmentMigrator extends App
             AND   var.course_implementation_id    IS NOT NULL
             AND   var.project_assessment_id       IS NULL
             GROUP BY var.assessment_id, var.course_implementation_id, f.id, f.name
-            ORDER BY var.assessment_id DESC
+            ORDER BY var.assessment_id ASC
         ");
 
         // Does the unit implementation already exist?
