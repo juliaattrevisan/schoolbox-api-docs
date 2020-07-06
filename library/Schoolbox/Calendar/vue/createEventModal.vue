@@ -125,6 +125,10 @@
                 this.event = event;
 
                 this.$refs.modal.open();
+
+                /* Clear selectize contents
+                 */
+                this.selected = [];
             },
 
 
