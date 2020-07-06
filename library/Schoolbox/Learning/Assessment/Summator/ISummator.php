@@ -83,4 +83,11 @@ interface ISummator
      * @return bool
      */
     public function impliesOptionality();
+
+    /**
+     * Returns whether the assessable's result contributes to this summation
+     * @param IAssessable $assessable
+     * @return bool
+     */
+    public function contribute(IAssessable $assessable): bool;
 }

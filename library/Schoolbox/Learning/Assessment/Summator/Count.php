@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
  * Count Summator
@@ -66,5 +67,13 @@ class Count extends AbstractSummator
     public function impliesOptionality()
     {
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function contribute(IAssessable $assessable): bool
+    {
+        return true;
     }
 }

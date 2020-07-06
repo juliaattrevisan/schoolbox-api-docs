@@ -310,6 +310,11 @@ class Project extends AbstractAssessment implements AssessmentContext
         $mustGiveFeedbackToAll = !$canGiveFeedbackToAny;
 
         foreach ($this->iterateAssessablesForParticipant($participant) as $subParticipant) {
+            // do not check, if the current assessment does not contribute to summation
+            if (!$this->summator->contribute($subParticipant->getAssessable())) {
+                continue;
+            }
+
             $hasPublishedSubFeedback = $subParticipant->hasPublishedFeedback();
 
             // Does project require all sub-assessment to be completed, and student hasn't received published feedback ?

@@ -15,6 +15,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\User;
@@ -112,28 +114,11 @@ class ProjectTest extends TestCase
      */
     public function testBuild()
     {
-        $id = 5567;
-        $title = 'Find Diablo';
+        $id          = 5567;
+        $title       = 'Find Diablo';
         $description = 'The things you need to do in order to slay the prime evil';
 
-        $project = new Project(new SummatorAverage());
-        $project
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->somodio)
-            ->setPublishAt($this->tomorrow)
-            ->setOpenAt($this->tomorrow)
-            ->setDueAt($this->fiftyDaysFromNow)
-            ->setCloseAt($this->fiftyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
-
-        $plan = $this->getLinker()->createAndLinkPlan($project);
-        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+        $project = $this->spawnProject($id, $title, $description);
 
         /* Details
          */
@@ -177,32 +162,15 @@ class ProjectTest extends TestCase
      */
     public function testAssessables()
     {
-        $id = 5567;
-        $title = 'Find Diablo';
+        $id          = 5567;
+        $title       = 'Find Diablo';
         $description = 'The things you need to do in order to slay the prime evil';
 
-        $project = new Project(new SummatorAverage());
-        $project
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->somodio)
-            ->setPublishAt($this->tomorrow)
-            ->setOpenAt($this->tomorrow)
-            ->setDueAt($this->fiftyDaysFromNow)
-            ->setCloseAt($this->fiftyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $project = $this->spawnProject($id, $title, $description);
 
-        $plan = $this->getLinker()->createAndLinkPlan($project);
-        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
-        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
-
-        $task = $this->spawnTask();
+        $task    = $this->spawnTask();
         $dueWork = $this->spawnDueWork();
-        $quiz = $this->spawnQuiz();
+        $quiz    = $this->spawnQuiz();
 
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($task)
@@ -237,58 +205,115 @@ class ProjectTest extends TestCase
         $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
+    /**
+     *
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     */
+    public function testHasPublishedFeedBack()
+    {
+        $id          = 5567;
+        $title       = 'Find Diablo';
+        $description = 'The things you need to do in order to slay the prime evil';
+
+        $project = $this->spawnProject($id, $title, $description);
+
+        $task    = $this->spawnTask(false);
+        $dueWork = $this->spawnDueWork(false);
+        $quiz    = $this->spawnQuiz(false);
+
+        // hasPublishedFeedback for project returns whether all required feedback has been marked.
+        // If there's no feedback required to be marked, it returns true
+
+        // should return true, as there's no assessment
+        $project->setSummator(new SummatorAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // adding a task, should still return true, as task doesn't involve at all
+        $project->setAssessables((new GenericCollection(IAssessable::class))
+            ->add($task));
+
+        $project->setSummator(new SummatorAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // adding a non-weighted quiz, should return false for Average and return true for WeightedAverage
+        $project->getAssessables()->add($quiz);
+        $project->setSummator(new SummatorAverage());
+        $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // now mark the quiz and they should now be true
+        $this->addFeedbackToQuiz($quiz, $this->hodes);
+        $project->setSummator(new SummatorAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // adding a weighted due work, should return false for both Average and WeightedAverage
+        $dueWork->setWeight(100);
+        $project->getAssessables()->add($dueWork);
+        $project->setSummator(new SummatorAverage());
+        $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // now mark the quiz and they should now be true
+        $this->addFeedbackToDueWork($dueWork, $this->hodes);
+        $project->setSummator(new SummatorAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+    }
 
     /**
      * Spawn a Due Work
-     *
+     * @param bool $withFeedback
      * @return DueWork
      * @throws \UnexpectedValueException
      */
-    protected function spawnDueWork()
+    protected function spawnDueWork(bool $withFeedback = true)
     {
 
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
+        $id          = 2;
+        $title       = 'Enter the Realm of Terroarrrr';
         $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
+        $typeName    = 'Essay';
 
         $files = [
             [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
+                'id'       => 1,
+                'hash'     => 'abcdefg12341234',
+                'filename' => 'myfile1.jpg',
             ],
             [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
+                'id'       => 2,
+                'hash'     => 'zxvzxcvzxcv945786947',
+                'filename' => 'myfile2.jpg',
             ],
         ];
 
         $submissionFiles = [
             [
-                'id' => 11,
-                'hash' => 's89789d9hw3thsug8923u5',
+                'id'       => 11,
+                'hash'     => 's89789d9hw3thsug8923u5',
                 'filename' => 'mark this Sir.xlsx',
                 'plagscan' => [
-                    'id' => 1234,
+                    'id'     => 1234,
                     'status' => 1,
-                    'score' => '93% plagiariased',
-                    'html' => '<div><strong>YOU CHEATED</strong></div>'
-                ]
+                    'score'  => '93% plagiariased',
+                    'html'   => '<div><strong>YOU CHEATED</strong></div>',
+                ],
             ],
             [
-                'id' => 23,
-                'hash' => 'lk5j34kl5jousdio',
-                'filename' => 'and this too.docx'
-            ],
-        ];
-
-        $feedbackFiles = [
-            [
-                'id' => 112,
-                'hash' => 'lj23lj2llj5l2jsdkjf90',
-                'filename' => 'This is the correct response.txt',
+                'id'       => 23,
+                'hash'     => 'lk5j34kl5jousdio',
+                'filename' => 'and this too.docx',
             ],
         ];
 
@@ -348,6 +373,30 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
+        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
+
+        if (!$withFeedback) {
+            return $dueWork;
+        }
+        return $this->addFeedbackToDueWork($dueWork, $this->hodes);
+    }
+
+    /**
+     * @param DueWork $dueWork
+     * @param User    $student
+     * @return DueWork
+     */
+    private function addFeedbackToDueWork(DueWork $dueWork, User $student)
+    {
+
+        $feedbackFiles = [
+            [
+                'id'       => 112,
+                'hash'     => 'lj23lj2llj5l2jsdkjf90',
+                'filename' => 'This is the correct response.txt',
+            ],
+        ];
+
         $feedback = (new DueWorkFeedback())
             ->setId(3385)
             ->setAssessable($dueWork)
@@ -365,9 +414,9 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+        $dueWork->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
+        $submission = $dueWork->getParticipant($student)->getAllResponses()->first();
         $submission->getAllFeedback()->add($feedback);
 
         /* Freefloating Feedback
@@ -387,7 +436,7 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork->getParticipant($student)->getAllFeedbacks()->add($floatingFeedback);
 
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(4236)
@@ -401,7 +450,7 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork->getParticipant($student)->getAllFeedbacks()->add($floatingFeedback);
 
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(4225)
@@ -415,7 +464,7 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:23:21', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork->getParticipant($student)->getAllFeedbacks()->add($floatingFeedback);
 
         return $dueWork;
     }
@@ -424,13 +473,15 @@ class ProjectTest extends TestCase
     /**
      * Spawn a Task
      *
+     * @param bool $withFeedback
+     * @return Task
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    protected function spawnTask()
+    protected function spawnTask(bool $withFeedback = true)
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
+        $id          = 1234;
+        $title       = 'Read the Horadric Scrolls';
         $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
 
         $task = new Task();
@@ -451,12 +502,25 @@ class ProjectTest extends TestCase
         $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
         $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
+        if (!$withFeedback) {
+            return $task;
+        }
+        return $this->addFeedbackToTask($task, $this->hodes);
+    }
+
+    /**
+     * @param Task $task
+     * @param User $student
+     * @return Task
+     */
+    private function addFeedbackToTask(Task $task, User $student)
+    {
         $response = new TaskResponse();
         $response
             ->setId(883)
             ->setAssessable($task)
-            ->setSubmittedBy($this->hodes)
-            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -466,8 +530,8 @@ class ProjectTest extends TestCase
 
         $response->getAllFeedback()->add($feedback);
 
-        $task->getParticipant($this->hodes)->getAllResponses()->add($response);
-        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+        $task->getParticipant($student)->getAllResponses()->add($response);
+        $task->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         return $task;
     }
@@ -476,13 +540,14 @@ class ProjectTest extends TestCase
     /**
      * Spawn a Quiz
      *
+     * @param bool $withFeedback
      * @return Quiz
      * @throws \UnexpectedValueException
      */
-    protected function spawnQuiz()
+    protected function spawnQuiz(bool $withFeedback = true)
     {
-        $id = 3;
-        $title = 'How did you find The Prime Evil?';
+        $id          = 3;
+        $title       = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
         $quiz = new Quiz();
@@ -513,6 +578,33 @@ class ProjectTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
+        $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
+
+        $attempt = new QuizAttempt();
+        $attempt
+            ->setId(8666)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $quiz->getParticipant($this->hodes)->getAllResponses()->add($attempt);
+
+        if (!$withFeedback) {
+            return $quiz;
+        }
+        return $this->addFeedbackToQuiz($quiz, $this->bsalem);
+    }
+
+    /**
+     * @param Quiz $quiz
+     * @param User $student
+     * @return Quiz
+     */
+    private function addFeedbackToQuiz(Quiz $quiz, User $student)
+    {
+
         $feedback = new QuizReview();
         $feedback
             ->setId(99759)
@@ -524,36 +616,37 @@ class ProjectTest extends TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
+        $attempt = $quiz->getParticipant($student)->getAllResponses()->first();
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
 
-        $responses = [
+        $responses  = [
             [
-                'mark' => 1, // Question 1,
+                'mark'      => 1, // Question 1,
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 2
+                'mark'      => 1, // Question 2
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 3
+                'mark'      => 1, // Question 3
                 'available' => 5,
             ],
             [
-                'mark' => 2, // Question 4
+                'mark'      => 2, // Question 4
                 'available' => 5,
-            ]
+            ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
+        foreach ($responses as $response) {
+            $marksGiven     += $response['mark'];
             $marksAvailable += $response['available'];
         }
 
         $attempt->setMarksAvailable($marksAvailable);
         $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+        $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
         $feedback
@@ -568,33 +661,33 @@ class ProjectTest extends TestCase
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
 
-        $responses = [
+        $responses  = [
             [
-                'mark' => 1, // Question 1,
+                'mark'      => 1, // Question 1,
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 2
+                'mark'      => 1, // Question 2
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 3
+                'mark'      => 1, // Question 3
                 'available' => 5,
             ],
             [
-                'mark' => 2, // Question 4
+                'mark'      => 2, // Question 4
                 'available' => 5,
-            ]
+            ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
+        foreach ($responses as $response) {
+            $marksGiven     += $response['mark'];
             $marksAvailable += $response['available'];
         }
 
         $attempt->setMarksAvailable($marksAvailable);
         $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+        $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
         $feedback
@@ -609,34 +702,34 @@ class ProjectTest extends TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $responses = [
+        $responses  = [
             [
-                'mark' => 1, // Question 1,
+                'mark'      => 1, // Question 1,
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 2
+                'mark'      => 1, // Question 2
                 'available' => 5,
             ],
             [
-                'mark' => 1, // Question 3
+                'mark'      => 1, // Question 3
                 'available' => 5,
             ],
             [
-                'mark' => 2, // Question 4
+                'mark'      => 2, // Question 4
                 'available' => 5,
-            ]
+            ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
+        foreach ($responses as $response) {
+            $marksGiven     += $response['mark'];
             $marksAvailable += $response['available'];
         }
 
         $attempt->setMarksAvailable($marksAvailable);
         $attempt->setMarksGiven($marksGiven);
 
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+        $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
         $feedback
@@ -651,37 +744,68 @@ class ProjectTest extends TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $responses = [
+        $responses  = [
             [
-                'mark' => 3, // Question 1,
+                'mark'      => 3, // Question 1,
                 'available' => 5,
             ],
             [
-                'mark' => 2, // Question 2
+                'mark'      => 2, // Question 2
                 'available' => 5,
             ],
             [
-                'mark' => 2, // Question 3
+                'mark'      => 2, // Question 3
                 'available' => 5,
             ],
             [
-                'mark' => 5, // Question 4
+                'mark'      => 5, // Question 4
                 'available' => 5,
-            ]
+            ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
+        foreach ($responses as $response) {
+            $marksGiven     += $response['mark'];
             $marksAvailable += $response['available'];
         }
 
         $attempt->setMarksAvailable($marksAvailable);
         $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+        $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
-        $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
+        $quiz->getParticipant($student)->getAllResponses()->add($attempt);
 
 
         return $quiz;
+    }
+
+    /**
+     * @param int            $id
+     * @param string         $title
+     * @param string         $description
+     * @param ISummator|null $summator
+     * @return Project
+     */
+    public function spawnProject(int $id, string $title, string $description, ?ISummator $summator = null): Project
+    {
+        $summator = $summator ?? new SummatorAverage();
+        $project = new Project($summator);
+        $project
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($this->somodio)
+            ->setPublishAt($this->tomorrow)
+            ->setOpenAt($this->tomorrow)
+            ->setDueAt($this->fiftyDaysFromNow)
+            ->setCloseAt($this->fiftyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($project);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+        return $project;
     }
 }
