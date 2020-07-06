@@ -194,12 +194,11 @@ class Controller extends Component_Homepage_ControllerAbstract
             'returnUrlName'        => Redirect::RETURN_URL,
             'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
         ];
-        
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/component.twig',
-            $data,
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            $data
         );
     }
 
@@ -227,8 +226,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/outline/emptyStateContextInvalid.twig',
-            $data,
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            $data
         );
     }
 

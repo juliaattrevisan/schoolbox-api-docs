@@ -77,8 +77,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'folderId' => $this->getContext()->getId(),
                 'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
                 'user' => $this->getUser()
-            ],
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            ]
         );
     }
 }

@@ -100,8 +100,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'readonly'              => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
-            ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            )
         );
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Normal (non-eportfolio) blog component controller. Is responsible for rendering the TWIG into component 
+ * Normal (non-eportfolio) blog component controller. Is responsible for rendering the TWIG into component
  * on non-eportfolio pages
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
@@ -56,13 +56,13 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         }
 
         // Get all the blog entries for this page (e-portfolio pages have no limit parameter on their blogs)
-        
+
         $blogs = $this->getEportfolioBlogMapper()
             ->findByColumn("page_id", $this->getInstance()->getIdentifier())
             ->sortBy('createdAt', 'desc');
 
-        // Grab comments and image gallery items for each blog post 
-        
+        // Grab comments and image gallery items for each blog post
+
         $blogComments = [];
         $blogImages = [];
 
@@ -76,13 +76,13 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
             // Hydrate owner of comments
-            
+
             /** @var EportfolioBlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
                 $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
             }
         }
-        
+
         // Render this component out
 
         return $this->renderTwigTemplate(
@@ -95,8 +95,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'page'                  => $page
-            ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            )
         );
     }
 
