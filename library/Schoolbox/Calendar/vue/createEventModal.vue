@@ -92,15 +92,6 @@
                     : '';
             },
 
-            /**
-             * All event types that are not tasks.
-             *
-             * @return {Array}
-             */
-            nonTaskEventTypes() {
-                return this.eventTypes.filter(v => !v.isTaskType);
-            },
-
 
             /**
              * Compile object ids into csv
