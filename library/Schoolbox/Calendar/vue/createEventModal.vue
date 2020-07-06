@@ -2,6 +2,21 @@
     import RevealModal from '@schoolbox/reveal-modal'
     import axios       from 'axios'
 
+    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+
+    /* Vue select
+     */
+    import vSelect from "vue-select";
+    import "vue-select/dist/vue-select.css";
+
+    /* Render custom template for Deselect icon/button
+     * It's not well documented, but you can trawl through closed PRs to figger out how
+     * https://github.com/sagalbot/vue-select/issues/994
+     */
+    import Deselect from '@schoolbox/selectize/Deselect';
+    import audiencesModal from "@schoolboxCalendarEvent/audiencesModal";
+    vSelect.props.components.default = () => ({ Deselect });
+
     const EVENT_CREATED = 'eventCreated';
 
     export default {
@@ -21,10 +36,19 @@
         ],
         components: {
             RevealModal,
+            vSelect
+        },
+        created() {
+            this.ENDPOINTS = ENDPOINTS;
         },
         data() {
             return {
                 event: {},
+
+                /* Vue Select
+                 */
+                options: [],
+                selected: []
             }
         },
         computed: {
@@ -79,6 +103,7 @@
             },
         },
         methods: {
+
             /**
              * Open this modal.
              */
@@ -88,8 +113,39 @@
                 this.$refs.modal.open();
             },
 
+
             /**
-             * Post the event creation form.
+
+            /**
+             * Start searching for keyword
+             *
+             * @param query
+             * @param loading
+             */
+            onSearch(query, loading) {
+                loading(true);
+                this.search(loading, query, this);
+            },
+
+
+            /**
+             * Perform async request and load results into component
+             */
+            search: _.debounce(function(loading, query, vm) {
+                axios.get(ENDPOINTS.URL_SELECTIZE, {
+                    params: {
+                        query: query,
+                        groupID: 0
+                    }
+                })
+                        .then(function(response) {
+                            vm.options = response.data;
+                            loading(false);
+                        });
+            }, 350),
+
+
+            /* Post the event creation form.
              *
              * TODO consider whether this should be in the base FullCalendar component
              *
@@ -158,6 +214,20 @@
                                 </option>
                             </select>
                         </label>
+
+                        <label>Invitations</label>
+                        <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                            <template slot="option" slot-scope="option">
+                                    <span class="d-center">
+                                        {{ option.name }}
+                                    </span>
+                            </template>
+                            <template slot="selected-option" slot-scope="option">
+                                    <span class="selected d-center">
+                                        {{ option.first_name }} {{ option.last_name }}
+                                    </span>
+                            </template>
+                        </v-select>
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
