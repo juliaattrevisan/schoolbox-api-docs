@@ -382,7 +382,7 @@ class CliAssessmentMigrator extends App
                 f.name AS class_folder_name
             FROM v_assessment_relation var
             INNER JOIN folder                                  f   ON var.folder_id     = f.id
-            INNER JOIN folder_code                             fc  ON f.id              = fc.folder_id AND fc.deleted_at IS NOT NULL
+            LEFT  JOIN folder_code                             fc  ON f.id              = fc.folder_id AND fc.deleted_at IS NULL
             INNER JOIN assessment                              a   ON var.assessment_id = a.id
             INNER JOIN lu_work_type                            lwt ON a.work_type_id    = lwt.id
             INNER JOIN assessment_specification_implementation asi ON var.assessment_id = asi.implementation_assessment_id
