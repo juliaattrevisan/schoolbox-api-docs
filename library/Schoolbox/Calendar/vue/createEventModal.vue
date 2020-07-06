@@ -101,6 +101,20 @@
             nonTaskEventTypes() {
                 return this.eventTypes.filter(v => !v.isTaskType);
             },
+
+
+            /**
+             * Compile object ids into csv
+             */
+            compileAttendeeIds() {
+                let stack = [];
+
+                for (let i = 0; i < this.selected.length; i++) {
+                    stack.push(this.selected[i].id);
+                }
+
+                return stack.join(',');
+            }
         },
         methods: {
 
@@ -138,11 +152,12 @@
                         groupID: 0
                     }
                 })
-                        .then(function(response) {
-                            vm.options = response.data;
-                            loading(false);
-                        });
+                .then(function(response) {
+                    vm.options = response.data;
+                    loading(false);
+                });
             }, 350),
+
 
 
             /* Post the event creation form.
@@ -218,16 +233,17 @@
                         <label>Invitations</label>
                         <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                             <template slot="option" slot-scope="option">
-                                    <span class="d-center">
-                                        {{ option.name }}
-                                    </span>
+                                <span class="d-center">
+                                    {{ option.name }}
+                                </span>
                             </template>
                             <template slot="selected-option" slot-scope="option">
-                                    <span class="selected d-center">
-                                        {{ option.first_name }} {{ option.last_name }}
-                                    </span>
+                                <span class="selected d-center">
+                                    {{ option.first_name }} {{ option.last_name }}
+                                </span>
                             </template>
                         </v-select>
+                        <input type="text" name="guests" :value="compileAttendeeIds" />
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
