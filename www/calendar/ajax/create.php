@@ -2,7 +2,7 @@
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access;
-use Schoolbox\Calendar\Event\Attendance\Transactor;
+use Schoolbox\Calendar\Event\Attendance;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
@@ -86,7 +86,7 @@ $personalRelationMapper->save($personalRelation);
 
 /* Persist event attendances
  */
-(new Transactor($this->attendanceMapper, $this->userMapper))->update($event, $_POST['guestIds']);
+(new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, explode(',', $_POST['guests']));
 
 // Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {

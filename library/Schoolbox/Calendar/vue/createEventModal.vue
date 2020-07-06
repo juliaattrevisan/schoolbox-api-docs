@@ -243,7 +243,7 @@
                                 </span>
                             </template>
                         </v-select>
-                        <input type="text" name="guests" :value="compileAttendeeIds" />
+                        <input type="hidden" name="guests" :value="compileAttendeeIds" />
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
