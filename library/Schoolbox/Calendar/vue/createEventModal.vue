@@ -14,7 +14,6 @@
      * https://github.com/sagalbot/vue-select/issues/994
      */
     import Deselect from '@schoolbox/selectize/Deselect';
-    import audiencesModal from "@schoolboxCalendarEvent/audiencesModal";
     vSelect.props.components.default = () => ({ Deselect });
 
     const EVENT_CREATED = 'eventCreated';
