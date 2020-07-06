@@ -19,6 +19,11 @@
   :-moz-placeholder { color: $aluminum !important }
   ::-moz-placeholder { color: $aluminum !important }
 
+  /* Same bottom margin as other generic input elements
+   * This is rendered as a div in vue
+   */
+  margin-bottom: 1rem;
+
   /* Hide our input field because we're going to simulate it with
    * a container element instead. This input field is the last
    * brick in the selectize wall and gets focus when the container

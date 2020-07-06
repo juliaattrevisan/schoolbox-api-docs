@@ -234,7 +234,7 @@
                             </select>
                         </label>
 
-                        <label>Invitations</label>
+                        <label>Add Guests</label>
                         <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                             <template slot="option" slot-scope="option">
                                 <span class="d-center">
