@@ -378,8 +378,9 @@ class CliAssessmentMigrator extends App
             SELECT DISTINCT
                 var.assessment_id,
                 var.course_implementation_id,
-                f.id   AS class_folder_id,
-                f.name AS class_folder_name
+                f.id                        AS class_folder_id,
+                f.name                      AS class_folder_name,
+                COALESCE(COUNT(fc.code), 0) AS folder_code_count
             FROM v_assessment_relation var
             INNER JOIN folder                                  f   ON var.folder_id     = f.id
             LEFT  JOIN folder_code                             fc  ON f.id              = fc.folder_id AND fc.deleted_at IS NULL
@@ -390,6 +391,7 @@ class CliAssessmentMigrator extends App
             AND   var.course_specification_id     IS NULL
             AND   var.course_implementation_id    IS NOT NULL
             AND   var.project_assessment_id       IS NULL
+            GROUP BY var.assessment_id, var.course_implementation_id, f.id, f.name
         ");
 
         // Does the unit implementation already exist?
