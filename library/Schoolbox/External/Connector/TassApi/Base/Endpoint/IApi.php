@@ -18,7 +18,8 @@ interface IApi
     /**
      * Retrieves a data document representing the result from the API call.
      *
+     * @param array $params
      * @return string|null
      */
-    public function retrieveDocument(): ?string;
+    public function retrieveDocument(array $params): ?string;
 }

@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace External\Tass\Api;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
+use External\Tass\Api\Exception\InvalidApiKey;
 use function base64_decode;
 use function base64_encode;
-use External\Tass\Api\Exception\InvalidApiKey;
 use function json_decode;
 use function json_encode;
 use function openssl_decrypt;
@@ -23,41 +23,46 @@ use function trim;
  */
 class TokenCodec
 {
-    // The cipher method that openssl should use to encrypt/decrypt the token
+    /**
+     * The cipher method that openssl should use to encrypt/decrypt the token
+     */
     private const CIPHER_METHOD = 'aes-128-ecb';
+
 
     /**
      * @var string
      */
-    private $decodedApiKey;
+    private $decodedToken;
 
 
     /**
      * ApiToken constructor.
      *
-     * @param string $apiKey
+     * @param string $token
      * @throws InvalidApiKey If we can already tell that the API key is invalid
      */
-    public function __construct(string $apiKey)
+    public function __construct(string $token)
     {
         // Check not empty
-        if (trim($apiKey) === '') {
-            throw new InvalidApiKey('API key cannot be empty');
+        if (trim($token) === '') {
+            throw new InvalidApiKey('API token cannot be empty');
         }
 
         // Check no invalid chars
-        $decodedApiKey = base64_decode($apiKey, true);
-        if ($decodedApiKey === false) {
-            throw new InvalidApiKey("Unable to base64_decode API key: '$apiKey'");
+        $decodedToken = base64_decode($token, true);
+
+        if ($decodedToken === false) {
+            throw new InvalidApiKey("Unable to base64_decode API token: '$token'");
         }
 
         // Check is not inconsistent with base64 encoding
-        $reEncoded = base64_encode($decodedApiKey);
-        if ($reEncoded !== $apiKey) {
-            throw new InvalidApiKey("encode(decode(key)) !== key. Key: '$apiKey', ReEncoded: '$reEncoded'");
+        $reEncoded = base64_encode($decodedToken);
+
+        if ($reEncoded !== $token) {
+            throw new InvalidApiKey("encode(decode(token)) !== token. Token: '$token', ReEncoded: '$reEncoded'");
         }
 
-        $this->decodedApiKey = $decodedApiKey;
+        $this->decodedToken = $decodedToken;
     }
 
 
@@ -70,7 +75,7 @@ class TokenCodec
     public function generateToken(array $data): string
     {
         $parameters = json_encode($data);
-        $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedApiKey, OPENSSL_RAW_DATA);
+        $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
     }
@@ -85,7 +90,7 @@ class TokenCodec
     public function unpackToken(string $token): array
     {
         $encrypted  = base64_decode($token);
-        $parameters = openssl_decrypt($encrypted, self::CIPHER_METHOD, $this->decodedApiKey, OPENSSL_RAW_DATA);
+        $parameters = openssl_decrypt($encrypted, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return json_decode($parameters, true);
     }

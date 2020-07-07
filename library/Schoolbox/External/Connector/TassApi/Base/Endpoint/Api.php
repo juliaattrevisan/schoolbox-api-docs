@@ -60,6 +60,19 @@ class Api implements IApi
 
 
     /**
+     * @var TokenCodec
+     */
+    private $tokenCodec;
+
+
+    /**
+     *
+     * @var array
+     */
+    private $credentials;
+
+
+    /**
      * @var Client
      */
     private $client;
@@ -76,44 +89,61 @@ class Api implements IApi
     public function __construct(string $host, string $dsn)
     {
         $this->host = $host;
+        $this->dsn = $dsn;
 
-        $this->client = $this->initClient($dsn, $dsn, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($host, $dsn, self::DEFAULT_TIMEOUT);
     }
 
 
     /**
      * Set up guzzle client
      *
+     * @param string $host
      * @param string $dsn
-     * @param string $key
      * @param int    $timeout
      * @return Client
      * @throws DomainException
      * @throws InvalidArgumentException
      */
-    private function initClient(string $dsn, string $key, int $timeout): Client
+    private function initClient(string $host, string $dsn, int $timeout): Client
     {
-        $credentials = (new DSNCodec())->decode($dsn);
 
-//        $queryArgs = [
-//            'method'  => $method,
-//            'appcode' => $this->appCode,
-//            'company' => $this->companyCode,
-//            'v'       => self::VERSION_NUMBER,
-//            'token'   => $this->tokenBuilder->generateToken($params),
-//        ];
+        /* Figure out all the credential parts: company code, app code, token
+         */
+        $this->credentials = (new DSNCodec())->decode($dsn);
 
+        /* Set up a token codec which does some security stuff based on the
+         * params provided to its generateToken() method
+         */
+        $this->tokenCodec = new TokenCodec($this->credentials['token']);
 
+        /* Set up a reusable guzzle
+         */
+        return new Client([
+            'base_uri' => $host,
+            'timeout' => $timeout,
+            'http_errors' => false,
+        ]);
     }
 
 
     /**
      * Retrieves endpoint data representing the result from the API call.
      *
+     * @param array $params
      * @return string
      */
-    public function retrieveDocument(): string
+    public function retrieveDocument(array $params): ?string
     {
-        return '';
+        $queryArgs = [
+            'appcode' => $this->credentials['appcode'],
+            'company' => $this->credentials['companycode'],
+            'v'       => self::VERSION_NUMBER,
+            'token'   => $this->tokenCodec->generateToken($params),
+        ];
+
+        print_r($queryArgs);
+
+        return null;
     }
 }
