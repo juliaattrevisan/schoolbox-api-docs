@@ -15,6 +15,9 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
+/**
+ * Module for requests that work with user tokens.
+ */
 class Module extends BaseModule
 {
     protected $basename = 'userToken';
@@ -26,13 +29,14 @@ class Module extends BaseModule
     {
         // Routes:
         // getTokenForSelf, getTokenForUser
-        $isLoggedIn = new Rule\LazyCallback(function () {
-            return new Rule\IsLoggedIn();
-        });
+        $isLoggedIn        = $this->getAuthRule('isLoggedIn');
         $isUserOrSuperUser = new Rule\LazyCallback(function () {
-            return new Rule\Any(
-                $this->getAuthRule('isSuperuser'),
-                new Rule\IsUser('userId')
+            return new Rule\All(
+                $this->getAuthRule('isLoggedIn'),
+                new Rule\Any(
+                    $this->getAuthRule('isSuperuser'),
+                    new Rule\IsUser('userId')
+                )
             );
         });
         $preloadUser = function (array $params) {
