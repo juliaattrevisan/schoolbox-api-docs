@@ -2,7 +2,7 @@
     import RevealModal from '@schoolbox/reveal-modal'
     import axios       from 'axios'
 
-    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+    import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
 
     /* Vue select
      */
@@ -123,8 +123,6 @@
 
 
             /**
-
-            /**
              * Start searching for keyword
              *
              * @param query
@@ -151,7 +149,6 @@
                     loading(false);
                 });
             }, 350),
-
 
 
             /* Post the event creation form.
