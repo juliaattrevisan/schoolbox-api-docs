@@ -8,7 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
 use Alaress_Curl_Url;
+use DomainException;
+use GuzzleHttp\Client;
+use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Zend\Uri\Exception;
 use Zend\Uri\Uri;
 
@@ -19,7 +23,19 @@ class Api implements IApi
 {
 
     /**
-     * The host of the Tass API server
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
+
+    /**
+     * Tass API Version Number
+     */
+    private const VERSION_NUMBER = 2;
+
+
+    /**
+     * The host server
      *
      * @var string
      */
@@ -27,11 +43,14 @@ class Api implements IApi
 
 
     /**
-     * The API key for this call, provided by the school
+     * The dsn string of the Tass API server
+     * This contains strings for companycode, appcode, token
+     *
+     * These are stored in the Endpoint Key field
      *
      * @var string
      */
-    private $apiKey;
+    private $dsn;
 
 
     /**
@@ -41,89 +60,60 @@ class Api implements IApi
 
 
     /**
+     * @var Client
+     */
+    private $client;
+
+
+    /**
      * Constructor
      *
      * @param string $host
-     * @param string $apiKey
+     * @param string $dsn
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $host, string $dsn)
     {
-        $this->host   = $host;
-        $this->apiKey = $apiKey;
+        $this->host = $host;
+
+        $this->client = $this->initClient($dsn, $dsn, self::DEFAULT_TIMEOUT);
     }
 
 
     /**
-     * Retrieves a XML document representing the result from the API call.
+     * Set up guzzle client
      *
-     * @param string $filter An XML document representing a filter
-     * @return string|null
-     * @throws RuntimeException if the retrieval of the XML doc failed
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @param string $dsn
+     * @param string $key
+     * @param int    $timeout
+     * @return Client
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
-    public function retrieveDocument(string $filter = ''): ?string
+    private function initClient(string $dsn, string $key, int $timeout): Client
     {
-        $curl = $this->initCurl($filter);
-        $curl->exec();
+        $credentials = (new DSNCodec())->decode($dsn);
 
-        if (empty($curl->getErrors())) {
-            // Too big to parse
-            return $curl->getResult();
-        }
+//        $queryArgs = [
+//            'method'  => $method,
+//            'appcode' => $this->appCode,
+//            'company' => $this->companyCode,
+//            'v'       => self::VERSION_NUMBER,
+//            'token'   => $this->tokenBuilder->generateToken($params),
+//        ];
 
-        throw new RuntimeException(
-            sprintf(
-                'XML retrieval failed: response code %d, message: %s',
-                $curl->getResponseCode(),
-                implode(', ', $curl->getErrors())
-            ),
-            $curl->getResponseCode()
-        );
+
     }
 
 
     /**
-     * Cache a url definition then return its value
+     * Retrieves endpoint data representing the result from the API call.
      *
-     * @return Uri
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @return string
      */
-    public function getUrl(): Uri
+    public function retrieveDocument(): string
     {
-        if (!$this->url) {
-            $this->url = (new Uri())
-                ->setScheme('https')
-                ->setHost($this->host)
-                ->setPath('/api/batch/1.0/xml.ashx')
-                ->setQuery(['apikey' => $this->apiKey]);
-        }
-
-        return $this->url;
-    }
-
-
-    /**
-     * Set up curl instance
-     *
-     * @param string $filter
-     * @return Alaress_Curl_Url
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
-     */
-    private function initCurl(string $filter = ''): \Alaress_Curl_Url
-    {
-        $curl = new Alaress_Curl_Url($this->getUrl()->toString());
-
-        if ('' !== $filter) {
-            $curl->addOptions([
-                CURLOPT_HTTPHEADER => ['Content-Type: text/xml'],
-                CURLOPT_POST       => true,
-                CURLOPT_POSTFIELDS => $filter,
-            ]);
-        }
-
-        return $curl;
+        return '';
     }
 }
