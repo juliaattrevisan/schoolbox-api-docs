@@ -23,6 +23,9 @@ $app = new class extends CliTool\App {
     private const OPT_SHORT_FORCE = 'f';
     private const OPT_LONG_FORCE  = 'force';
 
+    private const OPT_SHORT_QUIET = 'q';
+    private const OPT_LONG_QUIET  = 'quiet';
+
     /**
      * Short options:
      * * `-f` to force override of existing key
@@ -32,7 +35,7 @@ $app = new class extends CliTool\App {
      */
     public function getShortOpts(): array
     {
-        return [self::OPT_SHORT_FORCE, self::OPT_SHORT_HELP];
+        return [self::OPT_SHORT_HELP, self::OPT_SHORT_FORCE, self::OPT_SHORT_QUIET,];
     }
 
 
@@ -45,7 +48,7 @@ $app = new class extends CliTool\App {
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_FORCE, self::OPT_LONG_HELP];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_FORCE, self::OPT_LONG_QUIET,];
     }
 
 
@@ -91,9 +94,11 @@ $app = new class extends CliTool\App {
 
         if (!($this->getOpt(self::OPT_SHORT_FORCE) || $this->getOpt(self::OPT_LONG_FORCE))) {
             if (!($existingPublicKey === '' && $existingPrivateKey === '')) {
-                $this->getLogger()->notice(
-                    'A key pair already exists. Run with the `-f` option to override the existing key pair.'
-                );
+                if (!($this->getOpt(self::OPT_SHORT_QUIET) || $this->getOpt(self::OPT_LONG_QUIET))) {
+                    $this->getLogger()->notice(
+                        'A key pair already exists. Run with the `-f` option to override the existing key pair.'
+                    );
+                }
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
@@ -142,9 +147,14 @@ DESCRIPTION
 
     $yellow-f, --force$white
         Force generation of a new key pair, even if a pair already exists.
+        (Takes priority over $yellow-q$white).
 
         By default: this will refuse to override an existing key pair, and will
         exit with an error code if either the public or private key exists.
+
+    $yellow-q, --quiet$white
+        Silently exits without doing anything if a pair already exists, instead
+        of outputting a message.
 
 HELP;
         \fwrite(STDOUT, $help);
