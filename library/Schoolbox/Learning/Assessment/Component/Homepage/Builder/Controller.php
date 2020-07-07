@@ -119,8 +119,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/builder/component.twig',
-            $data,
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            $data
         );
     }
 
@@ -161,8 +160,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningAssessment/builder/emptyStateNoUnitSpec.twig',
-            $data,
-            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+            $data
         );
     }
 }
