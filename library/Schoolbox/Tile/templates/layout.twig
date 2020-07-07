@@ -35,12 +35,28 @@
                 digits: true,
                 min: 1,
                 max: 100
+            },
+            column_padding: {
+                required: true,
+                digits: true,
+                min: 0,
+                max: 127
             }
         };
-        form.alaressValidate({ rules: rules });
+
+        form.alaressValidate({
+            rules: rules
+        });
 
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
+
+            /* Only update layout if the values supplied were valid
+             */
+            if (!form.valid()) {
+                return;
+            }
+
             // Get aspect ratio. If it's invalid, don't resize anything
             var xAspect = Math.max(
                 rules.aspect_ratio_x.min,
