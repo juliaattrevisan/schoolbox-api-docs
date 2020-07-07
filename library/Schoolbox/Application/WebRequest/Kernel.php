@@ -247,7 +247,7 @@ class Kernel extends WebKernelAbstract
         // * Authorization header
         // * Session, if not in auth header
 
-        // Put JWT auth here
+        // Token authentication
         $user       = null;
         $session    = null;
         $authHeader = $server['HTTP_AUTHORIZATION'] ?? null;
@@ -257,13 +257,7 @@ class Kernel extends WebKernelAbstract
                 /** @var Jwt $tokenValidator */
                 $tokenValidator = $this->get('user.tokenBuilder');
                 $claims         = $tokenValidator->decode($token);
-                // Put something in the session about a claimed username
-                // If the claimed username is valid, either:
-                // * Put the user in a temporary $_SESSION var
-                // ** Fetch that user when calling getUser or performing auth
-                // ** Unset that var once processing completes
-                // * Override the current session var?
-                if ($claims['sub']) {
+                if (isset($claims['sub'])) {
                     /** @var MapperFactory $mapperFactory */
                     $mapperFactory = $this->di->get('mapperFactory');
                     /** @var UserMapper $userMapper */
@@ -272,6 +266,8 @@ class Kernel extends WebKernelAbstract
                     if (!$user) {
                         throw new Unauthenticated('User in token not found');
                     }
+                } else {
+                    throw new Unauthenticated('Token does not contain a "sub" claim');
                 }
             }
         }
@@ -319,6 +315,9 @@ class Kernel extends WebKernelAbstract
 
         /** @var \Alaress\Web\Controller\Base $controller */
         $controller = $this->di->get('controller:' . $controllerName);
+
+        // The user is now injected directly into the controller, instead of the
+        // user being loaded from the session within the controller.
         $controller->setUser($user);
 
         // Authorize, throwing whatever exceptions might be thrown.
