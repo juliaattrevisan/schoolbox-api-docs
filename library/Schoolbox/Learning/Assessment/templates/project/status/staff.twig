@@ -106,11 +106,11 @@ Data:
                 <ul id='assessment-list' class="information-list sortable-card"
                     data-sortable
                     data-assessment-list
-                    data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                    data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: assessment}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                     {% for assessable in assessment.assessables %}
                         {% set stats = assessmentStats[assessable.id] %}
                         {% import '@learningAssessment/project/macro/icon.twig' as icon %}
-
+                        {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportForm', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% if assessable is quiz %}
                             {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
@@ -155,6 +155,7 @@ Data:
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                         {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
                                         {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
                                         {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
                                     </ul>

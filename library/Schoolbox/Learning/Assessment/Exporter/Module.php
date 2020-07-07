@@ -9,10 +9,15 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ContainerLocked;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Di\Exception\ServiceNotObject;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper;
@@ -25,8 +30,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
-use Schoolbox\Filter;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Alaress\Authorizer\Rule;
+
 
 /**
  * Module for assessment export options.
@@ -44,8 +49,7 @@ class Module extends BaseModule
      *
      * @return void
      * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws ApplicationException
      */
     protected function registerRoutes(): void
     {
@@ -56,11 +60,18 @@ class Module extends BaseModule
         $isStaff = $this->getAuthRule('isStaffOrSuper');
         $isSuperuser = $this->getAuthRule('isSuperuser');
 
+        $canExport = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new AssessmentNotDeleted(),
+            $isStaff,
+            new IsSpecification()
+        );
+
         // register the routes
         $route = '/assessment/{assessmentId:\d+}';
-        $this->register('GET', $route, 'getExportForm', $isStaff, $preloadAssessment);
+        $this->register('GET', $route, 'getExportForm', $canExport, $preloadAssessment);
         $this->register('GET', '/assessment/csv', 'getCSV', $isSuperuser);
-        $this->register('POST', $route, 'postExport', $isStaff, $preloadAssessment);
+        $this->register('POST', $route, 'postExport', $canExport, $preloadAssessment);
     }
 
 
@@ -69,9 +80,10 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws ApplicationException
+     * @throws \Exception
      */
     protected function preloadAssessment(array $params): array
     {
@@ -84,12 +96,12 @@ class Module extends BaseModule
         }
 
         // If the assessment isn't a specification - it can't be imported anywhere
-        if (!$assessment->getContext() instanceof UnitSpecification\Model) {
+        if (!$assessment->isSpecification()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
-            'assessmentSpec' => $assessment
+            'assessment' => $assessment
         ];
     }
 
@@ -103,8 +115,10 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
+     * @param ContainerInterface $injector
      * @throws ServiceNotFound
+     * @throws ContainerLocked
+     * @throws ServiceNotObject
      */
     public function initControllers(ContainerInterface $injector): void
     {
@@ -162,7 +176,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {

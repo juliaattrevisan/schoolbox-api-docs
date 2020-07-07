@@ -31,7 +31,7 @@
            data-datepicker-time
            data-datepicker-format="datetime"
            data-datepicker-buttontext=""
-           {% if startSync %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
-           {% if endSync %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if startSync is defined %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if endSync is defined %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
     />
 </div>
