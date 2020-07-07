@@ -37,7 +37,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * Maximum percentage padding allowed
      */
-    public const MAX_PADDING_PERCENTAGE = 127;
+    public const MAX_PADDING_PERCENTAGE = 120;
 
 
     /**
