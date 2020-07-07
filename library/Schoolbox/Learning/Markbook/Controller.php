@@ -114,11 +114,8 @@ class Controller extends Base
              */
             [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, $this->getUser(), true);
 
-            // Further filter assessments by folder ID.
-            // May need to apply that outside of the filter?
-
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-            $markbook      = $this->buildMarkbook($assessmentIds);
+            $markbook      = $this->buildMarkbook($assessmentIds, $folderId);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
@@ -360,6 +357,8 @@ class Controller extends Base
     /**
      * Stream a filtered markbook in CSV format
      *
+     * TODO update this to take a folder ID
+     *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
      * @param User $viewee
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
@@ -389,11 +388,15 @@ class Controller extends Base
      * @param array $assessmentIds
      * @return MarkBook
      */
-    private function buildMarkbook(array $assessmentIds)
+    private function buildMarkbook(array $assessmentIds, ?int $folderId = null)
     {
         // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        if (isset($folderId)) {
+            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folderId, null, ['ids' => $assessmentIds]);
+        } else {
+            $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        }
 
         // TODO: remove this when SA-9384 is implemented
         /** @var IAssessable $assessment */
