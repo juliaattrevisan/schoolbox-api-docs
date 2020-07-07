@@ -274,7 +274,10 @@ class Kernel extends WebKernelAbstract
                     }
                 }
             }
-        } else {
+        }
+
+        // Did token auth fail to find a user?
+        if (!$user) {
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
 
