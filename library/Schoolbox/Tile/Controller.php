@@ -107,7 +107,7 @@ class Controller extends Base
             ->setGridWidth((int)$this->request->post['grid_width'])
             ->setGridPadding((int)$this->request->post['grid_padding'])
             ->setColumnCount((int)$this->request->post['column_count'])
-            ->setColumnPadding((int)$this->request->post['column_padding'])
+            ->setColumnPadding(min((int)$this->request->post['column_padding'], Layout\Model::MAX_PADDING_PERCENTAGE))
             ->setAspectRatioX((int)$this->request->post['aspect_ratio_x'])
             ->setAspectRatioY((int)$this->request->post['aspect_ratio_y']);
         switch ($this->getRequest()->post['layout_type']) {

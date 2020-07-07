@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Tile\Layout;
 
 use Alaress_Date_Format;
@@ -32,6 +32,13 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @var int
      */
     const LAYOUT_TYPE_COLUMN = 2;
+
+
+    /**
+     * Maximum percentage padding allowed
+     */
+    public const MAX_PADDING_PERCENTAGE = 127;
+
 
     /**
      * The primary key of this grid.
