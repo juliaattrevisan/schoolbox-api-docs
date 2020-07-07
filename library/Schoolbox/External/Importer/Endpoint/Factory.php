@@ -19,6 +19,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint as IsamsEndpoint;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint as SentralEndpoint;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -44,6 +45,7 @@ class Factory
     public const ISAMS = 'isams';
     public const KAMAR = 'kamar';
     public const SENTRAL = 'sentral';
+    public const TASS_API = 'tassapi';
     public const CSV = 'csv';
 
 
@@ -181,6 +183,31 @@ class Factory
                     /* Timetable pieces
                     */
                     CampusMapper::getInstance(),
+                    UserMapper::getInstance(),
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance()
+                ))->produce();
+
+            case self::TASS_API:
+                return (new TassApiEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+
+                    /* Profile pieces
+                    */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+
+                    /* Timetable pieces
+                    */
                     UserMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),

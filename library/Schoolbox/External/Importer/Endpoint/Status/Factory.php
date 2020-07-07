@@ -66,6 +66,9 @@ class Factory
             case Endpoint\Factory::SENTRAL:
                 return new Connector\Sentral\Base\Endpoint\Status($this->host, $this->key);
 
+            case Endpoint\Factory::TASS_API:
+                return new Connector\TassApi\Base\Endpoint\Status($this->host, $this->key);
+
             default:
                 // Use manual csv imports
                 return null;
