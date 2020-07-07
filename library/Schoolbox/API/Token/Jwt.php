@@ -8,10 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token;
 
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
+use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * JWT generator and validator.
@@ -62,6 +66,11 @@ class Jwt
      *
      * @param string $jwt
      * @return array
+     * @throws SignatureInvalidException Provided JWT was invalid because the signature verification failed
+     * @throws BeforeValidException      Provided JWT is trying to be used before it's eligible as defined by 'nbf'
+     * @throws BeforeValidException      Provided JWT is trying to be used before it's been created as defined by 'iat'
+     * @throws ExpiredException          Provided JWT has since expired, as defined by the 'exp' claim
+     * @throws UnexpectedValueException  Provided JWT was invalid for any other reason
      */
     public function decode(string $jwt): array
     {

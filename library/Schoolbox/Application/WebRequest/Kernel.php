@@ -20,6 +20,9 @@ use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
 use Aura\Web\Request;
 use Aura\Web\Response;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\API\Token\Jwt;
@@ -29,6 +32,8 @@ use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
+use Throwable;
+use UnexpectedValueException;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -227,7 +232,7 @@ class Kernel extends WebKernelAbstract
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Throwable
+     * @throws Throwable
      */
     private function outputAuraContent(Route $route, array $server): void
     {
@@ -256,7 +261,17 @@ class Kernel extends WebKernelAbstract
                 [, $token]  = $matches;
                 /** @var Jwt $tokenValidator */
                 $tokenValidator = $this->get('user.tokenBuilder');
-                $claims         = $tokenValidator->decode($token);
+                try {
+                    $claims = $tokenValidator->decode($token);
+                } catch (SignatureInvalidException $e) {
+                    throw new Unauthenticated('Token signature is invalid', 0, $e);
+                } catch (BeforeValidException $e) {
+                    throw new Unauthenticated('Token is not yet valid', 0, $e);
+                } catch (ExpiredException $e) {
+                    throw new Unauthenticated('Token has expired', 0, $e);
+                } catch (Throwable $e) {
+                    throw new Unauthenticated('Token could not be parsed', 0, $e);
+                }
                 if (isset($claims['sub'])) {
                     /** @var MapperFactory $mapperFactory */
                     $mapperFactory = $this->di->get('mapperFactory');
@@ -332,10 +347,10 @@ class Kernel extends WebKernelAbstract
             // always throw this, even if there was preloader exception
             throw $ue;
 
-        } catch (\Throwable $ae) {
+        } catch (Throwable $ae) {
             // Some other exception (including unauthorized):
             // throw the preloader exception in preference to this
-            if ($preloaderException instanceof \Throwable) {
+            if ($preloaderException instanceof Throwable) {
                 throw $preloaderException;
             }
             throw $ae;
@@ -343,7 +358,7 @@ class Kernel extends WebKernelAbstract
 
         // No auth exception:
         // throw the preloader exception if there was one
-        if ($preloaderException instanceof \Throwable) {
+        if ($preloaderException instanceof Throwable) {
             throw $preloaderException;
         }
 
