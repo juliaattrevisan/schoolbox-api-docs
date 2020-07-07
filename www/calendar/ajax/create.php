@@ -85,8 +85,11 @@ $personalRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
 $personalRelationMapper->save($personalRelation);
 
 /* Persist event attendances
+ * If event has zero guests, or if guests weren't specified at all, just provide empty array
  */
-(new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, explode(',', $_POST['guests']));
+$guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : $_POST['guests'];
+
+(new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
 // Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {
