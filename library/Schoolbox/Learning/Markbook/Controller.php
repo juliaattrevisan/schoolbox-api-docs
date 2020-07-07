@@ -164,7 +164,7 @@ class Controller extends Base
     public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term, User $viewee = null)
     {
         // TODO override the filter instead of redirecting
-        $this->buildMarkbookRedirect($folderId, $term, $viewee ?: $this->getUser());
+        $this->buildMarkbookRedirect($folderId, $term, $this->getUser());
     }
 
 
