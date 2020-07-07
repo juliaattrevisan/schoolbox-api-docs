@@ -16,6 +16,7 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
+use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
 use Aura\Web\Request;
@@ -151,10 +152,19 @@ class Kernel extends WebKernelAbstract
             // Start constructing a response
             /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
+            $code     = 401;
+
+            // Request was JSON: just let outputError build an ApiProblem response
+            if ((new IsJson())->isSatisfiedBy($request)) {
+                $this->outputError($e, $e->getMessage(), '', [], $code);
+                return;
+            }
+
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
-                $response->status->setCode(401);
+                // In fact, get rid of IsXhr completely: modern HTTP clients don't set X-Requested-With
+                $response->status->setCode($code);
                 $response->content->set([
                     'format' => 'json',
                     'data'   => ['error' => 'Unauthenticated'],
@@ -179,6 +189,11 @@ class Kernel extends WebKernelAbstract
             /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;
+            if ((new IsJson())->isSatisfiedBy($request)) {
+                $this->outputError($e, $e->getMessage(), '', [], $code);
+                return;
+            }
+
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
