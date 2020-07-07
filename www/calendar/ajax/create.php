@@ -87,7 +87,7 @@ $personalRelationMapper->save($personalRelation);
 /* Persist event attendances
  * If event has zero guests, or if guests weren't specified at all, just provide empty array
  */
-$guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : $_POST['guests'];
+$guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
