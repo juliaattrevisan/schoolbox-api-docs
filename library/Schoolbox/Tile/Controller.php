@@ -87,6 +87,7 @@ class Controller extends Base
                 'template' => '@tile/layout.twig',
                 'data'     => [
                     'item' => $layout,
+                    'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
                 ],
             ]
         );
