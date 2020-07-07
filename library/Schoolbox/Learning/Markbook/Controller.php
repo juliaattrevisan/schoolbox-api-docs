@@ -66,7 +66,10 @@ class Controller extends Base
 
 
     /**
-     * Redirect to the markbook for the specified class
+     * Render the shell of the markbook for the specified class.
+     *
+     * This renders the filter panel, but not its contents: those are rendered
+     * by `postMarkbookForClass`.
      *
      * @param int       $folderId
      * @param User|null $viewee
@@ -74,7 +77,79 @@ class Controller extends Base
      */
     public function getMarkbookForClass(int $folderId, User $viewee = null)
     {
-        $this->buildMarkbookRedirect($folderId, null, $viewee ?: $this->getUser());
+        // This is now the final location, not the redirect
+        // Ignore viewee: always use current user
+        $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
+        $route     = $this->getRouter()->generate('learningMarkbook.postMarkbookForClass', ['folderId' => $folderId]);
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
+
+        $pageTitle = 'Markbook';
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
+                'viewee'      => $this->getUser(),
+                'filterPanel' => $filterPanel,
+            ])->setTab('submission')->setTitle($pageTitle)
+        );
+    }
+
+
+    /**
+     * Receives a set of filter panel selections and render a filtered markbook
+     * for the given class.
+     *
+     * @param int $folderId
+     */
+    public function postMarkbookForClass(int $folderId): void
+    {
+        try {
+            $request = $this->request->post['filter_selection'] ?: [];
+
+            /**
+             * @var null[]|Collection[]        $filters
+             * @var Filter\Codec               $codec
+             * @var Filter\Selection\Model[][] $selectionsPerFilter
+             */
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, $this->getUser(), true);
+
+            // Further filter assessments by folder ID.
+            // May need to apply that outside of the filter?
+
+            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+            $markbook      = $this->buildMarkbook($assessmentIds);
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'status'  => 200,
+                'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
+                    'markbook'     => $markbook,
+                    'viewee'       => $this->getUser(),
+                    'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
+                    'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+                ])->getAsString(),
+            ]));
+
+        } catch (Filter\BrokenFilterException $e) {
+            $this->captureException($e);
+            $data = [
+                'status'  => 500,
+                'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
+            ];
+            if ($this->getConfigLoader()->get('debug_mode')) {
+                $data = array_merge($data, [
+                    'code'    => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine(),
+                    'file'    => $e->getFile(),
+                ]);
+            }
+            $this->getResponse()->content->set($this->buildJsonOutput($data));
+        } catch (\Throwable $e) {
+            $this->captureException($e);
+            $this->returnJsonError($e);
+        }
     }
 
 
@@ -88,6 +163,7 @@ class Controller extends Base
      */
     public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term, User $viewee = null)
     {
+        // TODO override the filter instead of redirecting
         $this->buildMarkbookRedirect($folderId, $term, $viewee ?: $this->getUser());
     }
 

@@ -40,6 +40,7 @@ class Module extends BaseModule
         );
 
         $preload = function ($params) {
+            // TODO replace with preload of folder
             if(null !== $params['userId']){
                 try{
                     return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
@@ -74,6 +75,7 @@ class Module extends BaseModule
         // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
 
         $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $classMarkbookPerm, $preload);
+        $this->register('POST', '/class/{folderId:\d+}',                          'postMarkbookForClass',       $classMarkbookPerm, $preload);  //AJAX in the report
         $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
 
         $this->register('GET',  '/export/{userId:\d+}', 'getMarkbookExport', $isStaffOrSuper, $preload);
