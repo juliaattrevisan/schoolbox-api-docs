@@ -79,6 +79,7 @@ class Module extends BaseModule
         $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
 
         $this->register('GET',  '/export/{userId:\d+}', 'getMarkbookExport', $isStaffOrSuper, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/export', 'getMarkbookExportForClass', $isStaffOrSuper, $preload);
 
         $this->register('GET',  '{/userId:\d+}',        'getMarkbook',       $isStaffOrSuper, $preload);
         $this->register('POST', '/{userId:\d+}',        'postMarkbook',      $isStaffOrSuper, $preload);  //AJAX in the report

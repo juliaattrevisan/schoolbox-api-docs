@@ -357,8 +357,6 @@ class Controller extends Base
     /**
      * Stream a filtered markbook in CSV format
      *
-     * TODO update this to take a folder ID
-     *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
      * @param User $viewee
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
@@ -381,6 +379,34 @@ class Controller extends Base
         $csvExporter = new Export\CSV();
         $csvExporter->export($markbook, 'Markbook.csv');
         exit;
+    }
+
+
+    /**
+     * Stream a filtered markbook for a folder in CSV format
+     *
+     * @api   GET /learning/markbook/class/:folderId/export?{filterQueryArgs}
+     * @param int $folderId
+     *
+     * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
+     * @throws Filter\BrokenFilterException          If a injected filter is unable to be processed
+     * @throws \InvalidArgumentException             If any filter keys not recognised
+     * @throws \ReflectionException                  If a specified filter class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     */
+    public function getMarkbookExportForClass(int $folderId): void
+    {
+        $filtersArray = $this->request->query->getArrayCopy();
+        unset($filtersArray['page']);
+
+        [$filters] = $this->convertRequestToFilters($filtersArray, $this->getUser(), false);
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $markbook      = $this->buildMarkbook($assessmentIds, $folderId);
+
+        $csvExporter = new Export\CSV();
+        $csvExporter->export($markbook, 'Markbook.csv');
     }
 
 
