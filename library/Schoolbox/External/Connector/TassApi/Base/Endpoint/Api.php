@@ -130,19 +130,26 @@ class Api implements IApi
     /**
      * Retrieves endpoint data representing the result from the API call.
      *
-     * @param array $params
+     * @param string $method
+     * @param array  $params
      * @return string
      */
-    public function retrieveDocument(array $params): ?string
+    public function retrieveDocument(string $method, array $params): ?string
     {
         $queryArgs = [
+            'method'  => $method,
             'appcode' => $this->credentials['appcode'],
             'company' => $this->credentials['companycode'],
-            'v'       => self::VERSION_NUMBER,
             'token'   => $this->tokenCodec->generateToken($params),
+            'v'       => self::VERSION_NUMBER,
         ];
 
+        $response = $this->client->get($this->host, [
+            'query' => $queryArgs
+        ]);
+
         print_r($queryArgs);
+        print_r($response);
 
         return null;
     }
