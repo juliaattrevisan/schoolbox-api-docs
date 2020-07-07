@@ -43,6 +43,11 @@ case "$1" in
             chmod 0644 /etc/schoolbox/conf.php;
             /usr/share/schoolbox/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
+
+        # Run scripts that apply instance-specific values.
+        # (These should only be run on install, not on upgrade. For that reason, these scripts must be idempotent.)
+        php /usr/share/schoolbox/tools/token/generateKeyPair.php --quiet 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+
         # Manage services (upstart|systemd)
         if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
             cp -f /usr/share/schoolbox/tools/init/schoolbox-*.service /lib/systemd/system;

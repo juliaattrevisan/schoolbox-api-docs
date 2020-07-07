@@ -26,6 +26,10 @@
                 {% endif %}
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
+            {# There is no user token icon: use LTI because it sort of implies third-party integrations #}
+            {% if token is defined %}
+            <li><a href="#" class="icon-lti" data-reveal-id="userToken">Generate User Token</a></li>
+            {% endif %}
             <li>
                 {% if isSchoolboxAdmin %}
                     <a class="icon-delete menu_disabled"
@@ -55,6 +59,7 @@
     </div>
 
 {% endif %}
+
 
 {# User detail section #}
 
@@ -688,6 +693,28 @@
 {% endif %}
 
 <div id="saveLabel" class="toast"></div>
+
+{% if token is defined %}
+<div data-reveal id="userToken" class="reveal-modal">
+    <h2>User Token</h2>
+    <p>
+        Use this token within the "Authorization" header of requests to the Schoolbox
+        API, to perform requests as this user. Use the "Bearer" auth type.
+    </p>
+    <div class="row">
+        <div class="small-12 island">
+            <div class="alert-box scrollable">
+                {{ token }}
+            </div>
+        </div>
+    </div>
+    <p>
+        The Schoolbox API is documented at
+        <a href="https://api.schoolbox.com.au/" target="_blank">https://api.schoolbox.com.au/</a>.
+    </p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+{% endif %}
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>

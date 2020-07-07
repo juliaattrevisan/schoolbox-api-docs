@@ -16,16 +16,25 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
+use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Aura\Router\Route;
 use Aura\Web\Request;
 use Aura\Web\Response;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
+use Throwable;
+use UnexpectedValueException;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -121,7 +130,7 @@ class Kernel extends WebKernelAbstract
 
         try {
             if ($route instanceof Route) {
-                $this->outputAuraContent($route);
+                $this->outputAuraContent($route, $server);
             } else {
                 $this->outputSitepageContent($_GET['page'] ?? null);
             }
@@ -143,10 +152,19 @@ class Kernel extends WebKernelAbstract
             // Start constructing a response
             /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
+            $code     = 401;
+
+            // Request was JSON: just let outputError build an ApiProblem response
+            if ((new IsJson())->isSatisfiedBy($request)) {
+                $this->outputError($e, $e->getMessage(), '', [], $code);
+                return;
+            }
+
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
-                $response->status->setCode(401);
+                // In fact, get rid of IsXhr completely: modern HTTP clients don't set X-Requested-With
+                $response->status->setCode($code);
                 $response->content->set([
                     'format' => 'json',
                     'data'   => ['error' => 'Unauthenticated'],
@@ -171,6 +189,11 @@ class Kernel extends WebKernelAbstract
             /** @var Response $response */
             $response = $this->di->get('webFactory')->newResponse();
             $code     = $e instanceof Deleted ? 410 : 404;
+            if ((new IsJson())->isSatisfiedBy($request)) {
+                $this->outputError($e, $e->getMessage(), '', [], $code);
+                return;
+            }
+
             if ((new IsXhr())->isSatisfiedBy($request)) {
                 // Fabricate an AJAX response. Don't redirect
                 // TODO replace this with standard outputError (ApiProblem style payload)
@@ -216,16 +239,17 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Aura-based content.
      *
-     * @param Route  $route the route to render: the controller and action are
+     * @param Route $route  the route to render: the controller and action are
      *                      extracted from its name.
+     * @param array $server Vars from $_SERVER
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Throwable
+     * @throws Throwable
      */
-    private function outputAuraContent(Route $route): void
+    private function outputAuraContent(Route $route, array $server): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -239,17 +263,59 @@ class Kernel extends WebKernelAbstract
         $module = $this->di->get('module:' . $controllerName);
         $module->initControllerDependencies();
 
-        /** @var \Alaress\Session\Session $session */
-        $session = $this->di->get('session');
+        // User is from:
+        // * Authorization header
+        // * Session, if not in auth header
 
-        // Do authorization here
-        // TODO Inject user getter into authorizer, and use it to determine:
-        // * if user is there
-        // * if user session is timed out or not
-        /** @var \Schoolbox\User $user */
-        $user = $session->getAuthUser();
-        if ($session->isAuthSessionAlive()) {
-            $session->updateLastTime();
+        // Token authentication
+        $user       = null;
+        $session    = null;
+        $authHeader = $server['HTTP_AUTHORIZATION'] ?? null;
+        if (isset($authHeader)) {
+            if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
+                [, $token]  = $matches;
+                /** @var Jwt $tokenValidator */
+                $tokenValidator = $this->get('user.tokenBuilder');
+                try {
+                    $claims = $tokenValidator->decode($token);
+                } catch (SignatureInvalidException $e) {
+                    throw new Unauthenticated('Token signature is invalid', 0, $e);
+                } catch (BeforeValidException $e) {
+                    throw new Unauthenticated('Token is not yet valid', 0, $e);
+                } catch (ExpiredException $e) {
+                    throw new Unauthenticated('Token has expired', 0, $e);
+                } catch (Throwable $e) {
+                    throw new Unauthenticated('Token could not be parsed', 0, $e);
+                }
+                if (isset($claims['sub'])) {
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $this->di->get('mapperFactory');
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $mapperFactory->get(UserMapper::class);
+                    $user       = $userMapper->findByUsername($claims['sub']);
+                    if (!$user) {
+                        throw new Unauthenticated('User in token not found');
+                    }
+                } else {
+                    throw new Unauthenticated('Token does not contain a "sub" claim');
+                }
+            }
+        }
+
+        // Did token auth fail to find a user?
+        if (!$user) {
+            /** @var \Alaress\Session\Session $session */
+            $session = $this->di->get('session');
+
+            // Do authorization here
+            // TODO Inject user getter into authorizer, and use it to determine:
+            // * if user is there
+            // * if user session is timed out or not
+            /** @var \Schoolbox\User $user */
+            $user = $session->getAuthUser();
+            if ($session->isAuthSessionAlive()) {
+                $session->updateLastTime();
+            }
         }
 
         /** @var \Aura\Web\Response $response */
@@ -280,6 +346,10 @@ class Kernel extends WebKernelAbstract
         /** @var \Alaress\Web\Controller\Base $controller */
         $controller = $this->di->get('controller:' . $controllerName);
 
+        // The user is now injected directly into the controller, instead of the
+        // user being loaded from the session within the controller.
+        $controller->setUser($user);
+
         // Authorize, throwing whatever exceptions might be thrown.
         /** @var \Alaress\Authorizer\Authorizer $auth */
         $auth = $this->di->get('authorizer');
@@ -292,10 +362,10 @@ class Kernel extends WebKernelAbstract
             // always throw this, even if there was preloader exception
             throw $ue;
 
-        } catch (\Throwable $ae) {
+        } catch (Throwable $ae) {
             // Some other exception (including unauthorized):
             // throw the preloader exception in preference to this
-            if ($preloaderException instanceof \Throwable) {
+            if ($preloaderException instanceof Throwable) {
                 throw $preloaderException;
             }
             throw $ae;
@@ -303,7 +373,7 @@ class Kernel extends WebKernelAbstract
 
         // No auth exception:
         // throw the preloader exception if there was one
-        if ($preloaderException instanceof \Throwable) {
+        if ($preloaderException instanceof Throwable) {
             throw $preloaderException;
         }
 
@@ -362,7 +432,7 @@ class Kernel extends WebKernelAbstract
         $redirect             = $controller->getResponse()->headers->get('location');
         $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
         $isJson               = $output instanceof Json;
-        if (!($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
+        if ($session && !($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
 

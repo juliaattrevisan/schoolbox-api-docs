@@ -63,6 +63,15 @@ abstract class Base {
     /** @var ISpecification */
     private $isXhrSpec;
 
+
+    /**
+     * The currently authenticated user.
+     *
+     * @var User
+     */
+    private $user;
+
+
     /**
      * Null if the SB instance is not configured to use Sentry, or if unable to instantiate Sentry.
      *
@@ -229,16 +238,24 @@ abstract class Base {
 
 
     /**
-     * Gets the current authenticated user out of the session.
-     *
-     * WARNING: Do not call this in post-request detached-client callbacks,
-     *          as at that point the session has been destroyed.
-     *
      * @return User
      */
-    public function getUser() {
-        return $this->getSession()->getAuthUser();
+    public function getUser(): User
+    {
+        return $this->user;
     }
+
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
 
     /**
      * Helper method for retrieving config.

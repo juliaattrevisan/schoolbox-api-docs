@@ -15,6 +15,7 @@ use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
 use Schoolbox\User\Profile\DocumentManagement\Module as UserProfileDocumentManagementModule;
+use Schoolbox\User\Token\Module as UserTokenModule;
 
 class User implements ModuleConfigInterface
 {
@@ -50,5 +51,9 @@ class User implements ModuleConfigInterface
          */
         $module = new ResetPasswordModule($di);
         $module->init('/passwordReset');
+
+        // Token
+        $module = new UserTokenModule($di);
+        $module->init('/user/token');
     }
 }

@@ -12,6 +12,17 @@ use Alaress\Specification;
 use Aura\Web\Request;
 use TypeError;
 
+
+/**
+ * Is the given request XHR?
+ *
+ * @deprecated This depends on the `X-Requested-With` header, whose existence
+ *             cannot be relied upon. Axios and HTTP fetch don't set it, and
+ *             neither does Guzzle (because it's not performing XHRs at all).
+ *             If you want JSON, then set the request's `Accept` header to
+ *             `application/json`, and use `Alaress\Web\Request\IsJson` to
+ *             detect that.
+ */
 class IsXhr extends Specification\Leaf
 {
 

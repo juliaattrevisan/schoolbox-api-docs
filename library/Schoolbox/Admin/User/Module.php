@@ -121,6 +121,7 @@ class Module extends BaseModule
                     'cmsLogMapper' => $this->getMapperFactory()->getLazy(CMSLogMapper::class),
                     'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                     'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
+                    'tokenBuilder' => $injector->get('user.tokenBuilder'),
                 ]
             )
         );

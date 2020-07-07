@@ -1,36 +1,32 @@
 <?php
 /**
- * Abstract composite authorization method, the base class for the All and Any
- * rules.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Authorizer\Rule;
-use InvalidArgumentException;
 
-abstract class Composite implements IAuthorizationRule {
-
+/**
+ * Abstract composite authorization method, the base class for the All and Any
+ * rules.
+ */
+abstract class Composite implements IAuthorizationRule
+{
     /**
      * @var array|IAuthorizationRule[]
      */
-    protected $subRuleList = array();
+    protected $subRuleList = [];
 
     /**
-     * @throws InvalidArgumentException if any param is not a IAuthorizationRule
+     * Constructor
+     *
+     * @param IAuthorizationRule ...$subRules
      */
-    public function __construct() {
-
-        /* An unlimited number of authorization rules.
-         */
-        foreach (func_get_args() as $subRule) {
-            if (!($subRule instanceof IAuthorizationRule)) {
-                throw new InvalidArgumentException(
-                    'Sub-rules passed to Alaress\\Authorizer\\Rule\\Any must implement Alaress\\Authorizer\\Rule\\IAuthorizationRule'
-                );
-            }
+    public function __construct(IAuthorizationRule...$subRules)
+    {
+        foreach ($subRules as $subRule) {
             $this->addRule($subRule);
         }
     }
@@ -38,10 +34,11 @@ abstract class Composite implements IAuthorizationRule {
     /**
      * Adds a rule to the end of the chain.
      *
-     * @param  IAuthorizationRule $subRule
+     * @param IAuthorizationRule $subRule
      * @return $this
      */
-    public function addRule(IAuthorizationRule $subRule) {
+    public function addRule(IAuthorizationRule $subRule)
+    {
         $this->subRuleList[] = $subRule;
         return $this;
     }
@@ -52,12 +49,12 @@ abstract class Composite implements IAuthorizationRule {
      * If you have a rule you want to check before any others, you should use
      * this method.
      *
-     * @param  IAuthorizationRule $subRule
+     * @param IAuthorizationRule $subRule
      * @return $this
      */
-    public function prependRule(IAuthorizationRule $subRule) {
+    public function prependRule(IAuthorizationRule $subRule)
+    {
         array_unshift($this->subRuleList, $subRule);
         return $this;
     }
-
 }

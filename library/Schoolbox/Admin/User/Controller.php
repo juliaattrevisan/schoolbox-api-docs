@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Scrub;
@@ -99,6 +100,12 @@ class Controller extends Base
      * @var CMSLogMapper;
      */
     protected $cmsLogMapper;
+
+
+    /**
+     * @var Jwt
+     */
+    private $tokenBuilder;
 
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
@@ -242,7 +249,8 @@ class Controller extends Base
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseResidentialMapper $houseResidentialMapper,
-        HouseMapper $houseMapper
+        HouseMapper $houseMapper,
+        Jwt $tokenBuilder
     ) {
         $this->cmsLogMapper = $cmsLogMapper;
         $this->userLogMapper = $userLogMapper;
@@ -255,6 +263,7 @@ class Controller extends Base
         $this->roleMapper = $roleMapper;
         $this->houseResidentialMapper = $houseResidentialMapper;
         $this->houseMapper = $houseMapper;
+        $this->tokenBuilder = $tokenBuilder;
     }
 
 
@@ -342,6 +351,7 @@ class Controller extends Base
                 ]),
                 'portraitZone' => $portraitZone,
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
+                'token' => $this->tokenBuilder->generate($user),
             ],
             'title' => 'Admin - Users'
         ]);
