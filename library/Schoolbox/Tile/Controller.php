@@ -103,12 +103,21 @@ class Controller extends Base
     public function layoutForm(Layout\Model $layout)
     {
         $code = 200;
+
+        $columnPadding = (int)$this->request->post['column_padding'];
+
+        /* If column padding exceeds the maximum, set it to zero
+         */
+        if ($columnPadding > Layout\Model::MAX_PADDING_PERCENTAGE) {
+            $columnPadding = 0;
+        }
+
         $layout
             ->setHeading($this->request->post->get('heading', ''))
             ->setGridWidth((int)$this->request->post['grid_width'])
             ->setGridPadding((int)$this->request->post['grid_padding'])
             ->setColumnCount((int)$this->request->post['column_count'])
-            ->setColumnPadding(min((int)$this->request->post['column_padding'], Layout\Model::MAX_PADDING_PERCENTAGE))
+            ->setColumnPadding($columnPadding)
             ->setAspectRatioX((int)$this->request->post['aspect_ratio_x'])
             ->setAspectRatioY((int)$this->request->post['aspect_ratio_y']);
         switch ($this->getRequest()->post['layout_type']) {
