@@ -222,7 +222,7 @@
                         </label>
 
                         <label>Add Guests</label>
-                        <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                        <v-select class="schoolbox-vue-selectize" :options="options" :close-on-select="false" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                             <template slot="option" slot-scope="option">
                                 <span class="d-center">
                                     {{ option.name }}
