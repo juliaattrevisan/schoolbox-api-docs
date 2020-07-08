@@ -635,10 +635,18 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
-                    <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
-                    <template v-else>No</template> available place(s) remaining
-                </meta-item>
+                <template v-if="this.canRsvp(
+                                eventExtendedProps.attendance.payload.level,
+                                eventExtendedProps.attendance.payload.attendees.guests,
+                                eventExtendedProps.attendance.payload.currentUser.user.id,
+                                eventExtendedProps.attendance.payload.currentUser.status,
+                                eventExtendedProps.attendance.payload.attendees.max,
+                                eventExtendedProps.attendance.payload.attendees.available)">
+                    <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
+                        <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
+                        <template v-else>No</template> available place(s) remaining
+                    </meta-item>
+                </template>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
