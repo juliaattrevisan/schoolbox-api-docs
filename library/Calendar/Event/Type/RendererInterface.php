@@ -1,7 +1,7 @@
 <?php
 /**
  * This provides the interface for all renderers that are employed by events to use
- * Possible implementations include: json, vcal, html, csv
+ * Possible implementations include: json, vcal, csv
  *
  * @author	  James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
