@@ -49,7 +49,13 @@
         data() {
             return {
 
-                /* Mirrors backend Payload instance
+                /* Initialise vars
+                 *
+                 * Mirrors backend Payload instance to prevent random js error about
+                 * undefined vars being accessed; null operator doesn't work when supplying
+                 * as an arg, apparently
+                 *
+                 * This gets updated asynchronously when modals open
                  */
                 payload: {
                     user: {
@@ -66,6 +72,7 @@
                     guests: [],
                     level: null
                 },
+
                 event: {}
             }
         },
