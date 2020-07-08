@@ -88,6 +88,14 @@ class Payload
              */
             'user' => $user,
 
+            /* Whether the current user can modify the event
+             */
+            'canModify' => $canModify,
+
+            /* Current attendance level
+             */
+            'level' => $event->getAttendance(),
+
             /* Convenient counts
              */
             'attendees' => [
@@ -114,14 +122,6 @@ class Payload
                 'accepted' => $analysis->getNumAccepted(),
                 'declined' => $analysis->getNumDeclined(),
             ],
-
-            /* Current attendance level
-             */
-            'level' => $event->getAttendance(),
-
-            /* Whether the current user can modify the event
-             */
-            'canModify' => $canModify,
         ];
     }
 }
