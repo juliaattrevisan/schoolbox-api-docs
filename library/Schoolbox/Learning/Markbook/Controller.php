@@ -122,6 +122,7 @@ class Controller extends Base
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'     => $markbook,
                     'viewee'       => $this->getUser(),
+                    'folderId'     => $folderId,
                     'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
@@ -289,6 +290,7 @@ class Controller extends Base
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'     => $markbook,
                     'viewee'       => $viewee,
+                    'folderId'     => null,
                     'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
