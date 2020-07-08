@@ -140,11 +140,7 @@
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: {
-                        payload: this.payload,
-
-                        /* Your current status
-                         */
-                        status: data?.attendance?.attendanceStatus
+                        payload: this.payload
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -184,7 +180,7 @@
                         this.eventExtendedProps.attendance.payload.level,
                         this.eventExtendedProps.attendance.payload.attendees.guests,
                         this.eventExtendedProps.attendance.payload.user.id,
-                        this.eventExtendedProps.attendance.status,
+                        this.eventExtendedProps.attendance.payload.currentUser.status,
                         this.eventExtendedProps.attendance.payload.attendees.max,
                         this.eventExtendedProps.attendance.payload.attendees.available
                     )
@@ -202,7 +198,7 @@
              * Decline an invitation
              */
             rsvpDecline() {
-                if (this.isInvited(this.eventExtendedProps.attendance.status)) {
+                if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                     this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
                 }
             },
@@ -674,7 +670,7 @@
                                     eventExtendedProps.attendance.payload.level,
                                     eventExtendedProps.attendance.payload.attendees.guests,
                                     eventExtendedProps.attendance.payload.user.id,
-                                    eventExtendedProps.attendance.status,
+                                    eventExtendedProps.attendance.payload.currentUser.status,
                                     eventExtendedProps.attendance.payload.attendees.max,
                                     eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">
                             <span>
