@@ -391,6 +391,40 @@
 
 
             /**
+             * Decide when the RSVP buttons are available for usage
+             *
+             * Further check in canRsvp() determines whether the current attendance settings
+             * prohibit you further due to limits, etc.
+             *
+             * @return boolean
+             */
+            showRsvpButtons()
+            {
+
+                /* If the event attendance is Open, show the buttons
+                 */
+                if (this.event.attendance.level.current === this.ATTENDANCE_LEVELS.OPEN) {
+                    return true;
+                }
+
+                /* If the event attendance is Invite Only, and you are on the list,
+                 * show the buttons
+                 */
+                if (this.event.attendance.level.current === this.ATTENDANCE_LEVELS.INVITE_ONLY) {
+                    for (let i = 0; i < this.guests.length; i++) {
+                        if (this.guests[i].id === this.event.attendance.payload.user.id) {
+                            return true;
+                        }
+                    }
+                }
+
+                /* Otherwise, hide the buttons
+                 */
+                return false;
+            },
+
+
+            /**
              * Whether you can edit this event,
              * including whether you can delete an invitation
              *
@@ -497,16 +531,18 @@
                 <h2 class="subheader">Guests</h2>
 
                 <div class="row">
-                    <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
-                        <section class="content no-margin">
-                            <p><strong>Attending?</strong></p>
+                    <template v-if="showRsvpButtons()">
+                        <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
+                            <section class="content no-margin">
+                                <p><strong>Attending?</strong></p>
 
-                            <ul class="flex-list buttons rsvp">
-                                <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
-                                <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
-                            </ul>
-                        </section>
-                    </div>
+                                <ul class="flex-list buttons rsvp">
+                                    <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                                    <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
+                                </ul>
+                            </section>
+                        </div>
+                    </template>
                     <div class="small-12 columns">
                         <section>
                             <div class="content" v-if="this.isLimitedAttendance(this.numMax) || canModify()">
