@@ -115,6 +115,10 @@ class Payload
              */
             'guests' => $guests,
 
+            /* Current attendancen level
+             */
+            'level' => $event->getAttendance(),
+
             /* Whether the current user can modify the event
              */
             'canModify' => $canModify,

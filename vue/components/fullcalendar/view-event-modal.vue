@@ -52,6 +52,9 @@
                 /* Mirrors backend Payload instance
                  */
                 payload: {
+                    user: {
+                        id: null
+                    },
                     attendees: {
                         accepted: null,
                         available: null,
@@ -60,7 +63,8 @@
                         num: null,
                         pending: null
                     },
-                    guests: []
+                    guests: [],
+                    level: null
                 },
                 event: {}
             }
@@ -191,7 +195,9 @@
                     this.eventExtendedProps.classAttendance.url ||
                     this.eventExtendedProps.booking.actions.length > 0 ||
                     this.canRsvp(
-                        1, [{id:19}], 19,
+                        this.payload.level,
+                        this.payload.guests,
+                        this.payload.user.id,
                         this.eventExtendedProps.attendance.status,
                         this.eventExtendedProps.attendance.max,
                         this.eventExtendedProps.attendance.available
@@ -672,7 +678,13 @@
             <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <span v-if="this.canRsvp(1, [{id:19}], 19, eventExtendedProps.attendance.status, this.payload.attendees.max, this.payload.attendees.available)" :class="'rsvp'">
+                        <span v-if="this.canRsvp(
+                                    this.payload.level,
+                                    this.payload.guests,
+                                    this.payload.user.id,
+                                    eventExtendedProps.attendance.status,
+                                    this.payload.attendees.max,
+                                    this.payload.attendees.available)" :class="'rsvp'">
                             <span>
                                 <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
