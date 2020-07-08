@@ -27,19 +27,23 @@
      * This gets updated asynchronously when modals open
      */
     const INITIAL_PAYLOAD = {
+        level: null,
         user: {
             id: null
         },
+        canModify: null,
+        currentUser: {
+            status: null
+        },
         attendees: {
+            guests: [],
             accepted: null,
             available: null,
             declined: null,
             max: null,
             num: null,
             pending: null
-        },
-        guests: [],
-        level: null
+        }
     };
 
     export default {
@@ -674,10 +678,10 @@
                                     eventExtendedProps.attendance.payload.attendees.max,
                                     eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">
                             <span>
-                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
+                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
+                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 

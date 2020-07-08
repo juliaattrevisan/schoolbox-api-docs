@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
 
+use Schoolbox\User;
+
 /**
  * Class PayloadAnalysis
  *
@@ -114,5 +116,24 @@ class PayloadAnalysis
         }
 
         return $available;
+    }
+
+
+    /**
+     * Find $user's current RSVP status
+     * null if they weren't even on the list
+     *
+     * @param User $user
+     * @return int|null
+     */
+    public function getUserStatus(User $user): ?int
+    {
+        foreach ($this->guests as $guest) {
+            if ($guest['id'] === $user->getId()) {
+                return $guest['status'];
+            }
+        }
+
+        return null;
     }
 }

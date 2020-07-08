@@ -61,7 +61,6 @@ class Payload
      * @param Event $event
      * @param User $user
      * @return array
-     * @throws ServiceNotFound
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws Exception
@@ -83,6 +82,9 @@ class Payload
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         return [
+            /* Current attendance level for the event
+             */
+            'level' => $event->getAttendance(),
 
             /* The current user
              */
@@ -92,9 +94,14 @@ class Payload
              */
             'canModify' => $canModify,
 
-            /* Current attendance level
+            /* Details about the current user
              */
-            'level' => $event->getAttendance(),
+            'currentUser' => [
+
+                /* The current user RSVP status
+                 */
+                'status' => $analysis->getUserStatus($user),
+            ],
 
             /* Convenient counts
              */
