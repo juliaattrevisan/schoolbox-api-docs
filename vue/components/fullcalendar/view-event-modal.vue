@@ -136,29 +136,7 @@
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: {
-
-                        /* Data struct
-                         *
-                         * The output is a json payload from /calendar/ajax/full.php
-                         * This feeds into the main fullcalendar
-                         *
-                         * full.php uses the Calendar API Composite to get all the events from everywhere
-                         * Inside that Factory you'll find specialised classes to collate events from various places
-                         * The regular calendar events are in Calendar_Api_EventType_Event_Schoolbox_Default
-                         *
-                         * This uses the Calendar handler to find events
-                         *
-                         * Fields come from the javascript-rendered data via the abstraction
-                         * library/Calendar/Event/Type/Day/Renderer/Javascript.php
-                         */
-
-                        /* Maximum allowed guests
-                         */
-                        max: this.payload.attendees?.max,
-
-                        /* Remaining attendee places
-                         */
-                        available: this.payload.attendees?.available,
+                        payload: this.payload,
 
                         /* Your current status
                          */
@@ -202,12 +180,12 @@
                     this.eventExtendedProps.classAttendance.url ||
                     this.eventExtendedProps.booking.actions.length > 0 ||
                     this.canRsvp(
-                        this.payload.level,
-                        this.payload.guests,
-                        this.payload.user.id,
+                        this.eventExtendedProps.attendance.payload.level,
+                        this.eventExtendedProps.attendance.payload.guests,
+                        this.eventExtendedProps.attendance.payload.user.id,
                         this.eventExtendedProps.attendance.status,
-                        this.eventExtendedProps.attendance.max,
-                        this.eventExtendedProps.attendance.available
+                        this.eventExtendedProps.attendance.payload.attendees.max,
+                        this.eventExtendedProps.attendance.payload.attendees.available
                     )
             },
 
@@ -655,8 +633,8 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.max)">
-                    <template v-if="eventExtendedProps.attendance.available > 0">{{ eventExtendedProps.attendance.available }}</template>
+                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
+                    <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
                     <template v-else>No</template> available place(s) remaining
                 </meta-item>
             </meta-list>
@@ -686,12 +664,12 @@
                 <div class="component-action">
                     <section>
                         <span v-if="this.canRsvp(
-                                    this.payload.level,
-                                    this.payload.guests,
-                                    this.payload.user.id,
+                                    eventExtendedProps.attendance.payload.level,
+                                    eventExtendedProps.attendance.payload.guests,
+                                    eventExtendedProps.attendance.payload.user.id,
                                     eventExtendedProps.attendance.status,
-                                    this.payload.attendees.max,
-                                    this.payload.attendees.available)" :class="'rsvp'">
+                                    eventExtendedProps.attendance.payload.attendees.max,
+                                    eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">
                             <span>
                                 <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>

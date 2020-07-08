@@ -115,7 +115,7 @@ class Payload
              */
             'guests' => $guests,
 
-            /* Current attendancen level
+            /* Current attendance level
              */
             'level' => $event->getAttendance(),
 
