@@ -326,9 +326,9 @@ class Controller extends Base
             /* The available attendance levels which can be chosen
              */
             'attendanceLevels' => [
-                Attendance\Model::LEVEL_NO_ATTENDANCE => 'No attendance',
-                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite only',
-                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open attendance'
+                Attendance\Model::LEVEL_NO_ATTENDANCE => 'None',
+                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite Only',
+                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open'
             ],
 
             /* Specifically hides attendance inputs when you choose this setting
