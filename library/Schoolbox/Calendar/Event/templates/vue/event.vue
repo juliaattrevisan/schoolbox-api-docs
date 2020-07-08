@@ -422,13 +422,20 @@
 
                 /* If you've got write access, you can see it
                  */
+                if (this.canModify()) {
+                    return true;
+                }
 
                 /* Otherwise, check the showAttendees flag
                  * If that's on, you can see it
                  */
+                if (this.event.showAttendees) {
+                    return true;
+                }
 
                 /* Otherwise, it's hidden
                  */
+                return false;
             },
 
 
