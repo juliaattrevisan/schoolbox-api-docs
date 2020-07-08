@@ -140,7 +140,7 @@ const jsSrc = {
         // Promise polyfill
         'node_modules/promise-polyfill/dist/polyfill.js',
 
-        'www/javascript/shared/calendar/jquery.calendar.js'
+        'www/javascript/shared/calendar/jquery.getExportCalendarLink.js'
     ],
     masonry: [
         // Colour handling

@@ -1,10 +1,11 @@
 (function() {
-
     /**
      * Set up attendance processing
      *
      * This should be applied to the element containing the RSVP control
      * which is typically a modal div
+     *
+     * @deprecated not used anymore now new attendance system is implemented
      *
      * @param options
      */
@@ -99,41 +100,5 @@
                 }
             };
         }
-
-        /**
-         * Method for exporting a calendar link.
-         *
-         * @param token  The user's token
-         * @param values A plain object, or list from jQuery.fn.serializeArray
-         *
-         * @return string
-         */
-        $.fn.getExportCalendarLink = function(token, values) {
-
-            // If from serializeArray: convert to object
-            if ($.isArray(values)) {
-                var new_values = {};
-
-                $.each(values, function(k,v) {
-                    new_values[v.name] = v.value;
-                });
-
-                values = new_values;
-            }
-
-            // Add token to object
-            values.token = token;
-
-            // remove unused fields
-            if (values['export'] !== 'group') {
-                delete values.group;
-            }
-
-            if (values['export'] !== 'campus') {
-                delete values.campus;
-            }
-
-            return window.location.protocol+'//'+window.location.host+'/calendar/export.php?'+$.param(values);
-        };
     }
 }(jQuery));

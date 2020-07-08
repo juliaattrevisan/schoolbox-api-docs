@@ -10,7 +10,8 @@ module.exports = {
         upcomingDueworkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/calendar.main.js",
         resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js",
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
-        eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js"
+        eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
+        calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),

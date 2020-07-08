@@ -1,0 +1,22 @@
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        window.fullCalendarConfig = {
+            userId: Number('{{ user.id }}') || null,
+            folderId: null,
+            // Days: 0 = max, must be at least 1.
+            // Allegedly may be up to 1 year (or "all": wtf?),
+            // but surely don't show all events for all time?
+            days: Math.min(Math.max(1, Number('{{ component.config.days }}') || 365), 365),
+            dateDisplayFormats: dateDisplayFormats,
+            limit: null,
+            createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}",
+            exportUrl: '',
+            importEventsUrl: "/calendar/import",
+            canCreateEvent: false,
+        };
+    </script>
+{% endautoescape %}
+    <div id="calendar">
+        <div class="loader"></div>
+    </div>
+    <script type="text/javascript" src="/javascript/components/calendarComponent.bundle.js?v={{ config.site_version }}"></script>

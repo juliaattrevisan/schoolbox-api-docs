@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 
 class Calendar_Api_Factory
 {
@@ -89,13 +90,13 @@ class Calendar_Api_Factory
     /**
      * Produce an API Composite
      *
-     * @param \Schoolbox\User $user
-     * @param \Schoolbox\User $viewer
-     * @return Calendar_Api_Composite
+     * @param User $user
+     * @param User $viewer
+     * @return Calendar_Api_EventType_Interface
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function produceForUser(\Schoolbox\User $user, \Schoolbox\User $viewer)
+    public function produceForUser(User $user, User $viewer): Calendar_Api_EventType_Interface
     {
         $compositeApi = new Calendar_Api_Composite();
 
@@ -109,16 +110,34 @@ class Calendar_Api_Factory
 
 
     /**
+     * Handles construction logic for a folder-specific variant of the calendar
+     * connector.
+     *
+     * @param int  $folderId
+     * @param User $user
+     * @param User $viewer
+     * @return Calendar_Api_EventType_Interface
+     */
+    public function produceForFolderId(int $folderId, User $user, User $viewer): Calendar_Api_EventType_Interface
+    {
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(
+            Calendar_Api_EventType_Event_Schoolbox_Group::class
+        );
+        return new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $user, $viewer, $folderId);
+    }
+
+
+    /**
      * Handle unique construction logic for each variant of the calendar connector.
      *
      * @param Calendar_Api_Config_Record $config
-     * @param \Schoolbox\User            $user
-     * @param \Schoolbox\User            $viewer
+     * @param User                       $user
+     * @param User                       $viewer
      * @return Calendar_Api_EventType_Abstract
      * @throws InvalidArgumentException If the item can't be built
      * @throws UnexpectedValueException If unable to build the external event factory
      */
-    private function produceFromConfig($config, \Schoolbox\User $user, \Schoolbox\User $viewer): Calendar_Api_EventType_Interface
+    private function produceFromConfig($config, User $user, User $viewer): Calendar_Api_EventType_Interface
     {
         $className   = "Calendar_Api_EventType_{$config->getEventType()}_{$config->getConnectorClass()}_Default";
         $connectorId = $config->getId();

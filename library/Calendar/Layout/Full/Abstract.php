@@ -15,25 +15,96 @@ use Schoolbox\UserMapper;
 
 abstract class Calendar_Layout_Full_Abstract
 {
+    /**
+     * A SitePage instance, used for rendering.
+     *
+     * @var SitePage|null
+     */
     protected $page         = null;
+
+
+    /**
+     * A date string, in d-m-Y format.
+     *
+     * @var string
+     */
     protected $date         = '';
+
+
+    /**
+     * A list of folders. Currently unused
+     *
+     * @var array
+     */
     protected $categoryList = [];
+
+
+    /**
+     * The SitePage template to render.
+     *
+     * @var string
+     */
     protected $templateFile = '';
+
+
+    /**
+     * The selected groups, campuses, event types and sources for this calendar.
+     *
+     * @var array
+     */
     protected $selected     = [];
+
+
+    /**
+     * The selected date on this calendar, in timestamp format.
+     *
+     * @var int|null
+     */
     protected $selectedDate = null;
+
+
+    /**
+     * The start of the current week on this calendar, in timestamp format.
+     *
+     * @var int|null
+     */
     protected $startOfWeek  = null;
 
-    /** @var Calendar_Api_EventType_Interface Actual connector instance */
+
+    /**
+     * Actual calendar API instance, used as a source of events.
+     *
+     * @var Calendar_Api_EventType_Interface
+     */
     protected $api;
 
-    /** @var  Schoolbox\User $user Who this Calendar is about */
+
+    /**
+     * The subject of this calendar.
+     *
+     * @var Schoolbox\User $user
+     */
     protected $user;
 
-    /** @var  Schoolbox\User $viewer Who is currently viewing the Calendar */
+
+    /**
+     * Who is currently viewing the calendar?
+     * (as opposed to the subject of the calendar)
+     *
+     * @var Schoolbox\User $viewer
+     */
     protected $viewer;
 
-    /** @var ModuleChecker */
+
+    /**
+     * The source of information on whether a module is enabled.
+     *
+     * Used to determine which event sources are available.
+     *
+     * @var ModuleChecker
+     */
     private $moduleChecker;
+
 
     /**
      * Constructor
@@ -44,10 +115,20 @@ abstract class Calendar_Layout_Full_Abstract
      * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
+     * @param int|null             $folderId
      */
-    public function __construct(SitePage $page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
-    {
-        $this->api           = $factory->produceForUser($user, $viewer);
+    public function __construct(
+        SitePage $page,
+        User $user,
+        string $date,
+        User $viewer,
+        Calendar_Api_Factory $factory,
+        ModuleChecker $moduleChecker,
+        ?int $folderId = null
+    ) {
+        $this->api           = isset($folderId)
+            ? $factory->produceForFolderId($folderId, $user, $viewer)
+            : $factory->produceForUser($user, $viewer);
         $this->moduleChecker = $moduleChecker;
         $this->user          = $user;
         $this->viewer        = $viewer;

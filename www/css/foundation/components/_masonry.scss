@@ -121,7 +121,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-folder;
   color: $icon-color-folders;
 }
-.icon-masonry-Component_Homepage_EventListController:before {
+.icon-masonry-Schoolbox_Calendar_Component_Homepage_Controller:before {
   @extend .icon-calendar;
   color: $icon-color-calendar;
 }
@@ -152,10 +152,6 @@ $masonry-drop-background: $input-focus-bg-color;
 .icon-masonry-Component_Homepage_TeachersController:before {
   @extend .icon-teacher;
   color: $icon-color-class-teachers;
-}
-.icon-masonry-Component_Homepage_CalendarListController:before {
-  @extend .icon-calendar;
-  color: $icon-color-calendar;
 }
 .icon-masonry-Component_Homepage_PollController:before {
   @extend .icon-poll;
@@ -312,7 +308,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-report;
   color: $icon-color-homepage-news;
 }
-.icon-masonry-Component_Dashboard_CalendarController:before {
+.icon-masonry-Schoolbox_Calendar_Component_Dashboard_Controller:before {
   @extend .icon-calendar;
   color: $icon-color-calendar;
 }
