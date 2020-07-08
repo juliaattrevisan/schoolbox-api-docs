@@ -325,7 +325,7 @@
                 const data = this.event.extendedProps.data;
 
                 if (data.meta.eventId !== undefined) {
-                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data.attendance.attendanceStatus);
+                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data?.attendance?.attendanceStatus);
                 }
             },
 
