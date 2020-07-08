@@ -159,7 +159,7 @@ class Controller extends Base
             /* Modify perms are calculated in the attendance list fragment
              * This is synonymous with calling (new Event\Access())->checkExisting() again
              */
-            'canModify' => $payload['canModify'],
+            'canModify' => $payload['currentUser']['canModify'],
 
             /* Attendance info
              * Current attendee info and your current rsvp status

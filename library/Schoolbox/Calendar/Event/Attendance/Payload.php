@@ -90,10 +90,6 @@ class Payload
              */
             'user' => $user,
 
-            /* Whether the current user can modify the event
-             */
-            'canModify' => $canModify,
-
             /* Details about the current user
              */
             'currentUser' => [
@@ -101,6 +97,10 @@ class Payload
                 /* The current user RSVP status
                  */
                 'status' => $analysis->getUserStatus($user),
+
+                /* Whether the current user can modify the event
+                 */
+                'canModify' => $canModify,
             ],
 
             /* Convenient counts
