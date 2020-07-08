@@ -94,7 +94,7 @@ class Controller extends Base
 
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
-        $pageTitle = 'Markbook';
+        $pageTitle = 'Class Markbook';
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
@@ -298,7 +298,7 @@ class Controller extends Base
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
         $csvExporter = new Export\CSV();
-        $csvExporter->export($markbook, 'Markbook.csv');
+        $csvExporter->export($markbook, 'Class Markbook.csv');
     }
 
 
