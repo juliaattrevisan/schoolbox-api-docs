@@ -34,50 +34,48 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $isStaffOrSuper = new Rule\Any(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsSuperuser()
-        );
-
         $preload = function ($params) {
-            // TODO replace with preload of folder
-            if(null !== $params['userId']){
-                try{
-                    return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
-                } catch (Mapper\Exception $e){
-                    throw new NotFound("No user found for id: {$params['userId']}");
-                }
-            }
-            return [];
-        };
+            $args = [];
 
-        $termAndViewee = function ($params) use ($preload) {
-            $args = $preload($params);
-            try{
-                $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+            // Must preload folder
+            try {
+                $args['folder'] = $this->getFolderMapper()->findById($params['folderId']);
             } catch (Mapper\Exception $e){
-                throw new NotFound("No term found for code: {$params['termCode']}");
+                throw new NotFound("No folder found for id: {$params['folderId']}");
+            }
+
+            // Preload term if it's there
+            if (isset($params['termCode'])) {
+                try {
+                    $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+                } catch (Mapper\Exception $e){
+                    throw new NotFound("No term found for code: {$params['termCode']}");
+                }
             }
             return $args;
         };
 
-        $classMarkbookPerm = new Rule\All(
+        $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) {
-                    return $params['folderId'];
-                }, Access::getInstance())
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    static function (array $params) {
+                        return $params['folderId'];
+                    },
+                    Access::getInstance()
+                )
             )
         );
-        // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
 
-        $this->register('GET',  '/class/{folderId:\d+}',                 'getMarkbookForClass',        $classMarkbookPerm, $preload);
-        $this->register('POST', '/class/{folderId:\d+}',                 'postMarkbookForClass',       $classMarkbookPerm, $preload);  //AJAX in the report
-        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
-        $this->register('GET',  '/class/{folderId:\d+}/export',          'getMarkbookExportForClass',  $isStaffOrSuper, $preload);
+        // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
+        $this->register('GET',  '/class/{folderId:\d+}',                 'getMarkbookForClass',        $permissions, $preload);
+        $this->register('POST', '/class/{folderId:\d+}',                 'postMarkbookForClass',       $permissions, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}', 'getMarkbookForClassAndTerm', $permissions, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/export',          'getMarkbookExportForClass',  $permissions, $preload);
     }
 
 
