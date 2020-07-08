@@ -12,7 +12,11 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {# Crumbz: Class > Markbook #}
-{{ bread.crumbs(['Learning', '/learning/classes'], ['Markbook']) }}
+{{ bread.crumbs(
+    ['Learning', '/learning/classes'],
+    [folder.name, '/homepage/' ~ folder.id],
+    ['Markbook']
+) }}
 
 {% set reportContentId = 'report_content' %}
 
