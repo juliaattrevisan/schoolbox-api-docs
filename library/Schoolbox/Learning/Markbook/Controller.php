@@ -312,7 +312,15 @@ class Controller extends Base
     private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
         // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folder->getId(), null, ['ids' => $assessmentIds]);
+        if (empty($assessmentIds)) {
+            $assessments = $this->assessmentMapperProxy->createCollection();
+        } else {
+            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
+                $folder->getId(),
+                null,
+                ['ids' => $assessmentIds]
+            );
+        }
 
         // Build a markbook
         $markSchemeFactory = new Factory($this->getConfigLoader());
