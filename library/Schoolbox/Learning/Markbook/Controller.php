@@ -260,9 +260,6 @@ class Controller extends Base
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        // Only one filter factory factory has this method: which one?
-        $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $viewee);
-
         // Ensure that assessments are not Assessment Specs
         $filters = array_merge($filters, [
             Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
