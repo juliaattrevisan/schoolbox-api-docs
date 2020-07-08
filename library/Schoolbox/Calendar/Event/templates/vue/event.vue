@@ -53,6 +53,7 @@
             this.ENDPOINTS = ENDPOINTS;
             this.ATTENDANCE_LEVELS = ATTENDANCE_LEVELS;
             this.canRsvp = checks.canRsvp;
+            this.showRsvpButtons = checks.showRsvpButtons;
             this.isInvited = checks.isInvited;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
@@ -391,40 +392,6 @@
 
 
             /**
-             * Decide when the RSVP buttons are available for usage
-             *
-             * Further check in canRsvp() determines whether the current attendance settings
-             * prohibit you further due to limits, etc.
-             *
-             * @return boolean
-             */
-            showRsvpButtons()
-            {
-
-                /* If the event attendance is Open, show the buttons
-                 */
-                if (this.event.attendance.level.current === this.ATTENDANCE_LEVELS.OPEN) {
-                    return true;
-                }
-
-                /* If the event attendance is Invite Only, and you are on the list,
-                 * show the buttons
-                 */
-                if (this.event.attendance.level.current === this.ATTENDANCE_LEVELS.INVITE_ONLY) {
-                    for (let i = 0; i < this.guests.length; i++) {
-                        if (this.guests[i].id === this.event.attendance.payload.user.id) {
-                            return true;
-                        }
-                    }
-                }
-
-                /* Otherwise, hide the buttons
-                 */
-                return false;
-            },
-
-
-            /**
              * Whether you can edit this event,
              * including whether you can delete an invitation
              *
@@ -531,8 +498,8 @@
                 <h2 class="subheader">Guests</h2>
 
                 <div class="row">
-                    <template v-if="showRsvpButtons()">
-                        <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
+                    <template v-if="this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable)">
+                        <div class="small-12 columns">
                             <section class="content no-margin">
                                 <p><strong>Attending?</strong></p>
 

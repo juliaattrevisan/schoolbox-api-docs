@@ -2,18 +2,33 @@ const ATTENDANCE_STATUS_PENDING = 1;
 const ATTENDANCE_STATUS_ACCEPTED = 2;
 const ATTENDANCE_STATUS_DECLINED = 3;
 
+const ATTENDANCE_LEVELS_NONE = 0;
+const ATTENDANCE_LEVELS_INVITE_ONLY = 1;
+const ATTENDANCE_LEVELS_OPEN = 2;
+
 export default {
 
     /**
      * Decide whether you can RSVP to an invitation or, alternatively,
      * insert yourself into the guest list (same approach either way)
      *
+     * @param currentAttendanceLevel  int      current event's Attendance level
+     * @param guests                  array    a list of guests currently invited
+     * @param currentUserId           int      the currently logged in user's id
      * @param currentAttendanceStatus int|null your current attendance status,
      * @param maxAttendees            int|null maximum number of people who can attend,
      * @param numAvailable            int      the quantity of free spaces available,
      * @return boolean
      */
-    canRsvp(currentAttendanceStatus, maxAttendees, numAvailable) {
+    canRsvp(currentAttendanceLevel, guests, currentUserId, currentAttendanceStatus, maxAttendees, numAvailable)
+    {
+
+        /* Attendance Levels prohibit availability of the RSVP buttons
+         * If you have access to see the buttons, check if attendance quantities let you rsvp
+         */
+        if (!this.showRsvpButtons(currentAttendanceLevel, guests, currentUserId)) {
+            return false;
+        }
 
         /* No limit; you can always rsvp
          */
@@ -81,6 +96,39 @@ export default {
         return false;
     },
 
+
+    /**
+     * Decide when the RSVP buttons are available for usage
+     *
+     * Further check in canRsvp() determines whether the current attendance settings
+     * prohibit you further due to limits, etc.
+     *
+     * @return boolean
+     */
+    showRsvpButtons(currentAttendanceLevel, guests, currentUserId)
+    {
+
+        /* If the event attendance is Open, show the buttons
+         */
+        if (currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN) {
+            return true;
+        }
+
+        /* If the event attendance is Invite Only, and you are on the list,
+         * show the buttons
+         */
+        if (currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY) {
+            for (let i = 0; i < guests.length; i++) {
+                if (guests[i].id === currentUserId) {
+                    return true;
+                }
+            }
+        }
+
+        /* Otherwise, hide the buttons
+         */
+        return false;
+    },
 
     /**
      * If your currentAttendanceStatus is null, you aren't invited/on the list
