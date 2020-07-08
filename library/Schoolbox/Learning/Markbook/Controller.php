@@ -5,6 +5,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
@@ -76,7 +78,7 @@ class Controller extends Base
      * @param FolderModel $folder
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClass(FolderModel $folder)
+    public function getMarkbookForClass(FolderModel $folder): void
     {
         // This is now the final location, not the redirect
         // Ignore viewee: always use current user
@@ -90,7 +92,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
-                'viewee'      => $this->getUser(),
+                'folder'      => $folder,
                 'filterPanel' => $filterPanel,
             ])->setTab('submission')->setTitle($pageTitle)
         );
@@ -128,7 +130,7 @@ class Controller extends Base
                     'folder'                => $folder,
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+                    'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getAsString(),
             ]));
 
@@ -164,7 +166,7 @@ class Controller extends Base
      * @param Term\Model  $term
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClassAndTerm(FolderModel $folder, Term\Model $term)
+    public function getMarkbookForClassAndTerm(FolderModel $folder, Term\Model $term): void
     {
         // TODO override the filter instead of redirecting
         $this->buildMarkbookRedirect($folder, $term);
@@ -176,7 +178,7 @@ class Controller extends Base
      * @param null|Term\Model $term
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    private function buildMarkbookRedirect(FolderModel $folder, ?Term\Model $term)
+    private function buildMarkbookRedirect(FolderModel $folder, ?Term\Model $term): void
     {
         $route = $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', ['folderId' => $folder->getId()]);
 
@@ -208,7 +210,7 @@ class Controller extends Base
      * @param string                  $key
      * @return Filter\Selection\Model
      */
-    private function createSelectionModel(Filter\Selection\Mapper $selectionMapper, Filter\Model $filter, $key)
+    private function createSelectionModel(Filter\Selection\Mapper $selectionMapper, Filter\Model $filter, $key): Filter\Selection\Model
     {
         $selection = $selectionMapper->createModel();
         $selection
@@ -232,7 +234,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    private function convertRequestToFilters(array $request, User $viewee, $saveToDB)
+    private function convertRequestToFilters(array $request, User $viewee, $saveToDB): array
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
@@ -295,7 +297,7 @@ class Controller extends Base
      * @param FolderModel $folder
      * @return Markbook
      */
-    private function buildMarkbook(array $assessmentIds, FolderModel $folder)
+    private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folder->getId(), null, ['ids' => $assessmentIds]);
@@ -314,7 +316,7 @@ class Controller extends Base
      * @param GenericCollection|IAssessable[] $assessments
      * @return bool[]
      */
-    private function getAssessmentsWritability(GenericCollection $assessments)
+    private function getAssessmentsWritability(GenericCollection $assessments): array
     {
         /* Determine which assessments the user should be able to mark.
          *
@@ -337,7 +339,7 @@ class Controller extends Base
      *
      * @param \Throwable $e
      */
-    protected function returnJsonError($e)
+    protected function returnJsonError($e): void
     {
         $data = [
             'status'  => 500,
@@ -366,7 +368,7 @@ class Controller extends Base
      * @param GenericCollection|Term\Model[] $terms
      * @return bool
      */
-    private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms)
+    private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms): bool
     {
         foreach ($terms as $term) {
             if ($term->contains($assessment->getDueAt())) {

@@ -1,3 +1,11 @@
+{#
+    Markbook report wrapper
+
+    Usage:
+        folder        \Schoolbox\Resource\Folder\Model - what folder is this markbook for?
+        filterPanel   \Schoolbox\Filter\Panel          - which assessments are writable? indexed by assessment.id
+#}
+
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
@@ -7,6 +15,14 @@
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Markbook']) }}
 
 {% set reportContentId = 'report_content' %}
+
+
+<div class="row">
+    <div class="small-12">
+        <h1>Markbook for {{ folder.name }}</h1>
+    </div>
+</div>
+
 
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
