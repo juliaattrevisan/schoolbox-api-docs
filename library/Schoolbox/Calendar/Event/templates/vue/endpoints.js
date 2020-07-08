@@ -1,8 +1,16 @@
 export const ENDPOINTS = Object.freeze({
 
+    /* Event API URLs
+     */
+    URL_EVENT_SOURCE: '/calendar/ajax/full',
+    URL_EVENT_UPDATE: '/calendar/ajax/update',
+    URL_EVENT_DELETE: '/calendar/event/{eventId}/delete',
+    URL_EVENT_EXPORT: '/calendar/export.php',
+
     /* Event Modify screen
      */
     URL_EVENT_MODIFY_FORM: '/calendar/event/{eventId}/modify',
+    URL_EVENT_MODIFY_FORM_ACTION: '/calendar/modifyForm.php',
 
     /* Inline alteration of attendees on event detail screen
      */

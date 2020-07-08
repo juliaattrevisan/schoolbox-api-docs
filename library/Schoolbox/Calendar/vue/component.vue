@@ -7,21 +7,7 @@
     import axios              from "axios";
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
     import RevealModal        from '@schoolbox/reveal-modal'
-
-    // Various URLs that FullCalendar may make use of.
-    const URL_EVENT_SOURCE = '/calendar/ajax/full';
-    const URL_EVENT_UPDATE = '/calendar/ajax/update';
-
-    /* TODO: Events should already know about and come with their own modify link;
-     * we shouldn't be inferring and building it out here
-     */
-    const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
-    const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
-    const URL_EVENT_EXPORT = '/calendar/export.php';
-
-    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
+    import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 
     // TODO let display formats be configurable
     const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -33,6 +19,9 @@
             ViewEventModal,
             FullCalendar,
             RevealModal,
+        },
+        created() {
+            this.ENDPOINTS = ENDPOINTS;
         },
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
@@ -53,16 +42,6 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            urls() {
-                return {
-                    modifyForm: URL_EVENT_MODIFY_FORM,
-                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    update: URL_EVENT_UPDATE,
-                    delete: URL_EVENT_DELETE,
-                    attendanceList: URL_ATTENDANCE_LIST,
-                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
-                };
-            },
             formats() {
                 return {
                     displayDate: FORMAT_DISPLAY_DATE,
@@ -91,7 +70,7 @@
             events(fetchInfo, callback) {
                 let self = this;
                 axios.get(
-                    URL_EVENT_SOURCE,
+                    ENDPOINTS.URL_EVENT_SOURCE,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -207,11 +186,10 @@
         <view-event-modal
             ref="event"
             :to-moment="toMoment"
-            :event-modify-form-url="urls.modifyForm"
-            :event-modify-form-action-url="urls.modifyFormAction"
-            :event-delete-url="urls.delete"
-            :event-update-url="urls.update"
-            :attendance-list-url="urls.attendanceList"
+            :event-modify-form-url="ENDPOINTS.URL_EVENT_MODIFY_FORM"
+            :event-modify-form-action-url="ENDPOINTS.URL_EVENT_MODIFY_FORM_ACTION"
+            :event-delete-url="ENDPOINTS.URL_EVENT_DELETE"
+            :event-update-url="ENDPOINTS.URL_EVENT_UPDATE"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
