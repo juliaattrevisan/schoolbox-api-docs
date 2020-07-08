@@ -273,7 +273,7 @@
                         </script>
                     </div>
 
-                    <div id="attendance-guests" class="small-12 columns" {% if not event.attendance %}style="display:none"{% endif %}>
+                    <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
                         <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
                         <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
 
