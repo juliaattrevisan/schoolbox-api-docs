@@ -86,13 +86,13 @@ class Payload
              */
             'level' => $event->getAttendance(),
 
-            /* The current user
-             */
-            'user' => $user,
-
             /* Details about the current user
              */
             'currentUser' => [
+
+                /* The current user
+                 */
+                'user' => $user,
 
                 /* The current user RSVP status
                  */

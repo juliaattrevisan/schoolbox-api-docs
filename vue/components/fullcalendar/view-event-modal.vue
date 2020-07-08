@@ -28,12 +28,12 @@
      */
     const INITIAL_PAYLOAD = {
         level: null,
-        user: {
-            id: null
-        },
-        canModify: null,
         currentUser: {
-            status: null
+            user: {
+                id: null
+            },
+            status: null,
+            canModify: null
         },
         attendees: {
             guests: [],
@@ -179,7 +179,7 @@
                     this.canRsvp(
                         this.eventExtendedProps.attendance.payload.level,
                         this.eventExtendedProps.attendance.payload.attendees.guests,
-                        this.eventExtendedProps.attendance.payload.user.id,
+                        this.eventExtendedProps.attendance.payload.currentUser.user.id,
                         this.eventExtendedProps.attendance.payload.currentUser.status,
                         this.eventExtendedProps.attendance.payload.attendees.max,
                         this.eventExtendedProps.attendance.payload.attendees.available
@@ -668,7 +668,7 @@
                         <span v-if="this.canRsvp(
                                     eventExtendedProps.attendance.payload.level,
                                     eventExtendedProps.attendance.payload.attendees.guests,
-                                    eventExtendedProps.attendance.payload.user.id,
+                                    eventExtendedProps.attendance.payload.currentUser.user.id,
                                     eventExtendedProps.attendance.payload.currentUser.status,
                                     eventExtendedProps.attendance.payload.attendees.max,
                                     eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">

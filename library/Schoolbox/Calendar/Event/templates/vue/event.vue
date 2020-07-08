@@ -274,7 +274,7 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.user.id;
+                            let userId = response.data.currentUser.user.id;
 
                             for (let i = 0; i < self.guests.length; i++) {
                                 if (self.guests[i].id === id) {
@@ -338,8 +338,8 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.user.id;
-                            let fullname = response.data.user.title + ' ' + response.data.user.firstname + ' ' + response.data.user.lastname;
+                            let userId = response.data.currentUser.user.id;
+                            let fullname = response.data.currentUser.user.title + ' ' + response.data.currentUser.user.firstname + ' ' + response.data.currentUser.user.lastname;
                             let found = false;
 
                             /* Update data with the result from async request
@@ -498,7 +498,7 @@
                 <h2 class="subheader">Guests</h2>
 
                 <div class="row">
-                    <template v-if="this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable)">
+                    <template v-if="this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable)">
                         <div class="small-12 columns">
                             <section class="content no-margin">
                                 <p><strong>Attending?</strong></p>
