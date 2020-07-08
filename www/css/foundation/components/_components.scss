@@ -60,6 +60,7 @@
         margin: 0;
         font-weight: $font-weight-semibold;
         font-size: rem-calc(($base-font-size - 2));
+        line-height: inherit;
         height: auto;
         text-transform: uppercase;
         width: auto;
