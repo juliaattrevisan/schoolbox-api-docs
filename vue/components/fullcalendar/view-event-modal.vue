@@ -39,6 +39,7 @@
         created() {
             this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
+            this.showRsvpButtons = checks.showRsvpButtons;
             this.isInvited = checks.isInvited;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
@@ -158,31 +159,6 @@
         methods: {
 
             /**
-             * Set up a selectize in a modal
-             *
-             * Use $nextTick() to execute this when data has been loaded, otherwise
-             * really odd behaviour occurs. Things about elements not existing or
-             * certain javascript not executing are really cryptic to figure out
-             *
-             * @param eventId int
-             * @param attendanceStatus bool
-             */
-            jqueryPlugins(eventExtendedProps, eventId, attendanceStatus) {
-                let self = this;
-
-                this.$nextTick(() => {
-
-                    // SA-10476
-                    // this.jQuery.fn.attendance({
-                    //     createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
-                    //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
-                    //     canModify: true
-                    // });
-                });
-            },
-
-
-            /**
              * Decide whether the modal has component actions or not
              *
              * Show the bar if you can do anything with its contents
@@ -191,13 +167,23 @@
              * @return boolean
              */
             hasComponentActions() {
+
+                /* TODO: Temporary values for now, to fulfil interface while I set up everything
+                 */
                 return this.eventExtendedProps.folder.id ||
                     this.eventExtendedProps.links.view ||
                     this.eventExtendedProps.links.modify ||
                     this.eventExtendedProps.links.delete ||
                     this.eventExtendedProps.classAttendance.url ||
                     this.eventExtendedProps.booking.actions.length > 0 ||
-                    this.canRsvp(this.eventExtendedProps.attendance.status, this.eventExtendedProps.attendance.max, this.eventExtendedProps.attendance.available)
+                    this.canRsvp(
+                        0,
+                        [],
+                        19,
+                        this.eventExtendedProps.attendance.status,
+                        this.eventExtendedProps.attendance.max,
+                        this.eventExtendedProps.attendance.available
+                    )
             },
 
 
@@ -319,14 +305,6 @@
                 this.event = event;
 
                 this.$refs.modal.open();
-
-                /* Set up the selectize for adding more guests
-                 */
-                const data = this.event.extendedProps.data;
-
-                if (data.meta.eventId !== undefined) {
-                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data?.attendance?.attendanceStatus);
-                }
             },
 
             /**
@@ -641,10 +619,6 @@
                     <template v-if="eventExtendedProps.attendance.available > 0">{{ eventExtendedProps.attendance.available }}</template>
                     <template v-else>No</template> available place(s) remaining
                 </meta-item>
-<!-- SA-10476 -->
-<!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->
-<!--                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />-->
-<!--                </form>-->
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
