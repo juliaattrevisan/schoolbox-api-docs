@@ -178,6 +178,11 @@
 
 // FullCalendar homepage and dashboard components
 .component-container {
+  // Otherwise it has an irritating 1px border
+  .fc-list-view {
+    border-width: 0;
+  }
+
   // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
   .fc-view-container {
     background-color: $body-bg;
