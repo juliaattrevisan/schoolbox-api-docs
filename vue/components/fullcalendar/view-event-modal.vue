@@ -48,6 +48,20 @@
         },
         data() {
             return {
+
+                /* Mirrors backend Payload instance
+                 */
+                payload: {
+                    attendees: {
+                        accepted: null,
+                        available: null,
+                        declined: null,
+                        max: null,
+                        num: null,
+                        pending: null
+                    },
+                    guests: []
+                },
                 event: {}
             }
         },
@@ -129,11 +143,11 @@
 
                         /* Maximum allowed guests
                          */
-                        max: data?.attendance?.maxAttendees,
+                        max: this.payload.attendees?.max,
 
                         /* Remaining attendee places
                          */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
+                        available: this.payload.attendees?.available,
 
                         /* Your current status
                          */
@@ -177,9 +191,7 @@
                     this.eventExtendedProps.classAttendance.url ||
                     this.eventExtendedProps.booking.actions.length > 0 ||
                     this.canRsvp(
-                        0,
-                        [],
-                        19,
+                        1, [{id:19}], 19,
                         this.eventExtendedProps.attendance.status,
                         this.eventExtendedProps.attendance.max,
                         this.eventExtendedProps.attendance.available
@@ -302,9 +314,24 @@
              * Open this modal.
              */
             open(event) {
+                let self = this;
+
                 this.event = event;
 
                 this.$refs.modal.open();
+
+                /* Asynchronously fetch attendance payload
+                 */
+                let request = {
+                    url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
+                    method: 'get',
+                    responseType: 'json'
+                }
+
+                axios.request(request)
+                        .then(function (response) {
+                            self.payload = response.data;
+                        });
             },
 
             /**
@@ -645,7 +672,7 @@
             <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
+                        <span v-if="this.canRsvp(1, [{id:19}], 19, eventExtendedProps.attendance.status, this.payload.attendees.max, this.payload.attendees.available)" :class="'rsvp'">
                             <span>
                                 <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
                             </span>
