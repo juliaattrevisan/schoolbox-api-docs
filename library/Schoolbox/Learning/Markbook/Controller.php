@@ -8,11 +8,11 @@
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use function func_get_args;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -22,7 +22,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;
-use Alaress\Database\Predicate\InvalidColumnException;
 
 class Controller extends Base
 {
@@ -71,15 +70,18 @@ class Controller extends Base
      * This renders the filter panel, but not its contents: those are rendered
      * by `postMarkbookForClass`.
      *
-     * @param int $folderId
+     * @api   GET /learning/markbook/class/:folderId?{filterQueryArgs}
+     * @since 20.1
+     *
+     * @param FolderModel $folder
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClass(int $folderId)
+    public function getMarkbookForClass(FolderModel $folder)
     {
         // This is now the final location, not the redirect
         // Ignore viewee: always use current user
         $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
-        $route     = $this->getRouter()->generate('learningMarkbook.postMarkbookForClass', ['folderId' => $folderId]);
+        $route     = $this->getRouter()->generate('learningMarkbook.postMarkbookForClass', ['folderId' => $folder->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
@@ -99,9 +101,12 @@ class Controller extends Base
      * Receives a set of filter panel selections and render a filtered markbook
      * for the given class.
      *
-     * @param int $folderId
+     * @api   POST /learning/markbook/class/:folderId
+     * @since 20.1
+     *
+     * @param FolderModel $folder
      */
-    public function postMarkbookForClass(int $folderId): void
+    public function postMarkbookForClass(FolderModel $folder): void
     {
         try {
             $request = $this->request->post['filter_selection'] ?: [];
@@ -114,13 +119,13 @@ class Controller extends Base
             [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, $this->getUser(), true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-            $markbook      = $this->buildMarkbook($assessmentIds, $folderId);
+            $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
-                    'folderId'              => $folderId,
+                    'folder'                => $folder,
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
@@ -152,25 +157,28 @@ class Controller extends Base
     /**
      * Redirect to the markbook for the specified class and filter to a term
      *
-     * @param int        $folderId
-     * @param Term\Model $term
+     * @api   GET /learning/markbook/class/:folderId/term/:termCode
+     * @since 20.1
+     *
+     * @param FolderModel $folder
+     * @param Term\Model  $term
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term)
+    public function getMarkbookForClassAndTerm(FolderModel $folder, Term\Model $term)
     {
         // TODO override the filter instead of redirecting
-        $this->buildMarkbookRedirect($folderId, $term);
+        $this->buildMarkbookRedirect($folder, $term);
     }
 
 
     /**
-     * @param int             $folderId
+     * @param FolderModel     $folder
      * @param null|Term\Model $term
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    private function buildMarkbookRedirect(int $folderId, ?Term\Model $term)
+    private function buildMarkbookRedirect(FolderModel $folder, ?Term\Model $term)
     {
-        $route = $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', ['folderId' => $folderId]);
+        $route = $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', ['folderId' => $folder->getId()]);
 
         $filterMapper    = Filter\Mapper::getInstance();
         $selectionMapper = Filter\Selection\Mapper::getInstance();
@@ -254,7 +262,9 @@ class Controller extends Base
      * Stream a filtered markbook for a folder in CSV format
      *
      * @api   GET /learning/markbook/class/:folderId/export?{filterQueryArgs}
-     * @param int $folderId
+     * @since 20.1
+     *
+     * @param FolderModel $folder
      *
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException          If a injected filter is unable to be processed
@@ -263,7 +273,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
-    public function getMarkbookExportForClass(int $folderId): void
+    public function getMarkbookExportForClass(FolderModel $folder): void
     {
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
@@ -271,7 +281,7 @@ class Controller extends Base
         [$filters] = $this->convertRequestToFilters($filtersArray, $this->getUser(), false);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-        $markbook      = $this->buildMarkbook($assessmentIds, $folderId);
+        $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
         $csvExporter = new Export\CSV();
         $csvExporter->export($markbook, 'Markbook.csv');
@@ -281,19 +291,14 @@ class Controller extends Base
     /**
      * Builds a markbook for this folder.
      *
-     * @param array $assessmentIds
-     * @param int   $folderId
+     * @param array       $assessmentIds
+     * @param FolderModel $folder
      * @return Markbook
      */
-    private function buildMarkbook(array $assessmentIds, int $folderId)
+    private function buildMarkbook(array $assessmentIds, FolderModel $folder)
     {
         // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folderId, null, ['ids' => $assessmentIds]);
-
-        // TODO: remove this when SA-9384 is implemented
-        /** @var IAssessable $assessment */
-        $assessment = $assessments->first();
-        $folder = $assessment ? $assessment->getContext()->getFolder() : null;
+        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folder->getId(), null, ['ids' => $assessmentIds]);
 
         // Build a markbook
         $markSchemeFactory = new Factory($this->getConfigLoader());
