@@ -414,6 +414,25 @@
 
 
             /**
+             * Whether the list of attendees is visible to the current user
+             *
+             * @return boolean
+             */
+            isAttendeesVisible() {
+
+                /* If you've got write access, you can see it
+                 */
+
+                /* Otherwise, check the showAttendees flag
+                 * If that's on, you can see it
+                 */
+
+                /* Otherwise, it's hidden
+                 */
+            },
+
+
+            /**
              * Start searching for keyword
              *
              * @param query
@@ -535,30 +554,32 @@
                                 </template>
                             </div>
 
-                            <p class="content"><strong>
-                                {{ numAccepted }} accepted,
-                                {{ numDeclined }} declined,
-                                {{ numPending }} pending
-                            </strong></p>
+                            <template v-if="isAttendeesVisible()">
+                                <p class="content"><strong>
+                                    {{ numAccepted }} accepted,
+                                    {{ numDeclined }} declined,
+                                    {{ numPending }} pending
+                                </strong></p>
 
-                            <ul class="action-list attendance-guest-list" v-if="guests">
-                                <li class="actions-small-1" v-for="(guest, index) in guests">
-                                    <div class="compact card small-11">
-                                        <a :href="'/search/user/' + guest.id" title="View Profile">
-                                            <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
+                                <ul class="action-list attendance-guest-list" v-if="guests">
+                                    <li class="actions-small-1" v-for="(guest, index) in guests">
+                                        <div class="compact card small-11">
+                                            <a :href="'/search/user/' + guest.id" title="View Profile">
+                                                <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
 
-                                            <p :class="{
-                                                pending: isPending(guest.status),
-                                                accepted: isAccepted(guest.status),
-                                                declined: isDeclined(guest.status)
-                                            }">{{ guest.name }}<span class="status-icon"></span></p>
-                                        </a>
-                                    </div>
-                                    <nav>
-                                        <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
-                                    </nav>
-                                </li>
-                            </ul>
+                                                <p :class="{
+                                                    pending: isPending(guest.status),
+                                                    accepted: isAccepted(guest.status),
+                                                    declined: isDeclined(guest.status)
+                                                }">{{ guest.name }}<span class="status-icon"></span></p>
+                                            </a>
+                                        </div>
+                                        <nav>
+                                            <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
+                                        </nav>
+                                    </li>
+                                </ul>
+                            </template>
                         </section>
                     </div>
                 </div>
