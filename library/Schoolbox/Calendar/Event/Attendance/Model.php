@@ -42,6 +42,14 @@ class Model
 
 
     /**
+     * Attendance levels - how this event restricts guests' attendance
+     */
+    public const LEVEL_NO_ATTENDANCE = 0;
+    public const LEVEL_INVITE_ONLY = 1;
+    public const LEVEL_OPEN_ATTENDANCE = 2;
+
+
+    /**
      * @var User
      */
     private $user;

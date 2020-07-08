@@ -246,7 +246,14 @@
                     <div class="small-12 column">
                         <label>
                             Enable attendance?
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may use attendance to invite guests, or publish an event that people may join. Open personal events will become visible to others on your calendar.">?</span>
+
+                            <select name="attendance">
+                                {% for value, label in attendanceLevels %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
                             <div class="switch">
                                 <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {{ event.attendance ? 'checked="checked"' : '' }}>
                                 <label for="attendanceCheckbox">

@@ -322,6 +322,11 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'attendanceLevels' => [
+                Attendance\Model::LEVEL_NO_ATTENDANCE => 'No attendance',
+                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite only',
+                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open attendance'
+            ],
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
