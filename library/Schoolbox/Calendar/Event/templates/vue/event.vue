@@ -538,8 +538,8 @@
                     </template>
                     <div class="small-12 columns">
                         <section>
-                            <div class="content" v-if="this.isLimitedAttendance(this.numMax) || canModify()">
-                                <span class="meta" v-if="this.isLimitedAttendance(this.numMax)">
+                            <div class="content" v-if="(this.isLimitedAttendance(this.numMax) && isAttendeesVisible()) || canModify()">
+                                <span class="meta" v-if="this.isLimitedAttendance(this.numMax) && isAttendeesVisible()">
                                     <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
                                     <template v-else>No</template>
                                     available place(s) remaining
