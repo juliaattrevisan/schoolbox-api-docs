@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
@@ -232,19 +231,18 @@ class Factory
 
     /**
      * @param Folder|null $folder
-     * @param bool   $isStaff If false, showOverallGrade will be taken into account
+     * @param bool        $isStaff If false, showOverallGrade will be taken into account
      * @return IMarkScheme
      */
     public function spawnForFolder(?Folder $folder, bool $isStaff): IMarkScheme
     {
-        $gradeGroups     = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
+        if ($folder && $folder->getYearLevels()->count() > 0) {
+            // Get overall grade settings from year level, when all the settings are the same
+            $overAllGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
+            $showOverallGrades = array_unique($folder->getYearLevels()->getPropertyValues('showOverallGrade'));
 
-        if ($folder && $folder->getYearLevels()->count() === 1) {
-            // If this folder has an effective year level setting
-            /** @var YearLevel $yearLevel */
-            $yearLevel        = $folder->getYearLevels()->first();
-            $overAllGrade     = $yearLevel->getOverallGrade();
-            $showOverallGrade = $yearLevel->getShowOverallGrade();
+            $overAllGrade     = count($overAllGrades) === 1 ? $overAllGrades[0] : null;
+            $showOverallGrade = count($showOverallGrades) === 1 ? $showOverallGrades[0] : null;
         }
 
         // Otherwise fall back to config
@@ -256,7 +254,9 @@ class Factory
             return new None();
         }
 
-        $gradeGroup = $gradeGroups->getBy('id', $overAllGrade);
+        /** @var Group\Model|null $gradeGroup */
+        $gradeGroups = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
+        $gradeGroup  = $gradeGroups->getBy('id', $overAllGrade);
         if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
             return new None();
         } elseif ($gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_PERCENTAGE) {
