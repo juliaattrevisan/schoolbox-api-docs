@@ -240,30 +240,4 @@ interface EventInterface
      * @return $this
      */
     public function setMaxAttendees(?int $maxAttendees): EventInterface;
-
-
-    /**
-     * @return int|null
-     */
-    public function getNumAttendees(): ?int;
-
-
-    /**
-     * @param int|null $numAttendees
-     * @return $this
-     */
-    public function setNumAttendees(?int $numAttendees): EventInterface;
-
-
-    /**
-     * @return int|null
-     */
-    public function getAttendanceStatus(): ?int;
-
-
-    /**
-     * @param int|null $attendanceStatus
-     * @return $this
-     */
-    public function setAttendanceStatus(?int $attendanceStatus): EventInterface;
 }
