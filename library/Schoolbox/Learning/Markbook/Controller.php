@@ -124,7 +124,7 @@ class Controller extends Base
              * @var Filter\Codec               $codec
              * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
-            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, $this->getUser(), true);
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
@@ -237,7 +237,6 @@ class Controller extends Base
 
     /**
      * @param array $request  Indexed by filter.id, option.key
-     * @param User  $viewee
      * @param bool  $saveToDB Should we persist these selections to the DB ?
      * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
@@ -246,7 +245,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    private function convertRequestToFilters(array $request, User $viewee, $saveToDB): array
+    private function convertRequestToFilters(array $request, bool $saveToDB): array
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
@@ -289,7 +288,7 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        [$filters] = $this->convertRequestToFilters($filtersArray, $this->getUser(), false);
+        [$filters] = $this->convertRequestToFilters($filtersArray, false);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
