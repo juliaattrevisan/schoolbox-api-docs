@@ -57,7 +57,8 @@ class Renderer
      * @param int                              $startTimestamp
      * @param int                              $endTimestamp
      * @param User                             $user
-     * @param ContainerInterface               $di
+     * @param Authorizer                       $authorizer
+     * @param Router                           $router
      * @param User                             $viewer
      */
     public function __construct(
