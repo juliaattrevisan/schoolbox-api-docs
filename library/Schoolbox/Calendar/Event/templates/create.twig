@@ -1,16 +1,18 @@
 {##
  # Event Create/Update screen
  #
- # @param Event      $event         An Event instance
- # @param User       $user          A User instance (this person receives the event on their calendar)
- # @param Collection $eventTypes    A list of Event Types
- # @param array      $recurrence    A list of recurring instances
- # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
- # @param array      $levels        An array of Event Levels (personal/group/school)
- # @param array      $roles         A list of available and selected Roles
- # @param array      $folders       A list of available and selected Folders
- # @param array      $campuses      A list of available and selected Campuses
- # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
+ # @param Event      $event                        An Event instance
+ # @param User       $user                         A User instance (this person receives the event on their calendar)
+ # @param Collection $eventTypes                   A list of Event Types
+ # @param array      $recurrence                   A list of recurring instances
+ # @param array      $efficacy                     An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
+ # @param array      $levels                       An array of Event Levels (personal/group/school)
+ # @param array      $roles                        A list of available and selected Roles
+ # @param array      $folders                      A list of available and selected Folders
+ # @param array      $campuses                     A list of available and selected Campuses
+ # @param string     $returnUrl                    A Redirect-encoded string (you go here after saving the form)
+ # @param array      $attendanceLevels             A set of consts and their meaning, key-value pairs
+ # @param int        $attendanceLevelNoAttendance  An int corresponding to No Attendance
  #}
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
