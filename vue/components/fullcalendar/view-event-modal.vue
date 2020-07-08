@@ -228,9 +228,8 @@
 
                             /* Update data with the result from async request
                              */
-                            self.event.extendedProps.data.attendance.attendanceStatus = status;
-                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
-                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
+                            self.payload.currentUser.status = status;
+                            self.payload.attendees = response.data.attendees;
 
                             self.event.setExtendedProp('data', self.event.extendedProps.data);
 
