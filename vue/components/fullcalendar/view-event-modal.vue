@@ -18,6 +18,30 @@
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
 
+    /* Initialise vars
+     *
+     * Mirrors backend Payload instance to prevent random js error about
+     * undefined vars being accessed; null operator doesn't work when supplying
+     * as an arg, apparently
+     *
+     * This gets updated asynchronously when modals open
+     */
+    const INITIAL_PAYLOAD = {
+        user: {
+            id: null
+        },
+        attendees: {
+            accepted: null,
+            available: null,
+            declined: null,
+            max: null,
+            num: null,
+            pending: null
+        },
+        guests: [],
+        level: null
+    };
+
     export default {
         name: "view-event-modal",
         props: {
@@ -48,31 +72,7 @@
         },
         data() {
             return {
-
-                /* Initialise vars
-                 *
-                 * Mirrors backend Payload instance to prevent random js error about
-                 * undefined vars being accessed; null operator doesn't work when supplying
-                 * as an arg, apparently
-                 *
-                 * This gets updated asynchronously when modals open
-                 */
-                payload: {
-                    user: {
-                        id: null
-                    },
-                    attendees: {
-                        accepted: null,
-                        available: null,
-                        declined: null,
-                        max: null,
-                        num: null,
-                        pending: null
-                    },
-                    guests: [],
-                    level: null
-                },
-
+                payload: INITIAL_PAYLOAD,
                 event: {}
             }
         },
@@ -307,11 +307,17 @@
             open(event) {
                 let self = this;
 
+                /* Initialise data
+                 */
                 this.event = event;
+                this.payload = INITIAL_PAYLOAD;
 
+                /* Pop modal open
+                 */
                 this.$refs.modal.open();
 
                 /* Asynchronously fetch attendance payload
+                 * This will update the modal in realtime when it's ready
                  */
                 let request = {
                     url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
