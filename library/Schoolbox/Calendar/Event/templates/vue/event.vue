@@ -15,6 +15,13 @@
     import vSelect from "vue-select";
     import "vue-select/dist/vue-select.css";
 
+    /* Render custom template for Deselect icon/button
+     * It's not well documented, but you can trawl through closed PRs to figger out how
+     * https://github.com/sagalbot/vue-select/issues/994
+     */
+    import Deselect from '@schoolbox/selectize/Deselect';
+    vSelect.props.components.default = () => ({ Deselect });
+
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
     const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
@@ -380,6 +387,17 @@
 
 
             /**
+             * Whether you can invite people to this event
+             * Requires WRITE perm and free spaces under the current event configuration and setup
+             *
+             * @return boolean
+             */
+            canInviteAttendees() {
+                return this.canModify() && ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax));
+            },
+
+
+            /**
              * Start searching for keyword
              *
              * @param query
@@ -482,7 +500,7 @@
                                 available place(s) remaining
                             </span>
 
-                            <template v-if="canModify() && this.numAvailable">
+                            <template v-if="canInviteAttendees()">
                                 <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
                                     <template slot="option" slot-scope="option">
                                         <div class="d-center">
