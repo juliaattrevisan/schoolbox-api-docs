@@ -92,6 +92,10 @@ class Payload
              */
             'attendees' => [
 
+                /* A list of invited users index by their user id
+                 */
+                'guests' => $guests,
+
                 /* Maximum number of people you can invite
                  */
                 'max' => $event->getMaxAttendees(),
@@ -110,10 +114,6 @@ class Payload
                 'accepted' => $analysis->getNumAccepted(),
                 'declined' => $analysis->getNumDeclined(),
             ],
-
-            /* A list of invited users index by their user id
-             */
-            'guests' => $guests,
 
             /* Current attendance level
              */

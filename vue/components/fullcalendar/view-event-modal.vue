@@ -170,9 +170,6 @@
              * @return boolean
              */
             hasComponentActions() {
-
-                /* TODO: Temporary values for now, to fulfil interface while I set up everything
-                 */
                 return this.eventExtendedProps.folder.id ||
                     this.eventExtendedProps.links.view ||
                     this.eventExtendedProps.links.modify ||
@@ -181,7 +178,7 @@
                     this.eventExtendedProps.booking.actions.length > 0 ||
                     this.canRsvp(
                         this.eventExtendedProps.attendance.payload.level,
-                        this.eventExtendedProps.attendance.payload.guests,
+                        this.eventExtendedProps.attendance.payload.attendees.guests,
                         this.eventExtendedProps.attendance.payload.user.id,
                         this.eventExtendedProps.attendance.status,
                         this.eventExtendedProps.attendance.payload.attendees.max,
@@ -671,7 +668,7 @@
                     <section>
                         <span v-if="this.canRsvp(
                                     eventExtendedProps.attendance.payload.level,
-                                    eventExtendedProps.attendance.payload.guests,
+                                    eventExtendedProps.attendance.payload.attendees.guests,
                                     eventExtendedProps.attendance.payload.user.id,
                                     eventExtendedProps.attendance.status,
                                     eventExtendedProps.attendance.payload.attendees.max,

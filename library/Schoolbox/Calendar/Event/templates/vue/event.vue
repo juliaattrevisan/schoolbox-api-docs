@@ -68,7 +68,7 @@
                 numPending: this.event.attendance.payload.attendees.pending,
                 numAccepted: this.event.attendance.payload.attendees.accepted,
                 numDeclined: this.event.attendance.payload.attendees.declined,
-                guests: this.event.attendance.payload.guests,
+                guests: this.event.attendance.payload.attendees.guests,
 
                 /* Vue Select
                  */
