@@ -39,7 +39,7 @@
                     {% if courseMarkbookRoute %}
                         <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>
                     {% else %}
-                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folderId: unit.course.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
+                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
                     {% endif %}
                     <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" class="icon-delete" title="Delete this {{ locale.unit }}">Delete</a></li>
                 </ul>

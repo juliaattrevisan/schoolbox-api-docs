@@ -11,19 +11,19 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Filter\Codec;
-use Schoolbox\Learning\Assessment\Feedback\Visibility;
-use Schoolbox\Learning\MarkScheme\Factory;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use function func_get_args;
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\User;
+use Schoolbox\Filter\Codec;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\Visibility;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
+use function func_get_args;
 
 class Controller extends Base
 {
@@ -83,7 +83,13 @@ class Controller extends Base
         // This is now the final location, not the redirect
         // Ignore viewee: always use current user
         $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
-        $route     = $this->getRouter()->generate('learningMarkbook.postMarkbookForClass', ['folderId' => $folder->getId()]);
+        $route     = $this->getRouter()->generate(
+            'learningMarkbook.postMarkbookForClass',
+            [
+                'folder'   => $folder,
+                'folderId' => $folder->getId(),
+            ]
+        );
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
@@ -180,7 +186,13 @@ class Controller extends Base
      */
     private function buildMarkbookRedirect(FolderModel $folder, ?Term\Model $term): void
     {
-        $route = $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', ['folderId' => $folder->getId()]);
+        $route = $this->getRouter()->generate(
+            'learningMarkbook.getMarkbookForClass',
+            [
+                'folder'   => $folder,
+                'folderId' => $folder->getId(),
+            ]
+        );
 
         $filterMapper    = Filter\Mapper::getInstance();
         $selectionMapper = Filter\Selection\Mapper::getInstance();

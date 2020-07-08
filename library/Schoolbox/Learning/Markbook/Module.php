@@ -4,23 +4,23 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
+use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
+use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
-use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Assessment\Term;
-use Schoolbox\UserMapper;
-use Schoolbox\Error;
 
 
 class Module extends BaseModule
@@ -29,7 +29,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws NotFound If a class was specified but it does not exist
      */
     public function registerRoutes()
@@ -40,7 +40,7 @@ class Module extends BaseModule
             // Must preload folder
             try {
                 $args['folder'] = $this->getFolderMapper()->findById($params['folderId']);
-            } catch (Mapper\Exception $e){
+            } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['folderId']}");
             }
 
@@ -48,7 +48,7 @@ class Module extends BaseModule
             if (isset($params['termCode'])) {
                 try {
                     $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
-                } catch (Mapper\Exception $e){
+                } catch (Mapper\Exception $e) {
                     throw new NotFound("No term found for code: {$params['termCode']}");
                 }
             }
@@ -90,7 +90,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      * @param Container $injector
-     * @throws \InvalidArgumentException If class not found
+     * @throws InvalidArgumentException If class not found
      * @throws ServiceNotFound
      */
     public function initControllers(ContainerInterface $injector)
@@ -98,11 +98,12 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
-                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                'access'                     => $this->getMapperFactory()->getLazy(Access::class),// Has a static 'getInstance()' method
-                'assessmentIdFinder'         => $injector->lazyGet('filters.assessmentIdFinder'),
-                'filterFactoryFactory'       => $injector->lazyGet('filters.factoryFactory'),
+                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+                // Access has a static 'getInstance()' method
+                'access'                => $this->getMapperFactory()->getLazy(Access::class),
+                'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
+                'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
             ])
         );
     }
@@ -112,7 +113,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If class not found
+     * @throws InvalidArgumentException If class not found
      */
     protected function getFolderMapper()
     {
@@ -121,7 +122,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|Term\Mapper
-     * @throws \InvalidArgumentException If class not found
+     * @throws InvalidArgumentException If class not found
      */
     protected function getTermMapper()
     {
