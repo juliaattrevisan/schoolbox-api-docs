@@ -254,8 +254,9 @@ class Factory
             return new None();
         }
 
-        /** @var Group\Model|null $gradeGroup */
         $gradeGroups = $this->getGradeLevelGroupMapper()->findAllForAdminOption();
+
+        /** @var Group\Model|null $gradeGroup */
         $gradeGroup  = $gradeGroups->getBy('id', $overAllGrade);
         if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
             return new None();
