@@ -74,9 +74,9 @@ class Module extends BaseModule
         );
         // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
 
-        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $classMarkbookPerm, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}{/userId:\d+}',                 'getMarkbookForClass',        $classMarkbookPerm, $preload);
         $this->register('POST', '/class/{folderId:\d+}',                          'postMarkbookForClass',       $classMarkbookPerm, $preload);  //AJAX in the report
-        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId:\d+}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
 
         $this->register('GET',  '/export/{userId:\d+}', 'getMarkbookExport', $isStaffOrSuper, $preload);
         $this->register('GET',  '/class/{folderId:\d+}/export', 'getMarkbookExportForClass', $isStaffOrSuper, $preload);
