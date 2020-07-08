@@ -157,6 +157,7 @@
                 this.numDeclined = payload.attendees.declined;
             },
 
+
             /**
              * Accept an invitation
              */
@@ -378,6 +379,18 @@
 
 
             /**
+             * The Guests island is visible under these conditions
+             * This island also contains the attendance list and invite selectize
+             *
+             * @return boolean
+             */
+            showGuestsPanel()
+            {
+                return this.event.attendance.level.current !== this.ATTENDANCE_LEVELS.NONE
+            },
+
+
+            /**
              * Whether you can edit this event,
              * including whether you can delete an invitation
              *
@@ -480,76 +493,72 @@
                 </div>
             </section>
 
-            <template>
-                {{ this.ATTENDANCE_LEVELS.NONE }}
-                {{ this.ATTENDANCE_LEVELS.INVITE_ONLY }}
-                {{ this.ATTENDANCE_LEVELS.OPEN }}
-
+            <template v-if="showGuestsPanel()">
                 <h2 class="subheader">Guests</h2>
 
                 <div class="row">
-                <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
-                    <section class="content no-margin">
-                        <p><strong>Attending?</strong></p>
+                    <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
+                        <section class="content no-margin">
+                            <p><strong>Attending?</strong></p>
 
-                        <ul class="flex-list buttons rsvp">
-                            <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
-                            <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
-                        </ul>
-                    </section>
+                            <ul class="flex-list buttons rsvp">
+                                <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                                <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
+                            </ul>
+                        </section>
+                    </div>
+                    <div class="small-12 columns">
+                        <section>
+                            <div class="content" v-if="this.isLimitedAttendance(this.numMax) || canModify()">
+                                <span class="meta" v-if="this.isLimitedAttendance(this.numMax)">
+                                    <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
+                                    <template v-else>No</template>
+                                    available place(s) remaining
+                                </span>
+
+                                <template v-if="canInviteAttendees()">
+                                    <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                        <template slot="option" slot-scope="option">
+                                            <div class="d-center">
+                                                {{ option.name }}
+                                            </div>
+                                        </template>
+                                        <template slot="selected-option" slot-scope="option">
+                                            <div class="selected d-center">
+                                                {{ option.name }}
+                                            </div>
+                                        </template>
+                                    </v-select>
+                                </template>
+                            </div>
+
+                            <p class="content"><strong>
+                                {{ numAccepted }} accepted,
+                                {{ numDeclined }} declined,
+                                {{ numPending }} pending
+                            </strong></p>
+
+                            <ul class="action-list attendance-guest-list" v-if="guests">
+                                <li class="actions-small-1" v-for="(guest, index) in guests">
+                                    <div class="compact card small-11">
+                                        <a :href="'/search/user/' + guest.id" title="View Profile">
+                                            <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
+
+                                            <p :class="{
+                                                pending: isPending(guest.status),
+                                                accepted: isAccepted(guest.status),
+                                                declined: isDeclined(guest.status)
+                                            }">{{ guest.name }}<span class="status-icon"></span></p>
+                                        </a>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
+                                    </nav>
+                                </li>
+                            </ul>
+                        </section>
+                    </div>
                 </div>
-                <div class="small-12 columns">
-                    <section>
-                        <div class="content" v-if="this.isLimitedAttendance(this.numMax) || canModify()">
-                            <span class="meta" v-if="this.isLimitedAttendance(this.numMax)">
-                                <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
-                                <template v-else>No</template>
-                                available place(s) remaining
-                            </span>
-
-                            <template v-if="canInviteAttendees()">
-                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
-                                    <template slot="option" slot-scope="option">
-                                        <div class="d-center">
-                                            {{ option.name }}
-                                        </div>
-                                    </template>
-                                    <template slot="selected-option" slot-scope="option">
-                                        <div class="selected d-center">
-                                            {{ option.name }}
-                                        </div>
-                                    </template>
-                                </v-select>
-                            </template>
-                        </div>
-
-                        <p class="content"><strong>
-                            {{ numAccepted }} accepted,
-                            {{ numDeclined }} declined,
-                            {{ numPending }} pending
-                        </strong></p>
-
-                        <ul class="action-list attendance-guest-list" v-if="guests">
-                            <li class="actions-small-1" v-for="(guest, index) in guests">
-                                <div class="compact card small-11">
-                                    <a :href="'/search/user/' + guest.id" title="View Profile">
-                                        <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
-
-                                        <p :class="{
-                                            pending: isPending(guest.status),
-                                            accepted: isAccepted(guest.status),
-                                            declined: isDeclined(guest.status)
-                                        }">{{ guest.name }}<span class="status-icon"></span></p>
-                                    </a>
-                                </div>
-                                <nav>
-                                    <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
-                                </nav>
-                            </li>
-                        </ul>
-                    </section>
-                </div>
-            </div>
             </template>
         </div>
 

@@ -169,6 +169,9 @@ class Controller extends Base
                 'status' => [
                     'current' => $attendanceStatus,
                 ],
+                'level' => [
+                    'current' => $event->getAttendance(),
+                ],
             ],
         ])->setTitle($event->getTitle()));
     }
