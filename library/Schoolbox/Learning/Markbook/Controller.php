@@ -298,7 +298,7 @@ class Controller extends Base
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
         $csvExporter = new Export\CSV();
-        $csvExporter->export($markbook, 'Class Markbook.csv');
+        $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
     }
 
 
