@@ -220,8 +220,7 @@
         />
 
         <!-- Loading state -->
-        <div ref="loadingState" class="empty-state" v-if="!eventsLoaded">
-            <p>Loading events...</p>
+        <div ref="loadingState" class="loader" v-if="!eventsLoaded">
         </div>
 
         <!-- Empty state: show only if events have loaded, but none are shown -->
@@ -238,7 +237,10 @@
                     There are no upcoming events to display at this time.
                 </p>
             </template>
-            <p v-else>There are no upcoming events</p>
+            <span v-else>
+                <i class="icon-calendar"></i>
+                <p>There are no upcoming calendar events</p>
+            </span>
         </div>
 
         <!-- Component panel: show only for homepage variant, events are loaded and some are shown -->
