@@ -111,15 +111,6 @@ class Module extends BaseModule
      */
 
     /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If class not found
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-    /**
      * @return Mapper|Folder\Mapper
      * @throws \InvalidArgumentException If class not found
      */
@@ -135,14 +126,5 @@ class Module extends BaseModule
     protected function getTermMapper()
     {
         return $this->getMapperFactory()->get(Term\Mapper::class);
-    }
-
-    /**
-     * @return Mapper|Error\Mapper
-     * @throws \InvalidArgumentException If class not found
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 }
