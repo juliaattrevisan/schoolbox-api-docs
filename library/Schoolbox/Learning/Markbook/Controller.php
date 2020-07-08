@@ -71,11 +71,10 @@ class Controller extends Base
      * This renders the filter panel, but not its contents: those are rendered
      * by `postMarkbookForClass`.
      *
-     * @param int       $folderId
-     * @param User|null $viewee
+     * @param int $folderId
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClass(int $folderId, User $viewee = null)
+    public function getMarkbookForClass(int $folderId)
     {
         // This is now the final location, not the redirect
         // Ignore viewee: always use current user
@@ -120,11 +119,10 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
-                    'markbook'     => $markbook,
-                    'viewee'       => $this->getUser(),
-                    'folderId'     => $folderId,
-                    'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
-                    'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                    'markbook'              => $markbook,
+                    'folderId'              => $folderId,
+                    'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
+                    'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getAsString(),
             ]));
@@ -156,23 +154,21 @@ class Controller extends Base
      *
      * @param int        $folderId
      * @param Term\Model $term
-     * @param null|User  $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term, User $viewee = null)
+    public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term)
     {
         // TODO override the filter instead of redirecting
-        $this->buildMarkbookRedirect($folderId, $term, $this->getUser());
+        $this->buildMarkbookRedirect($folderId, $term);
     }
 
 
     /**
      * @param int             $folderId
      * @param null|Term\Model $term
-     * @param User            $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    private function buildMarkbookRedirect(int $folderId, ?Term\Model $term, User $viewee)
+    private function buildMarkbookRedirect(int $folderId, ?Term\Model $term)
     {
         $route = $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', ['folderId' => $folderId]);
 
@@ -184,9 +180,6 @@ class Controller extends Base
         foreach ($filters as $filter) {
             $selections[$filter->getId()] = $selectionMapper->createCollection();
 
-//            if (Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()) {
-//                $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
-//            } else
             if ($term && Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()) {
                 $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
             }
@@ -286,18 +279,16 @@ class Controller extends Base
 
 
     /**
+     * Builds a markbook for this folder.
+     *
      * @param array $assessmentIds
-     * @return MarkBook
+     * @param int   $folderId
+     * @return Markbook
      */
-    private function buildMarkbook(array $assessmentIds, ?int $folderId = null)
+    private function buildMarkbook(array $assessmentIds, int $folderId)
     {
         // Fetch assessments & participants
-        if (isset($folderId)) {
-            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folderId, null, ['ids' => $assessmentIds]);
-        } else {
-            $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
-        }
+        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($folderId, null, ['ids' => $assessmentIds]);
 
         // TODO: remove this when SA-9384 is implemented
         /** @var IAssessable $assessment */
