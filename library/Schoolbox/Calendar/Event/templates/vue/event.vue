@@ -7,6 +7,7 @@
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */
     import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
@@ -50,6 +51,7 @@
         },
         created() {
             this.ENDPOINTS = ENDPOINTS;
+            this.ATTENDANCE_LEVELS = ATTENDANCE_LEVELS;
             this.canRsvp = checks.canRsvp;
             this.isInvited = checks.isInvited;
             this.isPending = checks.isPending;
@@ -478,9 +480,14 @@
                 </div>
             </section>
 
-            <h2 class="subheader">Guests</h2>
+            <template>
+                {{ this.ATTENDANCE_LEVELS.NONE }}
+                {{ this.ATTENDANCE_LEVELS.INVITE_ONLY }}
+                {{ this.ATTENDANCE_LEVELS.OPEN }}
 
-            <div class="row">
+                <h2 class="subheader">Guests</h2>
+
+                <div class="row">
                 <div class="small-12 columns" v-if="this.canRsvp(this.currentAttendanceStatus, this.numMax, this.numAvailable)">
                     <section class="content no-margin">
                         <p><strong>Attending?</strong></p>
@@ -543,6 +550,7 @@
                     </section>
                 </div>
             </div>
+            </template>
         </div>
 
         <div data-toast class="toast"></div>
