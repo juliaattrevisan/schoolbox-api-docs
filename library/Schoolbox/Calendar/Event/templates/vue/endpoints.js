@@ -45,7 +45,7 @@ export const ENDPOINTS = Object.freeze({
     generateUrlFromConst(str, eventId, returnUrl) {
         let url = str.replace('{eventId}', eventId);
 
-        if (returnUrl !== undefined) {
+        if (returnUrl !== undefined && returnUrl !== null) {
             url += '?returnUrl=' + returnUrl;
         }
 
