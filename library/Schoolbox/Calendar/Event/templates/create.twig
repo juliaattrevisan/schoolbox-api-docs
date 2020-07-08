@@ -274,31 +274,48 @@
                     </div>
 
                     <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
-                        <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
-                        <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
-
-                        <label>Add Guests</label>
-                        <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
-                        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-                        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-                        <script type="text/javascript">
-                            $(function() {
-                                $('#add-guests').selectizeSelector({
-                                    ajax: {
-                                        url:      '/ajax/user.php',
-                                        type:     'GET',
-                                        data:     {groupID: 0, showCampus: true},
-                                        dataType: 'json'
-                                    },
-                                    value: [
-                                        {% for guest in guests %}
-                                        {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
-                                        {% endfor %}
-                                    ],
-                                    multiple: true
-                                });
-                            });
-                        </script>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <label>
+                                    Show Guest List
+                                    <div class="switch">
+                                        <input id="showGuestList" name="showGuestList" type="checkbox" value="1" {{ event.showGuestList ? 'checked="checked"' : '' }}>
+                                        <label for="showGuestList">
+                                            <span>On</span>
+                                            <span>Off</span>
+                                        </label>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="small-12 columns">
+                                <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
+                                <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
+                            </div>
+                            <div class="small-12 columns">
+                                <label>Add Guests</label>
+                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                                <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+                                <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+                                <script type="text/javascript">
+                                    $(function() {
+                                        $('#add-guests').selectizeSelector({
+                                            ajax: {
+                                                url:      '/ajax/user.php',
+                                                type:     'GET',
+                                                data:     {groupID: 0, showCampus: true},
+                                                dataType: 'json'
+                                            },
+                                            value: [
+                                                {% for guest in guests %}
+                                                {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
+                                                {% endfor %}
+                                            ],
+                                            multiple: true
+                                        });
+                                    });
+                                </script>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
             </section>
