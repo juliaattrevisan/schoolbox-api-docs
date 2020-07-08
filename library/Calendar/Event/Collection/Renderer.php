@@ -9,6 +9,8 @@
 
 namespace Calendar\Event\Collection;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Router;
 use Aura\Di\ContainerInterface;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
@@ -28,9 +30,15 @@ class Renderer
     private $endTimestamp;
 
     /**
-     * @var ContainerInterface
+     * @var Authorizer
      */
-    private $di;
+    private $authorizer;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
 
     /** @var User */
     private $user;
@@ -49,7 +57,8 @@ class Renderer
      * @param int                              $startTimestamp
      * @param int                              $endTimestamp
      * @param User                             $user
-     * @param ContainerInterface               $di
+     * @param Authorizer                       $authorizer
+     * @param Router                           $router
      * @param User                             $viewer
      */
     public function __construct(
@@ -57,14 +66,16 @@ class Renderer
         int $startTimestamp,
         int $endTimestamp,
         User $user,
-        ContainerInterface $di,
+        Authorizer $authorizer,
+        Router $router,
         User $viewer
     ) {
         $this->api            = $api;
         $this->startTimestamp = $startTimestamp;
         $this->endTimestamp   = $endTimestamp;
         $this->user           = $user;
-        $this->di             = $di;
+        $this->authorizer     = $authorizer;
+        $this->router         = $router;
         $this->viewer         = $viewer;
 
         $this->allEvents = new Collection();
@@ -121,7 +132,8 @@ class Renderer
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
-            $this->di,
+            $this->authorizer,
+            $this->router,
             $event,
             $this->user,
             $this->viewer

@@ -7,7 +7,8 @@
 
 namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 
-use Aura\Di\ContainerInterface;
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Router;
 use Calendar\Event\Type\Submission;
 use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
 use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
@@ -25,14 +26,15 @@ class Javascript extends SubmissionRendererJavascript
     /**
      * Constructor
      *
-     * @param ContainerInterface $di
-     * @param Submission\Event   $event
-     * @param User               $user
-     * @param User               $viewer
+     * @param Authorizer       $authorizer
+     * @param Router           $router
+     * @param Submission\Event $event
+     * @param User             $user
+     * @param User             $viewer
      */
-    public function __construct(ContainerInterface $di, Submission\Event $event, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Router $router, Submission\Event $event, User $user, User $viewer)
     {
-        parent::__construct($di, $event, $user, $viewer);
+        parent::__construct($authorizer, $router, $event, $user, $viewer);
 
         // Regrettably, because of dynamic invocation, we have to settle for singletons in here
 
@@ -55,7 +57,7 @@ class Javascript extends SubmissionRendererJavascript
 
         // Can edit if staff, or student is viewing own work
 
-        return $this->getViewer()->getRole()->isStaff() || $this->getViewer()->getId() === $this->getUser()->getId();
+        return $this->viewer->getRole()->isStaff() || $this->viewer->getId() === $this->user->getId();
     }
 
     /**
@@ -70,7 +72,7 @@ class Javascript extends SubmissionRendererJavascript
 
             $dueDate = $this->pblMapper->findOneByColumnList([
                 'assessment_id' => $this->getEvent()->getAssessment()->getId(),
-                'student_id'    => $this->getUser()->getId(),
+                'student_id'    => $this->user->getId(),
             ])->getOpenDate();
         } catch (MapperException $e) {
             // No override: fall back to the due date of the assessment
@@ -169,11 +171,11 @@ class Javascript extends SubmissionRendererJavascript
     {
         // Add a style for bling (if you're not a parent)
 
-        if ($this->getViewer()->getRole()->isParent()) {
+        if ($this->viewer->getRole()->isParent()) {
             return null;
         }
 
-        $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->getUser());
+        $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->user);
 
         if (!$part) {
             // If there's no participation, there's no bling

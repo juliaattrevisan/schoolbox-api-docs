@@ -9,7 +9,8 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Aura\Di\ContainerInterface;
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Router;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\Submission;
 use Schoolbox\User;
@@ -24,14 +25,15 @@ abstract class Base extends RendererBase
     /**
      * Constructor
      *
-     * @param ContainerInterface $di
-     * @param Submission\Event   $event
-     * @param User               $user
-     * @param User               $viewer
+     * @param Authorizer       $authorizer
+     * @param Router           $router
+     * @param Submission\Event $event
+     * @param User             $user
+     * @param User             $viewer
      */
-    public function __construct(ContainerInterface $di, Submission\Event $event, User $user, User $viewer)
+    public function __construct(Authorizer $authorizer, Router $router, Submission\Event $event, User $user, User $viewer)
     {
-        parent::__construct($di, $user, $viewer);
+        parent::__construct($authorizer, $router, $user, $viewer);
         $this->event = $event;
     }
 
@@ -44,7 +46,7 @@ abstract class Base extends RendererBase
      */
     public function isEditable()
     {
-        return $this->getViewer()->getRole()->isStaff();
+        return $this->viewer->getRole()->isStaff();
     }
 
 

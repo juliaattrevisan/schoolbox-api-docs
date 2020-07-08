@@ -486,26 +486,6 @@ parameters:
 			path: library/Calendar/Import/Vcal.php
 
 		-
-			message: "#^Binary operation \"\\-\" between string and string results in an error\\.$#"
-			count: 1
-			path: library/Calendar/Layout/Full/Abstract.php
-
-		-
-			message: "#^Cannot call method map\\(\\) on array\\<Schoolbox\\\\Calendar\\\\EventType\\>\\.$#"
-			count: 1
-			path: library/Calendar/Layout/Full/Abstract.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and string results in an error\\.$#"
-			count: 1
-			path: library/Calendar/Layout/Full/Ajax/JSON.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and 1 results in an error\\.$#"
-			count: 1
-			path: library/Calendar/Layout/Full/Javascript.php
-
-		-
 			message: "#^Variable \\$textbox might not be defined\\.$#"
 			count: 3
 			path: library/Component/Config/TextboxSearch.php

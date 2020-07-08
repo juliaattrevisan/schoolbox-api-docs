@@ -411,7 +411,8 @@ class Controller extends Base
             $start,
             $end,
             $student,
-            $this->di,
+            $this->getAuthorizer(),
+            $this->getRouter(),
             $this->getUser()
         );
 

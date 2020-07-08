@@ -623,7 +623,8 @@ class Controller extends Base
             (int)$this->getRequest()->query['start'],
             (int)$this->getRequest()->query['end'],
             $this->getUser(),
-            $this->getDi(),
+            $this->getAuthorizer(),
+            $this->getRouter(),
             $this->getUser()
         );
 
@@ -648,7 +649,8 @@ class Controller extends Base
 
             foreach ($roomEvents as $event) {
                 $renderer = new Javascript(
-                    $this->getDi(),
+                    $this->getAuthorizer(),
+                    $this->getRouter(),
                     $event,
                     $this->getUser(),
                     $this->getUser()

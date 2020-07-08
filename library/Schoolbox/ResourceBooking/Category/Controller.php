@@ -210,7 +210,8 @@ class Controller extends Base {
             (int)$this->getRequest()->query->get('start'),
             (int)$this->getRequest()->query->get('end'),
             $this->getUser(),
-            $this->getDi(),
+            $this->getAuthorizer(),
+            $this->getRouter(),
             $this->getUser()
         );
         $output = json_decode('[' . \implode(',', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']');
