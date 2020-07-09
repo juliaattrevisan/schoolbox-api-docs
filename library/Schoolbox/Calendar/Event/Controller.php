@@ -257,6 +257,19 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+
+            /* The available attendance levels which can be chosen
+             */
+            'attendanceLevels' => [
+                Attendance\Model::LEVEL_NO_ATTENDANCE => 'None',
+                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite Only',
+                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open'
+            ],
+
+            /* Specifically hides attendance inputs when you choose this setting
+             */
+            'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
+
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
