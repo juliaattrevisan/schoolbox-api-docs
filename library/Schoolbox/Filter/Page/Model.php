@@ -39,7 +39,6 @@ class Model
     {
         return [
             self::PAGE_PENDING_ASSESSMENTS,
-            self::PAGE_CLASS_MARK_BOOK,
             self::PAGE_UPCOMING_ASSESSMENTS,
         ];
     }
@@ -55,6 +54,7 @@ class Model
         return [
             self::PAGE_GRADES,
             self::PAGE_RUBRIC_MARK_BOOK,
+            self::PAGE_CLASS_MARK_BOOK,
         ];
     }
 
