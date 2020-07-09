@@ -62,7 +62,7 @@ class Embed implements IAttachmentHandler
         // Create the component
         $this->componentMapper->injectNewComponent(
             $folder,
-            ['textbox' => $textbox->getId(), 'textBoxComponentName' => $attachment->getTitle(),],
+            ['textbox' => $textbox->getId(), 'componentname' => $attachment->getTitle(),],
             \Component_Homepage_TextBoxController::class
         );
     }
