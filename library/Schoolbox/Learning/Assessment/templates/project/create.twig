@@ -34,7 +34,13 @@
     {% endfor %}
 </select>
 
-{% include '@learningAssessment/fragments/markType.twig' %}
+{% include '@learningAssessment/fragments/markType.twig' with {
+    context: '',
+    assessment: assessment,
+    allMarkTypes: allMarkTypes,
+    allGradeSchemes: allGradeSchemes,
+    defaultGradeGroup: defaultGradeGroup
+} %}
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.project.proper} %}
 
