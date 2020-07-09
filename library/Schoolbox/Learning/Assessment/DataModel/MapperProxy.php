@@ -296,7 +296,7 @@ class MapperProxy
      *
      * @param int   $assessmentId
      * @param array $options
-     * @return IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
