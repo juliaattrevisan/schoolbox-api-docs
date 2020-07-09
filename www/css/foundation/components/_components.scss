@@ -56,9 +56,14 @@
     }
     .button, button, input{
         background-color: transparent;
+        color: $content-ui-foreground;
         margin: 0;
-        text-transform: uppercase;
         font-weight: $font-weight-semibold;
+        font-size: rem-calc(($base-font-size - 2));
+        line-height: inherit;
+        height: auto;
+        text-transform: uppercase;
+        width: auto;
 
         &:hover{
             background-color: $content-ui-hover;
@@ -71,10 +76,7 @@
         }
     }
     input {
-        color: $content-ui-foreground;
         display: inline-block;
-        font-size: rem-calc(($base-font-size - 2));
-        width: auto;
 
         &:hover {
             color: $content-ui-foreground;
