@@ -56,4 +56,4 @@ WHERE attendance = 1;
 -- Show Attendees List
 
 ALTER TABLE `event`
-    ADD COLUMN `show_attendees` TINYINT(1) NOT NULL DEFAULT 1 AFTER `attendance`;
+    ADD COLUMN `show_attendees` TINYINT(1) NULL DEFAULT 1 AFTER `attendance`;
