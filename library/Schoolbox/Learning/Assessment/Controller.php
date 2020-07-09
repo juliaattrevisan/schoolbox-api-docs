@@ -364,16 +364,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* The usual info everything requires
          */
         $data = [
-            'context'               => $context,
-            'contextType'           => $contextType,
-            'baseContextType'       => AssessmentContextType::objectToString($context->getBaseContext()),
-            'breadcrumbs'           => $this->getBakery()->produceFromContext($context, $assessment),
-            'assessment'            => $assessment,
-            'folder'                => $context->getFolder(),
-            'assessmentType'        => AssessmentType::objectToString($assessment),
-            'markVisibility'        => $assessment->getMarkVisibility(),
-            'availableVisibilities' => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
-            'allWorkTypes'          => $this->workTypeMapper->findAll(),
+            'context'                  => $context,
+            'contextType'              => $contextType,
+            'baseContextType'          => AssessmentContextType::objectToString($context->getBaseContext()),
+            'breadcrumbs'              => $this->getBakery()->produceFromContext($context, $assessment),
+            'assessment'               => $assessment,
+            'folder'                   => $context->getFolder(),
+            'assessmentType'           => AssessmentType::objectToString($assessment),
+            'markVisibility'           => $assessment->getMarkVisibility(),
+            'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+            'allWorkTypes'             => $this->workTypeMapper->findAll(),
+            'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
+            'capabilityGradingSchemes' => $this->getAllGradeSchemes()
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
