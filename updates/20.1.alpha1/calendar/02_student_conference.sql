@@ -44,4 +44,11 @@ ALTER TABLE `event`
 -- Special error message when you reach the max attendees
 
 INSERT INTO `error` (id, message) VALUES
-(227, 'Maximum number of attendees has been reached.')
+(227, 'Maximum number of attendees has been reached.');
+
+-- All attendance=1 events are now decided to be closest to Open Attendance
+-- Update them accordingly
+
+UPDATE `event`
+SET attendance = 2
+WHERE attendance = 1;

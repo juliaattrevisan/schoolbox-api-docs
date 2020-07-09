@@ -699,42 +699,4 @@ abstract class EventBase implements EventInterface
     {
         return $this;
     }
-
-
-    /**
-     * @return int|null
-     */
-    public function getNumAttendees(): ?int
-    {
-        return null;
-    }
-
-
-    /**
-     * @param int|null $numAttendees
-     * @return $this
-     */
-    public function setNumAttendees(?int $numAttendees): EventInterface
-    {
-        return $this;
-    }
-
-
-    /**
-     * @return int|null
-     */
-    public function getAttendanceStatus(): ?int
-    {
-        return null;
-    }
-
-
-    /**
-     * @param int|null $attendanceStatus
-     * @return $this|EventInterface
-     */
-    public function setAttendanceStatus(?int $attendanceStatus): EventInterface
-    {
-        return $this;
-    }
 }

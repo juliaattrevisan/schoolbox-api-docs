@@ -1,16 +1,18 @@
 {##
  # Event Create/Update screen
  #
- # @param Event      $event         An Event instance
- # @param User       $user          A User instance (this person receives the event on their calendar)
- # @param Collection $eventTypes    A list of Event Types
- # @param array      $recurrence    A list of recurring instances
- # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
- # @param array      $levels        An array of Event Levels (personal/group/school)
- # @param array      $roles         A list of available and selected Roles
- # @param array      $folders       A list of available and selected Folders
- # @param array      $campuses      A list of available and selected Campuses
- # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
+ # @param Event      $event                        An Event instance
+ # @param User       $user                         A User instance (this person receives the event on their calendar)
+ # @param Collection $eventTypes                   A list of Event Types
+ # @param array      $recurrence                   A list of recurring instances
+ # @param array      $efficacy                     An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
+ # @param array      $levels                       An array of Event Levels (personal/group/school)
+ # @param array      $roles                        A list of available and selected Roles
+ # @param array      $folders                      A list of available and selected Folders
+ # @param array      $campuses                     A list of available and selected Campuses
+ # @param string     $returnUrl                    A Redirect-encoded string (you go here after saving the form)
+ # @param array      $attendanceLevels             A set of consts and their meaning, key-value pairs
+ # @param int        $attendanceLevelNoAttendance  An int corresponding to No Attendance
  #}
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -246,33 +248,32 @@
                     <div class="small-12 column">
                         <label>
                             Enable attendance?
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow people to RSVP to this event">?</span>
-                            <div class="switch">
-                                <input name="attendance" id="attendanceCheckbox" type="checkbox" value="1" {{ event.attendance ? 'checked="checked"' : '' }}>
-                                <label for="attendanceCheckbox">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may use attendance to invite guests, or publish an event that people may join. Open personal events will become visible to others on your calendar.">?</span>
+
+                            <select name="attendance" id="attendanceLevelSelector">
+                                {% for value, label in attendanceLevels %}
+                                <option value="{{ value }}" {% if value == event.attendance %}selected="selected"{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
                         </label>
 
-                        {# Show the Guests input if attendance is enabled
-                         # Hide the Guests input if attendance is disabled
+                        {# Hide the attendance inputs if No Attendance is selected
+                         # Otherwise, show the attendance inputs
                          #}
                         <script>
                             $(function() {
-                                $('#attendanceCheckbox').on('change', function(event) {
-                                    if ($(this).is(':checked')) {
-                                        $('#attendance-guests').show();
-                                    } else {
+                                $('#attendanceLevelSelector').on('change', function(event) {
+                                    if ($(this).val() == '{{ attendanceLevelNoAttendance }}') {
                                         $('#attendance-guests').hide();
+                                    } else {
+                                        $('#attendance-guests').show();
                                     }
                                 });
                             });
                         </script>
                     </div>
 
-                    <div id="attendance-guests" class="small-12 columns" {% if not event.attendance %}style="display:none"{% endif %}>
+                    <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
                         <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
                         <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
 

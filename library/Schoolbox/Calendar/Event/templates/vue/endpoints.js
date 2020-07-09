@@ -12,6 +12,10 @@ export const ENDPOINTS = Object.freeze({
     URL_EVENT_MODIFY_FORM: '/calendar/event/{eventId}/modify',
     URL_EVENT_MODIFY_FORM_ACTION: '/calendar/modifyForm.php',
 
+    /* Attendance Payload for data about a given event
+     */
+    URL_ATTENDANCE_PAYLOAD: '/calendar/event/attendance/{eventId}',
+
     /* Inline alteration of attendees on event detail screen
      */
     URL_ATTENDANCE_CREATE: '/calendar/event/attendance/{eventId}/create',
@@ -41,7 +45,7 @@ export const ENDPOINTS = Object.freeze({
     generateUrlFromConst(str, eventId, returnUrl) {
         let url = str.replace('{eventId}', eventId);
 
-        if (returnUrl !== undefined) {
+        if (returnUrl !== undefined && returnUrl !== null) {
             url += '?returnUrl=' + returnUrl;
         }
 
@@ -50,7 +54,21 @@ export const ENDPOINTS = Object.freeze({
 
 
     /**
+     * Get some payload data about a given event
+     *
+     * @param eventId
+     * @return string
+     */
+    payloadPath: function(eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_PAYLOAD, eventId, null);
+    },
+
+
+    /**
      * Onwards to the modify screen
+     *
+     * @param eventId
+     * @return string
      */
     modifyPath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, eventId, btoa(window.location.pathname));
@@ -59,6 +77,9 @@ export const ENDPOINTS = Object.freeze({
 
     /**
      * Create new attendances
+     *
+     * @param eventId
+     * @return string
      */
     createAttendancePath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, eventId, btoa(window.location.pathname));
@@ -67,6 +88,9 @@ export const ENDPOINTS = Object.freeze({
 
     /**
      * Delete attendances
+     *
+     * @param eventId
+     * @return string
      */
     deleteAttendancePath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, eventId, btoa(window.location.pathname));
@@ -75,6 +99,9 @@ export const ENDPOINTS = Object.freeze({
 
     /**
      * RSVP Accept
+     *
+     * @param eventId
+     * @return string
      */
     rsvpAcceptPath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, eventId, btoa(window.location.pathname));
@@ -83,6 +110,9 @@ export const ENDPOINTS = Object.freeze({
 
     /**
      * RSVP Decline
+     *
+     * @param eventId
+     * @return string
      */
     rsvpDeclinePath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE, eventId, btoa(window.location.pathname));
@@ -91,6 +121,9 @@ export const ENDPOINTS = Object.freeze({
 
     /**
      * RSVP Delete
+     *
+     * @param eventId
+     * @return string
      */
     rsvpDeletePath: function(eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, eventId, btoa(window.location.pathname));

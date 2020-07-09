@@ -18,6 +18,34 @@
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
 
+    /* Initialise vars
+     *
+     * Mirrors backend Payload instance to prevent random js error about
+     * undefined vars being accessed; null operator doesn't work when supplying
+     * as an arg, apparently
+     *
+     * This gets updated asynchronously when modals open
+     */
+    const INITIAL_PAYLOAD = {
+        level: null,
+        currentUser: {
+            user: {
+                id: null
+            },
+            status: null,
+            canModify: null
+        },
+        attendees: {
+            guests: [],
+            accepted: null,
+            available: null,
+            declined: null,
+            max: null,
+            num: null,
+            pending: null
+        }
+    };
+
     export default {
         name: "view-event-modal",
         props: {
@@ -39,6 +67,7 @@
         created() {
             this.ENDPOINTS = ENDPOINTS;
             this.canRsvp = checks.canRsvp;
+            this.showRsvpButtons = checks.showRsvpButtons;
             this.isInvited = checks.isInvited;
             this.isPending = checks.isPending;
             this.isAccepted = checks.isAccepted;
@@ -47,6 +76,7 @@
         },
         data() {
             return {
+                payload: INITIAL_PAYLOAD,
                 event: {}
             }
         },
@@ -110,33 +140,7 @@
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: {
-
-                        /* Data struct
-                         *
-                         * The output is a json payload from /calendar/ajax/full.php
-                         * This feeds into the main fullcalendar
-                         *
-                         * full.php uses the Calendar API Composite to get all the events from everywhere
-                         * Inside that Factory you'll find specialised classes to collate events from various places
-                         * The regular calendar events are in Calendar_Api_EventType_Event_Schoolbox_Default
-                         *
-                         * This uses the Calendar handler to find events
-                         *
-                         * Fields come from the javascript-rendered data via the abstraction
-                         * library/Calendar/Event/Type/Day/Renderer/Javascript.php
-                         */
-
-                        /* Maximum allowed guests
-                         */
-                        max: data?.attendance?.maxAttendees,
-
-                        /* Remaining attendee places
-                         */
-                        available: data?.attendance?.maxAttendees - data?.attendance?.numAttendees,
-
-                        /* Your current status
-                         */
-                        status: data?.attendance?.attendanceStatus
+                        payload: this.payload
                     },
                     classAttendance: {
                         url: data?.classAttendance?.url,
@@ -158,31 +162,6 @@
         methods: {
 
             /**
-             * Set up a selectize in a modal
-             *
-             * Use $nextTick() to execute this when data has been loaded, otherwise
-             * really odd behaviour occurs. Things about elements not existing or
-             * certain javascript not executing are really cryptic to figure out
-             *
-             * @param eventId int
-             * @param attendanceStatus bool
-             */
-            jqueryPlugins(eventExtendedProps, eventId, attendanceStatus) {
-                let self = this;
-
-                this.$nextTick(() => {
-
-                    // SA-10476
-                    // this.jQuery.fn.attendance({
-                    //     createAttendanceForm: this.jQuery('#createAttendanceForm-' + eventId),
-                    //     createAttendanceSelector: this.jQuery('#add-guests-' + eventId),
-                    //     canModify: true
-                    // });
-                });
-            },
-
-
-            /**
              * Decide whether the modal has component actions or not
              *
              * Show the bar if you can do anything with its contents
@@ -197,7 +176,14 @@
                     this.eventExtendedProps.links.delete ||
                     this.eventExtendedProps.classAttendance.url ||
                     this.eventExtendedProps.booking.actions.length > 0 ||
-                    this.canRsvp(this.eventExtendedProps.attendance.status, this.eventExtendedProps.attendance.max, this.eventExtendedProps.attendance.available)
+                    this.canRsvp(
+                        this.eventExtendedProps.attendance.payload.level,
+                        this.eventExtendedProps.attendance.payload.attendees.guests,
+                        this.eventExtendedProps.attendance.payload.currentUser.user.id,
+                        this.eventExtendedProps.attendance.payload.currentUser.status,
+                        this.eventExtendedProps.attendance.payload.attendees.max,
+                        this.eventExtendedProps.attendance.payload.attendees.available
+                    )
             },
 
 
@@ -212,7 +198,7 @@
              * Decline an invitation
              */
             rsvpDecline() {
-                if (this.isInvited(this.eventExtendedProps.attendance.status)) {
+                if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                     this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
                 }
             },
@@ -242,9 +228,8 @@
 
                             /* Update data with the result from async request
                              */
-                            self.event.extendedProps.data.attendance.attendanceStatus = status;
-                            self.event.extendedProps.data.attendance.maxAttendees = response.data.attendees.max;
-                            self.event.extendedProps.data.attendance.numAttendees = response.data.attendees.num;
+                            self.payload.currentUser.status = status;
+                            self.payload.attendees = response.data.attendees;
 
                             self.event.setExtendedProp('data', self.event.extendedProps.data);
 
@@ -316,17 +301,30 @@
              * Open this modal.
              */
             open(event) {
-                this.event = event;
+                let self = this;
 
+                /* Initialise data
+                 */
+                this.event = event;
+                this.payload = INITIAL_PAYLOAD;
+
+                /* Pop modal open
+                 */
                 this.$refs.modal.open();
 
-                /* Set up the selectize for adding more guests
+                /* Asynchronously fetch attendance payload
+                 * This will update the modal in realtime when it's ready
                  */
-                const data = this.event.extendedProps.data;
-
-                if (data.meta.eventId !== undefined) {
-                    this.jqueryPlugins(this.event.extendedProps, data.meta.eventId, data?.attendance?.attendanceStatus);
+                let request = {
+                    url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
+                    method: 'get',
+                    responseType: 'json'
                 }
+
+                axios.request(request)
+                        .then(function (response) {
+                            self.payload = response.data;
+                        });
             },
 
             /**
@@ -637,14 +635,18 @@
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.max)">
-                    <template v-if="eventExtendedProps.attendance.available > 0">{{ eventExtendedProps.attendance.available }}</template>
-                    <template v-else>No</template> available place(s) remaining
-                </meta-item>
-<!-- SA-10476 -->
-<!--                <form :id="'createAttendanceForm-' + eventExtendedProps.eventId" :action="createAttendancePath" method="post" v-if="true">-->
-<!--                    <input :id="'add-guests-' + eventExtendedProps.eventId" name="guests" type='text' value='' placeholder="Start typing the name of a user" />-->
-<!--                </form>-->
+                <template v-if="this.canRsvp(
+                                eventExtendedProps.attendance.payload.level,
+                                eventExtendedProps.attendance.payload.attendees.guests,
+                                eventExtendedProps.attendance.payload.currentUser.user.id,
+                                eventExtendedProps.attendance.payload.currentUser.status,
+                                eventExtendedProps.attendance.payload.attendees.max,
+                                eventExtendedProps.attendance.payload.attendees.available)">
+                    <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
+                        <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
+                        <template v-else>No</template> available place(s) remaining
+                    </meta-item>
+                </template>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
@@ -671,12 +673,18 @@
             <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <span v-if="this.canRsvp(eventExtendedProps.attendance.status, eventExtendedProps.attendance.max, eventExtendedProps.attendance.available)" :class="'rsvp'">
+                        <span v-if="this.canRsvp(
+                                    eventExtendedProps.attendance.payload.level,
+                                    eventExtendedProps.attendance.payload.attendees.guests,
+                                    eventExtendedProps.attendance.payload.currentUser.user.id,
+                                    eventExtendedProps.attendance.payload.currentUser.status,
+                                    eventExtendedProps.attendance.payload.attendees.max,
+                                    eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">
                             <span>
-                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.status) }" data-rsvp="accept">Yes</a>
+                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="accept">Yes</a>
                             </span>
                             <span>
-                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.status) }" data-rsvp="decline">No</a>
+                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
                             </span>
                         </span>
 

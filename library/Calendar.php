@@ -663,33 +663,6 @@ class Calendar extends DeprecatedModel
 
         $allEvents = $this->db->getAll($query);
 
-        /* Collate attendance details separately to avoid left-join hell
-         *
-         * Left join on events associated with multiple folders also multiplied the aggregation outcome
-         * leading to incorrect tallying of dudes attending. Could have been solved by reverting back
-         * to a subquery like I originally had it, but instead of that, just do one more query and use
-         * it as a lookup indexed by event_id
-         */
-        $attendanceCounts = $this->db->getAll("
-            SELECT
-                event_id,
-                SUM(IF(event_attendance.`status` = 2, 1, 0)) AS num_attendees,
-                MAX(IF(event_attendance.user_id = '{$user->getId()}', event_attendance.`status`, null)) AS attendance_status
-            FROM event_attendance
-            GROUP BY event_id
-        ");
-
-        $countStack = [];
-
-        if (is_array($attendanceCounts) && \count($attendanceCounts)) {
-            foreach ($attendanceCounts as $attendanceCount) {
-                $countStack[$attendanceCount['event_id']] = [
-                    'num_attendees'     => $attendanceCount['num_attendees'],
-                    'attendance_status' => $attendanceCount['attendance_status']
-                ];
-            }
-    }
-
         /* Standardised output
          */
         $stack = new Collection();
@@ -737,10 +710,7 @@ class Calendar extends DeprecatedModel
                 }
 
                 $event->setAttendance($currentEvent['attendance']);
-
                 $event->setMaxAttendees($currentEvent['max_attendees']);
-                $event->setNumAttendees($countStack[$currentEvent['id']]['num_attendees'] ?? 0);
-                $event->setAttendanceStatus($countStack[$currentEvent['id']]['attendance_status']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);

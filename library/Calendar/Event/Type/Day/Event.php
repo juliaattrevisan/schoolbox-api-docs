@@ -402,42 +402,6 @@ class Event extends EventBase
     }
 
     /**
-     * @return int|null
-     */
-    public function getNumAttendees(): ?int
-    {
-        return $this->numAttendees;
-    }
-
-    /**
-     * @param int|null $numAttendees
-     * @return $this
-     */
-    public function setNumAttendees(?int $numAttendees): EventInterface
-    {
-        $this->numAttendees = $numAttendees;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getAttendanceStatus(): ?int
-    {
-        return $this->attendanceStatus;
-    }
-
-    /**
-     * @param int|null $attendanceStatus
-     * @return $this
-     */
-    public function setAttendanceStatus(?int $attendanceStatus): EventInterface
-    {
-        $this->attendanceStatus = $attendanceStatus;
-        return $this;
-    }
-
-    /**
      * @return string[]
      */
     protected function getRenderClasses(): array

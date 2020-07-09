@@ -159,7 +159,7 @@ class Controller extends Base
             /* Modify perms are calculated in the attendance list fragment
              * This is synonymous with calling (new Event\Access())->checkExisting() again
              */
-            'canModify' => $payload['canModify'],
+            'canModify' => $payload['currentUser']['canModify'],
 
             /* Attendance info
              * Current attendee info and your current rsvp status
@@ -168,6 +168,9 @@ class Controller extends Base
                 'payload' => $payload,
                 'status' => [
                     'current' => $attendanceStatus,
+                ],
+                'level' => [
+                    'current' => $event->getAttendance(),
                 ],
             ],
         ])->setTitle($event->getTitle()));
@@ -254,6 +257,19 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+
+            /* The available attendance levels which can be chosen
+             */
+            'attendanceLevels' => [
+                Attendance\Model::LEVEL_NO_ATTENDANCE => 'None',
+                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite Only',
+                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open'
+            ],
+
+            /* Specifically hides attendance inputs when you choose this setting
+             */
+            'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
+
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
@@ -322,6 +338,19 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+
+            /* The available attendance levels which can be chosen
+             */
+            'attendanceLevels' => [
+                Attendance\Model::LEVEL_NO_ATTENDANCE => 'None',
+                Attendance\Model::LEVEL_INVITE_ONLY => 'Invite Only',
+                Attendance\Model::LEVEL_OPEN_ATTENDANCE => 'Open'
+            ],
+
+            /* Specifically hides attendance inputs when you choose this setting
+             */
+            'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
+
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
