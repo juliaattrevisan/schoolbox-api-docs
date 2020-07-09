@@ -81,6 +81,17 @@ class Payload
          */
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
+        /* Decide whether $user can invite other users
+         *
+         * A person who can create an event might not have the ability to invite attendees
+         * so it's not equivalent to $canModify
+         *
+         * TODO: SA-10478
+         *   Replace with a check on
+         *   $user->getRole()->isStudent() && $configLoader->get('whatever')
+         */
+        $canInvite = true;
+
         return [
             /* Current attendance level for the event
              */
@@ -101,6 +112,10 @@ class Payload
                 /* Whether the current user can modify the event
                  */
                 'canModify' => $canModify,
+
+                /* Whether the current user can invite other users to an event
+                 */
+                'canInvite' => $canInvite
             ],
 
             /* Convenient counts
