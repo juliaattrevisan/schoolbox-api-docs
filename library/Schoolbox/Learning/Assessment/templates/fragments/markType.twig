@@ -5,7 +5,11 @@
  # and a set of Grade Group instances. The latter conditionally shows,
  # depending on the setting of the former.
  #
- # @param $context string  A string prefix for namespacing, so you can reuse this fragment in the same template
+ # @param $context           string       A string prefix for namespacing, so you can reuse this fragment in the same template
+ # @param $assessment        IAssessable  An assessment instance
+ # @param $allMarkTypes      array        tuples for (id, name) of mark types
+ # @param $allGradeSchemes   array        tuples for (id, name) of grading schemes
+ # @param $defaultGradeGroup int          Set in admin via default_grade_group config var
  #}
 
 {# Letter Grade enables Grading Scheme

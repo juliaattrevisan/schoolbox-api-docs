@@ -95,11 +95,19 @@
     {% set markTypeTotalMark = 3 %}
 
     {% include '@learningAssessment/fragments/markType.twig' with {
-        context: ''
+        context: '',
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        defaultGradeGroup: defaultGradeGroup
     } %}
 
     {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'horse'
+        context: 'horse',
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        defaultGradeGroup: defaultGradeGroup
     } %}
 
     {% include '@learningAssessment/fragments/rubric.twig' with {
