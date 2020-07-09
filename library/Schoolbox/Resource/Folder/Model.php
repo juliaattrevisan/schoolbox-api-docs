@@ -669,4 +669,17 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         $this->yearLevels = $yearLevels;
         return $this;
     }
+
+    /**
+     * Returns whether grade page is enabled for this folder from associated year levels
+     * @return bool
+     */
+    public function isGradePageEnabled(): bool
+    {
+        if ($this->getYearLevels()->count() === 0) {
+            return true;
+        }
+        $displayGradePages = array_unique($this->getYearLevels()->getPropertyValues('displayGradePage'));
+        return count($displayGradePages) > 1 ? true : $displayGradePages[0];
+    }
 }

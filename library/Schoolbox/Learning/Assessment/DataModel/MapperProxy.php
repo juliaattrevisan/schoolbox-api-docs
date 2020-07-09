@@ -685,6 +685,8 @@ class MapperProxy
             true
         );
 
+        $classFolderIds = $folderMapper->filterIdsForGradePage($classFolderIds);
+
         // Build a list of parameters to pass to findAllForFolderId
         $options['due_after']  = $from;
         $options['due_before'] = $to;

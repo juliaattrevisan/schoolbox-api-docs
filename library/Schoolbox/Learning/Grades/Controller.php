@@ -161,6 +161,7 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
@@ -173,8 +174,9 @@ class Controller extends Base
             });
 
         /** @var GenericCollection|Folder\Model[] $folders */
-        $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder) {
-            return $assessmentsPerFolder->keyExists($folder->getId());
+        $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder, $displayFolderIds) {
+            return $assessmentsPerFolder->keyExists($folder->getId())
+                && in_array($folder->getId(), $displayFolderIds);
         })->indexBy('id');
 
         // Load Teachers
@@ -243,28 +245,31 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
-            if ($folder instanceof Folder\Model && !$folder->isDeleted()) {
-                if (!isset($markbooksFolders[$folder->getId()])) {
-                    $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
-                    $folder->loadTeachers();
-                    $folders->offsetSet($folder->getId(), $folder);
-                }
-
-                if (
-                    ($assessment instanceof DueWork\Model || $assessment instanceof Quiz\Model) &&
-                    $assessment->getWorkType() &&
-                    \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
-                    $visibility->isVisibleToUser($assessment, $viewee, true, null, !$this->access->isInstructor($this->getUser(), $folder))
-                ) {
-                    if (!isset($assessmentTasks[$folder->getId()])) {
-                        $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
-                    }
-
-                    $assessmentTasks[$folder->getId()]->add($assessment);
-                }
-
-                $markbooksFolders[$folder->getId()]->add($assessment);
+            if (!$folder instanceof Folder\Model
+                || $folder->isDeleted()
+                || !$folder->isGradePageEnabled()) {
+                continue;
             }
+            if (!isset($markbooksFolders[$folder->getId()])) {
+                $markbooksFolders[$folder->getId()] = $this->getAssessmentMapperProxy()->createCollection();
+                $folder->loadTeachers();
+                $folders->offsetSet($folder->getId(), $folder);
+            }
+
+            if (
+                ($assessment instanceof DueWork\Model || $assessment instanceof Quiz\Model) &&
+                $assessment->getWorkType() &&
+                \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
+                $visibility->isVisibleToUser($assessment, $viewee, true, null, !$this->access->isInstructor($this->getUser(), $folder))
+            ) {
+                if (!isset($assessmentTasks[$folder->getId()])) {
+                    $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
+                }
+
+                $assessmentTasks[$folder->getId()]->add($assessment);
+            }
+
+            $markbooksFolders[$folder->getId()]->add($assessment);
         }
 
         // Sort the assessments
@@ -430,7 +435,7 @@ class Controller extends Base
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
     {
-        $request         = $this->request->post['filter_selection'] ?: [];
+        $request         = $this->request->post->get('filter_selection') ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
 
         /* @var RosettaStone $l10n */
