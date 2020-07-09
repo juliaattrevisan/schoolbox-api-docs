@@ -102,14 +102,6 @@
         defaultGradeGroup: defaultGradeGroup
     } %}
 
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'capability',
-        assessment: assessment,
-        allMarkTypes: allMarkTypes,
-        allGradeSchemes: allGradeSchemes,
-        defaultGradeGroup: defaultGradeGroup
-    } %}
-
     {% include '@learningAssessment/fragments/rubric.twig' with {
         rubricGrid: rubricGrid,
         rubricAttachZone: rubricAttachZone,
@@ -118,7 +110,8 @@
         assessment: assessment,
         markTypeTotalMark: markTypeTotalMark,
         capabilityMarkTypes: capabilityMarkTypes,
-        capabilityGradingSchemes: capabilityGradingSchemes
+        capabilityGradingSchemes: capabilityGradingSchemes,
+        defaultGradeGroup: defaultGradeGroup
     } only %}
 </fieldset>
 

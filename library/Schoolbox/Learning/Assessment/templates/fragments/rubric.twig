@@ -300,40 +300,16 @@ Usage:
 </div>
 <fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
     <legend>Rubric marking options</legend>
-    <div class="row">
-        <script>
-            $(function() {
 
-                /* Mark Per Capability now has a secondary choice
-                 *
-                 * Similar to how you can set Mark Type for the Assessment,
-                 * you can now do it for rubric capabilities
-                 */
-                $('#capabilityMarkType').on('change', function(event) {
-                    if ($(this).val() === 0) {
-                        $('#capabilityGradingSchemeContainer').hide();
-                    } else {
-                        $('#capabilityGradingSchemeContainer').show();
-                    }
-                });
-            });
-        </script>
-        <div class="small-12 medium-6 columns">
-            <label for="capabilityMarkType">{{ locale.rubricGroup.proper }} Mark Type</label>
-            <select id="capabilityMarkType" name="capabilityMarkType">
-                {% for capabilityMarkType in capabilityMarkTypes %}
-                <option value="{{ capabilityMarkType.id }}">{{ capabilityMarkType.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="small-12 medium-6 columns" id="capabilityGradingSchemeContainer">
-            <label for="capabilityGradingScheme">{{ locale.rubricGroup.proper }} Mark Grading Scheme</label>
-            <select id="capabilityGradingScheme" name="capabilityGradingScheme">
-                {% for capabilityGradingScheme in capabilityGradingSchemes %}
-                <option value="{{ capabilityGradingScheme.name }}">{{ capabilityGradingScheme.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    {% include '@learningAssessment/fragments/markType.twig' with {
+        context: 'capability',
+        assessment: assessment,
+        allMarkTypes: capabilityMarkTypes,
+        allGradeSchemes: capabilityGradingSchemes,
+        defaultGradeGroup: defaultGradeGroup
+    } %}
+
+    <div class="row">
         <div class="small-12 columns">
             <div id="useMarkRangePanel">
                 <label for="useMarkRange">Use Mark Range</label>
