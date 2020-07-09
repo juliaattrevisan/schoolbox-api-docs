@@ -96,7 +96,13 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only
-        $renderer = new Javascript($kernel->getDependencyInjector(), $calendarEvent, $_SESSION['user'], $_SESSION['user']);
+        $renderer = new Javascript(
+            $kernel->getDependencyInjector()->get('authorizer'),
+            $kernel->getDependencyInjector()->get('router'),
+            $calendarEvent,
+            $_SESSION['user'],
+            $_SESSION['user']
+        );
         $output   = $renderer->render();
         echo $output;
         break;
