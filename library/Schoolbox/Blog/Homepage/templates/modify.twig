@@ -5,12 +5,12 @@
 <script type="text/javascript">
     $(function() {
         $.fn.alaressEditor({
-            file_browser_category_id : {% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}
+            file_browser_category_id : {% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}
         });
 
         $('#blogForm').alaressValidate();
 
-        {% if record != undefined %}
+        {% if record is defined %}
             $('[data-delete]').click(function(event) {
                 event.preventDefault();
 
@@ -31,8 +31,8 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="/homepage/{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}">{% if record != undefined %}{{ record.getFolder.getName }}{% else %}{{ folder.getName }}{% endif %}</a></li>
-    <li class="active"><a href="#">{% if record.getId %}Modify{% else %}Post{% endif %} Blog</a></li>
+    <li><a href="/homepage/{% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}">{% if record is defined %}{{ record.getFolder.getName }}{% else %}{{ folder.getName }}{% endif %}</a></li>
+    <li class="active"><a href="#">{% if record is defined %}Modify{% else %}Post{% endif %} Blog</a></li>
 </ul>
 
 <div class="row">
@@ -40,10 +40,10 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h1>{% if record.getId %}Modify{% else %}Post{% endif %} Blog</h1>
+                    <h1>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</h1>
                 </div>
             </div>
-            {% if record != undefined %}
+            {% if record is defined %}
                 <nav>
                     <a class="icon-more" title="Actions" data-dropdown="header-options" aria-expanded="false"></a>
                 </nav>
@@ -60,18 +60,18 @@
     <div class="small-12 island">
         <form method="post"
               id="blogForm"
-              action="{{ record.getId ? routeLookup('blog.postModify', {id: record.getId}) : routeLookup('blog.postInsert', {folderId: folder.getId}) }}">
-            <input type="hidden" name="categoryId" value="{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}" />
+              action="{{ record is defined ? routeLookup('blog.postModify', {id: record.getId}) : routeLookup('blog.postInsert', {folderId: folder.getId}) }}">
+            <input type="hidden" name="categoryId" value="{% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}" />
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="heading" class="required">Title </label>
-                        <input type="text" name="heading" id="heading" maxlength="100" value="{{ record.getHeading }}" required />
+                        <input type="text" name="heading" id="heading" maxlength="100" value="{{ record.getHeading ?? '' }}" required />
 
                         <label>
                             Body
-                            <textarea id="body" name="body">{{ record.getBody }}</textarea>
+                            <textarea id="body" name="body">{{ record.getBody ?? '' }}</textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -87,7 +87,7 @@
                 </fieldset>
             </section>
 
-            <input type="submit" name="submits" value="{% if record.getId %}Modify{% else %}Post{% endif %} Blog" />
+            <input type="submit" name="submits" value="{% if record is defined %}Modify{% else %}Post{% endif %} Blog" />
         </form>
     </div>
 </div>

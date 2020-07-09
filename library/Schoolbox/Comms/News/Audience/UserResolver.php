@@ -414,7 +414,7 @@ class UserResolver implements IUserResolver
      */
     public function isUserInAudience(User $user, News\Model $article): bool
     {
-        // Convert segments to bricks for easier analysis - dimensions - year 9 & relationship - parents_of
+        // Convert segments to bricks for easier analysis
         $bricks = (new BrickManager($this->db))->generateBricksFromAudience($article->getAudience());
 
         // Keep track of bricks we are unable to derive a conclusion for using currently available model graph
