@@ -1,14 +1,10 @@
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-{% if item.id is empty %}
-    {% set createForm = true %}
-{% else %}
-    {% set createForm = false %}
-{% endif %}
+{% set createForm = item is not defined %}
 
 <form id="itemForm" action="{{ routeLookup('adminProfileButton.postModify') }}" method="post">
-    <input type="hidden" name="id" value="{{ item.id }}">
+    <input type="hidden" name="id" value="{{ item.id ?? '' }}">
     <div class="row">
         <div class="small-12 island">
 
@@ -24,11 +20,11 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="profile-button-title" class="required">Button Text</label>
-                        <input type="text" id="profile-button-title" name='text' value="{{ item.text }}">
+                        <input type="text" id="profile-button-title" name='text' value="{{ item.text ?? '' }}">
                     </div>
                     <div class="small-12 columns">
                         <label for="profile-button-desc">Hover Description</label>
-                        <input name='title' id="profile-button-desc" type="text" value="{{ item.title }}">
+                        <input name='title' id="profile-button-desc" type="text" value="{{ item.title ?? '' }}">
                     </div>
                     <div class="small-12 columns">
                         <label for="profile-button-css">
@@ -36,19 +32,19 @@
                             <span data-tooltip class="has-tip hint" title="Add a css class to this button so it can be used with your custom Skin Config.">?</span>
                         </label>
 
-                        <input name='css' id="profile-button-css" type="text" value="{{ item.css }}">
+                        <input name='css' id="profile-button-css" type="text" value="{{ item.css ?? '' }}">
                     </div>
                     <div class="small-10 columns">
                         <label for="icon-select">Icon</label>
                         <select id="icon-select" name="icon">
                             {% for icon in icons %}
-                                <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
+                                <option {% if not createForm and icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="small-2 columns">
                         <label>Preview</label>
-                        <div id="icon-preview" style="margin-button:5px" class="size-32 icon-{{ item.icon }}"></div>
+                        <div id="icon-preview" style="margin-button:5px" class="size-32 icon-{{ item.icon ?? '' }}"></div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -65,15 +61,15 @@
                             });
                         </script>
                         <div class="input-group">
-                            <input name="url" id="profile-button-url" type="text" value="{{ item.url }}">
+                            <input name="url" id="profile-button-url" type="text" value="{{ item.url ?? '' }}">
                             <a id="modalLinkButton" class="button icon-link">Browse</a>
                         </div>
                     </div>
                     <div class="small-12 columns">
                         <label for="profile-button-destination">Destination Target</label>
                         <select name="target" id="profile-button-destination">
-                            <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
-                            <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
+                            <option {% if not createForm and item.target == '' %}selected{% endif %} value="">Same Window</option>
+                            <option {% if not createForm and item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
                         </select>
                     </div>
                 </fieldset>
@@ -90,7 +86,7 @@
                                 <input id="campus-availability-all" type="checkbox">
                                 <label for="campus-availability-all">Select All</label>
                                 {% for campus in campuses %}
-                                    <input name="campusAvailability[]" data-campus-availability id="campus-availability-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <input name="campusAvailability[]" data-campus-availability id="campus-availability-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
                                     <label for="campus-availability-{{ campus.id }}">{{ campus.name }}</label>
                                 {% endfor %}
                             </div>
@@ -103,7 +99,7 @@
                                 <input id="role-availability-all" type="checkbox">
                                 <label for="role-availability-all">Select All</label>
                                 {% for role in roles %}
-                                    <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
                                     <label for="role-availability-{{ role.id }}">{{ role.name }}</label>
                                 {% endfor %}
                             </div>
@@ -124,7 +120,7 @@
                                 <input id="campus-visibility-all" type="checkbox">
                                 <label for="campus-visibility-all">Select All</label>
                                 {% for campus in campuses %}
-                                    <input name="campusVisibility[]" data-campus-visibility id="campus-visibility-{{ campus.id }}" type="checkbox" {% if campusVisibilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <input name="campusVisibility[]" data-campus-visibility id="campus-visibility-{{ campus.id }}" type="checkbox" {% if campusVisibilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
                                     <label for="campus-visibility-{{ campus.id }}">{{ campus.name }}</label>
                                 {% endfor %}
                             </div>
@@ -137,7 +133,7 @@
                                 <input id="role-visibility-all" type="checkbox">
                                 <label for="role-visibility-all">Select All</label>
                                 {% for role in roles %}
-                                    <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
                                     <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
                                 {% endfor %}
                             </div>
@@ -151,7 +147,7 @@
     <div class="row">
         <div class="small-12 column">
             <ul class="flex-list buttons">
-                <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</button></a>
+                <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</a>
                 <li>
                     <button type="submit" class="submit expand" id="profile-button-submit">
                         {% if createForm %}

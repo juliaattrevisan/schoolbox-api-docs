@@ -57,7 +57,7 @@ Data:
             <h2>File Storage</h2>
             <table>
                 <tbody>
-                <tr><th>File Count</th><td>{{ storageFileCount is null ? '-' : storageFileCount|number_format }}</td></tr>
+                <tr><th>File Count</th><td>{{ storageFileCount is not defined ? '-' : storageFileCount|number_format }}</td></tr>
                 <tr><th>Disk Usage</th><td>{{ storageFileUsage|default('-') }}</td></tr>
                 </tbody>
             </table>
@@ -75,7 +75,7 @@ Data:
                 </tr>
                 </thead>
                 <tbody>
-                {% for date, fileSizes in backupFiles %}
+                {% for date, fileSizes in backupFiles ?? [] %}
                     <tr>
                         <td>{{ date|default('Unknown') }}</td>
                         <td>{{ fileSizes.conf|default('-') }}</td>
