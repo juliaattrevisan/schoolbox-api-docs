@@ -1,15 +1,19 @@
-{#
-Usage:
-
-{% include '@learningAssessment/fragments/rubric.twig' with {
-    rubricAttachZone: array,
-    resultSets:       array,
-    rubricHasMarks:   bool
-    assessment:       IAssessable
-    markTypeTotalMark: int
-} only %}
-
-#}
+{##
+ # Rubric
+ #
+ # This is the assessment creational/updational section concerning the rubric grid.
+ # It appears on the assessment modify screen at the bottom.
+ #
+ # @param $rubricGrid               Grid         An instance of Grid
+ # @param $rubricAttachZone         array        An attachzone, for uploading rubric csvs
+ # @param $resultSets               array        A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
+ # @param $rubricHasMarks           bool         Whether students have a feedback using this rubric grid
+ # @param $assessment               IAssessable  An assessment instance
+ # @param $markTypeTotalMark        int          The id of the Total Mark instance
+ # @param $capabilityMarkTypes      array        Tuples for (id, name) Mark Types available for rubric capabilities
+ # @param $capabilityGradingSchemes array        Tuples for (id, name) Grading Schemes available for rubric capabilities
+ # @param defaultGradeGroup         int          Set in admin via default_grade_group config var
+ #}
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
     <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
