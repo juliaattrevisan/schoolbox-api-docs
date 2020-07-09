@@ -21,81 +21,14 @@
     {% set context = context ~ '-' %}
 {% endif %}
 
-<script type="text/javascript">
+<script type="text/javascript" src="/javascript/shared/assessment/jquery.markType-gradingScheme.js"></script>
+<script>
     $(function() {
-        var $markTypeDropdown = $('#{{ context }}markType');
-        var $maxMarkDiv = $('[data-max-mark="{{ context }}"]');
-        var $gradeSchemeDiv = $('[data-grading-scheme="{{ context }}"]');
-
-        /**
-         * Show max mark
-         */
-        function showMaxMark() {
-            $maxMarkDiv.show();
-        }
-
-        /**
-         * Hide max mark
-         */
-        function hideMaxMark() {
-            $maxMarkDiv.hide();
-        }
-
-        /**
-         * Show grading scheme
-         */
-        function showGradingScheme() {
-            $gradeSchemeDiv.show();
-
-            // Populate the grade scale modal with the default scheme selected
-            populateScaleModal();
-        }
-
-        /**
-         * Hide grading scheme
-         */
-        function hideGradingScheme() {
-            $gradeSchemeDiv.hide();
-        }
-
-
-        /* Mark Type switcher
-         */
-        $markTypeDropdown.on('change', function () {
-            if ($(this).val() == {{ markTypeTotalMark }}) {
-                showMaxMark();
-            } else {
-                hideMaxMark();
-            }
-
-            if ($(this).val() == {{ markTypeLetterGrade }}) {
-                showGradingScheme();
-            } else {
-                hideGradingScheme();
-            }
+        $.fn.markTypeGradingScheme({
+            context: '{{ context }}',
+            markTypeTotalMark: '{{ markTypeTotalMark }}',
+            markTypeLetterGrade: '{{ markTypeLetterGrade }}',
         });
-
-        // Initiate
-        $markTypeDropdown.trigger('change');
-
-        // Populate the grade scale modal on scheme change
-        $('#{{ context }}gradingScheme').change(populateScaleModal);
-
-        /**
-         * Put a title and grade scale into a modal based on the currently selected scheme
-         */
-        function populateScaleModal() {
-            var $schemeSelect = $('#{{ context }}gradingScheme'),
-                schemeName = $schemeSelect.find(':selected').text(),
-                schemeId = $schemeSelect.val(),
-                schemeTemplate = $('[data-grading-scale=' + '{{ context }}' + schemeId +']').html();
-
-            // Populate the modal title with scheme name
-            $('#{{ context }}gradeScaleTitle').text(schemeName);
-
-            // Populate the modal body with the scheme table
-            $('#{{ context }}gradeScaleDesc').html(schemeTemplate);
-        }
     });
 </script>
 
