@@ -56,7 +56,6 @@
     }
     .button, button, input{
         background-color: transparent;
-        color: $content-ui-foreground;
         margin: 0;
         font-weight: $font-weight-semibold;
         font-size: rem-calc(($base-font-size - 2));
@@ -75,7 +74,8 @@
             }
         }
     }
-    input {
+    input, [type="submit"] {
+        color: $content-ui-foreground;
         display: inline-block;
 
         &:hover {
