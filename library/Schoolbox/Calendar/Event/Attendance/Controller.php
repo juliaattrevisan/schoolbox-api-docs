@@ -104,10 +104,16 @@ class Controller extends Base
         $guests = $this->attendanceMapper->findAttendances($event);
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
-        $newGuests = explode(',', $this->request->post['guests'] ?? '');
-        $oldGuests = array_column($guests, 'id');
+        /* You can only create attendances if we let you
+         */
+        $ids = [];
 
-        $ids = array_diff($newGuests, $oldGuests);
+        if ((new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))) {
+            $newGuests = explode(',', $this->request->post['guests'] ?? '');
+            $oldGuests = array_column($guests, 'id');
+
+            $ids = array_diff($newGuests, $oldGuests);
+        }
 
         /* Added a user who's already in the list
          *
