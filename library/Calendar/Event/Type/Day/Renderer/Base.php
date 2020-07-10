@@ -70,21 +70,24 @@ abstract class Base extends RendererBase
     /**
      * Returns the current attendance status for the viewer of a given attendance event
      *
-     * @return string
+     * @return int|null One of the `Event\Attendance\Model::STATUS_*` constants,
+     *                  or null if the current user hasn't responded.
      */
-    public function attendanceStatus()
+    public function attendanceStatus(): ?int
     {
         if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->viewer->getId())) {
-            if ($attendance['status'] == Event\Attendance\Model::STATUS_PENDING) {
-                return 'Pending';
-            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_ACCEPTED) {
-                return 'Approved';
-            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_DECLINED) {
-                return 'Rejected';
-            }
+            return (int)$attendance['status'];
+//            if ($attendance['status'] == Event\Attendance\Model::STATUS_PENDING) {
+//                return 'Pending';
+//            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_ACCEPTED) {
+//                return 'Approved';
+//            } else if ($attendance['status'] == Event\Attendance\Model::STATUS_DECLINED) {
+//                return 'Rejected';
+//            }
         }
 
-        return '';
+        return null;
+//        return '';
     }
 
 

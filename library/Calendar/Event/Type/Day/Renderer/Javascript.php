@@ -110,39 +110,55 @@ class Javascript extends Base
      */
     private function renderEventAttendance(): array
     {
-        $hasIcon                    = false;
-        $hasStatus                  = false;
-        $hasAttendanceRequestButton = false;
-        $hasListButton              = false;
-        $nextAttendanceAction       = '';
-        if ($this->getEvent()->canAttend()) {
-            $hasIcon = true;
-
-            /* Anyone with write access can approve attendance
-             */
-            if ($this->getEvent()->isEditable()) {
-                $hasListButton = true;
-            }
-
-            $hasStatus = $this->attendanceStatus();
-
-            if ($hasStatus) {
-                $hasAttendanceRequestButton = 'Unattend';
-                $nextAttendanceAction       = 'remove';
-            } else {
-                $hasAttendanceRequestButton = 'RSVP';
-                $nextAttendanceAction       = 'add';
-            }
+        // Most of this won't be needed anymore now the payload object exists.
+        // However, some of its information is required: I at least need to know
+        // the current user's attendance status.
+        // Put it in attendance.status.current
+        $currentStatus = null;
+        $hasAttendance = (bool)$this->getEvent()->canAttend();
+        if ($hasAttendance) {
+            $currentStatus = $this->attendanceStatus();
         }
-
         return [
-            'maxAttendees' => $this->getEvent()->getMaxAttendees(),
-
-            'icon'          => $hasIcon,
-            'status'        => $hasStatus,
-            'nextAction'    => $nextAttendanceAction,
-            'requestButton' => $hasAttendanceRequestButton,
-            'listButton'    => $hasListButton,
+            'hasAttendance' => $hasAttendance,
+            'status'        => [
+                'current' => $currentStatus,
+            ],
         ];
+
+//        $hasIcon                    = false;
+//        $hasStatus                  = false;
+//        $hasAttendanceRequestButton = false;
+//        $hasListButton              = false;
+//        $nextAttendanceAction       = '';
+//        if ($this->getEvent()->canAttend()) {
+//            $hasIcon = true;
+//
+//            /* Anyone with write access can approve attendance
+//             */
+//            if ($this->getEvent()->isEditable()) {
+//                $hasListButton = true;
+//            }
+//
+//            $hasStatus = $this->attendanceStatus();
+//
+//            if ($hasStatus) {
+//                $hasAttendanceRequestButton = 'Unattend';
+//                $nextAttendanceAction       = 'remove';
+//            } else {
+//                $hasAttendanceRequestButton = 'RSVP';
+//                $nextAttendanceAction       = 'add';
+//            }
+//        }
+//
+//        return [
+//            'maxAttendees' => $this->getEvent()->getMaxAttendees(),
+//
+//            'icon'          => $hasIcon,
+//            'status'        => $hasStatus,
+//            'nextAction'    => $nextAttendanceAction,
+//            'requestButton' => $hasAttendanceRequestButton,
+//            'listButton'    => $hasListButton,
+//        ];
     }
 }
