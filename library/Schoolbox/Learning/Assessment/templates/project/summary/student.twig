@@ -19,7 +19,7 @@
 
 {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-{% set hasActions = statusRoute or modifyRoute or deleteRoute %}
+{% set hasActions = statusRoute or modifyRoute %}
 
 
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
