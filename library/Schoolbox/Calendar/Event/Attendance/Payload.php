@@ -88,7 +88,11 @@ class Payload
          *
          * If so, remove everyone except $user from the guest list
          */
-
+        if (!$canModify && !$event->getShowAttendees()) {
+            $guests = array_values(array_filter($guests, static function($element) use ($user) {
+                return $element['id'] === $user->getId();
+            }));
+        }
 
         /* Decide whether $user can invite other users
          *
