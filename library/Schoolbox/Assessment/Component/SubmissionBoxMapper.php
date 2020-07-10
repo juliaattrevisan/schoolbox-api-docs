@@ -61,6 +61,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->uses('rubric_mark_per_capability', self::TYPE_BOOLEAN, null, 'markedPerCapability');
+        $this->uses('rubric_capability_grade_group_id', self::TYPE_INTEGER, null, 'capabilityGradeGroup');
         $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
