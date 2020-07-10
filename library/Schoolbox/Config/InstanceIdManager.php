@@ -154,6 +154,8 @@ class InstanceIdManager extends CliTool\App
     /**
      * Renames redis keys that contain the instance id
      *
+     * However we wont update redis keys that are referenced by stomp, as I don't know how to update stomp messages??
+     *
      * @param string $oldInstanceId
      * @param string $newInstanceId
      */
@@ -168,11 +170,31 @@ class InstanceIdManager extends CliTool\App
         //  scrub.html:24d3025b:f5b376f03db472410fa1494bb0c8a253ee4723208bda85110a3e05958e89051b
         $this->getLogger()->notice('Updating redis keys');
         $this->getLogger()->info("Fetching redis keys containing ':$oldInstanceId:' ...");
-        $oldKeys = new Keyspace($this->redis, "*:$oldInstanceId:*");
+        $oldKeys = new Keyspace($this->redis, "*");
         foreach ($oldKeys as $oldKey) {
+
+            // I don't know how to modify payloads in rabbitmq. Seems like we don't need to, so long as it
+            // can find the payload in redis, all is well.
+            if (preg_match("/^msg:$oldInstanceId:s:.+$/", $oldKey)) {
+                $this->getLogger()->notice("Skipping stomp redis payload: $oldKey");
+                continue;
+            }
+
             $newKey = preg_replace("/:$oldInstanceId:/", ":$newInstanceId:", $oldKey);
             $this->getLogger()->debug("Renaming '$oldKey' to '$newKey'");
-            $this->redis->rename($oldKey, $newKey);
+
+            // If a set, we may need to rename the key and the members
+            if ($this->redis->type($oldKey)->getPayload() === 'set') {
+                // Special case, create a new set with modified members
+                $members = $this->redis->smembers($oldKey);
+                foreach ($members as $idx => $member) {
+                    $members[$idx] = preg_replace("/:$oldInstanceId:/", ":$newInstanceId:", $member);
+                }
+                $this->redis->del([$oldKey]);
+                $this->redis->sadd($newKey, $members);
+            } else {
+                $this->redis->rename($oldKey, $newKey);
+            }
         }
     }
 
