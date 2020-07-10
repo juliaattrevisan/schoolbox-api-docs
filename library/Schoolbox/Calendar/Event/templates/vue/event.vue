@@ -7,7 +7,6 @@
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */
     import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
-    import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
@@ -51,7 +50,6 @@
         },
         created() {
             this.ENDPOINTS = ENDPOINTS;
-            this.ATTENDANCE_LEVELS = ATTENDANCE_LEVELS;
             this.canRsvp = checks.canRsvp;
             this.showRsvpButtons = checks.showRsvpButtons;
             this.isInvited = checks.isInvited;
