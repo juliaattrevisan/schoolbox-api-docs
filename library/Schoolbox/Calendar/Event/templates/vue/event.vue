@@ -69,6 +69,7 @@
                 numAccepted: this.event.attendance.payload.attendees.accepted,
                 numDeclined: this.event.attendance.payload.attendees.declined,
                 guests: this.event.attendance.payload.attendees.guests,
+                canInvite: this.event.attendance.payload.currentUser.canInvite,
 
                 /* Vue Select
                  */
@@ -401,7 +402,19 @@
              * @return boolean
              */
             canInviteAttendees() {
-                return this.canModify() && ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax));
+
+                /* To invite others, you must
+                 *   - be a staff member or the config var lets you invite others
+                 *   - be able to edit the event (you're its author)
+                 *   - have available places
+                 */
+                if (this.canInvite && this.canModify()) {
+                    if ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax)) {
+                        return true;
+                    }
+                }
+
+                return false;
             },
 
 
