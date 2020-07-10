@@ -100,7 +100,7 @@ class Payload
          * A person who can create an event might not have the ability to invite attendees
          * so it's not equivalent to $canModify
          */
-        $canInvite = ($user->getRole()->isStudent() && (int)$this->di->get('config')->get('calendar_student_can_invite'));
+        $canInvite = $user->getRole()->isStaff() || ($user->getRole()->isStudent() && (int)$this->di->get('config')->get('calendar_student_can_invite'));
 
         return [
             /* Current attendance level for the event
