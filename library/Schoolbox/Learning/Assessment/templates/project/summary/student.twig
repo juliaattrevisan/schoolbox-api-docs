@@ -79,7 +79,6 @@
         </nav>
         <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessment.id }}">
             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
-            {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
             {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
         </ul>
     {% endif %}
