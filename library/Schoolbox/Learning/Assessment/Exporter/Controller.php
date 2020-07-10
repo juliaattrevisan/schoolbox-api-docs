@@ -4,10 +4,15 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Exporter;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Controller\Exception as ControllerException;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -16,6 +21,8 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -98,15 +105,15 @@ class Controller extends BaseController
      * @api   GET /learning/export/assessment/:assessmentId
      * @since 165
      *
-     * @param IAssessable $assessmentSpec
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @param IAssessable $assessment Assessment specification
+     * @throws ServiceNotFound
      * @throws \DomainException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws DefinitionException
+     * @throws \UnexpectedValueException|MapperException
      */
-    public function getExportForm(IAssessable $assessmentSpec)
+    public function getExportForm(IAssessable $assessment): void
     {
-        $assessmentImpls = $this->buildImplementationsForSpecification($assessmentSpec);
+        $assessmentImpls = $this->buildImplementationsForSpecification($assessment);
 
         $notImported = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return null === $assessmentImpl->getId();
@@ -119,7 +126,7 @@ class Controller extends BaseController
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
 
         $data = [
-            'assessmentSpec'   => $assessmentSpec,
+            'assessmentSpec'   => $assessment,
             'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
             'returnUrlName'    => Redirect::RETURN_URL,
             'unImported'       => $notImported,
@@ -138,6 +145,7 @@ class Controller extends BaseController
      *
      * @param IAssessable[]|GenericCollection $assessmentImpls
      * @return bool[] Indexed by folder.id
+     * @throws MapperException
      */
     private function buildFolderWritePermissions(GenericCollection $assessmentImpls): array
     {
@@ -156,14 +164,14 @@ class Controller extends BaseController
      * @api      POST /learning/export/assessment/:assessmentId
      * @since    165
      *
-     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessment
      *
      * @throws InvalidArgumentException
-     * @throws \Alaress\Web\Controller\Exception
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws ControllerException
+     * @throws RouteNotFound
      * @throws \DomainException
      * @throws \LogicException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      * @internal param string $_GET ['returnUrl']            a URL to return to once done
      * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
@@ -171,23 +179,21 @@ class Controller extends BaseController
      *                                           value: true/false
      * @internal param string[][] $_GET ['dates']            by unitImpl.id, then ['publish', 'open', 'due', 'late']
      */
-    public function postExport(IAssessable $assessmentSpec)
+    public function postExport(IAssessable $assessment): void
     {
         $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
         $importedImplementationDates = $this->getRequest()->post->get('unit', []);
-        $assessmentImpls             = $this->buildImplementationsForSpecification($assessmentSpec);
+        // get corresponding assessment impls in the unit impls selected by the user.
+        $assessmentImpls             = $this->buildImplementationsForSpecification($assessment, array_keys($importedImplementations));
         $folderWritePerms            = $this->buildFolderWritePermissions($assessmentImpls);
 
         // Check all permissions before making any changes to system
         $errors = [];
 
         foreach ($assessmentImpls as $assessmentImpl) {
-            // But only if the implementation was ticked by the user
-            if (array_key_exists($assessmentImpl->getBaseContext()->getId(), $importedImplementations)) {
-                $folderId = $assessmentImpl->getContext()->getFolder()->getId();
-                if (!$folderWritePerms[$folderId]) {
-                    $errors[$folderId] = true;
-                }
+            $folderId = $assessmentImpl->getContext()->getFolder()->getId();
+            if (!$folderWritePerms[$folderId]) {
+                $errors[$folderId] = true;
             }
         }
 
@@ -236,8 +242,8 @@ class Controller extends BaseController
             }
 
             $this->exportToNewContext(
-                $assessmentSpec,
-                $unitImpl,
+                $assessment,
+                $assessmentImpl->getContext(),
                 $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
                 $datesObjects['publish'],
                 $datesObjects['open'] ?? $datesObjects['publish'],
@@ -252,7 +258,7 @@ class Controller extends BaseController
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
             /** @var UnitSpecification\Model $unitSpec */
-            $unitSpec  = $assessmentSpec->getBaseContext();
+            $unitSpec  = $assessment->getBaseContext();
             $returnUrl = $this->getRouter()->generate(
                     'course.modifyCourse',
                     ['id' => $unitSpec->getCourse()->getId(),]
@@ -281,7 +287,7 @@ class Controller extends BaseController
      * @return IAssessable
      * @throws InvalidArgumentException
      * @throws \DomainException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     protected function exportToNewContext(
@@ -340,19 +346,35 @@ class Controller extends BaseController
     /**
      * Helper method: builds assessment implementations for a spec assessment
      *
-     * @param IAssessable $assessment
+     * @param IAssessable $assessmentSpec
+     * @param array|null  $unitImplIds
      * @return IAssessable[]|GenericCollection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    protected function buildImplementationsForSpecification(IAssessable $assessment): GenericCollection
+    protected function buildImplementationsForSpecification(IAssessable $assessmentSpec, array $unitImplIds = null): GenericCollection
     {
-        $assessmentImpls     = $this->assessmentDataSource->createCollection();
-        $unitImplementations = $this->unitImplementationMapper->findAllByUnitSpecificationId(
-            $assessment->getContext()->getId()
-        );
+        // if the assessment is in a project spec, get project impls of the project spec
+        $projectImpls = $assessmentSpec->getContext() instanceof Project
+            ? $this->assessmentDataSource->findAllImplementationsBySpecificationId($assessmentSpec->getContext()->getId())
+                ->indexByCallback(static function (IAssessable $assessable) {
+                    return $assessable->getBaseContext()->getId();
+                })
+            : null;
 
+        // unit implementations of the unit spec of this assessment spec or for specified unit impl ids
+        $unitImplementations = $unitImplIds
+            ? $this->unitImplementationMapper->findByColumn('id', $unitImplIds)
+            : $this->unitImplementationMapper->findAllByUnitSpecificationId($assessmentSpec->getBaseContext()->getId());
+
+        // find all assessment impl for the assessment spec
+        $allAssessmentImpls = $this->assessmentDataSource->findAllImplementationsBySpecificationId($assessmentSpec->getId())
+                                                         ->indexByCallback(static function (IAssessable $assessable) {
+                                                             return $assessable->getBaseContext()->getId();
+                                                         });
+
+        $assessmentImpls = $this->assessmentDataSource->createCollection();
         foreach ($unitImplementations as $unitImplementation) {
 
             // Closed already? don't allow export
@@ -360,34 +382,28 @@ class Controller extends BaseController
                 continue;
             }
 
-            // Load assessments into unit implementation
-            $unitImplementation->setAssessables(
-                $this->assessmentDataSource->findAllByUnitImplementationIds([$unitImplementation->getId()])
-            );
+            if ($allAssessmentImpls->keyExists($unitImplementation->getId())) {
+                $assessmentImpls->add($allAssessmentImpls->offsetGet($unitImplementation->getId()));
+                continue;
+            }
 
-            // Is $assessable imported into this unit yet?
-            $isAlreadyImported = false;
-            foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
-                // It's not guaranteed that an assessment in a implementation will have a spec.
-                // An assessment added to an implementation post-spec won't have one.
-                $spec = $implementationAssessment->getSpecificationAssessment();
-                if ($spec instanceof IAssessable && $spec->getId() == $assessment->getId()) {
-                    $isAlreadyImported = true;
-                    $assessmentImpls->add($implementationAssessment);
-                    break;
+            $context = null;
+            // try to find a corresponding project impl, do not return, if project impl doesn't exist.
+            if ($projectImpls) {
+                if ($projectImpls->keyExists($unitImplementation->getId())) {
+                    $context = $projectImpls->offsetGet($unitImplementation->getId());
+                } else {
+                    continue;
                 }
             }
-            // Not yet imported?
-            if (!$isAlreadyImported) {
-                $assessmentImpl = $assessment->cloneForCopy();
-                $assessmentImpl->setContext($unitImplementation);
-                $assessmentImpl->setPublishAt($unitImplementation->getOpenDate());
-                $assessmentImpl->setOpenAt($unitImplementation->getOpenDate());
-                $assessmentImpl->setDueAt($unitImplementation->getDueDate());
-                $assessmentImpl->setCloseAt($unitImplementation->getDueDate());
-                $unitImplementation->getAssessables()->add($assessmentImpl);
-                $assessmentImpls->add($assessmentImpl);
-            }
+
+            $assessmentImpl = $assessmentSpec->cloneForCopy();
+            $assessmentImpl->setContext($context ?? $unitImplementation);
+            $assessmentImpl->setPublishAt($unitImplementation->getOpenDate());
+            $assessmentImpl->setOpenAt($unitImplementation->getOpenDate());
+            $assessmentImpl->setDueAt($unitImplementation->getDueDate());
+            $assessmentImpl->setCloseAt($unitImplementation->getDueDate());
+            $assessmentImpls->add($assessmentImpl);
         }
 
         return $assessmentImpls;

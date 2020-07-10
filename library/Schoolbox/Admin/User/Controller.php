@@ -389,6 +389,8 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'portraitZone' => $portraitZone->getTwigContext(),
                 'isSchoolboxAdmin' => false,
+                'serviceMapping' => self::SERVICE_MAPPING,
+                'identifiers' => self::IDENTIFIERS,
             ],
             'title' => 'Admin - Users'
         ]);
