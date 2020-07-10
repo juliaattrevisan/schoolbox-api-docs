@@ -203,30 +203,11 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let found = false;
 
                             /* Update data with the result from async request
                              */
                             self.updateCountsFromPayload(response.data);
-
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === id) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            /* If user $id wasn't already in the list, ram them into the list;
-                             * otherwise, don't accidentally update their rsvp status - just
-                             * walk past it like nothing happened
-                             */
-                            if (!found) {
-                                self.guests.push({
-                                    id: id,
-                                    name: fullname,
-                                    status: ATTENDANCE_STATUS.PENDING
-                                });
-                            }
+                            self.guests = response.data.attendees.guests;
 
                             toast.toastTimeout({
                                 text: fullname + ' has been invited',
