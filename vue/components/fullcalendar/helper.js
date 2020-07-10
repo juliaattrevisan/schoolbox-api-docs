@@ -1,4 +1,5 @@
-import {toMoment} from '@fullcalendar/moment'
+import {toMoment}          from '@fullcalendar/moment';
+import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 
 const EVENT_VARIANT_EVENT = 'event';
 const EVENT_VARIANT_TASK  = 'task';
@@ -93,15 +94,27 @@ export default class FullCalendarHelper {
             title = $element.find('.fc-title'),
             content = $element.find('.fc-event-content');
 
-        // If appropriate, indicate this event can be attended
-        if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
-            let span = '<span class="att">(A)</span>';
-            if (content.length === 1) {
-                content.append(span)
-            } else {
-                inner.append(span)
+        if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
+            // Add a style depending on attendability
+            let attendanceStatus = calEvent?.extendedProps?.data?.attendance?.status?.current;
+            if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
+                title.addClass('declined');
+            } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
+                title.addClass('pending');
+            } else if (attendanceStatus === ATTENDANCE_STATUS.ACCEPTED) {
+                title.addClass('accepted');
             }
         }
+
+        // // If appropriate, indicate this event can be attended
+        // if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
+        //     let span = '<span class="att">(A)</span>';
+        //     if (content.length === 1) {
+        //         content.append(span)
+        //     } else {
+        //         inner.append(span)
+        //     }
+        // }
 
         // If this event is a task, alter the state of the checkbox accordingly.
         if (this.isTask(calEvent)) {
