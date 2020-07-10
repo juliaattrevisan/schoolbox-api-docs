@@ -81,6 +81,15 @@ class Payload
          */
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
+        /* Post-analysis censorship
+         *
+         * After the basic Payload administration has occurred, which generates counts and perms etc.
+         * check whether $user has been invited into an event with a hidden guest list
+         *
+         * If so, remove everyone except $user from the guest list
+         */
+
+
         /* Decide whether $user can invite other users
          *
          * A person who can create an event might not have the ability to invite attendees
