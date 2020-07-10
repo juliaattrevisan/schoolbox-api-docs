@@ -33,7 +33,8 @@
                 id: null
             },
             status: null,
-            canModify: null
+            canModify: null,
+            canInvite: null
         },
         attendees: {
             guests: [],

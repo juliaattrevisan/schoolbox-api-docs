@@ -52,3 +52,8 @@ INSERT INTO `error` (id, message) VALUES
 UPDATE `event`
 SET attendance = 2
 WHERE attendance = 1;
+
+-- Show Attendees List
+
+ALTER TABLE `event`
+    ADD COLUMN `show_attendees` TINYINT(1) NULL DEFAULT 1 AFTER `attendance`;

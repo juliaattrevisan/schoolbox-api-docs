@@ -170,6 +170,14 @@ class Event implements ISoftDeletable
 
 
     /**
+     * Whether to show the attendance guest list
+     *
+     * @var bool
+     */
+    protected $showAttendees;
+
+
+    /**
      * Determine whether the attendance state changed prior to saving
      *
      * This saves us an extra db call in save() where it used to
@@ -961,8 +969,7 @@ class Event implements ISoftDeletable
      *
      * @param Collection $folderCollection
      * @return $this
-     */
-    public function setFolderCollection(Collection $folderCollection): self
+     */    public function setFolderCollection(Collection $folderCollection): self
     {
         $this->folderCollection = $folderCollection;
         return $this;
@@ -1048,6 +1055,26 @@ class Event implements ISoftDeletable
     public function setMaxAttendees(?int $maxAttendees): self
     {
         $this->maxAttendees = $maxAttendees;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getShowAttendees(): ?bool
+    {
+        return $this->showAttendees;
+    }
+
+
+    /**
+     * @param bool|null $showAttendees
+     * @return $this;
+     */
+    public function setShowAttendees(?bool $showAttendees): self
+    {
+        $this->showAttendees = $showAttendees;
         return $this;
     }
 }
