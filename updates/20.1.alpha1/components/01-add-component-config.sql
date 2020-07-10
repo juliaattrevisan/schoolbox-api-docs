@@ -151,6 +151,8 @@ WHERE ccd.`key` = 'compactMode'
 
 -- Assign a componentname config definition to components who don't already have it
 
+UPDATE component_config_definition SET `key` = 'componentname' WHERE `key` = 'textBoxComponentName';
+
 INSERT INTO
 component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
 (
