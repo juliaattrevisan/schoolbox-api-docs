@@ -57,3 +57,22 @@ WHERE attendance = 1;
 
 ALTER TABLE `event`
     ADD COLUMN `show_attendees` TINYINT(1) NULL DEFAULT 1 AFTER `attendance`;
+
+-- Config option for allowing students to invite people to their events
+INSERT INTO `config`
+(`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+VALUES
+(
+    'calendar_student_can_invite',
+    1,
+    'Allow students to invite others to events',
+    "If toggled to 'ON', students will be able to create events in the calendar and invite other users in the system to these events",
+    (SELECT id FROM lu_config_field where field = 'boolean'),
+    null,
+    (SELECT id FROM lu_config_type WHERE type = 'Policy'),
+    'true',
+    'false',
+    'true',
+    'settings',
+    null
+);
