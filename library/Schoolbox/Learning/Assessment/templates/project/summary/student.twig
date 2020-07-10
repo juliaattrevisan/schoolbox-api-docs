@@ -17,6 +17,11 @@
 
 {% set participant = assessment.participantIfExtant(student) %}
 
+{% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+{% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+{% set hasActions = statusRoute or modifyRoute or deleteRoute %}
+
+
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 
 {% autoescape 'js' %}
@@ -64,10 +69,20 @@
 </script>
 {% endautoescape %}
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
     </div>
+    {% if hasActions %}
+        <nav>
+            <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessment.id }}" aria-expanded="false" title="Actions"></a></nav>
+        </nav>
+        <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessment.id }}">
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+            {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
+            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
+        </ul>
+    {% endif %}
 </div>
 
 <div class="row">
