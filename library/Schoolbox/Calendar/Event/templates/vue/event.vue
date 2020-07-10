@@ -338,9 +338,6 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.currentUser.user.id;
-                            let fullname = response.data.currentUser.user.title + ' ' + response.data.currentUser.user.firstname + ' ' + response.data.currentUser.user.lastname;
-                            let found = false;
 
                             /* Update data with the result from async request
                              */
