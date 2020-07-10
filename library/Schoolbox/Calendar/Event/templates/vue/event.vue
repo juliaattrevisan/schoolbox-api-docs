@@ -346,22 +346,7 @@
                              */
                             self.currentAttendanceStatus = status;
                             self.updateCountsFromPayload(response.data);
-
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === userId) {
-                                    self.guests[i].status = status;
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found) {
-                                self.guests.push({
-                                    id: userId,
-                                    name: fullname,
-                                    status: status
-                                });
-                            }
+                            self.guests = response.data.attendees.guests;
 
                             toast.toastTimeout({
                                 text: 'Invitation successfully updated',
