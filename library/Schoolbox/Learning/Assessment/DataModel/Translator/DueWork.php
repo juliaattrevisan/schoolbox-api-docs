@@ -95,6 +95,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
         null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
         null === $domainObject->getMarkPerCapability()      || $dataModel->setMarkedPerCapability($domainObject->getMarkPerCapability());
+        null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
         null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
@@ -156,6 +157,7 @@ class DueWork implements IAssessmentTypeTranslator
         // Has Rubric? (actual rubric must be loaded outside of this method)
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
+            $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
 
             if ($dataModel->isMarkedPerCapability()) {
                 $domainObject->setMarkPerCapability(true);

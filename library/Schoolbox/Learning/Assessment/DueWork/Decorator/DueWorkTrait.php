@@ -49,6 +49,13 @@ trait DueWorkTrait
      */
     protected $markPerCapability = false;
 
+
+    /**
+     * @var int
+     */
+    protected $capabilityGradeGroup;
+
+
     /**
      * @var bool
      */
@@ -166,6 +173,25 @@ trait DueWorkTrait
         $this->markPerCapability = $markPerCapability;
         return $this;
     }
+
+    /**
+     * @return int|null
+     */
+    public function getCapabilityGradeGroup(): ?int
+    {
+        return $this->capabilityGradeGroup;
+    }
+
+    /**
+     * @param int|null $capabilityGradeGroup
+     * @return DueWorkTrait
+     */
+    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
+    {
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
+        return $this;
+    }
+
 
     /**
      * @return boolean

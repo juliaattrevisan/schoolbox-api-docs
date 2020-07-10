@@ -86,6 +86,14 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     protected $markPerCapability = false;
 
+
+    /**
+     * The rubric capability's grade group, if chosen
+     *
+     * @var int|null
+     */
+    protected $capabilityGradeGroup;
+
     /**
      * This DueWork's Rubric has Use Mark Range on
      *
@@ -832,6 +840,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setSimilarityCheckEnabled(bool $similarityCheckEnabled): self
     {
         $this->similarityCheckEnabled = $similarityCheckEnabled;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCapabilityGradeGroup(): ?int
+    {
+        return $this->capabilityGradeGroup;
+    }
+
+    /**
+     * @param int|null $capabilityGradeGroup
+     * @return Model
+     */
+    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
+    {
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 
