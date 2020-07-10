@@ -59,11 +59,12 @@ class Payload
      * Generate attendance payload info for $event
      *
      * @param Event $event
-     * @param User $user
+     * @param User  $user
      * @return array
+     * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws Exception
+     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function generate(Event $event, User $user): array
