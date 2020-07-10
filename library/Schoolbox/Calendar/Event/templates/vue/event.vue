@@ -372,7 +372,17 @@
              */
             showGuestsPanel()
             {
-                return this.event.attendance.level.current !== this.ATTENDANCE_LEVELS.NONE
+                /* The Guests panel is available when any of the following can be performed:
+                 *
+                 * You can rsvp to an event (shows rsvp buttons)
+                 * There's limited attendance and the attendance list is visible to you (shows metadata about counts)
+                 * You can modify the event (you can see the Invite Guest selectize)
+                 * You can see the attendance list (shows invited dudes)
+                 */
+                return this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable) ||
+                    (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
+                    this.canModify() ||
+                    this.isAttendeesVisible();
             },
 
 
