@@ -56,7 +56,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('access',self::TYPE_INTEGER);
         $this->uses('attendance',self::TYPE_INTEGER);
         $this->uses('max_attendees',self::TYPE_INTEGER);
-        $this->uses('show_attendees',self::TYPE_INTEGER);
+        $this->uses('show_attendees',self::TYPE_BOOLEAN);
         $this->uses('completed',self::TYPE_INTEGER);
         $this->uses('publish_date',self::TYPE_DATETIME,null,'publishDateTime');
         $this->joins('owner', UserMapper::class,'id',self::TYPE_MODEL, null, 'owner','owner');

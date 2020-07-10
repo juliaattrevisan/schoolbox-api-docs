@@ -969,8 +969,7 @@ class Event implements ISoftDeletable
      *
      * @param Collection $folderCollection
      * @return $this
-     */
-    public function setFolderCollection(Collection $folderCollection): self
+     */    public function setFolderCollection(Collection $folderCollection): self
     {
         $this->folderCollection = $folderCollection;
         return $this;
@@ -1061,19 +1060,19 @@ class Event implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return bool|null
      */
-    public function getShowAttendees(): ?int
+    public function getShowAttendees(): ?bool
     {
         return $this->showAttendees;
     }
 
 
     /**
-     * @param int|null $showAttendees
+     * @param bool|null $showAttendees
      * @return $this;
      */
-    public function setShowAttendees(?int $showAttendees): self
+    public function setShowAttendees(?bool $showAttendees): self
     {
         $this->showAttendees = $showAttendees;
         return $this;

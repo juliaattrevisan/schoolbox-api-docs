@@ -612,7 +612,7 @@ class Controller extends Base
          */
         $attendance = (int)$this->request->post['attendance'];
         $maxAttendees = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
-        $showAttendees = (int)$this->request->post['showAttendees'];
+        $showAttendees = (bool)$this->request->post['showAttendees'];
 
         /* Decide if the Attendance settings need to be reset
          *
