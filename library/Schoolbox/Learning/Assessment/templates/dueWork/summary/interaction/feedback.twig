@@ -145,7 +145,7 @@ feedback: currentFeedback,
                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}>
-                {{ currentFeedback.comment|nl2br }}
+                {{ currentFeedback.comment|linkify|nl2br }}
             </blockquote>
         {% endif %}
 

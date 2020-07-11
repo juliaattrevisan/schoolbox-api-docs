@@ -14,7 +14,7 @@
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/workType.twig' %}
     {% if student.id != USER.id %}
-    <li class="icon-staff-students">{{ student.fullname }}</li>
+        <li class="icon-staff-students"><a href="/search/user/{{ student.id }}">{{ student.fullname }}</a></li>
     {% endif %}
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
