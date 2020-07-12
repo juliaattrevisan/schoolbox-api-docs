@@ -311,11 +311,11 @@ class Controller extends Base
             [
                 'template' => '@pastoralReportBuilder/report_tags.twig',
                 'data'     => [
-                    'tag'     => $tag,
-                    'results' => $records,
+                    'tag'          => $tag,
+                    'results'      => $records,
+                    'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
                 ],
-                'title' => 'Pastoral Tag Report',
-                'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
+                'title'    => 'Pastoral Tag Report',
             ]
         );
     }

@@ -55,12 +55,12 @@
         // Ensure match is scheduled within the season
 
         $('#homeTeam').selectizeSelector({
-            {% if match.homeTeam.id -%}
+            {% if match.homeTeam -%}
             value: {
                 id: {{ match.homeTeam.id }},
                 name: "{{ match.homeTeam.name }}"
             },
-            {% elseif match.homeSchool.Id -%}
+            {% elseif match.homeSchool -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
                 name: "{{ match.homeSchool.name }}"
@@ -90,12 +90,12 @@
         });
 
         $('#awayTeam').selectizeSelector({
-            {% if match.awayTeam.id -%}
+            {% if match.awayTeam -%}
             value: {
                 id: {{ match.awayTeam.id }},
                 name: "{{ match.awayTeam.name }}"
             },
-            {% elseif match.awaySchool.id -%}
+            {% elseif match.awaySchool -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.awaySchool.id }}",
                 name: "{{ match.awaySchool.name }}"
@@ -130,7 +130,7 @@
                 type: 'GET',
                 dataType: 'json'
             },
-            {% if match.venue.id -%}
+            {% if match.venue -%}
             value: {
                 id: {{ match.venue.id }},
                 name: "{{ match.venue.name }}"
@@ -208,7 +208,7 @@
 
                     <div class="column small-12 medium-6">
                         <label for="startAtDate" class="required">Date</label>
-                        <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.startAt.local }}" required />
+                        <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.startAt ? match.startAt.local : '' }}" required />
                     </div>
 
                     <div class="small-12 columns">

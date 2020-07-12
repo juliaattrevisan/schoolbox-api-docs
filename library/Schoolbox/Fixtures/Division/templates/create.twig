@@ -14,7 +14,7 @@
         });
 
         var ize = $('#season').selectizeSelector({
-            {% if division.season.id %}
+            {% if division.season %}
             value: {"id":{{ division.season.id }}, "name": "{{ division.season.name }}"},
             {% endif %}
             multiple: false,
@@ -74,7 +74,7 @@
                         <input type="text" name="name" id="name" value="{{ division.name }}" required/>
 
                         <label for="season" class="required">Current Season</label>
-                        <input id="season" name="seasonId" type="text" value="{{ division.season.name }}" placeholder="Search Seasons" required />
+                        <input id="season" name="seasonId" type="text" value="{{ division.season.name ?? '' }}" placeholder="Search Seasons" required />
 
                         <label for="url">Homepage URL</label>
                         <script>

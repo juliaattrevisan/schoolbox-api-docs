@@ -1,4 +1,4 @@
-{% if subtype.id is null %}
+{% if subtype is null %}
     {% set action = routeLookupIfAuthorized('pastoralAudience.postAudienceTypeModify', {type: type, typeId: type.id}) %}
     {% set title = type.name %}
 {% else %}

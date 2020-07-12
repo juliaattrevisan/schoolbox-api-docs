@@ -216,11 +216,6 @@ class Module extends BaseModule
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 
-        // Should never have got to this page the course was not imported
-        if (0 === $unitImplementations->count()) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_NO_ANALYTICS_DATA);
-        }
-
         /**
          * UnitImpls that contain assessments due in selected Term
          *

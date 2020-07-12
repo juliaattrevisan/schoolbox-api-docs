@@ -109,10 +109,10 @@
 
 {% if not record.id %}
     {% set name = "yourself" %}
-{% elseif USER.id != record.owner.id %}
+{% elseif record.owner is defined and USER.id != record.owner.id %}
     {% set name = "yourself" %}
 {% else %}
-    {% set name = record.owner.fullName %}
+    {% set name = record.owner.fullName ?? '' %}
 {% endif %}
 
 {# Empty state when no visibility rules #}

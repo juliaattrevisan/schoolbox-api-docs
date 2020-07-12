@@ -21,6 +21,7 @@ use \Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\Fixtures\Team\Model as Team;
 use \Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
 use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Team\Position\Participant\Model as TeamPositionParticipant;
 
 class Metadata
 {
@@ -107,10 +108,19 @@ class Metadata
                  */
                 /** @var TeamPosition $currentPosition */
                 foreach ($allPositions as $currentPosition) {
-                    if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
+                    if ($currentPosition instanceof TeamPositionParticipant) {
+                        // Historic
+                        $playerPosition = $currentPosition;
+                    } elseif ($currentPosition instanceof TeamPosition) {
+                        // Current
+                        $playerPosition = $currentPosition->getPosition();
+                    } else {
+                        continue;
+                    }
 
-                        /** @var Collection $item['positions'] */
-                        $item['positions']->add($currentPosition);
+                    if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
+                        /** @var Collection $item ['positions'] */
+                        $item['positions']->add($playerPosition);
                     }
                 }
 

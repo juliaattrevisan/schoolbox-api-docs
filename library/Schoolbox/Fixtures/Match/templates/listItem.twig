@@ -5,11 +5,11 @@
         <div class="small-12 card">
             {% if currentMatch.name | length %}
 
-                {%  if currentMatch.homeTeam.id and currentMatch.awayTeam.id %}
+                {%  if currentMatch.homeTeam and currentMatch.awayTeam %}
                     <h3>{{ currentMatch.name }}</h3>
-                {% elseif currentMatch.homeTeam.id %}
+                {% elseif currentMatch.homeTeam %}
                     <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.name }}</a></h3>
-                {% elseif currentMatch.awayTeam.id  %}
+                {% elseif currentMatch.awayTeam %}
                     <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.name }}</a></h3>
                 {% endif %}
 

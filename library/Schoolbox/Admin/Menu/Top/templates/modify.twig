@@ -29,10 +29,10 @@
 {{ renderAdminNavigation(pageCurrent) }}
 
 <form id="itemForm" action="{{ routeLookup('adminMenuTop.postModify') }}" method="post">
-    <input type="hidden" name="id" value="{{ item.id }}">
+    <input type="hidden" name="id" value="{{ item.id ?? '' }}">
     <div class="row">
         <div class="small-12 island">
-            {% if item.id is empty %}
+            {% if item is not defined %}
                 <h2 class="subheader">Create Menu Item</h2>
             {% else %}
                 <h2 class="subheader">Modify Menu Item</h2>
@@ -42,13 +42,13 @@
                     <div class="small-12 columns">
                         <label>
                             Title
-                            <input required type="text" name='text' value="{{ item.text }}">
+                            <input required type="text" name='text' value="{{ item.text ?? '' }}">
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>
                             Hover Description
-                            <input name='title' type="text" value="{{ item.title }}">
+                            <input name='title' type="text" value="{{ item.title ?? '' }}">
                         </label>
                     </div>
                     <div class="small-10 columns">
@@ -56,7 +56,7 @@
                             Icon
                             <select id="icon-select" name="icon" data-icon>
                                 {% for icon in icons %}
-                                    <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
+                                    <option {% if item is defined and icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
                                 {% endfor %}
                             </select>
                         </label>
@@ -65,7 +65,7 @@
                         <label>
                             Preview
                         </label>
-                        <div id="icon" style="margin-top:5px" class="size-32 icon-{{ item.icon }}"></div>
+                        <div id="icon" style="margin-top:5px" class="size-32 icon-{{ item.icon ?? '' }}"></div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -84,7 +84,7 @@
                             });
                         </script>
                         <div class="input-group">
-                            <input name="url" required type="text" value="{{ item.url }}" />
+                            <input name="url" required type="text" value="{{ item.url ?? '' }}" />
                             <a id="modalLinkButton" class="button icon-link">Browse</a>
                         </div>
                     </div>
@@ -92,8 +92,8 @@
                         <label>
                             Destination Target
                             <select name="target">
-                                <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
-                                <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
+                                <option {% if item is defined and item.target == '' %}selected{% endif %} value="">Same Window</option>
+                                <option {% if item is defined and item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
                             </select>
                         </label>
                     </div>
@@ -102,7 +102,7 @@
                             Webmail Link
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Special logic is used for webmail display based on the individual, this will indicate that this item represents the webmail tab">?</span>
                             <div class="switch round">
-                            <input id="webmail" type="checkbox" name="webmail" data-checkbox-group="webmail" {% if item.webmail %}checked{% endif %}/>
+                            <input id="webmail" type="checkbox" name="webmail" data-checkbox-group="webmail" {% if item.webmail ?? false %}checked{% endif %}/>
                             <label for="webmail">
                                 <span>On</span>
                                 <span>Off</span>
@@ -121,7 +121,7 @@
                             <input id="campus-all" type="checkbox">
                             <label for="campus-all">Select All</label>
                             {% for campus in campuses %}
-                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
                                 <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
                             {% endfor %}
                         </fieldset>
@@ -135,7 +135,7 @@
                             <input id="role-all" type="checkbox">
                             <label for="role-all">Select All</label>
                             {% for role in roles %}
-                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
                                 <label for="role-{{ role.id }}">{{ role.name }}</label>
                             {% endfor %}
                         </fieldset>

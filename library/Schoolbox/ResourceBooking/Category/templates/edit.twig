@@ -29,16 +29,16 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceCategory.browse') }}">Resource Categories</a></li>
-    <li class="active"><a href="#">{% if category.id %}Edit{% else %}Add{% endif %}</a></li>
+    <li class="active"><a href="#">{% if category is defined %}Edit{% else %}Add{% endif %}</a></li>
 </ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{% if category.id %}Edit{% else %}Add{% endif %} Resource Category</h1>
+            <h1>{% if category is defined %}Edit{% else %}Add{% endif %} Resource Category</h1>
         </div>
     </div>
-    {% if category.id and isRouteAuthorized('resourceCategory.delete:post', {id: category.id, category: category}) %}
+    {% if category is defined and isRouteAuthorized('resourceCategory.delete:post', {id: category.id, category: category}) %}
     <nav>
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
@@ -50,20 +50,20 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id="resourcecategory-form" action="{% if category.id %}{{ routeLookup('resourceCategory.update:post', {id: category.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form">
-            <input type="hidden" name="id" value="{{ category.id }}"/>
+        <form id="resourcecategory-form" action="{% if category is defined %}{{ routeLookup('resourceCategory.update:post', {id: category.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form">
+            <input type="hidden" name="id" value="{{ category.id ?? '' }}"/>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="name" class="required">Title</label>
-                        <input class="required" name="name" id="name" type="text" value="{{ category.name }}" maxlength="250" required/>
+                        <input class="required" name="name" id="name" type="text" value="{{ category.name ?? '' }}" maxlength="250" required/>
                     </div>
                 </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input id="resourcecategory-save" type="submit" value="{% if category.id %}Update{% else %}Create{% endif %}" />
+                    <input id="resourcecategory-save" type="submit" value="{% if category is defined %}Update{% else %}Create{% endif %}" />
                 </div>
             </div>
         </form>

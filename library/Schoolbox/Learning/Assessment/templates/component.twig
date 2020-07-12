@@ -22,7 +22,7 @@
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
     <i class="{{ icon }}"></i>
 
-    {% if readOnly %}
+    {% if readOnly ?? false %}
 
         <p>{{ studentMessage }}</p>
         {% set route = routeLookupIfAuthorized(
@@ -39,7 +39,7 @@
             <p><a href="{{ route }}">View your {{ locale.grades.plural }}</a>.</p>
         {% endif %}
 
-    {% else %}
+    {% elseif createRouteType is defined %}
 
         <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not a part of your course {{ teacherMessage }}.</p>
 

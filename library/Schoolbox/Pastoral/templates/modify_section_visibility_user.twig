@@ -162,6 +162,6 @@
         {% set searchScope = 'staff' %}
     {% endif %}
 
-    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded', 'window.modalUsersExisting') }}
+    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id ?? 0, 'window.modalUserAdded', 'window.modalUsersExisting') }}
 
 {% endif %}

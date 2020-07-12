@@ -11,7 +11,7 @@
                     </a>
                     <p class="meta">
                         {% for currentPosition in currentPlayer.positions %}
-                        {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
+                        {{ currentPosition.name ?? '' }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </p>
                 </div>

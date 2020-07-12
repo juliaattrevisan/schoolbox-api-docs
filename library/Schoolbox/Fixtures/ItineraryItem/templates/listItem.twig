@@ -1,24 +1,24 @@
 <div class="list-item">
     <input type="hidden" name="itinerary[matchId][]" value="{{ match.id }}"/>
-    <input type="hidden" name="itinerary[itemId][]" value="{{ itineraryItem.id }}"/>
+    <input type="hidden" name="itinerary[itemId][]" value="{{ itineraryItem.id ?? '' }}"/>
     <div class="column small-12 large-6 xlarge-4">
         <label>
             Date
             {# If this input has data - it can use the datepicker attacher,
                otherwise it needs to use a custom one which is attached on MightyList create (in listContent.twig)
              #}
-            <input type="text" name="itinerary[date][]" id="itineraryDate-{{ itineraryItem.id }}" placeholder="Date" {{ (itineraryItem.startAt.localShort) ? 'data-datepicker' : 'data-itinerary-date' }} data-datepicker-time value="{{ itineraryItem.startAt.local }}">
+            <input type="text" name="itinerary[date][]" id="itineraryDate-{{ itineraryItem.id ?? '' }}" placeholder="Date" {{ (itineraryItem is defined and itineraryItem.startAt and itineraryItem.startAt.localShort) ? 'data-datepicker' : 'data-itinerary-date' }} data-datepicker-time value="{{ itineraryItem.startAt.local ?? '' }}">
         </label>
     </div>
     <div class="small-12 large-6 xlarge-8 columns">
         <label>
             Description
-            <input type="text" name="itinerary[description][]" value="{{ itineraryItem.description }}"  data-item-original-value="{{ itineraryItem.description }}" data-item-element />
+            <input type="text" name="itinerary[description][]" value="{{ itineraryItem.description ?? '' }}"  data-item-original-value="{{ itineraryItem.description ?? '' }}" data-item-element />
         </label>
     </div>
 </div>
-{% if not hideNav %}
+{% if hideNav is not defined or not hideNav %}
 <nav>
-    <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentItineraryItem.id }}"></a>
+    <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id ?? 0}) }}" class="icon-delete" title="Delete" data-delete="{{ currentItineraryItem.id ?? '' }}"></a>
 </nav>
 {% endif %}

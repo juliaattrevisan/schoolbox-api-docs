@@ -63,15 +63,15 @@
                             <tr>
                                 <td>{{ role.getName }}</td>
                                 <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" checked id="groupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] }}>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" checked id="groupNone{{ role.getId }}" value="0">
                                     <label class="radio-label" for="groupNone{{ role.getId }}"></label>
                                 </td>
                                 <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] }}>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1"}}>
                                     <label class="radio-label" for="groupRead{{ role.getId }}"></label>
                                 </td>
                                 <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] }}>
+                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2"}}>
                                     <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
                                 </td>
                             </tr>

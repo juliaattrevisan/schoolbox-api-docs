@@ -1,8 +1,8 @@
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
-{% if assessment.isSelfGradable %}
+{% if assessment.isSelfGradable ?? false %}
     {% set selfReflectSuffix = ' includes ' ~ locale.selfAssessment.proper %}
-{% elseif assessment.isSelfReflectableOnly %}
+{% elseif assessment.isSelfReflectableOnly ?? false %}
     {% set selfReflectSuffix = ' includes ' ~ locale.selfReflection.proper %}
 {% else %}
     {% set selfReflectSuffix = '' %}

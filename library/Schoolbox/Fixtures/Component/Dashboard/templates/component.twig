@@ -9,11 +9,11 @@
                     <div class="list-item">
                         <div class="card small-12">
                             {% if match.name|length %}
-                                {%  if match.homeTeam.id and match.awayTeam.id %}
+                                {%  if match.homeTeam and match.awayTeam %}
                                     <h3>{{ match.name }}</h3>
-                                {% elseif match.homeTeam.id %}
+                                {% elseif match.homeTeam %}
                                     <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.name }}</a></h3>
-                                {% elseif match.awayTeam.id  %}
+                                {% elseif match.awayTeam  %}
                                     <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.name }}</a></h3>
                                 {% endif %}
                                     <p class="meta">{{ matchHeading.generateWithResultLink(match) }}</p>
@@ -36,7 +36,7 @@
                                     </p>
                                 {% endif %}
 
-                                {% if match.awayTeam.players | length %}
+                                {% if match.awayTeam.players ?? []| length %}
                                     <p class="meta">
                                         {% for child in match.awayTeam.players %}
                                             {% if not loop.first and not loop.last %},{% endif %}
