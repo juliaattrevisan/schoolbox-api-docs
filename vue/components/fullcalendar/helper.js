@@ -95,7 +95,7 @@ export default class FullCalendarHelper {
 
         if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
             // Add a style depending on attendability
-            $element.addClass('attendable');
+            $element.addClass('has-attendance');
             let attendanceStatus = calEvent?.extendedProps?.data?.attendance?.status?.current;
             if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
                 $element.addClass('declined');

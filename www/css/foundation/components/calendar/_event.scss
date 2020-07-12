@@ -145,7 +145,7 @@
 }
 
 // RSVP styles
-.fc-event.attendable, .fc-list-item.attendable {
+.fc-event.has-attendance, .fc-list-item.has-attendance {
   &.declined {
     text-decoration: line-through;
   }
