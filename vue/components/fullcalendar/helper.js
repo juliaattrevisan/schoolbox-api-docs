@@ -91,8 +91,7 @@ export default class FullCalendarHelper {
         // TODO don't depend on jQuery for this
         let $element = self.jQuery(eventRenderInfo.el),
             inner = $element.find('.fc-content'),
-            title = $element.find('.fc-title'),
-            content = $element.find('.fc-event-content');
+            title = $element.find('.fc-title');
 
         if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
             // Add a style depending on attendability
@@ -106,16 +105,6 @@ export default class FullCalendarHelper {
                 $element.addClass('accepted');
             }
         }
-
-        // // If appropriate, indicate this event can be attended
-        // if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
-        //     let span = '<span class="att">(A)</span>';
-        //     if (content.length === 1) {
-        //         content.append(span)
-        //     } else {
-        //         inner.append(span)
-        //     }
-        // }
 
         // If this event is a task, alter the state of the checkbox accordingly.
         if (this.isTask(calEvent)) {
