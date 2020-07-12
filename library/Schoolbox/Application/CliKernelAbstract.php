@@ -394,6 +394,15 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     }
 
 
+    /** @inheritDoc */
+    protected function installDependencies(): void
+    {
+        parent::installDependencies();
+
+        $this->getDependencyInjector()->values['logger'] = $this->logger();
+    }
+
+
     /**
      * Determine logging level via verbose setting
      * verbose is set by -vvv.  Each v represents a value in an array.
