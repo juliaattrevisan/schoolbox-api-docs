@@ -96,13 +96,14 @@ export default class FullCalendarHelper {
 
         if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
             // Add a style depending on attendability
+            $element.addClass('attendable');
             let attendanceStatus = calEvent?.extendedProps?.data?.attendance?.status?.current;
             if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
-                title.addClass('declined');
+                $element.addClass('declined');
             } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
-                title.addClass('pending');
+                $element.addClass('pending');
             } else if (attendanceStatus === ATTENDANCE_STATUS.ACCEPTED) {
-                title.addClass('accepted');
+                $element.addClass('accepted');
             }
         }
 
