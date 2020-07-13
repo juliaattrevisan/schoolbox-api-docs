@@ -62,7 +62,7 @@ class AjaxFlot
      *
      * Find total group usage
      *
-     * @return string
+     * @return mixed
      */
     public function findGroupUsage()
     {
@@ -91,7 +91,7 @@ class AjaxFlot
         usort($allResults, function ($a, $b) use ($order, $index) {
             return $order === 'DESC' ? $a[$index] < $b[$index] : $a[$index] > $b[$index];
         });
-        $this->render($allResults);
+        return $this->render($allResults);
     }
 
 
@@ -117,7 +117,7 @@ class AjaxFlot
      *
      * Find total type usage and pie it out, which uses a percentage
      *
-     * @return string
+     * @return mixed
      */
     public function findTypeUsage()
     {
@@ -152,11 +152,12 @@ class AjaxFlot
         usort($allResults, function ($a, $b) use ($order, $index) {
             return $order === 'DESC' ? $a[$index] < $b[$index] : $a[$index] > $b[$index];
         });
-        $this->render($allResults);
+        return $this->render($allResults);
     }
 
     /**
-     * @param $results
+     * @param array $results
+     * @return mixed
      */
     private function render($results)
     {
@@ -177,8 +178,7 @@ class AjaxFlot
             $page->parse('data_block', 'data', true);
         }
 
-        echo $page->template->_varVals['data_block'];
-
+        return $page->template->_varVals['data_block'];
     }
 
 
@@ -191,6 +191,7 @@ class AjaxFlot
      * @param string $order
      * @param int $index
      * @param int $numPerPage
+     * @return mixed
      */
     public function findUserUsage($orderBy, $order, $index, $numPerPage)
     {
@@ -216,7 +217,7 @@ class AjaxFlot
             $page->parse('user_block', 'user', true);
         }
 
-        echo $page->template->_varVals['user_block'];
+        return $page->template->_varVals['user_block'];
     }
 
     /* Getters/Setters
