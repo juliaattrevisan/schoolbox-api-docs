@@ -13,13 +13,13 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
-{% set isTask    = isTask    or assessment is task %}
-{% set isQuiz    = isQuiz    or assessment is quiz %}
-{% set isDueWork = isDueWork or assessment is dueWork %}
+{% set isTask    = isTask    ?? assessment is task %}
+{% set isQuiz    = isQuiz    ?? assessment is quiz %}
+{% set isDueWork = isDueWork ?? assessment is dueWork %}
 
 {%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
 
-<section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt.unixTimeStamp }}">
+<section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
         <div class="card small-6 columns no-pad">
             {#- Dessicator -#}
@@ -44,6 +44,9 @@
             {%- elseif isTask -%}
                 {% set submitTitleSuffix = 'completed this task' -%}
                 {% set markedTitleSuffix = 'teacher assessment' -%}
+            {%- else -%}
+                {% set submitTitleSuffix = '' -%}
+                {% set markedTitleSuffix = '' -%}
             {%- endif -%}
 
             <div

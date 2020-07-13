@@ -258,6 +258,8 @@ class Markbook
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
                     $weightedSummator->summate($visibleAssessments, $student, true);
 
+            $this->studentStatistics[$student->getId()]['draftWeightedMean'] = null;
+            $this->studentStatistics[$student->getId()]['meanDraftNormalised'] = null;
             if ($statsHasDraft) {
                 $this->studentStatistics[$student->getId()]['draftWeightedMean'] =
                     $this->defaultMarkScheme->getHumanReadableMark(

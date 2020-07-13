@@ -64,7 +64,7 @@ Usage:
         response: response,
         readonly: readonly,
         summaryRoute: routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: participant.user.id}),
-        deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response ? response.id : null, response: response })
+        deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id ?? null, response: response })
     } only %}
 {% endblock %}
 
@@ -149,12 +149,12 @@ Usage:
         <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
             assessmentId: assessment.id,
             studentId:    participant.user.id,
-            responseId:   response ? response.id : null,
+            responseId:   response.id ?? null,
             assessment:   assessment,
             student:      participant.user
         }) }}">
             <section>
-                <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}" />
+                <input type="hidden" name="responseId" value="{{ response.id ?? '' }}" />
                 {# Required so that this form is recognised as containing a rubric and files #}
                 <input name="fromInlineGrader" value="true" type="hidden"/>
 

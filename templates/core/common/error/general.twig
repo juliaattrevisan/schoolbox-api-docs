@@ -4,14 +4,14 @@
             <div class="row">
                 <div>
                     {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
-                    <h1>{{ message|raw }}</h1>
+                    <h1>{{ message ?? ''|raw }}</h1>
                     <h2>Sorry, we are unable to complete this request </h2>
 
-                    {% if url|length %}
+                    {% if url is defined %}
                         <p>{{ url }}</p>
                     {% endif %}
 
-                    {% if info|length %}
+                    {% if info is defined %}
                         <p>{{ info }}</p>
                     {% endif %}
 
@@ -25,7 +25,7 @@
     </div>
 </div>
 
-{% if outputStackTrace %}
+{% if outputStackTrace ?? false %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Stack trace</h2>
@@ -42,8 +42,8 @@
                     <li>
                         <div class="column small-1"><pre>#{{ loop.index }} </pre></div>
                         <div class="column small-11">
-                            <pre>{% if frame.class is defined %}{{  frame.class }}{% endif %}{%  if frame.type is defined %}{{  frame.type }}{% endif %}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
-                            <pre class="meta">called from {{ frame.file }}:{{ frame.line }}</pre>
+                            <pre>{{ frame.class ?? '' }}{{ frame.type ?? '' }}{{ frame.function }}({% for arg in frame.args %}<span>{{ arg|json_encode }}</span>{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+                            <pre class="meta">called from {{ frame.file ?? '' }}:{{ frame.line ?? '' }}</pre>
                         </div>
                     </li>
                 {% endfor %}

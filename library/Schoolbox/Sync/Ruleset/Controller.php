@@ -812,10 +812,29 @@ class Controller extends Base
                     $effect['arguments'] = json_encode([]);
                 }
 
-                $model = new Effect\Model();
-                $model->setId($effect['id']);
-                $model->setRule((new Rule())->setId($effect['rule_id']));
-                $model->setEffectType((new EffectType())->setId($effect["effect_type_id"]));
+                try {
+                    $rule = $ruleMapper->findById($effect['rule_id']);
+                } catch (Mapper\Exception $e) {
+                    $rule = (new Rule())->setId($effect['rule_id']);
+                }
+
+                try {
+                    $effectType = $effectTypeMapper->findById($effect["effect_type_id"]);
+                } catch (Mapper\Exception $e) {
+                    $effectType = (new EffectType())->setId($effect["effect_type_id"]);
+                }
+
+                try {
+                    $model = $mapper->findOneByColumnList([
+                        'rule_id'       => $rule->getId(),
+                        'user_property' => $effect['user_property'],
+                    ]);
+                } catch (Mapper\Exception $e) {
+                    $model = (new Effect\Model())->setId($effect['id']);
+                }
+
+                $model->setRule($rule);
+                $model->setEffectType($effectType);
                 $model->setUserProperty($effect['user_property']);
                 $model->setArguments($arg);
                 $mapper->save($model);

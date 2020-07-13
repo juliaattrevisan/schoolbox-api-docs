@@ -14,18 +14,18 @@
  # selectData: a set of key-value pairs corresponding to data vars or element attributes
  # showPrompt: a boolean to determine whether to show the "Please Select" option
  #}
-<select {{ disabled }} name="{{ name }}"
-    {% for dataVar, dataValue in selectData %}
+<select {{ disabled ?? '' }} name="{{ name }}"
+    {% for dataVar, dataValue in selectData ?? [] %}
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
 >
-    {% if showPrompt %}
+    {% if showPrompt ?? false %}
     <option disabled selected="selected" value="">Please Select</option>
     {% endif %}
 
 {% for index, option in options %}
 
-    {% if (pairs == null)  %}
+    {% if (pairs ?? null == null)  %}
 
         {# If (value, label) was not specified, assume backwards-compatible defaults
          #}

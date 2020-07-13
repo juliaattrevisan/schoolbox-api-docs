@@ -56,13 +56,12 @@
                                     Draft Submission
                                 {% endif %}
                                 by {{ participant.user.fullname }}
+                            </p>
                             {% if currentInteraction.isSubmitted %}
                                 <p class="meta">{{ currentInteraction.submittedAt.short }}</p>
                             {% else %}
                                 <p class="meta">{{ currentInteraction.updatedAt.short }}</p>
                             {% endif %}
-                            </p>
-
                         {% if url %}
                         </a>
                         {%  endif %}

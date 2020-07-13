@@ -22,15 +22,15 @@
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
     <i class="{{ icon }}"></i>
 
-    {% if readOnly %}
+    {% if readOnly ?? false %}
 
         <p>{{ studentMessage }}</p>
         {% set route = routeLookupIfAuthorized(
             'learningGrades.getGrades', {
                 viewee:    USER,
                 userId:    USER.id,
-                subject:   folder,
-                subjectId: folder.id,
+                subject:   context,
+                subjectId: context.id,
                 term:      term,
                 termCode:  termCode,
             }
@@ -39,7 +39,7 @@
             <p><a href="{{ route }}">View your {{ locale.grades.plural }}</a>.</p>
         {% endif %}
 
-    {% else %}
+    {% elseif createRouteType is defined %}
 
         <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not a part of your course {{ teacherMessage }}.</p>
 
@@ -57,7 +57,7 @@
                 {% endblock %}
             {% endfor %}
         </ul>
-        {% if createRoute and not readOnly %}
+        {% if createRoute and not readOnly and createRouteType is defined %}
             <div class="component-action">
                 <section>
                     <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>

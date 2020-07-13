@@ -188,11 +188,11 @@
                                     {% for studentId, student in students %}
                                         {% if not capability.show or not markPerCap %}
                                             <td class="excluded"></td>
-                                        {% elseif exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                        {% elseif studentId in (exclusions[assessmentId] ?? []) %}
                                             <td class="excluded" title="Excluded from assessment"></td>
                                         {% else %}
-                                            {% set capabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                            {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
+                                            {% set capabilityMark           = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark ?? null %}
+                                            {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark ?? null %}
                                             {% set summaryLink              = student.assessments[assessmentId].summaryLink %}
                                             {% set gradientClass            = urgency.marks(normalisedCapabilityMark) %}
                                             <td class="mark">
@@ -210,12 +210,12 @@
 
                                         {% for studentId, student in students %}
 
-                                            {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                            {% if studentId in (exclusions[assessmentId] ?? []) %}
                                                 <td class="excluded" title="Excluded from assessment"></td>
                                             {% else %}
-                                                {% set indicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                                {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
-                                                {% set descriptorText          = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                                {% set indicatorMark           = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark ?? null %}
+                                                {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark ?? null %}
+                                                {% set descriptorText          = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText ?? null %}
                                                 {% set summaryLink             = student.assessments[assessmentId].summaryLink %}
                                                 {% set gradientClass           = urgency.marks(normalisedIndicatorMark) %}
                                                 {% set renderedIndicatorMark   = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
@@ -237,7 +237,7 @@
                             <tr class="capability-row summated{% if loop.index0 == 0 %} first-summated{% endif %}">
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
-                                        {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised) %}
+                                        {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised ?? '') %}
                                         <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
                                     {% else %}
                                         <td class="excluded"></td>
@@ -247,7 +247,7 @@
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
                                     {% for studentId, studentData in students %}
-                                        {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised) %}
+                                        {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
                                         <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</td>
                                     {% endfor %}
                                 </tr>

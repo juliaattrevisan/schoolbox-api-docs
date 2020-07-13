@@ -20,7 +20,4 @@
     {% if student.id != USER.id %}
     <li class="icon-staff-students">{{ student.fullname }}</li>
     {% endif %}
-    {% if submissionsBlocked %}
-    <li class="icon-upload">{{ submissionsBlocked }}</li>
-    {% endif %}
 </ul>

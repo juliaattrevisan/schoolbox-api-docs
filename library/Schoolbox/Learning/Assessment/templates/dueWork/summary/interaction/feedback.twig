@@ -15,7 +15,7 @@ Data:
  #}
 {% set url     = null %}
 {% set tooltip = null %}
-{% set responseId = responseId is defined ? responseId : (currentFeedback.response ? currentFeedback.response.id : null ) %}
+{% set responseId = responseId ?? (currentFeedback.response.id ?? null ) %}
 {% if not currentFeedback.isPublished %}
     {% if currentFeedback.response %}
         {% if currentFeedback.isSelfGrading %}

@@ -6,8 +6,8 @@
  # those characters stripped.
  #}
 
-<select {{ disabled }} name="{{ name }}"
-    {% for dataVar, dataValue in selectData %}
+<select {{ disabled ?? '' }} name="{{ name }}"
+    {% for dataVar, dataValue in selectData ?? [] %}
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
 >

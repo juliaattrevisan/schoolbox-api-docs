@@ -45,15 +45,13 @@
  #}
 {% block participant %}
     {% set latestResponse    = participant.findMostRecentResponse %}
-    {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
+    {% set latestFeedback    = latestResponse ? latestResponse.findMostRecentInstructorGivenFeedback : null %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
     {# Tot actions are derived from access to the Attempt History route
      # By default this empty, hiding the tot
      #}
-    {% if latestResponse %}
-        {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
-    {% endif %}
+    {% set pActionSummary = latestResponse ? routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) : null %}
 
     {% set pActionCount = (pActionSummary ? 1 : 0) %}
 
@@ -118,7 +116,7 @@
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
         <div class="flex-grade">
-            <div class="{{ cardSize ?: 'small-12' }} card sibling">
+            <div class="{{ cardSize ?? 'small-12' }} card sibling">
                 <a href="/search/user/{{ participant.user.id }}" title="View Profile">
                     <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
                 </a>
@@ -174,11 +172,11 @@
          # Action Bar at the bottom of each participant's row
          #}
         {% set canFinish  = latestResponse and not latestResponse.submitted %}
-        {% set canPublish = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+        {% set canPublish = (latestResponse.submitted ?? false) and (not latestFeedback or not latestFeedback.published) %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
         {# Hide if no attempts, or attempt has published review #}
-        {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
+        {% set actionStyle = not latestResponse or (latestFeedback.published ?? false) ? 'display:none;' : '' %}
 
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
@@ -188,9 +186,9 @@
         {# Buttons #}
         {% spaceless %}
             {% set buttons %}
-                <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt">Delete Attempt</a>
-                <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>
-                <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
+                {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt">Delete Attempt</a>{% endif %}
+                {% if canFinish  %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
+                {% if canPublish %}<a class="button" data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>{% endif %}
             {% endset %}
         {% endspaceless %}
 

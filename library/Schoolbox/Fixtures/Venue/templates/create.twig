@@ -59,7 +59,7 @@
                             function initMap() {
                                 {% set gLat  = venue.latitude ?: location.lat %}
                                 {% set gLon  = venue.longitude ?: location.lon %}
-                                {% set gZoom = zoom ?: (venue.latitude ? 16 : 13) %}
+                                {% set gZoom = zoom ?? (venue.latitude ? 16 : 13) %}
 
                                 var map = new google.maps.Map(document.getElementById('map'), {
                                     zoom: {{ gZoom }},

@@ -37,12 +37,12 @@
 
                     <div class="column small-12 medium-6">
                         <label for="start" class="required">Start Date</label>
-                        <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datesync-enddate="#end" value="{{ season.start.getLocalShort }}" required >
+                        <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datesync-enddate="#end" value="{{ season.start.getLocalShort ?? '' }}" required >
                     </div>
 
                     <div class="column small-12 medium-6">
                         <label for="end" class="required">End Date</label>
-                        <input type="text" id="end" name="end" placeholder="End Date" data-datepicker data-datesync-startdate="#start" value="{{ season.end.getLocalShort }}" required >
+                        <input type="text" id="end" name="end" placeholder="End Date" data-datepicker data-datesync-startdate="#start" value="{{ season.end.getLocalShort ?? '' }}" required >
                     </div>
 
                 </fieldset>

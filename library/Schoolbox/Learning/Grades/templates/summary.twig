@@ -99,7 +99,7 @@
                         </nav>
                     </li>
                     {% endfor %}
-                    {% if assessmentTasks[folder.id] is defined and assessmentTasks[folder.id] | length %}
+                    {% if assessmentTasks[folder.id] ?? []| length %}
                     <li>
                         <ul class="activity-list">
                             {% for assessment in assessmentTasks[folder.id] %}

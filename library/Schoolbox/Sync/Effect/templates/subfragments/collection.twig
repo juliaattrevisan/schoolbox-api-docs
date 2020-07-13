@@ -9,14 +9,14 @@
         {# raw HTML NOT sanctioned - this list should be generated elsewhere #}
         $('#{{ mapRowIdentifier }}-input').selectizeSelector({
             value: [
-                {% if preselected is iterable %}
+                {% if preselected is defined and preselected is iterable %}
                     {% for current in preselected %}
                 {% if (current in entireDataset|keys) and  entireDataset[current] %}
                             {% autoescape 'js' %}{"id":{{ current }},"name":"{{ entireDataset[current] }}"}{% endautoescape %}
                         {% endif %}
                         {% if not loop.last %},{% endif %}
                     {% endfor %}
-                {% elseif preselected != '' and entireDataset[preselected] %}
+                {% elseif preselected is defined and preselected != '' and entireDataset[preselected] %}
                 {% autoescape 'js' %}{"id":{{ preselected }},"name":"{{ entireDataset[preselected] }}"}{% endautoescape %}
                 {% endif %}
             ],

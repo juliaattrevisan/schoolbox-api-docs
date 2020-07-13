@@ -376,6 +376,8 @@ class Controller extends Base
                 'types'          => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents' => $linkedCounts,
                 'typeSelected'   => $get['type'],
+                'resultsPerPage' => $resultsPerPage,
+                'pagesToDisplay' => $maxPage,
             ],
             'title' => 'Linked Records',
         ]);

@@ -61,7 +61,7 @@ Data:
 
 {# student submit form #}
 {% set participant         = assessment.getParticipantIfExtant(student) %}
-{% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
+{% set mostRecentResponse  = participant.findMostRecentSubmittedResponse ?? null %}
 {% set isViewingOwnSummary = student.id == USER.id %}
 {% set reviewer            = mostRecentResponse ? mostRecentResponse.submittedBy : null %}
 {% set reviewerName        = reviewer ? (reviewer.id == USER.id ? 'You' : reviewer.fullName) : null %}

@@ -131,7 +131,7 @@
     <div class="small-12 island" id="allMatches">
         <div>
             {% for season in allSeasons %}
-                {% set matchCount = allMatches[season.id]|length %}
+                {% set matchCount = allMatches[season.id] ?? []|length %}
 
                 <div data-season="{{ season.id }}" {% if season.archived %} data-archived="1" {% endif %}  {% if season.id != division.season.id %} class="hide" {% endif %}  >
                     <div class="actions-small-1">

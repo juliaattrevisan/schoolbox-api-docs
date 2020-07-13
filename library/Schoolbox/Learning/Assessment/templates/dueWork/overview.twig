@@ -9,7 +9,7 @@
             <h1>Rubric Report for {{ dueWork.title }}</h1>
             <ul class="meta">
                 <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
-                <li class="icon-calendar">Due {{ dueWork.dueAt.relative }} on {{ dueWork.dueAt.localShort }}</li>
+                <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
             </ul>
         </div>
     </div>
@@ -54,10 +54,10 @@
                         {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    {% set mark = marks[participant.id][id] %}
+                                    {% set mark = marks[participant.id][id] ?? null %}
                                     <td>
-                                        <p>{{ mark.descriptor.description | nl2br }}</p>
-                                        <p>{{ mark.value }}</p>
+                                        <p>{{ mark.descriptor.description ?? '' | nl2br }}</p>
+                                        <p>{{ mark.value ?? '' }}</p>
                                     </td>
                                 {% endfor %}
                             {% endfor %}

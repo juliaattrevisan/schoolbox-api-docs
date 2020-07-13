@@ -27,7 +27,7 @@
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished  = latestFeedback.published %}
+    {% set isPublished  = latestFeedback and latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}

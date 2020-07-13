@@ -1,4 +1,4 @@
-{% if rule.id > 0 %}
+{% if rule.id is defined and rule.id > 0 %}
     {% set heading = 'Modify Rule' %}
     {% set url = 'update' %}
 {% else %}
@@ -24,19 +24,19 @@
 
         <form action="/adminv2/ups/rule/{{ url }}" method="post">
             <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
-            <input type="hidden" name="ruleId" value="{{ rule.id }}" />
+            <input type="hidden" name="ruleId" value="{{ rule.id ?? '' }}" />
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
                             Name
-                            <input type="text" name="name" value="{{ rule.name }}" />
+                            <input type="text" name="name" value="{{ rule.name ?? '' }}" />
                         </label>
 
                         <label>
                             Description
-                            <textarea name="description" rows="3">{{ rule.description }}</textarea>
+                            <textarea name="description" rows="3">{{ rule.description ?? '' }}</textarea>
                         </label>
                     </div>
                 </fieldset>

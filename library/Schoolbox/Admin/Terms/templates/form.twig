@@ -1,4 +1,4 @@
-{% if term.getId() %}
+{% if term.getId() ?? false %}
     {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
     {% set saveValue = 'Update Term' %}
     {% set saveType  = 'update' %}
@@ -15,7 +15,7 @@
                 Title
                 <input type="text"
                        name="title"
-                       value="{{ term.getTitle() }}"
+                       value="{{ term.getTitle() ?? '' }}"
                        required
                        maxlength="100" />
             </label>
@@ -25,7 +25,7 @@
                 Code
                 <input type="text"
                        name="code"
-                       value="{{ term.getCode() }}"
+                       value="{{ term.getCode() ?? '' }}"
                        required
                        maxlength="16" />
             </label>
@@ -35,7 +35,7 @@
                 Start
                 <input type="text"
                        name="start"
-                       value="{{ term.getStart().getLocalShort() }}"
+                       value="{{ term.getStart().getLocalShort() ?? '' }}"
                        required
                        data-datepicker />
             </label>
@@ -45,7 +45,7 @@
                 Finish
                 <input type="text"
                        name="finish"
-                       value="{{ term.getDisplayFinish().getLocalShort() }}"
+                       value="{{ term.getDisplayFinish().getLocalShort() ?? '' }}"
                        required
                        data-datepicker />
             </label>

@@ -132,8 +132,8 @@
         {% if isRouteAuthorized('eportfolioBlog.getArchiveCurrent', {page: page}) %}
             <a href="{{ routeLookup('eportfolioBlog.getArchiveCurrent', {pageId: page.getPageId}) }}" class="button">View Archive</a>
         {% endif %}
-        {% if isRouteAuthorized('eportfolioBlog.getInsert', {page: page, blog: blog}) %}
-            <a href="{{ routeLookup('eportfolioBlog.getInsert', {pageId: page.getPageId, id: blog.getId}) }}" class="button">Post Blog</a>
+        {% if isRouteAuthorized('eportfolioBlog.getInsert', {page: page}) %}
+            <a href="{{ routeLookup('eportfolioBlog.getInsert', {pageId: page.getPageId}) }}" class="button">Post Blog</a>
         {% endif %}
     </section>
 </div>

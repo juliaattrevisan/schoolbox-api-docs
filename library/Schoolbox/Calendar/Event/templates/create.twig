@@ -24,7 +24,7 @@
         $.fn.alaressEditor();
 
         $('#eventForm').eventModify({
-            functionLabel: "{{ action }}",
+            functionLabel: "{{ action ?? '' }}",
             deleteButton: $('[data-action="delete"]')
         });
 

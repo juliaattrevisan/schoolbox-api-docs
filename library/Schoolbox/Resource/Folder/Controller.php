@@ -913,20 +913,10 @@ class Controller extends BaseController
                 $folder->setColour($colourCache->getOffset($hexColour));
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
-            switch ($accessType) {
-                case UserAccess::ACCESS_READ:
-                    $userAccess[$folder->getId()] = Array('read' => true);
-                    break;
-                case UserAccess::ACCESS_WRITE:
-                    $userAccess[$folder->getId()] = Array('write' => true);
-                    break;
-                case UserAccess::ACCESS_FULL:
-                    $userAccess[$folder->getId()] = Array('admin' => true);
-                    break;
-                default:
-                    $userAccess[$folder->getId()] = Array();
-                    break;
+            try {
+                $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
+            } catch (MapperException $e) {
+                $userAccess[$folder->getId()] = null;
             }
             $folderList->add($folder);
         }

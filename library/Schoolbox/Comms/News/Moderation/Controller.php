@@ -79,7 +79,7 @@ class Controller extends Base
             'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
-
+            'selected' => null,
         ], $sidebar->generate());
 
 

@@ -6,7 +6,7 @@
 {% macro generateWithResultLink(match) %}
 {% spaceless %}
     {# Home Team #}
-    {% if match.homeTeam.id %}
+    {% if match.homeTeam %}
         {% set homeTeamData %}
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
         {% endset %}
@@ -15,7 +15,7 @@
     {% endif %}
 
     {# Away Team #}
-    {% if match.awayTeam.id %}
+    {% if match.awayTeam %}
         {% set awayTeamData %}
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
         {% endset %}
@@ -73,7 +73,7 @@
         {{ match.homeSchool.name }}
     {% endif %} vs
 
-    {% if match.awayTeam.id %}
+    {% if match.awayTeam %}
         {{ match.awayTeam.name }}
     {% else %}
         {{ match.awaySchool.name }}

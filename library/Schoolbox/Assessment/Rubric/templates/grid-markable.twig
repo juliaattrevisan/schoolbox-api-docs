@@ -100,7 +100,7 @@
 
     {% if showRubricTotal and markType.mode != "none"  %}
 
-        {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark %}
+        {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark ?? null %}
         {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
 
         <tr>
@@ -110,7 +110,7 @@
                       data-max="{{ rubricMax }}"
                       data-mark-type="{{ markType.mode }}">
 
-                    {{ rubricMarkedGrid.retrieveHumanReadableMark }}
+                    {{ rubricMarkedGrid.retrieveHumanReadableMark ?? null }}
                 </span>
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}

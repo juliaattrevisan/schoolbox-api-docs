@@ -4,7 +4,7 @@
     {% import 'sub/breadcrumbs.twig' as bread %}
 
     {% set headingCrumb = match.id ? routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) : '' %}
-    {% set actionCrumb  = match.id ? action : '' %}
+    {% set actionCrumb  = match.id ? action ?? '' : '' %}
 
     {{ bread.crumbs(
         [ 'Fixtures',                   routeLookupIfAuthorized('sportsfixtures.getLanding') ],

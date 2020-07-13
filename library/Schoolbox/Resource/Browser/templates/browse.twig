@@ -9,10 +9,12 @@
 {% if namespace == 'myFilesBrowser' %}
     {% set fileController   = 'myFile' %}
     {% set folderController = 'myFolder' %}
+    {% set linkController   = 'myLink' %}
     {% set folderVar = 'parent' %}
 {% elseif namespace == 'webDavBrowser' %}
     {% set fileController   = 'networkFile' %}
     {% set folderController = 'networkFolder' %}
+    {% set linkController   = null %}
     {% set folderVar = 'parent' %}
 {% else %}
     {% set fileController   = 'file' %}

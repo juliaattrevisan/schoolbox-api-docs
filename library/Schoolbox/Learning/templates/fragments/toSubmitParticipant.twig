@@ -10,9 +10,9 @@
         isDueWork:    bool                   (optional) Override to indicate to render as DueWork
 #}
 {# Enable insertion of non IAssessable instance data transfer objects #}
-{% set isTask     = isTask    or assessment is task %}
-{% set isQuiz     = isQuiz    or assessment is quiz %}
-{% set isDueWork  = isDueWork or assessment is dueWork %}
+{% set isTask     = isTask    ?? assessment is task %}
+{% set isQuiz     = isQuiz    ?? assessment is quiz %}
+{% set isDueWork  = isDueWork ?? assessment is dueWork %}
 
 <li data-participant="{{ participant.user.id }}" data-email="{{ participant.user.email }}">
     {% if isTask %}

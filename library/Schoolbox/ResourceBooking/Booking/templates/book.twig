@@ -386,7 +386,7 @@ $(function() {
                                type="text"
                                size="15"
                                maxlength="30"
-                               value="{{ item.event.startDateTime.local }}"/>
+                               value="{{ item.event.startDateTime.local ?? '' }}"/>
                     </div>
                     <div class="small-6 columns">
                         <label for="endDate" class="required">
@@ -402,7 +402,7 @@ $(function() {
                                type="text"
                                size="15"
                                maxlength="30"
-                               value="{{ item.event.endDateTime.local }}"/>
+                               value="{{ item.event.endDateTime.local ?? '' }}"/>
                     </div>
                 </fieldset>
 
@@ -506,7 +506,7 @@ $(function() {
                                     <div class="small-11 columns">
                                         <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
                                         <div data-relation="related-resource-notes" style="{% if relatedBooking is empty %}display:none{% endif %}">
-                                            <textarea id="related-item-{{ relatedItem.id }}-notes" name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
+                                            <textarea id="related-item-{{ relatedItem.id }}-notes" name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes ?? '' }}</textarea>
                                         </div>
 
                                     </div>

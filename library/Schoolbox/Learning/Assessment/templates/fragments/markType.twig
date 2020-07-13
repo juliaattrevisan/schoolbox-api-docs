@@ -89,7 +89,7 @@
             Mark Type
             <select id="markType" name="markType">
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}"{% if index == assessment.markType.id %} selected{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"{% if index == (assessment.markType.id ?? '') %} selected{% endif %}>{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
@@ -99,7 +99,7 @@
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
         <label for="maxMark">
             Maximum Available Marks
-            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
+            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark?? '' }}" />
         </label>
     </div>
 
@@ -112,7 +112,7 @@
                 },
                 name: 'gradingScheme',
                 options: allGradeSchemes,
-                preselected: assessment.gradeGroup.id ?: defaultGradeGroup,
+                preselected: assessment.gradeGroup.id ?? null,
                 pairs: {
                     value: 'id',
                     label: 'name'

@@ -8,8 +8,8 @@
 
 {% set routeArgs = {
     courseSpecId:     courseSpec.id,
-    folderId:         classFolder.id,
-    submissionTypeId: submissionType.Id,
+    folderId:         classFolder.id ?? null,
+    submissionTypeId: submissionType.Id ?? null,
     termCode:         term.code
 } %}
 
@@ -142,7 +142,7 @@
                 <a href="{{ routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
             </dd>
             {% for folder in classFolders %}
-                {% set active = (folder.id == classFolder.id) and (route == 'folder') %}
+                {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
                 {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
 
                 <dd class="{% if active %}active{% endif %}">

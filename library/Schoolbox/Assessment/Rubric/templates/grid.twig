@@ -39,7 +39,8 @@
 
         {# Only show capability summary if there's something to actually show #}
         {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set showSummaryForThisCapability = showSummaryCapability and ((selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading) or capabilityMark.retrieveHumanReadableMark is not null) %}
+        {% set showSummaryForThisCapability = showSummaryCapability
+            and ((selfAssessmentFeedback.isSelfGrading ?? false) or (capabilityMark.retrieveHumanReadableMark ?? null is not null)) %}
         {% set rowspan                      = groupUsage.indicatorUsages|length + (showSummaryForThisCapability ? 1 : 0) %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}

@@ -20,11 +20,11 @@
 
 {% set participant = assessment.participantIfExtant(student) %}
 
-{% if postRoute %}
+{% if postRoute is defined %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
-          data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
+          data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
         {% if not participant or participant.isResponseRequired %}
             <a href="#"
                class="no-text progress-tick"

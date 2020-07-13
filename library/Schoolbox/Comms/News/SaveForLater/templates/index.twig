@@ -28,7 +28,7 @@
                         <div class="list-item">
                             <div class="small-12 card">
 
-                                {% if article.featureImage.hash %}
+                                {% if article.featureImage %}
                                     <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
                                         <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
                                     </a>
@@ -60,12 +60,9 @@
                         </nav>
                         {% endif %}
 
-                        {# Hide the article tag when there's no content to show, or when compactMode is on #}
-                        {% if not compactMode %}
-                            {% set blurb = macro.newsBlurb(article, readMore) %}
-                            {% if blurb|length %}
-                                <article>{{ blurb }}</article>
-                            {% endif %}
+                        {% set blurb = macro.newsBlurb(article, readMore) %}
+                        {% if blurb|length %}
+                            <article>{{ blurb }}</article>
                         {% endif %}
                     </li>
                 {% endfor %}

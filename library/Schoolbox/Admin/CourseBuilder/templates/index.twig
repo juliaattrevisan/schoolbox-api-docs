@@ -80,15 +80,15 @@
                                             <tr>
                                                 <td>{{ role.getName }}</td>
                                                 <td>
-                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupNone{{ role.getId }}" value="0" {{ permissions['course'][role.getId][0] }}>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupNone{{ role.getId }}" value="0" {{ permissions['course'][role.getId][0] ?? '' }}>
                                                     <label class="radio-label" for="courseGroupNone{{ role.getId }}"></label>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupRead{{ role.getId }}" value="1" {{ permissions['course'][role.getId][1] }}>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupRead{{ role.getId }}" value="1" {{ permissions['course'][role.getId][1] ?? '' }}>
                                                     <label class="radio-label" for="courseGroupRead{{ role.getId }}"></label>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupWrite{{ role.getId }}" value="2" {{ permissions['course'][role.getId][2] }}>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupWrite{{ role.getId }}" value="2" {{ permissions['course'][role.getId][2] ?? ''}}>
                                                     <label class="radio-label" for="courseGroupWrite{{ role.getId }}"></label>
                                                 </td>
                                             </tr>
@@ -137,15 +137,15 @@
                                             <tr>
                                                 <td>{{ role.getName }}</td>
                                                 <td>
-                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] }}>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] ?? '' }}>
                                                     <label class="radio-label" for="unitGroupNone{{ role.getId }}"></label>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] }}>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] ?? '' }}>
                                                     <label class="radio-label" for="unitGroupRead{{ role.getId }}"></label>
                                                 </td>
                                                 <td>
-                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] }}>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] ?? '' }}>
                                                     <label class="radio-label" for="unitGroupWrite{{ role.getId }}"></label>
                                                 </td>
                                             </tr>

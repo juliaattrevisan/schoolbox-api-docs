@@ -1,12 +1,12 @@
 {# Generates the local URL to review an Assessment Response #}
 {% macro localUrl(response) -%}
 
-    {%- if response.assessable is quiz -%}
+    {%- if response and response.assessable is quiz -%}
         {% set argList = {assessmentId: response.assessable.id, firstSectionId: response.firstSectionId, responseId: response.id} -%}
         {{ routeLookup('learningQuiz.getQuizResponseFirstSection', argList) }}
-    {%- elseif response.assessable is dueWork -%}
+    {%- elseif response and response.assessable is dueWork -%}
         {{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}
-    {%- elseif response.assessable is task -%}
+    {%- elseif response and response.assessable is task -%}
         {# no link. Caller should not render a link if assessable is a task #}
     {%- endif -%}
 {% endmacro %}

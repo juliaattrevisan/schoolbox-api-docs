@@ -9,7 +9,7 @@
                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                         </a>
                         <p><a href="/search/user/{{ teamPlayer.id }}">{{ teamPlayer.fullName }}</a></p>
-                        {% if positions[teamPlayer.id] %}
+                        {% if positions[teamPlayer.id] is defined %}
                             <p class="pipe meta">
                                 {% for currentPosition in positions[teamPlayer.id] %}
                                     {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
@@ -28,7 +28,7 @@
                    data-player-positions-team-name="{{ team.name }}"
                    data-player-positions-user="{{ teamPlayer.id }}"
                    data-player-positions-team="{{ team.id }}"
-                   data-player-positions="{% for teamPosition in positions[teamPlayer.id] %}{{ teamPosition.position.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+                   data-player-positions="{% for teamPosition in positions[teamPlayer.id] ?? [] %}{{ teamPosition.position.id }}{% if not loop.last %},{% endif %}{% endfor %}"
                 ></a>
                 {% set routeRemovePlayers = routeLookupIfAuthorized('sportsfixturesTeam.postRemovePlayers', {
                     entityId: team.id,

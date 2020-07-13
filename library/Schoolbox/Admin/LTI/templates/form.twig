@@ -1,4 +1,4 @@
-{% if provider.getId() %}
+{% if provider.getId() ?? false %}
     {% set saveValue = 'Update Provider' %}
     {% set saveType  = 'update' %}
 {% else %}
@@ -7,38 +7,38 @@
 {% endif %}
 
 <form method="post" action="{{ routeLookup('adminLti.postModify') }}" class="row" data-term-form="{{ saveType }}">
-    <input type="hidden" name="id" value="{{ provider.id }}">
+    <input type="hidden" name="id" value="{{ provider.id ?? '' }}">
     <div data-mage-wrapper>
         <div class="small-6 columns">
             <label>
                 Provider Name
-                <input required type="text" name="name" value="{{ provider.name }}">
+                <input required type="text" name="name" value="{{ provider.name ?? '' }}">
             </label>
         </div>
         <div class="small-6 columns">
             <label>
                 Configuration XML URL
-                <input required type="text" name="xml" value="{{ provider.xml }}">
+                <input required type="text" name="xml" value="{{ provider.xml ?? '' }}">
             </label>
         </div>
         <div class="small-6 columns">
             <label>
                 Consumer Key (Optional)
-                <input type="text" name="key" value="{{ provider.key }}">
+                <input type="text" name="key" value="{{ provider.key ?? '' }}">
             </label>
         </div>
         <div class="small-6 columns">
             <label>
                 Consumer Secret (Optional)
-                <input type="text" name="secret" value="{{ provider.secret }}">
+                <input type="text" name="secret" value="{{ provider.secret ?? '' }}">
             </label>
         </div>
         <div class="small-12 columns">
             <label>
                 LTI Request Type
                 <select name="launch_type">
-                    <option {% if provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
-                    <option {% if provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
+                    <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
+                    <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
                 </select>
             </label>
         </div>

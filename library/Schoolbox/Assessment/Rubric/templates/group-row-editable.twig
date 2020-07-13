@@ -1,8 +1,8 @@
 {# ensure these are set #}
-{%- set rubricId  = rubricId ?: 'rb-' ~ rubricGrid.id -%}
-{%- set groupId   = groupId ?: rubricId ~ '-' ~ groupIndex -%}
-{%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
-{%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}
+{%- set rubricId  = rubricId ?? ('rb-' ~ rubricGrid.id) -%}
+{%- set groupId   = groupId ?? (rubricId ~ '-' ~ groupIndex) -%}
+{%- set groupName = group.name ?? ('(no ' ~ locale.translate('rubricGroup') ~ ')') -%}
+{%- set groupInput = groupInput ?? (formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']') -%}
 
 {%- if rowspan is not null -%}
 <tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ group.name }}" class="rb-group-header">

@@ -47,7 +47,7 @@
                                     {{ record.type.name }} {% if record.subtype.name != '' %}({{ record.subtype.name }}){% endif %}
                                     |
 
-                                    {% if showSeverity %}
+                                    {% if showSeverity ?? false %}
                                         {# Pastoral event severity #}
                                         {{ record.severity.name ?? '' }} |
                                     {% endif %}
