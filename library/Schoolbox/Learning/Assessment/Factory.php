@@ -165,7 +165,7 @@ class Factory
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
         $this->setCapabilityMarkType(trim($post['capability-markType']));
-        $this->setCapabilityGradeGroup($post['capability-gradingScheme']);
+        $this->setCapabilityGradeGroup(trim($post['capability-gradingScheme']));
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
         // Only due works have a max mark.
