@@ -726,6 +726,201 @@ class DueWorkTest extends TestCase
 
 
     /**
+     * Test most recent response retrieval, when responses are published on the
+     * same date.
+     */
+    public function testFindMostRecentResponseWhenDatesAreIdentical(): void
+    {
+        // findMostRecentResponse
+        // findMostRecentDraftResponse
+        // findMostRecentSubmittedResponse
+        $time      = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $dueWork   = $this->spawnDueWork();
+        $publishedResponse1 = new DueWorkSubmission();
+        $publishedResponse1
+            ->setId(1)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $publishedResponse2 = new DueWorkSubmission();
+        $publishedResponse2
+            ->setId(2)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedResponse1 = new DueWorkSubmission();
+        $unpublishedResponse1
+            ->setId(3)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedResponse2 = new DueWorkSubmission();
+        $unpublishedResponse2
+            ->setId(4)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+
+        // Test feedback belonging to a participant
+        $participant = $dueWork->getParticipant($this->hodes);
+        $participant->setAllResponses(
+            $participant->getAllResponses()->emptyClone()
+                        ->add($publishedResponse1)
+                        ->add($publishedResponse2)
+                        ->add($unpublishedResponse1)
+                        ->add($unpublishedResponse2)
+        );
+
+        self::assertSame($publishedResponse2, $participant->findMostRecentSubmittedResponse());
+        self::assertSame($unpublishedResponse2, $participant->findMostRecentResponse());
+        self::assertSame($unpublishedResponse2, $participant->findMostRecentDraftResponse());
+    }
+
+
+    /**
+     * Test most recent feedback retrieval, when feedbacks are published on the
+     * same date.
+     */
+    public function testFindMostRecentFeedbackWhenDatesAreIdentical(): void
+    {
+        $time      = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $dueWork  = $this->spawnDueWork();
+        $response = new DueWorkSubmission();
+        $response
+            ->setId(1)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Feedback given on the same date:
+        // disambiguate by ID (highest ID is most recent)
+        $publishedFeedback1 = (new DueWorkFeedback())
+            ->setId(1)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $publishedFeedback2 = (new DueWorkFeedback())
+            ->setId(2)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedFeedback1 = (new DueWorkFeedback())
+            ->setId(3)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $unpublishedFeedback2 = (new DueWorkFeedback())
+            ->setId(4)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $selfAssessedPublishedFeedback1 = (new DueWorkFeedback())
+            ->setId(5)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->hodes)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $selfAssessedPublishedFeedback2 = (new DueWorkFeedback())
+            ->setId(6)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->hodes)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $selfAssessedUnpublishedFeedback1 = (new DueWorkFeedback())
+            ->setId(7)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->hodes)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $selfAssessedUnpublishedFeedback2 = (new DueWorkFeedback())
+            ->setId(8)
+            ->setAssessable($dueWork)
+            ->setReviewer($this->hodes)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Test feedback belonging to a response
+        $response->setAllFeedback(
+            $response->getAllFeedback()->emptyClone()
+                       ->add($publishedFeedback1)
+                       ->add($publishedFeedback2)
+                       ->add($unpublishedFeedback1)
+                       ->add($unpublishedFeedback2)
+                       ->add($selfAssessedPublishedFeedback1)
+                       ->add($selfAssessedPublishedFeedback2)
+                       ->add($selfAssessedUnpublishedFeedback1)
+                       ->add($selfAssessedUnpublishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $response->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($unpublishedFeedback2, $response->findMostRecentInstructorGivenFeedback());
+        self::assertSame($selfAssessedPublishedFeedback2, $response->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertSame($selfAssessedUnpublishedFeedback2, $response->findMostRecentSelfAssessedFeedback());
+
+        // Test feedback belonging to a participant
+        $participant = $dueWork->getParticipant($this->hodes);
+        $participant->setAllFeedbacks(
+            $participant->getAllFeedbacks()->emptyClone()
+                        ->add($publishedFeedback1)
+                        ->add($publishedFeedback2)
+                        ->add($unpublishedFeedback1)
+                        ->add($unpublishedFeedback2)
+                        ->add($selfAssessedPublishedFeedback1)
+                        ->add($selfAssessedPublishedFeedback2)
+                        ->add($selfAssessedUnpublishedFeedback1)
+                        ->add($selfAssessedUnpublishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $participant->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($unpublishedFeedback2, $participant->findMostRecentInstructorGivenFeedback());
+        self::assertSame($selfAssessedPublishedFeedback2, $participant->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertSame($selfAssessedUnpublishedFeedback2, $participant->findMostRecentSelfAssessedFeedback());
+    }
+
+
+    /**
      * Test that Due Work Feedback Marks are stored correctly
      *
      * @throws \UnexpectedValueException
