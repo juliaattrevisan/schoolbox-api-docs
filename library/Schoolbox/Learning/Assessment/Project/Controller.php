@@ -1,15 +1,16 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
@@ -17,27 +18,35 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
+use UnexpectedValueException;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning\Assessment\Project
+ */
 class Controller extends Assessment\Controller
 {
 
     /**
      * @param Assessment\Project|IAssessable $assessment
      * @return array
+     * @throws UnexpectedValueException
      */
-    protected function getAssessmentTwigData(IAssessable $assessment)
+    protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $summatorMapping = new Assessment\Summator\Mapping();
 
         try {
             $selectedSummator = $summatorMapping->decompose($assessment->getSummator());
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             //no selected summator if none exists
             $selectedSummator = null;
         }
 
-        $data = [
+        return [
             'types'             => new Assessment\AssessmentType(),
             'selectedSummator'  => $selectedSummator,
             'acceptingResponses'=> false,
@@ -45,8 +54,6 @@ class Controller extends Assessment\Controller
             'allMarkTypes'      => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'   => $this->getAllGradeSchemes(),
         ];
-
-        return $data;
     }
 
 
@@ -91,7 +98,7 @@ class Controller extends Assessment\Controller
      * @param Project|IAssessable $assessment
      * @throws ServiceNotFound
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
 
         // Calculate summary totals for display purposes
@@ -126,13 +133,16 @@ class Controller extends Assessment\Controller
     }
 
 
-
     /**
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 165
      * @param IAssessable|Project $assessment
      * @param User                $student
      * @throws ServiceNotFound If unable to find web renderer
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -151,11 +161,11 @@ class Controller extends Assessment\Controller
         $subActivities = $subActivities
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter'])
-            ->filter(function (IAssessable $subAssessable) use ($student, $isViewerAnInstructor) {
+            ->filter(static function (IAssessable $subAssessable) use ($student, $isViewerAnInstructor) {
                 try {
                     $participant = $subAssessable->getParticipant($student);
                     return !$participant->isExcluded();
-                } catch (\UnexpectedValueException $e) {
+                } catch (UnexpectedValueException $e) {
                     // not participant
                     return $isViewerAnInstructor;
                 }
@@ -198,8 +208,9 @@ class Controller extends Assessment\Controller
      * @param string|null $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
+     * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
+    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = ''): string
     {
         /**
          * Always go to the status screen when a project has been created,
@@ -213,5 +224,4 @@ class Controller extends Assessment\Controller
 
         return $redirect;
     }
-
 }

@@ -1,16 +1,21 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Web\Exception\InvalidStatusCode;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
+use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -18,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -31,14 +37,21 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
+use UnexpectedValueException;
 
-
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning\Assessment\Task
+ */
 class Controller extends Assessment\Controller
 {
+
     /**
      * @var TaskResponseDataSource
      */
     protected $taskResponseDataSource;
+
 
     /**
      * Constructor
@@ -79,12 +92,17 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws ServiceNotFound
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         // Ensure completions are sorted most recent first
         foreach($assessment->getAllParticipants() as $participant){
-            $participant->getAllResponses()->sortByCallback(function(Assessment\IResponse $responseA, Assessment\IResponse $responseB){
+            $participant->getAllResponses()->sortByCallback(static function(Assessment\IResponse $responseA, Assessment\IResponse $responseB){
                 return $responseB->getSubmittedAt()->compare($responseA->getSubmittedAt());
             });
         }
@@ -98,7 +116,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/task/status.twig",
+                '@learningAssessment/task/status.twig',
                 $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
@@ -112,12 +130,14 @@ class Controller extends Assessment\Controller
      * @since 165
      * @param IAssessable|Task $assessment
      * @param User             $student
-     * @throws ServiceNotFound
-     * @throws \DomainException
-     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
-     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws \PDOException If unable to save task response to DB
+     * @throws Exception
      * @throws InsufficientHydrationException If lack of hydration
+     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws LogicException
+     * @throws PDOException If unable to save task response to DB
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws DomainException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -128,7 +148,7 @@ class Controller extends Assessment\Controller
          * decide which one it is
          */
         if ($assessment->getUrl()) {
-            $translator = new \Schoolbox\Cyberhound\Url\Translator(
+            $translator = new Translator(
                 $this->getSession()->get('ip'),
                 $this->getConfigLoader()->get('cyberhound_api_url'),
                 $this->getConfigLoader()->get('cyberhound_api_shared_key')
@@ -136,7 +156,7 @@ class Controller extends Assessment\Controller
 
             $previewFragment = (new PreviewFactory($translator))->urlFragment($assessment->getUrl());
 
-            if (($previewFragment['type'] == 'redirect' || $previewFragment['type'] == 'iframe')
+            if (($previewFragment['type'] === 'redirect' || $previewFragment['type'] === 'iframe')
                 && !$assessment->getDescription()) {
 
                 // Don't save a response if instructor is looking at student's summary page
@@ -155,8 +175,7 @@ class Controller extends Assessment\Controller
                  */
                 $this->getResponse()->redirect->temporaryRedirect($previewFragment['fragment']);
                 return;
-            }
-            elseif ($previewFragment['type'] == 'image') {
+            } elseif ($previewFragment['type'] === 'image') {
 
                 /* The specified url is actually an image
                  *
@@ -167,14 +186,12 @@ class Controller extends Assessment\Controller
                  * and we don't need to do anything more
                  */
 
-            }
-            elseif ($previewFragment['type'] == 'inline') {
+            } elseif ($previewFragment['type'] === 'inline') {
 
                 /* Embedded content like youtube videos etc
                  */
                 $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
-            }
-            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $assessment->getUrl(), $matches)) {
+            } elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $assessment->getUrl(), $matches)) {
 
                 /* Other regular files
                  *
@@ -184,7 +201,7 @@ class Controller extends Assessment\Controller
                 try {
                     $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
                 }
-                catch (\Schoolbox\Mapper\Exception $e) {
+                catch (Exception $e) {
                     $previewFragment = [];
                 }
             }
@@ -217,7 +234,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/task/summary/student.twig",
+                '@learningAssessment/task/summary/student.twig',
                 $twigData
             )
         );
@@ -249,14 +266,16 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @var int                 $_POST ['status'] One of the TaskCompletion::STATUS_* constants
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Web\Exception\InvalidStatusCode if value is invalid
-     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws \PDOException If unable to save task response to DB
-     * @throws \Schoolbox\Application\Exception\Exception If synchronous request and something went wrong
+     * @throws Exception
      * @throws InsufficientHydrationException If unable to perform some logic because an object lacks hydration
+     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws InvalidStatusCode if value is invalid
+     * @throws LogicException
+     * @throws PDOException If unable to save task response to DB
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception If synchronous request and something went wrong
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -319,11 +338,15 @@ class Controller extends Assessment\Controller
      *
      * @param TaskResponse $response
      * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
-     * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
+     * @throws Exception
      * @throws InsufficientHydrationException If task object has not been sufficiently hydrated
+     * @throws InvalidArgumentException
+     * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
+     * @throws LogicException
+     * @throws UnexpectedValueException
      * @todo This should all be wrapped up in an auth rule
      */
-    protected function assertSaveability(TaskResponse $response)
+    protected function assertSaveability(TaskResponse $response): void
     {
         $submittedFor = $response->getSubmittedOnBehalfOf();
         $participant  = $response->getAssessable()->getParticipantIfExtant($submittedFor);
@@ -370,7 +393,7 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @return array
      */
-    protected function getAssessmentTwigData(IAssessable $assessment)
+    protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
         $data['acceptingResponses'] = false;
@@ -387,11 +410,14 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @param User        $student
      * @return TaskResponse $taskResponse Created task response
-     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws \PDOException If unable to save task response to DB
      * @throws ConcurrentModificationException If participant already has the task completion status.
-     * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
+     * @throws Exception
      * @throws InsufficientHydrationException If task object is insufficiently hydrated
+     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
+     * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
+     * @throws LogicException
+     * @throws PDOException If unable to save task response to DB
+     * @throws UnexpectedValueException
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {
@@ -413,7 +439,7 @@ class Controller extends Assessment\Controller
 
         // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
         $this->taskResponseDataSource->save($taskResponse);
+
         return $taskResponse;
     }
-
 }

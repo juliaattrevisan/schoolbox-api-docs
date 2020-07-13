@@ -9,7 +9,9 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
+use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
@@ -30,18 +32,30 @@ use Aura\Di\Exception\ServiceNotFound;
 /**
  * Class Controller
  *
+ * This controller contains the Create/Modify screen that's shared among all the IAssessables:
+ * DueWork, Task, Project. They were all originally one screen, though their abilities have
+ * since expanded and diverged.
+ *
  * @package Schoolbox\Learning\Assessment
  */
 abstract class Controller extends ListController implements IAssessmentController
 {
 
-    /** @var BreadcrumbFactory */
+    /**
+     * @var BreadcrumbFactory
+     */
     protected $bakery;
 
-    /** @var WorkTypeMapper */
+
+    /**
+     * @var WorkTypeMapper
+     */
     private $workTypeMapper;
 
-    /** @var Term\Mapper */
+
+    /**
+     * @var Term\Mapper
+     */
     private $termMapper;
 
 
@@ -84,7 +98,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param IAssessable $assessment
      * @throws RouteNotFound
      */
-    public function getAssessment(IAssessable $assessment)
+    public function getAssessment(IAssessable $assessment): void
     {
 
         /* Presume a default url.
@@ -135,6 +149,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->redirect($parentUrl ?: $defaultUrl);
     }
 
+
     /**
      * Get the form for creating a new assessment in a particular context
      *
@@ -142,12 +157,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param AssessmentContext $context
-     * @throws DomainException If user has interaction but not participant record
-     * @throws ServiceNotFound If unable to locate HTML web Output renderer in DI
      * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException
+     * @throws ServiceNotFound If unable to locate HTML web Output renderer in DI
      * @throws UnexpectedValueException If unable to derive a project's participant collection
      */
-    public function getCreateAssessmentForm(AssessmentContext $context)
+    public function getCreateAssessmentForm(AssessmentContext $context): void
     {
         $type = $this->getRequest()->query->get('type');
 
@@ -195,11 +211,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Get the form to update an existing Assessment's details
      *
-     * @api /learning/assessments/:assessmentId/modify
+     * @api   /learning/assessments/:assessmentId/modify
      * @since 165
      * @param IAssessable $assessment
+     * @throws InvalidArgumentException
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
-    public function getUpdateAssessmentForm(IAssessable $assessment)
+    public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
         $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([$assessment->getTitle()]);
@@ -229,10 +248,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @param IAssessable $assessment
      * @throws DefinitionException
-     * @throws RouteNotFound
-     * @throws \Alaress\Web\Controller\Exception
+     * @throws Exception
      * @throws LogicException
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws RouteNotFound
+     * @throws ServiceNotFound
+     * @throws \Alaress\Web\Controller\Exception
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
@@ -280,23 +300,27 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Get an overview of rubric marks
      *
      * @param IAssessable $assessment
+     * @throws Exception
      */
-    public function getOverview(IAssessable $assessment)
+    public function getOverview(IAssessable $assessment): void
     {
         // For now, only DueWork uses this route.
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
+
     /**
      * Download overview of rubric marks
      *
      * @param IAssessable $assessment
+     * @throws Exception
      */
-    public function downloadOverview(IAssessable $assessment)
+    public function downloadOverview(IAssessable $assessment): void
     {
         // For now, only DueWork uses this route.
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
+
 
     /**
      * Delete the given assessment.
@@ -308,8 +332,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      * @param IAssessable $assessment
      * @return void
+     * @throws LogicException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function postDeleteAssessment(IAssessable $assessment)
+    public function postDeleteAssessment(IAssessable $assessment): void
     {
         // If not already deleted?
         if (!$assessment->isDeleted()) {
@@ -334,12 +362,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
     }
 
+
     /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
      * @return array
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
-    private function getAssessmentAsTwigArray(AssessmentContext $context, IAssessable $assessment)
+    private function getAssessmentAsTwigArray(AssessmentContext $context, IAssessable $assessment): array
     {
         if (!$assessment->getId()) {
             // new assessment: set default values
@@ -374,6 +405,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
             'allWorkTypes'             => $this->workTypeMapper->findAll(),
+
+            /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
+             * so we don't need a different method than the existing getAllMarkTypes
+             */
             'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
             'capabilityGradingSchemes' => $this->getAllGradeSchemes()
         ];
@@ -389,11 +424,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @param IAssessable $assessable
      * @return array
+     * @throws UnexpectedValueException
      */
     protected function getAllMarkTypes(IAssessable $assessable)
     {
         return MarkSchemeFactory::getAvailableMarkTypes($assessable);
     }
+
 
     /**
      * Gets all grading schemes.
@@ -407,19 +444,22 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
     }
 
+
     /**
      * @return BreadcrumbFactory
      */
-    protected function getBakery()
+    protected function getBakery(): BreadcrumbFactory
     {
         return $this->bakery;
     }
+
 
     /**
      * @param IAssessable $assessment
      * @return array
      */
-    protected abstract function getAssessmentTwigData(IAssessable $assessment);
+    abstract protected function getAssessmentTwigData(IAssessable $assessment): array;
+
 
     /**
      * Decide which URL to send the client back to
@@ -428,8 +468,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string|null $postReturnUrl an encoded URL
      * @param string      $defaultReturnUrl
      * @return string
+     * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '')
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = ''): string
     {
         /**
          * First priority is a the post return URL
@@ -445,15 +486,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return $defaultReturnUrl;
     }
 
+
     /**
      * @param IMarkScheme $scheme
      * @return string
      */
-    protected function deriveSchemeName(IMarkScheme $scheme)
+    protected function deriveSchemeName(IMarkScheme $scheme): string
     {
         $c = get_class($scheme);
         return substr($c, strrpos($c, '\\')+1);
     }
+
 
     /**
      * Update particular fields of an existing IAssessable
@@ -462,16 +505,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws Exception
      */
-    public function patchUpdateAssessment(IAssessable $assessment)
+    public function patchUpdateAssessment(IAssessable $assessment): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
+
     /**
      * @return Term\Mapper
      */
-    protected function getTermMapper()
+    protected function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
     {
         return $this->termMapper;
     }
