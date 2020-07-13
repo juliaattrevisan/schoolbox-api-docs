@@ -57,7 +57,7 @@
                 {% endblock %}
             {% endfor %}
         </ul>
-        {% if createRoute and not readOnly %}
+        {% if createRoute and not readOnly and createRouteType is defined %}
             <div class="component-action">
                 <section>
                     <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>

@@ -161,6 +161,10 @@ class ListController extends Web\Controller\Base
             'assessables'     => $assessments,
             'contextType'     => AssessmentContextType::objectToString($context) . 's',
             'assessmentType'  => $q['type'],
+            'component_id'    => null,
+            'icon'            => '',
+            'readOnly'        => $readOnly,
+            'compact'         => false,
             '_is_xhr'         => $this->getRequest()->isXhr(),
         ];
 
