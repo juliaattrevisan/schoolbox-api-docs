@@ -83,7 +83,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * The rubric capability's mark type, if chosen
      *
-     * @var int|null
+     * @var MarkType|null
      */
     protected $capabilityMarkType;
 
@@ -91,7 +91,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * The rubric capability's grade group, if chosen
      *
-     * @var int|null
+     * @var SubmissionBox\GradeLevel\Group\Model|null
      */
     protected $capabilityGradeGroup;
 
@@ -737,18 +737,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return int|null
+     * @return MarkType|null
      */
-    public function getCapabilityMarkType() : ?int
+    public function getCapabilityMarkType() : ?MarkType
     {
         return $this->capabilityMarkType;
     }
 
     /**
-     * @param int|null $capabilityMarkType
+     * @param MarkType|null $capabilityMarkType
      * @return $this
      */
-    public function setCapabilityMarkType(?int $capabilityMarkType)
+    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
         $this->capabilityMarkType = $capabilityMarkType;
         return $this;
@@ -845,18 +845,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return int|null
+     * @return SubmissionBox\GradeLevel\Group\Model|null
      */
-    public function getCapabilityGradeGroup(): ?int
+    public function getCapabilityGradeGroup(): ?SubmissionBox\GradeLevel\Group\Model
     {
         return $this->capabilityGradeGroup;
     }
 
     /**
-     * @param int|null $capabilityGradeGroup
+     * @param SubmissionBox\GradeLevel\Group\Model|null $capabilityGradeGroup
      * @return Model
      */
-    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
+    public function setCapabilityGradeGroup(?SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup): self
     {
         $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;

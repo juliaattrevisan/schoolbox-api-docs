@@ -6,7 +6,13 @@
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
+use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
+use InvalidArgumentException;
+use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -17,7 +23,9 @@ use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use UnexpectedValueException;
 
 /**
  * Class Decorator
@@ -76,12 +84,12 @@ class Decorator implements DecoratorInterface
 
     /**
      * @param DueWork $assessment
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \RangeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws ServiceNotFound
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws RangeException
+     * @throws Exception
+     * @throws UnexpectedValueException
      */
     public function decorate($assessment)
     {
@@ -95,22 +103,22 @@ class Decorator implements DecoratorInterface
             $assessment->setAcceptsMultiple();
         }
 
-        /* TODO: Replace old classes and stuff?
+        /* Set matching data types
+         *
+         * Ideally these would be hydrated like everything else, but for some reason,
+         * I end up drowning in the Swamp if I try
          */
-        $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
-        $gradingGroup->setId($this->getGradingScheme());
+        $markType = MarkTypeMapper::getInstance()->createModel()->setId($this->getMarkType());
+        $gradingGroup = Mapper::getInstance()->createModel()->setId($this->getGradingScheme());
 
-        $assessment->setGradeGroup($gradingGroup);
+        $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
+        $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
 
-        /* TODO: Replace old classes and stuff?
-         */
-        $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
-        $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
-
+        $assessment->setGradeGroup($gradingGroup);
         $assessment->setUseRubric($this->getUseRubric());
-        $assessment->setCapabilityMarkType($this->getCapabilityMarkType());
-        $assessment->setCapabilityGradeGroup($this->getCapabilityGradeGroup());
+        $assessment->setCapabilityMarkType($capabilityMarkType);
+        $assessment->setCapabilityGradeGroup($capabilityGradeGroup);
         $assessment->setUseMarkRange($this->getUseMarkRange());
 
         if ($this->getSelfReviewable() !== null) {
@@ -120,8 +128,6 @@ class Decorator implements DecoratorInterface
             // $assessment doesn't have an existing setting - set to default
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
-
-
 
         if ($this->getUseRubric()) {
             $rubricMapper = RubricDataSource::getInstance();
@@ -149,7 +155,7 @@ class Decorator implements DecoratorInterface
             // returning false.
             // If it does just return false: that's a logic exception, fix it
             if (!$spec->isSatisfiedBy($newGrid->getRowSet())) {
-                throw new \InvalidArgumentException("Save of row set failed for unknown reason");
+                throw new InvalidArgumentException("Save of row set failed for unknown reason");
             }
 
             $assessment->setRubricGrid($newGrid);

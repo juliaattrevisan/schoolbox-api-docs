@@ -136,7 +136,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * The mark type chosen to represent capability totals
      *
-     * @var int|null
+     * @var MarkType|null
      */
     protected $capabilityMarkType;
 
@@ -144,7 +144,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * The grade group associated with Letter Grade capability mark type
      *
-     * @var int
+     * @var GradeLevel\Group\Model|null
      */
     protected $capabilityGradeGroup;
 
@@ -565,15 +565,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return int|null
-     */
-    public function getCapabilityMarkType(): ?int
-    {
-        return $this->capabilityMarkType;
-    }
-
-
-    /**
      * @return bool
      */
     public function isMarkedPerCapability(): bool
@@ -583,14 +574,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @param int|null $capabilityMarkType
+     * @return MarkType|null
+     */
+    public function getCapabilityMarkType(): ?MarkType
+    {
+        return $this->capabilityMarkType;
+    }
+
+
+    /**
+     * @param MarkType|null $capabilityMarkType
      * @return $this
      */
-    public function setCapabilityMarkType(?int $capabilityMarkType): self
+    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
         $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
+
 
     /**
      * @deprecated mapper method
@@ -689,7 +690,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param  GradeLevel\Group\Model $gradeGroup
+     * @param GradeLevel\Group\Model $gradeGroup
      * @return $this
      */
     public function setGradeGroup($gradeGroup)
@@ -883,18 +884,18 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int|null
+     * @return GradeLevel\Group\Model|null
      */
-    public function getCapabilityGradeGroup(): ?int
+    public function getCapabilityGradeGroup(): ?GradeLevel\Group\Model
     {
         return $this->capabilityGradeGroup;
     }
 
     /**
-     * @param int|null $capabilityGradeGroup
+     * @param GradeLevel\Group\Model|null $capabilityGradeGroup
      * @return $this
      */
-    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
+    public function setCapabilityGradeGroup(?GradeLevel\Group\Model $capabilityGradeGroup): self
     {
         $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
