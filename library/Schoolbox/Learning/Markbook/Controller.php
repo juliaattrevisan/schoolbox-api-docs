@@ -200,10 +200,13 @@ class Controller extends Base
         $selections = new GenericCollection(GenericCollection::class);
         $filters    = $filterMapper->findForEntity(\Schoolbox\Learning\Assessment\DataModel\Mapper::class);
         foreach ($filters as $filter) {
-            $selections[$filter->getId()] = $selectionMapper->createCollection();
-
             if ($term && Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()) {
-                $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
+                $selections[$filter->getId()]                 = $selectionMapper->createCollection();
+                $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel(
+                    $selectionMapper,
+                    $filter,
+                    (string)$term->getId()
+                );
             }
         }
 
