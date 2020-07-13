@@ -8,6 +8,7 @@
  */
 
 namespace Etherpad;
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 
 class Pad implements ISoftDeletable {
@@ -64,21 +65,21 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Created at
 	 *
-	 * @var \Alaress_Date_Format
+	 * @var Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
 	 * Updated at
 	 *
-	 * @var \Alaress_Date_Format
+	 * @var Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
 	 * Deleted at
 	 *
-	 * @var \Alaress_Date_Format
+	 * @var Alaress_Date_Format
 	 */
 	private $deletedAt = null;
 
@@ -135,7 +136,7 @@ class Pad implements ISoftDeletable {
 	 * {@inheritdoc}
 	 */
 	public function isDeleted() {
-		return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
+		return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
 	}
 
 	/**
@@ -175,7 +176,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Set created at
 	 *
-	 * @param string $createdAt
+	 * @param Alaress_Date_Format $createdAt
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
@@ -184,7 +185,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Get created at
 	 *
-	 * @return string
+	 * @return Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->createdAt;
@@ -193,7 +194,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Set deleted at
 	 *
-	 * @param string $deletedAt
+	 * @param Alaress_Date_Format $deletedAt
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
@@ -202,7 +203,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Get deleted at
 	 *
-	 * @return string
+	 * @return Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;
@@ -265,7 +266,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Set updated at
 	 *
-	 * @param string $updatedAt
+	 * @param Alaress_Date_Format $updatedAt
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
@@ -274,7 +275,7 @@ class Pad implements ISoftDeletable {
 	/**
 	 * Get updated at
 	 *
-	 * @return string
+	 * @return Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
