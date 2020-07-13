@@ -279,7 +279,7 @@ class Participant
     {
         return $this->allFeedbacks
             ->filter(new InstructorGivenFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -296,7 +296,7 @@ class Participant
         return $this->allFeedbacks
             ->filter(new PublishedFilter())
             ->filter(new InstructorGivenFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -310,7 +310,7 @@ class Participant
     {
         return $this->allFeedbacks
             ->filter(new SelfAssessmentFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -325,7 +325,7 @@ class Participant
         return $this->allFeedbacks
             ->filter(new PublishedFilter())
             ->filter(new SelfAssessmentFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
