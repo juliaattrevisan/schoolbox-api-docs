@@ -4,9 +4,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Learning\MarkScheme;
 
+use DomainException;
+use InvalidArgumentException;
+use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -17,20 +19,31 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use UnexpectedValueException;
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
  */
 class Factory
 {
-    /** @var string[] MarkTypes available for Projects */
+
+    /**
+     * MarkTypes available for Projects
+     *
+     * @var string[]
+     */
     private static $markTypesProject = [
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_NONE    => None::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
-    /** @var string[] MarkTypes available for DueWorks */
+
+    /**
+     * MarkTypes available for DueWorks
+     *
+     * @var string[]
+     */
     private static $markTypesDueWork = [
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_NONE    => None::TITLE,
@@ -38,23 +51,42 @@ class Factory
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
-    /** @var string[] MarkTypes available for Tasks */
+
+    /**
+     * MarkTypes available for Tasks
+     *
+     * @var string[]
+     */
     private static $markTypesTask = [
         MarkType::TYPE_COMPLETION => Completion::TITLE,
     ];
 
-    /** @var string[] MarkTypes available for Quizzes */
+
+    /**
+     * MarkTypes available for Quizzes
+     *
+     * @var string[]
+     */
     private static $markTypesQuiz = [
         MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
     ];
 
-    /** @var Group\Mapper */
-    private $gradeLevelGroupMapper;
-
-    /** @var IConfigLoader|null */
-    private $config;
 
     /**
+     * @var Group\Mapper
+     */
+    private $gradeLevelGroupMapper;
+
+
+    /**
+     * @var IConfigLoader|null
+     */
+    private $config;
+
+
+    /**
+     * Constructor
+     *
      * @param IConfigLoader|null $config
      */
     public function __construct(?IConfigLoader $config = null)
@@ -62,72 +94,81 @@ class Factory
         $this->config = $config;
     }
 
+
     /**
      * @param IAssessable $assessable
      * @return null|IMarkScheme
-     * @throws \DomainException If MarkType is invalid for the assessment
-     * @throws \InvalidArgumentException If assessment class not registered
-     * @throws \RangeException
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws RangeException
      * @throws Mapper\Exception
      */
     public function spawnMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
     {
         $markType = $assessable->getMarkType();
+
         if (null === $markType) {
             return null;
         }
+
         if ($assessable instanceof Task) {
             return $this->spawnForTask($assessable);
         }
+
         if ($assessable instanceof Quiz) {
             return $this->spawnForQuiz($assessable);
         }
+
         if ($assessable instanceof DueWork) {
             return $this->spawnForDueWork($assessable);
         }
+
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
         }
-        throw new \InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
+
+        throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
     }
+
 
     /**
      * @param Task $task
-     * @throws \DomainException if MarkType is invalid for Tasks
+     * @throws DomainException if MarkType is invalid for Tasks
      * @return Completion
      */
-    protected function spawnForTask(Task $task)
+    protected function spawnForTask(Task $task): ?Completion
     {
         switch ($task->getMarkType()->getId()) {
             case MarkType::TYPE_COMPLETION:
                 return new Completion();
             default:
-                throw new \DomainException("Invalid MarkType for Task: " . $task->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for Task: ' . $task->getMarkType()->getName());
         }
     }
+
 
     /**
      * @param Quiz $quiz
      * @return TotalMarkFractional
-     * @throws \DomainException
-     * @throws \RangeException
+     * @throws DomainException
      */
-    protected function spawnForQuiz(Quiz $quiz)
+    protected function spawnForQuiz(Quiz $quiz): ?TotalMarkFractional
     {
         switch ($quiz->getMarkType()->getId()) {
             case MarkType::TYPE_TOTAL:
                 return new TotalMarkFractional();
             default:
-                throw new \DomainException("Invalid MarkType for Quiz: " . $quiz->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for Quiz: ' . $quiz->getMarkType()->getName());
         }
     }
+
 
     /**
      * @param DueWork    $dueWork
      * @param float|null $totalMark
      * @return IMarkScheme
-     * @throws \RangeException
-     * @throws \DomainException
+     * @throws RangeException
+     * @throws DomainException
      */
     protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
@@ -142,9 +183,10 @@ class Factory
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
-                throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for DueWork: ' . $dueWork->getMarkType()->getName());
         }
     }
+
 
     /**
      * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
@@ -153,8 +195,8 @@ class Factory
      * @param IAssessable    $assessable
      * @param float|null $maxMark
      * @return IMarkScheme
-     * @throws \DomainException
-     * @throws \RangeException
+     * @throws DomainException
+     * @throws RangeException
      */
     public function spawnForCapability(IAssessable $assessable, ?float $maxMark = null) : IMarkScheme
     {
@@ -177,14 +219,15 @@ class Factory
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($assessable->getGradeGroup());
             default:
-                throw new \DomainException("Invalid MarkType for DueWork: " . $assessable->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for DueWork: ' . $assessable->getMarkType()->getName());
         }
     }
+
 
     /**
      * @param Project $project
      * @return IMarkScheme
-     * @throws \DomainException
+     * @throws DomainException
      * @throws Mapper\Exception
      */
     protected function spawnForProject(Project $project)
@@ -203,31 +246,37 @@ class Factory
                 }
                 return new LetterGrade($project->getGradeGroup());
             default:
-                throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for Project: ' . $project->getMarkType()->getName());
         }
     }
+
 
     /**
      * @param IAssessable $assessable
      * @return string[] Indexed by MarkType.id
-     * @throws \UnexpectedValueException If $assessment class is not registered
+     * @throws UnexpectedValueException If $assessment class is not registered
      */
-    public static function getAvailableMarkTypes(IAssessable $assessable)
+    public static function getAvailableMarkTypes(IAssessable $assessable): array
     {
         if ($assessable instanceof Project) {
             return self::$markTypesProject;
         }
+
         if ($assessable instanceof DueWork) {
             return self::$markTypesDueWork;
         }
+
         if ($assessable instanceof Quiz) {
             return self::$markTypesQuiz;
         }
+
         if ($assessable instanceof Task) {
             return self::$markTypesTask;
         }
-        throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
+
+        throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
     }
+
 
     /**
      * @param Folder|null $folder
@@ -258,13 +307,16 @@ class Factory
 
         /** @var Group\Model|null $gradeGroup */
         $gradeGroup  = $gradeGroups->getBy('id', $overAllGrade);
+
         if (empty($gradeGroup) || $gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_NONE) {
             return new None();
         } elseif ($gradeGroup->getId() === $this->getGradeLevelGroupMapper()::GRADE_GROUP_ID_PERCENTAGE) {
             return new Percentage();
         }
+
         return new LetterGrade($gradeGroup);
     }
+
 
     /**
      * @return Group\Mapper
@@ -274,6 +326,7 @@ class Factory
         if (!$this->gradeLevelGroupMapper) {
             $this->gradeLevelGroupMapper = Group\Mapper::getInstance();
         }
+
         return $this->gradeLevelGroupMapper;
     }
 }
