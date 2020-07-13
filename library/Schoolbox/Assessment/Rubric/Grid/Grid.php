@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
@@ -124,11 +125,15 @@ class Grid
     /**
      * Does this rubric grid use mark-per-capability?
      *
+     * If your mark type is None, or not set, then you're not using Mark per Capability.
+     *
      * @return bool
      */
     public function isMarkPerCapability(): bool
     {
-        return $this->assessment instanceof DueWork && $this->assessment->getCapabilityMarkType();
+        return $this->assessment instanceof DueWork &&
+            $this->assessment->getCapabilityMarkType() !== MarkType::TYPE_NONE &&
+            $this->assessment->getCapabilityMarkType() !== null;
     }
 
 
@@ -239,7 +244,7 @@ class Grid
      */
     public function isCapabilityMarkShown(Capability $capability): bool
     {
-        if (!($this->assessment instanceof DueWork && $this->assessment->getCapabilityMarkType())) {
+        if (!($this->assessment instanceof DueWork && $this->assessment->isMarkedPerCapability())) {
             return false;
         }
 
