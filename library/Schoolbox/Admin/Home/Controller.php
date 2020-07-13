@@ -15,7 +15,9 @@ use Alaress_Date_Format;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
@@ -62,11 +64,21 @@ class Controller extends Base
     public function getIndex()
     {
         // Disk usage
+        $adapter      = $this->getConfigLoader()->get(ConfigMapper::NAME_OTFS_ADAPTER);
+        $usageInGraph = $adapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL;
 
-        $disk_total = disk_total_space($this->getConfigLoader()->get('storage_dir'));
-        $disk_free = disk_free_space($this->getConfigLoader()->get('storage_dir'));
-        $disk_used = $disk_total - $disk_free;
-        $disk_percentage = round(($disk_used / $disk_total) * 100);;
+        if ($usageInGraph) {
+            $disk_total      = disk_total_space($this->getConfigLoader()->get('storage_dir'));
+            $disk_free       = disk_free_space($this->getConfigLoader()->get('storage_dir'));
+            $disk_used       = Alaress_Byte_Format::bytesToString($disk_total - $disk_free);
+            $disk_percentage = round((($disk_total - $disk_free) / $disk_total) * 100);;
+        } else {
+            $disk_total      = null;
+            $disk_free       = null;
+            $disk_percentage = null;
+            $s3info          = $this->buildDisasterRecoveryContext(true);
+            $disk_used       = $s3info['bucketSize'] ?? null;
+        }
 
         // Memory Usage
 
@@ -249,7 +261,9 @@ class Controller extends Base
                 'template' => '@adminHome/index.twig',
                 'data' => array(
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                    'usageInGraph' => $usageInGraph,
+                    'disk_used' => $disk_used,
+//                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                     'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
                     'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
                     'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
@@ -342,10 +356,11 @@ class Controller extends Base
     /**
      * Builds the context data for the Disaster Report
      *
+     * @param bool $bucketSizeOnly True to get bucket size
      * @return array
      * @throws InvalidArgumentException
      */
-    private function buildDisasterRecoveryContext(): array
+    private function buildDisasterRecoveryContext(bool $bucketSizeOnly = false): array
     {
         $enabledData = [];
 
@@ -397,6 +412,10 @@ class Controller extends Base
         ]);
 
         $bucketSize  = (new CloudWatchMetrics($cloudWatchClient))->getBucketSize($s3Bucket);
+
+        if ($bucketSizeOnly) {
+            return ['bucketSize' => Alaress_Byte_Format::bytesToString($bucketSize)];
+        }
         $objectCount = (new CloudWatchMetrics($cloudWatchClient))->getNumberOfObjects($s3Bucket);
 
         $objects = $s3Client->getIterator('ListObjects', [

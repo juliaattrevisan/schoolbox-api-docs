@@ -113,9 +113,18 @@
         <!-- Usage Graphs -->
 
         <h2 class="subheader">Server Usage</h2>
+        {% if usageInGraph %}
         <section>
             <div data-graph="usage"></div>
         </section>
+        {% else %}
+            <table>
+                <tbody>
+                <tr><th>Storage</th><td>{{ disk_used }}</td></tr>
+                <tr><th>Memory</th><td>{{ memory_used }} / {{ memory_total }}</td></tr>
+                </tbody>
+            </table>
+        {% endif %}
 
         <!-- Service Statuses -->
 

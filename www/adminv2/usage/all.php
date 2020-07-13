@@ -7,17 +7,26 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
+
 if (!$_SESSION['user']->isSuperuser()) {
-	error(19);
+    error(19);
 }
 
 $mapper = new \Schoolbox\Usage\All\UsageMapper();
-$this->setFile(TEMPLATE_content, 'adminv2/usage/all.html');
+/** @var \Schoolbox\IConfigLoader $config */
+$config = $this->getDi()->get('config');
 
-$this->setVar(array(
-	'USAGE_NUM_TOTAL' => $mapper->numUsers()
-));
+if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === \Schoolbox\Resource\FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+    $this->setFile(TEMPLATE_content, 'adminv2/usage/allAws.html');
+} else {
+    $this->setFile(TEMPLATE_content, 'adminv2/usage/all.html');
+}
+
+$this->setVar([
+    'USAGE_NUM_TOTAL' => $mapper->numUsers(),
+]);
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
+$nav = new AdminV2_Nav($config);
 $nav->parse($this, 'usage');
