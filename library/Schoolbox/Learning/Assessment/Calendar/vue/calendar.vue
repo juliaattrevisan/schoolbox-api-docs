@@ -241,6 +241,12 @@
                                 });
                             }
                         });
+                        self.folderResources.sort(function (a, b) {
+                            if (typeof a?.title === 'string' && typeof b?.title === 'string') {
+                                return a.title.localeCompare(b.title, 'en', { numeric: true, sensitivity: 'accent' });
+                            }
+                            return 0;
+                        });
 
                         // Reload resources here too
                         self.$refs.fullCalendar.getApi().refetchResources();

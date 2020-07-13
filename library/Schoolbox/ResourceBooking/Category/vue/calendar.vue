@@ -278,7 +278,7 @@
              */
             resourceOrder(a, b) {
                 if (typeof a?.name === 'string' && typeof b?.name === 'string') {
-                    return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' });
+                    return a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'accent' });
                 }
                 return 0;
             },
