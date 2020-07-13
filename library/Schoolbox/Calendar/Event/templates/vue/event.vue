@@ -338,30 +338,12 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let userId = response.data.currentUser.user.id;
-                            let fullname = response.data.currentUser.user.title + ' ' + response.data.currentUser.user.firstname + ' ' + response.data.currentUser.user.lastname;
-                            let found = false;
 
                             /* Update data with the result from async request
                              */
                             self.currentAttendanceStatus = status;
                             self.updateCountsFromPayload(response.data);
-
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === userId) {
-                                    self.guests[i].status = status;
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found) {
-                                self.guests.push({
-                                    id: userId,
-                                    name: fullname,
-                                    status: status
-                                });
-                            }
+                            self.guests = response.data.attendees.guests;
 
                             toast.toastTimeout({
                                 text: 'Invitation successfully updated',
@@ -387,7 +369,17 @@
              */
             showGuestsPanel()
             {
-                return this.event.attendance.level.current !== this.ATTENDANCE_LEVELS.NONE
+                /* The Guests panel is available when any of the following can be performed:
+                 *
+                 * You can rsvp to an event (shows rsvp buttons)
+                 * There's limited attendance and the attendance list is visible to you (shows metadata about counts)
+                 * You can modify the event (you can see the Invite Guest selectize)
+                 * You can see the attendance list (shows invited dudes)
+                 */
+                return this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable) ||
+                    (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
+                    this.canModify() ||
+                    this.isAttendeesVisible();
             },
 
 
