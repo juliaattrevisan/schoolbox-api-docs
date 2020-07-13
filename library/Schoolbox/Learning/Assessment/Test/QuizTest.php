@@ -644,4 +644,155 @@ class QuizTest extends TestCase
          */
         $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
+
+
+    /**
+     * Test most recent response retrieval, when responses are published on the
+     * same date.
+     */
+    public function testFindMostRecentResponseWhenDatesAreIdentical(): void
+    {
+        $time     = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $quiz     = new Quiz();
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+
+        $publishedResponse1 = new QuizAttempt();
+        $publishedResponse1
+            ->setId(1)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $publishedResponse2 = new QuizAttempt();
+        $publishedResponse2
+            ->setId(2)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedResponse1 = new QuizAttempt();
+        $unpublishedResponse1
+            ->setId(3)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt(new \Alaress_Date_NullDate())
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedResponse2 = new QuizAttempt();
+        $unpublishedResponse2
+            ->setId(4)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt(new \Alaress_Date_NullDate())
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Test feedback belonging to a participant
+        $participant = $quiz->getParticipant($this->hodes);
+        $participant->setAllResponses(
+            $participant->getAllResponses()->emptyClone()
+                        ->add($publishedResponse1)
+                        ->add($publishedResponse2)
+                        ->add($unpublishedResponse1)
+                        ->add($unpublishedResponse2)
+        );
+
+        self::assertSame($publishedResponse2, $participant->findMostRecentSubmittedResponse());
+        self::assertSame($unpublishedResponse2, $participant->findMostRecentResponse());
+        self::assertSame($unpublishedResponse2, $participant->findMostRecentDraftResponse());
+    }
+
+
+    /**
+     * Test most recent feedback retrieval, when feedbacks are published on the
+     * same date.
+     */
+    public function testFindMostRecentFeedbackWhenDatesAreIdentical(): void
+    {
+        $time     = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $quiz     = new Quiz();
+        $response = new QuizAttempt();
+        $response
+            ->setId(1)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+
+        // Feedback given on the same date:
+        // disambiguate by ID (highest ID is most recent)
+        $publishedFeedback1 = (new QuizReview())
+            ->setId(1)
+            ->setAssessable($quiz)
+            ->setReviewer($this->celia)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $publishedFeedback2 = (new QuizReview())
+            ->setId(2)
+            ->setAssessable($quiz)
+            ->setReviewer($this->celia)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $unpublishedFeedback1 = (new QuizReview())
+            ->setId(3)
+            ->setAssessable($quiz)
+            ->setReviewer($this->celia)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $unpublishedFeedback2 = (new QuizReview())
+            ->setId(4)
+            ->setAssessable($quiz)
+            ->setReviewer($this->celia)
+            ->setPublishedAt(null)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Test feedback belonging to a response
+        $response->setAllFeedback(
+            $response->getAllFeedback()->emptyClone()
+                     ->add($publishedFeedback1)
+                     ->add($publishedFeedback2)
+                     ->add($unpublishedFeedback1)
+                     ->add($unpublishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $response->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($unpublishedFeedback2, $response->findMostRecentInstructorGivenFeedback());
+        self::assertNull($response->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertNull($response->findMostRecentSelfAssessedFeedback());
+
+        // Test feedback belonging to a participant
+        $participant = $quiz->getParticipant($this->hodes);
+        $participant->setAllFeedbacks(
+            $participant->getAllFeedbacks()->emptyClone()
+                        ->add($publishedFeedback1)
+                        ->add($publishedFeedback2)
+                        ->add($unpublishedFeedback1)
+                        ->add($unpublishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $participant->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($unpublishedFeedback2, $participant->findMostRecentInstructorGivenFeedback());
+        self::assertNull($participant->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertNull($participant->findMostRecentSelfAssessedFeedback());
+    }
 }
