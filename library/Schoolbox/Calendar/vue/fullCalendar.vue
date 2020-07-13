@@ -266,8 +266,19 @@
                 Object.keys(eventAttributes).forEach(function (attributeGroup) {
                     let ids                = eventAttributes[attributeGroup],
                         eventMatchesFilter = false;
+
+                    // If all items in the attribute group are selected:
+                    // always render an event that has one of these attributes,
+                    // even if it doesn't match the filter.
+                    // This allows events a user has been invited to, but are
+                    // outside their list of groups/campuses, to display.
+                    if (self.$refs.filter.allSelected(attributeGroup)) {
+                        eventMatchesFilter = true;
+                        return;
+                    }
+
+                    // Otherwise: check id against the list of selected filters.
                     ids.forEach(function (id) {
-                        // Check id against the list of selected filters.
                         let keyspace = [];
                         switch (attributeGroup) {
                             case 'source':
