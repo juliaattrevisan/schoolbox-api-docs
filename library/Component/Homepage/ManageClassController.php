@@ -231,12 +231,21 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): string
     {
-        $classArg = ['folderId' => $this->getContext()->getId()];
+        $classArg = [
+            'folder'   => $this->getContext(),
+            'folderId' => $this->getContext()->getId(),
+        ];
         if ($wasClassPage) {
             return $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', $classArg);
         }
 
-        $classAndTermArgs = array_merge($classArg, ['termCode' => $currentTerm->getCode()]);
+        $classAndTermArgs = array_merge(
+            $classArg,
+            [
+                'term'     => $currentTerm,
+                'termCode' => $currentTerm->getCode(),
+            ]
+        );
         return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
     }
 

@@ -34,7 +34,6 @@ class Definition extends FolderFilter\Definition
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,
-            Page\Model::PAGE_CLASS_MARK_BOOK,
         ];
     }
 
