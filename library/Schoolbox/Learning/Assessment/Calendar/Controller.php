@@ -114,11 +114,7 @@ class Controller extends Base
                     'user'        => $this->getUser(),
                     'filterPanel' => $filterPanel,
                     'termDates'   => $this->getAvailableTermDates(),
-                    'eventTypes'  => $this->eventTypeMapper
-                        ->findAll()
-                        ->sortByCallback(static function (EventType $a, EventType $b) {
-                            return strnatcasecmp($a->getType(), $b->getType());
-                        }),
+                    'eventTypes'  => $this->eventTypeMapper->findAll(),
                     'inContext'   =>  $inContext,
                 ],
                 'Assessment Calendar',
