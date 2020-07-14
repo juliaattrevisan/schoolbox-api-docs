@@ -31,6 +31,7 @@
 
     window.fullCalendarConfig = {
         userId:             Number('{{ user.id }}'),
+        canInvite:          Boolean('{{ canInvite }}'),
         token:              '{{ user.key }}',
         sources:            {{ sources | json_encode | raw }},
         eventTypes:         {{ eventTypes | json_encode | raw }},

@@ -654,6 +654,7 @@
 
         <create-event-modal ref="createEvent"
                             :user-id="config.userId"
+                            :can-invite="config.canInvite"
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
