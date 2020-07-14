@@ -361,7 +361,115 @@ class TaskTest extends TestCase
         $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getNormalisedMark());
         $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->isPublished());
     }
+
+
+    /**
+     * Test most recent response retrieval, when responses are published on the
+     * same date.
+     */
+    public function testFindMostRecentResponseWhenDatesAreIdentical(): void
+    {
+        $time = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $task = $this->spawnTask();
+
+        $publishedResponse1 = new TaskResponse();
+        $publishedResponse1
+            ->setId(1)
+            ->setAssessable($task)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $publishedResponse2 = new TaskResponse();
+        $publishedResponse2
+            ->setId(2)
+            ->setAssessable($task)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Test feedback belonging to a participant
+        $participant = $task->getParticipant($this->hodes);
+        $participant->setAllResponses(
+            $participant->getAllResponses()->emptyClone()
+                        ->add($publishedResponse1)
+                        ->add($publishedResponse2)
+        );
+
+        self::assertSame($publishedResponse2, $participant->findMostRecentSubmittedResponse());
+        self::assertSame($publishedResponse2, $participant->findMostRecentResponse());
+
+        // Tasks have no concept of draft responses
+        self::assertNull($participant->findMostRecentDraftResponse());
+    }
+
+
+    /**
+     * Test most recent feedback retrieval, when feedbacks are published on the
+     * same date.
+     */
+    public function testFindMostRecentFeedbackWhenDatesAreIdentical(): void
+    {
+        $time     = \Alaress_Date_Format::newDatabaseDate('2020-07-01 00:00:00');
+        $task     = $this->spawnTask();
+        $response = new TaskResponse();
+        $response
+            ->setId(1)
+            ->setAssessable($task)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        $quizPlan = $this->getLinker()->createAndLinkPlan($task);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+
+        // Feedback given on the same date:
+        // disambiguate by ID (highest ID is most recent)
+        $publishedFeedback1 = (new TaskFeedback())
+            ->setResponse(clone $response)
+            ->setId(1)
+            ->setAssessable($task)
+            ->setReviewer($this->celia)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+        $publishedFeedback2 = (new TaskFeedback())
+            ->setResponse(clone $response)
+            ->setId(2)
+            ->setAssessable($task)
+            ->setReviewer($this->celia)
+            ->setPublishedAt($time)
+            ->setCreatedAt($time)
+            ->setUpdatedAt($time);
+
+        // Test feedback belonging to a response
+        $response->setAllFeedback(
+            $response->getAllFeedback()->emptyClone()
+                     ->add($publishedFeedback1)
+                     ->add($publishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $response->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($publishedFeedback2, $response->findMostRecentInstructorGivenFeedback());
+
+        // Tasks have no concept of unpublished or self-assessed feedback
+        self::assertNull($response->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertNull($response->findMostRecentSelfAssessedFeedback());
+
+        // Test feedback belonging to a participant
+        $participant = $task->getParticipant($this->hodes);
+        $participant->setAllFeedbacks(
+            $participant->getAllFeedbacks()->emptyClone()
+                        ->add($publishedFeedback1)
+                        ->add($publishedFeedback2)
+        );
+
+        self::assertSame($publishedFeedback2, $participant->findMostRecentInstructorGivenPublishedFeedback());
+        self::assertSame($publishedFeedback2, $participant->findMostRecentInstructorGivenFeedback());
+        self::assertNull($participant->findMostRecentSelfAssessedPublishedFeedback());
+        self::assertNull($participant->findMostRecentSelfAssessedFeedback());
+    }
 }
-
-
-
