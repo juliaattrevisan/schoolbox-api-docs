@@ -279,7 +279,7 @@
                                 <label>
                                     Show Guest List
                                     <div class="switch">
-                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ (event.showAttendees or event.showAttendees is null) ? 'checked="checked"' : '' }}>
+                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
                                         <label for="showAttendees">
                                             <span>On</span>
                                             <span>Off</span>

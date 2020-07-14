@@ -232,6 +232,10 @@ class Controller extends Base
         $selectedUser = $this->getSelectedUser();
         $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
+        /* Guest List is initially on
+         */
+        $event->setShowAttendees(true);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,
             'user' => $selectedUser,
