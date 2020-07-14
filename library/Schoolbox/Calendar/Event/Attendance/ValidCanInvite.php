@@ -31,6 +31,6 @@ class ValidCanInvite
      */
     public function isSatisfiedBy(User $user, bool $configVar): bool
     {
-        return $user->getRole()->isStaff() || ($user->getRole()->isStudent() && $configVar);
+        return $user->isSuperuser() || $user->getRole()->isStaff() || ($user->getRole()->isStudent() && $configVar);
     }
 }
