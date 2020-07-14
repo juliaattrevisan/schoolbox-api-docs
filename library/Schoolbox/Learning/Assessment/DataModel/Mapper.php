@@ -1060,6 +1060,7 @@ class Mapper extends BaseMapper
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception
      */
     protected function augmentListWithGradeGroups($modelList)
     {
@@ -1077,6 +1078,14 @@ class Mapper extends BaseMapper
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
+                    );
+                }
+
+                /* Rubric Capability Grade Groups
+                 */
+                if ($submodel->getCapabilityGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
+                    $submodel->setCapabilityGradeGroup(
+                        $gradeGroupMapper->findByIdWithFallback($submodel->getCapabilityGradeGroup()->getId())
                     );
                 }
             }
