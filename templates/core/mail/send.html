@@ -21,21 +21,24 @@ $(function() {
             data:     {groupID: 0, email: 1},
             dataType: 'json'
         },
-        createOnBlur: false,
         multiple: true,
         selectize: {
             plugins: ['remove_button', 'restore_on_backspace'],
             create: function(input) {
+                if (!validateEmail(input)) {
+                    return false;
+                }
                 var freeEntry = {};
                 freeEntry[this.settings.valueField]  = input;
                 freeEntry[this.settings.searchField] = input;
                 return freeEntry;
             },
-            onItemAdd: function(key, $item) {
-                if (validateEmail(key) === false) {
-                    $item.addClass('error');
-                    var closeTab = '<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>';
-                    $item.text(key + ' - Invalid email format').append(closeTab);
+            render: {
+                option_create: function (data, escape) {
+                    if (!validateEmail(data.input)) {
+                        return '';
+                    }
+                    return '<div class="create">Add <strong>' + escape(data.input) + '</strong>&hellip;</div>';
                 }
             }
         }
