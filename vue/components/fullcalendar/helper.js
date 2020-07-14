@@ -1,4 +1,5 @@
-import {toMoment} from '@fullcalendar/moment'
+import {toMoment}          from '@fullcalendar/moment';
+import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 
 const EVENT_VARIANT_EVENT = 'event';
 const EVENT_VARIANT_TASK  = 'task';
@@ -90,16 +91,18 @@ export default class FullCalendarHelper {
         // TODO don't depend on jQuery for this
         let $element = self.jQuery(eventRenderInfo.el),
             inner = $element.find('.fc-content'),
-            title = $element.find('.fc-title'),
-            content = $element.find('.fc-event-content');
+            title = $element.find('.fc-title');
 
-        // If appropriate, indicate this event can be attended
-        if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
-            let span = '<span class="att">(A)</span>';
-            if (content.length === 1) {
-                content.append(span)
-            } else {
-                inner.append(span)
+        if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
+            // Add a style depending on attendability
+            $element.addClass('has-attendance');
+            let attendanceStatus = calEvent?.extendedProps?.data?.attendance?.status?.current;
+            if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
+                $element.addClass('declined');
+            } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
+                $element.addClass('pending');
+            } else if (attendanceStatus === ATTENDANCE_STATUS.ACCEPTED) {
+                $element.addClass('accepted');
             }
         }
 

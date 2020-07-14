@@ -143,3 +143,16 @@
     color: $alert-color;
   }
 }
+
+// RSVP styles
+.fc-event.has-attendance, .fc-list-item.has-attendance {
+  &.declined {
+    text-decoration: line-through;
+  }
+  &.pending {
+    opacity: 0.5;
+  }
+  &.accepted {
+    // No special styles for events where attendance is confirmed
+  }
+}

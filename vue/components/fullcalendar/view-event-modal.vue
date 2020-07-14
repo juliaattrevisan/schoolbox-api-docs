@@ -239,6 +239,7 @@
                                 css: 'success'
                             });
                         })
+                        .then(() => this.$emit(EVENT_MODIFIED, this.event))
                         .catch(error => {
                             if (error.response) {
                                 toast.toastTimeout({
