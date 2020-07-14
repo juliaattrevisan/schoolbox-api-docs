@@ -4,12 +4,18 @@
 #	Sets the correct permissions for the data directories
 #	Only to be used by packaging post install
 # Usage:
-#	set-data-dir-perms.sh [base data directory] [apache user](optional)
+#	set-data-dir-perms.sh [base data directory] [php-fpm user](optional)
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 #
+
+# Check we're running as root
+if [[ "$EUID" -ne 0 ]]
+  then echo "Error - please run script as root."
+  exit 1
+fi
 
 echo "Updating data directory permissions";
 
