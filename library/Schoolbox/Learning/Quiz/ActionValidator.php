@@ -171,8 +171,7 @@ class ActionValidator
         // Parent of student may view participation
         // (as long as config.restrict_student_submissions is off)
         return !$restrictStudentSubmissions
-            && $user->isParentOf($student)
-            && $this->access->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
+            && $user->isParentOf($student);
     }
 
 
