@@ -9,13 +9,11 @@
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage;
-
 if(isset($this) || empty($_POST)) {
 	SitePage::localRedir('/adminv2/messages');
 }
 
-if (!$page->getDi()->get('session')->get('user')->isSuperuser()) {
+if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
 }
 

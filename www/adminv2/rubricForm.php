@@ -7,15 +7,14 @@
  */
 
 // no sitepage allowed
-if(isset($this)) {
+if (isset($this)) {
     $this->localRedir('/adminv2/rubricresults');
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage;
-if (!$page->getDi()->get('session')->get('user')->isSuperuser()) {
+if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
 }
 
