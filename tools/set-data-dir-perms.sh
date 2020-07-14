@@ -4,7 +4,7 @@
 #	Sets the correct permissions for the data directories
 #	Only to be used by packaging post install
 # Usage:
-#	set-data-dir-perms.sh [base data directory] [apache user](optional)
+#	set-data-dir-perms.sh [base data directory] [php-fpm user](optional)
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
