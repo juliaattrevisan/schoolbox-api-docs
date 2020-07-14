@@ -24,10 +24,10 @@ class ValidCanInviteTest extends TestCase
     /**
      * @dataProvider provider_validCanInvite
      * @param User $user
-     * @param                 $configVar
-     * @param int             $expected
+     * @param bool $configVar
+     * @param bool $expected
      */
-    public function testValidCanInvite(User $user, $configVar, $expected)
+    public function testValidCanInvite(User $user, bool $configVar, bool $expected): void
     {
         $outcome = (new ValidCanInvite())->isSatisfiedBy($user, $configVar);
 
