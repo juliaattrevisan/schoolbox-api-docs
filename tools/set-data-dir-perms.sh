@@ -11,6 +11,12 @@
 # @link        https://schoolbox.com.au/
 #
 
+# Check we're running as root
+if [[ "$EUID" -ne 0 ]]
+  then echo "Error - please run script as root."
+  exit
+fi
+
 echo "Updating data directory permissions";
 
 datadir='/var/lib/schoolbox';
