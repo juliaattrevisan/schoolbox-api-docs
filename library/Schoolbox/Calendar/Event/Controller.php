@@ -274,6 +274,11 @@ class Controller extends Base
              */
             'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
 
+            /* Whether the current user can invite others; if you're a student, then it depends on the
+             * Policy config var's setting
+             */
+            'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
+
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
