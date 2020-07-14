@@ -6,6 +6,7 @@ use Schoolbox\Calendar\Event\Attendance;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\Loader;
 use Schoolbox\UserMapper;
 use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\Permission\Access\Access as FolderAccess;
@@ -23,6 +24,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $user    = $_SESSION['user'];
 $ownerId = $_POST['userId'];
 $owner   = UserMapper::getInstance()->findById($ownerId);
+$config  = new Loader();
 
 $event = new Event();
 
@@ -86,8 +88,13 @@ $personalRelationMapper->save($personalRelation);
 
 /* Persist event attendances
  * If event has zero guests, or if guests weren't specified at all, just provide empty array
+ * If you can't add attendees because you're a student and the config var is off, just provide empty array
  */
-$guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
+$guests = [];
+
+if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
+    $guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
+}
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
