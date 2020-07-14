@@ -22,8 +22,12 @@ class ValidCanInvite
     /**
      * Decide whether $user is allowed to invite other users
      *
-     * You have to be a staff member, of ir you're a student you must also have the accompanying
-     * config var enabled
+     * Superusers can always add attendees
+     *
+     * Otherwise, you have to be a staff member,
+     * or if you're a student you must also have the accompanying config var enabled
+     *
+     * Parents and Guests can never add attendees
      *
      * @param User $user
      * @param bool $configVar
