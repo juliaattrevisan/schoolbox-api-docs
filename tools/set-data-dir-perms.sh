@@ -14,7 +14,7 @@
 # Check we're running as root
 if [[ "$EUID" -ne 0 ]]
   then echo "Error - please run script as root."
-  exit
+  exit 1
 fi
 
 echo "Updating data directory permissions";
