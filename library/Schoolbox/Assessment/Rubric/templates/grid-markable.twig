@@ -16,11 +16,10 @@
 
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
-{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+{% set markType = rubricGrid.capabilityMarkScheme.generateContext %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
-
 {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
 <div class="scrollable">

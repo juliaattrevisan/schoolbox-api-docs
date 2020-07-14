@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use DomainException;
+use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
@@ -15,6 +17,8 @@ use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
 /**
  * A rubric grid.
@@ -69,6 +73,14 @@ class Grid
 
 
     /**
+     * Capabilities' values can be represented differently than the assessment's
+     *
+     * @var MarkSchemeFactory
+     */
+    private $markSchemeFactory;
+
+
+    /**
      * Constructor
      *
      * @param IAssessable $assessment
@@ -76,10 +88,11 @@ class Grid
      */
     public function __construct(IAssessable $assessment, RowSet $rowSet)
     {
-        $this->assessment       = $assessment;
-        $this->rowSet           = $rowSet;
-        $this->capabilityUsages = new GenericCollection(CapabilityUsage::class);
-        $this->levels           = new GenericCollection(Level::class);
+        $this->assessment        = $assessment;
+        $this->rowSet            = $rowSet;
+        $this->capabilityUsages  = new GenericCollection(CapabilityUsage::class);
+        $this->levels            = new GenericCollection(Level::class);
+        $this->markSchemeFactory = new MarkSchemeFactory();
     }
 
 
@@ -303,6 +316,20 @@ class Grid
         }
         sort($capabilityIds);
         return $capabilityIds;
+    }
+
+
+    /**
+     * Get an IMarkScheme instance for translation of capability marks specifically,
+     * and separately from its parent assessment
+     *
+     * @return IMarkScheme
+     * @throws DomainException
+     * @throws RangeException
+     */
+    public function getCapabilityMarkScheme(): IMarkScheme
+    {
+        return $this->markSchemeFactory->spawnForCapability($this->getAssessment());
     }
 
 

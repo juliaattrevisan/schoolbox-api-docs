@@ -204,23 +204,25 @@ class Factory
             return new None();
         }
 
-        switch ($assessable->getMarkType()->getId()) {
-            case MarkType::TYPE_PERCENT:
-                return new Percentage();
-            case MarkType::TYPE_NONE:
-                // Special case for mark type None:
-                // If mark-per-cap is on, then use the fractional type.
-                if ($assessable instanceof DueWork && $assessable->getCapabilityMarkType()) {
+        /* Type-enforcement throughout the swamp compels me to keep this as IAssessable $assessable
+         * instead of switching it to DueWork $assessable, even though only DueWork gets rubric grids
+         */
+        if ($assessable instanceof DueWork) {
+            switch ($assessable->getCapabilityMarkType()->getId()) {
+                case MarkType::TYPE_PERCENT:
+                    return new Percentage();
+                case MarkType::TYPE_NONE:
+                    return new None();
+                case MarkType::TYPE_TOTAL:
                     return new TotalMarkFractional($maxMark);
-                }
-                return new None();
-            case MarkType::TYPE_TOTAL:
-                return new TotalMarkFractional($maxMark);
-            case MarkType::TYPE_LETTER:
-                return new LetterGrade($assessable->getGradeGroup());
-            default:
-                throw new DomainException('Invalid MarkType for DueWork: ' . $assessable->getMarkType()->getName());
+                case MarkType::TYPE_LETTER:
+                    return new LetterGrade($assessable->getCapabilityGradeGroup());
+                default:
+                    throw new DomainException('Invalid MarkType for DueWork: ' . $assessable->getMarkType()->getName());
+            }
         }
+
+        throw new DomainException('$assessable is not an instance of DueWork');
     }
 
 
