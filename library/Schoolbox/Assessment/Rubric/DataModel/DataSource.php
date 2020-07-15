@@ -465,7 +465,7 @@ class DataSource
 
             // Max value is derived from indicators, if mark-per-cap is off
             $capabilityUsage->setMaxValue(
-                $assessment->getMarkPerCapability()
+                $assessment->getCapabilityMarkType()
                     ? $capabilityUsageModel->getMaxValue()
                     : $capabilityUsage->calculateMaxValueFromIndicators()
             );
@@ -951,6 +951,7 @@ class DataSource
 
 
         // Now start building the grid
+        // TODO: Figure out this thing
         $dueWork
             ->setMarkPerCapability($importer->isMarkPerCapability())
             ->setUseMarkRange($importer->isUseMarkRange());

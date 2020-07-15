@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
@@ -80,11 +81,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $rubricGrid;
 
     /**
-     * This DueWork's Rubric has Mark Per Capability on
+     * The rubric capability's mark type, if chosen
      *
-     * @var bool
+     * @var int|null
      */
-    protected $markPerCapability = false;
+    protected $capabilityMarkType;
 
 
     /**
@@ -736,20 +737,20 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return boolean
+     * @return int|null
      */
-    public function getMarkPerCapability() : bool
+    public function getCapabilityMarkType() : ?int
     {
-        return $this->markPerCapability;
+        return $this->capabilityMarkType;
     }
 
     /**
-     * @param boolean $markPerCapability
+     * @param int|null $capabilityMarkType
      * @return $this
      */
-    public function setMarkPerCapability(bool $markPerCapability)
+    public function setCapabilityMarkType(?int $capabilityMarkType)
     {
-        $this->markPerCapability = $markPerCapability;
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 
@@ -859,6 +860,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
+    }
+
+
+    /**
+     * Whether this assessment has a meaningful mark per capability setting activated
+     * If null, or None, then mark per capability is presumed ot be off.
+     *
+     * @return bool
+     */
+    public function isMarkedPerCapability(): bool
+    {
+        return $this->capabilityMarkType === null || $this->capabilityMarkType === MarkType::TYPE_NONE;
     }
 
 

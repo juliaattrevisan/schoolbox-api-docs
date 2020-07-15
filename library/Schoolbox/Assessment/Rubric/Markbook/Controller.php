@@ -620,9 +620,9 @@ class Controller extends Base
         foreach ($students as $studentId => $student) {
             foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
 
-                $assessmentMaxMark        = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
-                $assessmentMarkType       = $assessments[$assessmentId]['markType'];
-                $assessmentUsesMarkPerCap = $booleanHydrator->hydrate($assessments[$assessmentId]['usesMarkPerCap']);
+                $assessmentMaxMark = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
+                $assessmentMarkType = $assessments[$assessmentId]['markType'];
+                $assessmentCapabilityMarkType = $assessments[$assessmentId]['capabilityMarkType'];
 
                 // Create some things the markscheme factory wants our Due Work to have
                 try {
@@ -637,7 +637,7 @@ class Controller extends Base
                 // Fill out a Due Work with the data we need for the markscheme factory to work
                 $stubAssessment = new DueWork\Model();
                 $stubAssessment->setId($assessmentId);
-                $stubAssessment->setMarkPerCapability($assessmentUsesMarkPerCap);
+                $stubAssessment->setCapabilityMarkType($assessmentCapabilityMarkType);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
                 $stubAssessment->setMarkType($markType);
                 if ($gradeGroup !== null) {

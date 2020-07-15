@@ -37,7 +37,7 @@ class Decorator implements DecoratorInterface
      * @param int        $markType
      * @param int        $gradingScheme
      * @param bool       $useRubric
-     * @param bool       $markPerCapability
+     * @param int        $capabilityMarkType
      * @param int|null   $capabilityGradeGroup
      * @param bool       $useMarkRange
      * @param float|null $maxMark
@@ -51,7 +51,7 @@ class Decorator implements DecoratorInterface
         int $markType,
         int $gradingScheme,
         bool $useRubric,
-        bool $markPerCapability,
+        int $capabilityMarkType,
         ?int $capabilityGradeGroup,
         bool $useMarkRange,
         ?float $maxMark,
@@ -64,7 +64,7 @@ class Decorator implements DecoratorInterface
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
         $this->setUseRubric(trim($useRubric));
-        $this->setMarkPerCapability(trim($markPerCapability));
+        $this->setCapabilityMarkType(trim($capabilityMarkType));
         $this->setCapabilityGradeGroup($capabilityGradeGroup);
         $this->setUseMarkRange(trim($useMarkRange));
         $this->setMaxMark($maxMark);
@@ -109,7 +109,7 @@ class Decorator implements DecoratorInterface
         $assessment->setMarkType($markType);
 
         $assessment->setUseRubric($this->getUseRubric());
-        $assessment->setMarkPerCapability($this->getMarkPerCapability());
+        $assessment->setCapabilityMarkType($this->getCapabilityMarkType());
         $assessment->setCapabilityGradeGroup($this->getCapabilityGradeGroup());
         $assessment->setUseMarkRange($this->getUseMarkRange());
 

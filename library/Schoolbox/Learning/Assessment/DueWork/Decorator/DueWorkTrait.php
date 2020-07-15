@@ -45,13 +45,13 @@ trait DueWorkTrait
     protected $rubricData;
 
     /**
-     * @var bool
+     * @var int|null
      */
-    protected $markPerCapability = false;
+    protected $capabilityMarkType;
 
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $capabilityGradeGroup;
 
@@ -157,20 +157,20 @@ trait DueWorkTrait
     }
 
     /**
-     * @return boolean
+     * @return int|null
      */
-    protected function getMarkPerCapability() : bool
+    protected function getCapabilityMarkType(): ?int
     {
-        return $this->markPerCapability;
+        return $this->capabilityMarkType;
     }
 
     /**
-     * @param boolean $markPerCapability
+     * @param int|null $capabilityMarkType
      * @return $this
      */
-    protected function setMarkPerCapability(bool $markPerCapability)
+    protected function setCapabilityMarkType(?int $capabilityMarkType): self
     {
-        $this->markPerCapability = $markPerCapability;
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 

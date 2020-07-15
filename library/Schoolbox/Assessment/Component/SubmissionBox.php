@@ -132,8 +132,13 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /** @var bool */
     protected $useRubric;
 
-    /** @var bool */
-    protected $markedPerCapability;
+
+    /**
+     * The mark type chosen to represent capability totals
+     *
+     * @var int|null
+     */
+    protected $capabilityMarkType;
 
 
     /**
@@ -560,31 +565,30 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @deprecated mapper method
-     * @return boolean
+     * @return int|null
      */
-    public function getMarkedPerCapability()
+    public function getCapabilityMarkType(): ?int
     {
-        return $this->isMarkedPerCapability();
+        return $this->capabilityMarkType;
     }
 
 
     /**
      * @return bool
      */
-    public function isMarkedPerCapability()
+    public function isMarkedPerCapability(): bool
     {
-        return $this->markedPerCapability;
+        return (bool)$this->capabilityMarkType;
     }
 
 
     /**
-     * @param boolean $markedPerCapability
-     * @return static
+     * @param int|null $capabilityMarkType
+     * @return $this
      */
-    public function setMarkedPerCapability($markedPerCapability)
+    public function setCapabilityMarkType(?int $capabilityMarkType): self
     {
-        $this->markedPerCapability = $markedPerCapability;
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 

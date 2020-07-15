@@ -210,7 +210,7 @@ class Factory
             case MarkType::TYPE_NONE:
                 // Special case for mark type None:
                 // If mark-per-cap is on, then use the fractional type.
-                if ($assessable instanceof DueWork && $assessable->getMarkPerCapability()) {
+                if ($assessable instanceof DueWork && $assessable->getCapabilityMarkType()) {
                     return new TotalMarkFractional($maxMark);
                 }
                 return new None();

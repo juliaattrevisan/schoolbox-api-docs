@@ -94,7 +94,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getShowSubmittedOnly()      || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
         null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
         null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getMarkPerCapability()      || $dataModel->setMarkedPerCapability($domainObject->getMarkPerCapability());
+        null === $domainObject->getCapabilityMarkType()     || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
         null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
         null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
@@ -154,21 +154,21 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getSelfReviewability()      || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
         null === $dataModel->getSimilarityCheckEnabled() || $domainObject->setSimilarityCheckEnabled($dataModel->getSimilarityCheckEnabled());
 
-        // Has Rubric? (actual rubric must be loaded outside of this method)
+        /* Has Rubric? (actual rubric must be loaded outside of this method)
+         * If rubric is off for this Due Work, then clear the rubric-related settings
+         */
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
+            $domainObject->setCapabilityMarkType($dataModel->getCapabilityMarkType());
             $domainObject->setCapabilityGradeGroup($dataModel->getCapabilityGradeGroup());
-
-            if ($dataModel->isMarkedPerCapability()) {
-                $domainObject->setMarkPerCapability(true);
-            }
 
             if ($dataModel->isMarkedUsingRange()) {
                 $domainObject->setUseMarkRange(true);
             }
         } else {
             $domainObject->setUseRubric(false);
-            $domainObject->setMarkPerCapability(false);
+            $domainObject->setCapabilityMarkType(null);
+            $domainObject->setCapabilityGradeGroup(null);
             $domainObject->setUseMarkRange(false);
         }
 

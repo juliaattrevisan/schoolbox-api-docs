@@ -316,7 +316,7 @@ class Controller extends BaseController
             'formField'              => $post->get('formField', 'rb'),
             'rubricGrid'             => $assessment->getRubricGrid(),
             'levelLimit'             => $maxLevels,
-            'usingMarkPerCapability' => $assessment->getMarkPerCapability(),
+            'usingMarkPerCapability' => $assessment->getCapabilityMarkType(),
             'usingMarkRange'         => $assessment->getUseMarkRange(),
         ];
 
@@ -344,7 +344,7 @@ class Controller extends BaseController
             $this->sendError('Can only download rubrics for due work');
             return;
         }
-        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
+        $assessment->setCapabilityMarkType($this->request->post['markPerCapability'])
                    ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
@@ -396,7 +396,7 @@ class Controller extends BaseController
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
-            ->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
+            ->setCapabilityMarkType($this->request->post['markPerCapability'])
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
