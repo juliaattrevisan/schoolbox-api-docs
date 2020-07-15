@@ -34,12 +34,19 @@ $(function() {
                 return freeEntry;
             },
             render: {
-                option_create: function (data, escape) {
-                    if (!validateEmail(data.input)) {
-                        return '';
+                item: function (data, escape) {
+                    var value = data[this.settings.valueField];
+                    if (!validateEmail(value)) {
+                        return '<div class="item error">' + escape(value) + ' - Invalid email format</div>';
                     }
-                    return '<div class="create">Add <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                }
+                    return '<div class="item">' + escape(value) + '</div>';
+                },
+                // option_create: function (data, escape) {
+                //     if (!validateEmail(data.input)) {
+                //         return '';
+                //     }
+                //     return '<div class="create">Add <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+                // }
             }
         }
     }
