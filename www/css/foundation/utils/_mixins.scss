@@ -3,7 +3,6 @@
 @mixin button-dimensions() {
 	height: $global-button-height;
 	padding: $global-button-padding;
-    line-height: 1.7;
 	position: relative;
 	overflow: hidden;
 	vertical-align: middle;
