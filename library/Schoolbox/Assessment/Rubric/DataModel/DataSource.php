@@ -465,7 +465,7 @@ class DataSource
 
             // Max value is derived from indicators, if mark-per-cap is off
             $capabilityUsage->setMaxValue(
-                $assessment->getCapabilityMarkType()
+                $assessment->isMarkedPerCapability()
                     ? $capabilityUsageModel->getMaxValue()
                     : $capabilityUsage->calculateMaxValueFromIndicators()
             );
