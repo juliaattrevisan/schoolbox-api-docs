@@ -184,7 +184,7 @@ trait DueWorkTrait
 
     /**
      * @param int|null $capabilityGradeGroup
-     * @return DueWorkTrait
+     * @return $this
      */
     public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
     {
