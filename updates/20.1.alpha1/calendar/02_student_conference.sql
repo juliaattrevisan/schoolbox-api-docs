@@ -59,6 +59,12 @@ ALTER TABLE `event`
     ADD COLUMN `show_attendees` TINYINT(1) NULL DEFAULT 1 AFTER `attendance`;
 
 -- Config option for allowing students to invite people to their events
+-- First push everything else out of the way
+
+UPDATE config SET sequence = sequence+1 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Policy') and sequence >= 40;
+
+-- Then shank it into place
+
 INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES
@@ -74,5 +80,5 @@ VALUES
     'false',
     'true',
     'settings',
-    null
+    40
 );
