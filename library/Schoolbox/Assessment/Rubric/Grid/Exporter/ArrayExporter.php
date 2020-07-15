@@ -46,7 +46,7 @@ class ArrayExporter
         $usingMarkRange         = false;
         $assessment             = $grid->getAssessment();
         if ($assessment instanceof DueWork) {
-            $usingMarkPerCapability = $assessment->getCapabilityMarkType();
+            $usingMarkPerCapability = $assessment->isMarkedPerCapability();
             $usingMarkRange         = $assessment->getUseMarkRange();
         }
         $square[0][0] = 'markPerCapability: ' . ($usingMarkPerCapability ? 'On' : 'Off');
