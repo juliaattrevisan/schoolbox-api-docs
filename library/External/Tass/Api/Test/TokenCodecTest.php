@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace External\Tass\Api\Test;
 
-use External\Tass\Api\TokenCodec;
 use External\Tass\Api\Exception\InvalidApiKey;
 use PHPUnit;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\TokenCodec;
 
 /**
  * @covers \External\Tass\Api\TokenCodec
