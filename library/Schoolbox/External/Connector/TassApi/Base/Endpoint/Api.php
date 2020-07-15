@@ -136,6 +136,15 @@ class Api implements IApi
      */
     public function retrieveDocument(string $method, array $params): ?string
     {
+        print_r("\n\n");
+
+        print_r("Host: {$this->host}\n");
+        print_r("\n\n");
+
+        print_r("Params:\n");
+        print_r($params);
+        print_r("\n\n");
+
         $queryArgs = [
             'method'  => $method,
             'appcode' => $this->credentials['appcode'],
@@ -144,12 +153,17 @@ class Api implements IApi
             'v'       => self::VERSION_NUMBER,
         ];
 
+        print_r("queryArgs:\n");
+        print_r($queryArgs);
+
         $response = $this->client->get($this->host, [
             'query' => $queryArgs
         ]);
 
-        print_r($queryArgs);
+        print_r("\n\n");
         print_r($response);
+
+        die();
 
         return null;
     }
