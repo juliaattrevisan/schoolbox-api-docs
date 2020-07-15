@@ -1,9 +1,5 @@
 <?php
 /**
- * ValidationTest
- *
- * See SD-10 for usages
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -19,6 +15,16 @@ use Schoolbox\Calendar\Event\Attendance\ValidCanInvite;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+
+/**
+ * Class ValidCanInviteTest
+ *
+ * Ensures that the config var "Allow students to invite others" doesn't regress
+ *
+ * See SD-10 for usages
+ *
+ * @package Schoolbox\Calendar\Event\Attendance\Test
+ */
 class ValidCanInviteTest extends TestCase
 {
     /**
