@@ -33,4 +33,6 @@ fi
 chown -R $wwwuser:$wwwuser $datadir
 chmod -R 775 $datadir
 
+echo "Data directory permissions updated";
+
 # End of script
