@@ -94,7 +94,14 @@
     {% set markTypeLetterGrade = 2 %}
     {% set markTypeTotalMark = 3 %}
 
-    {% include '@learningAssessment/fragments/markType.twig' %}
+    {% include '@learningAssessment/fragments/markType.twig' with {
+        context: ''
+    } %}
+
+    {% include '@learningAssessment/fragments/markType.twig' with {
+        context: 'horse'
+    } %}
+
     {% include '@learningAssessment/fragments/rubric.twig' with {
         rubricGrid: rubricGrid,
         rubricAttachZone: rubricAttachZone,
