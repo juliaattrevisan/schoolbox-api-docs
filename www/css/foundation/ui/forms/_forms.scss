@@ -823,8 +823,10 @@ select.visibility {
          */
         a {
             @extend .button;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: $global-button-height;
-			padding-bottom: 0.5rem !important;
         }
 
         &:first-of-type {
@@ -868,8 +870,7 @@ select.visibility {
      */
     nav {
         a {
-            padding: 1.75rem 0.75rem 0.5rem 0.75rem !important;
-            height: 4.10rem;
+            height: 4.10rem !important;
 
             @media #{$small-only} {
                 padding: 1.25rem 0.75rem 0.5rem 0.75rem !important;
