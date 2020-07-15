@@ -565,15 +565,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return bool
-     */
-    public function isMarkedPerCapability(): bool
-    {
-        return $this->capabilityMarkType !== null && $this->capabilityMarkType !== MarkType::TYPE_NONE;
-    }
-
-
-    /**
      * @return MarkType|null
      */
     public function getCapabilityMarkType(): ?MarkType
