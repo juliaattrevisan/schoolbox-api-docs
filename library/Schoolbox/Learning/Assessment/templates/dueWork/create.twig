@@ -93,6 +93,7 @@
      #}
     {% set markTypeLetterGrade = 2 %}
     {% set markTypeTotalMark = 3 %}
+    {% set markTypeNone = 6 %}
 
     {% include '@learningAssessment/fragments/markType.twig' with {
         context: '',
@@ -113,7 +114,8 @@
         markTypeTotalMark: markTypeTotalMark,
         capabilityMarkTypes: capabilityMarkTypes,
         capabilityGradingSchemes: capabilityGradingSchemes,
-        defaultGradeGroup: defaultGradeGroup
+        defaultGradeGroup: defaultGradeGroup,
+        markTypeNone: markTypeNone
     } only %}
 </fieldset>
 

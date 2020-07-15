@@ -13,6 +13,7 @@
  # @param $capabilityMarkTypes      array        Tuples for (id, name) Mark Types available for rubric capabilities
  # @param $capabilityGradingSchemes array        Tuples for (id, name) Grading Schemes available for rubric capabilities
  # @param defaultGradeGroup         int          Set in admin via default_grade_group config var
+ # @param markTypeNone              int          The id of the mark type "None" (usually int 6)
  #}
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
@@ -51,7 +52,7 @@
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function() {
-        const capabilityMarkTypeNone = 6;
+        const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
 
         var $rubric = $('table[data-rubric]');
 
@@ -238,7 +239,7 @@
             var $groupMaxValueInputs = $('[data-group-max-value]'),
                 $groupMaxValueRows = $('[data-group-max-value-row]');
 
-            if ($('#capability-markType').val() == capabilityMarkTypeNone) {
+            if (parseInt($('#capability-markType').val()) === capabilityMarkTypeNone) {
                 // Not using mark-per-group? Easy, hide all max value inputs
                 $groupMaxValueRows.addClass('hide');
                 $groupMaxValueInputs.addClass('hide').prop('disabled', true);
