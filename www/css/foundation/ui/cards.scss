@@ -117,6 +117,10 @@
   .label {
     padding: nth($label-padding, 1) 1rem;
 
+    @media #{$medium-down} {
+      padding: .275rem 1rem;
+    }
+
     /* Status Label special definition - this uses
 		 * a label to indicate a user's current status in some
 		 * way, as per original .card .label intent
@@ -131,7 +135,7 @@
       left: 5rem;
       bottom: 0;
       width: calc(100% - 4rem);
-      @media #{$small-only} {
+      @media #{$medium-down} {
         width: calc(100% - 3rem);
         left: 4rem;
       }

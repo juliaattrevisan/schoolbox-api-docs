@@ -872,9 +872,8 @@ select.visibility {
         a {
             height: 4.10rem !important;
 
-            @media #{$small-only} {
-                padding: 1.25rem 0.75rem 0.5rem 0.75rem !important;
-                height: 3.25rem;
+            @media #{$medium-down} {
+                height: rem-calc(50) !important;
             }
         }
     }
