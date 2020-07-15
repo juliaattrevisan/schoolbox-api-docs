@@ -51,6 +51,7 @@
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function() {
+        const capabilityMarkTypeNone = 6;
 
         var $rubric = $('table[data-rubric]');
 
@@ -237,7 +238,7 @@
             var $groupMaxValueInputs = $('[data-group-max-value]'),
                 $groupMaxValueRows = $('[data-group-max-value-row]');
 
-            if (!$('#markPerCapability').prop('checked')) {
+            if ($('#capability-markType').val() == capabilityMarkTypeNone) {
                 // Not using mark-per-group? Easy, hide all max value inputs
                 $groupMaxValueRows.addClass('hide');
                 $groupMaxValueInputs.addClass('hide').prop('disabled', true);
@@ -284,7 +285,7 @@
         // Show/hide group marks based upon mark-per-group (NOT capability)
         // Only show the group mark if at least one criterion is selected
         // in the group
-        $("#markPerCapability").change(toggleGroupMaxValues);
+        $("#capability-markType").change(toggleGroupMaxValues);
         $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
     });
 </script>
