@@ -59,11 +59,12 @@ class Payload
      * Generate attendance payload info for $event
      *
      * @param Event $event
-     * @param User $user
+     * @param User  $user
      * @return array
+     * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws Exception
+     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function generate(Event $event, User $user): array
@@ -98,12 +99,8 @@ class Payload
          *
          * A person who can create an event might not have the ability to invite attendees
          * so it's not equivalent to $canModify
-         *
-         * TODO: SA-10478
-         *   Replace with a check on
-         *   $user->getRole()->isStudent() && $configLoader->get('whatever')
          */
-        $canInvite = true;
+        $canInvite = (new ValidCanInvite())->isSatisfiedBy($user, (bool)$this->di->get('config')->get('calendar_student_can_invite'));
 
         return [
             /* Current attendance level for the event

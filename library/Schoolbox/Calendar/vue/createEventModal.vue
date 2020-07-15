@@ -22,6 +22,7 @@
         name: "create-event-modal",
         props: [
             'userId',
+            'canInvite',
             'eventTypes',
             // TODO why do I have to pass this method around?
             'toMoment',
@@ -221,20 +222,22 @@
                             </select>
                         </label>
 
-                        <label>Add Guests</label>
-                        <v-select class="schoolbox-vue-selectize" :options="options" :clear-search-on-blur="function(clearSearchOnSelect, multiple) { return true; }" :clear-search-on-select="false" :close-on-select="false" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
-                            <template slot="option" slot-scope="option">
-                                <span class="d-center">
-                                    {{ option.name }}
-                                </span>
-                            </template>
-                            <template slot="selected-option" slot-scope="option">
-                                <span class="selected d-center">
-                                    {{ option.first_name }} {{ option.last_name }}
-                                </span>
-                            </template>
-                        </v-select>
-                        <input type="hidden" name="guests" :value="compileAttendeeIds" />
+                        <template v-if="canInvite">
+                            <label>Add Guests</label>
+                            <v-select class="schoolbox-vue-selectize" :options="options" :clear-search-on-blur="function(clearSearchOnSelect, multiple) { return true; }" :clear-search-on-select="false" :close-on-select="false" multiple @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <template slot="option" slot-scope="option">
+                                    <span class="d-center">
+                                        {{ option.name }}
+                                    </span>
+                                </template>
+                                <template slot="selected-option" slot-scope="option">
+                                    <span class="selected d-center">
+                                        {{ option.first_name }} {{ option.last_name }}
+                                    </span>
+                                </template>
+                            </v-select>
+                            <input type="hidden" name="guests" :value="compileAttendeeIds" />
+                        </template>
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>

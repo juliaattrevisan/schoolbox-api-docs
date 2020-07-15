@@ -274,6 +274,11 @@ class Controller extends Base
              */
             'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
 
+            /* Whether the current user can invite others; if you're a student, then it depends on the
+             * Policy config var's setting
+             */
+            'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
+
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
@@ -354,6 +359,11 @@ class Controller extends Base
             /* Specifically hides attendance inputs when you choose this setting
              */
             'attendanceLevelNoAttendance' => Attendance\Model::LEVEL_NO_ATTENDANCE,
+
+            /* Whether the current user can invite others; if you're a student, then it depends on the
+             * Policy config var's setting
+             */
+            'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
@@ -562,20 +572,20 @@ class Controller extends Base
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders = $this->request->post['folder'] ? array_map('intval', $this->request->post['folder']) : [];
-        $campuses = $this->request->post['campus'] ? array_map('intval', $this->request->post['campus']) : [];
+        $folders     = $this->request->post['folder'] ? array_map('intval', $this->request->post['folder']) : [];
+        $campuses    = $this->request->post['campus'] ? array_map('intval', $this->request->post['campus']) : [];
         $accessLevel = (int)$this->request->post['level'];
         $eventTypeId = (int)$this->request->post['type'];
-        $title = $this->request->post['title'];
-        $location = $this->request->post['location'];
-        $detail = $this->request->post['detail'];
-        $allDay = (int)$this->request->post['allDay'];
-        $roles = $this->request->post['roles'] ?? [];
+        $title       = $this->request->post['title'];
+        $location    = $this->request->post['location'];
+        $detail      = $this->request->post['detail'];
+        $allDay      = (int)$this->request->post['allDay'];
+        $roles       = $this->request->post['roles'] ?? [];
 
         /* Recurrence settings
          */
         $efficacy = $this->request->post['efficacy'];
-        $repeat = $this->request->post['repeat'];
+        $repeat   = $this->request->post['repeat'];
 
         /* Redirects
          */
@@ -613,10 +623,10 @@ class Controller extends Base
          */
         if ($allDay === Event::ALL_DAY) {
             $startDate = Alaress_Date_Format::newLocalShort($this->request->post['startDate'])->startOfDay();
-            $endDate = Alaress_Date_Format::newLocalShort($this->request->post['endDate'])->endOfDay();
+            $endDate   = Alaress_Date_Format::newLocalShort($this->request->post['endDate'])->endOfDay();
         } else {
             $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate']);
-            $endDate = Alaress_Date_Format::newLocal($this->request->post['endDate']);
+            $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate']);
         }
 
         /* Don't allow start to be after end
@@ -627,8 +637,8 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance = (int)$this->request->post['attendance'];
-        $maxAttendees = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
+        $attendance    = (int)$this->request->post['attendance'];
+        $maxAttendees  = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
         $showAttendees = (bool)$this->request->post['showAttendees'];
 
         /* Decide if the Attendance settings need to be reset
@@ -639,15 +649,17 @@ class Controller extends Base
          * For now, changing datetimes requires people to respond again
          */
         $attendanceDirty = $event->getStartDateTime() && $event->getEndDateTime() && (
-            ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
-            ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
+                ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
+                ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
 
         /* Invited guests
          */
         $guests = [];
 
-        if ('' !== (string)$this->request->post['guests']) {
-            $guests = explode(',', $this->request->post['guests']);
+        if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
+            if ('' !== (string)$this->request->post['guests']) {
+                $guests = explode(',', $this->request->post['guests']);
+            }
         }
 
         /* Assign values to $event instance

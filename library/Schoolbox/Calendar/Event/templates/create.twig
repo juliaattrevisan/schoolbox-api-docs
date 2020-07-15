@@ -13,6 +13,16 @@
  # @param string     $returnUrl                    A Redirect-encoded string (you go here after saving the form)
  # @param array      $attendanceLevels             A set of consts and their meaning, key-value pairs
  # @param int        $attendanceLevelNoAttendance  An int corresponding to No Attendance
+ # @param Event      $event         An Event instance
+ # @param User       $user          A User instance (this person receives the event on their calendar)
+ # @param Collection $eventTypes    A list of Event Types
+ # @param array      $recurrence    A list of recurring instances
+ # @param array      $efficacy      An array of key-value pairs corresponding to 'self' and 'series' efficacies consts
+ # @param array      $levels        An array of Event Levels (personal/group/school)
+ # @param array      $roles         A list of available and selected Roles
+ # @param array      $folders       A list of available and selected Folders
+ # @param array      $campuses      A list of available and selected Campuses
+ # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
  #}
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -56,10 +66,10 @@
         </div>
     </div>
     {% if event.id %}
-    <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
-    <ul class="f-dropdown" data-dropdown-content id="overflow">
-        <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
-    </ul>
+        <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
+        <ul class="f-dropdown" data-dropdown-content id="overflow">
+            <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
+        </ul>
     {% endif %}
 </div>
 
@@ -153,11 +163,11 @@
                             Type
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
                             {% if eventTypes|length %}
-                            <select name="type">
-                                {% for eventType in eventTypes %}
-                                <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
-                                {% endfor %}
-                            </select>
+                                <select name="type">
+                                    {% for eventType in eventTypes %}
+                                        <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
+                                    {% endfor %}
+                                </select>
                             {% else %}
                                 <input type="hidden" name="type" value="{{ event.type.id }}" />
                             {% endif %}
@@ -192,7 +202,7 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select who you would like to be able to see this event">?</span>
                             <select name="level" id="level" data-interaction="select-level">
                                 {% for level in levels.all %}
-                                <option value="{{ level.id }}" {{ level.id == levels.selected ? 'selected="selected"' : '' }}>{{ level.name }}</option>
+                                    <option value="{{ level.id }}" {{ level.id == levels.selected ? 'selected="selected"' : '' }}>{{ level.name }}</option>
                                 {% endfor %}
                             </select>
                         </label>
@@ -220,8 +230,8 @@
                             <label for="roleSelectAll">Select all</label>
 
                             {% for role in roles.all %}
-                            <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
-                            <label for="role{{ role.id }}">{{ role.name }}</label>
+                                <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
+                                <label for="role{{ role.id }}">{{ role.name }}</label>
                             {% endfor %}
                         </fieldset>
                     </div>
@@ -235,13 +245,14 @@
                             <label for="campusSelectAll">Select all</label>
 
                             {% for campus in campuses.all %}
-                            <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
-                            <label for="campus{{ campus.id }}">{{ campus.name }}</label>
+                                <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
+                                <label for="campus{{ campus.id }}">{{ campus.name }}</label>
                             {% endfor %}
                         </fieldset>
                     </div>
                 </fieldset>
 
+                {% if canInvite %}
                 <fieldset id="attendance" class="content">
                     <legend>Attendance</legend>
 
@@ -252,7 +263,7 @@
 
                             <select name="attendance" id="attendanceLevelSelector">
                                 {% for value, label in attendanceLevels %}
-                                <option value="{{ value }}" {% if value == event.attendance %}selected="selected"{% endif %}>{{ label }}</option>
+                                    <option value="{{ value }}" {% if value == event.attendance %}selected="selected"{% endif %}>{{ label }}</option>
                                 {% endfor %}
                             </select>
                         </label>
@@ -316,8 +327,24 @@
                                 </script>
                             </div>
                         </div>
+
+                        {# Show the Guests input if attendance is enabled
+                         # Hide the Guests input if attendance is disabled
+                         #}
+                        <script>
+                            $(function() {
+                                $('#attendanceCheckbox').on('change', function(event) {
+                                    if ($(this).is(':checked')) {
+                                        $('#attendance-guests').show();
+                                    } else {
+                                        $('#attendance-guests').hide();
+                                    }
+                                });
+                            });
+                        </script>
                     </div>
                 </fieldset>
+                {% endif %}
             </section>
             <input id="calendar-modify-submit" type="submit" value="{{ action }} Event" />
         </form>
@@ -346,3 +373,4 @@
         <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
     </ul>
 </div>
+

@@ -16,6 +16,7 @@ use Schoolbox\Calendar\Config\EventType;
 use Schoolbox\Calendar\Config\Filter;
 use Schoolbox\Calendar\Config\Group;
 use Schoolbox\Calendar\Config\SourceList;
+use Schoolbox\Calendar\Event\Attendance\ValidCanInvite;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -150,6 +151,7 @@ class Controller extends Base
                 '@calendar/calendar.twig',
                 [
                     'user'         => $user->getId() === null ? $this->getUser() : $user,
+                    'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
                     'groups'       => $groups,
                     'sources'      => $sourceList,
                     'campuses'     => $campus,

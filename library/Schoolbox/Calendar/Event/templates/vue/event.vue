@@ -7,7 +7,6 @@
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */
     import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
-    import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
@@ -51,7 +50,6 @@
         },
         created() {
             this.ENDPOINTS = ENDPOINTS;
-            this.ATTENDANCE_LEVELS = ATTENDANCE_LEVELS;
             this.canRsvp = checks.canRsvp;
             this.showRsvpButtons = checks.showRsvpButtons;
             this.isInvited = checks.isInvited;
@@ -69,6 +67,7 @@
                 numAccepted: this.event.attendance.payload.attendees.accepted,
                 numDeclined: this.event.attendance.payload.attendees.declined,
                 guests: this.event.attendance.payload.attendees.guests,
+                canInvite: this.event.attendance.payload.currentUser.canInvite,
 
                 /* Vue Select
                  */
@@ -202,30 +201,11 @@
 
                 axios.request(request)
                         .then(function (response) {
-                            let found = false;
 
                             /* Update data with the result from async request
                              */
                             self.updateCountsFromPayload(response.data);
-
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === id) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            /* If user $id wasn't already in the list, ram them into the list;
-                             * otherwise, don't accidentally update their rsvp status - just
-                             * walk past it like nothing happened
-                             */
-                            if (!found) {
-                                self.guests.push({
-                                    id: id,
-                                    name: fullname,
-                                    status: ATTENDANCE_STATUS.PENDING
-                                });
-                            }
+                            self.guests = response.data.attendees.guests;
 
                             toast.toastTimeout({
                                 text: fullname + ' has been invited',
@@ -401,7 +381,19 @@
              * @return boolean
              */
             canInviteAttendees() {
-                return this.canModify() && ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax));
+
+                /* To invite others, you must
+                 *   - be a staff member or the config var lets you invite others
+                 *   - be able to edit the event (you're its author)
+                 *   - have available places
+                 */
+                if (this.canInvite && this.canModify()) {
+                    if ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax)) {
+                        return true;
+                    }
+                }
+
+                return false;
             },
 
 
