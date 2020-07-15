@@ -144,9 +144,7 @@ class Grid
      */
     public function isMarkPerCapability(): bool
     {
-        return $this->assessment instanceof DueWork &&
-            $this->assessment->getCapabilityMarkType() !== MarkType::TYPE_NONE &&
-            $this->assessment->getCapabilityMarkType() !== null;
+        return $this->assessment instanceof DueWork && $this->assessment->isMarkedPerCapability();
     }
 
 
