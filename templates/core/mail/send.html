@@ -25,6 +25,7 @@ $(function() {
         selectize: {
             plugins: ['remove_button', 'restore_on_backspace'],
             create: function(input) {
+                // Disallow creation of invalid emails
                 if (!validateEmail(input)) {
                     return false;
                 }
@@ -35,6 +36,7 @@ $(function() {
             },
             render: {
                 item: function (data, escape) {
+                    // Render invalid emails with error styling, if they somehow make it past create()
                     var value = data[this.settings.valueField];
                     if (!validateEmail(value)) {
                         return '<div class="item error">' + escape(value) + ' - Invalid email format</div>';
@@ -42,6 +44,9 @@ $(function() {
                     return '<div class="item">' + escape(value) + '</div>';
                 },
                 option_create: function (data, escape) {
+                    // Is what I'm trying to enter invalid?
+                    // Don't show the create option, so that temptation to enter invalid emails is removed
+                    // (You can still select matching users though)
                     if (!validateEmail(data.input)) {
                         return '';
                     }
