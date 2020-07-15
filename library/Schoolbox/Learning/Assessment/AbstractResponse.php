@@ -74,7 +74,7 @@ abstract class AbstractResponse implements IResponse
     {
         return $this->getAllFeedback()
                     ->filter(new InstructorGivenFilter())
-                    ->sortBy('updatedAt', 'desc')
+                    ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
                     ->first();
     }
 
@@ -86,7 +86,7 @@ abstract class AbstractResponse implements IResponse
         return $this->getAllFeedback()
                     ->filter(new PublishedFilter())
                     ->filter(new InstructorGivenFilter())
-                    ->sortBy('updatedAt', 'desc')
+                    ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
                     ->first();
     }
 
@@ -97,7 +97,7 @@ abstract class AbstractResponse implements IResponse
     {
         return $this->getAllFeedback()
                     ->filter(new SelfAssessmentFilter())
-                    ->sortBy('updatedAt', 'desc')
+                    ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
                     ->first();
     }
 
@@ -109,7 +109,7 @@ abstract class AbstractResponse implements IResponse
         return $this->getAllFeedback()
                     ->filter(new PublishedFilter())
                     ->filter(new SelfAssessmentFilter())
-                    ->sortBy('updatedAt', 'desc')
+                    ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
                     ->first();
     }
 

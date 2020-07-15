@@ -36,7 +36,13 @@ class Model extends AbstractResponse
      */
     private $firstSectionId;
 
-    /** @var \Alaress_Date_Format */
+    /**
+     * When was this submitted?
+     *
+     * TODO this should accept NULL values instead of Alaress_Date_NullDate
+     *
+     * @var \Alaress_Date_Format
+     */
     protected $submittedAt;
 
 

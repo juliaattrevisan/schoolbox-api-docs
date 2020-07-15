@@ -10,6 +10,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
 use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
+use Schoolbox\Learning\Assessment\Response\NotSubmittedFilter;
+use Schoolbox\Learning\Assessment\Response\SubmittedFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
@@ -230,16 +232,12 @@ class Participant
      */
     public function findMostRecentResponse()
     {
-        /** @var IResponse $mostRecentResponse */
-        $mostRecentResponse = null;
-
-        /** @var IResponse $response */
-        foreach ($this->allResponses as $response) {
-            if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
-                $mostRecentResponse = $response;
-            }
-        }
-        return $mostRecentResponse;
+        // Most recent response: most recently submitted, with most recent
+        // auto-increment as the tiebreaker
+        return $this->allResponses
+            ->shallowClone()
+            ->sortByMultiFields(['submittedAt' => 'desc', 'id' => 'desc'])
+            ->first();
     }
 
 
@@ -251,15 +249,10 @@ class Participant
      */
     public function findMostRecentDraftResponse(): ?IResponse
     {
-        if ($this->allResponses->count()) {
-            return $this->allResponses->filter(
-                function (IResponse $response) {
-                    return !$response->getSubmittedAt() || $response->getSubmittedAt()->isNull();
-                }
-            )->sortBy('createdAt', 'desc')->first();
-        }
-
-        return null;
+        return $this->allResponses
+            ->filter(new NotSubmittedFilter())
+            ->sortByMultiFields(['submittedAt' => 'desc', 'id' => 'desc'])
+            ->first();
     }
 
 
@@ -268,18 +261,10 @@ class Participant
      */
     public function findMostRecentSubmittedResponse()
     {
-        /** @var IResponse|null $mostRecentSubmittedResponse */
-        $mostRecentSubmittedResponse = null;
-
-        /** @var IResponse $response */
-        foreach ($this->allResponses as $response) {
-            if ($response->isSubmitted()) {
-                if (!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())) {
-                    $mostRecentSubmittedResponse = $response;
-                }
-            }
-        }
-        return $mostRecentSubmittedResponse;
+        return $this->allResponses
+            ->filter(new SubmittedFilter())
+            ->sortByMultiFields(['submittedAt' => 'desc', 'id' => 'desc'])
+            ->first();
     }
 
 
@@ -294,7 +279,7 @@ class Participant
     {
         return $this->allFeedbacks
             ->filter(new InstructorGivenFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -311,7 +296,7 @@ class Participant
         return $this->allFeedbacks
             ->filter(new PublishedFilter())
             ->filter(new InstructorGivenFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -325,7 +310,7 @@ class Participant
     {
         return $this->allFeedbacks
             ->filter(new SelfAssessmentFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 
@@ -340,7 +325,7 @@ class Participant
         return $this->allFeedbacks
             ->filter(new PublishedFilter())
             ->filter(new SelfAssessmentFilter())
-            ->sortBy('updatedAt', 'desc')
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
             ->first();
     }
 

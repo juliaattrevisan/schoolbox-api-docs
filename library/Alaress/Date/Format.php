@@ -1681,10 +1681,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      *
      * @param Alaress_Date_Format $other
      *
-     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
+     * @return int -1 if $this < $other
+     *             0 if $this == $other
+     *             +1 if $this > $other
+     *             0 if either $this or $other is a null date
      */
     public function compare($other)
     {
+        if ($this->isNull() || $other->isNull()) {
+            return 0;
+        }
         if ($this->lt($other)) {
             return -1;
         }
