@@ -10,7 +10,6 @@ namespace Schoolbox\Assessment\Rubric\Grid;
 
 use DomainException;
 use RangeException;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
@@ -38,8 +37,9 @@ class Grid
 {
     /**
      * The assessment for which the grid exists.
+     * Rubric Grids only exist for DueWork instances, for now.
      *
-     * @var IAssessable
+     * @var DueWork
      */
     private $assessment;
 
@@ -83,10 +83,10 @@ class Grid
     /**
      * Constructor
      *
-     * @param IAssessable $assessment
-     * @param RowSet      $rowSet
+     * @param DueWork $assessment
+     * @param RowSet  $rowSet
      */
-    public function __construct(IAssessable $assessment, RowSet $rowSet)
+    public function __construct(DueWork $assessment, RowSet $rowSet)
     {
         $this->assessment        = $assessment;
         $this->rowSet            = $rowSet;
@@ -332,9 +332,9 @@ class Grid
 
 
     /**
-     * @return IAssessable
+     * @return DueWork
      */
-    public function getAssessment(): IAssessable
+    public function getAssessment(): DueWork
     {
         return $this->assessment;
     }

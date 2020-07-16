@@ -48,6 +48,7 @@ use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -156,7 +157,7 @@ class DataSource
 
                 if ($getUsages) {
                     foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
-                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
+                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new Model())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
                     }
@@ -170,7 +171,7 @@ class DataSource
             if ($getUsages) {
                 foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
-                        = (new DueWork\Model())
+                        = (new Model())
                             ->setId($indicatorUsage['id'])
                             ->setTitle($indicatorUsage['title']);
                 }
@@ -342,18 +343,18 @@ class DataSource
     /**
      * Retrieve a grid for the given assessment.
      *
-     * @param IAssessable $assessment
+     * @param Model $assessment
      * @param bool        $getUsages
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(IAssessable $assessment, bool $getUsages): Grid
+    public function retrieveGrid(Model $assessment, bool $getUsages): Grid
     {
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
 
         // Not a due work? This has an empty grid
-        if (!$assessment instanceof DueWork\Model) {
+        if (!$assessment instanceof Model) {
             return $grid;
         }
 
@@ -896,7 +897,7 @@ class DataSource
      * Imports a rubric grid from a CSV into the given due work.
      *
      * @param IStorage      $file
-     * @param DueWork\Model $dueWork
+     * @param Model $dueWork
      * @param int           $maxLevels
      *
      * @throws UnexpectedValueException if the importer couldn't be built
@@ -906,7 +907,7 @@ class DataSource
      *                                  or persisting the rowset
      * @return void
      */
-    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
+    public function importGridFromCsv(IStorage $file, Model $dueWork, $maxLevels): void
     {
         // Create the factory
         $importerFactory = new CsvImporterFactory();
@@ -1113,8 +1114,8 @@ class DataSource
      *   - assessment
      *   - descriptor (student result)
      *
-     * @param GenericCollection|DueWork\Model[] $dueWorks
-     * @param User                              $student
+     * @param GenericCollection|Model[] $dueWorks
+     * @param User                      $student
      *
      * @return array $longitude
      * @throws UnderflowException
