@@ -92,17 +92,21 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getWeight()                 || $dataModel->setWeight($domainObject->getWeight());
         null === $domainObject->getMarkVisibility()         || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
         null === $domainObject->getShowSubmittedOnly()      || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
-        null === $domainObject->isAcceptMulti()             || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
-        null === $domainObject->getUseRubric()              || $dataModel->setUseRubric($domainObject->getUseRubric());
-        null === $domainObject->getCapabilityMarkType()     || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
-        null === $domainObject->getCapabilityGradeGroup()   || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
-        null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
-        null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
-        null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
 
-        if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
-            $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
+        if ($domainObject instanceof DueWorkObject) {
+            null === $domainObject->isAcceptMulti()           || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
+            null === $domainObject->getUseRubric()            || $dataModel->setUseRubric($domainObject->getUseRubric());
+            null === $domainObject->getCapabilityMarkType()   || $dataModel->setCapabilityMarkType($domainObject->getCapabilityMarkType());
+            null === $domainObject->getCapabilityGradeGroup() || $dataModel->setCapabilityGradeGroup($domainObject->getCapabilityGradeGroup());
+            null === $domainObject->getUseMarkRange()         || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
+
+            null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
+            null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
+
+            if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
+                $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
+            }
         }
 
         // Convert a mark type into fields
