@@ -35,13 +35,14 @@ class Factory
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
 
-        $assessment   = $grid->getAssessment();
-        $levels       = $rubricData['level']      ?: [];
-        $capabilities = $rubricData['group']      ?: [];
-        $indicators   = $rubricData['criterion']  ?: [];
-        $descriptors  = $rubricData['descriptor'] ?: [];
+        $assessment    = $grid->getAssessment();
+        $levels        = $rubricData['level']      ?: [];
+        $capabilities  = $rubricData['group']      ?: [];
+        $indicators    = $rubricData['criterion']  ?: [];
+        $descriptors   = $rubricData['descriptor'] ?: [];
+        $usesMarkRange = false;
+        $markPerCap    = false;
 
-        $markPerCap = false;
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
             $markPerCap    = $assessment->isMarkedPerCapability();

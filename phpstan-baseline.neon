@@ -1696,11 +1696,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Variable \\$usesMarkRange might not be defined\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setMarkPerCapability\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Rubric/Grid/Test/Grid.php
