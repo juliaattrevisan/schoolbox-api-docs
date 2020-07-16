@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -231,7 +233,7 @@ class Grid extends TestCase
         $indicatorUsage6->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
         $indicatorUsage6->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
 
-        $dueWork1 = (new DueWork())->setMarkPerCapability(true);
+        $dueWork1 = (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
         $grid1    = new RubricGrid\Grid($dueWork1, $rowSet);
 
         yield 'mark per capability, empty grid' => [$grid1, 0];
@@ -250,7 +252,7 @@ class Grid extends TestCase
         yield 'mark per capability, two group usages' => [$grid3, 18];
 
 
-        $duework2 = (new DueWork())->setMarkPerCapability(false);
+        $duework2 = (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
         $grid4    = new RubricGrid\Grid($duework2, $rowSet);
 
         yield 'no mark per capability, empty grid' => [$grid4, 0];
@@ -421,7 +423,7 @@ class Grid extends TestCase
 
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setMarkPerCapability(false),
+            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE)),
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
@@ -429,7 +431,7 @@ class Grid extends TestCase
 
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setMarkPerCapability(true),
+            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL)),
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage1;
@@ -437,7 +439,7 @@ class Grid extends TestCase
 
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setMarkPerCapability(true),
+            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL)),
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
@@ -659,8 +661,8 @@ class Grid extends TestCase
             Generator::TEST_LEVELS,
             Generator::TEST_CAPABILITY_USAGES
         );
-        $grid1->getAssessment()->setMarkPerCapability(true);
-        $grid2->getAssessment()->setMarkPerCapability(false);
+        $grid1->getAssessment()->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+        $grid2->getAssessment()->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
         yield "different mark per capability setting" => [$grid1, $grid2, true];
 
 
