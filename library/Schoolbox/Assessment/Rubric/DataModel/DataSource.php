@@ -953,7 +953,7 @@ class DataSource
         // Now start building the grid
         // TODO: Figure out this thing
         $dueWork
-            ->setMarkPerCapability($importer->isMarkPerCapability())
+            ->setCapabilityMarkType(SubmissionBox\MarkTypeMapper::getInstance()->createModel()->setId($importer->getCapabilityMarkType()))
             ->setUseMarkRange($importer->isUseMarkRange());
         $grid = new Grid($dueWork, $rowSet);
 
