@@ -75,6 +75,7 @@ This is to follow the standard packaging process linux distributions use for web
   * [Build Process](./docs/front-end/build-process.md)
   * [Database Guide](./docs/database.md)
   * [Standards](./docs/charter/standards.md)
+  * [Code Style](./docs/charter/code-style.md)
   * [Sanitisation](./docs/scrub.md)
   * [Updates](./updates/README.md)
   * [Packaging](./tools/pkg-build/README.md)
