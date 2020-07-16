@@ -1,0 +1,85 @@
+{% if not textbox.id %}
+    <div class="empty-state">
+        {##
+         # There was a lot of junk here!
+         #}
+        <i class="icon-textbox"></i>
+        <p><a href="#">Add text and multimedia, or embed content</a> to display in this component.</p>
+    </div>
+{% else %}
+
+    <section>
+        {% if context.deleted %}
+        {% else %}
+
+            {% if writable %}
+            <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+            <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $.fn.alaressEditor({
+                        targetElements: $('textarea[name=textBoxBody]'),
+                        file_browser_category_id: {{ context.id }}
+                    });
+                    $('#textBoxForm{{ textbox.id }}').alaressValidate({
+                        rules: {
+                            textBoxHeading: {
+                                required: {
+                                    param: true,
+                                    depends: function (element) {
+                                        return !CKEDITOR.instances['textBoxBody{{ textbox.id }}'].getData().length;
+                                    }
+                                }
+                            },
+                            textBoxBody: {
+                                ckeRequired: {
+                                    param: true,
+                                    depends: function (element) {
+                                        return !$(element).parents('form').find('input[name=textBoxHeading]').val().length;
+                                    }
+                                }
+                            }
+                        },
+                        messages: {
+                            textBoxHeading: "Please enter a heading or content for your text box",
+                            textBoxBody: ""
+                        }
+                    });
+                });
+            </script>
+
+            <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{{ textbox.id }}">
+                <input type="hidden" name="originID" value="{{ textbox.id }}"/>
+                <input type="hidden" name="categoryID" value="{{ context.id }}"/>
+                <input type="hidden" name="textBoxID" value="{{ textbox.id }}"/>
+                <input type="hidden" name="componentID" value="{{ component.id }}"/>
+
+                <div class="content">
+                    <label for="textBoxHeading{{ textbox.id }}" class="required">Textbox Heading</label>
+                    <input type="text" maxlength="100" name="textBoxHeading" id="textBoxHeading{{ textbox.id }}" value="{{ textbox.heading }}"/>
+
+                    <label for="textBoxBody{{ textbox.id }}">
+                        Textbox Content
+                        <textarea rows="20" name="textBoxBody" id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</textarea>
+                    </label>
+
+                    <input type="submit" value="Save Content"/>
+                </div>
+            </form>
+            {% endif %}
+
+            <div class="content">
+                <article>{{ textbox.body | purify }}</article>
+            </div>
+
+            {% if writable %}
+                <div class="component-action">
+                    <section>
+                        <a href="#" class="button">Modify</a>
+                        <a href="#" data-delete class="button">Delete</a>
+                    </section>
+                </div>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endif %}
