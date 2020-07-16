@@ -34,15 +34,16 @@ class CsvImporterFactory
 
         // First two cells may be settings:
         // useMarkRange:      On/Off
-        // markPerCapability: On/Off
-        $useMarkRange      = false;
-        $markPerCapability = false;
+        // capabilityMarkType: int|null
+        $useMarkRange       = false;
+        $capabilityMarkType = null;
         $settingCells      = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
             $settingPair = explode(':', $settingCell);
             $setting     = $settingPair[0] ?? '';
-            $value       = $settingPair[1] ?? '';
-            switch (strtolower(trim($value ?? ''))) {
+            $value       = trim($settingPair[1] ?? '');
+
+            switch (strtolower($value)) {
                 case '1':
                 case 'yes':
                 case 'on':
@@ -56,13 +57,14 @@ class CsvImporterFactory
                     $boolValue = false;
                     break;
             }
+
             switch (trim($setting)) {
                 case 'useMarkRange':
                     $useMarkRange = $boolValue;
                     break;
 
-                case 'markPerCapability':
-                    $markPerCapability = $boolValue;
+                case 'capabilityMarkType':
+                    $capabilityMarkType = (int)$value;
                     break;
 
                 default:
@@ -121,7 +123,7 @@ class CsvImporterFactory
 
             $square[] = $row;
         }
-        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $markPerCapability);
+        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $capabilityMarkType);
     }
 
 

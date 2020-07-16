@@ -57,7 +57,7 @@ class CsvImporter
      * Does the imported CSV have per-capability marks?
      * This is the capability mark type id now
      *
-     * @var int
+     * @var int|null
      */
     private $capabilityMarkType;
 
@@ -65,13 +65,13 @@ class CsvImporter
     /**
      * Constructor
      *
-     * @param array $levels
-     * @param array $capabilities
-     * @param array $square
-     * @param bool  $useMarkRange
-     * @param int   $capabilityMarkType
+     * @param array    $levels
+     * @param array    $capabilities
+     * @param array    $square
+     * @param bool     $useMarkRange
+     * @param int|null $capabilityMarkType
      */
-    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, int $capabilityMarkType)
+    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, ?int $capabilityMarkType)
     {
         $this->levels             = $levels;
         $this->capabilities       = $capabilities;
@@ -91,9 +91,9 @@ class CsvImporter
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getCapabilityMarkType(): int
+    public function getCapabilityMarkType(): ?int
     {
         return $this->capabilityMarkType;
     }
