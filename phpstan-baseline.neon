@@ -3982,12 +3982,12 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityMarkType\\(\\)\\.$#"
-			count: 4
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityMarkType\\(\\)\\.$#"
-			count: 4
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
