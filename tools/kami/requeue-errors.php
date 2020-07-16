@@ -50,7 +50,7 @@ $app = new class extends CliTool\App{
             $timeout           = Kami\ReQueueErrors::DEFAULT_TIMEOUT;
             echo <<<HELP
 Deletes any 'error' status documents from Kami and re-queues for uploading.
- 
+
 Usage: requeue-errors.php [--perform] [--error-message=ERROR_MESSAGE][-v[v[v]]] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
     --perform:           If set, do delete in Kami and do update the status in Schoolbox (if absent, runs in dry-run mode)
     --error-message:     Optional. If set, only delete and re-queue documents that match ERROR_MESSAGE
@@ -86,7 +86,11 @@ HELP;
          */
         $mapperFactory = $this->getDi()->get('mapperFactory');
         $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-        $connector     = new Kami\Connector(new GuzzleHttp\Client(), $this->getConfig()->get('kami_api_key'), $this->getConfig()->get('site_school_code'));
+        $connector     = new Kami\Connector(
+            new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
+            $this->getConfig()->get('kami_api_key'),
+            $this->getConfig()->get('site_school_code')
+        );
 
         if (!$connector->isEnabled()) {
             $this->getLogger()->warning('Kami has not been enabled by puppet for this instance. Aborting');

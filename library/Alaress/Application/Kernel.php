@@ -1284,7 +1284,9 @@ abstract class Kernel
         ]));
 
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
-            'client'         => $di->lazyNew(GuzzleHttp\Client::class),
+            'client'         => $di->lazy(static function () {
+                return new GuzzleHttp\Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
+            }),
             'apiKey'         => $di->get('config')->get('kami_api_key'),
             'siteSchoolCode' => $di->get('config')->get('site_school_code'),
         ]));
