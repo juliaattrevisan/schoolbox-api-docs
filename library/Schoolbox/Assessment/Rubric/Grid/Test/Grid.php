@@ -417,9 +417,18 @@ class Grid extends TestCase
         $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(1);
 
 
-        $grid = new RubricGrid\Grid(new Task(), $rowSet);
-        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
-        yield 'Not a due work' => [$grid, $capability2, false];
+        /* Grids now exclusively work on DueWork instances; this former test will die fatally
+         * IAssessables are a minimum contract; they shouldn't be expected to require more than that.
+         * As per statement to james,
+         *
+         * "I suppose the cheap answer is that Grid always returns a DueWork instance, instead of an IAssessable,
+         * though that comes with its own issues"
+         *
+         * "I think thats fair assumption"
+         */
+        //        $grid = new RubricGrid\Grid(new Task(), $rowSet);
+        //        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
+        //        yield 'Not a due work' => [$grid, $capability2, false];
 
 
         $grid = new RubricGrid\Grid(
