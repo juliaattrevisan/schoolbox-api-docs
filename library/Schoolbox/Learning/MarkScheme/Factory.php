@@ -208,6 +208,14 @@ class Factory
          * instead of switching it to DueWork $assessable, even though only DueWork gets rubric grids
          */
         if ($assessable instanceof DueWork) {
+
+            /* Mark type never specified; equivalent to TotalMarkFractional,
+             * which is to exhibit original behaviour
+             */
+            if ($assessable->getCapabilityMarkType() === null) {
+                return new TotalMarkFractional($maxMark);
+            }
+
             switch ($assessable->getCapabilityMarkType()->getId()) {
                 case MarkType::TYPE_PERCENT:
                     return new Percentage();
