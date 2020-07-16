@@ -98,7 +98,7 @@ TEST1;
 
 
         $test2 = <<<TEST2
-"markPerCapability: Off","useMarkRange: On",,,,,
+"capabilityMarkType: 6","useMarkRange: On",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 ,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
@@ -142,7 +142,7 @@ TEST2;
 
 
         $test3= <<<TEST2
-"markPerCapability: On","useMarkRange: Off",,,,,
+"capabilityMarkType: 1","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
@@ -195,7 +195,7 @@ TEST2;
      * @param array    $expectedLevels
      * @param array    $expectedCapabilities
      * @param bool     $expectedUseMarkRange
-     * @param bool     $expectedMarkPerCapability
+     * @param int      $expectedCapabilityMarkType
      */
     public function testBuild(
         $fp,
@@ -203,14 +203,14 @@ TEST2;
         array $expectedLevels,
         array $expectedCapabilities,
         bool $expectedUseMarkRange,
-        bool $expectedMarkPerCapability
+        int $expectedCapabilityMarkType
     ): void {
         $factory  = new CsvImporterFactory();
         $importer = $factory->build($fp, $maxLevels);
         $this->assertSame($expectedLevels, $importer->getLevels());
         $this->assertSame($expectedCapabilities, $importer->retrieveCapabilitiesWithIndicators());
         $this->assertSame($expectedUseMarkRange, $importer->isUseMarkRange());
-        $this->assertSame($expectedMarkPerCapability, $importer->isMarkPerCapability());
+        $this->assertSame($expectedCapabilityMarkType, $importer->getCapabilityMarkType());
     }
 
 
