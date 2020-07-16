@@ -25,16 +25,32 @@ $(function() {
         selectize: {
             plugins: ['remove_button', 'restore_on_backspace'],
             create: function(input) {
+                // Disallow creation of invalid emails
+                if (!validateEmail(input)) {
+                    return false;
+                }
                 var freeEntry = {};
                 freeEntry[this.settings.valueField]  = input;
                 freeEntry[this.settings.searchField] = input;
                 return freeEntry;
             },
-            onItemAdd: function(key, $item) {
-                if (validateEmail(key) === false) {
-                    $item.addClass('error');
-                    var closeTab = '<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>';
-                    $item.text(key + ' - Invalid email format').append(closeTab);
+            render: {
+                item: function (data, escape) {
+                    // Render invalid emails with error styling, if they somehow make it past create()
+                    var value = data[this.settings.valueField];
+                    if (!validateEmail(value)) {
+                        return '<div class="item error">' + escape(value) + ' - Invalid email format</div>';
+                    }
+                    return '<div class="item">' + escape(value) + '</div>';
+                },
+                option_create: function (data, escape) {
+                    // Is what I'm trying to enter invalid?
+                    // Don't show the create option, so that temptation to enter invalid emails is removed
+                    // (You can still select matching users though)
+                    if (!validateEmail(data.input)) {
+                        return '';
+                    }
+                    return '<div class="create">Add <strong>' + escape(data.input) + '</strong>&hellip;</div>';
                 }
             }
         }
