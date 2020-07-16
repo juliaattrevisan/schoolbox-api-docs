@@ -1696,11 +1696,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Rubric/Grid/Test/Grid.php
-
-		-
 			message: "#^PHPDoc tag @throws has invalid value \\(/Aura/Router/Exception/RouteNotFound\\)\\: Unexpected token \"/Aura/Router/Exception/RouteNotFound\", expected type at offset 215$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
@@ -3992,5 +3987,10 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
