@@ -1,10 +1,10 @@
-#PHP Style Guide
+# PHP Style Guide
 
-#General
+## General
 
 We utilise the [PSR-12](https://www.php-fig.org/psr/psr-12/) coding style guide and that should be used as the initial starting point for all coding style.
 
-##Example
+## Example
 
 ```php
 <?php
@@ -40,13 +40,13 @@ class Foo extends Bar implements FooInterface
 }
 ```
 
-##Naming Conventions
+## Naming Conventions
 
-###Modules
+### Modules
 
 TBC
 
-###Classes
+### Classes
 
 TBC
 * Model
@@ -54,7 +54,7 @@ TBC
 * Controller
 * Helper
 
-###Namespaces and Use
+### Namespaces and Use
 
 When importing namespaces and classes into your file, it is important that they maintain their specificity.  This means what are generic named classes inside a module, should become specific name classes when included outside that module.
 
@@ -66,20 +66,20 @@ use Mapper\Exception as MapperException;
 ```
 
 
-###Interfaces, Traits & Abstract Classes
+### Interfaces, Traits & Abstract Classes
 
 They must also end with the word "Abstract", "Trait" or "Interface" respectively. Occasionaly a common interface may just be identified by a captial 'I', for example 'ISoftDeleted'.
 
 Traits should be used sparingly and only if other options have first been explored.
 
 
-###Filenames
+### Filenames
 
 For all other files, only alphanumeric characters, underscores, and the dash character ("-") are permitted. Spaces are strictly prohibited.
 
 Any file that contains PHP code should end with the extension ".php", with the notable exception of view scripts.
 
-###Functions and Methods
+### Functions and Methods
 
 Verbosity is generally encouraged. Function names should be as verbose as is practical to fully describe their purpose and behaviour.
 
@@ -94,11 +94,11 @@ These are examples of acceptable names for functions:
 For object-oriented programming, accessors for instance or static variables should always be prefixed with "get" or "set". In implementing design patterns, such as the singleton or factory patterns, the name of the method should contain the pattern name where practical to more thoroughly describe behaviour.
 
 
-###Variables
+### Variables
 
 Verbosity is generally encouraged. Variables should always be as verbose as practical to describe the data that the developer intends to store in them. Terse variable names such as "$i" and "$n" are discouraged for all but the smallest loop contexts. If a loop contains more than 20 lines of code, the index variables should have more descriptive names.
 
-###Constants
+### Constants
 
 Constants may contain both alphanumeric characters and underscores. Numbers are permitted in constant names.
 
@@ -108,13 +108,13 @@ For example, EMBED_SUPPRESS_EMBED_EXCEPTION is permitted but EMBED_SUPPRESSEMBED
 
 Constants must be defined as class members with the "const" modifier. Defining constants in the global scope with the "define" function is permitted but strongly discouraged.
 
-###Record (Database) Columns
+### Record (Database) Columns
 
 All record columns must be in lowercase and usage of underscores(_) are encouraged for columns that consist of more than one word.
 
 Foreign key fields must be in format [table_name]_[column]. Table names follow the same convention as columns.
 
-##Coding Style
+## Coding Style
 
 
 ### Strings
@@ -138,7 +138,7 @@ However please be sure you have practised [safe sanitisation](../scrub.md).
 
 Strings may be concatenated using the "." operator. A space must always be added before and after the "." operator to improve readability.
 
-##Inline Documentation
+## Inline Documentation
 
 All documentation blocks ("docblocks") must be compatible with the phpDocumentor format. Describing the phpDocumentor format is beyond the scope of this document. For more information, visit: https://docs.phpdoc.org/latest/guides/docblocks.html
 
@@ -152,11 +152,22 @@ If a function/method throws an exception, use @throws to communicate. If an exce
 
 ```php
     /**
-     * Test function
+     * Demonstrate docblock function
      *
-     * @throws InvalidArgumentException
+     * @param int $bookCount Number of books
+     * @return bool If book count is valid
+     * @throws NotFound
      */
-    public function test() {
-        throw new InvalidArgumentException('This function did not work');
+    public function test(int $bookCount) {
+        if($bookCount > 1 ) {
+            return true;
+        }
+
+        try {
+            return $this->findBookcount() > 1;
+        }
+        catch(ConnectionException $e) {
+                throw new NotFound('Unable to connect');
+        }
     }
 ```
