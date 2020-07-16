@@ -4000,3 +4000,22 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityMarkType\\(\\)\\.$#"
+			count: 4
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityMarkType\\(\\)\\.$#"
+			count: 4
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityGradeGroup\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
