@@ -2531,11 +2531,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAcceptOnline\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
