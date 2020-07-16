@@ -93,7 +93,7 @@ TEST1;
                 ],
             ],
             false,
-            false,
+            null,
         ];
 
 
@@ -137,7 +137,7 @@ TEST2;
                 ],
             ],
             true,
-            false,
+            6,
         ];
 
 
@@ -181,7 +181,7 @@ TEST2;
                 ],
             ],
             false,
-            true,
+            1,
         ];
     }
 
@@ -195,7 +195,7 @@ TEST2;
      * @param array    $expectedLevels
      * @param array    $expectedCapabilities
      * @param bool     $expectedUseMarkRange
-     * @param int      $expectedCapabilityMarkType
+     * @param int|null $expectedCapabilityMarkType
      */
     public function testBuild(
         $fp,
@@ -203,7 +203,7 @@ TEST2;
         array $expectedLevels,
         array $expectedCapabilities,
         bool $expectedUseMarkRange,
-        int $expectedCapabilityMarkType
+        ?int $expectedCapabilityMarkType
     ): void {
         $factory  = new CsvImporterFactory();
         $importer = $factory->build($fp, $maxLevels);
