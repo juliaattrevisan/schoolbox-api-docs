@@ -71,7 +71,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@calendar/component/homepage.twig',
+            '@textbox/component/homepage.twig',
             [
                 'component' => $this,
                 'textbox'   => $this->textbox,
