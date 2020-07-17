@@ -109,7 +109,8 @@
                 .attr('action', '/rubric/csv')
                 .attr('method', 'post')
                 .append($('table[data-rubric]').clone())
-                .append($('#markPerCapability').clone())
+                .append($('#capability-markType').clone())
+                .append($('#capability-gradingScheme').clone())
                 .append($('#useMarkRange').clone());
 
             frm.on('submit', function () {

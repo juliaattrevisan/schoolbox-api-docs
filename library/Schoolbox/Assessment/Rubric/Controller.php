@@ -12,6 +12,8 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
@@ -338,13 +340,40 @@ class Controller extends BaseController
         $post         = $this->request->post->get('rb');
         $assessmentId = key($post);
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
+
         if (!$assessment instanceof DueWork) {
             // This is an error. How do I generate one?
             // Note: I can't download rubrics for due works that don't exist yet
             $this->sendError('Can only download rubrics for due work');
             return;
         }
-        $assessment->setCapabilityMarkType($this->request->post['markPerCapability'])
+
+        /* Find the MarkType instance associated with whatever was POSTed
+         */
+        $markType = null;
+
+        if ($this->request->post['capability-markType']) {
+            try {
+                $markType = MarkTypeMapper::getInstance()->findById($this->request->post['capability-markType']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendError('Unknown capability mark type selected');
+            }
+        }
+
+        /* Find the Grade Group instance associated with whatever was POSTed
+         */
+        $gradeGroup = null;
+
+        if ($this->request->post['capability-gradingScheme'] !== null) {
+            try {
+                $gradeGroup = Group\Mapper::getInstance()->findById($this->request->post['capability-gradingScheme']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendError('Unknown capability grade group selected');
+            }
+        }
+
+        $assessment->setCapabilityMarkType($markType)
+                   ->setCapabilityGradeGroup($gradeGroup)
                    ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(

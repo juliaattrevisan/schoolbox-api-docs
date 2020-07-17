@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Exporter;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
@@ -42,15 +43,20 @@ class ArrayExporter
         // Use Mark Range: On/Off
         // (Put these in first two cells, default them to OFF on import)
         // TODO markPerCapability should be localized, as should the input
-        $usingMarkPerCapability = false;
-        $usingMarkRange         = false;
-        $assessment             = $grid->getAssessment();
+        $capabilityMarkType   = null;
+        $capabilityGradeGroup = null;
+        $usingMarkRange       = false;
+        $assessment           = $grid->getAssessment();
+
         if ($assessment instanceof DueWork) {
-            $usingMarkPerCapability = $assessment->isMarkedPerCapability();
-            $usingMarkRange         = $assessment->getUseMarkRange();
+            $capabilityMarkType   = $assessment->isMarkedPerCapability() ? $assessment->getCapabilityMarkType()->getId() : MarkType::TYPE_NONE;
+            $capabilityGradeGroup = $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null;
+            $usingMarkRange       = $assessment->getUseMarkRange();
         }
-        $square[0][0] = 'markPerCapability: ' . ($usingMarkPerCapability ? 'On' : 'Off');
-        $square[0][1] = 'useMarkRange: ' . ($usingMarkRange ? 'On' : 'Off');
+
+        $square[0][0] = 'capabilityMarkType: ' . $capabilityMarkType;
+        $square[0][1] = 'capabilityGradeGroup: ' . $capabilityGradeGroup;
+        $square[0][2] = 'useMarkRange: ' . ($usingMarkRange ? 'On' : 'Off');
 
 
         // first row is level names
@@ -81,7 +87,7 @@ class ArrayExporter
                 $currentVRow = $currentDRow + 1;
 
                 // Max points per capability (if enabled)
-                if ($usingMarkPerCapability && !$groupRendered) {
+                if ($assessment->isMarkedPerCapability() && !$groupRendered) {
                     $square[$currentVRow][0] = $capabilityUsage->getMaxValue();
                 }
 
