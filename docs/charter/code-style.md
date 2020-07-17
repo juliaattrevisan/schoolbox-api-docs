@@ -2,7 +2,7 @@
 
 ## General
 
-We utilise the [PSR-12](https://www.php-fig.org/psr/psr-12/) coding style guide and that should be used as the initial starting point for all coding style.
+We utilise the [PSR-12](https://www.php-fig.org/psr/psr-12/) coding style guide and that should be used as the initial starting point for all coding style. This style should automatically be applied through PhpStorm using the inbuilt [project setting file](../../.editorconfig). Any changes to the style should be implemented through that file.
 
 ## Example
 
@@ -42,17 +42,32 @@ class Foo extends Bar implements FooInterface
 
 ## Naming Conventions
 
+We the following naming structure for our standard objects. Of course due to PSR-1 the namespace and folder structures and filenames should match the namespace and class names.
+
+```
+/Module/Controller
+/Module/Entity/Model
+/Module/Entity/Mapper
+/Module/Entity/Notifier
+/Module/Test
+/Module/templates
+/Module/SubModule/...
+```
+
 ### Modules
 
-TBC
+Modules should name the primary area of the system that this feature belongs with.  Examples include Learning, Admin and Calendar. Within each module you may have 'sub-modules'.  These will represent the main feature of the module, for example; Calendar -> Event, Calendar -> Export.  The top level generally will have a controller, but submodules can repeat the structure and have a controller and appropriate models.
 
 ### Classes
 
-TBC
-* Model
-* Mapper
-* Controller
-* Helper
+#### Model
+Should be named 'model', but placed in namespace of the 'entity' name, this should generally match the DB table name, except it should use CamelCase rather than snake_case.  An example would be Calendar/Event/Model.php.  When importing this it should be aliased to the entity name.
+#### Mapper
+Similar to the 'model', the 'mapper' should be placed in the folder alongside the model it will hydrate.  It will be named 'Mapper', but when imported into other areas it will be aliased to 'EntityMapper'.
+#### Controller
+The controller should always be called Controller and be located in the root of the Module or Sub-Module.
+#### Helper
+There is no hard and fast rules on Helper objects.  These should be named to clearly indicate their purpose.  If a helper works on a specific entity it should be located in the entity folder.  Helper classes may also be more generic or support the controller, in which case they can live in the module folder.
 
 ### Namespaces and Use
 
@@ -68,7 +83,7 @@ use Mapper\Exception as MapperException;
 
 ### Interfaces, Traits & Abstract Classes
 
-They must also end with the word "Abstract", "Trait" or "Interface" respectively. Occasionaly a common interface may just be identified by a captial 'I', for example 'ISoftDeleted'.
+They must also end with the word "Abstract", "Trait" or "Interface" respectively.  Common interfaces may also be identified by a captial 'I', for example 'ISoftDeleted'.
 
 Traits should be used sparingly and only if other options have first been explored.
 
@@ -149,6 +164,9 @@ Every method, must have a docblock that contains at a minimum:
 * All of the possible return values
 
 If a function/method throws an exception, use @throws to communicate. If an exception has been thrown by a function below, and you do not intend to catch it, you do not need to document it in your docblock.
+
+Controller functions that map to a route should also contain an @api tag with the route. For example: '@api   GET /module/entity/{entityID}'
+
 
 ```php
     /**
