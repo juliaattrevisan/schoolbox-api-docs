@@ -1,0 +1,59 @@
+<!-- BEGIN custom_head -->
+<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
+
+<script type='text/javascript'>
+    $(function() {
+        $('[data-panel=group]').usageTabulator({
+            url: '/adminv2/usage/ajax/allAjax?type=group',
+            title: 'Roles',
+            columns: [
+                {column: 'label', label: 'Name'},
+                {column: 'data', label: 'Usage'},
+            ],
+            orderBy: 'label',
+            order: 'ASC',
+        });
+
+        $('[data-panel=type]').usageTabulator({
+            url: '/adminv2/usage/ajax/allAjax?type=type',
+            title: 'Category',
+            columns: [
+                {column: 'label', label: 'Type'},
+                {column: 'data', label: 'Usage'},
+            ],
+            orderBy: 'data',
+            order: 'DESC',
+        });
+
+        $('[data-panel=user]').usageTabulator({
+            url: '/adminv2/usage/ajax/allAjax?type=user',
+            title: 'Users',
+            orderBy: 'bytes',
+            order: 'DESC',
+            index: 0,
+            numPerPage: 25,
+            numTotal: {USAGE_NUM_TOTAL}
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="small-12 columns">
+        <div data-panel='group'>
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="small-12 columns">
+        <div data-panel='type'>
+            <div class="loader"></div>
+        </div>
+    </div>
+    <div class="small-12 columns">
+        <div data-panel='user'>
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>

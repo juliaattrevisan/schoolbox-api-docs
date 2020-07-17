@@ -62,10 +62,15 @@ class AjaxFlot
      *
      * Find total group usage
      *
-     * @return string
+     * @return mixed
      */
     public function findGroupUsage()
     {
+        $returnJson = true;
+        if (isset($_GET['orderBy']) && isset($_GET['order'])) {
+            $returnJson = false;
+        }
+
         $allData = $this->getMapper()->findGroupUsage();
         $allResults = array();
 
@@ -78,8 +83,15 @@ class AjaxFlot
 
             $allResults[] = $result;
         }
-
-        return json_encode($allResults);
+        if ($returnJson) {
+            return json_encode($allResults);
+        }
+        $order = $_GET['order'];
+        $index = $_GET['orderBy'];
+        usort($allResults, function ($a, $b) use ($order, $index) {
+            return $order === 'DESC' ? $a[$index] < $b[$index] : $a[$index] > $b[$index];
+        });
+        return $this->render($allResults);
     }
 
 
@@ -105,10 +117,15 @@ class AjaxFlot
      *
      * Find total type usage and pie it out, which uses a percentage
      *
-     * @return string
+     * @return mixed
      */
     public function findTypeUsage()
     {
+        $returnJson = true;
+        if (isset($_GET['orderBy']) && isset($_GET['order'])) {
+            $returnJson = false;
+        }
+
         $allData = $this->getMapper()->findTypeUsage();
 
         $allResults = array();
@@ -127,8 +144,41 @@ class AjaxFlot
 
             $allResults[] = $result;
         }
+        if ($returnJson) {
+            return json_encode($allResults);
+        }
+        $order = $_GET['order'];
+        $index = $_GET['orderBy'] === 'data' ? 1 : 0;
+        usort($allResults, function ($a, $b) use ($order, $index) {
+            return $order === 'DESC' ? $a[$index] < $b[$index] : $a[$index] > $b[$index];
+        });
+        return $this->render($allResults);
+    }
 
-        return json_encode($allResults);
+    /**
+     * @param array $results
+     * @return mixed
+     */
+    private function render($results)
+    {
+        $page = new \SitePage();
+        $page->setFile('data_list', '/adminv2/usage/data.html');
+        $page->setBlock('data_list', 'data', 'data_block');
+
+        /* Really? You should be passing the bytes as constructor arg
+         */
+        $bytes = new \Alaress_Byte_Format();
+
+        foreach ($results as $currentData) {
+            $page->setVar(array(
+                'DATA_LABEL' => $currentData['label'] ?? $currentData[0],
+                'DATA_BYTES' => $bytes->bytesToString($currentData['data'] ?? $currentData[1]),
+            ));
+
+            $page->parse('data_block', 'data', true);
+        }
+
+        return $page->template->_varVals['data_block'];
     }
 
 
@@ -141,6 +191,7 @@ class AjaxFlot
      * @param string $order
      * @param int $index
      * @param int $numPerPage
+     * @return mixed
      */
     public function findUserUsage($orderBy, $order, $index, $numPerPage)
     {
@@ -166,7 +217,7 @@ class AjaxFlot
             $page->parse('user_block', 'user', true);
         }
 
-        echo $page->template->_varVals['user_block'];
+        return $page->template->_varVals['user_block'];
     }
 
     /* Getters/Setters
