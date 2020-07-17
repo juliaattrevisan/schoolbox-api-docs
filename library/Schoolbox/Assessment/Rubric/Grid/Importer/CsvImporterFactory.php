@@ -37,7 +37,8 @@ class CsvImporterFactory
         // capabilityMarkType: int|null
         $useMarkRange       = false;
         $capabilityMarkType = null;
-        $settingCells      = [$headerRow[0], $headerRow[1]];
+        $capabilityGradeGroup = null;
+        $settingCells      = [$headerRow[0], $headerRow[1], $headerRow[2]];
         foreach ($settingCells as $settingCell) {
             $settingPair = explode(':', $settingCell);
             $setting     = $settingPair[0] ?? '';
@@ -65,6 +66,10 @@ class CsvImporterFactory
 
                 case 'capabilityMarkType':
                     $capabilityMarkType = (int)$value;
+                    break;
+
+                case 'capabilityGradeGroup':
+                    $capabilityGradeGroup = (int)$value;
                     break;
 
                 default:
@@ -123,7 +128,7 @@ class CsvImporterFactory
 
             $square[] = $row;
         }
-        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $capabilityMarkType);
+        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $capabilityMarkType, $capabilityGradeGroup);
     }
 
 

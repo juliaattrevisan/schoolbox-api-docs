@@ -63,6 +63,14 @@ class CsvImporter
 
 
     /**
+     * Does the imported CSV have a grade group specified for its associated mark type?
+     *
+     * @var int|null
+     */
+    private $capabilityGradeGroup;
+
+
+    /**
      * Constructor
      *
      * @param array    $levels
@@ -70,14 +78,16 @@ class CsvImporter
      * @param array    $square
      * @param bool     $useMarkRange
      * @param int|null $capabilityMarkType
+     * @param int|null $capabilityGradeGroup
      */
-    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, ?int $capabilityMarkType)
+    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, ?int $capabilityMarkType, ?int $capabilityGradeGroup)
     {
-        $this->levels             = $levels;
-        $this->capabilities       = $capabilities;
-        $this->square             = $square;
-        $this->useMarkRange       = $useMarkRange;
-        $this->capabilityMarkType = $capabilityMarkType;
+        $this->levels               = $levels;
+        $this->capabilities         = $capabilities;
+        $this->square               = $square;
+        $this->useMarkRange         = $useMarkRange;
+        $this->capabilityMarkType   = $capabilityMarkType;
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
     }
 
 
@@ -96,6 +106,15 @@ class CsvImporter
     public function getCapabilityMarkType(): ?int
     {
         return $this->capabilityMarkType;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getCapabilityGradeGroup(): ?int
+    {
+        return $this->capabilityGradeGroup;
     }
 
 

@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
@@ -952,9 +953,12 @@ class DataSource
 
 
         // Now start building the grid
-        // TODO: Figure out this thing
+        $capabilityMarkType = SubmissionBox\MarkTypeMapper::getInstance()->createModel()->setId($importer->getCapabilityMarkType());
+        $capabilityGradeGroup = Group\Mapper::getInstance()->createModel()->setId($importer->getCapabilityGradeGroup());
+
         $dueWork
-            ->setCapabilityMarkType(SubmissionBox\MarkTypeMapper::getInstance()->createModel()->setId($importer->getCapabilityMarkType()))
+            ->setCapabilityMarkType($capabilityMarkType)
+            ->setCapabilityGradeGroup($capabilityGradeGroup)
             ->setUseMarkRange($importer->isUseMarkRange());
         $grid = new Grid($dueWork, $rowSet);
 
