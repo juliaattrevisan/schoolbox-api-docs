@@ -1,0 +1,64 @@
+Old Group Name,Campus Name,Student Year Levels,New Group Name,Add to House Group,Delete Old Group Access
+Clunes Leadership,GW_SS,10,GW Head of Senior School,1,0
+Clunes Leadership,GW_SS,10,LIR Leadership,1,0
+Clunes Leadership,SKR_SS,10,SKR Head of Senior School,1,0
+EL Head of Junior School,EL_MS,5,EL Head of Middle School,0,0
+EL Head of Middle School,SKR_SS,10,SKR Head of Senior School,1,0
+EL Head of Middle School,GW_SS,10,GW Head of Senior School,1,0
+EL Head of Middle School,EL_MS,9,Clunes Leadership,0,0
+EL Head of Middle School,CL,9,Clunes Leadership,0,0
+EL Heads of Individual Needs,GW_SS,10,GW Heads of Individual Needs,0,0
+EL Heads of Individual Needs,SKR_SS,10,SKR Heads of Individual Needs,0,0
+ELPP Pastoral,GW_SS,10,LIR Leadership,1,0
+ELPP Pastoral,GW_SS,11,LIR Leadership,1,0
+ELPP Pastoral,GW_SS,12,LIR Leadership,1,0
+ELPP Pastoral,GW_SS,10,GW Counsellors,1,0
+ELPP Pastoral,GW_SS,11,GW Counsellors,1,0
+ELPP Pastoral,GW_SS,12,GW Counsellors,1,0
+ELPP Pastoral,GW_SS,10,GW International Students,1,0
+ELPP Pastoral,GW_SS,11,GW International Students,1,0
+ELPP Pastoral,GW_SS,12,GW International Students,1,0
+ELPP Pastoral,GW_SS,10,GW Head of Senior School,1,0
+ELPP Pastoral,GW_SS,11,GW Head of Senior School,1,0
+ELPP Pastoral,GW_SS,12,GW Head of Senior School,1,0
+ELPP Pastoral,GW_MS,8,GW Year 8 Cluster Leader,0,0
+ELPP Pastoral,GW_MS,9,GW Year 9 Cluster Leader,0,0
+ELPP Pastoral,GW_MS,8,GW Head of Middle School,0,0
+ELPP Pastoral,GW_MS,9,GW Head of Middle School,0,0
+ELPP Pastoral,GW_MS,8,GW Counsellors,0,0
+ELPP Pastoral,GW_MS,9,GW Counsellors,0,0
+ELPP Pastoral,GW_MS,8,GW International Students,0,0
+ELPP Pastoral,GW_MS,9,GW International Students,0,0
+EL Student Services Junior School,EL_MS,5,EL Student Services Middle School,0,0
+EL Student Services Middle School,GW_SS,10,GW Head of Senior School,1,0
+EL Student Services Middle School,GW_SS,10,GW Heads of Individual Needs,1,0
+EL Student Services Middle School,GW_SS,10,GW Counsellors,1,0
+EL Student Services Middle School,SKR_SS,10,SKR Head of Senior School,1,0
+EL Student Services Middle School,SKR_SS,10,SKR Heads of Individual Needs,1,0
+EL Student Services Middle School,SKR_SS,10,SKR Counsellors,1,0
+GW Head of Junior School,GW_MS,5,GW Head of Middle School,0,0
+GW Head of Middle School,GW_SS,10,GW Head of Senior School,1,0
+GW Junior School Welfare Team,GW_MS,5,GW Middle School Welfare Team,0,0
+GW Middle School Welfare Team,GW_SS,10,GW Senior School Pastoral Team,1,0
+GW Middle School Welfare Team,GW_SS,10,GW Heads of Individual Needs,1,0
+GW Middle School Welfare Team,GW_SS,10,GW Counsellors,1,0
+GW Middle School Welfare Team,GW_SS,10,LIR Leadership,1,0
+GW Middle School Welfare Team,GW_MS,9,Clunes Leadership,0,0
+GW Year 5/6 Cluster Leader,GW_MS,7,GW Year 7 Cluster Leader,0,0
+GW Year 7 Cluster Leader,GW_MS,8,GW Year 8 Cluster Leader,0,0
+GW Year 8 Cluster Leader,GW_MS,9,GW Year 9 Cluster Leader,0,0
+GW Year 8 Cluster Leader,CL,9,Clunes Leadership,0,0
+GW Year 8 Cluster Leader,GW_MS,9,Clunes Leadership,0,0
+GW Year 9 Cluster Leader,GW_SS,10,GW Head of Senior School,1,0
+GW Year 9 Cluster Leader,GW_SS,10,LIR Leadership,1,0
+SKR Head of Middle School,SKR_SS,10,SKR Head of Senior School,1,0
+SKR Junior School Student Support,SKR_MS,5,SKR Head of Middle School,0,0
+SKR Junior School Student Support,SKR_MS,5,SKR Year 5/6 Cluster Leader,0,0
+SKR Junior School Student Support,SKR_MS,5,SKR Counsellors,0,0
+SKR Junior School Student Support,SKR_MS,5,SKR Heads of Individual Needs,0,0
+SKR Year 5/6 Cluster Leader,SKR_MS,7,SKR Year 7 Cluster Leader,0,0
+SKR Year 7 Cluster Leader,SKR_MS,8,SKR Year 8 Cluster Leader,0,0
+SKR Year 8 Cluster Leader,SKR_MS,9,SKR Year 9 Cluster Leader,0,0
+SKR Year 8 Cluster Leader,SKR_MS,9,Clunes Leadership,0,0
+SKR Year 8 Cluster Leader,CL,9,Clunes Leadership,0,0
+SKR Year 9 Cluster Leader,SKR_SS,10,SKR Head of Senior School,1,0
