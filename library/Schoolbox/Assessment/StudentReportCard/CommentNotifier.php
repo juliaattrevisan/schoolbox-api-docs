@@ -153,7 +153,7 @@ class CommentNotifier extends AbstractModuleNotifier
         $category = $comment->getCategory();
 
         $category = $this->categoryMapper->findById($category->getId());
-        if ($category->isGradePageEnabled()) {
+        if (!$category->isGradePageEnabled()) {
             // there is no grades page to show
             return $envelope;
         }
