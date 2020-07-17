@@ -174,10 +174,11 @@ class Controller extends Base
             });
 
         /** @var GenericCollection|Folder\Model[] $folders */
-        $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder, $displayFolderIds) {
-            return $assessmentsPerFolder->keyExists($folder->getId())
-                && in_array($folder->getId(), $displayFolderIds);
-        })->indexBy('id');
+        $folders = $folders->filter(
+            static function (Folder\Model $folder) use ($assessmentsPerFolder, $displayFolderIds) {
+                return $assessmentsPerFolder->keyExists($folder->getId())
+                    && in_array($folder->getId(), $displayFolderIds);
+            })->indexBy('id');
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -374,6 +375,12 @@ class Controller extends Base
 
         // Get folders for drop-down.
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+        $folders = $folders->filter(
+            static function (Folder\Model $folder) use ($displayFolderIds) {
+                return in_array($folder->getId(), $displayFolderIds);
+            }
+        );
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
@@ -724,7 +731,7 @@ class Controller extends Base
      * @param array $filters
      * @param User  $viewee
      * @param bool  $loadOtherParticipantInteractions
-     * @return GenericCollection|IAssessable[]|static
+     * @return GenericCollection|IAssessable[]
      * @throws DomainException If MarkType is invalid for the assessment, or user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected

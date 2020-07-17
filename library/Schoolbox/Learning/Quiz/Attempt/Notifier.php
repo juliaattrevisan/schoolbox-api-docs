@@ -291,6 +291,7 @@ class Notifier extends AbstractModuleNotifier
 
         try {
             $category = $this->folderMapper->findById($assess->getCategory()->getId());
+            $restrictGrades = $restrictGrades && !$category->isGradePageEnabled();
             $studentId = $attempt->getUser()->getId();
             $student = $this->userMapper->findById($studentId);
         } catch (BaseMapper\Exception\Deleted $e) {

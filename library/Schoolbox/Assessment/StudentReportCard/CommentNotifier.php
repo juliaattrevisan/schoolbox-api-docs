@@ -152,9 +152,10 @@ class CommentNotifier extends AbstractModuleNotifier
         $student  = $comment->getStudent();
         $category = $comment->getCategory();
 
-        // selective hydrations
-        if (!$category->getName()) {
-            $category = $this->categoryMapper->findById($category->getId());
+        $category = $this->categoryMapper->findById($category->getId());
+        if ($category->isGradePageEnabled()) {
+            // there is no grades page to show
+            return $envelope;
         }
 
         if (!$student->getFirstname()) {

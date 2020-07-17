@@ -107,7 +107,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForToday();
-        $this->setVar('WORK_TERM', $currentTerm->getCode());
 
         // Show markbook link to staff on class or group pages
         if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage) && $this->getConfigLoader()->get('class_markbook_enable')) {
@@ -177,7 +176,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (($involvedInGroup || $involvedInClass)
             && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
             && UserAccess::ACCESS_READ === $this->getContentPermission()
+            && $this->getContext()->isGradePageEnabled()
         ) {
+            $route       = 'learningGrades.getGradesForSubject';
+            $params      = [
+                'userId'    => $this->getUser()->getId(),
+                'termCode'  => $currentTerm->getCode(),
+                'subjectId' => $this->getContext()->getId(),
+            ];
+            $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;
         } else {
