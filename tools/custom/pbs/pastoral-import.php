@@ -56,6 +56,10 @@ $app = new class extends CliTool\App
     private $pastoralAccessMapper;
 
 
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
 
 
     /** @inheritdoc */
@@ -90,6 +94,7 @@ HELP;
          */
         $this->pastoralMapper = Pastoral\Mapper::getInstance();
         $this->pastoralAccessMapper = Pastoral\Access\Mapper::getInstance();
+        $this->userMapper = UserMapper::getInstance();
 
 
         // Import csv
@@ -119,7 +124,13 @@ HELP;
         $count = 1;
         $this->userMapper->getDatabase()->beginTransaction();
         while ($reader->valid()) {
-            $this->process($reader->current());
+            try {
+                $this->process($reader->current());
+            } catch (Throwable $e) {
+                $this->getLogger()->warning(
+                    sprintf('Could not import row %d: %s', $reader->key(), $e->getMessage())
+                );
+            }
             $reader->next();
             $count++;
         }
@@ -137,10 +148,10 @@ HELP;
     function process(array $row) {
 
         $pastoral = new Pastoral\Model();
-        $pastoral->setOwner((new User)->setId((int)$row['owner_id']));
+        $pastoral->setOwner($this->userMapper->findById((int)$row['owner_id']));
         //$pastoral->setSeverity((new Pastoral\Severity\Model())->setId((int)$row['severity_id']));
         $pastoral->setSeverity(null);
-        $pastoral->setStudent((new User)->setId((int)$row['student_id']));
+        $pastoral->setStudent($this->userMapper->findById((int)$row['student_id']));
         $pastoral->setType((new Pastoral\Type\Model())->setId((int)$row['type_id']));
         $pastoral->setSubType((new Pastoral\SubType\Model())->setId((int)$row['subtype_id']));
         $pastoral->setHeading(trim($row['heading']));
