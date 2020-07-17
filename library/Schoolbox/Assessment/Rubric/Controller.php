@@ -314,19 +314,34 @@ class Controller extends BaseController
             return;
         }
 
-        $context = [
+        /* Obtain the grid html separately from the other rubric settings
+         *
+         * Otherwise you have to infer the settings from what might have been visible in the grid
+         */
+        $fragment = $this->buildUnthemedHtmlOutput('@rubric/grid-editable.twig', $context = [
             'formField'              => $post->get('formField', 'rb'),
             'rubricGrid'             => $assessment->getRubricGrid(),
             'levelLimit'             => $maxLevels,
             'usingMarkPerCapability' => $assessment->isMarkedPerCapability(),
             'usingMarkRange'         => $assessment->getUseMarkRange(),
+        ])->getAsString();
+
+        $payload = [
+
+            /* Capability Mark Type value, if applicable
+             */
+            'capabilityMarkType' => $assessment->getCapabilityMarkType() ? $assessment->getCapabilityMarkType()->getId() : null,
+
+            /* Capability Grade Group value, if applicable
+             */
+            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
+
+            /* The rubric grid resulting from the csv import
+             */
+            'fragment' => $fragment,
         ];
 
-        $this->getResponse()->content->set([
-            'data'     => $context,
-            'format'   => 'nochrome',
-            'template' => '@rubric/grid-editable.twig'
-        ]);
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 
     /**
