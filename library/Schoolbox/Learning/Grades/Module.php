@@ -200,7 +200,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Term\Mapper|Mapper
+     * @return Term\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()

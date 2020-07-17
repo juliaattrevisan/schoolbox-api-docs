@@ -2926,6 +2926,11 @@ parameters:
 			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php
 
 		-
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Grades/Module.php
+
+		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Mapper.php
