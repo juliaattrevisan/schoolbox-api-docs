@@ -148,10 +148,18 @@ HELP;
     function process(array $row) {
 
         $pastoral = new Pastoral\Model();
-        $pastoral->setOwner($this->userMapper->findById((int)$row['owner_id']));
+        try {
+            $pastoral->setOwner($this->userMapper->findById((int)$row['owner_id']));
+        } catch (Mapper\Exception $e) {
+            throw new InvalidArgumentException(sprintf('Could not find owner #%d', $row['owner_id']));
+        }
         //$pastoral->setSeverity((new Pastoral\Severity\Model())->setId((int)$row['severity_id']));
         $pastoral->setSeverity(null);
-        $pastoral->setStudent($this->userMapper->findById((int)$row['student_id']));
+        try {
+            $pastoral->setStudent($this->userMapper->findById((int)$row['student_id']));
+        } catch (Mapper\Exception $e) {
+            throw new InvalidArgumentException(sprintf('Could not find student #%d', $row['student_id']));
+        }
         $pastoral->setType((new Pastoral\Type\Model())->setId((int)$row['type_id']));
         $pastoral->setSubType((new Pastoral\SubType\Model())->setId((int)$row['subtype_id']));
         $pastoral->setHeading(trim($row['heading']));
