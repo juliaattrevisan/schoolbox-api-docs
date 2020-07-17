@@ -135,7 +135,8 @@ HELP;
 
         $pastoral = new Pastoral\Model();
         $pastoral->setOwner((new User)->setId((int)$row['owner_id']));
-        $pastoral->setSeverity((new Pastoral\Severity\Model())->setId((int)$row['severity_id']));
+        //$pastoral->setSeverity((new Pastoral\Severity\Model())->setId((int)$row['severity_id']));
+        $pastoral->setSeverity(null);
         $pastoral->setStudent((new User)->setId((int)$row['student_id']));
         $pastoral->setType((new Pastoral\Type\Model())->setId((int)$row['type_id']));
         $pastoral->setSubType((new Pastoral\SubType\Model())->setId((int)$row['subtype_id']));
