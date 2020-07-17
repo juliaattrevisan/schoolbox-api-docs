@@ -73,7 +73,8 @@ class CsvImporterTest extends TestCase
                 ],
             ],
             false,
-            MarkType::TYPE_NONE
+            MarkType::TYPE_NONE,
+            null
         );
 
         yield 'capabilities not in use' => [
@@ -167,7 +168,8 @@ class CsvImporterTest extends TestCase
                 ],
             ],
             false,
-            MarkType::TYPE_NONE
+            MarkType::TYPE_NONE,
+            null
         );
 
         yield 'capability with indicators' => [
