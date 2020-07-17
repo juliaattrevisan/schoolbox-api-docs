@@ -117,6 +117,7 @@ HELP;
 
         $reader->next();
         $count = 1;
+        $this->userMapper->getDatabase()->beginTransaction();
         while ($reader->valid()) {
             $this->process($reader->current());
             $reader->next();
@@ -125,8 +126,10 @@ HELP;
 
         if ($this->perform()) {
             $this->getLogger()->info("Processed {$count} records.");
+            $this->userMapper->getDatabase()->commit();
         } else {
             $this->getLogger()->info("{$count} feedback will be processed.");
+            $this->userMapper->getDatabase()->rollback();
         }
 
     }
