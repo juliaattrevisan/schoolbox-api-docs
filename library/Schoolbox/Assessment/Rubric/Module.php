@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -78,6 +79,7 @@ class Module extends BaseModule
                 'groupMapper'          => $this->getMapperFactory()->getLazy(CapabilityMapper::class),
                 'criterionMapper'      => $this->getMapperFactory()->getLazy(IndicatorMapper::class),
                 'rosettaStone'         => $injector->lazyGet('l10n'),
+                'markTypeMapper'       => $this->getMapperFactory()->getLazy(MarkTypeMapper::class),
             ])
         );
     }

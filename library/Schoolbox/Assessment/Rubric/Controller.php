@@ -68,6 +68,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var MarkTypeMapper
+     */
+    private $markTypeMapper;
+
+
+    /**
      * Constructor
      *
      * @param RubricDataSource     $mapper
@@ -76,6 +82,7 @@ class Controller extends BaseController
      * @param Capability\Mapper    $groupMapper
      * @param Indicator\Mapper     $criterionMapper
      * @param RosettaStone         $rosettaStone
+     * @param MarkTypeMapper       $markTypeMapper
      */
     public function __construct(
         RubricDataSource $mapper,
@@ -83,7 +90,8 @@ class Controller extends BaseController
         FolderMapper $folderMapper,
         Capability\Mapper $groupMapper,
         Indicator\Mapper $criterionMapper,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        MarkTypeMapper $markTypeMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
@@ -91,6 +99,7 @@ class Controller extends BaseController
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;
         $this->rosettaStone         = $rosettaStone;
+        $this->markTypeMapper       = $markTypeMapper;
     }
 
 
@@ -440,7 +449,7 @@ class Controller extends BaseController
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
-            ->setCapabilityMarkType($this->request->post['markPerCapability'])
+            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)$this->request->post['capability-markType']))
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
