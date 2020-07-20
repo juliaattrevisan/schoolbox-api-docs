@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use function array_intersect;
 use function array_merge;
 use function array_unique;
@@ -118,7 +119,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $dueWorkAlias                                             = 'dw';
         [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
         [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
-        [$markPerCapWhere]                                        = $this->getClauseMarkPerCapability($markPerCap, $dueWorkAlias);
+        [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCapability($markPerCap, $dueWorkAlias);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
         [$termDJoin, $termDWhere, $termDParams]                   = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         [$termCJoin, $termCWhere, $termCParams]                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
@@ -160,6 +161,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $unitImplParams,
             $unitSpecParams,
             $uImpSpcParams,
+            $markPerCapParams,
             $temporalParams,
             $rubricUsageParams,
             $termDParams,
@@ -689,13 +691,13 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->isTrue("$dueWorkAlias.rubric_mark_per_capability");
+            $pb->notEquals("$dueWorkAlias.rubric_mark_per_capability", MarkType::TYPE_NONE);
         }
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->isFalse("$dueWorkAlias.rubric_mark_per_capability");
+            $pb->equals("$dueWorkAlias.rubric_mark_per_capability", MarkType::TYPE_NONE);
         }
 
-        return ['('. implode(' OR ', $pb->getWhere()) . ')'];
+        return ['('. implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
     }
 
 
