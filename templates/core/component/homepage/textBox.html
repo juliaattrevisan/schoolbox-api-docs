@@ -38,9 +38,17 @@
                             dataType: 'json',
                             contentType: 'application/json',
                         }
-                    ).done(function () {
+                    ).done(function (response) {
                         // Reload the component, close the dialog
                         $('#addTextboxModal-{COMPONENT_INSTANCE_ID}').foundation('reveal', 'close');
+
+                        // Set the component's configuration.
+                        // (Cheat by setting the component's textbox to the just created one, and submit its form)
+                        var configForm = $('#component{COMPONENT_INSTANCE_ID}').find('[data-component-panel="settings"] form');
+                        configForm
+                            .find(':input[name="textbox"]')
+                            .val(response.id);
+                        configForm.submit();
                     }).always(function () {
                         $submit.prop("disabled", false).text(submitText);
                     });
