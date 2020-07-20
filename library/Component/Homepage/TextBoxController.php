@@ -88,6 +88,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 'empty_content_block' => '',
                 'empty_read_only_block' => '',
                 'empty_custom_block' => '',
+                'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
             ]);
 
             $emptyStateMessage = trim($this->getConfig('emptyStateMessage'));
@@ -148,7 +149,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     'TEXTBOX_BODY' => $body,
                     'TEXTBOX_ID' => $this->textbox->getId(),
                     'ID' => $this->getContext()->getId(),
-                    'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
                     'text_editable_block' => '',
                     'modify_text_block' => '',
                     'text_locked_block' => '',
