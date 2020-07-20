@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Textbox;
 
 use Alaress\Web\Controller\Base;
+use Component_Instance;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -42,6 +43,21 @@ class Controller extends Base
      * @param FolderModel $folder
      */
     public function createTextboxInFolder(FolderModel $folder): void
+    {
+        //
+    }
+
+
+    /**
+     * Create a textbox within a folder, tied to a particular component within
+     * that folder.
+     *
+     * @api   POST /textbox/folder/{folderId}/component/{componentId}
+     * @since 20.1
+     *
+     * @param FolderModel $folder
+     */
+    public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
     {
         //
     }

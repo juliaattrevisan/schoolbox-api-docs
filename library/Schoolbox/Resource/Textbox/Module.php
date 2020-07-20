@@ -11,6 +11,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Component_InstanceMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -27,6 +28,9 @@ class Module extends BaseModule
     protected $basename = 'textbox';
 
 
+    /**
+     * @inheritDoc
+     */
     protected function registerRoutes()
     {
         parent::registerRoutes();
@@ -35,6 +39,15 @@ class Module extends BaseModule
             /** @var FolderMapper $folderMapper */
             $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
             return ['folder' => $folderMapper->findById($params['folderId'])];
+        };
+
+        $componentPreload = function ($params) use ($folderPreload): array {
+            $result = $folderPreload($params);
+
+            /** @var Component_InstanceMapper $componentMapper */
+            $componentMapper     = $this->getMapperFactory()->get(Component_InstanceMapper::class);
+            $result['component'] = $componentMapper->findById($params['componentId']);
+            return $result;
         };
 
         $folderAuth = new Rule\All(
@@ -60,6 +73,13 @@ class Module extends BaseModule
         };
 
         $this->register('POST', '/folder/{folderId:\d}', 'createTextboxInFolder', $folderAuth, $folderPreload);
+        $this->register(
+            'POST',
+            '/folder/{folderId:\d}/component/{componentId:\d}',
+            'createTextboxInFolderAndComponent',
+            $folderAuth,
+            $componentPreload
+        );
         $this->register('PUT', '/{id:\d}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d}', 'deleteTextbox', $folderAuth, $textboxPreload);
     }

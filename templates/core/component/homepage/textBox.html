@@ -142,13 +142,12 @@
 
 
             <div id="addTextboxModal-{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{COMPONENT_INSTANCE_ID}-title" aria-hidden="true" role="dialog">
-                <form method="post" action="#" id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form">
-                    <input type="hidden" name="folder_id" value="{TEXTBOX_CATEGORY_ID}" />
-                    <input type="hidden" name="component_id" value="{COMPONENT_INSTANCE_ID}" />
+                <form method="post" action="/textbox/folder/{TEXTBOX_CATEGORY_ID}/component/{COMPONENT_INSTANCE_ID}" id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form">
                     <section>
                         <h3 id="addTextboxModal-{COMPONENT_INSTANCE_ID}-title">Add Textbox</h3>
                         <label class="required" for="addTextboxModal-{COMPONENT_INSTANCE_ID}-form-heading">Title</label>
                         <input id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form-heading" type="text" name="heading" value="" required maxlength="100" />
+                        <input type="hidden" name="body" value="" />
                         <input type="submit" value="Create Textbox">
                     </section>
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
