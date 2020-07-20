@@ -31,15 +31,15 @@
 
                 <!-- BEGIN empty_custom -->
                 <p>{EMPTY_STATE_MESSAGE}</p>
-                <p><a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}">Add content to this text box</a>.</p>
+                <p><a href="#" data-reveal-id="addTextboxModal-{COMPONENT_INSTANCE_ID}">Add content to this text box</a>.</p>
                 <!-- END empty_custom -->
 
                 <!-- BEGIN empty_content -->
-                <p><a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}">Add text and multimedia, or embed content</a> to display in this component.</p>
+                <p><a href="#" data-reveal-id="addTextboxModal-{COMPONENT_INSTANCE_ID}">Add text and multimedia, or embed content</a> to display in this component.</p>
                 <!-- END empty_content -->
 
                 <!-- BEGIN empty_id -->
-                <p><a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}">Add text and multimedia, or embed content</a> to display in this component.</p>
+                <p><a href="#" data-reveal-id="addTextboxModal-{COMPONENT_INSTANCE_ID}">Add text and multimedia, or embed content</a> to display in this component.</p>
                 <!-- END empty_id -->
             </div>
             <!-- END empty_state -->
@@ -127,6 +127,21 @@
                 <!-- END source_folder_exists -->
             </section>
             <!-- END textbox_form -->
+
+
+            <div id="addTextboxModal-{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{COMPONENT_INSTANCE_ID}-title" aria-hidden="true" role="dialog">
+                <form method="post" action="#">
+                    <section>
+                        <h3 id="addTextboxModal-{COMPONENT_INSTANCE_ID}-title">Add Textbox</h3>
+                        <label>
+                            Title
+                            <input type="text" name="title" value="" required maxlength="100" />
+                        </label>
+                        <input type="submit" value="Create Textbox">
+                    </section>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </form>
+            </div>
 
         </div>
     </div>
