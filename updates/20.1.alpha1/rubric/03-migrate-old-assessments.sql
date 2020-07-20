@@ -6,7 +6,9 @@
 -- was set to None, emulating existing behaviour which relied on a temp hack
 
 UPDATE submission_box
-SET rubric_mark_per_capability = IF(mark_type = 6, 3, mark_type),
+SET rubric_mark_per_capability = IF(mark_type =
+                                    (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'none'),
+                                    (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'raw'), mark_type),
     rubric_capability_grade_group_id = submission_grade_group_id
 WHERE rubric_mark_per_capability = 1;
 
@@ -14,6 +16,6 @@ WHERE rubric_mark_per_capability = 1;
 -- the elected Capability Mark Type
 
 UPDATE submission_box
-SET rubric_mark_per_capability = 6,
+SET rubric_mark_per_capability = (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'none'),
     rubric_capability_grade_group_id = submission_grade_group_id
 WHERE rubric_mark_per_capability = 0;
