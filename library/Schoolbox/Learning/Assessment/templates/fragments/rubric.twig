@@ -312,8 +312,8 @@
         assessment: assessment,
         allMarkTypes: capabilityMarkTypes,
         allGradeSchemes: capabilityGradingSchemes,
-        selectedMarkType: assessment.capabilityMarkType.id,
-        selectedGradeGroup: assessment.capabilityGradeGroup.id,
+        selectedMarkType: assessment.capabilityMarkType.id ?? null,
+        selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup
     } %}
 

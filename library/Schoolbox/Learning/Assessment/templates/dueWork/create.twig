@@ -100,8 +100,8 @@
         assessment: assessment,
         allMarkTypes: allMarkTypes,
         allGradeSchemes: allGradeSchemes,
-        selectedMarkType: assessment.markType.id,
-        selectedGradeGroup: assessment.gradeGroup.id,
+        selectedMarkType: assessment.markType.id ?? null,
+        selectedGradeGroup: assessment.gradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup
     } %}
 
