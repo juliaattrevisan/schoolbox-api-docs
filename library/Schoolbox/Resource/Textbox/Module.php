@@ -11,6 +11,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Component_ConfigMapper;
 use Component_InstanceMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
@@ -103,7 +104,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
                 ]
             )
         );

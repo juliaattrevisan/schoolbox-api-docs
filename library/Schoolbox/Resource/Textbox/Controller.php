@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Textbox;
 
 use Alaress\Web\Controller\Base;
+use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -24,13 +25,20 @@ class Controller extends Base
 
 
     /**
+     * @var Component_ConfigMapper
+     */
+    private $componentConfigMapper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper $mapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Component_ConfigMapper $componentConfigMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper                = $mapper;
+        $this->componentConfigMapper = $componentConfigMapper;
     }
 
 
@@ -65,10 +73,25 @@ class Controller extends Base
         $model = $this->mapper->createModel()
                               ->setCategory($folder)
                               ->setHeading($data->heading)
-                              ->setBody($data->body);
+                              ->setBody($data->body)
+                              ->setDeletedAt(null);
         $this->mapper->save($model);
 
-        // TODO attach to component
+
+        // Update the component's textbox
+        $textboxConfigDefinition = $component->getConfigByKey('textbox');
+        $textboxConfig           = $this->componentConfigMapper->findByColumnList([
+            'component_config_definition_id' => $textboxConfigDefinition->getId(),
+            'component_instance_id'          => $component->getId()
+        ])->first();
+        if (!$textboxConfig) {
+            $textboxConfig = $this->componentConfigMapper->createModel()
+                                                         ->setConfigDefinitionId($textboxConfigDefinition->getId())
+                                                         ->setInstanceId($component->getId());
+        }
+        $textboxConfig->setValue($model->getId());
+        $this->componentConfigMapper->save($textboxConfig);
+
 
         // Render the textbox
         $this->response->content->set($this->buildJsonOutput($model));
