@@ -232,6 +232,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
 
+        $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
+
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
