@@ -52,7 +52,9 @@ class Controller extends Base
      */
     public function createTextboxInFolder(FolderModel $folder): void
     {
-        //
+        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $this->mapper->save($model);
+        $this->response->content->set($this->buildJsonOutput($model));
     }
 
 
@@ -68,13 +70,7 @@ class Controller extends Base
      */
     public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
     {
-        /** @var \stdClass $data */
-        $data  = $this->request->content->get();
-        $model = $this->mapper->createModel()
-                              ->setCategory($folder)
-                              ->setHeading($data->heading)
-                              ->setBody($data->body)
-                              ->setDeletedAt(null);
+        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
 
 
@@ -108,7 +104,9 @@ class Controller extends Base
      */
     public function updateTextbox(Model $textbox): void
     {
-        //
+        $textbox = $this->persistTextbox($textbox);
+        $this->mapper->save($textbox);
+        $this->response->content->set($this->buildJsonOutput($textbox));
     }
 
 
@@ -122,6 +120,24 @@ class Controller extends Base
      */
     public function deleteTextbox(Model $textbox): void
     {
-        //
+        $this->mapper->delete($textbox);
+
+        // Empty response
+    }
+
+
+    /**
+     * Helper method for persisting textbox
+     *
+     * @param Model $model
+     * @return Model
+     */
+    private function persistTextbox(Model $model): Model
+    {
+        /** @var \stdClass $data */
+        $data = $this->request->content->get();
+        return $model->setHeading($data->heading)
+                     ->setBody($data->body)
+                     ->setDeletedAt(null);
     }
 }
