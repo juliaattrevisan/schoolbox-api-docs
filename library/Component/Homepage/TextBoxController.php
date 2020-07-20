@@ -149,6 +149,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     'TEXTBOX_BODY' => $body,
                     'TEXTBOX_ID' => $this->textbox->getId(),
                     'ID' => $this->getContext()->getId(),
+                    'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
                     'text_editable_block' => '',
                     'modify_text_block' => '',
                     'text_locked_block' => '',
