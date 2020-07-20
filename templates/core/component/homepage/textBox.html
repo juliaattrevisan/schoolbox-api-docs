@@ -46,7 +46,11 @@
                         // (Cheat by setting the component's textbox to the just created one, and submit its form)
                         var configForm = $('#component{COMPONENT_INSTANCE_ID}').find('[data-component-panel="settings"] form');
                         configForm
-                            .find(':input[name="textbox"]')
+                            .find('select[name="textbox"]')
+                            .append($('<option>')
+                                .attr('value', response.id)
+                                .text(response.heading)
+                            )
                             .val(response.id);
                         configForm.submit();
                     }).always(function () {
@@ -170,7 +174,7 @@
 
 
             <div id="addTextboxModal-{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{COMPONENT_INSTANCE_ID}-title" aria-hidden="true" role="dialog">
-                <form method="post" action="/textbox/folder/{TEXTBOX_CATEGORY_ID}/component/{COMPONENT_INSTANCE_ID}" id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form">
+                <form method="post" action="/textbox/folder/{TEXTBOX_CATEGORY_ID}" id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form">
                     <section>
                         <h3 id="addTextboxModal-{COMPONENT_INSTANCE_ID}-title">Add Textbox</h3>
                         <label class="required" for="addTextboxModal-{COMPONENT_INSTANCE_ID}-form-heading">Title</label>
