@@ -387,7 +387,7 @@ class Controller extends Base
                 vr.capability_name                           AS capability_name,
                 vr.capability_max_value                      AS capability_max_value,
                 vr.capability_mark_type_id                   AS capability_mark_type_id,
-                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_rubric_group_marks,
+                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_is_mark_per_capability,
                 vr.indicator_id                              AS indicator_id,
                 vr.indicator_name                            AS indicator_name,
                 vr.indicator_max_value                       AS indicator_max_value
@@ -441,7 +441,7 @@ class Controller extends Base
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
                 'gradeGroupId'   => $row['assessment_grade_group_id'],
-                'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
+                'usesMarkPerCap' => $row['assessment_is_mark_per_capability'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
