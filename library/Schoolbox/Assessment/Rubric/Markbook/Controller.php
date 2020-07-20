@@ -385,6 +385,7 @@ class Controller extends Base
                 vr.capability_name                           AS capability_name,
                 vr.capability_max_value                      AS capability_max_value,
                 vr.capability_mark_type_id                   AS capability_mark_type_id,
+                vr.capability_grade_group_id                 AS capability_grade_group_id,
                 IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_is_mark_per_capability,
                 vr.indicator_id                              AS indicator_id,
                 vr.indicator_name                            AS indicator_name,
@@ -511,13 +512,16 @@ class Controller extends Base
 
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
             SELECT
-                vrm.assessment_id        AS assessment_id,
-                vrm.student_id           AS student_id,
-                u.firstname              AS student_firstname,
-                u.lastname               AS student_lastname,
-                vrm.capability_id        AS capability_id,
-                vrm.capability_mark      AS capability_mark,
-                vrm.capability_max_value AS capability_max_value,
+                vrm.assessment_id             AS assessment_id,
+                vrm.student_id                AS student_id,
+                u.firstname                   AS student_firstname,
+                u.lastname                    AS student_lastname,
+                vrm.capability_id             AS capability_id,
+                vrm.capability_mark           AS capability_mark,
+                vrm.capability_max_value      AS capability_max_value,
+                vrm.capability_mark_type_id   AS capability_mark_type_id,
+                vrm.capability_grade_group_id AS capability_grade_group_id,
+
                 vrm.descriptor_name      AS descriptor_name,
                 vrm.indicator_id         AS indicator_id,
                 vrm.indicator_mark       AS indicator_mark,

@@ -67,6 +67,7 @@ SELECT
     -- Assessment fields
     sb.assessment_id                     AS assessment_id,
     vr.capability_mark_type_id           AS capability_mark_type_id,
+    vr.capability_grade_group_id         AS capability_grade_group_id,
 
     -- Feedback fields
     student.id                           AS student_id,
