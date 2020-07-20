@@ -322,7 +322,7 @@ class Controller extends BaseController
             'formField'              => $post->get('formField', 'rb'),
             'rubricGrid'             => $assessment->getRubricGrid(),
             'levelLimit'             => $maxLevels,
-            'usingMarkPerCapability' => $assessment->isMarkedPerCapability(),
+            'usingMarkPerCapability' => $assessment->isMarkPerCapability(),
             'usingMarkRange'         => $assessment->getUseMarkRange(),
         ])->getAsString();
 

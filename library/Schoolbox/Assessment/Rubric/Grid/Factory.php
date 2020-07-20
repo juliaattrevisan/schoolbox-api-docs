@@ -45,7 +45,7 @@ class Factory
 
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
-            $markPerCap    = $assessment->isMarkedPerCapability();
+            $markPerCap    = $assessment->isMarkPerCapability();
         }
 
         // Rebuild the set of levels from scratch each time

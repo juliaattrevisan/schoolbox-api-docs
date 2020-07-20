@@ -144,7 +144,7 @@ class Grid
      */
     public function isMarkPerCapability(): bool
     {
-        return $this->assessment instanceof DueWork && $this->assessment->isMarkedPerCapability();
+        return $this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability();
     }
 
 
@@ -255,7 +255,7 @@ class Grid
      */
     public function isCapabilityMarkShown(Capability $capability): bool
     {
-        if (!($this->assessment instanceof DueWork && $this->assessment->isMarkedPerCapability())) {
+        if (!($this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability())) {
             return false;
         }
 

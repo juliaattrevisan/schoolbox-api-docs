@@ -49,7 +49,7 @@ class ArrayExporter
         $assessment           = $grid->getAssessment();
 
         if ($assessment instanceof DueWork) {
-            $capabilityMarkType   = $assessment->isMarkedPerCapability() ? $assessment->getCapabilityMarkType()->getId() : MarkType::TYPE_NONE;
+            $capabilityMarkType   = $assessment->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getId() : MarkType::TYPE_NONE;
             $capabilityGradeGroup = $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null;
             $usingMarkRange       = $assessment->getUseMarkRange();
         }
@@ -87,7 +87,7 @@ class ArrayExporter
                 $currentVRow = $currentDRow + 1;
 
                 // Max points per capability (if enabled)
-                if ($assessment->isMarkedPerCapability() && !$groupRendered) {
+                if ($assessment->isMarkPerCapability() && !$groupRendered) {
                     $square[$currentVRow][0] = $capabilityUsage->getMaxValue();
                 }
 

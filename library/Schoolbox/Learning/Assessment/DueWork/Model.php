@@ -869,7 +869,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @return bool
      */
-    public function isMarkedPerCapability(): bool
+    public function isMarkPerCapability(): bool
     {
         return $this->capabilityMarkType !== null && $this->capabilityMarkType->getId() !== MarkType::TYPE_NONE;
     }
