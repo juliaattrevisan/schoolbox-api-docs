@@ -20,10 +20,28 @@
                 submitHandler: function (form) {
                     // Disable submit actions
                     // TODO split beforeSubmit and formSubmit into separate actions
-                    $(form).find('input[type=submit]').prop("disabled", true).val('Working...');
-                    $(form).find('button[type=submit]').prop("disabled", true).text('Working...');
+                    var $submit    = $(form).find('input[type=submit]'),
+                        submitText = $submit.val(),
+                        formData   = new FormData(form);
+
+                    $submit.prop("disabled", true).text('Working...');
 
                     // And submit form via AJAX
+                    $.ajax(
+                        form.action,
+                        {
+                            method: form.method,
+                            data:   JSON.stringify({
+                                heading: formData.get('heading'),
+                                body:    formData.get('body'),
+                            }),
+                            dataType: 'json',
+                        }
+                    ).done(function () {
+                        // Reload the component
+                    }).always(function () {
+                        $submit.prop("disabled", false).text(submitText);
+                    });
                 }
             });
         });
