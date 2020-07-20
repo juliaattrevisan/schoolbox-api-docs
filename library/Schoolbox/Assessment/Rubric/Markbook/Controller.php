@@ -372,8 +372,6 @@ class Controller extends Base
 
         $whereClause = implode(' AND ', $pb->getWhere());
 
-        /* TODO: Come back to replace these magic numbers with consts from MarkType
-         */
         $sql  = "
             SELECT
                 vr.assessment_id                             AS assessment_id,
