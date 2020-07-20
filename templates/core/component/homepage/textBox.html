@@ -36,9 +36,11 @@
                                 body:    formData.get('body'),
                             }),
                             dataType: 'json',
+                            contentType: 'application/json',
                         }
                     ).done(function () {
-                        // Reload the component
+                        // Reload the component, close the dialog
+                        $('#addTextboxModal-{COMPONENT_INSTANCE_ID}').foundation('reveal', 'close');
                     }).always(function () {
                         $submit.prop("disabled", false).text(submitText);
                     });
