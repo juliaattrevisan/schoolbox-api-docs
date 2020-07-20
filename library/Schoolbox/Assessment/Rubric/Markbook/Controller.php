@@ -372,22 +372,25 @@ class Controller extends Base
 
         $whereClause = implode(' AND ', $pb->getWhere());
 
+        /* TODO: Come back to replace these magic numbers with consts from MarkType
+         */
         $sql  = "
             SELECT
-                vr.assessment_id                  AS assessment_id,
-                vr.assessment_grade_group_id      AS assessment_grade_group_id,
-                vr.assessment_title               AS assessment_name,
-                vr.assessment_max_mark            AS assessment_max_mark,
-                vr.assessment_mark_type           AS assessment_mark_type,
-                vr.assessment_grade_group_id      AS assessment_grade_group_id,
-                vr.assessment_mark_per_capability AS assessment_rubric_group_marks,
-                vr.assessment_weight              AS assessment_weight,
-                vr.capability_id                  AS capability_id,
-                vr.capability_name                AS capability_name,
-                vr.capability_max_value           AS capability_max_value,
-                vr.indicator_id                   AS indicator_id,
-                vr.indicator_name                 AS indicator_name,
-                vr.indicator_max_value            AS indicator_max_value
+                vr.assessment_id                             AS assessment_id,
+                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
+                vr.assessment_title                          AS assessment_name,
+                vr.assessment_max_mark                       AS assessment_max_mark,
+                vr.assessment_mark_type                      AS assessment_mark_type,
+                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
+                vr.assessment_weight                         AS assessment_weight,
+                vr.capability_id                             AS capability_id,
+                vr.capability_name                           AS capability_name,
+                vr.capability_max_value                      AS capability_max_value,
+                vr.capability_mark_type_id                   AS capability_mark_type_id,
+                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_rubric_group_marks,
+                vr.indicator_id                              AS indicator_id,
+                vr.indicator_name                            AS indicator_name,
+                vr.indicator_max_value                       AS indicator_max_value
             FROM v_rubric vr
             WHERE {$whereClause}
             ORDER BY
@@ -397,7 +400,7 @@ class Controller extends Base
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
-        $stmt = $this->internalDb->prepareQuery($sql);
+        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE]);
 
         $capabilities = [];
         $indicators   = [];
