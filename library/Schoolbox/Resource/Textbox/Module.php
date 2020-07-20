@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Component_InstanceMapper;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -45,8 +46,15 @@ class Module extends BaseModule
             $result = $folderPreload($params);
 
             /** @var Component_InstanceMapper $componentMapper */
-            $componentMapper     = $this->getMapperFactory()->get(Component_InstanceMapper::class);
-            $result['component'] = $componentMapper->findById($params['componentId']);
+            $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
+            $component       = $componentMapper->findByInstanceId($params['componentId']);
+            if (!$component) {
+                throw new NotFound('Unable to find component');
+            }
+            if ($component->getDefinition()->getClass() !== \Component_Homepage_TextBoxController::class) {
+                throw new NotFound('Component is not a textbox');
+            }
+            $result['component'] = $component;
             return $result;
         };
 
