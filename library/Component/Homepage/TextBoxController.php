@@ -73,33 +73,43 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'textbox_form', 'textbox_form_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
+        $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
+        $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
+        $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
+        $this->setBlock('empty_state', 'empty_content', 'empty_content_block');
+        $this->setBlock('textbox_form', 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock('textbox_form', 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
+        $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
+        $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
+
+        $this->setVar([
+            'textbox_form_block' => '',
+            'empty_id_block' => '',
+            'empty_content_block' => '',
+            'empty_read_only_block' => '',
+            'empty_custom_block' => '',
+            'text_editable_block' => '',
+            'modify_text_block' => '',
+            'text_locked_block' => '',
+            'empty_state_block' => '',
+            'source_folder_deleted_block' => '',
+            'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
+        ]);
+
+        // Read-only users get the generic message if there's no content,
+        // even if the textbox exists
         $textBoxContent = Scrub::text($this->textbox->getBody());
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE
+            && (empty($this->textbox->getId()) || empty($textBoxContent))
+        ) {
+            $this->parse('empty_read_only_block', 'empty_read_only');
 
-        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty($this->textbox->getId())) {
-
-            $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
-            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
-            $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
-            $this->setBlock('empty_state', 'empty_content', 'empty_content_block');
-
-            $this->setVar([
-                'textbox_form_block' => '',
-                'empty_id_block' => '',
-                'empty_content_block' => '',
-                'empty_read_only_block' => '',
-                'empty_custom_block' => '',
-                'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
-            ]);
+        } elseif ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty($this->textbox->getId())) {
 
             $emptyStateMessage = trim($this->getConfig('emptyStateMessage'));
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                /**
-                 * Read only gets a generic message
-                 */
-                $this->parse('empty_read_only_block', 'empty_read_only');
-
-            } elseif ($emptyStateMessage != '') {
+            if ($emptyStateMessage != '') {
                 /**
                  * There's a custom empty state message from the config to show
                  */
@@ -117,18 +127,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         } else {
 
-            $this->setVar('empty_state_block', '');
-
-            $this->setBlock('textbox_form', 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock('textbox_form', 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
-            $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
-            $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
-
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar('source_folder_deleted_block', '');
 
                 /*
                  * Remember where the textBox came from - if you modify a streamed
@@ -144,9 +145,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     'TEXTBOX_ID' => $this->textbox->getId(),
                     'ID' => $this->getContext()->getId(),
                     'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
-                    'text_editable_block' => '',
-                    'modify_text_block' => '',
-                    'text_locked_block' => '',
                 ));
 
                 /* To edit someone else's textbox, you need write access to both homepages.
