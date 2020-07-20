@@ -19,3 +19,6 @@ UPDATE submission_box
 SET rubric_mark_per_capability = (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'none'),
     rubric_capability_grade_group_id = submission_grade_group_id
 WHERE rubric_mark_per_capability = 0;
+
+# TODO: tigs might have done something with their Due Works that makes the above query incorrect
+#  for them; they might need a different migration scheme. TBC shortly
