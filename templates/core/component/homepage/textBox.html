@@ -14,6 +14,18 @@
                     }
                 });
             });
+
+            // Dialog for creation of a textbox
+            $('#addTextboxModal-{COMPONENT_INSTANCE_ID}-form').alaressValidate({
+                submitHandler: function (form) {
+                    // Disable submit actions
+                    // TODO split beforeSubmit and formSubmit into separate actions
+                    $(form).find('input[type=submit]').prop("disabled", true).val('Working...');
+                    $(form).find('button[type=submit]').prop("disabled", true).text('Working...');
+
+                    // And submit form via AJAX
+                }
+            });
         });
     </script>
     {CONFIGURATION}
@@ -130,13 +142,13 @@
 
 
             <div id="addTextboxModal-{COMPONENT_INSTANCE_ID}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{COMPONENT_INSTANCE_ID}-title" aria-hidden="true" role="dialog">
-                <form method="post" action="#">
+                <form method="post" action="#" id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form">
+                    <input type="hidden" name="folder_id" value="{TEXTBOX_CATEGORY_ID}" />
+                    <input type="hidden" name="component_id" value="{COMPONENT_INSTANCE_ID}" />
                     <section>
                         <h3 id="addTextboxModal-{COMPONENT_INSTANCE_ID}-title">Add Textbox</h3>
-                        <label>
-                            Title
-                            <input type="text" name="title" value="" required maxlength="100" />
-                        </label>
+                        <label class="required" for="addTextboxModal-{COMPONENT_INSTANCE_ID}-form-heading">Title</label>
+                        <input id="addTextboxModal-{COMPONENT_INSTANCE_ID}-form-heading" type="text" name="heading" value="" required maxlength="100" />
                         <input type="submit" value="Create Textbox">
                     </section>
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
