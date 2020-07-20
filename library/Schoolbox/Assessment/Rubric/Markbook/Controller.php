@@ -443,7 +443,7 @@ class Controller extends Base
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
                 'gradeGroupId'   => $row['assessment_grade_group_id'],
-                'usesMarkPerCap' => $row['assessment_is_mark_per_capability'],
+                'isMarkedPerCapability' => $row['assessment_is_mark_per_capability'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
@@ -586,7 +586,7 @@ class Controller extends Base
                 'indicators' => $indicatorMarks,
             ];
             if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark'] = $assessments[$row['assessment_id']]['usesMarkPerCap'] ? $row['capability_mark'] : null;
+                $capData['databaseMark'] = $assessments[$row['assessment_id']]['isMarkedPerCapability'] ? $row['capability_mark'] : null;
                 $capData['maxMark']      = $row['capability_max_value'];
 
                 /* Capabilities' Mark Type and Grade Group can be represented differently to

@@ -149,7 +149,7 @@ class Csv extends AbstractCSV
             $capabilityName = $capability['name'];
 
             // Output capability marks only if this assessment uses them
-            if ($assessment['usesMarkPerCap']) {
+            if ($assessment['isMarkedPerCapability']) {
                 $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId);
                 $this->exportRow(
                     [$assessmentName, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],

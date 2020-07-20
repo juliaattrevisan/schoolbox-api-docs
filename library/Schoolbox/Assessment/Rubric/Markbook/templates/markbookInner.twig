@@ -182,7 +182,7 @@
 
                         <tbody>
                         {% for assessmentId, assessment in assessments %}
-                            {% set markPerCap = assessment.usesMarkPerCap %}
+                            {% set markPerCap = assessment.isMarkedPerCapability %}
                             {% for capabilityId, capability in assessment.capabilities %}
                                 <tr class="capability-row">
                                     {% for studentId, student in students %}
