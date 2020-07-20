@@ -55,11 +55,20 @@ class Controller extends Base
      * @api   POST /textbox/folder/{folderId}/component/{componentId}
      * @since 20.1
      *
-     * @param FolderModel $folder
+     * @param FolderModel        $folder
+     * @param Component_Instance $component
      */
     public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
     {
-        //
+        /** @var \stdClass $data */
+        $data  = $this->request->content->get();
+        $model = $this->mapper->createModel()
+                              ->setCategory($folder)
+                              ->setHeading($data->heading)
+                              ->setBody($data->body);
+        $this->mapper->save($model);
+
+        // TODO attach to component
     }
 
 
