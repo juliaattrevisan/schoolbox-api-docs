@@ -72,16 +72,16 @@ class Module extends BaseModule
             ];
         };
 
-        $this->register('POST', '/folder/{folderId:\d}', 'createTextboxInFolder', $folderAuth, $folderPreload);
+        $this->register('POST', '/folder/{folderId:\d+}', 'createTextboxInFolder', $folderAuth, $folderPreload);
         $this->register(
             'POST',
-            '/folder/{folderId:\d}/component/{componentId:\d}',
+            '/folder/{folderId:\d+}/component/{componentId:\d+}',
             'createTextboxInFolderAndComponent',
             $folderAuth,
             $componentPreload
         );
-        $this->register('PUT', '/{id:\d}', 'updateTextbox', $folderAuth, $textboxPreload);
-        $this->register('DELETE', '/{id:\d}', 'deleteTextbox', $folderAuth, $textboxPreload);
+        $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
+        $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
     }
 
 
