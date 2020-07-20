@@ -98,6 +98,7 @@ class Controller extends Base
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\Mapper                      $filterMapper
+     * @param Translator                         $translator
      */
     public function __construct(
         IConnector $internalDb,
