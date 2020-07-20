@@ -1,96 +1,50 @@
-{% if not textbox.id %}
-    <div class="empty-state">
-        {##
-         # There was a lot of junk here!
-         #}
-        <i class="icon-textbox"></i>
-        <p><a href="#">Add text and multimedia, or embed content</a> to display in this component.</p>
-    </div>
+{##
+ # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
+ # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
+ # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ # writable:  bool                                                      Is this component's content writable?
+ #}
+
+
+{##
+ # Empty states:
+ #
+ # Not writable, and (content is empty or textbox doesn't exist): generic empty state
+ # Writable, and textbox doesn't exist
+ # * Is there an empty state message? I have never seen it, and the config doesn't exist on the textbox
+ #}
+
+{% set textboxExists = textbox is not null and textbox.id is not null %}
+
+{% if writable %}
+    {% if textboxExists %}
+        <div class="content">
+            <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="icon-textbox"></i>
+
+            {% if component.config.emptyStateMessage ?? '' %}
+                <p>{{ component.config.emptyStateMessage }}</p>
+                <p><a href="#" data-reveal-id="addTextboxModal-{{ component.id }}">Add content to this text box</a>.</p>
+            {% else %}
+                <p>
+                    <a href="#" data-reveal-id="addTextboxModal-{{ component.id }}">Add text and multimedia, or embed content</a>
+                    to display in this component.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
 {% else %}
-
-    <section>
-        {% if context.deleted %}
-        {% else %}
-            {% if writable %}
-            <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-            <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-            <script type="text/javascript">
-                $(function () {
-                    CKEDITOR.disableAutoInline = true;
-
-                    $('#modify-{{ textbox.id }}').click(function (event) {
-                        event.preventDefault();
-                        CKEDITOR.inline(
-                            'textBoxBody{{ textbox.id }}',
-                            $.alaressEditorConfig({
-                                file_browser_category_id: {{ context.id }}
-                            })
-                        );
-                    });
-
-                    {#$.fn.alaressEditor({#}
-                    {#    targetElements: $('#textBoxBody{{ textbox.id }}'),#}
-                    {#    file_browser_category_id: {{ context.id }}#}
-                    {#});#}
-                    {#$('#textBoxForm{{ textbox.id }}').alaressValidate({#}
-                    {#    rules: {#}
-                    {#        textBoxHeading: {#}
-                    {#            required: {#}
-                    {#                param: true,#}
-                    {#                depends: function (element) {#}
-                    {#                    return !CKEDITOR.instances['textBoxBody{{ textbox.id }}'].getData().length;#}
-                    {#                }#}
-                    {#            }#}
-                    {#        },#}
-                    {#        textBoxBody: {#}
-                    {#            ckeRequired: {#}
-                    {#                param: true,#}
-                    {#                depends: function (element) {#}
-                    {#                    return !$(element).parents('form').find('input[name=textBoxHeading]').val().length;#}
-                    {#                }#}
-                    {#            }#}
-                    {#        }#}
-                    {#    },#}
-                    {#    messages: {#}
-                    {#        textBoxHeading: "Please enter a heading or content for your text box",#}
-                    {#        textBoxBody: ""#}
-                    {#    }#}
-                    {#});#}
-                });
-            </script>
-
-{#            <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{{ textbox.id }}">#}
-{#                <input type="hidden" name="originID" value="{{ textbox.id }}"/>#}
-{#                <input type="hidden" name="categoryID" value="{{ context.id }}"/>#}
-{#                <input type="hidden" name="textBoxID" value="{{ textbox.id }}"/>#}
-{#                <input type="hidden" name="componentID" value="{{ component.id }}"/>#}
-
-{#                <div class="content">#}
-{#                    <label for="textBoxHeading{{ textbox.id }}" class="required">Textbox Heading</label>#}
-{#                    <input type="text" maxlength="100" name="textBoxHeading" id="textBoxHeading{{ textbox.id }}" value="{{ textbox.heading }}"/>#}
-
-{#                    <label for="textBoxBody{{ textbox.id }}">#}
-{#                        Textbox Content#}
-{#                        <textarea rows="20" name="textBoxBody" id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</textarea>#}
-{#                    </label>#}
-
-{#                    <input type="submit" value="Save Content"/>#}
-{#                </div>#}
-{#            </form>#}
-            {% endif %}
-
-            <div class="content">
-                <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
-            </div>
-
-            {% if writable %}
-                <div class="component-action">
-                    <section>
-                        <a href="#" class="button" id="modify-{{ textbox.id }}">Modify</a>
-                        <a href="#" data-delete class="button">Delete</a>
-                    </section>
-                </div>
-            {% endif %}
-        {% endif %}
-    </section>
+    {% if textboxExists and textbox.body is defined and textbox.body != '' %}
+        <div class="content">
+            <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="icon-textbox"></i>
+            <p>There is no content to view at this time.</p>
+        </div>
+    {% endif %}
 {% endif %}
