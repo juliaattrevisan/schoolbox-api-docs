@@ -60,7 +60,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
-        $this->joins('rubric_mark_per_capability', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
+        $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
         $this->joins('rubric_capability_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'capabilityGradeGroup');
         $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
         $this->uses('mark_visibility', self::TYPE_INTEGER);

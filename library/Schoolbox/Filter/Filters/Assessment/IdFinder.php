@@ -691,10 +691,10 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->notEquals("$dueWorkAlias.rubric_mark_per_capability", MarkType::TYPE_NONE);
+            $pb->notEquals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
         if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->equals("$dueWorkAlias.rubric_mark_per_capability", MarkType::TYPE_NONE);
+            $pb->equals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
 
         return ['('. implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];

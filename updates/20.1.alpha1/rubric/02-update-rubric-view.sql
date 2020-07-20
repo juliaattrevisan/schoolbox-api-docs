@@ -15,7 +15,7 @@ SELECT
     rg.name                             AS capability_name,
     rgu.max_value                       AS capability_max_value,
     rgu.sequence                        AS capability_sequence,
-    sb.rubric_mark_per_capability       AS capability_mark_type_id,
+    sb.rubric_capability_mark_type_id   AS capability_mark_type_id,
     sb.rubric_capability_grade_group_id AS capability_grade_group_id,
 
     -- Rubric indicator fields

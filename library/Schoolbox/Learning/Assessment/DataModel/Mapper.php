@@ -415,7 +415,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('work_type', 'wt')},
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                {$this->getJoinColumnString('duework.rubric_mark_per_capability', 'rmt')},
+                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
@@ -436,7 +436,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_mark_per_capability', 'd', 'rmt')}
+            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
@@ -707,7 +707,7 @@ class Mapper extends BaseMapper
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
-                        ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_mark_per_capability', 'rmt'))
+                        ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
                         ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
                 );
                 $dueWorkIds[] = $row['d.id'];
