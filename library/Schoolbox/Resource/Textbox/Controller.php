@@ -69,6 +69,9 @@ class Controller extends Base
         $this->mapper->save($model);
 
         // TODO attach to component
+
+        // Render the textbox
+        $this->response->content->set($this->buildJsonOutput($model));
     }
 
 

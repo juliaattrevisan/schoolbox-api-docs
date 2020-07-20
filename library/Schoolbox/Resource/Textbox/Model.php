@@ -8,11 +8,14 @@
  */
 namespace Schoolbox\Resource\Textbox;
 
+use Alaress\Json\Serializable;
+use Alaress\Json\SerializeTrait;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Serializable
 {
+    use SerializeTrait;
 
     /**
      * Identifier
@@ -178,5 +181,21 @@ class Model implements ISoftDeletable
     public function getId()
     {
         return $this->id;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'category',
+            'heading',
+            'body',
+            'createdAt',
+            'updatedAt',
+        ];
     }
 }
