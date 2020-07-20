@@ -7,12 +7,11 @@
 
 namespace Schoolbox\Learning\Grades;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
@@ -65,6 +64,36 @@ class Module extends BaseModule
             );
         });
 
+        $subjectPermissions = new Rule\LazyCallback(function () use ($permissions) {
+            return new Rule\All(
+                $permissions,
+                new Rule\LazyCallback(
+                    function () {
+                        return new Rule\Callback(function (array $params): bool {
+                            if (isset($params['subject'])
+                                && $params['subject'] instanceof Folder\Model
+                                && $params['subject']->getYearLevels() !== null
+                                && $params['subject']->isGradePageEnabled()) {
+                                return true;
+                            }
+                            // when year level collection is null, it may have not been hydrated.
+                            if (isset($params['subjectId'])) {
+                                try {
+                                    $folder = $this->getFolderMapper()->findById($params['subjectId']);
+                                    if ($folder->isGradePageEnabled()) {
+                                        return true;
+                                    }
+                                } catch (Mapper\Exception $e) {
+                                    // fall back to unauthorized
+                                }
+                            }
+                            throw new Unauthorized('Grade page is not available for this folder.');
+                        });
+                    }
+                )
+            );
+        });
+
         $loadViewee = function ($params) {
             try {
                 return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
@@ -86,7 +115,11 @@ class Module extends BaseModule
 
         $loadFolder = function ($params) {
             try {
-                return ['subject' => $this->getFolderMapper()->findById($params['subjectId'])];
+                $folder = $this->getFolderMapper()->findById($params['subjectId']);
+                if (!$folder->isGradePageEnabled()) {
+                    throw new NotFound("Grade is not available for id: {$params['subjectId']}");
+                }
+                return ['subject' => $folder];
             } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['subjectId']}");
             }
@@ -105,16 +138,15 @@ class Module extends BaseModule
         // Overview and single class pages
         $this->register('GET', '', 'getGradesForCurrentUser', $basicPermissions);
         $this->register('GET', '/{userId:\d+}{/termCode}', 'getGrades', $permissions, $loadVieweeTerm);
-        $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'getGradesForSubject', $permissions, $loadVieweeTermFolder);
+        $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'getGradesForSubject', $subjectPermissions, $loadVieweeTermFolder);
 
         // Filtered routes (todo merge GET + POST and distinguish via sync vs. ajax)
-        $this->register('POST', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport', $permissions, $loadVieweeTermFolder);
+        $this->register('POST', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport', $subjectPermissions, $loadVieweeTermFolder);
     }
 
 
     /**
      * @inheritdoc
-     * @throws \Twig_Error_Loader If template directory not found
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
@@ -122,13 +154,10 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
-     * @throws \InvalidArgumentException If mapper class not found
-     * @throws ServiceNotFound If cannot fetch service from DI
+     * @inheritdoc
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        /** @var Container $injector */
         $injector->params[Controller::class] = [
             'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
             'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
@@ -171,7 +200,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|Term\Mapper
+     * @return Term\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()

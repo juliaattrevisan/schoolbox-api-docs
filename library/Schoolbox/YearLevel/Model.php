@@ -43,6 +43,9 @@ class Model implements ISoftDeletable, Sequential
     /** @var bool */
     private $showOverallGrade;
 
+    /** @var bool */
+    private $displayGradePage;
+
     /**
      * @return string
      */
@@ -91,5 +94,21 @@ class Model implements ISoftDeletable, Sequential
     public function setShowOverallGrade(bool $showOverallGrade)
     {
         $this->showOverallGrade = $showOverallGrade;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayGradePage(): bool
+    {
+        return $this->displayGradePage;
+    }
+
+    /**
+     * @param bool $displayGradePage
+     */
+    public function setDisplayGradePage(bool $displayGradePage)
+    {
+        $this->displayGradePage = $displayGradePage;
     }
 }

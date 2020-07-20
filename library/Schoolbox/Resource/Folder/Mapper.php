@@ -2117,6 +2117,31 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         });
     }
 
+    /**
+     * Removes folder ids which are disabled on Grade Page
+     * @param array $folderIds
+     * @return array
+     */
+    public function filterIdsForGradePage(array $folderIds) : array
+    {
+        if (empty($folderIds)) {
+            return [];
+        }
+
+        // find disabled folder ids
+        $bindings = $this->getPredicateBuilder()::getArrayBindings($folderIds);
+        $query = "SELECT folder_id, MAX(yl.display_grade_page) AS disp
+                FROM folder_year_level fyl JOIN lu_year_level yl ON fyl.year_level_id = yl.id
+                WHERE yl.deleted_at IS NULL
+                AND folder_id IN ({$bindings['placeholders']})
+                GROUP BY folder_id HAVING disp = 0";
+        $statement = $this->database->prepare($query);
+        $statement->execute($bindings['bindings']);
+
+        $disabledIds = array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'folder_id');
+        return array_diff($folderIds, $disabledIds);
+    }
+
 
     /** @inheritDoc */
     protected function getDefaultOrderByParams(): array

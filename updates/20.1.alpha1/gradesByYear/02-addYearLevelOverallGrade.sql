@@ -1,4 +1,4 @@
-/** Add overall_grade column to
+/** Add overall_grade column and show_overall_grade to Year Level list
  */
 ALTER TABLE lu_year_level
     ADD COLUMN overall_grade INT DEFAULT NULL AFTER name,

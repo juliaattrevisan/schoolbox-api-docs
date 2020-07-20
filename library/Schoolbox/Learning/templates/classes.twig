@@ -34,7 +34,7 @@
                     {% include 'sub/classTile.twig' with {
                         'term':        term,
                         'class':       class,
-                        'classType':   classTypes[class.id],
+                        'classType':   classTypes[class.id] ?? '',
                         'courses':     courses[class.id],
                         'homepageUrl': homepageUrls[class.id],
                     } only %}
