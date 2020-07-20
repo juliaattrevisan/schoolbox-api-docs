@@ -59,4 +59,18 @@ class Controller extends Base
     {
         //
     }
+
+
+    /**
+     * Delete a textbox.
+     *
+     * @api   DELETE /textbox/{id}
+     * @since 20.1
+     *
+     * @param Model $textbox
+     */
+    public function deleteTextbox(Model $textbox): void
+    {
+        //
+    }
 }

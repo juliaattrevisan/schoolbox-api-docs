@@ -61,6 +61,7 @@ class Module extends BaseModule
 
         $this->register('POST', '/folder/{folderId:\d}', 'createTextboxInFolder', $folderAuth, $folderPreload);
         $this->register('PUT', '/{id:\d}', 'updateTextbox', $folderAuth, $textboxPreload);
+        $this->register('DELETE', '/{id:\d}', 'deleteTextbox', $folderAuth, $textboxPreload);
     }
 
 
