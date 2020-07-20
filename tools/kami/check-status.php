@@ -79,7 +79,7 @@ $app = new class extends CliTool\App
         $timeout           = Kami\StatusUpdater::DEFAULT_TIMEOUT;
         echo <<<HELP
 Checks whether documents 'processing' in Kami have finished processing.
- 
+
 Usage: check-status.php --dry-run|--perform [-v[v[v]]] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
     --dry-run:           If set, do not update the status in Schoolbox
     --perform:           If set, do update the status in Schoolbox
@@ -135,7 +135,11 @@ HELP;
         $config        = $this->getConfig();
         $mapperFactory = $this->getDi()->get('mapperFactory');
         $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-        $connector     = new Kami\Connector(new GuzzleHttp\Client(), $config->get('kami_api_key'), $config->get('site_school_code'));
+        $connector     = new Kami\Connector(
+            new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
+            $config->get('kami_api_key'),
+            $config->get('site_school_code')
+        );
 
         if (!$connector->isEnabled()) {
             $this->getLogger()->warning('Kami has not been enabled by puppet for this instance. Aborting');
