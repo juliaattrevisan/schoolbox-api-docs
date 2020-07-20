@@ -1,0 +1,27 @@
+{##
+ # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
+ # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
+ # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ #}
+
+{% set textboxExists = textbox is not null and textbox.id is not null %}
+
+{% if textboxExists %}
+    <div class="content">
+        <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-textbox"></i>
+
+        {% if component.config.emptyStateMessage ?? '' %}
+            <p>{{ component.config.emptyStateMessage }}</p>
+            <p><a href="#" data-reveal-id="addTextboxModal-{{ component.instance.id }}">Add content to this text box</a>.</p>
+        {% else %}
+            <p>
+                <a href="#" data-reveal-id="addTextboxModal-{{ component.instance.id }}">Add text and multimedia, or embed content</a>
+                to display in this component.
+            </p>
+        {% endif %}
+    </div>
+{% endif %}

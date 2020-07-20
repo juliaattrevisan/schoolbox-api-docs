@@ -5,46 +5,16 @@
  # writable:  bool                                                      Is this component's content writable?
  #}
 
-
-{##
- # Empty states:
- #
- # Not writable, and (content is empty or textbox doesn't exist): generic empty state
- # Writable, and textbox doesn't exist
- # * Is there an empty state message? I have never seen it, and the config doesn't exist on the textbox
- #}
-
-{% set textboxExists = textbox is not null and textbox.id is not null %}
-
 {% if writable %}
-    {% if textboxExists %}
-        <div class="content">
-            <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
-        </div>
-    {% else %}
-        <div class="empty-state">
-            <i class="icon-textbox"></i>
-
-            {% if component.config.emptyStateMessage ?? '' %}
-                <p>{{ component.config.emptyStateMessage }}</p>
-                <p><a href="#" data-reveal-id="addTextboxModal-{{ component.id }}">Add content to this text box</a>.</p>
-            {% else %}
-                <p>
-                    <a href="#" data-reveal-id="addTextboxModal-{{ component.id }}">Add text and multimedia, or embed content</a>
-                    to display in this component.
-                </p>
-            {% endif %}
-        </div>
-    {% endif %}
+    {% include '@textbox/component/homepage/writable.twig' with {
+        component: component,
+        textbox:   textbox,
+        context:   context,
+    } only %}
 {% else %}
-    {% if textboxExists and textbox.body is defined and textbox.body != '' %}
-        <div class="content">
-            <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
-        </div>
-    {% else %}
-        <div class="empty-state">
-            <i class="icon-textbox"></i>
-            <p>There is no content to view at this time.</p>
-        </div>
-    {% endif %}
+    {% include '@textbox/component/homepage/readonly.twig' with {
+        component: component,
+        textbox:   textbox,
+        context:   context,
+    } only %}
 {% endif %}
