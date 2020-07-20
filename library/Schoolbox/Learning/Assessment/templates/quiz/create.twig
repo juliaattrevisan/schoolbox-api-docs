@@ -51,6 +51,12 @@
         <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
 
+    {# ----------------------------------------------------------- #}
+    {# Assessment Location #}
+    {# ----------------------------------------------------------- #}
+    {% if assessment.id and context.baseContext is unitSpecification %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
 
     {# ----------------------------------------------------------- #}
     {# Completion Message #}
