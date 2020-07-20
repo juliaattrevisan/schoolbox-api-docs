@@ -657,6 +657,18 @@ class Controller extends Base
                     $stubAssessment->setGradeGroup($gradeGroup);
                 }
 
+                /* Set Capability Grade Group - it has a bunch of data we need from hydration
+                 * such as levels etc. so have to hydrate it
+                 *
+                 * We've made an assumption that Capability Mark Types and Capability Grade Groups
+                 * can only be set for *all* Capabilities in an assessment; not individual Capabilities
+                 * They all have the same representation; they cannot differ among themselves
+                 *
+                 * Therefore if we have a non-null $capabilityGradeGroup we can just skip trying
+                 * to fetch it from the db altogether
+                 */
+                $capabilityGradeGroup = null;
+
                 foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
 
@@ -666,12 +678,9 @@ class Controller extends Base
                         ->createModel()
                         ->setId($capabilityMarks['markTypeId']);
 
-                    /* Set Capability Grade Group - it has a bunch of data we need from hydration
-                     * such as levels etc. so have to hydrate it
+                    /* Only try to fetch a Capability Grade Group once
                      */
-                    $capabilityGradeGroup = null;
-
-                    if ($capabilityMarks['gradeGroupId'] !== null) {
+                    if (null === $capabilityGradeGroup && $capabilityMarks['gradeGroupId'] !== null) {
                         try {
                             $capabilityGradeGroup = $this->gradeGroupMapper->findById($capabilityMarks['gradeGroupId']);
                         } catch (Mapper\Exception $e) {
