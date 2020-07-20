@@ -75,7 +75,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $textBoxContent = Scrub::text($this->textbox->getBody());
 
-        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && (empty($this->textbox->getId()) || empty($textBoxContent))) {
+        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty($this->textbox->getId())) {
 
             $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
@@ -105,12 +105,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  */
                 $this->setVar('EMPTY_STATE_MESSAGE', Scrub::text($emptyStateMessage));
                 $this->parse('empty_custom_block', 'empty_custom');
-
-            } elseif ($this->textbox->getId()) {
-                /**
-                 * They submitted the form with nothing or just a heading
-                 */
-                $this->parse('empty_content_block', 'empty_content');
 
             } else {
                 /**
