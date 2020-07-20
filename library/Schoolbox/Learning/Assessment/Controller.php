@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Web\Controller\Exception as ControllerException;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
@@ -22,12 +23,15 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 /**
  * Class Controller
@@ -58,7 +62,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private $termMapper;
 
+    /** @var CourseSpecificationMapper */
+    private $courseSpecificationMapper;
 
+    /** @var UnitSpecificationMapper */
+    private $unitSpecificationMapper;
+
+    /** @var Replicator */
+    private $replicator;
     /**
      * Controller constructor.
      *
@@ -71,6 +82,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param BreadcrumbFactory      $bakery
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator    $replicator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -81,13 +95,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
 
-        $this->bakery         = $bakery;
-        $this->workTypeMapper = $workTypeMapper;
-        $this->termMapper     = $termMapper;
+        $this->bakery                    = $bakery;
+        $this->workTypeMapper            = $workTypeMapper;
+        $this->termMapper                = $termMapper;
+        $this->replicator                = $replicator;
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
+        $this->unitSpecificationMapper   = $unitSpecificationMapper;
     }
 
 
@@ -238,6 +258,91 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
+    /**
+     * Gets a list of units and projects, to which the assessment can be moved
+     * @param IAssessable $assessment
+     */
+    public function getLocationForm(IAssessable $assessment): void
+    {
+        if ($assessment->isImplementation()) {
+            // not interested
+            return;
+        }
+
+        $currentUnitSpec = $assessment->getBaseContext();
+        try {
+            $currentCourseSpec = $this->courseSpecificationMapper->findByFolderId($currentUnitSpec->getFolder()->getParent()->getId());
+        } catch (MapperException $e) {
+            return;
+        }
+        $allUnitSpecs = $currentCourseSpec->getUnits();
+
+        $unitProjects = new Collection();
+        foreach ($allUnitSpecs as $unitSpec) {
+            $projects    = $this->getAssessmentMapper()->createCollection();
+            $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
+            foreach ($assessables as $assessable) {
+                if (!$assessable instanceof Project) {
+                    continue;
+                }
+                $projects->add($assessable);
+            }
+            $unitProjects->offsetSet($unitSpec->getId(), $projects);
+        }
+        $this->getResponse()->content->set($this->buildContent(
+            '@learningAssessment/fragments/assessmentLocationList.twig',
+            [
+                'units'        => $allUnitSpecs,
+                'unitProjects' => $unitProjects,
+                'current'      => ($assessment->getContext() instanceof Project ? 'project' : 'unit') . '-' . $assessment->getContext()->getId(),
+            ]
+        ));
+    }
+
+    /**
+     * Moves assessment
+     * @param IAssessable $assessment
+     * @throws RouteNotFound
+     */
+    public function postMoveAssessment(IAssessable $assessment): void
+    {
+        $context = $this->getRequest()->post->get('contextId');
+        [$contextType, $contextId] = explode('-', $context);
+        if ($contextType === 'unit') {
+            try {
+                $context = $this->unitSpecificationMapper->findById($contextId);
+            } catch (MapperException $e) {
+                return;
+            }
+        } elseif ($contextType === 'project') {
+            try {
+                $context = $this->getAssessmentMapper()->findById($contextId);
+            } catch (MapperException $e) {
+                return;
+            }
+            if ($context->isImplementation() || !$context->getBaseAssessable() instanceof Project) {
+                return;
+            }
+        }
+
+        if ($context === $assessment->getContext()) {
+            return;
+        }
+
+        $db = $this->getUserMapper()->getDatabase();
+        $db->beginTransaction();
+
+        $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $this->getUser());
+
+        try {
+            $this->getAssessmentMapper()->delete($assessment);
+        } catch (MapperException $e) {
+            $db->rollback();
+        }
+        $db->commit();
+        $this->redirect($this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm',
+            ['assessmentId' => $newAssessment->getId(), 'assessment' => $newAssessment]));
+    }
 
     /**
      * Save the data when creating a specific kind of Assessment
@@ -337,7 +442,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @throws LogicException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {

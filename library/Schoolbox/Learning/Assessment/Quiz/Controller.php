@@ -21,10 +21,14 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -70,18 +74,21 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
-     * @param UserMapper             $userMapper
-     * @param ErrorMapper            $errorMapper
-     * @param DataModel\MapperProxy  $assessmentMapper
-     * @param WorkTypeMapper         $workTypeMapper
-     * @param Access                 $access
-     * @param Transactor             $transactor
-     * @param BreadcrumbFactory      $bakery
-     * @param QuizMapper             $quizMapper
-     * @param QuizSectionMapper      $quizSectionMapper
-     * @param QuizAttemptMapper      $quizAttemptMapper
-     * @param Term\Mapper            $termMapper
-     * @param Participant\DataSource $participantDataSource
+     * @param UserMapper                $userMapper
+     * @param ErrorMapper               $errorMapper
+     * @param DataModel\MapperProxy     $assessmentMapper
+     * @param WorkTypeMapper            $workTypeMapper
+     * @param Access                    $access
+     * @param Transactor                $transactor
+     * @param BreadcrumbFactory         $bakery
+     * @param QuizMapper                $quizMapper
+     * @param QuizSectionMapper         $quizSectionMapper
+     * @param QuizAttemptMapper         $quizAttemptMapper
+     * @param Term\Mapper               $termMapper
+     * @param Participant\DataSource    $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param Replicator                $replicator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -95,9 +102,24 @@ class Controller extends Assessment\Controller
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator);
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;

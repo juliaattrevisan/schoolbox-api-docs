@@ -1,0 +1,65 @@
+<script type="text/javascript">
+    $(function () {
+        let $locationReveal = $('#reveal-location');
+        $('#change-location').on('click', function (e) {
+            e.preventDefault();
+            $.post('{{ routeLookup('learningAssessment.getLocationForm', {assessment: assessment, assessmentId: assessment.id}) }}')
+                    .done(function (response) {
+                        $('#target-list').html(response);
+                        $locationReveal.foundation('reveal', 'open');
+                    })
+        })
+        $locationReveal.on('click', '[data-submit]', function (e) {
+            e.preventDefault();
+            $(this).text('Working...');
+            $(this).attr('readonly', 'readonly')
+            let jstree = $('#location-tree').jstree();
+            let selected = jstree.get_selected(true);
+            if (selected.length !== 1 || selected[0]['id'] === 'undefined') {
+                return;
+            }
+            $.post('{{ routeLookup('learningAssessment.postMoveAssessment', {assessment: assessment, assessmentId: assessment.id}) }}',
+                    {contextId: selected[0]['id']}
+            ).success(function (response) {
+                window.location.href = response.returnUrl;
+            }).error(function (response) {
+                $(selected[0]['id']).addClass('error').attr('title', response.error);
+            });
+        });
+        $locationReveal.on('click', '[data-cancel]', function (e) {
+            e.preventDefault();
+            $(this).foundation('reveal', 'close');
+        });
+    });
+</script>
+{% if assessment.context is project %}
+    {% set locationTitle = assessment.baseContext.title~' > '~assessment.context.title %}
+    {% set locationId = 'project-'~assessment.context.id %}
+{% else %}
+    {% set locationTitle = assessment.baseContext.title %}
+    {% set locationId = 'unit-'~assessment.context.id %}
+{% endif %}
+<div class="row">
+    <div class="small-12 columns">
+        <label>Assessment Location</label>
+        <div class="input-group">
+            <input type="hidden" id="locationId" name="locationId" value="{{ locationId }}">
+            <input id="locationTitle" name="locationTitle" type="text" value="{{ locationTitle }}" class="valid"
+                   aria-invalid="false" readonly="readonly">
+            <a class="adtp-btn" data-adtp-btn="" id="change-location">Change Location<span
+                        class="splash animate"></span></a>
+        </div>
+    </div>
+</div>
+
+<div class="reveal-modal" data-reveal id="reveal-location">
+    <h2>Change Location</h2>
+    <div id="target-list"></div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    <div data-overlay class="wait-overlay hide">
+        <p>
+            Working...
+            <span class="loader"></span>
+        </p>
+    </div>
+</div>
