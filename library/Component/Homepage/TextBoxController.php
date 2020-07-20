@@ -104,6 +104,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             && (empty($this->textbox->getId()) || empty($textBoxContent))
         ) {
             $this->parse('empty_read_only_block', 'empty_read_only');
+            $this->parse('empty_state_block', 'empty_state');
 
         } elseif ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && empty($this->textbox->getId())) {
 
