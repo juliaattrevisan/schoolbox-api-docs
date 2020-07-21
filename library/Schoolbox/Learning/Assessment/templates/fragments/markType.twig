@@ -12,6 +12,7 @@
  # @param $selectedMarkType   int|null     The mark type currently selected
  # @param $selectedGradeGroup int|null     The grade group currently selected
  # @param $defaultGradeGroup  int          Set in admin via default_grade_group config var
+ # @param $renderMaxMark      bool         True allows the maxMark input field to exist
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -50,12 +51,14 @@
         </label>
     </div>
 
+    {% if renderMaxMark %}
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
         <label for="{{ context }}maxMark">
             Maximum Available Marks
             <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" />
         </label>
     </div>
+    {% endif %}
 
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme="{{ context }}">
         <label for="{{ context }}gradingScheme">{{ locale.grading.proper }} Scheme</label>
