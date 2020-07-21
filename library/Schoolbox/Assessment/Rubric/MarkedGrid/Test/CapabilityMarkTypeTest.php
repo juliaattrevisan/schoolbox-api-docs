@@ -36,178 +36,6 @@ use Schoolbox\Learning\MarkScheme\Factory;
 class CapabilityMarkTypeTest extends TestCase
 {
 
-    private const TEST_CAPABILITIES = [
-        1 => [
-            'name'=> 'Capability 1',
-            'indicators' => [
-                11 => ['name' => 'Indicator 1.1'],
-                12 => ['name' => 'Indicator 1.2'],
-                13 => ['name' => 'Indicator 1.3'],
-            ],
-        ],
-        2 => [
-            'name' => 'Capability 2',
-            'indicators' => [
-                21 => ['name' => 'Indicator 2.1'],
-                22 => ['name' => 'Indicator 2.2'],
-                23 => ['name' => 'Indicator 2.3'],
-            ],
-        ],
-    ];
-
-
-    private const TEST_LEVELS = [
-        1 => ['name' => 'Poor'],
-        2 => ['name' => 'Okay'],
-        3 => ['name' => 'Good'],
-        4 => ['name' => 'Great'],
-        5 => ['name' => 'Excellent'],
-    ];
-
-
-    /**
-     * Capabilities made available for a simulated DueWork instance
-     */
-    public const TEST_CAPABILITY_USAGES = [
-        1 => [
-            'indicators' => [
-                11 => [
-                    'descriptors' => [
-                        111 => [
-                            'levelId'     => 1,
-                            'description' => 'Poor',
-                            'value'       => 0,
-                        ],
-                        112 => [
-                            'levelId'     => 2,
-                            'description' => 'Okay',
-                            'value'       => 2,
-                        ],
-                        114 => [
-                            'levelId'     => 4,
-                            'description' => 'Great',
-                            'value'       => 6,
-                        ],
-                        115 => [
-                            'levelId'     => 5,
-                            'description' => 'Excellent',
-                            'value'       => 8,
-                        ],
-                    ],
-                ],
-                12 => [
-                    'descriptors' => [
-                        121 => [
-                            'levelId'     => 1,
-                            'description' => 'Poor',
-                            'value'       => 0,
-                        ],
-                        122 => [
-                            'levelId'     => 2,
-                            'description' => 'Okay',
-                            'value'       => 2,
-                        ],
-                        123 => [
-                            'levelId'     => 3,
-                            'description' => 'Good',
-                            'value'       => 4,
-                        ],
-                        125 => [
-                            'levelId'     => 5,
-                            'description' => 'Excellent',
-                            'value'       => 8,
-                        ],
-                    ],
-                ],
-            ],
-        ],
-        2 => [
-            'indicators' => [
-                22 => [
-                    'descriptors' => [
-                        222 => [
-                            'levelId'     => 2,
-                            'description' => 'Okay',
-                            'value'       => 2,
-                        ],
-                        223 => [
-                            'levelId'     => 3,
-                            'description' => 'Good',
-                            'value'       => 4,
-                        ],
-                        224 => [
-                            'levelId'     => 4,
-                            'description' => 'Great',
-                            'value'       => 6,
-                        ],
-                        225 => [
-                            'levelId'     => 5,
-                            'description' => 'Excellent',
-                            'value'       => 8,
-                        ],
-                    ],
-                ],
-                23 => [
-                    'descriptors' => [
-                        231 => [
-                            'levelId'     => 1,
-                            'description' => 'Poor',
-                            'value'       => 0,
-                        ],
-                        233 => [
-                            'levelId'     => 3,
-                            'description' => 'Good',
-                            'value'       => 4,
-                        ],
-                        234 => [
-                            'levelId'     => 4,
-                            'description' => 'Great',
-                            'value'       => 6,
-                        ],
-                        235 => [
-                            'levelId'     => 4,
-                            'description' => 'Excellent',
-                            'value'       => 8,
-                        ],
-                    ],
-                ],
-            ],
-        ],
-    ];
-
-
-    /**
-     * These are the Descriptors that we simulate as being selected,
-     * corresponding to elements in TEST_CAPABILITY_USAGES that were
-     * simulated as enabled for a particular DueWork instance
-     */
-    public const TEST_CAPABILITY_MARKS = [
-        1 => [
-            'indicators' => [
-                11 => [
-                    // inferred value: 0
-                    'descriptorId' => 111,
-                ],
-                12 => [
-                    // inferred value: 8
-                    'descriptorId' => 125,
-                ],
-            ],
-        ],
-        2 => [
-            'indicators' => [
-                22 => [
-                    // inferred value: 6
-                    'descriptorId' => 224,
-                ],
-                23 => [
-                    // inferred value: 0
-                ],
-            ],
-        ],
-    ];
-
-
     /**
      * @dataProvider provider_validCapabilityMarkType
      * @param MarkType                    $dueWorkMarkType
@@ -220,10 +48,18 @@ class CapabilityMarkTypeTest extends TestCase
     public function testValidCapabilityMarkType(MarkType $dueWorkMarkType, MarkType $capabilityMarkType, ?GradeLevel\Group\Model $capabilityGradeGroup, array $expected)
     {
         $generator        = new Generator();
-        $capabilities     = self::TEST_CAPABILITIES;
-        $levels           = self::TEST_LEVELS;
-        $capabilityUsages = self::TEST_CAPABILITY_USAGES;
-        $capabilityMarks  = self::TEST_CAPABILITY_MARKS;
+        $capabilities     = \Schoolbox\Assessment\Rubric\RowSet\Test\Generator::TEST_CAPABILITIES;
+        $levels           = \Schoolbox\Assessment\Rubric\Grid\Test\Generator::TEST_LEVELS;
+
+        /* Capabilities made available for a simulated DueWork instance
+         */
+        $capabilityUsages = \Schoolbox\Assessment\Rubric\Grid\Test\Generator::TEST_CAPABILITY_USAGES;
+
+        /* These are the Descriptors that we simulate as being selected,
+         * corresponding to elements in TEST_CAPABILITY_USAGES that were
+         * simulated as enabled for a particular DueWork instance
+         */
+        $capabilityMarks  = \Schoolbox\Assessment\Rubric\MarkedGrid\Test\Generator::TEST_CAPABILITY_MARKS;
 
         /* Set up a grid generator with the assessment specified
          */
@@ -259,6 +95,8 @@ class CapabilityMarkTypeTest extends TestCase
         $markTypePercentage = (new MarkType())->setId(MarkType::TYPE_PERCENT)->setSlug(MarkType::SLUG_PERCENT);
         $markTypeLetter = (new MarkType())->setId(MarkType::TYPE_LETTER)->setSlug(MarkType::SLUG_LETTER);
 
+        /* Not using a grade group - send it null
+         */
         $gradeGroupNull = null;
 
         /* Letter Grade construction; simulate the A-E scale we have in vagrant atm
@@ -361,12 +199,20 @@ class CapabilityMarkTypeTest extends TestCase
                     'D+'
                 ]
             ],
+
+            /* Add more cases/combinations here, as you discover them
+             */
         ];
     }
 
 
     /**
-     * @param MarkedGrid    $markedGrid
+     * A custom method to inspect the contents of the Marked Grid's capabilities
+     * The main app never required this method to function, so it's unit-test-only
+     *
+     * It got cloned out of another test and modified to suit what we're doing here
+     *
+     * @param MarkedGrid $markedGrid
      * @return array
      * @throws \DomainException
      * @throws \RangeException
