@@ -332,7 +332,6 @@ class Controller extends BaseController
             'rubricGrid'             => $assessment->getRubricGrid(),
             'levelLimit'             => $maxLevels,
             'usingMarkPerCapability' => $assessment->isMarkPerCapability(),
-            'usingMarkRange'         => $assessment->getUseMarkRange(),
         ])->getAsString();
 
         $payload = [
@@ -344,6 +343,10 @@ class Controller extends BaseController
             /* Capability Grade Group value, if applicable
              */
             'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
+
+            /* Use Mark Range switch; grid-editable doesn't use this var
+             */
+            'useMarkRange' => $assessment->getUseMarkRange(),
 
             /* The rubric grid resulting from the csv import
              */
