@@ -142,7 +142,7 @@
      * @param options
      */
     $.fn.alaressEditor = function(options) {
-        var config = $.alaressValidate(options);
+        var config = $.alaressEditorConfig(options);
 
         start();
 
