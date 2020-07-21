@@ -15,13 +15,11 @@ declare(strict_types=1);
 namespace Schoolbox\Example\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Rubric\Grid\Test\Generator as GridGenerator;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\Test\Generator;
-use Schoolbox\Assessment\Rubric\RowSet\Test\Generator as RowSetGenerator;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme\Factory;
 
@@ -208,20 +206,39 @@ class CapabilityMarkTypeTest extends TestCase
         ],
     ];
 
+
     /**
      * @dataProvider provider_validExample
-     * @param mixed $input
-     * @param int   $expected
+     * @param MarkType                    $dueWorkMarkType
+     * @param MarkType                    $capabilityMarkType
+     * @param GradeLevel\Group\Model|null $capabilityGradeGroup
+     * @param array                       $expected
+     * @throws \DomainException
+     * @throws \RangeException
      */
-    public function testValidExample($input, $expected)
+    public function testValidExample(MarkType $dueWorkMarkType, MarkType $capabilityMarkType, ?GradeLevel\Group\Model $capabilityGradeGroup, array $expected)
     {
-        /* Substitute this with a spec pattern or other conditional
-         */
-        $outcome = false;
+        $generator        = new Generator();
+        $capabilities     = self::TEST_CAPABILITIES;
+        $levels           = self::TEST_LEVELS;
+        $capabilityUsages = self::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = self::TEST_CAPABILITY_MARKS;
 
-        if (is_numeric($input)) {
-            $outcome = true;
-        }
+        /* Set up a grid generator with the assessment specified
+         */
+        $generator->setDueWork((new DueWork\Model())
+            ->setMarkType($dueWorkMarkType)
+            ->setCapabilityMarkType($capabilityMarkType)
+            ->setCapabilityGradeGroup($capabilityGradeGroup));
+
+        /* Reach in and yank out a bunch of human readable marks using our local variant
+         */
+        $outcome = $this->calculateCapabilityMarks($generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        ));
 
         /* There are other assertions that you can try (ctrl-click to follow)
          */
@@ -234,42 +251,24 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * @return array
      */
-    public function provider_validExample() : array {
-        $generator        = new Generator();
-        $capabilities     = self::TEST_CAPABILITIES;
-        $levels           = self::TEST_LEVELS;
-        $capabilityUsages = self::TEST_CAPABILITY_USAGES;
-        $capabilityMarks  = self::TEST_CAPABILITY_MARKS;
+    public function provider_validExample() : array
+    {
+        $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
+        $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
+        $markTypePercentage = (new MarkType())->setId(MarkType::TYPE_PERCENT)->setSlug(MarkType::SLUG_PERCENT);
+        $markTypeLetter = (new MarkType())->setId(MarkType::TYPE_LETTER)->setSlug(MarkType::SLUG_LETTER);
 
-        /* Set up my own assessment; rubric grids only work on DueWork instances
-         */
-        $dueWorkMarkType = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
-        $capabilityMarkType = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
-        $capabilityGradeGroup = null;
-
-        /* Set up a grid generator with the assessment specified
-         */
-        $generator->setDueWork((new DueWork\Model())
-            ->setMarkType($dueWorkMarkType)
-            ->setCapabilityMarkType($capabilityMarkType)
-            ->setCapabilityGradeGroup($capabilityGradeGroup));
-
-        /* Reach in and yank out a bunch of human readable marks using our local variant
-         */
-        $marks = $this->calculateCapabilityMarks($generator->generateMarkedGrid(
-            $capabilities,
-            $levels,
-            $capabilityUsages,
-            $capabilityMarks
-        ));
+        $gradeGroupNull = null;
 
         return [
-
-            /* Add other cases that you expect to be valid
-             */
             'Valid Example 1' => [
-                0,    // goes into testValidExample() as $input
-                true  // goes into testValidExample() as $expected
+                $markTypeNone,
+                $markTypeTotal,
+                $gradeGroupNull,
+                [
+                    '8 / 16',
+                    '6 / 16'
+                ]
             ],
         ];
     }
@@ -299,7 +298,7 @@ class CapabilityMarkTypeTest extends TestCase
             // calculated mark.
             $capabilityValue = $markedGrid->getGrid()->isMarkPerCapability() ? $capabilityMark->getValue() : $capabilityMark->calculateScaledMark();
 
-            $stack[$index] = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+            $stack[] = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setValue($capabilityValue)
                 ->retrieveHumanReadableMark();
         }
