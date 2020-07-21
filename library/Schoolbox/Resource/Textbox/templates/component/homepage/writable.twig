@@ -10,6 +10,13 @@
     <div class="content">
         <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
     </div>
+
+    <div class="component-action">
+        <section>
+            <a href="#" class="button">Modify</a>
+            <a href="#" data-delete class="button">Delete</a>
+        </section>
+    </div>
 {% else %}
     <div class="empty-state">
         <i class="icon-textbox"></i>
@@ -23,5 +30,18 @@
                 to display in this component.
             </p>
         {% endif %}
+    </div>
+
+    <div id="addTextboxModal-{{ component.instance.id }}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{{ component.instance.id }}-title" aria-hidden="true" role="dialog">
+        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: context, folderId: context.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
+            <section>
+                <h3 id="addTextboxModal-{{ component.instance.id }}-title">Add Textbox</h3>
+                <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
+                <input id="addTextboxModal-{{ component.instance.id }}-form-heading" type="text" name="heading" value="" required maxlength="100" />
+                <input type="hidden" name="body" value="" />
+                <input type="submit" value="Create Textbox">
+            </section>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </form>
     </div>
 {% endif %}
