@@ -66,8 +66,7 @@
                 configForm      = component.find('[data-component-panel="settings"] form'),
                 addTextboxModal = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm  = $('#addTextboxModal-{{ component.instance.id }}-form'),
-                editor          = null,
-                editorImage     = null;
+                editor          = null;
 
 
             // Switch off auto-setup of inline editors
@@ -187,8 +186,7 @@
                         })
                     );
                     editor.on('instanceReady', function (evt) {
-                        // Store the current state
-                        editorImage = new CKEDITOR.plugins.undo.Image(evt.editor);
+                        // Focus on the editor
                         evt.editor.focus();
                     });
                     editor.on('focus', function () {
