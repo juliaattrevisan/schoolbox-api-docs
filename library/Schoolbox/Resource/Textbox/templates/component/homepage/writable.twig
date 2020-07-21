@@ -193,11 +193,15 @@
                     });
                     editor.on('focus', function () {
                         // Switch state of modify button
-                        switchState(currentState === states.clean ? states.cleanModify : states.dirtyModify);
+                        switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
                     });
                     editor.on('blur', function () {
                         // Revert state of modify button
-                        switchState(currentState === states.cleanModify ? states.clean : states.dirty);
+                        switchState(editor.checkDirty() ? states.dirty : states.clean);
+                    });
+                    editor.on('change', function () {
+                        // Has the content changed since saved?
+                        switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
                     });
                 }
             });
@@ -222,6 +226,8 @@
                         contentType: 'application/json',
                     }
                 ).done(function () {
+                    // Editor value is now persisted: the current state is now clean
+                    editor.resetDirty();
                     switchState(states.clean);
                 }).fail(function () {
                     switchState(previousState);
