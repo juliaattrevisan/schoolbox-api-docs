@@ -75,6 +75,8 @@
                 folderId         = Number("{{ context.id }}");
 
 
+            CKEDITOR.disableAutoInline = true;
+
             var options = {
                 modifyButton:     '[data-action="modify"]',
                 deleteButton:     '[data-action="delete"]',
