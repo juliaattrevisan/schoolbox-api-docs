@@ -76,11 +76,11 @@
 
 
             // States:
-            // Read-only
-            // Modifying
-            // Saving
-            // Dirty
-            // Clean
+            // * Empty -> Clean
+            // * Clean -> Dirty, Saving, Deleting
+            // * Dirty -> Clean, Saving, Deleting
+            // * Saving -> Clean (success), Dirty (failure)
+            // * Deleting -> Empty (success), Clean/Dirty (failure)
 
 
             // Dialog for modifying a textbox
@@ -104,7 +104,7 @@
                         // Switch state of modify button
                         modifyButton
                             .data('text', modifyButton.text())
-                            .text(modifyButton.data('processing-text'))
+                            .text(modifyButton.attr('data-processing-text'))
                             .prop('disabled', true)
                             .addClass('disabled');
                         // And cancel button
@@ -139,7 +139,21 @@
 
             // Action for save button
             saveButton.click(function (event) {
-
+                // Toast
+                event.preventDefault();
+                $.ajax(
+                    saveButton.attr('data-form-action'),
+                    {
+                        method: saveButton.attr('data-form-method'),
+                        data:   JSON.stringify({
+                            // TODO pass this via form input as well?
+                            heading: "{{ textbox.heading }}",
+                            body:    editor.getData(),
+                        }),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }
+                );
             });
 
 
@@ -153,12 +167,19 @@
             // Dialog for deleting a textbox
             deleteButton.click(function (event) {
                 event.preventDefault();
-                var element = $(this);
-                $(this).confirmDialog({
+                deleteButton.confirmDialog({
                     text: 'Are you sure you want to delete this content permanently?',
                     confirmEvent: function () {
-                        // TODO point to textbox delete location instead
-                        window.location.href = element.attr('href');
+                        $.ajax(
+                            deleteButton.attr('data-form-action'),
+                            { method: deleteButton.attr('data-form-method'), }
+                        ).done(function () {
+                            // Once done: reload component
+                            configForm
+                                .find('select[name="textbox"]')
+                                .val(0);
+                            configForm.submit();
+                        });
                     }
                 });
             });
