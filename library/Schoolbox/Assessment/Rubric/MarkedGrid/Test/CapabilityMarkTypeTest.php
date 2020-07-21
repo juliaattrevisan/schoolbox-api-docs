@@ -12,14 +12,13 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Example\Test;
+namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
-use Schoolbox\Assessment\Rubric\MarkedGrid\Test\Generator;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme\Factory;
