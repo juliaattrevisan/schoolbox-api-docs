@@ -75,222 +75,244 @@
                 folderId         = Number("{{ context.id }}");
 
 
-            // Switch off auto-setup of inline editors
-            CKEDITOR.disableAutoInline = true;
-
-
-            // States and their transitions:
-            // * created in Clean
-            // * Clean -> Dirty, Saving, Deleting
-            // * Dirty -> Clean, Saving, Deleting
-            // * Saving -> Clean (success), Dirty (failure)
-            // * Deleting -> destroy, Clean/Dirty (failure)
-            var states = {
-                clean:       'clean',
-                cleanModify: 'cleanModify',
-                dirty:       'dirty',
-                dirtyModify: 'dirtyModify',
-                saving:      'saving',
-                deleting:    'deleting',
+            var options = {
+                modifyButton:     '[data-action="modify"]',
+                deleteButton:     '[data-action="delete"]',
+                saveButton:       '[data-action="save"]',
+                editorInstance:   '[data-content]',
+                editorInstanceId: "textBoxBody{{ textbox.id }}",
+                editorInstanceOptions: $.alaressEditorConfig({
+                    file_browser_category_id: folderId
+                }),
+                heading:          "{{ textbox.heading }}",
+                folderId:         Number("{{ context.id }}"),
             };
-            var currentState = states.clean;
-
-
-            /**
-             * Add the processing styles from this button, and optionally set
-             * its text to its processing value.
-             *
-             * @param {jQuery}  button
-             * @param {Boolean} isProcessing
-             */
-            var addProcessing = function (button, isProcessing) {
-                // Store previous button text, update its text
-                button.attr('data-text', button.text())
-                      .prop('disabled', true)
-                      .addClass('disabled');
-                if (isProcessing) {
-                    button.text(button.attr('data-processing-text'));
-                }
-            };
-
-            /**
-             * Remove the processing styles from this button, and set its text
-             * back to its default value.
-             *
-             * @param {jQuery} button
-             */
-            var removeProcessing = function (button) {
-                // Reset button text back to its default
-                var dataText = button.attr('data-text');
-                if (dataText === undefined) {
-                    button.attr('data-text', button.text());
-                }
-                button.text(dataText)
-                      .prop('disabled', false)
-                      .removeClass('disabled');
-            };
-
-
-            /**
-             * Switches from the current state to another, and handles all
-             * resultant button states.
-             *
-             * @param {String} newState One of the values in `states`
-             */
-            var switchState = function (newState) {
-                // Add/remove processing from buttons dependent on state
-                switch (newState) {
-                    case states.clean:
-                    case states.cleanModify:
-                    case states.dirty:
-                    case states.dirtyModify:
-                        removeProcessing(saveButton);
-                        removeProcessing(deleteButton);
-                        break;
-
-                    case states.saving:
-                        addProcessing(saveButton, true);
-                        addProcessing(deleteButton, false);
-                        break;
-
-                    case states.deleting:
-                        addProcessing(saveButton, false);
-                        addProcessing(deleteButton, true);
-                        break;
-
-                    default:
-                        break;
-                }
-
-                // Show/hide buttons dependent on state
-                switch (newState) {
-                    case states.clean:
-                        modifyButton.removeClass('hide');
-                        saveButton.addClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    case states.cleanModify:
-                        modifyButton.addClass('hide');
-                        saveButton.removeClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    case states.dirty:
-                        modifyButton.removeClass('hide');
-                        saveButton.removeClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    case states.dirtyModify:
-                        modifyButton.addClass('hide');
-                        saveButton.removeClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    case states.saving:
-                        modifyButton.addClass('hide');
-                        saveButton.removeClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    case states.deleting:
-                        modifyButton.addClass('hide');
-                        saveButton.removeClass('hide');
-                        deleteButton.removeClass('hide');
-                        break;
-
-                    default:
-                        break;
-                }
-                currentState = newState;
-            };
-
-
-            // Dialog for modifying a textbox
-            modifyButton.click(function (event) {
-                event.preventDefault();
-                if (CKEDITOR.instances[editorInstanceId]) {
-                    CKEDITOR.instances[editorInstanceId].focus();
-                } else {
-                    editor = CKEDITOR.inline(
-                        editorInstanceId,
-                        $.alaressEditorConfig({
-                            file_browser_category_id: folderId
-                        })
-                    );
-                    editor.on('instanceReady', function (evt) {
-                        // Focus on the editor
-                        evt.editor.focus();
-                    });
-                    editor.on('focus', function () {
-                        // Switch state of modify button
-                        switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
-                    });
-                    editor.on('blur', function () {
-                        // Revert state of modify button
-                        switchState(editor.checkDirty() ? states.dirty : states.clean);
-                    });
-                    editor.on('change', function () {
-                        // Has the content changed since saved?
-                        switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
-                    });
-                }
+            // console.log(options.editorInstanceOptions);
+            component.inlineTextboxEditor(options);
+            component.on('inlineTextboxEditor.delete', function () {
+                configForm
+                    .find('select[name="textbox"]')
+                    .val(0);
+                configForm.submit();
             });
 
 
-            // Action for save button
-            saveButton.click(function (event) {
-                // Toast
-                event.preventDefault();
-                var previousState = currentState;
-                switchState(states.saving);
-                $.ajax(
-                    saveButton.attr('data-form-action'),
-                    {
-                        method: saveButton.attr('data-form-method'),
-                        data:   JSON.stringify({
-                            // TODO pass this via form input as well?
-                            heading: heading,
-                            body:    editor.getData(),
-                        }),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                    }
-                ).done(function () {
-                    // Editor value is now persisted: the current state is now clean
-                    editor.resetDirty();
-                    switchState(states.clean);
-                }).fail(function () {
-                    switchState(previousState);
-                });
-            });
-
-
-            // Dialog for deleting a textbox
-            deleteButton.click(function (event) {
-                event.preventDefault();
-                deleteButton.confirmDialog({
-                    text: 'Are you sure you want to delete this content permanently?',
-                    confirmEvent: function () {
-                        var previousState = currentState;
-                        switchState(states.deleting);
-                        $.ajax(
-                            deleteButton.attr('data-form-action'),
-                            { method: deleteButton.attr('data-form-method'), }
-                        ).done(function () {
-                            // Once done: reload component
-                            configForm
-                                .find('select[name="textbox"]')
-                                .val(0);
-                            configForm.submit();
-                            // Don't need to switch state, as reloading the component resets the state
-                        }).fail(function () {
-                            switchState(previousState);
-                        });
-                    }
-                });
-            });
+            // // Switch off auto-setup of inline editors
+            // CKEDITOR.disableAutoInline = true;
+            //
+            //
+            // // States and their transitions:
+            // // * created in Clean
+            // // * Clean -> Dirty, Saving, Deleting
+            // // * Dirty -> Clean, Saving, Deleting
+            // // * Saving -> Clean (success), Dirty (failure)
+            // // * Deleting -> destroy, Clean/Dirty (failure)
+            // var states = {
+            //     clean:       'clean',
+            //     cleanModify: 'cleanModify',
+            //     dirty:       'dirty',
+            //     dirtyModify: 'dirtyModify',
+            //     saving:      'saving',
+            //     deleting:    'deleting',
+            // };
+            // var currentState = states.clean;
+            //
+            //
+            // /**
+            //  * Add the processing styles from this button, and optionally set
+            //  * its text to its processing value.
+            //  *
+            //  * @param {jQuery}  button
+            //  * @param {Boolean} isProcessing
+            //  */
+            // var addProcessing = function (button, isProcessing) {
+            //     // Store previous button text, update its text
+            //     button.attr('data-text', button.text())
+            //           .prop('disabled', true)
+            //           .addClass('disabled');
+            //     if (isProcessing) {
+            //         button.text(button.attr('data-processing-text'));
+            //     }
+            // };
+            //
+            // /**
+            //  * Remove the processing styles from this button, and set its text
+            //  * back to its default value.
+            //  *
+            //  * @param {jQuery} button
+            //  */
+            // var removeProcessing = function (button) {
+            //     // Reset button text back to its default
+            //     var dataText = button.attr('data-text');
+            //     if (dataText === undefined) {
+            //         button.attr('data-text', button.text());
+            //     }
+            //     button.text(dataText)
+            //           .prop('disabled', false)
+            //           .removeClass('disabled');
+            // };
+            //
+            //
+            // /**
+            //  * Switches from the current state to another, and handles all
+            //  * resultant button states.
+            //  *
+            //  * @param {String} newState One of the values in `states`
+            //  */
+            // var switchState = function (newState) {
+            //     // Add/remove processing from buttons dependent on state
+            //     switch (newState) {
+            //         case states.clean:
+            //         case states.cleanModify:
+            //         case states.dirty:
+            //         case states.dirtyModify:
+            //             removeProcessing(saveButton);
+            //             removeProcessing(deleteButton);
+            //             break;
+            //
+            //         case states.saving:
+            //             addProcessing(saveButton, true);
+            //             addProcessing(deleteButton, false);
+            //             break;
+            //
+            //         case states.deleting:
+            //             addProcessing(saveButton, false);
+            //             addProcessing(deleteButton, true);
+            //             break;
+            //
+            //         default:
+            //             break;
+            //     }
+            //
+            //     // Show/hide buttons dependent on state
+            //     switch (newState) {
+            //         case states.clean:
+            //             modifyButton.removeClass('hide');
+            //             saveButton.addClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         case states.cleanModify:
+            //             modifyButton.addClass('hide');
+            //             saveButton.removeClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         case states.dirty:
+            //             modifyButton.removeClass('hide');
+            //             saveButton.removeClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         case states.dirtyModify:
+            //             modifyButton.addClass('hide');
+            //             saveButton.removeClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         case states.saving:
+            //             modifyButton.addClass('hide');
+            //             saveButton.removeClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         case states.deleting:
+            //             modifyButton.addClass('hide');
+            //             saveButton.removeClass('hide');
+            //             deleteButton.removeClass('hide');
+            //             break;
+            //
+            //         default:
+            //             break;
+            //     }
+            //     currentState = newState;
+            // };
+            //
+            //
+            // // Dialog for modifying a textbox
+            // modifyButton.click(function (event) {
+            //     event.preventDefault();
+            //     if (CKEDITOR.instances[editorInstanceId]) {
+            //         CKEDITOR.instances[editorInstanceId].focus();
+            //     } else {
+            //         editor = CKEDITOR.inline(
+            //             editorInstanceId,
+            //             $.alaressEditorConfig({
+            //                 file_browser_category_id: folderId
+            //             })
+            //         );
+            //         editor.on('instanceReady', function (evt) {
+            //             // Focus on the editor
+            //             evt.editor.focus();
+            //         });
+            //         editor.on('focus', function () {
+            //             // Switch state of modify button
+            //             switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
+            //         });
+            //         editor.on('blur', function () {
+            //             // Revert state of modify button
+            //             switchState(editor.checkDirty() ? states.dirty : states.clean);
+            //         });
+            //         editor.on('change', function () {
+            //             // Has the content changed since saved?
+            //             switchState(editor.checkDirty() ? states.dirtyModify : states.cleanModify);
+            //         });
+            //     }
+            // });
+            //
+            //
+            // // Action for save button
+            // saveButton.click(function (event) {
+            //     // Toast
+            //     event.preventDefault();
+            //     var previousState = currentState;
+            //     switchState(states.saving);
+            //     $.ajax(
+            //         saveButton.attr('data-form-action'),
+            //         {
+            //             method: saveButton.attr('data-form-method'),
+            //             data:   JSON.stringify({
+            //                 // TODO pass this via form input as well?
+            //                 heading: heading,
+            //                 body:    editor.getData(),
+            //             }),
+            //             dataType: 'json',
+            //             contentType: 'application/json',
+            //         }
+            //     ).done(function () {
+            //         // Editor value is now persisted: the current state is now clean
+            //         editor.resetDirty();
+            //         switchState(states.clean);
+            //     }).fail(function () {
+            //         switchState(previousState);
+            //     });
+            // });
+            //
+            //
+            // // Dialog for deleting a textbox
+            // deleteButton.click(function (event) {
+            //     event.preventDefault();
+            //     deleteButton.confirmDialog({
+            //         text: 'Are you sure you want to delete this content permanently?',
+            //         confirmEvent: function () {
+            //             var previousState = currentState;
+            //             switchState(states.deleting);
+            //             $.ajax(
+            //                 deleteButton.attr('data-form-action'),
+            //                 { method: deleteButton.attr('data-form-method'), }
+            //             ).done(function () {
+            //                 // Once done: reload component
+            //                 configForm
+            //                     .find('select[name="textbox"]')
+            //                     .val(0);
+            //                 configForm.submit();
+            //                 // Don't need to switch state, as reloading the component resets the state
+            //             }).fail(function () {
+            //                 switchState(previousState);
+            //             });
+            //         }
+            //     });
+            // });
 
 
             // Dialog for creation of a textbox

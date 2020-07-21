@@ -3,13 +3,24 @@
     /**
      * Inline textbox editor constructor.
      *
+     * @param {jQuery} element
+     * @param {jQuery} editorInstance
      * @param {jQuery} modifyButton
      * @param {jQuery} saveButton
      * @param {jQuery} deleteButton
+     * @param {Object} editorInstanceOptions
      * @constructor
      */
-    var InlineTextboxEditor = function (modifyButton, saveButton, deleteButton) {
-        this.states = {
+    var InlineTextboxEditor = function (
+        element,
+        editorInstance,
+        modifyButton,
+        saveButton,
+        deleteButton,
+        editorInstanceOptions
+    ) {
+        var self = this;
+        self.states = {
             clean:       'clean',
             cleanModify: 'cleanModify',
             dirty:       'dirty',
@@ -17,11 +28,29 @@
             saving:      'saving',
             deleting:    'deleting',
         };
-        this.currentState = states.clean;
-        this.modifyButton = modifyButton;
-        this.saveButton   = saveButton;
-        this.deleteButton = deleteButton;
-        this.editor       = null;
+        self.currentState = self.states.clean;
+        self.element = element;
+        self.editorInstance = editorInstance;
+        self.modifyButton = modifyButton;
+        self.saveButton   = saveButton;
+        self.deleteButton = deleteButton;
+        self.editorInstanceOptions = editorInstanceOptions;
+        self.editor       = null;
+
+
+        // Set up events
+        self.modifyButton.on('click.inlineTextboxEditor', function (event) {
+            event.preventDefault;
+            self.onClickModify();
+        });
+        self.saveButton.on('click.inlineTextboxEditor', function (event) {
+            event.preventDefault;
+            self.onClickSave();
+        });
+        self.deleteButton.on('click.inlineTextboxEditor', function (event) {
+            event.preventDefault;
+            self.onClickDelete();
+        });
     };
 
     /**
@@ -133,9 +162,118 @@
                 break;
         }
         this.currentState = newState;
+    }
+
+
+    InlineTextboxEditor.prototype.onClickModify = function () {
+        var self             = this,
+            editorInstanceId = self.editorInstance.attr('id');
+        if (CKEDITOR.instances[editorInstanceId]) {
+            CKEDITOR.instances[editorInstanceId].focus();
+        } else {
+            self.editor = CKEDITOR.inline(
+                editorInstanceId,
+                self.editorInstanceOptions
+            );
+            self.editor.on('instanceReady', function (event) {
+                // Focus on the editor
+                event.editor.focus();
+            });
+            self.editor.on('focus', function () {
+                // Switch state of modify button
+                self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
+            });
+            self.editor.on('blur', function () {
+                // Revert state of modify button
+                self.switchState(self.editor.checkDirty() ? self.states.dirty : self.states.clean);
+            });
+            self.editor.on('change', function () {
+                // Has the content changed since saved?
+                self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
+            });
+        }
     };
 
 
-    $.fn.inlineTextboxEditor = function () {
+    InlineTextboxEditor.prototype.onClickSave = function () {
+        var self          = this,
+            previousState = self.currentState;
+        self.switchState(self.states.saving);
+        $.ajax(
+            self.saveButton.attr('data-form-action'),
+            {
+                method: self.saveButton.attr('data-form-method'),
+                data:   JSON.stringify({
+                    // TODO pass this via form input as well?
+                    heading: heading,
+                    body:    self.editor.getData(),
+                }),
+                dataType:    'json',
+                contentType: 'application/json',
+            }
+        ).done(function () {
+            // Editor value is now persisted: the current state is now clean
+            self.editor.resetDirty();
+            self.switchState(self.states.clean);
+            self.element.trigger('inlineTextboxEditor.save', [self]);
+        }).fail(function () {
+            self.switchState(previousState);
+        });
+    };
+
+
+    InlineTextboxEditor.prototype.onClickDelete = function () {
+        var self = this;
+        self.deleteButton.confirmDialog({
+            text: 'Are you sure you want to delete this content permanently?',
+            confirmEvent: function () {
+                var previousState = self.currentState;
+                self.switchState(self.states.deleting);
+                $.ajax(
+                    self.deleteButton.attr('data-form-action'),
+                    { method: self.deleteButton.attr('data-form-method'), }
+                ).done(function () {
+                    // Once done: reload component
+                    // (Do this by triggering an event, rather than in here)
+                    self.element.trigger('inlineTextboxEditor.delete', [self]);
+                    // configForm
+                    //     .find('select[name="textbox"]')
+                    //     .val(0);
+                    // configForm.submit();
+                    // Don't need to switch state, as reloading the component resets the state
+                }).fail(function () {
+                    self.switchState(previousState);
+                });
+            }
+        });
+    };
+
+
+    $.fn.inlineTextboxEditor = function (options) {
+        // Try to derive editor instance ID
+        var defaults = {
+            modifyButton:          '[data-action="modify"]',
+            deleteButton:          '[data-action="delete"]',
+            saveButton:            '[data-action="save"]',
+            content:               '[data-content]',
+            editorInstanceOptions: {},
+        };
+        var derivedOptions = $.extend(true, {}, defaults, options);
+        this.each(function () {
+            var $this               = $(this),
+                $modifyButton       = $this.find(derivedOptions.modifyButton),
+                $deleteButton       = $this.find(derivedOptions.deleteButton),
+                $saveButton         = $this.find(derivedOptions.saveButton),
+                $editorInstance     = $this.find(derivedOptions.editorInstance),
+                inlineTextboxEditor = new InlineTextboxEditor(
+                    $this,
+                    $editorInstance,
+                    $modifyButton,
+                    $saveButton,
+                    $deleteButton,
+                    derivedOptions.editorInstanceOptions
+                );
+            $(this).data('inlineTextboxEditor', inlineTextboxEditor);
+        });
     };
 })(jQuery);
