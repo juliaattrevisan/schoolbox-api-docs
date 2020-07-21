@@ -73,20 +73,46 @@
             CKEDITOR.disableAutoInline = true;
 
 
-            // States:
-            // * Empty -> Clean
+            // States and their transitions:
+            // * created in Clean
             // * Clean -> Dirty, Saving, Deleting
             // * Dirty -> Clean, Saving, Deleting
             // * Saving -> Clean (success), Dirty (failure)
-            // * Deleting -> Empty (success), Clean/Dirty (failure)
+            // * Deleting -> destroy, Clean/Dirty (failure)
+            var states = {
+                clean:       'clean',
+                cleanModify: 'cleanModify',
+                dirty:       'dirty',
+                dirtyModify: 'dirtyModify',
+                saving:      'saving',
+                deleting:    'deleting',
+            };
+            var currentState = states.clean;
 
-            var addProcessing = function (button) {
+
+            /**
+             * Add the processing styles from this button, and optionally set
+             * its text to its processing value.
+             *
+             * @param {jQuery}  button
+             * @param {Boolean} isProcessing
+             */
+            var addProcessing = function (button, isProcessing) {
                 // Store previous button text, update its text
                 button.attr('data-text', button.text())
-                      .text(button.attr('data-processing-text'))
                       .prop('disabled', true)
                       .addClass('disabled');
+                if (isProcessing) {
+                    button.text(button.attr('data-processing-text'));
+                }
             };
+
+            /**
+             * Remove the processing styles from this button, and set its text
+             * back to its default value.
+             *
+             * @param {jQuery} button
+             */
             var removeProcessing = function (button) {
                 // Reset button text back to its default
                 var dataText = button.attr('data-text');
@@ -98,16 +124,14 @@
                       .removeClass('disabled');
             };
 
-            var states = {
-                clean:       'clean',
-                cleanModify: 'cleanModify',
-                dirty:       'dirty',
-                dirtyModify: 'dirtyModify',
-                saving:      'saving',
-                deleting:    'deleting',
-            };
-            var currentState = states.clean;
-            var switchState  = function (newState) {
+
+            /**
+             * Switches from the current state to another, and handles all
+             * resultant button states.
+             *
+             * @param {String} newState One of the values in `states`
+             */
+            var switchState = function (newState) {
                 // Add/remove processing from buttons dependent on state
                 switch (newState) {
                     case states.clean:
@@ -119,9 +143,13 @@
                         break;
 
                     case states.saving:
+                        addProcessing(saveButton, true);
+                        addProcessing(deleteButton, false);
+                        break;
+
                     case states.deleting:
-                        addProcessing(saveButton);
-                        addProcessing(deleteButton);
+                        addProcessing(saveButton, false);
+                        addProcessing(deleteButton, true);
                         break;
 
                     default:
@@ -236,11 +264,11 @@
             // Dialog for deleting a textbox
             deleteButton.click(function (event) {
                 event.preventDefault();
-                var previousState = currentState;
-                switchState(states.deleting);
                 deleteButton.confirmDialog({
                     text: 'Are you sure you want to delete this content permanently?',
                     confirmEvent: function () {
+                        var previousState = currentState;
+                        switchState(states.deleting);
                         $.ajax(
                             deleteButton.attr('data-form-action'),
                             { method: deleteButton.attr('data-form-method'), }
