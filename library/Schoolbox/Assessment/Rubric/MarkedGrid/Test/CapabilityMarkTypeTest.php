@@ -247,22 +247,21 @@ class CapabilityMarkTypeTest extends TestCase
         $capabilityMarkType = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
         $capabilityGradeGroup = null;
 
-        $dueWork = (new DueWork\Model())
+        /* Set up a grid generator with the assessment specified
+         */
+        $generator->setDueWork((new DueWork\Model())
             ->setMarkType($dueWorkMarkType)
             ->setCapabilityMarkType($capabilityMarkType)
-            ->setCapabilityGradeGroup($capabilityGradeGroup);
+            ->setCapabilityGradeGroup($capabilityGradeGroup));
 
-        $generator->setDueWork($dueWork);
-
-        // No scaling on cap marks for this grid
-        $markedGrid = $generator->generateMarkedGrid(
+        /* Reach in and yank out a bunch of human readable marks using our local variant
+         */
+        $marks = $this->calculateCapabilityMarks($generator->generateMarkedGrid(
             $capabilities,
             $levels,
             $capabilityUsages,
             $capabilityMarks
-        );
-
-        $marks = $this->calculateCapabilityMarks($markedGrid);
+        ));
 
         return [
 
