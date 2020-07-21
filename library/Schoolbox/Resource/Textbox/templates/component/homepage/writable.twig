@@ -19,7 +19,6 @@
                     data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}"
                     data-processing-text="Saving..."
                     class="hide">Save</button>
-            <button data-action="cancel" class="hide">Cancel</button>
             <button data-action="delete"
                     data-form-method="delete"
                     data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}">Delete</button>
@@ -63,7 +62,6 @@
                 modifyButton    = component.find('[data-action="modify"]'),
                 deleteButton    = component.find('[data-action="delete"]'),
                 saveButton      = component.find('[data-action="save"]'),
-                cancelButton    = component.find('[data-action="cancel"]'),
                 configForm      = component.find('[data-component-panel="settings"] form'),
                 addTextboxModal = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm  = $('#addTextboxModal-{{ component.instance.id }}-form'),
@@ -137,7 +135,7 @@
 
                     case states.cleanModify:
                         modifyButton.addClass('hide');
-                        saveButton.addClass('hide');
+                        saveButton.removeClass('hide');
                         deleteButton.removeClass('hide');
                         break;
 
@@ -194,37 +192,10 @@
                     editor.on('focus', function () {
                         // Switch state of modify button
                         switchState(currentState === states.clean ? states.cleanModify : states.dirtyModify);
-                        // modifyButton
-                        //     .data('text', modifyButton.text())
-                        //     .text(modifyButton.attr('data-processing-text'))
-                        //     .prop('disabled', true)
-                        //     .addClass('disabled');
-                        // // And cancel button
-                        // cancelButton
-                        //     .removeClass('hide');
-                        // // And save button
-                        // saveButton
-                        //     .removeClass('hide');
-                        // // And delete button
-                        // deleteButton
-                        //     .addClass('hide');
                     });
                     editor.on('blur', function () {
                         // Revert state of modify button
                         switchState(currentState === states.cleanModify ? states.clean : states.dirty);
-                        // modifyButton
-                        //     .text(modifyButton.data('text'))
-                        //     .prop('disabled', false)
-                        //     .removeClass('disabled');
-                        // // And cancel button
-                        // cancelButton
-                        //     .addClass('hide');
-                        // // And save button
-                        // saveButton
-                        //     .addClass('hide');
-                        // // And delete button
-                        // deleteButton
-                        //     .removeClass('hide');
                     });
                 }
             });
@@ -256,12 +227,6 @@
             });
 
 
-            // // Action for cancel button
-            // cancelButton.click(function (event) {
-            //     event.preventDefault();
-            // });
-
-
             // Dialog for deleting a textbox
             deleteButton.click(function (event) {
                 event.preventDefault();
@@ -278,7 +243,7 @@
                                 .find('select[name="textbox"]')
                                 .val(0);
                             configForm.submit();
-                            // Don't need to switch state, as reloading the component destroys the state machine
+                            // Don't need to switch state, as reloading the component resets the state
                         }).fail(function () {
                             switchState(previousState);
                         });
