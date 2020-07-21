@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\Test\Generator;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme\Factory;
 
@@ -208,7 +209,7 @@ class CapabilityMarkTypeTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validExample
+     * @dataProvider provider_validCapabilityMarkType
      * @param MarkType                    $dueWorkMarkType
      * @param MarkType                    $capabilityMarkType
      * @param GradeLevel\Group\Model|null $capabilityGradeGroup
@@ -216,7 +217,7 @@ class CapabilityMarkTypeTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function testValidExample(MarkType $dueWorkMarkType, MarkType $capabilityMarkType, ?GradeLevel\Group\Model $capabilityGradeGroup, array $expected)
+    public function testValidCapabilityMarkType(MarkType $dueWorkMarkType, MarkType $capabilityMarkType, ?GradeLevel\Group\Model $capabilityGradeGroup, array $expected)
     {
         $generator        = new Generator();
         $capabilities     = self::TEST_CAPABILITIES;
@@ -247,11 +248,11 @@ class CapabilityMarkTypeTest extends TestCase
 
 
     /**
-     * Data provider for testValidExample
+     * Data provider for testValidCapabilityMarkType
      *
      * @return array
      */
-    public function provider_validExample() : array
+    public function provider_validCapabilityMarkType() : array
     {
         $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
         $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
@@ -260,14 +261,104 @@ class CapabilityMarkTypeTest extends TestCase
 
         $gradeGroupNull = null;
 
+        /* Letter Grade construction; simulate the A-E scale we have in vagrant atm
+         */
+        $gradeGroupStandard = (new GradeLevel\Group\Model())
+            ->setGradeLevels(new Collection());
+
+        $gradeGroupStandard->getGradeLevels()
+                ->add((new GradeLevel\Model())->setLowerBound(0)->setRawGrade(5)->setCaption('E'))
+                ->add((new GradeLevel\Model())->setLowerBound(10)->setRawGrade(15)->setCaption('E+'))
+                ->add((new GradeLevel\Model())->setLowerBound(20)->setRawGrade(25)->setCaption('D'))
+                ->add((new GradeLevel\Model())->setLowerBound(30)->setRawGrade(35)->setCaption('D+'))
+                ->add((new GradeLevel\Model())->setLowerBound(40)->setRawGrade(45)->setCaption('C'))
+                ->add((new GradeLevel\Model())->setLowerBound(50)->setRawGrade(55)->setCaption('C+'))
+                ->add((new GradeLevel\Model())->setLowerBound(60)->setRawGrade(65)->setCaption('B'))
+                ->add((new GradeLevel\Model())->setLowerBound(70)->setRawGrade(75)->setCaption('B+'))
+                ->add((new GradeLevel\Model())->setLowerBound(80)->setRawGrade(85)->setCaption('A'))
+                ->add((new GradeLevel\Model())->setLowerBound(90)->setRawGrade(95)->setCaption('A+'));
+
         return [
-            'Valid Example 1' => [
+            'assessment mark type None, capability mark type Total' => [
                 $markTypeNone,
                 $markTypeTotal,
                 $gradeGroupNull,
                 [
                     '8 / 16',
                     '6 / 16'
+                ]
+            ],
+
+            'assessment mark type None, capability mark type Percentage' => [
+                $markTypeNone,
+                $markTypePercentage,
+                $gradeGroupNull,
+                [
+                    '50 %',
+                    '37.5 %'
+                ]
+            ],
+
+            'assessment mark type None, capability mark type None' => [
+                $markTypeNone,
+                $markTypeNone,
+                $gradeGroupNull,
+                [
+                    '',
+                    ''
+                ]
+            ],
+
+            'assessment mark type None, capability mark type Letter (Standard)' => [
+                $markTypeNone,
+                $markTypeLetter,
+                $gradeGroupStandard,
+                [
+                    'C+',
+                    'D+'
+                ]
+            ],
+
+            /* Capability mark types should be independent of their parent assessment's mark type
+             * therefore same answers should come out, regardless of assessment mark type
+             */
+            'assessment mark type Total, capability mark type Total' => [
+                $markTypeNone,
+                $markTypeTotal,
+                $gradeGroupNull,
+                [
+                    '8 / 16',
+                    '6 / 16'
+                ]
+            ],
+
+            'assessment mark type Total, capability mark type Percentage' => [
+                $markTypeNone,
+                $markTypePercentage,
+                $gradeGroupNull,
+                [
+                    '50 %',
+                    '37.5 %'
+                ]
+            ],
+
+            'assessment mark type Total, capability mark type None' => [
+                $markTypeNone,
+                $markTypeNone,
+                $gradeGroupNull,
+                [
+                    '',
+                    ''
+                ]
+            ],
+
+            'assessment mark type Total, capability mark type Letter (Standard)' => [
+                $markTypeNone,
+                $markTypeLetter,
+                $gradeGroupStandard,
+                [
+                    'C+',
+                    'D+'
                 ]
             ],
         ];
