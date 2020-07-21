@@ -37,7 +37,7 @@ TEST1;
         yield 'empty descriptors' => [
             $this->buildStream($test1),
             5,
-            ['', '', '', '', '',],
+            ['', '', '', '',],
             [
                 [
                     'name'       => 'cap2',
@@ -94,11 +94,12 @@ TEST1;
             ],
             false,
             null,
+            null
         ];
 
 
         $test2 = <<<TEST2
-"capabilityMarkType: 6","useMarkRange: On",,,,,
+"capabilityMarkType: 6","capabilityGradeGroup: 3","useMarkRange: On",,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 ,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
@@ -107,7 +108,7 @@ TEST2;
         yield 'mark range on' => [
             $this->buildStream($test2),
             5,
-            ['', '', '', '', '',],
+            ['', '', '', '',],
             [
                 [
                     'name'       => 'Test Capability 1',
@@ -138,11 +139,12 @@ TEST2;
             ],
             true,
             6,
+            3,
         ];
 
 
         $test3= <<<TEST2
-"capabilityMarkType: 1","useMarkRange: Off",,,,,
+"capabilityMarkType: 1","capabilityGradeGroup: 2","useMarkRange: Off",,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
@@ -151,7 +153,7 @@ TEST2;
         yield 'mark-per-cap on' => [
             $this->buildStream($test3),
             5,
-            ['', '', '', '', '',],
+            ['', '', '', '',],
             [
                 [
                     'name'       => 'Test Capability 1',
@@ -182,6 +184,7 @@ TEST2;
             ],
             false,
             1,
+            2,
         ];
     }
 
@@ -196,6 +199,7 @@ TEST2;
      * @param array    $expectedCapabilities
      * @param bool     $expectedUseMarkRange
      * @param int|null $expectedCapabilityMarkType
+     * @param int|null $expectedCapabilityGradeGroup
      */
     public function testBuild(
         $fp,
@@ -203,7 +207,8 @@ TEST2;
         array $expectedLevels,
         array $expectedCapabilities,
         bool $expectedUseMarkRange,
-        ?int $expectedCapabilityMarkType
+        ?int $expectedCapabilityMarkType,
+        ?int $expectedCapabilityGradeGroup
     ): void {
         $factory  = new CsvImporterFactory();
         $importer = $factory->build($fp, $maxLevels);
@@ -211,6 +216,7 @@ TEST2;
         $this->assertSame($expectedCapabilities, $importer->retrieveCapabilitiesWithIndicators());
         $this->assertSame($expectedUseMarkRange, $importer->isUseMarkRange());
         $this->assertSame($expectedCapabilityMarkType, $importer->getCapabilityMarkType());
+        $this->assertSame($expectedCapabilityGradeGroup, $importer->getCapabilityGradeGroup());
     }
 
 

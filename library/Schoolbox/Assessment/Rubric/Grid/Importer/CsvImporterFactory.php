@@ -32,9 +32,10 @@ class CsvImporterFactory
             throw new UnexpectedValueException('Not a valid rubric CSV file');
         }
 
-        // First two cells may be settings:
+        // First three cells may be settings:
         // useMarkRange:      On/Off
         // capabilityMarkType: int|null
+        // capabilityGradeGroup: int|null
         $useMarkRange       = false;
         $capabilityMarkType = null;
         $capabilityGradeGroup = null;
@@ -80,7 +81,7 @@ class CsvImporterFactory
         // Note: this used to be able to tell if the first row was actually the
         // first capability, instead of the set of levels. (This would happen if
         // Excel saved a CSV with nothing at all in the first row.)
-        // Because the first two cells are now reserved for settings, they
+        // Because the first three cells are now reserved for settings, they
         // should never be empty anymore; however, we can't tell anymore if the
         // spreadsheet used to have an empty first row.
         // (This was raised in SB-12175)
@@ -88,7 +89,7 @@ class CsvImporterFactory
         $square[] = $headerRow;
 
         // list of levels
-        $levels = array_slice($square[0], 2);
+        $levels = array_slice($square[0], 3);
 
         $workingCapName = '';
         $workingIndName = '';
