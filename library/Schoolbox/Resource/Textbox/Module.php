@@ -12,8 +12,8 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Component_ConfigMapper;
-use Component_InstanceMapper;
-use Schoolbox\Mapper\Exception\NotFound;
+//use Component_InstanceMapper;
+//use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -43,21 +43,21 @@ class Module extends BaseModule
             return ['folder' => $folderMapper->findById($params['folderId'])];
         };
 
-        $componentPreload = function ($params) use ($folderPreload): array {
-            $result = $folderPreload($params);
-
-            /** @var Component_InstanceMapper $componentMapper */
-            $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
-            $component       = $componentMapper->findByInstanceId($params['componentId']);
-            if (!$component) {
-                throw new NotFound('Unable to find component');
-            }
-            if ($component->getDefinition()->getClass() !== \Component_Homepage_TextBoxController::class) {
-                throw new NotFound('Component is not a textbox');
-            }
-            $result['component'] = $component;
-            return $result;
-        };
+//        $componentPreload = function ($params) use ($folderPreload): array {
+//            $result = $folderPreload($params);
+//
+//            /** @var Component_InstanceMapper $componentMapper */
+//            $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
+//            $component       = $componentMapper->findByInstanceId($params['componentId']);
+//            if (!$component) {
+//                throw new NotFound('Unable to find component');
+//            }
+//            if ($component->getDefinition()->getClass() !== \Component_Homepage_TextBoxController::class) {
+//                throw new NotFound('Component is not a textbox');
+//            }
+//            $result['component'] = $component;
+//            return $result;
+//        };
 
         $folderAuth = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -82,13 +82,15 @@ class Module extends BaseModule
         };
 
         $this->register('POST', '/folder/{folderId:\d+}', 'createTextboxInFolder', $folderAuth, $folderPreload);
-        $this->register(
-            'POST',
-            '/folder/{folderId:\d+}/component/{componentId:\d+}',
-            'createTextboxInFolderAndComponent',
-            $folderAuth,
-            $componentPreload
-        );
+
+        // Commented out for now, as textboxes are no longer created attached to a component
+//        $this->register(
+//            'POST',
+//            '/folder/{folderId:\d+}/component/{componentId:\d+}',
+//            'createTextboxInFolderAndComponent',
+//            $folderAuth,
+//            $componentPreload
+//        );
         $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
     }
