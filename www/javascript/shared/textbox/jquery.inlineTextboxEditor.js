@@ -9,6 +9,7 @@
      * @param {jQuery} saveButton
      * @param {jQuery} deleteButton
      * @param {Object} editorInstanceOptions
+     * @param {String} heading
      * @constructor
      */
     var InlineTextboxEditor = function (
@@ -17,7 +18,8 @@
         modifyButton,
         saveButton,
         deleteButton,
-        editorInstanceOptions
+        editorInstanceOptions,
+        heading
     ) {
         var self = this;
         self.states = {
@@ -35,6 +37,7 @@
         self.saveButton   = saveButton;
         self.deleteButton = deleteButton;
         self.editorInstanceOptions = editorInstanceOptions;
+        self.heading = heading;
         self.editor       = null;
 
 
@@ -165,14 +168,16 @@
     }
 
 
+    /**
+     * On-click event for when the
+     */
     InlineTextboxEditor.prototype.onClickModify = function () {
         var self             = this,
             editorInstanceId = self.editorInstance.attr('id');
-        // TODO pass in CKEditor
-        if (CKEDITOR.instances[editorInstanceId]) {
-            CKEDITOR.instances[editorInstanceId].focus();
+        if (window.CKEDITOR.instances[editorInstanceId]) {
+            window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
-            self.editor = CKEDITOR.inline(
+            self.editor = window.CKEDITOR.inline(
                 editorInstanceId,
                 self.editorInstanceOptions
             );
@@ -206,7 +211,7 @@
                 method: self.saveButton.attr('data-form-method'),
                 data:   JSON.stringify({
                     // TODO pass this via form input as well?
-                    heading: heading,
+                    heading: self.heading,
                     body:    self.editor.getData(),
                 }),
                 dataType:    'json',
@@ -234,13 +239,7 @@
                     self.deleteButton.attr('data-form-action'),
                     { method: self.deleteButton.attr('data-form-method'), }
                 ).done(function () {
-                    // Once done: reload component
-                    // (Do this by triggering an event, rather than in here)
                     self.element.trigger('inlineTextboxEditor.delete', [self]);
-                    // configForm
-                    //     .find('select[name="textbox"]')
-                    //     .val(0);
-                    // configForm.submit();
                     // Don't need to switch state, as reloading the component resets the state
                 }).fail(function () {
                     self.switchState(previousState);
@@ -250,8 +249,12 @@
     };
 
 
+    /**
+     * Inline textbox editor plugin.
+     *
+     * @param options
+     */
     $.fn.inlineTextboxEditor = function (options) {
-        // Try to derive editor instance ID
         var defaults = {
             modifyButton:          '[data-action="modify"]',
             deleteButton:          '[data-action="delete"]',
@@ -272,7 +275,8 @@
                     $modifyButton,
                     $saveButton,
                     $deleteButton,
-                    derivedOptions.editorInstanceOptions
+                    derivedOptions.editorInstanceOptions,
+                    derivedOptions.heading
                 );
             $(this).data('inlineTextboxEditor', inlineTextboxEditor);
         });
