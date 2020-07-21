@@ -62,7 +62,7 @@ class ArrayExporter
         // first row is level names
         $levelColumn = 0;
         foreach ($grid->getLevels() as $level) {
-            $square[0][$levelColumn + 2] = $level->getName();
+            $square[0][$levelColumn + 3] = $level->getName();
             $levelColumn++;
         }
 
