@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace SmokeTests;
 
-use Component_Homepage_TextBoxController;
 use IntegrationTester;
 use Payload;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponent;
 
 /** @noinspection PhpUnused */
 class HomePageCest
@@ -270,7 +270,7 @@ class HomePageCest
         $homePage = $i->grabFirstFolderByTitle($homepage_title);
 
         #WHEN
-        $textboxComponentDefinition = $i->grabComponentDefinitionByClass(Component_Homepage_TextBoxController::class);
+        $textboxComponentDefinition = $i->grabComponentDefinitionByClass(TextboxComponent::class);
         $textComponentPayload = new Payload\Homepage\Component\Config($homePage->getId());
         $textComponentPayload->setFormParam('add', $textboxComponentDefinition->getId());
         $i->amGoingTo('Add text component to homepage #' . $homePage->getId());

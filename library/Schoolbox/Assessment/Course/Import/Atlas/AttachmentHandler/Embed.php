@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Component_InstanceMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponent;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\User;
 
@@ -63,7 +64,7 @@ class Embed implements IAttachmentHandler
         $this->componentMapper->injectNewComponent(
             $folder,
             ['textbox' => $textbox->getId(), 'componentname' => $attachment->getTitle(),],
-            \Component_Homepage_TextBoxController::class
+            TextboxComponent::class
         );
     }
 
