@@ -328,10 +328,9 @@ class Controller extends BaseController
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
         $fragment = $this->buildUnthemedHtmlOutput('@rubric/grid-editable.twig', $context = [
-            'formField'              => $post->get('formField', 'rb'),
-            'rubricGrid'             => $assessment->getRubricGrid(),
-            'levelLimit'             => $maxLevels,
-            'usingMarkPerCapability' => $assessment->isMarkPerCapability(),
+            'formField'  => $post->get('formField', 'rb'),
+            'rubricGrid' => $assessment->getRubricGrid(),
+            'levelLimit' => $maxLevels,
         ])->getAsString();
 
         $payload = [
@@ -345,6 +344,7 @@ class Controller extends BaseController
             'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
 
             /* Use Mark Range switch; grid-editable doesn't use this var
+             * This compiled payload ends up in grid-csv.twig as result of async request
              */
             'useMarkRange' => $assessment->getUseMarkRange(),
 
