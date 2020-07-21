@@ -13,7 +13,7 @@
 
     <div class="component-action">
         <section>
-            <a href="#" class="button">Modify</a>
+            <a href="#" data-modify class="button">Modify</a>
             <a href="#" data-delete class="button">Delete</a>
         </section>
     </div>
@@ -47,34 +47,56 @@
 {% endif %}
 
 {% autoescape 'js' %}
-<script type="text/javascript">
-    $(function() {
-        // Dialog for deleting a textbox
-        $('#component{{ component.instance.id }}').find('[data-delete]').click(function (event) {
-            event.preventDefault();
-            var element = $(this);
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this content permanently?',
-                confirmEvent: function () {
-                    // TODO point to textbox delete location instead
-                    window.location.href = element.attr('href');
-                }
+    <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var component = $('#component{{ component.instance.id }}');
+
+
+            // Switch off auto-setup of inline editors
+            CKEDITOR.disableAutoInline = true;
+
+
+            // Dialog for modifying a textbox
+            component.find('[data-modify]').click(function (event) {
+                event.preventDefault();
+                CKEDITOR.inline(
+                    'textBoxBody{{ textbox.id }}',
+                    $.alaressEditorConfig({
+                        file_browser_category_id: Number("{{ context.id }}")
+                    })
+                );
             });
-        });
 
-        // Dialog for creation of a textbox
-        $('#addTextboxModal-{{ component.instance.id }}-form').alaressValidate({
-            submitHandler: function (form) {
-                // Disable submit actions
-                // TODO split beforeSubmit and formSubmit into separate actions
-                var $submit    = $(form).find('input[type=submit]'),
-                    submitText = $submit.val(),
-                    formData   = new FormData(form);
 
-                $submit.prop("disabled", true).text('Working...');
+            // Dialog for deleting a textbox
+            component.find('[data-delete]').click(function (event) {
+                event.preventDefault();
+                var element = $(this);
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this content permanently?',
+                    confirmEvent: function () {
+                        // TODO point to textbox delete location instead
+                        window.location.href = element.attr('href');
+                    }
+                });
+            });
 
-                // And submit form via AJAX
-                $.ajax(
+
+            // Dialog for creation of a textbox
+            $('#addTextboxModal-{{ component.instance.id }}-form').alaressValidate({
+                submitHandler: function (form) {
+                    // Disable submit actions
+                    // TODO split alaressValidate's submit handler into beforeSubmit (disable inputs) and submit actions
+                    var $submit    = $(form).find('input[type=submit]'),
+                        submitText = $submit.val(),
+                        formData   = new FormData(form);
+
+                    $submit.prop("disabled", true).text('Working...');
+
+                    // And submit form via AJAX
+                    $.ajax(
                         form.action,
                         {
                             method: form.method,
@@ -85,26 +107,26 @@
                             dataType: 'json',
                             contentType: 'application/json',
                         }
-                ).done(function (response) {
-                    // Reload the component, close the dialog
-                    $('#addTextboxModal-{{ component.instance.id }}').foundation('reveal', 'close');
+                    ).done(function (response) {
+                        // Reload the component, close the dialog
+                        $('#addTextboxModal-{{ component.instance.id }}').foundation('reveal', 'close');
 
-                    // Set the component's configuration.
-                    // (Cheat by setting the component's textbox to the just created one, and submit its form)
-                    var configForm = $('#component{{ component.instance.id }}').find('[data-component-panel="settings"] form');
-                    configForm
+                        // Set the component's configuration.
+                        // (Cheat by setting the component's textbox to the just created one, and submit its form)
+                        var configForm = $('#component{{ component.instance.id }}').find('[data-component-panel="settings"] form');
+                        configForm
                             .find('select[name="textbox"]')
                             .append($('<option>')
-                                    .attr('value', response.id)
-                                    .text(response.heading)
+                                .attr('value', response.id)
+                                .text(response.heading)
                             )
                             .val(response.id);
-                    configForm.submit();
-                }).always(function () {
-                    $submit.prop("disabled", false).text(submitText);
-                });
-            }
+                        configForm.submit();
+                    }).always(function () {
+                        $submit.prop("disabled", false).text(submitText);
+                    });
+                }
+            });
         });
-    });
-</script>
+    </script>
 {% endautoescape %}
