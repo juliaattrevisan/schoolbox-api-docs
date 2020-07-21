@@ -13,10 +13,16 @@
 
     <div class="component-action">
         <section>
-            <a href="#" data-action="modify" data-processing-text="Modifying" class="button">Modify</a>
-            <a href="#" data-action="save" data-processing-text="Saving..." class="button hide">Save</a>
-            <a href="#" data-action="cancel" class="button hide">Cancel</a>
-            <a href="#" data-action="delete" class="button">Delete</a>
+            <button data-action="modify" data-processing-text="Modifying">Modify</button>
+            <button data-action="save"
+                    data-form-method="put"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}"
+                    data-processing-text="Saving..."
+                    class="hide">Save</button>
+            <button data-action="cancel" class="hide">Cancel</button>
+            <button data-action="delete"
+                    data-form-method="delete"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}">Delete</button>
         </section>
     </div>
 {% else %}
@@ -60,11 +66,21 @@
                 cancelButton    = component.find('[data-action="cancel"]'),
                 configForm      = component.find('[data-component-panel="settings"] form'),
                 addTextboxModal = $('#addTextboxModal-{{ component.instance.id }}'),
-                addTextboxForm  = $('#addTextboxModal-{{ component.instance.id }}-form');
+                addTextboxForm  = $('#addTextboxModal-{{ component.instance.id }}-form'),
+                editor          = null,
+                editorImage     = null;
 
 
             // Switch off auto-setup of inline editors
             CKEDITOR.disableAutoInline = true;
+
+
+            // States:
+            // Read-only
+            // Modifying
+            // Saving
+            // Dirty
+            // Clean
 
 
             // Dialog for modifying a textbox
@@ -73,17 +89,64 @@
                 if (CKEDITOR.instances['textBoxBody{{ textbox.id }}']) {
                     CKEDITOR.instances['textBoxBody{{ textbox.id }}'].focus();
                 } else {
-                    CKEDITOR.inline(
+                    editor = CKEDITOR.inline(
                         'textBoxBody{{ textbox.id }}',
                         $.alaressEditorConfig({
                             file_browser_category_id: Number("{{ context.id }}")
                         })
-                    ).on('instanceReady', function (evt) {
+                    );
+                    editor.on('instanceReady', function (evt) {
+                        // Store the current state
+                        editorImage = new CKEDITOR.plugins.undo.Image(evt.editor);
                         evt.editor.focus();
-                    }).on('blur', function (evt) {
-                        // Destroy and recreate?
+                    });
+                    editor.on('focus', function () {
+                        // Switch state of modify button
+                        modifyButton
+                            .data('text', modifyButton.text())
+                            .text(modifyButton.data('processing-text'))
+                            .prop('disabled', true)
+                            .addClass('disabled');
+                        // And cancel button
+                        cancelButton
+                            .removeClass('hide');
+                        // And save button
+                        saveButton
+                            .removeClass('hide');
+                        // And delete button
+                        deleteButton
+                            .addClass('hide');
+                    });
+                    editor.on('blur', function () {
+                        // Revert state of modify button
+                        modifyButton
+                            .text(modifyButton.data('text'))
+                            .prop('disabled', false)
+                            .removeClass('disabled');
+                        // And cancel button
+                        cancelButton
+                            .addClass('hide');
+                        // And save button
+                        saveButton
+                            .addClass('hide');
+                        // And delete button
+                        deleteButton
+                            .removeClass('hide');
                     });
                 }
+            });
+
+
+            // Action for save button
+            saveButton.click(function (event) {
+
+            });
+
+
+            // Action for cancel button
+            cancelButton.click(function (event) {
+                event.preventDefault();
+                // editor.undoManager.restoreImage(editorImage);
             });
 
 
