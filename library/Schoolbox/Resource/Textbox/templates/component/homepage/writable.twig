@@ -10,7 +10,7 @@
 
 {% if textboxExists %}
     <div class="content">
-        <article id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
+        <article data-content id="textBoxBody{{ textbox.id }}" contenteditable="true">{{ textbox.body | purify }}</article>
     </div>
 
     <div class="component-action">

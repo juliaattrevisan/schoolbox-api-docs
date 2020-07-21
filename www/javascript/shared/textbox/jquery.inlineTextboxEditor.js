@@ -168,6 +168,7 @@
     InlineTextboxEditor.prototype.onClickModify = function () {
         var self             = this,
             editorInstanceId = self.editorInstance.attr('id');
+        // TODO pass in CKEditor
         if (CKEDITOR.instances[editorInstanceId]) {
             CKEDITOR.instances[editorInstanceId].focus();
         } else {
