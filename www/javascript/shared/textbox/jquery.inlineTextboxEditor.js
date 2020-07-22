@@ -157,6 +157,7 @@
                 // Focus on the editor
                 event.editor.setReadOnly(false);
                 event.editor.focus();
+                self.element.trigger('inlineTextboxEditor.instanceReady', [self]);
             });
             self.editor.on('focus', function () {
                 // Switch state of modify button

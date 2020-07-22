@@ -88,9 +88,9 @@
                         title:                    '',
                     }),
                 })
-                // Focus: add no-pad class, to offset the editor's padding
-                // (Don't need to remove on blur, as the editor remains in existence)
-                .on('inlineTextboxEditor.focus', function () {
+                // On create of editor:
+                // add no-pad class to its container, to offset editor's padding
+                .on('inlineTextboxEditor.instanceReady', function () {
                     content.addClass('no-pad');
                 })
                 // Pre/post save/delete: apply toast
