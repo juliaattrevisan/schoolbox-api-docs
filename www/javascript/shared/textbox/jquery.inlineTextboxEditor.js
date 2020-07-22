@@ -157,7 +157,7 @@
                 // Focus on the editor
                 event.editor.setReadOnly(false);
                 event.editor.focus();
-                self.element.trigger('inlineTextboxEditor.instanceReady', [self]);
+                self.element.trigger('inlineTextboxEditor.editorCreate', [self]);
             });
             self.editor.on('focus', function () {
                 // Switch state of modify button
@@ -196,8 +196,10 @@
             }
         ).done(function () {
             // Editor value is now persisted: the current state is now clean
-            self.editor.resetDirty();
+            self.editor.destroy();
+            self.editorInstance.removeAttr('contentEditable');
             self.switchState(self.states.clean);
+            self.element.trigger('inlineTextboxEditor.editorDestroy', [self]);
             self.element.trigger('inlineTextboxEditor.save', [self]);
         }).fail(function () {
             self.switchState(previousState);

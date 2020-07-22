@@ -95,10 +95,13 @@
                     editorInstance:        '[data-content]',
                     editorInstanceOptions: editorInstanceOptions,
                 })
-                // On create of editor:
-                // add no-pad class to its container, to offset editor's padding
-                .on('inlineTextboxEditor.instanceReady', function () {
+                // On create/destroy of editor:
+                // add/remove no-pad class to its container, to offset padding
+                .on('inlineTextboxEditor.editorCreate', function () {
                     content.addClass('no-pad');
+                })
+                .on('inlineTextboxEditor.editorDestroy', function () {
+                    content.removeClass('no-pad');
                 })
                 // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
