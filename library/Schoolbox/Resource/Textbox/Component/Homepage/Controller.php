@@ -60,6 +60,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        if (!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@textbox/component/homepage.twig',
