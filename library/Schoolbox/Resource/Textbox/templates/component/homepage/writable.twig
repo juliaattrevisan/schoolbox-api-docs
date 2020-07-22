@@ -68,6 +68,7 @@
     <script type="text/javascript">
         $(function() {
             var component        = $('#component{{ component.instance.id }}'),
+                content          = component.find('.content'),
                 configForm       = component.find('[data-component-panel="settings"] form'),
                 addTextboxModal  = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm   = $('#addTextboxModal-{{ component.instance.id }}-form'),
@@ -87,6 +88,12 @@
                         title:                    '',
                     }),
                 })
+                // Focus: add no-pad class, to offset the editor's padding
+                // (Don't need to remove on blur, as the editor remains in existence)
+                .on('inlineTextboxEditor.focus', function () {
+                    content.addClass('no-pad');
+                })
+                // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
                     toast.toastActivate({text: 'Saving...'});
                 })
@@ -98,16 +105,19 @@
                 })
                 .on('inlineTextboxEditor.delete', function () {
                     toast.toastTimeout({text: 'Deleted', css: 'success'});
-                    configForm
-                        .find('select[name="textbox"]')
-                        .val(0);
-                    configForm.submit();
                 })
                 .on('inlineTextboxEditor.saveFail', function () {
                     toast.toastTimeout({text: 'Could not save textbox', css: 'alert'});
                 })
                 .on('inlineTextboxEditor.deleteFail', function () {
                     toast.toastTimeout({text: 'Could not delete textbox', css: 'alert'});
+                })
+                // Post-delete: set the textbox to empty and submit config
+                .on('inlineTextboxEditor.delete', function () {
+                    configForm
+                        .find('select[name="textbox"]')
+                        .val(0);
+                    configForm.submit();
                 });
 
 

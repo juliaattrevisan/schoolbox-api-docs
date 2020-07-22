@@ -161,14 +161,17 @@
             self.editor.on('focus', function () {
                 // Switch state of modify button
                 self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
+                self.element.trigger('inlineTextboxEditor.focus', [self]);
             });
             self.editor.on('blur', function () {
                 // Revert state of modify button
                 self.switchState(self.editor.checkDirty() ? self.states.dirty : self.states.clean);
+                self.element.trigger('inlineTextboxEditor.blur', [self]);
             });
             self.editor.on('change', function () {
                 // Has the content changed since saved?
                 self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
+                self.element.trigger('inlineTextboxEditor.change', [self]);
             });
         }
     };
