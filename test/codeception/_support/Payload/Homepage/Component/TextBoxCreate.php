@@ -17,30 +17,38 @@ class TextBoxCreate extends Request
 {
     use PostTrait;
 
+    /**
+     * @var int
+     */
+    private $homepageId;
+
+    /**
+     * @var int
+     */
+    private $componentInstanceId;
+
     public function __construct(int $homepageId, int $componentInstanceId)
     {
-        $this->setReferer("/homepage/$homepageId/textBoxCreate/$componentInstanceId");
-        $this->setFormParam('originID', $homepageId);
-        $this->setFormParam('categoryID', $homepageId);
-        $this->setFormParam('textBoxID', '');
-        $this->setFormParam('componentID', $componentInstanceId);
+        $this->setReferer("/textbox/$homepageId");
         $this->setHeading('');
         $this->setBody('');
+        $this->homepageId          = $homepageId;
+        $this->componentInstanceId = $componentInstanceId;
     }
 
     public function setHeading(string $heading): void
     {
-        $this->setFormParam('textBoxHeading', $heading);
+        $this->setFormParam('heading', $heading);
     }
 
     public function setBody(string $text): void
     {
-        $this->setFormParam('textBoxBody', $text);
+        $this->setFormParam('body', $text);
     }
 
     /** @inheritDoc */
     protected function getUrl(): string
     {
-        return '/textbox/textBoxForm.php';
+        return "/textbox/folder/{$this->homepageId}/component/{$this->componentInstanceId}";
     }
 }
