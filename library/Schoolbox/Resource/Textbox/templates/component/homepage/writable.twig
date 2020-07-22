@@ -67,14 +67,25 @@
     <script type="text/javascript" src="/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
     <script type="text/javascript">
         $(function() {
-            var component        = $('#component{{ component.instance.id }}'),
-                content          = component.find('.content'),
-                configForm       = component.find('[data-component-panel="settings"] form'),
-                addTextboxModal  = $('#addTextboxModal-{{ component.instance.id }}'),
-                addTextboxForm   = $('#addTextboxModal-{{ component.instance.id }}-form'),
-                toast            = $('#toast-{{ component.instance.id }}');
+            var component             = $('#component{{ component.instance.id }}'),
+                content               = component.find('.content'),
+                configForm            = component.find('[data-component-panel="settings"] form'),
+                addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
+                addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
+                toast                 = $('#toast-{{ component.instance.id }}'),
+                editorInstanceOptions = $.alaressEditorConfig({
+                    // Always start file browser from current folder, instead of the alt source
+                    file_browser_category_id: Number("{{ context.id }}"),
+                    title:                    '',
+                },
+            );
 
-            CKEDITOR.disableAutoInline = true;
+            // Remove wordcount as it looks awkward in the inline editor
+            if (!editorInstanceOptions.removePlugins) {
+                editorInstanceOptions.removePlugins = 'wordcount';
+            } else {
+                editorInstanceOptions.removePlugins += ',wordcount';
+            }
 
             component
                 .inlineTextboxEditor({
@@ -82,11 +93,7 @@
                     deleteButton:          '[data-action="delete"]',
                     saveButton:            '[data-action="save"]',
                     editorInstance:        '[data-content]',
-                    editorInstanceOptions: $.alaressEditorConfig({
-                        // Always start file browser from current folder, instead of the alt source
-                        file_browser_category_id: Number("{{ context.id }}"),
-                        title:                    '',
-                    }),
+                    editorInstanceOptions: editorInstanceOptions,
                 })
                 // On create of editor:
                 // add no-pad class to its container, to offset editor's padding
