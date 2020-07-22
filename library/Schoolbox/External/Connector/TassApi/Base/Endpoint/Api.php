@@ -121,6 +121,7 @@ class Api implements IApi
         /* Set up a reusable guzzle
          */
         return new Client([
+            'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
             'base_uri' => $host,
             'timeout' => $timeout,
             'http_errors' => false,
