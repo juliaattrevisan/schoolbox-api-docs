@@ -17,6 +17,7 @@ use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Manager;
+use Schoolbox\Resource\Storage\S3\FileNester;
 use UnexpectedValueException;
 use function trim;
 
@@ -30,6 +31,10 @@ class FilesystemFactory
 {
     public const FILE_SYSTEM_ADAPTER_LOCAL = 'local';
     public const FILE_SYSTEM_ADAPTER_AWS_S3 = 'awsS3';
+
+    // All storage files in S3 will have this prefix in their key
+    public const PREFIX_STORAGE = 'storage/';
+
 
     /**
      * @param string $storageDir
@@ -99,6 +104,6 @@ class FilesystemFactory
             'version'     => $otfs_s3_version,
         ]);
 
-        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket), $fsConfig);
+        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, self::PREFIX_STORAGE), $fsConfig);
     }
 }

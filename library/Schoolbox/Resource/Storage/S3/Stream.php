@@ -15,6 +15,7 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 
 class Stream
 {
@@ -53,7 +54,7 @@ class Stream
         ]);
 
         // Return seekable stream
-
-        return fopen("s3://{$bucket}/{$path}", "r", false, $context);
+        $prefix = FilesystemFactory::PREFIX_STORAGE;
+        return fopen("s3://{$bucket}/{$prefix}{$path}", "r", false, $context);
     }
 }
