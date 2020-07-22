@@ -77,7 +77,8 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 editorInstanceOptions: $.alaressEditorConfig({
-                    file_browser_category_id: Number("{{ context.id }}")
+                    file_browser_category_id: Number("{{ context.id }}"),
+                    title:                    '',
                 }),
             });
             component.on('inlineTextboxEditor.delete', function () {
