@@ -10,7 +10,7 @@ namespace Schoolbox\Resource\Textbox;
 
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
-//use Component_Instance;
+use Component_Instance;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -58,40 +58,40 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * Create a textbox within a folder, tied to a particular component within
-//     * that folder.
-//     *
-//     * @api   POST /textbox/folder/{folderId}/component/{componentId}
-//     * @since 20.1
-//     *
-//     * @param FolderModel        $folder
-//     * @param Component_Instance $component
-//     */
-//    public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
-//    {
-//        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
-//        $this->mapper->save($model);
-//
-//
-//        // Update the component's textbox
-//        $textboxConfigDefinition = $component->getConfigByKey('textbox');
-//        $textboxConfig           = $this->componentConfigMapper->findByColumnList([
-//            'component_config_definition_id' => $textboxConfigDefinition->getId(),
-//            'component_instance_id'          => $component->getId()
-//        ])->first();
-//        if (!$textboxConfig) {
-//            $textboxConfig = $this->componentConfigMapper->createModel()
-//                                                         ->setConfigDefinitionId($textboxConfigDefinition->getId())
-//                                                         ->setInstanceId($component->getId());
-//        }
-//        $textboxConfig->setValue($model->getId());
-//        $this->componentConfigMapper->save($textboxConfig);
-//
-//
-//        // Render the textbox
-//        $this->response->content->set($this->buildJsonOutput($model));
-//    }
+    /**
+     * Create a textbox within a folder, tied to a particular component within
+     * that folder.
+     *
+     * @api   POST /textbox/folder/{folderId}/component/{componentId}
+     * @since 20.1
+     *
+     * @param FolderModel        $folder
+     * @param Component_Instance $component
+     */
+    public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
+    {
+        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $this->mapper->save($model);
+
+
+        // Update the component's textbox
+        $textboxConfigDefinition = $component->getConfigByKey('textbox');
+        $textboxConfig           = $this->componentConfigMapper->findByColumnList([
+            'component_config_definition_id' => $textboxConfigDefinition->getId(),
+            'component_instance_id'          => $component->getId()
+        ])->first();
+        if (!$textboxConfig) {
+            $textboxConfig = $this->componentConfigMapper->createModel()
+                                                         ->setConfigDefinitionId($textboxConfigDefinition->getId())
+                                                         ->setInstanceId($component->getId());
+        }
+        $textboxConfig->setValue($model->getId());
+        $this->componentConfigMapper->save($textboxConfig);
+
+
+        // Render the textbox
+        $this->response->content->set($this->buildJsonOutput($model));
+    }
 
 
     /**
