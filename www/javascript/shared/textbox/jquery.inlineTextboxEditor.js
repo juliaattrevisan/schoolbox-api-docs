@@ -1,5 +1,4 @@
 (function($) {
-
     /**
      * Inline textbox editor constructor.
      *
@@ -9,7 +8,6 @@
      * @param {jQuery} saveButton
      * @param {jQuery} deleteButton
      * @param {Object} editorInstanceOptions
-     * @param {String} heading
      * @constructor
      */
     var InlineTextboxEditor = function (
@@ -18,8 +16,7 @@
         modifyButton,
         saveButton,
         deleteButton,
-        editorInstanceOptions,
-        heading
+        editorInstanceOptions
     ) {
         var self = this;
         self.states = {
@@ -30,15 +27,14 @@
             saving:      'saving',
             deleting:    'deleting',
         };
-        self.currentState = self.states.clean;
-        self.element = element;
-        self.editorInstance = editorInstance;
-        self.modifyButton = modifyButton;
-        self.saveButton   = saveButton;
-        self.deleteButton = deleteButton;
+        self.currentState          = self.states.clean;
+        self.element               = element;
+        self.editorInstance        = editorInstance;
+        self.modifyButton          = modifyButton;
+        self.saveButton            = saveButton;
+        self.deleteButton          = deleteButton;
         self.editorInstanceOptions = editorInstanceOptions;
-        self.heading = heading;
-        self.editor       = null;
+        self.editor                = null;
 
 
         // Set up events
@@ -187,8 +183,7 @@
             {
                 method: self.saveButton.attr('data-form-method'),
                 data:   JSON.stringify({
-                    // TODO pass this via form input as well?
-                    heading: self.heading,
+                    heading: self.editorInstance.attr('data-textbox-heading'),
                     body:    self.editor.getData(),
                 }),
                 dataType:    'json',
@@ -252,10 +247,9 @@
                     $modifyButton,
                     $saveButton,
                     $deleteButton,
-                    derivedOptions.editorInstanceOptions,
-                    derivedOptions.heading
+                    derivedOptions.editorInstanceOptions
                 );
-            $(this).data('inlineTextboxEditor', inlineTextboxEditor);
+            $this.data('inlineTextboxEditor', inlineTextboxEditor);
         });
     };
 })(jQuery);

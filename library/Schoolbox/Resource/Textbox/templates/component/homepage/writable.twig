@@ -10,7 +10,9 @@
 
 {% if textboxExists %}
     <div class="content">
-        <article data-content id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
+        <article data-content
+                 data-textbox-heading="{{ textbox.heading }}"
+                 id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
     </div>
 
     <div class="component-action">
@@ -74,7 +76,6 @@
                 deleteButton:          '[data-action="delete"]',
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
-                heading:               "{{ textbox.heading }}",
                 editorInstanceOptions: $.alaressEditorConfig({
                     file_browser_category_id: Number("{{ context.id }}")
                 }),
