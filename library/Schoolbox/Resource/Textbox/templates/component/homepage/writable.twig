@@ -123,6 +123,7 @@
                     $submit.prop("disabled", true).text('Working...');
 
                     // And submit form via AJAX
+                    toast.toastActivate({text: 'Creating textbox...'});
                     $.ajax(
                         form.action,
                         {
@@ -137,6 +138,7 @@
                     ).done(function (response) {
                         // Reload the component, close the dialog
                         addTextboxModal.foundation('reveal', 'close');
+                        toast.toastTimeout({text: 'Created', css: 'success'});
 
                         // Set the component's configuration.
                         // (Cheat by setting the component's textbox to the just created one, and submit its form)
@@ -148,6 +150,8 @@
                             )
                             .val(response.id);
                         configForm.submit();
+                    }).fail(function () {
+                        toast.toastTimeout({text: 'Could not create textbox', css: 'alert'});
                     }).always(function () {
                         $submit.prop("disabled", false).text(submitText);
                     });
