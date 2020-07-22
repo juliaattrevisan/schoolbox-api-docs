@@ -289,7 +289,7 @@ class Profile implements IStrategy
                     ->setDateOfBirth($this->findDate($dob));
             }
 
-            /* Find emergency contacts
+            /* Find emergency contacts and manually shank them into Emergency Contacts 1, 2, 3
              */
             $emergencyContacts = $this->findEmergencyContacts($externalId);
 
@@ -348,9 +348,15 @@ class Profile implements IStrategy
      */
     public function findEmergencyContacts(string $studentCode): array
     {
-        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', ['code' => $studentCode]);
 
-        print_r($data);
+        /* TODO: Tass hasn't implemented this, apparently
+         */
+//        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', [
+//            'currentstatus' => 'current',
+//            'commtype' => 'ec',
+//            'code' => $studentCode
+//        ]);
+
         return [];
     }
 
