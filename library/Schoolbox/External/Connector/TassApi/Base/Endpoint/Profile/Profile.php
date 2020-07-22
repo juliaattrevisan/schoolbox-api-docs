@@ -280,7 +280,7 @@ class Profile implements IStrategy
 
                 /* Special Needs
                  */
-                ->setSpecialNeeds(null);
+                ->setSpecialNeeds($specialNeeds);
 
             /* Date of birth requires special treatment as ADF doesn't deal with nulls well
              */
