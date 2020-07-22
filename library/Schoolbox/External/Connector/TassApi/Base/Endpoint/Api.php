@@ -130,6 +130,7 @@ class Api implements IApi
      * @param array  $params
      * @return array
      * @throws RuntimeException
+     * @throws DomainException
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
@@ -154,14 +155,12 @@ class Api implements IApi
 
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
-        $message = '';
-
         if ($response) {
-            $message = "{$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}";
+            throw new RuntimeException("Bad endpoint {$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}");
         }
 
-        /* Couldn't decode json, or tass server refused something
+        /* Couldn't decode json, or tass server refused something, or something else died
          */
-        throw new RuntimeException("Could not access Tass server, or bad json payload returned. {$message}");
+        throw new DomainException('Could not access Tass server, or bad json payload returned.');
     }
 }

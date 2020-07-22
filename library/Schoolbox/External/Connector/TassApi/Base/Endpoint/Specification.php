@@ -41,7 +41,6 @@ class Specification implements ISpecification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     * @throws RuntimeException
      */
     public function check(): array
     {
@@ -50,12 +49,38 @@ class Specification implements ISpecification
             /**
              * Student Profile nodes
              */
-            ['method' => 'getStudents', 'args' => ['currentstatus' => 'current']],
+            [
+                'method' => 'getStudents',
+                'args' => [
+                    'currentstatus' => 'current'
+                ]
+            ],
 
+            /* Emergency contacts
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
+             */
+            [
+                'method' => 'getCommunicationRulesDetails',
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'ec'
+                ]
+            ],
 
             /**
              * Parent Profile nodes
              */
+
+            /* Parents come out in the m_* and f_* nodes
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
+             */
+            [
+                'method' => 'getCommunicationRulesDetails',
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'all'
+                ]
+            ],
 
 
             /**
@@ -72,7 +97,11 @@ class Specification implements ISpecification
         $endpoints = [];
 
         foreach ($paths as $path) {
-            $result = (bool)$this->api->retrieveDocument($path['method'], $path['args']);
+            try {
+                $result = (bool)$this->api->retrieveDocument($path['method'], $path['args']);
+            } catch (RuntimeException $e) {
+                $result = false;
+            }
 
             if ($result) {
                 $endpoints[] = [
