@@ -12,7 +12,6 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
-use Schoolbox\Resource\Textbox\Model as TextboxModel;
 
 /**
  * Homepage textbox component.
