@@ -74,9 +74,7 @@
                 deleteButton:          '[data-action="delete"]',
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
-                editorInstanceId:      "textBoxBody{{ textbox.id }}",
                 heading:               "{{ textbox.heading }}",
-                folderId:              Number("{{ context.id }}"),
                 editorInstanceOptions: $.alaressEditorConfig({
                     file_browser_category_id: Number("{{ context.id }}")
                 }),
