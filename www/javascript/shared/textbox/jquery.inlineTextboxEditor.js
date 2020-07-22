@@ -159,6 +159,7 @@
             );
             self.editor.on('instanceReady', function (event) {
                 // Focus on the editor
+                event.editor.setReadOnly(false);
                 event.editor.focus();
             });
             self.editor.on('focus', function () {
