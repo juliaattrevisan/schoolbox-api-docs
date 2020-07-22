@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -288,6 +289,10 @@ class Profile implements IStrategy
                     ->setDateOfBirth($this->findDate($dob));
             }
 
+            /* Find emergency contacts
+             */
+            $emergencyContacts = $this->findEmergencyContacts($externalId);
+
             /* Log it
              */
             $this->log->info(sprintf(
@@ -333,19 +338,22 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Find all the meaningful emergency contacts for a student
-//     *
-//     * @param array|null $emergencyContacts
-//     * @return array
-//     */
-//    public function findEmergencyContacts(?array $emergencyContacts): array
-//    {
-//        /* TODO Fill in emergency contacts vars
-//         */
-//        return [];
-//    }
-//
+    /**
+     * Find all the meaningful emergency contacts for a student
+     * We have to hit another api endpoint to find this data
+     *
+     * @param string $studentCode
+     * @return array
+     * @throws RuntimeException
+     */
+    public function findEmergencyContacts(string $studentCode): array
+    {
+        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', ['code' => $studentCode]);
+
+        print_r($data);
+        return [];
+    }
+
 //
 //    /**
 //     * Find a form teacher from their form code

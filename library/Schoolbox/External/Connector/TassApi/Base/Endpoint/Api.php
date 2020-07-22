@@ -157,11 +157,11 @@ class Api implements IApi
         $message = '';
 
         if ($response) {
-            $message = "{$response->getStatusCode()} {$response->getReasonPhrase()}";
+            $message = "{$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}";
         }
 
         /* Couldn't decode json, or tass server refused something
          */
-        throw new RuntimeException("Could not access Tass server, or bad json payload returned: {$message}");
+        throw new RuntimeException("Could not access Tass server, or bad json payload returned. {$message}");
     }
 }
