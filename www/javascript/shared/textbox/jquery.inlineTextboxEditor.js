@@ -99,66 +99,42 @@
      * @param {String} newState One of the values in `states`
      */
     InlineTextboxEditor.prototype.switchState = function (newState) {
-        // Add/remove processing from buttons dependent on state
-        switch (newState) {
-            case this.states.clean:
-            case this.states.cleanModify:
-            case this.states.dirty:
-            case this.states.dirtyModify:
-                this.removeProcessing(this.saveButton);
-                this.removeProcessing(this.deleteButton);
-                break;
-
-            case this.states.saving:
-                this.addProcessing(this.saveButton, true);
-                this.addProcessing(this.deleteButton, false);
-                break;
-
-            case this.states.deleting:
-                this.addProcessing(this.saveButton, false);
-                this.addProcessing(this.deleteButton, true);
-                break;
-
-            default:
-                break;
-        }
-
-        // Show/hide buttons dependent on state
+        // Show/hide and add/remove processing from buttons dependent on state
         switch (newState) {
             case this.states.clean:
                 this.modifyButton.removeClass('hide');
-                this.saveButton.addClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.removeProcessing(this.saveButton.addClass('hide'));
+                this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
             case this.states.cleanModify:
                 this.modifyButton.addClass('hide');
-                this.saveButton.removeClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.removeProcessing(this.saveButton.removeClass('hide'));
+                this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
             case this.states.dirty:
                 this.modifyButton.removeClass('hide');
-                this.saveButton.removeClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.removeProcessing(this.saveButton.removeClass('hide'));
+                this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
             case this.states.dirtyModify:
                 this.modifyButton.addClass('hide');
-                this.saveButton.removeClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.removeProcessing(this.saveButton.removeClass('hide'));
+                this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
             case this.states.saving:
                 this.modifyButton.addClass('hide');
-                this.saveButton.removeClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.addProcessing(this.saveButton.removeClass('hide'), true);
+                this.addProcessing(this.deleteButton.removeClass('hide'), false);
                 break;
 
             case this.states.deleting:
                 this.modifyButton.addClass('hide');
-                this.saveButton.removeClass('hide');
-                this.deleteButton.removeClass('hide');
+                this.addProcessing(this.saveButton.removeClass('hide'), false);
+                this.addProcessing(this.deleteButton.removeClass('hide'), true);
                 break;
 
             default:
