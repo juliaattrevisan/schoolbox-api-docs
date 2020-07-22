@@ -7,24 +7,27 @@ declare(strict_types=1);
 
 namespace Payload\Homepage\Component;
 
-use Payload\GetTrait;
+use Payload\DeleteTrait;
 use Payload\Request;
 
 class TextboxDelete extends Request
 {
-    use GetTrait;
+    use DeleteTrait;
+
+    /**
+     * @var int
+     */
+    private $textboxId;
 
     public function __construct(int $homepageId, int $textboxId)
     {
         $this->setReferer("/homepage/$homepageId");
-
-        $this->setQueryParam('delete', $textboxId);
-        $this->setQueryParam('originID', $homepageId);
+        $this->textboxId = $textboxId;
     }
 
     /** @inheritDoc */
     protected function getUrl(): string
     {
-        return '/textbox/textBoxForm.php';
+        return "/textbox/{$this->textboxId}";
     }
 }
