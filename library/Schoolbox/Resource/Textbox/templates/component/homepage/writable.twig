@@ -150,8 +150,9 @@
                         addTextboxModal.foundation('reveal', 'close');
                         toast.toastTimeout({text: 'Created', css: 'success'});
 
-                        // Set the component's configuration.
-                        // (Cheat by setting the component's textbox to the just created one, and submit its form)
+                        // Set the component's configuration:
+                        // * Textbox: the ID of the newly created textbox
+                        // * Heading: the newly created textbox's heading
                         configForm
                             .find('select[name="textbox"]')
                             .append($('<option>')
@@ -159,6 +160,9 @@
                                 .text(response.heading)
                             )
                             .val(response.id);
+                        configForm
+                            .find('input[name="componentname"]')
+                            .val(response.heading);
                         configForm.submit();
                     }).fail(function () {
                         toast.toastTimeout({text: 'Could not create textbox', css: 'alert'});
