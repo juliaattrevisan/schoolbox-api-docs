@@ -87,6 +87,8 @@ case "$1" in
         if [ -f /etc/schoolbox/conf.php ]; then
           /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
+
+        echo "Upgrade completed successfully" >> /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -95,8 +97,6 @@ case "$1" in
     *)
         echo "postinst called with unknown argument \`$1'" >&2
         exit 1
-
-        echo "Upgrade completed successfully" >> /var/log/schoolbox/upgrade.log;
     ;;
 esac
 
