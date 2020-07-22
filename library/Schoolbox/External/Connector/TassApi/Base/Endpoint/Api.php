@@ -32,7 +32,7 @@ class Api implements IApi
     /**
      * Tass API Version Number
      */
-    private const VERSION_NUMBER = 2;
+    private const VERSION_NUMBER = 3;
 
 
     /**
