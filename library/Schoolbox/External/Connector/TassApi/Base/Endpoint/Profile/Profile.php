@@ -150,7 +150,7 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $students = $this->api->retrieveDocument('getStudents', [
+        $students = $this->api->retrieveDocument('getStudentsDetails', [
             'currentstatus' => 'current'
         ]);
 

@@ -152,8 +152,16 @@ class Api implements IApi
             return json_decode($response->getBody()->getContents(), true);
         }
 
+        /* Mine out an error message if you try to access a thing that doesn't exist
+         */
+        $message = '';
+
+        if ($response) {
+            $message = "{$response->getStatusCode()} {$response->getReasonPhrase()}";
+        }
+
         /* Couldn't decode json, or tass server refused something
          */
-        throw new RuntimeException('Could not access Tass server, or bad json payload returned');
+        throw new RuntimeException("Could not access Tass server, or bad json payload returned: {$message}");
     }
 }
