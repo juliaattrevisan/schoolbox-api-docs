@@ -305,6 +305,10 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
+
+            /* Time for importing parents
+             */
+            $this->importParentsOfStudent($studentBaseProfile);
         }
     }
 
@@ -469,19 +473,14 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param array             $relation
      * @param UserProfile\Model $studentBaseProfile
      */
-    private function importParentsOfStudent(array $relation, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile): void
     {
 
-        /* TODO: Apparently Parents come out of a not-yet-implemented endpoint getCommunicationRulesDetails
-         *  with the m_* (mother) and f_* (father) fields...but that endpoint is 501 Not Implemented.
-         */
-//        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', [
-//            'currentstatus' => 'current',
-//            'code' => $studentCode
-//        ]);
+        $data = $this->api->retrieveDocument('getParents', [
+            'user_code' => 'all'
+        ]);
     }
 
 

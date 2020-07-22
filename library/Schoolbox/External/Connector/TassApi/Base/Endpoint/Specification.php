@@ -75,10 +75,9 @@ class Specification implements ISpecification
              * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
              */
             [
-                'method' => 'getCommunicationRulesDetails',
+                'method' => 'getParents',
                 'args' => [
-                    'currentstatus' => 'current',
-                    'commtype' => 'all'
+                    'user_code' => 'all',
                 ]
             ],
 
