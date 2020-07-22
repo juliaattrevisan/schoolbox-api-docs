@@ -345,11 +345,13 @@ class Specification implements ISpecification
             if ($result) {
                 $endpoints[] = [
                     'message' => $path['method'],
+                    'reason' => '',
                     'status' => ISpecification::STATUS_OK
                 ];
             } else {
                 $endpoints[] = [
-                    'message' => "{$path['method']} ({$errorMessage})",
+                    'message' => $path['method'],
+                    'reason' => $errorMessage,
                     'status' => ISpecification::STATUS_MISSING
                 ];
             }
@@ -364,6 +366,7 @@ class Specification implements ISpecification
         if (!\count($timetables)) {
             $endpoints[] = [
                 'message' => 'No timetables detected.',
+                'reason' => '',
                 'status' => ISpecification::STATUS_MISSING
             ];
         }
@@ -371,6 +374,7 @@ class Specification implements ISpecification
         foreach ($timetables as $timetable) {
             $endpoints[] = [
                 'message' => '',
+                'reason' => '',
                 'status' => ISpecification::STATUS_OK
             ];
         }

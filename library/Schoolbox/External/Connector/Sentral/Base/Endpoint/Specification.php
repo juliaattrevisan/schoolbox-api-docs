@@ -83,17 +83,20 @@ class Specification implements ISpecification
                 if (\count($result['data'])) {
                     $endpoints[] = [
                         'message' => $path,
+                        'reason' => '',
                         'status' => ISpecification::STATUS_OK
                     ];
                 } else {
                     $endpoints[] = [
                         'message' => $path,
+                        'reason' => '',
                         'status' => ISpecification::STATUS_EMPTY
                     ];
                 }
             } catch (UnexpectedValueException $e) {
                 $endpoints[] = [
                     'message' => $path,
+                    'reason' => '',
                     'status' => ISpecification::STATUS_MISSING
                 ];
             }

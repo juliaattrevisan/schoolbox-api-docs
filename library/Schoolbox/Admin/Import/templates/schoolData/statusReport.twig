@@ -25,7 +25,13 @@
                     <tbody>
                         {% for endpoint in report %}
                             <tr>
-                                <td>{{ endpoint.message }}</td>
+                                <td>
+                                    {{ endpoint.message }}
+
+                                    {% if endpoint.reason|length %}
+                                        <br /><span class="meta">{{ endpoint.reason }}</span>
+                                    {% endif %}
+                                </td>
                                 <td>
 
                                     {% if endpoint.status == 'OK' %}
