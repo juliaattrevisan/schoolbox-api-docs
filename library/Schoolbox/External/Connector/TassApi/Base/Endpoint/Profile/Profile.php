@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
@@ -24,6 +25,18 @@ use Schoolbox\External\Profile as UserProfile;
  */
 class Profile implements IStrategy
 {
+
+    /**
+     * Value of the school_details.boarder field corresponding to a Boarder
+     */
+    private const BOARDER = 'Yes';
+
+
+    /**
+     * Value of the other_school_details.learning_support field corresponding to Special Needs
+     * Tass seems to supply this one of "Y" or "N"
+     */
+    private const SPECIAL_NEEDS = 'Y';
 
 
     /**
@@ -150,41 +163,157 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $students = $this->api->retrieveDocument('getStudentsDetails', [
+        $students = $this->api->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
-        print_r($students);
+        foreach ($students['students'] as $student) {
+            $externalId = trim((string)$student['general_details']['student_code']);
+            $academicHouse = trim((string)$student['school_details']['house']);
+            $boardingStatus = trim((string)$student['school_details']['boarder']) === self::BOARDER;
+            $campusName = trim((string)$student['school_details']['campus']);
+            $dob = trim((string)$student['general_details']['date_of_birth']);
+            $email = trim((string)$student['school_details']['email_address']);
+            $firstname = trim((string)$student['general_details']['first_name']);
+            $form = trim((string)$student['school_details']['form_class']);
+            $gender = trim((string)$student['general_details']['gender']);
+            $lastname = trim((string)$student['general_details']['surname']);
+            $mobile = trim((string)$student['general_details']['mobile_phone']);
+            $specialNeeds = trim((string)$student['other_school_details']['learning_support']) === self::SPECIAL_NEEDS;
+            $studiesCode = trim((string)$student['general_details']['usi']);
+            $title = '';
+            $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
+            $username = trim((string)$student['general_details']['student_code']);
+            $yearLevel = trim((string)$student['school_details']['year_group']);
+
+            /* Dates
+             */
+            $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
+            $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
+
+            /* Find out if this externalId already has a student profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                $studentBaseProfile = $studentProfile->getBaseProfile();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+                $studentBaseProfile = $this->baseProfileMapper->createModel();
+
+                $studentProfile->setBaseProfile($studentBaseProfile);
+            }
+
+            $studentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($studentBaseProfile);
+            }
+
+//            /* Fish out a staff member via their user code
+//             */
+//            $tutor = $this->findTutor((string)$student->Tutor);
+//
+//            /* Fish out a staff member via their user code
+//             */
+//            $housemaster = $this->findHousemaster($academicHouse);
+//
+//            /* Find out a staff member via their user code
+//             */
+//            $formTeacher = $this->findFormTeacher($form);
+//
+//            /* Find out a staff member via their user code
+//             */
+//            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+
+            /* Smoosh it all together
+             */
+            $studentProfile
+                ->setUsername($username)
+                ->setAlertComment(null)
+                ->setAlertLegal(null)
+                ->setAlertMedical(null)
+                ->setAlertMessage(null)
+                ->setCampusName($campusName)
+                ->setEmail($email)
+                ->setEnrolmentDate($enrolment)
+                ->setFormName($form)
+                ->setFormTeacherId(null)
+                ->setFormTeacherName(null)
+                ->setGender($gender)
+                ->setHeadOfHouseId(null)
+                ->setHeadOfHouseName(null)
+                ->setHouseName($academicHouse)
+                ->setLeavingDate($leaving)
+                ->setMobile($mobile)
+                ->setStudiesCode($studiesCode)
+                ->setTutorGroup($tutorGroup)
+                ->setTutorTeacherId(null)
+                ->setTutorTeacherName(null)
+                ->setYearLevel($yearLevel)
+                ->setYearLevelCoordinatorId(null)
+                ->setYearLevelCoordinatorName(null)
+
+                /**
+                 * Flags
+                 */
+
+                ->setBoardingStatus($boardingStatus)
+                ->setEsl(null)
+                ->setIb(null)
+                ->setIndividualLearningPlans(null)
+
+                /* Special Needs
+                 */
+                ->setSpecialNeeds(null);
+
+            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+             */
+            if ($dob) {
+                $studentProfile
+                    ->setDateOfBirth($this->findDate($dob));
+            }
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding student profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->studentProfileMapper->save($studentProfile);
+            }
+        }
     }
 
-
-    /**
-     * Find campus name
-     *
-     * Assign campuses if they exist in the mapping
-     * Otherwise quietly disregard bad data
-     *
-     * @return string|null
-     */
-    private function findCampusName(): ?string
-    {
-        /* TODO Fill in campus vars
-          */
-        return null;
-    }
-
-
-    /**
-     * Find comments info for a given student
-     *
-     * @return string
-     */
-    private function findComments(): string
-    {
-        /* TODO Fill in comments
-          */
-        return '';
-    }
+//    /**
+//     * Find comments info for a given student
+//     *
+//     * @return string
+//     */
+//    private function findComments(): string
+//    {
+//        /* TODO Fill in comments
+//          */
+//        return '';
+//    }
 
 
     /**
@@ -192,133 +321,134 @@ class Profile implements IStrategy
      *
      * @param string|null $date
      * @return Alaress_Date_Format|null
+     * @throws InvalidArgumentException
      */
     public function findDate(?string $date): ?Alaress_Date_Format
     {
         if ($date) {
-            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
+            return new \Alaress_Date_Format($date, 'd/m/Y');
         }
 
         return null;
     }
 
 
-    /**
-     * Find all the meaningful emergency contacts for a student
-     *
-     * @param array|null $emergencyContacts
-     * @return array
-     */
-    public function findEmergencyContacts(?array $emergencyContacts): array
-    {
-        /* TODO Fill in emergency contacts vars
-         */
-        return [];
-    }
-
-
-    /**
-     * Find a form teacher from their form code
-     *
-     * @return array
-     */
-    private function findFormTeacher(): array
-    {
-        /* TODO Fill in these form teacher vars
-         */
-        return [
-            'id' => null,
-            'name' => null
-        ];
-    }
-
-
-    /**
-     * Find a housemaster from their house name
-     *
-     * @return array
-     */
-    private function findHousemaster(): array
-    {
-        /* TODO Fill in these housemaster vars
-         */
-        return [
-            'id' => null,
-            'name' => null
-        ];
-    }
-
-
-    /**
-     * Find legal alerts
-     *
-     * @return string|null
-     */
-    private function findLegal(): ?string
-    {
-        /* TODO Fill in these legal alert vars
-         */
-        return null;
-    }
-
-
-    /**
-     * Find medical data for student
-     *
-     * @param array|null $medical
-     * @return string|null
-     */
-    private function findMedicalAlert(?array $medical): ?string
-    {
-        /* TODO Fill in medical data
-         */
-        return null;
-    }
-
-
-    /**
-     * Find out if this student has special needs
-     *
-     * @return bool
-     */
-    private function findSpecialNeeds(): bool
-    {
-        /* TODO Fill in these special needs vars
-         */
-        return false;
-    }
-
-
-    /**
-     * Find a tutor from their id
-     *
-     * @return array
-     */
-    private function findTutor(): array
-    {
-        /* TODO Fill in these tutor vars
-         */
-        return [
-            'id' => null,
-            'name' => null
-        ];
-    }
-
-
-    /**
-     * Find a year level coordinator from their year level
-     *
-     * @return array
-     */
-    private function findYearLevelCoordinator(): array
-    {
-        /* TODO Fill in these ylc vars
-         */
-        return [
-            'id' => null,
-            'name' => null
-        ];
-    }
+//    /**
+//     * Find all the meaningful emergency contacts for a student
+//     *
+//     * @param array|null $emergencyContacts
+//     * @return array
+//     */
+//    public function findEmergencyContacts(?array $emergencyContacts): array
+//    {
+//        /* TODO Fill in emergency contacts vars
+//         */
+//        return [];
+//    }
+//
+//
+//    /**
+//     * Find a form teacher from their form code
+//     *
+//     * @return array
+//     */
+//    private function findFormTeacher(): array
+//    {
+//        /* TODO Fill in these form teacher vars
+//         */
+//        return [
+//            'id' => null,
+//            'name' => null
+//        ];
+//    }
+//
+//
+//    /**
+//     * Find a housemaster from their house name
+//     *
+//     * @return array
+//     */
+//    private function findHousemaster(): array
+//    {
+//        /* TODO Fill in these housemaster vars
+//         */
+//        return [
+//            'id' => null,
+//            'name' => null
+//        ];
+//    }
+//
+//
+//    /**
+//     * Find legal alerts
+//     *
+//     * @return string|null
+//     */
+//    private function findLegal(): ?string
+//    {
+//        /* TODO Fill in these legal alert vars
+//         */
+//        return null;
+//    }
+//
+//
+//    /**
+//     * Find medical data for student
+//     *
+//     * @param array|null $medical
+//     * @return string|null
+//     */
+//    private function findMedicalAlert(?array $medical): ?string
+//    {
+//        /* TODO Fill in medical data
+//         */
+//        return null;
+//    }
+//
+//
+//    /**
+//     * Find out if this student has special needs
+//     *
+//     * @return bool
+//     */
+//    private function findSpecialNeeds(): bool
+//    {
+//        /* TODO Fill in these special needs vars
+//         */
+//        return false;
+//    }
+//
+//
+//    /**
+//     * Find a tutor from their id
+//     *
+//     * @return array
+//     */
+//    private function findTutor(): array
+//    {
+//        /* TODO Fill in these tutor vars
+//         */
+//        return [
+//            'id' => null,
+//            'name' => null
+//        ];
+//    }
+//
+//
+//    /**
+//     * Find a year level coordinator from their year level
+//     *
+//     * @return array
+//     */
+//    private function findYearLevelCoordinator(): array
+//    {
+//        /* TODO Fill in these ylc vars
+//         */
+//        return [
+//            'id' => null,
+//            'name' => null
+//        ];
+//    }
 
 
     /**
