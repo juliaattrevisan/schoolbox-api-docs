@@ -9,8 +9,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Specification
@@ -22,12 +20,20 @@ use Zend\Uri\Exception\InvalidUriPartException;
 class Specification implements ISpecification
 {
 
+    /**
+     * @var IApi
+     */
+    private $api;
+
 
     /**
      * Specification constructor.
+     *
+     * @param IApi $api
      */
-    public function __construct()
+    public function __construct(IApi $api)
     {
+        $this->api = $api;
     }
 
 
@@ -35,10 +41,7 @@ class Specification implements ISpecification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     *
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function check(): array
     {
@@ -47,6 +50,7 @@ class Specification implements ISpecification
             /**
              * Student Profile nodes
              */
+            ['method' => 'getStudents', 'args' => ['currentstatus' => 'current']],
 
 
             /**
@@ -65,8 +69,23 @@ class Specification implements ISpecification
 
         ];
 
-        /* Find the timetable identifier, for reference, in the status screen
-         */
+        $endpoints = [];
+
+        foreach ($paths as $path) {
+            $result = (bool)$this->api->retrieveDocument($path['method'], $path['args']);
+
+            if ($result) {
+                $endpoints[] = [
+                    'message' => $path['method'],
+                    'status' => ISpecification::STATUS_OK
+                ];
+            } else {
+                $endpoints[] = [
+                    'message' => $path['method'],
+                    'status' => ISpecification::STATUS_MISSING
+                ];
+            }
+        }
 
         /* Get a list of all the timetables to process
          */
@@ -76,20 +95,14 @@ class Specification implements ISpecification
          */
         if (!\count($timetables)) {
             $endpoints[] = [
-                'message' => 'No PublishedTimetables detected.',
+                'message' => 'No timetables detected.',
                 'status' => ISpecification::STATUS_MISSING
             ];
         }
 
         foreach ($timetables as $timetable) {
-            $timetableMessage = sprintf(
-                'Found timetable %s: select %s for campus cycle_identifier',
-                trim((string)$timetable->Name),
-                trim((string)$timetable->xpath('@Id')[0]->Id)
-            );
-
             $endpoints[] = [
-                'message' => $timetableMessage,
+                'message' => '',
                 'status' => ISpecification::STATUS_OK
             ];
         }

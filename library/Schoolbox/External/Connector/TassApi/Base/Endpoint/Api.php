@@ -134,6 +134,7 @@ class Api implements IApi
      * @param string $method
      * @param array  $params
      * @return array
+     * @throws RuntimeException
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
@@ -153,18 +154,11 @@ class Api implements IApi
          * so try to decode it. If it can't decode properly, return null
          */
         if ((int)$response->getStatusCode() === 200) {
-            try {
-                return json_decode($response->getBody()->getContents(), true);
-            } catch (JsonException $e) {
-                // noop - something died
-            } catch (RuntimeException $e) {
-                // noop - something died
-            }
+            return json_decode($response->getBody()->getContents(), true);
         }
 
         /* Couldn't decode json, or tass server refused something
-         * just return null and deal with it elsewhere
          */
-        return null;
+        throw new RuntimeException('Could not access Tass server, or bad json payload returned');
     }
 }

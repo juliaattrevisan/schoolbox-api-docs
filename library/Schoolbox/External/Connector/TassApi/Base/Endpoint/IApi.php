@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
+use RuntimeException;
+
 /**
  * Interface IApi
  *
@@ -21,6 +23,7 @@ interface IApi
      * @param string $method
      * @param array  $params
      * @return array|null
+     * @throws RuntimeException
      */
     public function retrieveDocument(string $method, array $params): ?array;
 }

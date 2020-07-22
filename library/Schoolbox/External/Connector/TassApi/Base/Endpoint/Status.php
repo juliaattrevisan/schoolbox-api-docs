@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
-use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use DomainException;
+use InvalidArgumentException;
+use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Status
@@ -31,6 +31,8 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
+     * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
@@ -42,11 +44,19 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function isReachable(): bool
     {
+        try {
+            $this->api->retrieveDocument('getStudents', [
+                'currentstatus' => 'current'
+            ]);
+
+            return true;
+        } catch (RuntimeException $e) {
+            // noop - something died
+        }
+
         return false;
     }
 
@@ -55,14 +65,15 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function getReport(): array
     {
-        return [[
-            'message' => 'Cannot access api endpoint: not implemented',
-            'status' => ISpecification::STATUS_ERROR
-        ]];
+        $specification = new Specification($this->api);
+
+        try {
+            return $specification->check();
+        } catch (RuntimeException $e) {
+            return ["Cannot access api endpoint: {$e->getMessage()}"];
+        }
     }
 }
