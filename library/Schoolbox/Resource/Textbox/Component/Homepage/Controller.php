@@ -11,6 +11,8 @@ namespace Schoolbox\Resource\Textbox\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Resource\Textbox\Model as TextboxModel;
 
 /**
  * Homepage textbox component.
@@ -37,27 +39,16 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
         }
 
+        $textboxMapper = TextboxMapper::getInstance();
         try {
-            $this->textbox = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));
+            $this->textbox = $textboxMapper->findById($this->getConfig('textbox'));
         } catch (\Schoolbox\Mapper\Exception $e) {
             // didn't find it or it's been deleted: create a blank template box instead
-            $this->textbox = new \Schoolbox\Resource\Textbox\Model();
-            $this->textbox
+            $this->textbox = $textboxMapper
+                ->createModel()
                 ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
             $this->setComponentName('Text Box');
         }
-
-//        $textBoxHeading = Scrub::text($this->textbox->getHeading());
-//
-//        /**
-//         * If there's content and the heading isn't empty - use that as the component name
-//         * Otherwise use the one set in config
-//         */
-//        if (strlen(trim($textBoxHeading))) {
-//            $this->setComponentName($textBoxHeading);
-//        } else {
-//            $this->getComponentName();
-//        }
 
         return true;
     }
@@ -80,143 +71,5 @@ class Controller extends Component_Homepage_ControllerAbstract
             ],
             !$this->getConfig('compactMode')
         );
-
-//        if (!parent::loadTemplate($templateHandle, 'textBox')) {
-//            return false;
-//        }
-//        if (!$this->isSourceRenderable()) {
-//            return $this->renderSourceUnavailableTwig($templateHandle);
-//        }
-//
-//        $this->setBlock($templateHandle, 'textbox_form', 'textbox_form_block');
-//        $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-//
-//        $textBoxContent = Scrub::text($this->textbox->getBody());
-//
-//        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && (empty($this->textbox->getId()) || empty($textBoxContent))) {
-//
-//            $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
-//            $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
-//            $this->setBlock('empty_state', 'empty_id', 'empty_id_block');
-//            $this->setBlock('empty_state', 'empty_content', 'empty_content_block');
-//
-//            $this->setVar([
-//                'textbox_form_block'    => '',
-//                'empty_id_block'        => '',
-//                'empty_content_block'   => '',
-//                'empty_read_only_block' => '',
-//                'empty_custom_block'    => '',
-//            ]);
-//
-//            $emptyStateMessage = trim($this->getConfig('emptyStateMessage'));
-//
-//            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-//                /**
-//                 * Read only gets a generic message
-//                 */
-//                $this->parse('empty_read_only_block', 'empty_read_only');
-//
-//            } elseif ($emptyStateMessage != '') {
-//                /**
-//                 * There's a custom empty state message from the config to show
-//                 */
-//                $this->setVar('EMPTY_STATE_MESSAGE', Scrub::text($emptyStateMessage));
-//                $this->parse('empty_custom_block', 'empty_custom');
-//
-//            } elseif ($this->textbox->getId()) {
-//                /**
-//                 * They submitted the form with nothing or just a heading
-//                 */
-//                $this->parse('empty_content_block', 'empty_content');
-//
-//            } else {
-//                /**
-//                 * There's nothing
-//                 */
-//                $this->parse('empty_id_block', 'empty_id');
-//            }
-//
-//            $this->parse('empty_state_block', 'empty_state');
-//
-//        } else {
-//
-//            $this->setVar('empty_state_block', '');
-//
-//            $this->setBlock('textbox_form', 'source_folder_deleted', 'source_folder_deleted_block');
-//            $this->setBlock('textbox_form', 'source_folder_exists', 'source_folder_exists_block');
-//            $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
-//            $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
-//            $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
-//
-//            if (!$this->isSourceRenderable()) {
-//                return $this->renderSourceUnavailable();
-//            } else {
-//                $this->setVar('source_folder_deleted_block', '');
-//
-//                /*
-//                 * Remember where the textBox came from - if you modify a streamed
-//                 * textBox which comes from another homepage, you were able to
-//                 * inadvertently steal ownership of it
-//                 */
-//                $heading = Scrub::text($this->textbox->getHeading());
-//                $body    = Scrub::html($this->textbox->getBody());
-//
-//                $this->setVar([
-//                    'TEXTBOX_HEADING'     => $heading,
-//                    'TEXTBOX_BODY'        => $body,
-//                    'TEXTBOX_ID'          => $this->textbox->getId(),
-//                    'ID'                  => $this->getContext()->getId(),
-//                    'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
-//                    'text_editable_block' => '',
-//                    'modify_text_block'   => '',
-//                    'text_locked_block'   => '',
-//                ]);
-//
-//                /* To edit someone else's textbox, you need write access to both homepages.
-//                 * To just edit one homepage's textbox, you need write access to that homepage.
-//                 */
-//                $editing = false;
-//
-//                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
-//                    if ($this->getSitePage()->arg[1] == 'textBoxModify') {
-//                        $editing = true;
-//                        $this->setVar([
-//                            'TEXTBOX_BODY' => $body,
-//                        ]);
-//                    } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
-//                        $editing = true;
-//                        $this->setVar([
-//                            'TEXTBOX_HEADING'     => '',
-//                            'TEXTBOX_BODY'        => '',
-//                            'TEXTBOX_ID'          => '',
-//                            'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
-//                        ]);
-//                    }
-//
-//                    if ($editing) {
-//                        // Force content to show (when component is set to collapsed by default)
-//                        $this->setConfigValue('collapse', 0);
-//                    }
-//
-//                    $this->parse('text_editable_block', 'text_editable');
-//                } else {
-//                    // modify links
-//                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-//                        $this->parse('modify_text_block', 'modify_text');
-//                    }
-//
-//                    // formatted text
-//                    $this->parse('text_locked_block', 'text_locked');
-//                }
-//                $this->parse('source_folder_exists_block', 'source_folder_exists');
-//            }
-//
-//
-//            $this->parse('textbox_form_block', 'textbox_form');
-//        }
-//
-//        $this->parseConfig();
-//
-//        return true; // everything went according to plan
     }
 }

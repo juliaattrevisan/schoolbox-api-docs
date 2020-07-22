@@ -20,12 +20,12 @@
             <button data-action="modify" data-processing-text="Modifying">Modify</button>
             <button data-action="save"
                     data-form-method="put"
-                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
                     data-processing-text="Saving..."
                     class="hide">Save</button>
             <button data-action="delete"
                     data-form-method="delete"
-                    data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: context}) }}"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
                     data-processing-text="Deleting...">Delete</button>
         </section>
     </div>
@@ -45,7 +45,8 @@
     </div>
 
     <div id="addTextboxModal-{{ component.instance.id }}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{{ component.instance.id }}-title" aria-hidden="true" role="dialog">
-        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: context, folderId: context.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
+        {# Create component in alt-source folder context, if there is one #}
+        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: textbox.category, folderId: textbox.category.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
             <section>
                 <h3 id="addTextboxModal-{{ component.instance.id }}-title">Add Textbox</h3>
                 <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
@@ -77,6 +78,7 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 editorInstanceOptions: $.alaressEditorConfig({
+                    // Always start file browser from current folder, instead of the alt source
                     file_browser_category_id: Number("{{ context.id }}"),
                     title:                    '',
                 }),
