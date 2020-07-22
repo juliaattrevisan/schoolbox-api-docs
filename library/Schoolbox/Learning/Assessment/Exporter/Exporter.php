@@ -77,7 +77,7 @@ class Exporter
 
         foreach ($assessments as $assessment) {
 
-            /** @var  $assessment IAssessable */
+            /** @var IAssessable $assessment */
             $assessmentTitle = $assessment->getTitle();
             $workType        = $assessment->getWorkType();
             $weight          = $assessment->getWeight();
