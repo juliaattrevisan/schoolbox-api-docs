@@ -63,6 +63,7 @@ class Exporter
         $headings = [
             'student code',
             'class code',
+            'assessment id',
             'assessment title',
             'assessment item code',
             'due date',
@@ -75,6 +76,8 @@ class Exporter
         $data = [];
 
         foreach ($assessments as $assessment) {
+
+            /** @var IAssessable $assessment */
             $assessmentTitle = $assessment->getTitle();
             $workType        = $assessment->getWorkType();
             $weight          = $assessment->getWeight();
@@ -119,13 +122,14 @@ class Exporter
                 $data[] = [
                     $headings[0] => $participant->getUser()->getExternalId(),
                     $headings[1] => $folderCode->getCode(),
-                    $headings[2] => $assessmentTitle,
-                    $headings[3] => $assessmentCode,
-                    $headings[4] => $participant->getDueDate()->getDatabaseDate(),
-                    $headings[5] => $weight,
-                    $headings[6] => $mark,
-                    $headings[7] => $percentage,
-                    $headings[8] => $comment
+                    $headings[2] => $assessment->getId(),
+                    $headings[3] => $assessmentTitle,
+                    $headings[4] => $assessmentCode,
+                    $headings[5] => $participant->getDueDate()->getDatabaseDate(),
+                    $headings[6] => $weight,
+                    $headings[7] => $mark,
+                    $headings[8] => $percentage,
+                    $headings[9] => $comment
                 ];
             }
         }
