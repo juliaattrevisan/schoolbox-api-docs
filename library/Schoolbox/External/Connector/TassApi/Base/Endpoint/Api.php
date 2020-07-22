@@ -11,6 +11,7 @@ use Alaress_Curl_Url;
 use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
+use JsonException;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Zend\Uri\Exception;
@@ -132,19 +133,10 @@ class Api implements IApi
      *
      * @param string $method
      * @param array  $params
-     * @return string
+     * @return array
      */
-    public function retrieveDocument(string $method, array $params): ?string
+    public function retrieveDocument(string $method, array $params): ?array
     {
-        print_r("\n\n");
-
-        print_r("Host: {$this->host}\n");
-        print_r("\n\n");
-
-        print_r("Params:\n");
-        print_r($params);
-        print_r("\n\n");
-
         $queryArgs = [
             'method'  => $method,
             'appcode' => $this->credentials['appcode'],
@@ -153,18 +145,26 @@ class Api implements IApi
             'v'       => self::VERSION_NUMBER,
         ];
 
-        print_r("queryArgs:\n");
-        print_r($queryArgs);
-
         $response = $this->client->get($this->host, [
             'query' => $queryArgs
         ]);
 
-        print_r("\n\n");
-        print_r($response);
+        /* Successful response from server, but it might not send a valid data payload back
+         * so try to decode it. If it can't decode properly, return null
+         */
+        if ((int)$response->getStatusCode() === 200) {
+            try {
+                return json_decode($response->getBody()->getContents(), true);
+            } catch (JsonException $e) {
+                // noop - something died
+            } catch (RuntimeException $e) {
+                // noop - something died
+            }
+        }
 
-        die();
-
+        /* Couldn't decode json, or tass server refused something
+         * just return null and deal with it elsewhere
+         */
         return null;
     }
 }

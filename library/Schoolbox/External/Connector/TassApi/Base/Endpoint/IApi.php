@@ -20,7 +20,7 @@ interface IApi
      *
      * @param string $method
      * @param array  $params
-     * @return string|null
+     * @return array|null
      */
-    public function retrieveDocument(string $method, array $params): ?string;
+    public function retrieveDocument(string $method, array $params): ?array;
 }
