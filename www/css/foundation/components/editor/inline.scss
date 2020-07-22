@@ -1,0 +1,5 @@
+// The inline CKEditor shares styles with textareas.
+.cke_editable_inline {
+  @extend textarea;
+  height: auto;
+}
