@@ -178,6 +178,7 @@
         var self          = this,
             previousState = self.currentState;
         self.switchState(self.states.saving);
+        self.element.trigger('inlineTextboxEditor.preSave', [self]);
         $.ajax(
             self.saveButton.attr('data-form-action'),
             {
@@ -196,6 +197,7 @@
             self.element.trigger('inlineTextboxEditor.save', [self]);
         }).fail(function () {
             self.switchState(previousState);
+            self.element.trigger('inlineTextboxEditor.saveFail', [self]);
         });
     };
 
@@ -207,6 +209,7 @@
             confirmEvent: function () {
                 var previousState = self.currentState;
                 self.switchState(self.states.deleting);
+                self.element.trigger('inlineTextboxEditor.preDelete', [self]);
                 $.ajax(
                     self.deleteButton.attr('data-form-action'),
                     { method: self.deleteButton.attr('data-form-method'), }
@@ -215,6 +218,7 @@
                     // Don't need to switch state, as reloading the component resets the state
                 }).fail(function () {
                     self.switchState(previousState);
+                    self.element.trigger('inlineTextboxEditor.deleteFail', [self]);
                 });
             }
         });
@@ -251,5 +255,6 @@
                 );
             $this.data('inlineTextboxEditor', inlineTextboxEditor);
         });
+        return this;
     };
 })(jQuery);

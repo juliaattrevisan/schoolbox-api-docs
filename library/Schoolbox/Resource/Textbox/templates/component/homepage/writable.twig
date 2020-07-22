@@ -59,6 +59,8 @@
     </div>
 {% endif %}
 
+<div id="toast-{{ component.instance.id }}" class="toast"></div>
+
 {% autoescape 'js' %}
     <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -68,27 +70,45 @@
             var component        = $('#component{{ component.instance.id }}'),
                 configForm       = component.find('[data-component-panel="settings"] form'),
                 addTextboxModal  = $('#addTextboxModal-{{ component.instance.id }}'),
-                addTextboxForm   = $('#addTextboxModal-{{ component.instance.id }}-form');
+                addTextboxForm   = $('#addTextboxModal-{{ component.instance.id }}-form'),
+                toast            = $('#toast-{{ component.instance.id }}');
 
             CKEDITOR.disableAutoInline = true;
 
-            component.inlineTextboxEditor({
-                modifyButton:          '[data-action="modify"]',
-                deleteButton:          '[data-action="delete"]',
-                saveButton:            '[data-action="save"]',
-                editorInstance:        '[data-content]',
-                editorInstanceOptions: $.alaressEditorConfig({
-                    // Always start file browser from current folder, instead of the alt source
-                    file_browser_category_id: Number("{{ context.id }}"),
-                    title:                    '',
-                }),
-            });
-            component.on('inlineTextboxEditor.delete', function () {
-                configForm
-                    .find('select[name="textbox"]')
-                    .val(0);
-                configForm.submit();
-            });
+            component
+                .inlineTextboxEditor({
+                    modifyButton:          '[data-action="modify"]',
+                    deleteButton:          '[data-action="delete"]',
+                    saveButton:            '[data-action="save"]',
+                    editorInstance:        '[data-content]',
+                    editorInstanceOptions: $.alaressEditorConfig({
+                        // Always start file browser from current folder, instead of the alt source
+                        file_browser_category_id: Number("{{ context.id }}"),
+                        title:                    '',
+                    }),
+                })
+                .on('inlineTextboxEditor.preSave', function () {
+                    toast.toastActivate({text: 'Saving...'});
+                })
+                .on('inlineTextboxEditor.preDelete', function () {
+                    toast.toastActivate({text: 'Deleting...'})
+                })
+                .on('inlineTextboxEditor.save', function () {
+                    toast.toastTimeout({text: 'Saved', css: 'success'});
+                })
+                .on('inlineTextboxEditor.delete', function () {
+                    toast.toastTimeout({text: 'Deleted', css: 'success'});
+                    configForm
+                        .find('select[name="textbox"]')
+                        .val(0);
+                    configForm.submit();
+                })
+                .on('inlineTextboxEditor.saveFail', function () {
+                    toast.toastTimeout({text: 'Could not save textbox', css: 'alert'});
+                })
+                .on('inlineTextboxEditor.deleteFail', function () {
+                    toast.toastTimeout({text: 'Could not delete textbox', css: 'alert'});
+                });
 
 
             // Dialog for creation of a textbox
