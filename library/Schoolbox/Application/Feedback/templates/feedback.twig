@@ -37,7 +37,7 @@
                         <input {{ USER is null ? '' : 'disabled' }} type="text" name="name" id="name" size="35" value="{{ USER.fullname ?? '' }}" required />
 
                         <label for="email" class="required">Email</label>
-                        <input type="email" name="email" id="email" size="35"  value="{{ USER.email ?? '' }}" required />
+                        <input {{ USER.email is defined and USER.email != '' ? 'disabled' : '' }} type="email" name="email" id="email" size="35"  value="{{ USER.email ?? '' }}" required />
 
                         <label for="subject">Type of Enquiry</label>
                         <select name="subject" id="subject">
