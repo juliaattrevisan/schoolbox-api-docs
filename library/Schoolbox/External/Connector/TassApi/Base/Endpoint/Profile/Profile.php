@@ -349,7 +349,8 @@ class Profile implements IStrategy
     public function findEmergencyContacts(string $studentCode): array
     {
 
-        /* TODO: Tass hasn't implemented this, apparently
+        /* TODO: Apparently Emergency Contacts come out of a not-yet-implemented endpoint getCommunicationRulesDetails
+         *  with the commtype = 'ec'...but that endpoint is 501 Not Implemented.
          */
 //        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', [
 //            'currentstatus' => 'current',
@@ -474,6 +475,13 @@ class Profile implements IStrategy
     private function importParentsOfStudent(array $relation, UserProfile\Model $studentBaseProfile): void
     {
 
+        /* TODO: Apparently Parents come out of a not-yet-implemented endpoint getCommunicationRulesDetails
+         *  with the m_* (mother) and f_* (father) fields...but that endpoint is 501 Not Implemented.
+         */
+//        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', [
+//            'currentstatus' => 'current',
+//            'code' => $studentCode
+//        ]);
     }
 
 
