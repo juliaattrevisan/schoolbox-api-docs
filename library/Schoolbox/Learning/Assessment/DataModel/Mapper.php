@@ -1080,9 +1080,11 @@ class Mapper extends BaseMapper
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
                     );
                 }
+            }
 
-                /* Rubric Capability Grade Groups
-                 */
+            /* Rubric Capability Grade Groups only apply to submission boxes (DueWork instances)
+             */
+            if ($submodel instanceof SubmissionBox) {
                 if ($submodel->getCapabilityGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setCapabilityGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getCapabilityGradeGroup()->getId())
