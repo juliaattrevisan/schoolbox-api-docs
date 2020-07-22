@@ -47,6 +47,30 @@ class Model implements ISoftDeletable, Sequential
     private $displayGradePage;
 
     /**
+     * Grade Page: Class Results
+     * @var bool
+     */
+    private $displayAssessmentGrade;
+
+    /**
+     * Grade Page: Learning Levels
+     * @var bool
+     */
+    private $displayRubricGrade;
+
+    /**
+     * Grade Page: Capability Marks
+     * @var bool
+     */
+    private $displayCapabilityGrade;
+
+    /**
+     * Grade Page: Progression
+     * @var bool
+     */
+    private $displayProgressionGrade;
+
+    /**
      * @return string
      */
     public function getName(): ?string
@@ -56,7 +80,7 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param string $name
-     * @return $this
+     * @return static
      */
     public function setName(string $name): self
     {
@@ -74,10 +98,12 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param mixed $overallGrade
+     * @return static
      */
-    public function setOverallGrade($overallGrade)
+    public function setOverallGrade($overallGrade): self
     {
         $this->overallGrade = is_numeric($overallGrade) ? (int)$overallGrade : null;
+        return $this;
     }
 
     /**
@@ -90,10 +116,12 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param bool $showOverallGrade
+     * @return static
      */
-    public function setShowOverallGrade(bool $showOverallGrade)
+    public function setShowOverallGrade(bool $showOverallGrade): self
     {
         $this->showOverallGrade = $showOverallGrade;
+        return $this;
     }
 
     /**
@@ -106,9 +134,83 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param bool $displayGradePage
+     * @return static
      */
-    public function setDisplayGradePage(bool $displayGradePage)
+    public function setDisplayGradePage(bool $displayGradePage): self
     {
         $this->displayGradePage = $displayGradePage;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayAssessmentGrade(): bool
+    {
+        return $this->displayAssessmentGrade;
+    }
+
+    /**
+     * @param bool $displayAssessmentGrade
+     * @return static
+     */
+    public function setDisplayAssessmentGrade($displayAssessmentGrade): self
+    {
+        $this->displayAssessmentGrade = $displayAssessmentGrade;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayRubricGrade(): bool
+    {
+        return $this->displayRubricGrade;
+    }
+
+    /**
+     * @param bool $displayRubricGrade
+     * @return static
+     */
+    public function setDisplayRubricGrade($displayRubricGrade): self
+    {
+        $this->displayRubricGrade = $displayRubricGrade;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayCapabilityGrade(): bool
+    {
+        return $this->displayCapabilityGrade;
+    }
+
+    /**
+     * @param bool $displayCapabilityGrade
+     * @return static
+     */
+    public function setDisplayCapabilityGrade($displayCapabilityGrade): self
+    {
+        $this->displayCapabilityGrade = $displayCapabilityGrade;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisplayProgressionGrade(): bool
+    {
+        return $this->displayProgressionGrade;
+    }
+
+    /**
+     * @param bool $displayProgressionGrade
+     * @return static
+     */
+    public function setDisplayProgressionGrade($displayProgressionGrade): self
+    {
+        $this->displayProgressionGrade = $displayProgressionGrade;
+        return $this;
     }
 }

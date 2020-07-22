@@ -752,28 +752,60 @@ class Controller extends Base
             'fields' => [
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
-                    'width'     => 4,
+                    'width'     => 3,
                     'maxLength' => 150,
                     'mandatory' => true,
                 ],
-                'overallGrade' => [
+                'overallGrade'             => [
                     'caption'   => 'Overall Grade',
                     'tooltip'   => 'Controls the default method for displaying the students overall grade on the grade report for a subject with this year level.',
                     'lookup'    => $luGradeList,
-                    'width'     => 4,
+                    'width'     => 3,
                     'mandatory' => false,
                 ],
-                'showOverallGrade' => [
+                'showOverallGrade'         => [
                     'caption'   => 'Show Overall Grade',
                     'tooltip'   => 'If checked, the grade average for a subject with this year level will be displayed to students and their parents on the student\'s grades page.',
                     'checkbox'  => true,
-                    'width'     => 2,
+                    'width'     => 1,
                     'mandatory' => true,
                 ],
-                'displayGradePage' => [
+                'displayGradePage'         => [
                     'caption'   => 'Display Grade Page',
                     'checkbox'  => true,
-                    'width'     => 2,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                // Class Results, display_assessment_grade (global config: display_grade_graph)
+                'displayAssessmentGrade'  => [
+                    'caption'   => 'Display Assessment Graph',
+                    'tooltip'   => 'If toggled to \'ON\', the box plot graph will be displayed on a student\'s subject grades page.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                // Learning Levels tab, display_rubric_grade (global config: enable_grades_criteria)
+                'displayRubricGrade'      => [
+                    'caption'   => 'Display Rubric Table',
+                    'tooltip'   => 'If toggled to \'ON\', assessed Capabilities and Indicators will be displayed on subject grades pages.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                // Capability Marks tab, display_capability_grade (global config: grade_capability_display)
+                'displayCapabilityGrade'  => [
+                    'caption'   => 'Display Capability Grades',
+                    'tooltip'   => 'If toggled to \'ON\', attainment for each rubric capability will be displayed on the subject grades pages.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                // Progression tab, display_progression_grade (global config: grade_progression_display)
+                'displayProgressionGrade' => [
+                    'caption'   => 'Display Progression Graph',
+                    'tooltip'   => 'If toggled to \'ON\', a line graph of student progress over time will be displayed on the grades page.',
+                    'checkbox'  => true,
+                    'width'     => 1,
                     'mandatory' => true,
                 ],
             ],

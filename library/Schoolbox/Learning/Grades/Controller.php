@@ -14,7 +14,6 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use ReflectionException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
@@ -37,6 +36,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -146,7 +146,7 @@ class Controller extends Base
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException If cyclic graph detected during translation
      * @throws UnexpectedValueException If unable to merge project participant collections
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getGrades(User $viewee, Term\Model $term): void
     {
@@ -225,7 +225,7 @@ class Controller extends Base
      * @throws ServiceNotFound If unable to find mail handler service
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes): void
     {
@@ -323,13 +323,12 @@ class Controller extends Base
      * @param Term\Model   $term
      * @param Folder\Model $subject
      * @throws RouteNotFound If unable to generate the route to fetch the filtered report
-     * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException If a specified filter definition class cannot be found
-     * @throws \DomainException If the filter FactoryFactory has not defined its filterable entity
+     * @throws InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
+     * @throws DomainException If the filter FactoryFactory has not defined its filterable entity
      * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
-     * @throws \Schoolbox\Mapper\Exception If a database column alias is incorrect
+     * @throws MapperException If a database column alias is incorrect
      * @throws LogicException If cyclic graph detected
      * @throws UnexpectedValueException If unable to merge student collections
      */
@@ -400,9 +399,9 @@ class Controller extends Base
 
     /**
      * @param User $viewee
-     * @param int $year
+     * @param int  $year
+     * @throws MapperException
      * @throws ServiceNotFound If unable to find mail handler service
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      */
@@ -430,14 +429,13 @@ class Controller extends Base
      * @param Term\Model   $term
      * @param Folder\Model $subject
      * @throws InvalidArgumentException If unable to find the filter mapper class
-     * @throws ReflectionException If the specified class does not exist
      * @throws DomainException If this class has not defined what entity it is filtering
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
      * @throws LogicException If cyclic graph detected during assessment translation
      * @throws UnexpectedValueException If unable to merge student collections
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @todo convert to a GET route
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject): void
@@ -479,8 +477,12 @@ class Controller extends Base
         // * all staff (always)
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
-        $canSeeGraph = ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
-            || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()->get('display_grade_graph'));
+        $canSeeGraph           =
+            ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
+            || ($viewee->getDisplayGradeGraph() && $this->isTabEnabled('graph', $subject));
+        $canSeeRubricGrade     = $this->isTabEnabled('descriptors', $subject);
+        $canSeeCapabilityGrade = $this->isTabEnabled('capabilities', $subject);
+        $canSeeProgression     = $this->isTabEnabled('progression', $subject);
 
         $visibility = new Visibility($this->access);
 
@@ -513,31 +515,32 @@ class Controller extends Base
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
         /* Get Rubric Data for display */
-        $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
-        $rubricAssessmentList = $longitudinalRubric['assessments'];
-        unset($longitudinalRubric['assessments']);
-
+        $longitudinalRubric   = [];
+        $rubricAssessmentList = [];
+        if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
+            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee);
+            $rubricAssessmentList = $longitudinalRubric['assessments'];
+            unset($longitudinalRubric['assessments']);
+        }
 
         /* Build tabs for grade report */
         $tabs = [];
 
         if ($canSeeGraph) {
-            $tabs['graph'] = [
-                'label' => 'Class Results',
-            ];
+            $tabs['graph'] = ['label' => 'Class Results'];
         }
 
         if ($longitudinalRubric) {
-            if ($this->getConfigLoader()->get('enable_grades_criteria')) {
-                $tabs['descriptors'] = ['label' => 'Learning Levels' ];
+            if ($canSeeRubricGrade) {
+                $tabs['descriptors'] = ['label' => 'Learning Levels'];
             }
 
-            if ($this->getConfigLoader()->get('grade_capability_display')) {
-                $tabs['capabilities'] = ['label'=> $l10n->translate('rubricGroup', false,true) .' Marks' ];
+            if ($canSeeCapabilityGrade) {
+                $tabs['capabilities'] = ['label' => $l10n->translate('rubricGroup', false, true) . ' Marks'];
             }
 
-            if ($this->getConfigLoader()->get('grade_progression_display')) {
-                $tabs['progression'] = ['label'=>'Progression' ];
+            if ($canSeeProgression) {
+                $tabs['progression'] = ['label' => 'Progression'];
             }
         }
 
@@ -596,6 +599,44 @@ class Controller extends Base
             ])->getAsString(),
         ]));
 
+    }
+
+    /**
+     * @param string       $tabName
+     * @param Folder\Model $folder
+     * @return bool
+     */
+    private function isTabEnabled(string $tabName, Folder\Model $folder): bool
+    {
+        switch ($tabName) {
+            case 'graph':
+                $configName   = 'display_grade_graph';
+                $propertyName = 'displayAssessmentGrade';
+                break;
+            case 'descriptors':
+                $configName   = 'enable_grades_criteria';
+                $propertyName = 'displayRubricGrade';
+                break;
+            case 'capabilities':
+                $configName   = 'grade_capability_display';
+                $propertyName = 'displayCapabilityGrade';
+                break;
+            case 'progression':
+                $configName   = 'grade_progression_display';
+                $propertyName = 'displayProgressionGrade';
+                break;
+            default:
+                return false;
+        }
+
+        if (!$this->getConfigLoader()->get($configName)) {
+            return false;
+        }
+        if ($folder->getYearLevels()->count() === 0) {
+            return true;
+        }
+        $propertyValues = array_unique($folder->getYearLevels()->getPropertyValues($propertyName));
+        return count($propertyValues) > 1 ? true : (bool)$propertyValues[0];
     }
 
 
@@ -710,13 +751,8 @@ class Controller extends Base
      * @param User                            $student
      * @return array
      */
-    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
+    private function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
     {
-        if(!($this->getConfigLoader()->get('enable_grades_criteria') || $this->getConfigLoader()->get('grade_capability_display') || $this->getConfigLoader()->get('grade_progression_display'))) {
-            // only populate this if we're actually allowed to see it
-            return [];
-        }
-
         // Filter to dueWork with marks visible to current user
         $user = $this->getUser();
         $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($user) {
