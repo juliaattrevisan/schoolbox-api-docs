@@ -6,9 +6,25 @@ Data:
     assessment  IAssessable
     participant ?Participant - optional. If supplied override real assessment values
 #}
+<script type='text/javascript' src='https://contentstorage.onenote.office.net/onenoteltir/immersivereadersdk/immersive-reader-sdk.1.0.0.js'></script>
+
+<script>
+function launchImmersiveReader() {
+const content = {
+title: 'Immersive Reader',
+chunks: [ {
+    content: document.getElementById('immersive-reader-content').innerHTML,
+    mimeType: 'text/html'
+} ]
+};
+ImmersiveReader.launchAsync('e65f978aa7a24c65a0edb83cb6a8f74d', 'schoolbox-test', content);
+}
+</script>
+
 <section>
     {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
     {% if description|length %}
+        <div class='immersive-reader-button' onclick='launchImmersiveReader()'></div>
         <article class="content">
             {{ description | purify }}
         </article>
