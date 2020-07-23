@@ -444,7 +444,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
                 $allowedFileTypesFound[$spRow['FileType']] = $spRow['FileType'];
 
-                $periodList[] = [
+                $period = [
                     'Room'                      => $spRow['Room'],
                     'Description'               => $spRow['ClassDescription'],
                     'PeriodNumber'              => $spRow['Period'],
@@ -460,6 +460,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     'ClassCancelled'            => $spRow['ClassCancelledFlag'],
                     'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
                 ];
+                $period['Key'] = $this->determinePeriodUniqueIdentifier($period);
+                $periodList[]  = $period;
             }
         }
 
@@ -493,7 +495,26 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         unset($period);
 
-//        // Use getDayTimetable() for anything the proc didn't find
+        // Use getDayTimetable() for anything the proc didn't find
+        $fallbackPeriodList = $this->getTimetablePeriods(
+            $externalUserId,
+            (int)$userId,
+            (int)$dayNumber,
+            $allowedFileTypes,
+            $fileSemester,
+            $fileYear,
+            $campus
+        );
+        $uniquePeriodKeys = array_column($periodList, 'Key');
+        foreach ($fallbackPeriodList as $fallbackPeriod) {
+            // If PeriodNumber + ClassCampus + ClassCode + FileType match an
+            // existing period, then don't add it again
+            $fallbackPeriod['Key'] = $this->determinePeriodUniqueIdentifier($fallbackPeriod);
+            if (!in_array($fallbackPeriod['Key'], $uniquePeriodKeys)) {
+                $periodList[] = $fallbackPeriod;
+            }
+        }
+
 //        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
 //        if (!empty($allowedFileTypesNotFound)) {
 //            $periodList = array_merge(
@@ -502,7 +523,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 //                    $externalUserId,
 //                    (int)$userId,
 //                    (int)$dayNumber,
-//                    $allowedFileTypesNotFound,
+//                    $allowedFileTypes,
 //                    $fileSemester,
 //                    $fileYear,
 //                    $campus
@@ -516,6 +537,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         usort($timetable, [$this, 'sortTimetable']);
 
         return $timetable;
+    }
+
+
+    /**
+     * Determines a unique identifier for this period.
+     *
+     * A period is identified by its number, and the campus+code+filetype of the
+     * class within it.
+     *
+     * @param array $period A period record, as returned by `getTimetablePeriods`
+     *                      or built by `fetchTimetableForDate`.
+     * @return string
+     */
+    private function determinePeriodUniqueIdentifier(array $period): string
+    {
+        return serialize([
+            'period'   => (int)$period['PeriodNumber'],
+            'campus'   => (string)$period['ClassCampus'],
+            'code'     => (string)$period['ClassCode'],
+            'fileType' => (string)$period['FileType'],
+        ]);
     }
 
 
@@ -645,7 +687,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
-                Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
+                Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,Timetable.FileType, StaffID
                 FROM
                 dbo.StudentClasses StudentClasses,
                 dbo.SubjectClasses SubjectClasses,
@@ -672,7 +714,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 ORDER BY Timetable.PeriodNumber";
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
-                Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,
+                Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,Timetable.FileType,
                 Timetable.PeriodNumber as AttendancePeriod
                 FROM dbo.SubjectClasses SubjectClasses,
                 dbo.Timetable Timetable
