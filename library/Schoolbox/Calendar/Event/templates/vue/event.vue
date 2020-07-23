@@ -7,6 +7,7 @@
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */
     import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+    import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
     import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
     import checks              from '@schoolboxCalendarEvent/checks';
 
@@ -353,13 +354,13 @@
                  *
                  * You can rsvp to an event (shows rsvp buttons)
                  * There's limited attendance and the attendance list is visible to you (shows metadata about counts)
-                 * You can modify the event (you can see the Invite Guest selectize)
+                 * You can modify the event (you can see the Invite Guest selectize and attendance level != None)
                  * You can see the attendance list (shows invited dudes)
                  */
                 return this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable) ||
-                    (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
-                    this.canModify() ||
-                    this.isAttendeesVisible();
+                        (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
+                        (this.canModify() && !this.isAttendanceLevelNone()) ||
+                        this.isAttendeesVisible();
             },
 
 
@@ -404,7 +405,14 @@
              */
             isAttendeesVisible() {
 
-                /* If you've got write access, you can see it
+                /* If event has Attendance Level None, hide the panel
+                 */
+                if (this.isAttendanceLevelNone()) {
+                    return false;
+                }
+
+                /* If you've got write access, you can always see it
+                 * regardless of the showAttendees flag
                  */
                 if (this.canModify()) {
                     return true;
@@ -420,6 +428,14 @@
                 /* Otherwise, it's hidden
                  */
                 return false;
+            },
+
+
+            /**
+             * This event has a Attendance Level of None
+             */
+            isAttendanceLevelNone: function() {
+                return this.event.attendance.level.current === ATTENDANCE_LEVELS.NONE;
             },
 
 
