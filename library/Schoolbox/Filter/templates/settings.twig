@@ -185,14 +185,22 @@
     }
 </style>
 
-<div class="row">
-    <div class="small-12">
+<div class="row actions-small-1">
+    <div class="small-12 island">
         <h1>{{ pageName }}</h1>
 
         <ul class="meta">
             <li class="icon-{{ entityIcon }}">Filtered entity: {{ entityName }}</li>
         </ul>
     </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li>
+            <a class="icon-modify" href="#">Modify</a>
+        </li>
+    </ul>
 </div>
 
 <div class="row">
