@@ -55,6 +55,7 @@ class Module extends AlaressModule
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);
         $this->register('POST', '/{page}', 'postSavePageSettings', $isSuper, $loadFactoryFactory);
+        $this->register('POST', '/{page}/pushDefaultSelections', 'postPushDefaultSelections', $isSuper, $loadFactoryFactory);
     }
 
 

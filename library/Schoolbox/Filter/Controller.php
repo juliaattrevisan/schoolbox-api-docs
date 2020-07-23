@@ -107,6 +107,7 @@ class Controller extends BaseController
                 foreach ($pageFilter->getOptions() as $option) {
                     if (isset($option->getDefaults()[$roleType])) {
                         if (!isset($rolesForFilter[$roleType])) {
+                            // TODO inject role mapper
                             $rolesForFilter[$roleType] = RoleMapper::getInstance()->findByColumn('group_type', $roleType);
                         }
                         break 2;
@@ -221,6 +222,24 @@ class Controller extends BaseController
 
         $this->response->content->set($this->buildJsonOutput(['status' => 200]));
     }
+
+
+    /**
+     * Push default selections to users in the given roles.
+     *
+     * @api   POST /adminv2/filters/{page}/pushDefaultSelections
+     * @since 20.1
+     *
+     * @param IFactoryFactory $factoryFactory
+     * @param string          $page
+     */
+    public function postPushDefaultSelections(IFactoryFactory $factoryFactory, string $page): void
+    {
+        Selection\Mapper::getInstance()->deleteSelectionsForRoleIds($this->request->post->get('role', []), $page);
+
+        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+    }
+
 
 
     /**

@@ -336,7 +336,7 @@
         selected roles, and replace them with the currently saved defaults for
         that role type.
     </p>
-    <form>
+    <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections', { page: page }) }}">
         {% for roleType, roles in rolesForFilter if roles is not empty %}
             <fieldset class="checklist">
                 <legend>{{ roleType | capitalize }}</legend>
