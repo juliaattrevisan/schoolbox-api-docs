@@ -91,6 +91,11 @@
                 editorInstanceOptions.removePlugins += ',wordcount';
             }
 
+            // Restore source dialog plugin
+            if (editorInstanceOptions.removeButtons) {
+                editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
+            }
+
             component
                 .inlineTextboxEditor({
                     modifyButton:          '[data-action="modify"]',
