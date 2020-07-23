@@ -404,7 +404,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (empty($allowedFileTypes)) {
             $allowedFileTypes = [self::DEFAULT_FILE_TYPE];
         }
-        $allowedFileTypesFound = [];
 
         $periodsForSequenceIds = [];
 
@@ -442,8 +441,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
                 }
 
-                $allowedFileTypesFound[$spRow['FileType']] = $spRow['FileType'];
-
                 $period = [
                     'Room'                      => $spRow['Room'],
                     'Description'               => $spRow['ClassDescription'],
@@ -464,14 +461,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $periodList[]  = $period;
             }
         }
-
-        // Sort the periods and period sequences for niceness
-        usort(
-            $periodList,
-            static function ($a, $b) {
-                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
-            }
-        );
 
         foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
             sort($periodsForSequenceId);
@@ -515,21 +504,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
         }
 
-//        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
-//        if (!empty($allowedFileTypesNotFound)) {
-//            $periodList = array_merge(
-//                $periodList,
-//                $this->getTimetablePeriods(
-//                    $externalUserId,
-//                    (int)$userId,
-//                    (int)$dayNumber,
-//                    $allowedFileTypes,
-//                    $fileSemester,
-//                    $fileYear,
-//                    $campus
-//                )
-//            );
-//        }
+        // Sort the periods and period sequences for niceness after adding all
+        // of the periods
+        usort(
+            $periodList,
+            static function ($a, $b) {
+                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+            }
+        );
 
         // Add classes into it
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
