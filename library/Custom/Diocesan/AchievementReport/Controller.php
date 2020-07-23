@@ -63,7 +63,7 @@ class Controller extends Base
     {
         /* Check whether the Achievement Reports are enabled
          */
-        if (!(new ValidAccess())->isSatisfiedBy($this->getConfigLoader()->get('dio_achievement_report_enabled'), $user)) {
+        if (!(new ValidAccess())->isSatisfiedBy($this->getConfigLoader()->get('dio_achievement_report_enabled'), $this->getUser())) {
             $this->getResponse()->content->set([
                 'template' => '@achievementreport/unavailable.twig',
                 'data' => [
