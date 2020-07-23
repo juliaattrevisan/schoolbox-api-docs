@@ -17,6 +17,7 @@
 
     <div class="component-action">
         <section>
+            <span data-role="dirty-indicator" class="hide">Changes not saved</span>
             <button data-action="modify" data-processing-text="Modifying">Modify</button>
             <button data-action="save"
                     data-form-method="put"
@@ -70,6 +71,7 @@
             var component             = $('#component{{ component.instance.id }}'),
                 content               = component.find('.content'),
                 configForm            = component.find('[data-component-panel="settings"] form'),
+                dirtyIndicator        = component.find('[data-role="dirty-indicator"]'),
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
                 toast                 = $('#toast-{{ component.instance.id }}'),
@@ -129,9 +131,9 @@
                         .val(0);
                     configForm.submit();
                 })
-                .on('inlineTextboxEditor.change, inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
-                    console.log(inlineTextboxEditor.isDirty() ? 'dirty' : 'clean');
-                })
+                .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
+                    dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
+                });
 
 
             // Dialog for creation of a textbox
