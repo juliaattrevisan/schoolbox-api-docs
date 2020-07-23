@@ -35,4 +35,54 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
+
+	// Dialog background colour
+	config.dialog_backgroundCoverColor = "#000000";
 };
+
+// Inject nanospell
+
+var nanospell = {
+	ckeditor: function (selector, settings) {
+		if (typeof(window.CKEDITOR) == "undefined") {
+			setTimeout(function () {
+				window.nanospell.ckeditor(selector, settings)
+			}, 300)
+		}
+		if (!selector) {
+			selector = 'all'
+		}
+		if (!settings) {
+			settings = {}
+		}
+
+		var plugin_name = 'nanospell';
+		var plugin_url = '/ajax/nanospell/nanospell.ckeditor/plugin.js';
+
+		if (typeof(CKEDITOR) != 'undefined') {
+			ckInstances = {};
+
+			for (var i in CKEDITOR.instances) {
+				if (selector.toLowerCase() === 'all' || CKEDITOR.instances[i].element.$.id === selector) {
+					ckInstances[i] = true;
+				}
+			}
+			CKEDITOR.plugins.addExternal(plugin_name, plugin_url, '');
+			CKEDITOR.plugins.load(plugin_name, function (plugins) {
+				for (var i in ckInstances) {
+					var editor = CKEDITOR.instances[i];
+					editor.config.nanospell = settings;
+					editor.config.removePlugins += ',wsc,scayt';
+					plugins[plugin_name].init(editor)
+				}
+			});
+		}
+	}
+};
+
+nanospell.ckeditor('all', {
+	dictionary: "en_au,en",
+	ignore_block_caps: true,
+	ignore_non_alpha: true,
+	server: "php"
+});
