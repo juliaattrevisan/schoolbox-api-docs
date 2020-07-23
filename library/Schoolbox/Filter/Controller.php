@@ -100,14 +100,14 @@ class Controller extends BaseController
         }
 
         // Only output roles in the role types this filter supports
-        $roleTypes          = Role::getRoleTypes();
-        $roleTypesForFilter = [];
+        $roleTypes      = Role::getRoleTypes();
+        $rolesForFilter = [];
         foreach ($roleTypes as $roleType) {
             foreach ($pageFilters as $pageFilter) {
                 foreach ($pageFilter->getOptions() as $option) {
                     if (isset($option->getDefaults()[$roleType])) {
-                        if (!isset($roleTypesForFilter[$roleType])) {
-                            $roleTypesForFilter[$roleType] = $roleType;
+                        if (!isset($rolesForFilter[$roleType])) {
+                            $rolesForFilter[$roleType] = RoleMapper::getInstance()->findByColumn('group_type', $roleType);
                         }
                         break 2;
                     }
@@ -120,7 +120,7 @@ class Controller extends BaseController
             'definitions'              => $definitions,
             'pageFilters'              => $pageFilters,
             'roleTypes'                => $roleTypes,
-            'rolesForFilter'           => RoleMapper::getInstance()->findByColumn('group_type', $roleTypesForFilter),
+            'rolesForFilter'           => $rolesForFilter,
             'pageLabels'               => $this->buildFilteredPageLabels(),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));

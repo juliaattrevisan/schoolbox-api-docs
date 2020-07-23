@@ -336,10 +336,19 @@
         selected roles, and replace them with the currently saved defaults for
         that role type.
     </p>
-    <ul>
-        {% for role in rolesForFilter %}
-            <li>{{ role.name }}</li>
+    <form>
+        {% for roleType, roles in rolesForFilter if roles is not empty %}
+            <fieldset class="checklist">
+                <legend>{{ roleType | capitalize }}</legend>
+                <section>
+                    {% for role in roles %}
+                        <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
+                        <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
+                    {% endfor %}
+                </section>
+            </fieldset>
         {% endfor %}
-    </ul>
+        <input type="submit" class="expand" value="Push to Selected Roles" />
+    </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
