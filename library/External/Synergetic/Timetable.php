@@ -413,6 +413,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
         $statement->bindInputs(
             [
+                'FileType'                  => '',
                 'FileYear'                  => $fileYear,
                 'FileSemester'              => $fileSemester,
                 'ID'                        => $externalUserId,
@@ -492,22 +493,22 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         unset($period);
 
-        // Use getDayTimetable() for anything the proc didn't find
-        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
-        if (!empty($allowedFileTypesNotFound)) {
-            $periodList = array_merge(
-                $periodList,
-                $this->getTimetablePeriods(
-                    $externalUserId,
-                    (int)$userId,
-                    (int)$dayNumber,
-                    $allowedFileTypesNotFound,
-                    $fileSemester,
-                    $fileYear,
-                    $campus
-                )
-            );
-        }
+//        // Use getDayTimetable() for anything the proc didn't find
+//        $allowedFileTypesNotFound = array_diff($allowedFileTypes, $allowedFileTypesFound);
+//        if (!empty($allowedFileTypesNotFound)) {
+//            $periodList = array_merge(
+//                $periodList,
+//                $this->getTimetablePeriods(
+//                    $externalUserId,
+//                    (int)$userId,
+//                    (int)$dayNumber,
+//                    $allowedFileTypesNotFound,
+//                    $fileSemester,
+//                    $fileYear,
+//                    $campus
+//                )
+//            );
+//        }
 
         // Add classes into it
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
