@@ -141,6 +141,16 @@
 
 
     /**
+     * Is the editor in a dirty state?
+     *
+     * @returns {boolean}
+     */
+    InlineTextboxEditor.prototype.isDirty = function () {
+        return this.currentState === this.states.dirty || this.currentState === this.states.dirtyModify;
+    };
+
+
+    /**
      * On-click event for when the
      */
     InlineTextboxEditor.prototype.onClickModify = function () {

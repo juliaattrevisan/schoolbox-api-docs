@@ -128,7 +128,10 @@
                         .find('select[name="textbox"]')
                         .val(0);
                     configForm.submit();
-                });
+                })
+                .on('inlineTextboxEditor.change, inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
+                    console.log(inlineTextboxEditor.isDirty() ? 'dirty' : 'clean');
+                })
 
 
             // Dialog for creation of a textbox
