@@ -17,7 +17,8 @@
 
     <div class="component-action">
         <section>
-            <span data-role="dirty-indicator" class="hide">Changes not saved</span>
+            {# This has a button-like styling, but isn't actually a button #}
+            <button data-role="dirty-indicator" class="hide" disabled>Changes not saved</button>
             <button data-action="modify" data-processing-text="Modifying">Modify</button>
             <button data-action="save"
                     data-form-method="put"
@@ -72,6 +73,7 @@
                 content               = component.find('.content'),
                 configForm            = component.find('[data-component-panel="settings"] form'),
                 dirtyIndicator        = component.find('[data-role="dirty-indicator"]'),
+                beforeUnloadListener  = null,
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
                 toast                 = $('#toast-{{ component.instance.id }}'),
@@ -99,11 +101,23 @@
                 })
                 // On create/destroy of editor:
                 // add/remove no-pad class to its container, to offset padding
-                .on('inlineTextboxEditor.editorCreate', function () {
+                .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
                     content.addClass('no-pad');
+
+                    // Add beforeUnload, which will trigger if this is dirty
+                    beforeUnloadListener = function (event) {
+                        if (inlineTextboxEditor.isDirty()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.returnValue = '';
+                            return event.returnValue;
+                        }
+                    };
+                    window.addEventListener('beforeunload', beforeUnloadListener);
                 })
                 .on('inlineTextboxEditor.editorDestroy', function () {
                     content.removeClass('no-pad');
+                    window.removeEventListener('beforeunload', beforeUnloadListener);
                 })
                 // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
