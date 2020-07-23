@@ -6,8 +6,10 @@
 
 namespace Schoolbox\Filter;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\RoleMapper;
 use function count;
 use Schoolbox\GenericCollection;
@@ -230,13 +232,17 @@ class Controller extends BaseController
      * @api   POST /adminv2/filters/{page}/pushDefaultSelections
      * @since 20.1
      *
-     * @param IFactoryFactory $factoryFactory
-     * @param string          $page
+     * @param string $page
      */
-    public function postPushDefaultSelections(IFactoryFactory $factoryFactory, string $page): void
+    public function postPushDefaultSelections(string $page): void
     {
-        Selection\Mapper::getInstance()->deleteSelectionsForRoleIds($this->request->post->get('role', []), $page);
-
+        $roleIds = $this->request->post->get('role', []);
+        if (!is_array($roleIds) || empty($roleIds)) {
+            // Reject this request
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+        // TODO inject mappers
+        Selection\Mapper::getInstance()->deleteSelectionsForRoleIds($roleIds, $page);
         $this->response->content->set($this->buildJsonOutput(['status' => 200]));
     }
 

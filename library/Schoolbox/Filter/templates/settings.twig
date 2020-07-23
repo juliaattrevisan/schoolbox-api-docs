@@ -174,6 +174,40 @@
                     });
             }
         });
+
+
+        // Validate form input
+        $('#push-selections-modal-form').alaressValidate({
+            rules: {
+                'role[]': {
+                    required: true,
+                    minlength: { param: 1 }
+                }
+            },
+            submitHandler: function (form) {
+                var $submit = $(form).find('input[type=submit]');
+                $submit.prop("disabled", true);
+
+                // Post this form
+                var toast = $('#toast');
+                toast.toastActivate({text: 'Working...'});
+                $.ajax(
+                    form.action,
+                    {
+                        method: form.method,
+                        data: $(form).serializeArray(),
+                        dataType: 'json',
+                    }
+                ).done(function () {
+                    toast.toastTimeout({text: 'Done'});
+                    $('#push-selections-modal-form').foundation('reveal', 'close');
+                }).fail(function (xhr) {
+                    toast.toastTimeout({text: 'Push failed: ' + xhr.responseJSON.message, css: 'alert', duration: 5000});
+                }).always(function () {
+                    $submit.prop("disabled", false);
+                });
+            }
+        });
     });
 </script>
 
@@ -352,3 +386,5 @@
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
+
+<div id="toast" class="toast"></div>
