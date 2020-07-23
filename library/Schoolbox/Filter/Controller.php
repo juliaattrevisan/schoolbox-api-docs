@@ -8,6 +8,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\RoleMapper;
 use function count;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -98,11 +99,28 @@ class Controller extends BaseController
             $pageFilters[$class] = $definition->getFilter()->getPages()[$page];
         }
 
+        // Only output roles in the role types this filter supports
+        $roleTypes          = Role::getRoleTypes();
+        $roleTypesForFilter = [];
+        foreach ($roleTypes as $roleType) {
+            foreach ($pageFilters as $pageFilter) {
+                foreach ($pageFilter->getOptions() as $option) {
+                    if (isset($option->getDefaults()[$roleType])) {
+                        if (!isset($roleTypesForFilter[$roleType])) {
+                            $roleTypesForFilter[$roleType] = $roleType;
+                        }
+                        break 2;
+                    }
+                }
+            }
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
             'page'                     => $page,
             'definitions'              => $definitions,
             'pageFilters'              => $pageFilters,
-            'roleTypes'                => Role::getRoleTypes(),
+            'roleTypes'                => $roleTypes,
+            'rolesForFilter'           => RoleMapper::getInstance()->findByColumn('group_type', $roleTypesForFilter),
             'pageLabels'               => $this->buildFilteredPageLabels(),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));

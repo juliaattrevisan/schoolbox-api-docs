@@ -186,7 +186,7 @@
 </style>
 
 <div class="row actions-small-1">
-    <div class="small-12 island">
+    <div class="small-12">
         <h1>{{ pageName }}</h1>
 
         <ul class="meta">
@@ -198,7 +198,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li>
-            <a class="icon-modify" href="#">Modify</a>
+            <a class="icon-export" data-reveal-id="push-selections-modal" href="#">Push Default Selections to Roles...</a>
         </li>
     </ul>
 </div>
@@ -329,5 +329,17 @@
     </form>
 </div>
 
-
-
+<div id="push-selections-modal" class="reveal-modal" data-reveal aria-labelledby="push-selections-modal-title" aria-hidden="true" role="dialog">
+    <h2 id="push-selections-modal-title">Push Default Selections to Roles</h2>
+    <p class="meta">
+        This will clear the selections that users have made for filters in the
+        selected roles, and replace them with the currently saved defaults for
+        that role type.
+    </p>
+    <ul>
+        {% for role in rolesForFilter %}
+            <li>{{ role.name }}</li>
+        {% endfor %}
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
