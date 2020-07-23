@@ -44,7 +44,7 @@ $event
     ->setVariant($_POST['variant'] ?? Event::VARIANT_EVENT)
     ->setTitle($_POST['title'] ?? '')
     ->setLocation($_POST['location'] ?? '')
-    ->setAttendance($_POST['attendance'] ?? 0)
+    ->setAttendance($_POST['attendance'] ?? Event\Attendance\Model::LEVEL_INVITE_ONLY)
     ->setDetail($_POST['detail'] ?? '')
     ->setPublishDateTime(null)
     ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
