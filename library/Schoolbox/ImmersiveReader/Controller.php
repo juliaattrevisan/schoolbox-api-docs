@@ -31,7 +31,10 @@ class Controller extends Base
     {
        $this->httpClient = new Client();
 
-
+       $this->tenant_id = $this->getConfigLoader()->get('office365_tenant_id');
+       $this->client_id = $this->getConfigLoader()->get('office365_client');
+       $this->client_secret = $this->getConfigLoader()->get('office365_secret');
+       $this->subdomain = $this->getConfigLoader()->get('office365_immersive_reader_name');
 
     }
 
