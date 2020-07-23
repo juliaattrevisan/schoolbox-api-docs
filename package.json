@@ -15,6 +15,7 @@
     "@fullcalendar/resource-timeline": "^4.3.0",
     "@fullcalendar/timegrid": "^4.3.0",
     "@fullcalendar/vue": "^4.3.1",
+    "@microsoft/immersive-reader-sdk": "^1.1.0",
     "@types/classnames": "^2.2.9",
     "axios": "0.18.1",
     "classnames": "^2.2.6",
