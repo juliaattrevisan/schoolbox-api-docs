@@ -366,9 +366,9 @@
 <div id="push-selections-modal" class="reveal-modal" data-reveal aria-labelledby="push-selections-modal-title" aria-hidden="true" role="dialog">
     <h2 id="push-selections-modal-title">Push Default Selections to Roles</h2>
     <p class="meta">
-        This will clear the selections that users have made for filters in the
-        selected roles, and replace them with the currently saved defaults for
-        that role type.
+        This will clear the selections that users within the selected roles have
+        made for this page's filters, and replace them with the currently saved
+        defaults for their role type.
     </p>
     <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections', { page: page }) }}">
         {% for roleType, roles in rolesForFilter if roles is not empty %}
