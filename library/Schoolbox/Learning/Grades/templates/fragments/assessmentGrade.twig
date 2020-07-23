@@ -61,7 +61,7 @@
     {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
-            <p class="comment">{{ feedback.comment | nl2br }}</p>
+            <p class="comment">{{ feedback.comment | linkify | nl2br }}</p>
             {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
                 <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                     View assessment details</a>
