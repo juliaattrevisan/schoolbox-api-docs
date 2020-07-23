@@ -59,7 +59,6 @@ class Controller extends Base
                 ]
             );
         } catch (ClientException $e ) {
-            var_dump($e);
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
             $this->getResponse()->content->set(
@@ -75,10 +74,5 @@ class Controller extends Base
                 $this->buildJsonOutput($output)
             );
         }
-        else {
-            die('failed to auth');
-        }
-
-
     }
 }
