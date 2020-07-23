@@ -26,11 +26,11 @@ class ValidAccess
      * Decide if $user can access the Achievement Reports based on the $configVar
      * dio_achievement_report_enabled
      *
-     * @param int $configVar
+     * @param bool $configVar
      * @param User $user
      * @return bool
      */
-    public function isSatisfiedBy(int $configVar, User $user): bool
+    public function isSatisfiedBy(bool $configVar, User $user): bool
     {
         /* Superusers and Staff can always get in
          */
