@@ -10,7 +10,7 @@
         data() {
             return {
                 'page': this.page,
-                'articlesLoading': this.articlesLoading,
+                'articlesLoading': this.data.articlesLoading,
                 'topics': [],
                 'allArticles': [],
                 'savedArticleIds': [],
@@ -279,20 +279,20 @@
 <template>
     <div>
         <section>
-            <dl class="tabs" v-if="this.data.allArticles.length || this.data.articlesLoading">
+            <dl class="tabs" v-if="this.allArticles.length || this.articlesLoading">
                 <dd v-for="topic in this.data.topics" :class="{active: this.data.tabSelected === topic.slug}">
                     <a @click="onTabChange(topic.slug)">${ topic.name }</a>
                 </dd>
-                <template v-if="this.data.articlesLoading">
+                <template v-if="this.articlesLoading">
                     <dd class="skeleton" v-for="n in 3">
                         <a></a>
                     </dd>
                 </template>
             </dl>
-            <div v-if="this.data.articlesLoading"></div>
+            <div v-if="this.articlesLoading"></div>
             <div class="tabs-content no-margin">
                 <ul class="information-list">
-                    <template v-if="this.data.articlesLoading">
+                    <template v-if="this.articlesLoading">
                         <li class="actions-small-1" v-for="n in 3">
                             <div class="list-item">
                                 <div class="small-12 card skeleton">
