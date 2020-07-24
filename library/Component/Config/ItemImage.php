@@ -23,13 +23,13 @@ class Component_Config_ItemImage extends Component_Config_Abstract
         $page->setBlock($keyblock, 'item_image', 'item_image_block');
         $page->setVar('item_image_block', '');
 
-        $sortable = [
+        $options = [
             'author-image' => 'Author Portrait',
             'school-logo' => 'School Logo',
             'none' => 'None'
         ];
 
-        foreach ($sortable as $k => $opt) {
+        foreach ($options as $k => $opt) {
             $page->setVar('COMPONENT_CONFIG_ITEMIMAGE_NAME', $opt);
             $page->setVar('COMPONENT_CONFIG_ITEMIMAGE_VALUE', $k);
             $page->setVar('COMPONENT_CONFIG_ITEMIMAGE_SELECTED', $k == $configValue ? ' selected="selected"' : '');

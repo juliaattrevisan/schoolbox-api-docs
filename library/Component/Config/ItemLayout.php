@@ -23,13 +23,13 @@ class Component_Config_ItemLayout extends Component_Config_Abstract
         $page->setBlock($keyblock, 'item_layout', 'item_layout_block');
         $page->setVar('item_layout_block', '');
 
-        $sortable = [
+        $options = [
             'list' => 'List',
             'list-reversed' => 'List (Reversed)',
             'card' => 'Card',
         ];
 
-        foreach ($sortable as $k => $opt) {
+        foreach ($options as $k => $opt) {
             $page->setVar('COMPONENT_CONFIG_ITEMLAYOUT_NAME', $opt);
             $page->setVar('COMPONENT_CONFIG_ITEMLAYOUT_VALUE', $k);
             $page->setVar('COMPONENT_CONFIG_ITEMLAYOUT_SELECTED', $k == $configValue ? ' selected="selected"' : '');
