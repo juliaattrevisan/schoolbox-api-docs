@@ -24,7 +24,8 @@
                 'configSaveForLater': this.data.configSaveForLater,
                 'localeNewsPlural': this.data.localeNewsPlural,
                 'compactMode': this.data.compactMode,
-                'tabSelected': this.data.tabSelected
+                'tabSelected': this.data.tabSelected,
+                'topicAll': this.data.topicAll
             }
         },
         mounted: function () {
@@ -142,37 +143,37 @@
              * @param {boolean} holdState - Whether to change the window's history or not
              */
             onTabChange: function (tab, persistPage, holdState) {
-                // var self = this;
-                //
-                // self.tabSelected = tab;
-                // if (!persistPage) {
-                //     self.page = 1;
-                // }
-                //
-                // if (tab === this.topicAll.slug) {
-                //     // Reset back to original set
-                //     self.filteredArticles = self.allArticles;
-                // } else {
-                //     // Filter articles by tab selected
-                //     var filteredArticles = self.allArticles.filter(function (article) {
-                //         return article.topics.some(function(topic) { // Return true if the selected topic appears once
-                //             return topic.slug === tab;
-                //         });
-                //     });
-                //
-                //     self.filteredArticles = filteredArticles;
-                // }
-                //
-                // // Update the window history
-                // if (!holdState && this.data.modifyWindowState) {
-                //     window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
-                // }
-                //
-                // // Update the RSS link (which lives in a different Vue component)
-                // // The rssLink component only exists on the news feed page, not on the dashboard
-                // if (typeof rssLink !== 'undefined') {
-                //     rssLink.topic = tab;
-                // }
+                var self = this;
+
+                self.tabSelected = tab;
+                if (!persistPage) {
+                    self.page = 1;
+                }
+
+                if (tab === this.data.topicAll.slug) {
+                    // Reset back to original set
+                    self.filteredArticles = self.allArticles;
+                } else {
+                    // Filter articles by tab selected
+                    var filteredArticles = self.allArticles.filter(function (article) {
+                        return article.topics.some(function(topic) { // Return true if the selected topic appears once
+                            return topic.slug === tab;
+                        });
+                    });
+
+                    self.filteredArticles = filteredArticles;
+                }
+
+                // Update the window history
+                if (!holdState && this.data.modifyWindowState) {
+                    window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
+                }
+
+                // Update the RSS link (which lives in a different Vue component)
+                // The rssLink component only exists on the news feed page, not on the dashboard
+                if (typeof rssLink !== 'undefined') {
+                    rssLink.topic = tab;
+                }
             },
 
             /**
