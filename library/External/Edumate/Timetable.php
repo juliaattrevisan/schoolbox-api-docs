@@ -134,7 +134,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        $date = time();
+        if($date == 0) {
+            $date = time();
+        }
+
+        // Return 0 if weekend
+        if(date('N', $date) >= 6) {
+            return 0;
+        }
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
@@ -304,7 +311,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus,
-            $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+            $this->getDayNumber($campus, $date->getUnixTimeStamp()+1));
     }
 
 
