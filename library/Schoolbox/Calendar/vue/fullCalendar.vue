@@ -19,6 +19,7 @@
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
     import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
+    import {ATTENDANCE_STATUS}        from '@schoolboxCalendarEvent/attendance-status';
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -355,18 +356,7 @@
              * @param eventResizeInfo
              */
             onEventResize(eventResizeInfo) {
-                // TODO this needs to consider events in series
-                let event = eventResizeInfo.event,
-                    data  = {
-                        start:   this.toMoment(event.start).format(),
-                        end:     this.toMoment(event.end).format(),
-                        allDay: event.allDay,
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(
-                    ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
-                    qs.stringify(data)
-                );
+                this.moveEvent(eventResizeInfo.event);
             },
 
             /**
@@ -377,18 +367,38 @@
              * @param eventDropInfo
              */
             onEventDrop(eventDropInfo) {
-                let event = eventDropInfo.event,
-                    data  = {
+                this.moveEvent(eventDropInfo.event);
+            },
+
+
+            /**
+             * Moves an existing event to its new start and end time.
+             *
+             * @param {Object} event
+             */
+            moveEvent(event) {
+                let self = this,
+                    data = {
                         start:  this.toMoment(event.start).format(),
                         end:    this.toMoment(event.end).format(),
                         allDay: event.allDay,
                     };
-                // Apply and then remove the "loading" class
-                axios.post(
-                    ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
-                    qs.stringify(data)
-                );
+
+                // TODO this needs to consider events in series
+                axios
+                    .post(
+                        ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                        qs.stringify(data)
+                    )
+                    .then(function () {
+                        // Once done: all attendees are set back to Pending
+                        if (event?.extendedProps?.data?.attendance?.status?.current) {
+                            event.extendedProps.data.attendance.status.current = ATTENDANCE_STATUS.PENDING;
+                            self.$refs.fullCalendar.getApi().rerenderEvents();
+                        }
+                    });
             },
+
 
             /**
              * Helper function for converting a Date object to a Moment object.
