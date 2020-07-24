@@ -34,6 +34,16 @@ if (is_numeric($_POST['type'])) {
     $type = EventTypeMapper::getInstance()->findAll()->first();
 }
 
+/* Persist event attendances
+ * If event has zero guests, or if guests weren't specified at all, just provide empty array
+ * If you can't add attendees because you're a student and the config var is off, just provide empty array
+ */
+$guests = [];
+
+if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
+    $guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
+}
+
 $event
     ->setOwner($owner)
     ->setAuthor($user)
@@ -44,7 +54,7 @@ $event
     ->setVariant($_POST['variant'] ?? Event::VARIANT_EVENT)
     ->setTitle($_POST['title'] ?? '')
     ->setLocation($_POST['location'] ?? '')
-    ->setAttendance($_POST['attendance'] ?? 0)
+    ->setAttendance(\count($guests) ? Event\Attendance\Model::LEVEL_INVITE_ONLY : Event\Attendance\Model::LEVEL_NO_ATTENDANCE)
     ->setDetail($_POST['detail'] ?? '')
     ->setPublishDateTime(null)
     ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
@@ -85,16 +95,6 @@ $personalRelation->setUserId($ownerId);
 
 $personalRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
 $personalRelationMapper->save($personalRelation);
-
-/* Persist event attendances
- * If event has zero guests, or if guests weren't specified at all, just provide empty array
- * If you can't add attendees because you're a student and the config var is off, just provide empty array
- */
-$guests = [];
-
-if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
-    $guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
-}
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
