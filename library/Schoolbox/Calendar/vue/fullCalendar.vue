@@ -377,12 +377,11 @@
                 let event = eventDropInfo.event,
                     delta = toDuration(eventDropInfo.delta),
                     data  = {
-                        eventId:     event?.extendedProps?.data?.meta?.eventId,
                         minuteDelta: delta.asMinutes(),
                         allDay:      event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+                axios.post('/calendar/event/' + String(event?.extendedProps?.data?.meta?.eventId) + '/move', qs.stringify(data));
             },
 
             /**
