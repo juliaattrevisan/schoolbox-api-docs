@@ -23,7 +23,8 @@
                 'changeTabOnMeta': this.data.changeTabOnMeta,
                 'configSaveForLater': this.data.configSaveForLater,
                 'localeNewsPlural': this.data.localeNewsPlural,
-                'compactMode': this.data.compactMode
+                'compactMode': this.data.compactMode,
+                'tabSelected': this.data.tabSelected
             }
         },
         mounted: function () {
@@ -280,8 +281,8 @@
     <div>
         <section>
             <dl class="tabs" v-if="this.allArticles.length || this.articlesLoading">
-                <dd v-for="topic in this.data.topics" :class="{active: this.data.tabSelected === topic.slug}">
-                    <a @click="onTabChange(topic.slug)">${ topic.name }</a>
+                <dd v-for="topic in this.topics" :class="{active: tabSelected === topic.slug}">
+                    <a @click="onTabChange(topic.slug)">{{ topic.name }}</a>
                 </dd>
                 <template v-if="this.articlesLoading">
                     <dd class="skeleton" v-for="n in 3">
@@ -289,7 +290,6 @@
                     </dd>
                 </template>
             </dl>
-            <div v-if="this.articlesLoading"></div>
             <div class="tabs-content no-margin">
                 <ul class="information-list">
                     <template v-if="this.articlesLoading">
