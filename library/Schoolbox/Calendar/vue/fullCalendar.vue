@@ -18,6 +18,7 @@
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
+    import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -362,7 +363,10 @@
                         allDay: event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/event/' + String(event?.extendedProps?.data?.meta?.eventId) + '/move', qs.stringify(data));
+                axios.post(
+                    ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                    qs.stringify(data)
+                );
             },
 
             /**
@@ -380,7 +384,10 @@
                         allDay: event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/event/' + String(event?.extendedProps?.data?.meta?.eventId) + '/move', qs.stringify(data));
+                axios.post(
+                    ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                    qs.stringify(data)
+                );
             },
 
             /**

@@ -4,6 +4,7 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_EVENT_SOURCE: '/calendar/ajax/full',
     URL_EVENT_UPDATE: '/calendar/ajax/update',
+    URL_EVENT_MOVE: '/calendar/event/{eventId}/move',
     URL_EVENT_DELETE: '/calendar/event/{eventId}/delete',
     URL_EVENT_EXPORT: '/calendar/export.php',
 
