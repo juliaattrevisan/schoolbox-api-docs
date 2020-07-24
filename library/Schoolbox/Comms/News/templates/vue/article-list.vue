@@ -4,9 +4,22 @@
         props: [
             'data'
         ],
-        delimiters: ['${', '}'],
         components: {
             'Paginate': VuejsPaginate
+        },
+        data() {
+            return {
+                'page': this.page,
+                'articlesLoading': this.articlesLoading,
+                'topics': [],
+                'allArticles': [],
+                'savedArticleIds': [],
+                'filteredArticles': [],
+                'queryStringPage': this.data.queryStringPage,
+                'queryStringReferrer': this.data.queryStringReferrer,
+                'queryStringTopic': this.data.queryStringTopic,
+                'referrer': this.data.referrer,
+            }
         },
         mounted: function () {
             var self = this;
@@ -123,37 +136,37 @@
              * @param {boolean} holdState - Whether to change the window's history or not
              */
             onTabChange: function (tab, persistPage, holdState) {
-                var self = this;
-
-                self.tabSelected = tab;
-                if (!persistPage) {
-                    self.page = 1;
-                }
-
-                if (tab === this.topicAll.slug) {
-                    // Reset back to original set
-                    self.filteredArticles = self.allArticles;
-                } else {
-                    // Filter articles by tab selected
-                    var filteredArticles = self.allArticles.filter(function (article) {
-                        return article.topics.some(function(topic) { // Return true if the selected topic appears once
-                            return topic.slug === tab;
-                        });
-                    });
-
-                    self.filteredArticles = filteredArticles;
-                }
-
-                // Update the window history
-                if (!holdState && this.data.modifyWindowState) {
-                    window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
-                }
-
-                // Update the RSS link (which lives in a different Vue component)
-                // The rssLink component only exists on the news feed page, not on the dashboard
-                if (typeof rssLink !== 'undefined') {
-                    rssLink.topic = tab;
-                }
+                // var self = this;
+                //
+                // self.tabSelected = tab;
+                // if (!persistPage) {
+                //     self.page = 1;
+                // }
+                //
+                // if (tab === this.topicAll.slug) {
+                //     // Reset back to original set
+                //     self.filteredArticles = self.allArticles;
+                // } else {
+                //     // Filter articles by tab selected
+                //     var filteredArticles = self.allArticles.filter(function (article) {
+                //         return article.topics.some(function(topic) { // Return true if the selected topic appears once
+                //             return topic.slug === tab;
+                //         });
+                //     });
+                //
+                //     self.filteredArticles = filteredArticles;
+                // }
+                //
+                // // Update the window history
+                // if (!holdState && this.data.modifyWindowState) {
+                //     window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
+                // }
+                //
+                // // Update the RSS link (which lives in a different Vue component)
+                // // The rssLink component only exists on the news feed page, not on the dashboard
+                // if (typeof rssLink !== 'undefined') {
+                //     rssLink.topic = tab;
+                // }
             },
 
             /**
@@ -216,13 +229,13 @@
             // The current set of articles showing for the page
             currentArticles: function() {
                 // Short circuit if there's nothing in filteredArticles
-                if (!this.data.filteredArticles.length) {
+                if (!this.filteredArticles.length) {
                     return [];
                 }
 
                 // If there's a limit- just return 0 to that limit
                 if (this.limit) {
-                    return this.data.filteredArticles.slice(0, this.limit);
+                    return this.filteredArticles.slice(0, this.limit);
                 }
 
                 // If pagination is disabled- just return all the filtered articles
@@ -237,7 +250,7 @@
                 var offset = (this.page-1) * limit;
                 var total = offset + limit;
 
-                return this.data.filteredArticles.slice(offset, total);
+                return this.filteredArticles.slice(offset, total);
             },
 
             // When to show the 'show more' component action
@@ -287,27 +300,27 @@
                     </template>
 
                     <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in this.currentArticles">
-<!--                        <div class="list-item">-->
-<!--                            <div class="small-12 card wrap-down">-->
-<!--                                <template v-if="article.featureImage">-->
-<!--                                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">-->
-<!--                                        <img :src="article.featureImage._links.image.href + '&size=square64'">-->
-<!--                                    </a>-->
-<!--                                </template>-->
+                        <div class="list-item">
+                            <div class="small-12 card wrap-down">
+                                <template v-if="article.featureImage">
+                                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                                        <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                    </a>
+                                </template>
 
-<!--                                <h3>-->
-<!--                                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">-->
-<!--                                        ${ article.title }-->
-<!--                                    </a>-->
-<!--                                </h3>-->
+                                <h3>
+                                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                                        {{ article.title }}
+                                    </a>
+                                </h3>
 
-<!--                                <p class="meta">-->
-<!--                                        <span>-->
-<!--                                            <template v-if="article.sticky">Pinned by</template>-->
-<!--                                            <template v-else>By</template>-->
-<!--                                            <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>-->
-<!--                                            <template v-else>${ article.author.fullname }</template>-->
-<!--                                        </span>-->
+                                <p class="meta">
+                                        <span>
+                                            <template v-if="article.sticky">Pinned by</template>
+                                            <template v-else>By</template>
+                                            <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
+                                            <template v-else>${ article.author.fullname }</template>
+                                        </span>
 <!--                                    <span> &mdash; <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time></span>-->
 <!--                                    <span v-if="article.topics.length">-->
 <!--                                            in-->
@@ -320,9 +333,9 @@
 <!--                                    <span v-if="article.metadata && article.metadata.commentCount > 0">-->
 <!--                                        | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount | formatCommentCountMeta }</a>-->
 <!--                                        </span>-->
-<!--                                </p>-->
-<!--                            </div>-->
-<!--                        </div>-->
+                                </p>
+                            </div>
+                        </div>
 
 <!--                        <nav>-->
 <!--                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + this.data.localeNewsPlural"></a>-->
