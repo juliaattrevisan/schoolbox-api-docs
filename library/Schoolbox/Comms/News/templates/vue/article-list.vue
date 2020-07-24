@@ -22,7 +22,8 @@
                 'getIndexRoute': this.data.getIndexRoute,
                 'changeTabOnMeta': this.data.changeTabOnMeta,
                 'configSaveForLater': this.data.configSaveForLater,
-                'localeNewsPlural': this.data.localeNewsPlural
+                'localeNewsPlural': this.data.localeNewsPlural,
+                'compactMode': this.data.compactMode
             }
         },
         mounted: function () {
@@ -348,12 +349,12 @@
                                title="Save for later"></a>
                         </nav>
 
-<!--                        <article v-if="!compactMode">-->
-<!--                            <div v-html="article.blurb"></div>-->
-<!--                            <div class="article-read-more">-->
-<!--                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>-->
-<!--                            </div>-->
-<!--                        </article>-->
+                        <article v-if="compactMode">
+                            <div v-html="article.blurb"></div>
+                            <div class="article-read-more">
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                            </div>
+                        </article>
                     </li>
                 </ul>
 
