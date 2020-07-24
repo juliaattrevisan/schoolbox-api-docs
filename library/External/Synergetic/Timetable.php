@@ -408,101 +408,138 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodsForSequenceIds = [];
 
         // pvTimetableDefinitionAll
-        foreach ($allowedFileTypes as $fileType) {
-            $periodList = [];
-            $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
-            $statement->bindInputs(
-                [
-                    'FileType'                  => $fileType,
-                    'FileYear'                  => $fileYear,
-                    'FileSemester'              => $fileSemester,
-                    'ID'                        => $externalUserId,
-                    'Date'                      => $date->getDatabaseDate(),
-                    'IncludeStaffScheduleFlag'  => 1,
-                    'CheckAttendancesExistFlag' => 1,
-                    'IncludeSparesFlag'         => 0,
-                    'IncludeRecessFlag'         => 0,
-                ]
-            );
+        $periodList = [];
+        $statement  = $this->database->prepareProcedure('dbo.spsTimetable');
+        $statement->bindInputs(
+            [
+                'FileType'                  => '',
+                'FileYear'                  => $fileYear,
+                'FileSemester'              => $fileSemester,
+                'ID'                        => $externalUserId,
+                'Date'                      => $date->getDatabaseDate(),
+                'IncludeStaffScheduleFlag'  => 1,
+                'CheckAttendancesExistFlag' => 1,
+                'IncludeSparesFlag'         => 0,
+                'IncludeRecessFlag'         => 0,
+            ]
+        );
 
-            $iterator = $statement->getIterator();
+        $iterator = $statement->getIterator();
 
-            foreach ($iterator as $spRow) {
-                // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
-                if ($spRow['FileType'] !== $fileType) {
-                    continue;
-                }
-
-                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
-                    // There is a SeqLinkedTo field, which is only set for linked classes.
-                    $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
-                    $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
-
-                    if (isset($sequenceId) && $multiPeriodAttendance) {
-                        $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
-                    }
-
-                    $periodList[] = [
-                        'Room'                      => $spRow['Room'],
-                        'Description'               => $spRow['ClassDescription'],
-                        'PeriodNumber'              => $spRow['Period'],
-                        'ClassCampus'               => $spRow['ClassCampus'],
-                        'ClassCode'                 => $spRow['ClassCode'],
-                        'FileType'                  => $spRow['FileType'],
-                        'SubstituteFlag'            => $spRow['SubstituteFlag'],
-                        'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
-                        'PeriodSequence'            => $sequenceId,
-                        'AttendancePeriods'         => [$spRow['Period']],
-                        'AttendanceMarked'          => $spRow['IsMarkedFlag'],
-                        'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
-                        'ClassCancelled'            => $spRow['ClassCancelledFlag'],
-                        'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
-                    ];
-                }
+        foreach ($iterator as $spRow) {
+            // As spsTimetable does not sometimes return the specified fileType only, make sure to remove them
+            if (!in_array($spRow['FileType'], $allowedFileTypes, false)) {
+                continue;
             }
 
-            // Sort the periods and period sequences for niceness
-            usort(
-                $periodList,
-                static function ($a, $b) {
-                    return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+            if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
+                // There is a SeqLinkedTo field, which is only set for linked classes.
+                $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
+                $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
+
+                if (isset($sequenceId) && $multiPeriodAttendance) {
+                    $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
                 }
-            );
 
-            foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
-                sort($periodsForSequenceId);
-                $periodsForSequenceId = array_unique($periodsForSequenceId);
+                $period = [
+                    'Room'                      => $spRow['Room'],
+                    'Description'               => $spRow['ClassDescription'],
+                    'PeriodNumber'              => $spRow['Period'],
+                    'ClassCampus'               => $spRow['ClassCampus'],
+                    'ClassCode'                 => $spRow['ClassCode'],
+                    'FileType'                  => $spRow['FileType'],
+                    'SubstituteFlag'            => $spRow['SubstituteFlag'],
+                    'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
+                    'PeriodSequence'            => $sequenceId,
+                    'AttendancePeriods'         => [$spRow['Period']],
+                    'AttendanceMarked'          => $spRow['IsMarkedFlag'],
+                    'AttendanceEnabled'         => $spRow['AttendanceEntryEnabledFlag'],
+                    'ClassCancelled'            => $spRow['ClassCancelledFlag'],
+                    'MultiPeriodAttendanceMode' => $multiPeriodAttendance,
+                ];
+                $period['Key'] = $this->determinePeriodUniqueIdentifier($period);
+                $periodList[]  = $period;
             }
-
-            unset($periodsForSequenceId);
-
-            // Merge period numbers for attendance all together
-            foreach ($periodList as &$period) {
-                $periodSequence = $period['PeriodSequence'];
-
-                if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
-                    $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
-
-                    // Clear the list of periods for sequence IDs, so that later
-                    // classes in the sequence don't get an attendance link.
-                    $periodsForSequenceIds[$periodSequence] = [];
-                }
-            }
-
-            unset($period);
-
-            if (empty($periodList)) {
-                // Fall back to getDayTimetable()
-                $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, $fileType, $fileSemester, $fileYear, $campus);
-            }
-
-            // Add classes into it
-            $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
         }
+
+        foreach ($periodsForSequenceIds as &$periodsForSequenceId) {
+            sort($periodsForSequenceId);
+            $periodsForSequenceId = array_unique($periodsForSequenceId);
+        }
+
+        unset($periodsForSequenceId);
+
+        // Merge period numbers for attendance all together
+        foreach ($periodList as &$period) {
+            $periodSequence = $period['PeriodSequence'];
+
+            if (isset($periodsForSequenceIds[$periodSequence]) && $period['MultiPeriodAttendanceMode']) {
+                $period['AttendancePeriods'] = $periodsForSequenceIds[$periodSequence];
+
+                // Clear the list of periods for sequence IDs, so that later
+                // classes in the sequence don't get an attendance link.
+                $periodsForSequenceIds[$periodSequence] = [];
+            }
+        }
+
+        unset($period);
+
+        // Use getDayTimetable() for anything the proc didn't find
+        $fallbackPeriodList = $this->getTimetablePeriods(
+            $externalUserId,
+            (int)$userId,
+            (int)$dayNumber,
+            $allowedFileTypes,
+            $fileSemester,
+            $fileYear,
+            $campus
+        );
+        $uniquePeriodKeys = array_column($periodList, 'Key');
+        foreach ($fallbackPeriodList as $fallbackPeriod) {
+            // If PeriodNumber + ClassCampus + ClassCode + FileType match an
+            // existing period, then don't add it again
+            $fallbackPeriod['Key'] = $this->determinePeriodUniqueIdentifier($fallbackPeriod);
+            if (!in_array($fallbackPeriod['Key'], $uniquePeriodKeys)) {
+                $periodList[] = $fallbackPeriod;
+            }
+        }
+
+        // Sort the periods and period sequences for niceness after adding all
+        // of the periods
+        usort(
+            $periodList,
+            static function ($a, $b) {
+                return $a['PeriodNumber'] <=> $b['PeriodNumber'];
+            }
+        );
+
+        // Add classes into it
+        $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, $timetable);
 
         usort($timetable, [$this, 'sortTimetable']);
 
         return $timetable;
+    }
+
+
+    /**
+     * Determines a unique identifier for this period.
+     *
+     * A period is identified by its number, and the campus+code+filetype of the
+     * class within it.
+     *
+     * @param array $period A period record, as returned by `getTimetablePeriods`
+     *                      or built by `fetchTimetableForDate`.
+     * @return string
+     */
+    private function determinePeriodUniqueIdentifier(array $period): string
+    {
+        return serialize([
+            'period'   => (int)$period['PeriodNumber'],
+            'campus'   => (string)$period['ClassCampus'],
+            'code'     => (string)$period['ClassCode'],
+            'fileType' => (string)$period['FileType'],
+        ]);
     }
 
 
@@ -602,24 +639,28 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string      $externalUserId
-     * @param int         $userId
-     * @param int         $dayNumber
-     * @param string|null $fileType
-     * @param string      $fileSemester
-     * @param string      $fileYear
-     * @param Campus      $campus
+     * @param string              $externalUserId
+     * @param int                 $userId
+     * @param int                 $dayNumber
+     * @param array|string[]|null $fileTypes
+     * @param string              $fileSemester
+     * @param string              $fileYear
+     * @param Campus              $campus
      * @return array
      */
-    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?string $fileType, string $fileSemester, string $fileYear, Campus $campus): array
+    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?array $fileTypes, string $fileSemester, string $fileYear, Campus $campus): array
     {
         $campusString = $campus->getExtTimetableCode();
 
-        // Get fileType to limit the data to
+        // Get file types to limit the data to
         $allowedFileTypes = $this->getAllowedFileTypes();
-        if ($fileType && (empty($allowedFileTypes) || in_array($fileType, $allowedFileTypes))) {
-            $allowedFileTypes = [$fileType];
+        if (isset($fileTypes)) {
+            $allowedFileTypes = array_intersect($allowedFileTypes, $fileTypes);
         }
+        if (empty($allowedFileTypes)) {
+            return [];
+        }
+
         $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
                 $this->database,
                 'quote',
@@ -628,7 +669,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
-                Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
+                Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,Timetable.FileType, StaffID
                 FROM
                 dbo.StudentClasses StudentClasses,
                 dbo.SubjectClasses SubjectClasses,
@@ -655,7 +696,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 ORDER BY Timetable.PeriodNumber";
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
-                Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,
+                Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,Timetable.FileType,
                 Timetable.PeriodNumber as AttendancePeriod
                 FROM dbo.SubjectClasses SubjectClasses,
                 dbo.Timetable Timetable
