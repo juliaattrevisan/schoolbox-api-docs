@@ -9,68 +9,68 @@
             'Paginate': VuejsPaginate
         },
         mounted: function () {
-            // var self = this;
-            //
-            // axios.get(self.getSavedArticlesRoute, {headers: getHeaders}).then(function(response) {
-            //     self.savedArticleIds = response.data;
-            // }).catch(function (error) {
-            //     console.log(error);
-            // });
-            //
-            // // Find some articles
-            // axios.get(self.getArticlesRoute, {headers: getHeaders}).then(function(response) {
-            //     var articles = response.data;
-            //
-            //     self.articlesLoading = false;
-            //     self.allArticles = articles;
-            //     self.filteredArticles = articles;
-            //
-            //     // Start an array of topics, with All
-            //     var topics = [
-            //         self.topicAll
-            //     ];
-            //
-            //     // Add topics from the articles returned
-            //     var topicsAdded = [];
-            //     articles.map(function(article) {
-            //         article.topics.map(function(topic) {
-            //             if (topicsAdded.indexOf(topic.slug) === -1) {
-            //                 topicsAdded.push(topic.slug);
-            //                 // WARNING: do not remove the space inside the braces below, phplib will eat it
-            //                 topics.push(Object.assign({ }, topic));
-            //             }
-            //         });
-            //     });
-            //
-            //     // Sort topics based on sequence
-            //     topics.sort(function(a, b) {
-            //         return a.sequence - b.sequence;
-            //     });
-            //
-            //     // Send the array to Vue
-            //     self.topics = topics;
-            //
-            //     // Set default selected tab (if not already set via twig above)
-            //     if (!self.tabSelected) {
-            //         if (self.showTopicByDefault && self.topics[1]) {
-            //             self.tabSelected = self.topics[1].slug;
-            //         } else {
-            //             self.tabSelected = self.topicAll.slug;
-            //         }
-            //     }
-            //     self.initialTopic = self.tabSelected;
-            //
-            //     // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-            //     if (self.tabSelected !== self.topicAll.slug) {
-            //         self.onTabChange(self.tabSelected, true, true);
-            //     }
-            //     if (self.page > 1) {
-            //         self.onPaginate(self.page, true);
-            //     }
-            //
-            // }).catch(function (error) {
-            //     console.log(error);
-            // });
+            var self = this;
+
+            axios.get(self.data.getSavedArticlesRoute, {headers: getHeaders}).then(function(response) {
+                self.savedArticleIds = response.data;
+            }).catch(function (error) {
+                console.log(error);
+            });
+
+            // Find some articles
+            axios.get(self.data.getArticlesRoute, {headers: getHeaders}).then(function(response) {
+                var articles = response.data;
+
+                self.articlesLoading = false;
+                self.allArticles = articles;
+                self.filteredArticles = articles;
+
+                // Start an array of topics, with All
+                var topics = [
+                    self.data.topicAll
+                ];
+
+                // Add topics from the articles returned
+                var topicsAdded = [];
+                articles.map(function(article) {
+                    article.topics.map(function(topic) {
+                        if (topicsAdded.indexOf(topic.slug) === -1) {
+                            topicsAdded.push(topic.slug);
+                            // WARNING: do not remove the space inside the braces below, phplib will eat it
+                            topics.push(Object.assign({ }, topic));
+                        }
+                    });
+                });
+
+                // Sort topics based on sequence
+                topics.sort(function(a, b) {
+                    return a.sequence - b.sequence;
+                });
+
+                // Send the array to Vue
+                self.topics = topics;
+
+                // Set default selected tab (if not already set via twig above)
+                if (!self.tabSelected) {
+                    if (self.data.showTopicByDefault && self.topics[1]) {
+                        self.tabSelected = self.topics[1].slug;
+                    } else {
+                        self.tabSelected = self.topicAll.slug;
+                    }
+                }
+                self.initialTopic = self.tabSelected;
+
+                // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
+                if (self.tabSelected !== self.data.topicAll.slug) {
+                    self.onTabChange(self.tabSelected, true, true);
+                }
+                if (self.page > 1) {
+                    self.onPaginate(self.page, true);
+                }
+
+            }).catch(function (error) {
+                console.log(error);
+            });
             //
             // // Listen for window state change
             // if (self.modifyWindowState) {
@@ -96,24 +96,24 @@
             // }
         },
         methods: {
-            // /*
-            //  * On change of page
-            //  *
-            //  * @param {int} page - The page to change to
-            //  * @param {boolean} holdState - Whether to change the window's history or not
-            //  */
-            // onPaginate: function (page, holdState) {
-            //     // Update the window history
-            //     if (!holdState && this.modifyWindowState) {
-            //         var params;
-            //         if (this.tabSelected === this.topicAll.slug) {
-            //             params = '?' + this.queryStringPage + '=' + page;
-            //         } else {
-            //             params = '?' + this.queryStringPage + '=' + page + '&' + this.queryStringTopic + '=' + this.tabSelected;
-            //         }
-            //         window.history.pushState({page: page, tab: this.tabSelected}, '', params);
-            //     }
-            // },
+            /*
+             * On change of page
+             *
+             * @param {int} page - The page to change to
+             * @param {boolean} holdState - Whether to change the window's history or not
+             */
+            onPaginate: function (page, holdState) {
+                // Update the window history
+                if (!holdState && this.modifyWindowState) {
+                    var params;
+                    if (this.tabSelected === this.topicAll.slug) {
+                        params = '?' + this.data.queryStringPage + '=' + page;
+                    } else {
+                        params = '?' + this.data.queryStringPage + '=' + page + '&' + this.queryStringTopic + '=' + this.tabSelected;
+                    }
+                    window.history.pushState({page: page, tab: this.tabSelected}, '', params);
+                }
+            },
 
             /*
              * Changing topic tab
@@ -155,57 +155,57 @@
                     rssLink.topic = tab;
                 }
             },
-            //
-            // /**
-            //  * Save an article for later
-            //  *
-            //  * @param article
-            //  */
-            // saveForLater: function(article) {
-            //     var self = this;
-            //
-            //     var requestURL,
-            //             toastActivateMessage,
-            //             toastSuccessMessage,
-            //             toastFailMessage,
-            //             updateArticleIds;
-            //
-            //     function removeArticleId(articleId) {
-            //         var articleIdIndex = self.savedArticleIds.indexOf(articleId)
-            //         self.savedArticleIds.splice(articleIdIndex, 1);
-            //     }
-            //
-            //     function addArticleId(articleId) {
-            //         self.savedArticleIds.splice(0, 0, articleId);
-            //     }
-            //
-            //     if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
-            //         // Article is already saved; this is an "unsave" action
-            //         requestURL = article._links.unsaveForLater.href;
-            //         toastActivateMessage = 'Removing...';
-            //         toastSuccessMessage = 'Removed';
-            //         toastFailMessage = 'Unable to remove';
-            //         updateArticleIds = removeArticleId;
-            //     } else if (article._links.saveForLater.auth) {
-            //         // Save the article for later
-            //         requestURL = article._links.saveForLater.href;
-            //         toastActivateMessage = 'Saving...';
-            //         toastSuccessMessage = 'Saved';
-            //         toastFailMessage = 'Unable to save';
-            //         updateArticleIds = addArticleId;
-            //     }
-            //
-            //     var $toast = $('#toaster');
-            //     $toast.toastActivate({text: toastActivateMessage});
-            //     axios.post(requestURL, [], { headers: postHeaders }).then(function () {
-            //         $toast.toastTimeout({text: toastSuccessMessage, duration: 2000});
-            //         updateArticleIds(article.id);
-            //     }).catch(function (error) {
-            //         console.log(error);
-            //         $toast.toastTimeout({text: toastFailMessage, duration: 2000, css: 'alert'});
-            //     });
-            //
-            // }
+
+            /**
+             * Save an article for later
+             *
+             * @param article
+             */
+            saveForLater: function(article) {
+                var self = this;
+
+                var requestURL,
+                        toastActivateMessage,
+                        toastSuccessMessage,
+                        toastFailMessage,
+                        updateArticleIds;
+
+                function removeArticleId(articleId) {
+                    var articleIdIndex = self.savedArticleIds.indexOf(articleId)
+                    self.savedArticleIds.splice(articleIdIndex, 1);
+                }
+
+                function addArticleId(articleId) {
+                    self.savedArticleIds.splice(0, 0, articleId);
+                }
+
+                if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
+                    // Article is already saved; this is an "unsave" action
+                    requestURL = article._links.unsaveForLater.href;
+                    toastActivateMessage = 'Removing...';
+                    toastSuccessMessage = 'Removed';
+                    toastFailMessage = 'Unable to remove';
+                    updateArticleIds = removeArticleId;
+                } else if (article._links.saveForLater.auth) {
+                    // Save the article for later
+                    requestURL = article._links.saveForLater.href;
+                    toastActivateMessage = 'Saving...';
+                    toastSuccessMessage = 'Saved';
+                    toastFailMessage = 'Unable to save';
+                    updateArticleIds = addArticleId;
+                }
+
+                var $toast = $('#toaster');
+                $toast.toastActivate({text: toastActivateMessage});
+                axios.post(requestURL, [], { headers: postHeaders }).then(function () {
+                    $toast.toastTimeout({text: toastSuccessMessage, duration: 2000});
+                    updateArticleIds(article.id);
+                }).catch(function (error) {
+                    console.log(error);
+                    $toast.toastTimeout({text: toastFailMessage, duration: 2000, css: 'alert'});
+                });
+
+            }
         },
         computed: {
             // // The total pages to show for pagination buttons
