@@ -1,15 +1,33 @@
 {#
  # News dashboard component
  #
- # @param int componentInstanceId
- # @param string queryStringPage
- # @param string queryStringReferrer
- # @param string queryStringTopic
- # @param string topicAll
- # @param string referrer
- # @param string compactMode
- # @param int limit
- # @param bool showTopicByDefault
+ # Core and querystring params
+ # @param int $componentInstanceId     The primary key for this component instance
+ # @param string $queryStringPage      The string to use for page number param name in the URL
+ # @param string $queryStringReferrer  The string to use for referrer param name in the URL
+ # @param string $queryStringTopic     The string to use for topic param name in the URL
+ #
+ # Topics
+ # @param string $topicAll             The topic slug for the 'all' tab
+ # @param string|null $topic           The topic slug to load, as chosen by the user
+ # @param bool $showTopicByDefault     If true, preselects the first topic tab if a topic wasn't chosen by user
+ # @param bool $changeTabOnMeta        On click of a topic in a news card meta- whether to change tab on the current page or not
+ #
+ # Pagination
+ # @param int|null $initialPage        The page number to load by default
+ # @param int $limit                   Number of items to display per page
+ # @param bool $disablePagination      If true, the pagination palette doesn't render
+ #
+ # Referrers and Redirects
+ # @param bool $modifyWindowState      If true, push changes to the window state to simulate browser history
+ # @param string $referrer             Referrer string for stats logging
+ # @param string $returnUrl            Return to this location after submitting forms etc
+ #
+ # Layout
+ # @param string $compactMode          Bool for compactMode layout (removes the blurb from the news card)
+ # @param bool $showMore               If true, enables the Show More link under articles
+ # @param string|null $itemLayout      A string corresponding to which Item Layout was chosen in component config
+ # @param string|null $fallbackImage   A string corresponding to which Fallback Image was chosen in component config
  #}
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
@@ -19,16 +37,23 @@
         queryStringPage: queryStringPage,
         queryStringReferrer: queryStringReferrer,
         queryStringTopic: queryStringTopic,
+
         topicAll: topicAll,
         topic: null,
-        referrer: referrer,
+        showTopicByDefault: showTopicByDefault,
         changeTabOnMeta: false,
-        modifyWindowState: false,
-        compactMode: compactMode,
+
         initialPage: 1,
         limit: limit,
         disablePagination: true,
-        showTopicByDefault: showTopicByDefault,
-        showMore: true
+
+        modifyWindowState: false,
+        referrer: referrer,
+        returnUrl: returnUrl,
+
+        compactMode: compactMode,
+        showMore: true,
+        itemLayout: itemLayout,
+        fallbackImage: fallbackImage
     } %}
 </div>
