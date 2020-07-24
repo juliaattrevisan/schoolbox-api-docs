@@ -23,16 +23,20 @@ use function implode;
  */
 class Mapper extends Schoolbox\Mapper
 {
-    public const TABLE_NAME             = 'lu_year_level';
-    public const COL_ID                 = 'id';
-    public const COL_NAME               = 'name';
-    public const COL_OVERALL_GRADE      = 'overall_grade';
-    public const COL_SHOW_OVERALL_GRADE = 'show_overall_grade';
-    public const COL_DISPLAY_GRADE_PAGE = 'display_grade_page';
-    public const COL_SEQUENCE           = 'sequence';
-    public const COL_CREATED_AT         = 'created_at';
-    public const COL_UPDATED_AT         = 'updated_at';
-    public const COL_DELETED_AT         = 'deleted_at';
+    public const TABLE_NAME                    = 'lu_year_level';
+    public const COL_ID                        = 'id';
+    public const COL_NAME                      = 'name';
+    public const COL_OVERALL_GRADE             = 'overall_grade';
+    public const COL_SHOW_OVERALL_GRADE        = 'show_overall_grade';
+    public const COL_DISPLAY_GRADE_PAGE        = 'display_grade_page';
+    public const COL_DISPLAY_ASSESSMENT_GRADE  = 'display_assessment_grade';
+    public const COL_DISPLAY_RUBRIC_GRADE      = 'display_rubric_grade';
+    public const COL_DISPLAY_CAPABILITY_GRADE  = 'display_capability_grade';
+    public const COL_DISPLAY_PROGRESSION_GRADE = 'display_progression_grade';
+    public const COL_SEQUENCE                  = 'sequence';
+    public const COL_CREATED_AT                = 'created_at';
+    public const COL_UPDATED_AT                = 'updated_at';
+    public const COL_DELETED_AT                = 'deleted_at';
 
 
     /**
@@ -51,6 +55,10 @@ class Mapper extends Schoolbox\Mapper
         $this->uses(self::COL_OVERALL_GRADE, self::TYPE_INTEGER);
         $this->uses(self::COL_SHOW_OVERALL_GRADE, self::TYPE_BOOLEAN);
         $this->uses(self::COL_DISPLAY_GRADE_PAGE, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_DISPLAY_ASSESSMENT_GRADE, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_DISPLAY_RUBRIC_GRADE, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_DISPLAY_CAPABILITY_GRADE, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_DISPLAY_PROGRESSION_GRADE, self::TYPE_BOOLEAN);
         $this->uses(self::COL_SEQUENCE, self::TYPE_INTEGER);
         $this->uses(self::COL_CREATED_AT, self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses(self::COL_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
