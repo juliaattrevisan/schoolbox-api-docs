@@ -20,7 +20,7 @@ INSERT INTO
     component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
     (
         SELECT
-            id, 'itemImage', 'feature-image', 'Fallback Image', ''
+            id, 'itemImage', 'author', 'Fallback Image', ''
         FROM component_definition
         WHERE `module` = 'dashboard'
           AND `class` = 'Schoolbox\\Comms\\News\\Component\\Dashboard\\Controller'

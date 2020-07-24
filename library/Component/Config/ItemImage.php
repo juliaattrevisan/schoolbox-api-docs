@@ -8,6 +8,14 @@ class Component_Config_ItemImage extends Component_Config_Abstract
 {
 
     /**
+     * Fallback Image consts corresponding to itemLayout.php component config options
+     */
+    public const IMAGE_AUTHOR = 'author';
+    public const IMAGE_SCHOOL_LOGO = 'school-logo';
+    public const IMAGE_NONE = 'none';
+
+
+    /**
      * Render the config option
      *
      * @param SitePage                          $page
@@ -24,9 +32,9 @@ class Component_Config_ItemImage extends Component_Config_Abstract
         $page->setVar('item_image_block', '');
 
         $options = [
-            'author-image' => 'Author Portrait',
-            'school-logo' => 'School Logo',
-            'none' => 'None'
+            self::IMAGE_AUTHOR => 'Author Portrait',
+            self::IMAGE_SCHOOL_LOGO => 'School Logo',
+            self::IMAGE_NONE => 'None'
         ];
 
         foreach ($options as $k => $opt) {

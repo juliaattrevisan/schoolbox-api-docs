@@ -34,9 +34,15 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        $limit = Component_Config_Size::SIZE_ALL === (int)$this->getConfig('size')
-            ? self::HARD_LIMIT
-            : (int)$this->getConfig('size');
+        $limit = Component_Config_Size::SIZE_ALL === (int)$this->getConfig('size') ? self::HARD_LIMIT : (int)$this->getConfig('size');
+
+        /* Pick a card layout template
+         */
+        $layout = $this->getConfig('itemLayout');
+
+        /* Pick a fallback image type
+         */
+        $fallbackImage = $this->getConfig('itemImage');
 
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),

@@ -8,6 +8,14 @@ class Component_Config_ItemLayout extends Component_Config_Abstract
 {
 
     /**
+     * Layout consts corresponding to itemLayout.php component config options
+     */
+    public const LAYOUT_LIST = 'list';
+    public const LAYOUT_LIST_REVERSED = 'list-reversed';
+    public const LAYOUT_CARD = 'card';
+
+
+    /**
      * Render the config option
      *
      * @param SitePage                          $page
@@ -24,9 +32,9 @@ class Component_Config_ItemLayout extends Component_Config_Abstract
         $page->setVar('item_layout_block', '');
 
         $options = [
-            'list' => 'List',
-            'list-reversed' => 'List (Reversed)',
-            'card' => 'Card',
+            self::LAYOUT_LIST => 'List',
+            self::LAYOUT_LIST_REVERSED => 'List (Reversed)',
+            self::LAYOUT_CARD => 'Card',
         ];
 
         foreach ($options as $k => $opt) {
