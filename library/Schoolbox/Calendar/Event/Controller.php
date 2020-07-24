@@ -728,20 +728,14 @@ class Controller extends Base
     public function postMove(Event $event): void
     {
         // Do not modify anything except the event's start and end
-        // Amount to move by will be in "minuteDelta", allday flag in "allDay"
-        $minuteDelta = $this->request->post->getInt('minuteDelta');
-        $allDay      = $this->request->post->getBool('allDay');
-        if ($event->getStartDateTime()) {
-            $event->setStartDateTime($event->getStartDateTime()->addMinutes($minuteDelta));
-            if ($allDay) {
-                $event->setStartDateTime($event->getStartDateTime()->startOfDay());
-            }
-        }
-        if ($event->getEndDateTime()) {
-            $event->setEndDateTime($event->getEndDateTime()->addMinutes($minuteDelta));
-            if ($allDay) {
-                $event->setEndDateTime($event->getEndDateTime()->startOfDay());
-            }
+        $start = new Alaress_Date_Format($this->request->post->get('start'), \DateTime::ATOM);
+        $end   = new Alaress_Date_Format($this->request->post->get('end'), \DateTime::ATOM);
+        if ($this->request->post->getBool('allDay')) {
+            $event->setStartDate($start->getDatabase());
+            $event->setEndDate($end->getDatabase());
+        } else {
+            $event->setStartDateTime($start);
+            $event->setEndDateTime($end);
         }
 
         $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
@@ -768,6 +762,8 @@ class Controller extends Base
             $event->getAccess(),
             $eventRelations
         );
+
+        // No real need to return anything
     }
 
 

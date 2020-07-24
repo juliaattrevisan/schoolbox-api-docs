@@ -357,13 +357,12 @@
                 // TODO this needs to consider events in series
                 let event = eventResizeInfo.event,
                     data  = {
-                        eventId: event?.extendedProps?.data?.meta?.eventId,
-                        resize:  true,
                         start:   this.toMoment(event.start).format(),
                         end:     this.toMoment(event.end).format(),
+                        allDay: event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+                axios.post('/calendar/event/' + String(event?.extendedProps?.data?.meta?.eventId) + '/move', qs.stringify(data));
             },
 
             /**
@@ -375,10 +374,10 @@
              */
             onEventDrop(eventDropInfo) {
                 let event = eventDropInfo.event,
-                    delta = toDuration(eventDropInfo.delta),
                     data  = {
-                        minuteDelta: delta.asMinutes(),
-                        allDay:      event.allDay,
+                        start:  this.toMoment(event.start).format(),
+                        end:    this.toMoment(event.end).format(),
+                        allDay: event.allDay,
                     };
                 // Apply and then remove the "loading" class
                 axios.post('/calendar/event/' + String(event?.extendedProps?.data?.meta?.eventId) + '/move', qs.stringify(data));
