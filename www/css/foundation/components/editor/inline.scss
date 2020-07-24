@@ -1,0 +1,14 @@
+// The inline CKEditor shares styles with textareas.
+.cke_editable_inline {
+  @extend textarea;
+  height: auto;
+  // Only transition colors:
+  // keeping size transition causes an awkward resize of the editor on focus
+  transition:
+    all 0s,
+    background-color .15s linear,
+    border-bottom-color .15s linear,
+    border-top-color .15s linear,
+    border-left-color .15s linear,
+    border-right-color .15s linear;
+}

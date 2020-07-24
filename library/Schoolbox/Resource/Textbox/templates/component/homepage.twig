@@ -1,0 +1,20 @@
+{##
+ # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
+ # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
+ # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ # writable:  bool                                                      Is this component's content writable?
+ #}
+
+{% if writable %}
+    {% include '@textbox/component/homepage/writable.twig' with {
+        component: component,
+        textbox:   textbox,
+        context:   context,
+    } only %}
+{% else %}
+    {% include '@textbox/component/homepage/readonly.twig' with {
+        component: component,
+        textbox:   textbox,
+        context:   context,
+    } only %}
+{% endif %}

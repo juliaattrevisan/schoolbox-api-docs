@@ -1,145 +1,150 @@
 (function($) {
 
     /**
+     * Init
+     *
+     * @param options
+     * @returns {*}
+     */
+    function init(options) {
+
+        /* These are the default CKEDITOR.config values
+         * You can find more at http://docs.ckeditor.com/#!/api/CKEDITOR.config
+         */
+        var defaults =  {
+            toolbarGroups: [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'links', groups: ['links']},
+                /* Custom schoolbox-specific plugin stuff can go here
+                 * This is a hole into which you may put once-off abilities
+                 * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                 * This is typically not used for anything else for now
+                 */
+                {name: 'schoolbox', groups: ['schoolboxlink', 'schoolboxanchor', 'schoolboxresource', 'schoolboxiframe']},
+                {name: 'insert', groups: ['insert']},
+                '/',
+                {name: 'styles', groups: ['styles']},
+                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
+                {name: 'others', groups: ['others']},
+                '/',
+                {name: 'colors', groups: ['colors']},
+                {name: 'clipboard', groups: ['clipboard', 'undo']},
+                {name: 'document', groups: ['mode', 'document', 'doctools']},
+                {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
+                {name: 'tools', groups: ['tools']}
+            ],
+
+            /* Quicktable config for best table defaults
+             */
+            qtBorder: '0', // Border of inserted table
+            qtWidth: '100%', // Width of inserted table
+            qtCellPadding: '0', // Cell padding table
+            qtCellSpacing: '0', // Cell spacing table
+
+            /* Maximum height of editing panel is half the viewport height
+             * due to navigation panel, other elements on the page, etc.
+             */
+            autoGrow_maxHeight: 0.5 * $(window).height(),
+
+            /* Allow images to be styled using style attribute (they can use source if clever)
+             */
+            extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};' +
+                'iframe(full-width)[src,allowfullscreen,width,height,allow,frameBorder,webkitallowfullscreen,mozallowfullscreen]{width,height,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
+                'div(*);' +
+                'object[id,name,width,height];' +
+                'param[name,value];' +
+                'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
+                'a[id,href,target,data-portal,title];' +
+                'map[!name];' +
+                'area[!shape,!coords,!href,target,!alt];' +
+                'img[usemap];',
+
+            /* Remove annoying dialog that always appears
+             */
+            dialog_noConfirmCancel: true,
+
+            /* Remove default plugins; add Schoolbox Custom Plugins
+             */
+            removePlugins: 'image,image2,uploadimage',
+            extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
+
+            /* Other settings
+             */
+            toolbarCanCollapse: true,
+            removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
+            magicline_color: '#0066b0',
+            format_tags: 'p;h2;h3;h4;pre',
+            contentsCss: [
+                '/css/core/skin.css.php',
+                '/css/core/editor.css',
+            ],
+
+            /* set to use our iframely API key for oEmbed calls
+             */
+            embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
+
+            /* This used to be 'mode', a legacy setting from Tiny.
+             *
+             * Instead of using its broken interface design, I levelled it up
+             * so that you can use jquery selectors here and it will try to
+             * derive the id or name and then apply the ckeditor. It's a bit
+             * different to Tiny, but we use css selectors to start editors
+             *
+             * This also unifies the various scattered instantiations styles
+             * which were previously totally stupid
+             *
+             * The elements must have an id or name for it to work this way
+             */
+            targetElements: $('textarea'),
+
+            /* A callback to execute prior to the ritual spawning of all ck
+             */
+            load: function() {
+            },
+
+            /* A callback to fire prior to ck spawn
+             */
+            setup: function(element) {
+            },
+
+            /* A callback to fire immediately after ck spawn
+             */
+            start: function(element) {
+            },
+
+            /* A callback to fire when content is changed
+             */
+            change: function(element) {
+            },
+
+            /* A callback to fire when editor blurs
+             */
+            blur: function(element) {
+            }
+        };
+
+        var derived = {
+        };
+
+        return $.extend(defaults, derived, options);
+    }
+
+
+    $.alaressEditorConfig = function (options) {
+        options = options || {};
+        return init(options);
+    };
+
+
+    /**
      * Unified Editor interface
      *
      * @param options
      */
     $.fn.alaressEditor = function(options) {
-        options = options || {};
-
-        var config = init(options);
+        var config = $.alaressEditorConfig(options);
 
         start();
-
-        /**
-         * Init
-         *
-         * @param options
-         * @returns {*}
-         */
-        function init(options) {
-
-            /* These are the default CKEDITOR.config values
-             * You can find more at http://docs.ckeditor.com/#!/api/CKEDITOR.config
-             */
-            var defaults =  {
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'links', groups: ['links']},
-                    /* Custom schoolbox-specific plugin stuff can go here
-                     * This is a hole into which you may put once-off abilities
-                     * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
-                     * This is typically not used for anything else for now
-                     */
-                    {name: 'schoolbox', groups: ['schoolboxlink', 'schoolboxanchor', 'schoolboxresource', 'schoolboxiframe']},
-                    {name: 'insert', groups: ['insert']},
-                    '/',
-                    {name: 'styles', groups: ['styles']},
-                    {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
-                    {name: 'others', groups: ['others']},
-                    '/',
-                    {name: 'colors', groups: ['colors']},
-                    {name: 'clipboard', groups: ['clipboard', 'undo']},
-                    {name: 'document', groups: ['mode', 'document', 'doctools']},
-                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
-                    {name: 'tools', groups: ['tools']}
-                ],
-
-                /* Quicktable config for best table defaults
-                 */
-                qtBorder: '0', // Border of inserted table
-                qtWidth: '100%', // Width of inserted table
-                qtCellPadding: '0', // Cell padding table
-                qtCellSpacing: '0', // Cell spacing table
-
-                /* Maximum height of editing panel is half the viewport height
-                 * due to navigation panel, other elements on the page, etc.
-                 */
-                autoGrow_maxHeight: 0.5 * $(window).height(),
-
-                /* Allow images to be styled using style attribute (they can use source if clever)
-                 */
-                extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};' +
-                    'iframe(full-width)[src,allowfullscreen,width,height,allow,frameBorder,webkitallowfullscreen,mozallowfullscreen]{width,height,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
-                    'div(*);' +
-                    'object[id,name,width,height];' +
-                    'param[name,value];' +
-                    'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
-                    'a[id,href,target,data-portal,title];' +
-                    'map[!name];' +
-                    'area[!shape,!coords,!href,target,!alt];' +
-                    'img[usemap];',
-
-                /* Remove annoying dialog that always appears
-                 */
-                dialog_noConfirmCancel: true,
-
-                /* Remove default plugins; add Schoolbox Custom Plugins
-                 */
-                removePlugins: 'image,image2,uploadimage',
-                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
-
-                /* Other settings
-                 */
-                toolbarCanCollapse: true,
-                removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
-                magicline_color: '#0066b0',
-                format_tags: 'p;h2;h3;h4;pre',
-                contentsCss: [
-                    '/css/core/skin.css.php',
-                    '/css/core/editor.css',
-                ],
-
-                /* set to use our iframely API key for oEmbed calls
-                 */
-                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-
-                /* This used to be 'mode', a legacy setting from Tiny.
-                 *
-                 * Instead of using its broken interface design, I levelled it up
-                 * so that you can use jquery selectors here and it will try to
-                 * derive the id or name and then apply the ckeditor. It's a bit
-                 * different to Tiny, but we use css selectors to start editors
-                 *
-                 * This also unifies the various scattered instantiations styles
-                 * which were previously totally stupid
-                 *
-                 * The elements must have an id or name for it to work this way
-                 */
-                targetElements: $('textarea'),
-
-                /* A callback to execute prior to the ritual spawning of all ck
-                 */
-                load: function() {
-                },
-
-                /* A callback to fire prior to ck spawn
-                 */
-                setup: function(element) {
-                },
-
-                /* A callback to fire immediately after ck spawn
-                 */
-                start: function(element) {
-                },
-
-                /* A callback to fire when content is changed
-                 */
-                change: function(element) {
-                },
-
-                /* A callback to fire when editor blurs
-                 */
-                blur: function(element) {
-                }
-            };
-
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
-        }
 
         /**
          * Disturb the sleeping dragon

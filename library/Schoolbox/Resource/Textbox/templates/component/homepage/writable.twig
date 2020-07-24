@@ -1,0 +1,210 @@
+{##
+ # Writable version of homepage textbox component.
+ #
+ # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
+ # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
+ # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ #}
+
+{% set textboxExists = textbox is not null and textbox.id is not null %}
+
+{% if textboxExists %}
+    <div class="content">
+        <article data-content
+                 data-textbox-heading="{{ textbox.heading }}"
+                 id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
+    </div>
+
+    <div class="component-action">
+        <section>
+            {# This has a button-like styling, but isn't actually a button #}
+            <button data-role="dirty-indicator" class="hide" disabled>Changes not saved</button>
+            <button data-action="save"
+                    data-form-method="put"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
+                    data-processing-text="Saving..."
+                    class="hide">Save</button>
+            <button data-action="modify" data-processing-text="Modifying">Modify</button>
+            <button data-action="delete"
+                    data-form-method="delete"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
+                    data-processing-text="Deleting...">Delete</button>
+        </section>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-textbox"></i>
+
+        {% if component.config.emptyStateMessage ?? '' %}
+            <p>{{ component.config.emptyStateMessage }}</p>
+            <p><a href="#" data-reveal-id="addTextboxModal-{{ component.instance.id }}">Add content to this text box</a>.</p>
+        {% else %}
+            <p>
+                <a href="#" data-reveal-id="addTextboxModal-{{ component.instance.id }}">Add text and multimedia, or embed content</a>
+                to display in this component.
+            </p>
+        {% endif %}
+    </div>
+
+    <div id="addTextboxModal-{{ component.instance.id }}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{{ component.instance.id }}-title" aria-hidden="true" role="dialog">
+        {# Create component in alt-source folder context, if there is one #}
+        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: textbox.category, folderId: textbox.category.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
+            <section>
+                <h3 id="addTextboxModal-{{ component.instance.id }}-title">Add Textbox</h3>
+                <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
+                <input id="addTextboxModal-{{ component.instance.id }}-form-heading" type="text" name="heading" value="" required maxlength="100" />
+                <input type="hidden" name="body" value="" />
+                <input type="submit" value="Create Textbox">
+            </section>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </form>
+    </div>
+{% endif %}
+
+<div id="toast-{{ component.instance.id }}" class="toast"></div>
+
+{% autoescape 'js' %}
+    <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+    <script type="text/javascript" src="/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var component             = $('#component{{ component.instance.id }}'),
+                content               = component.find('.content'),
+                configForm            = component.find('[data-component-panel="settings"] form'),
+                dirtyIndicator        = component.find('[data-role="dirty-indicator"]'),
+                beforeUnloadListener  = null,
+                addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
+                addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
+                toast                 = $('#toast-{{ component.instance.id }}'),
+                editorInstanceOptions = $.alaressEditorConfig({
+                    // Always start file browser from current folder, instead of the alt source
+                    file_browser_category_id: Number("{{ context.id }}"),
+                    title:                    '',
+                },
+            );
+
+            // Remove wordcount as it looks awkward in the inline editor
+            if (!editorInstanceOptions.removePlugins) {
+                editorInstanceOptions.removePlugins = 'wordcount';
+            } else {
+                editorInstanceOptions.removePlugins += ',wordcount';
+            }
+
+            // Restore source dialog plugin
+            if (editorInstanceOptions.removeButtons) {
+                editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
+            }
+
+            component
+                .inlineTextboxEditor({
+                    modifyButton:          '[data-action="modify"]',
+                    deleteButton:          '[data-action="delete"]',
+                    saveButton:            '[data-action="save"]',
+                    editorInstance:        '[data-content]',
+                    editorInstanceOptions: editorInstanceOptions,
+                })
+                // On create/destroy of editor:
+                // add/remove no-pad class to its container, to offset padding
+                .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
+                    content.addClass('no-pad');
+
+                    // Add beforeUnload, which will trigger if this is dirty
+                    beforeUnloadListener = function (event) {
+                        if (inlineTextboxEditor.isDirty()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.returnValue = '';
+                            return event.returnValue;
+                        }
+                    };
+                    window.addEventListener('beforeunload', beforeUnloadListener);
+                })
+                .on('inlineTextboxEditor.editorDestroy', function () {
+                    content.removeClass('no-pad');
+                    window.removeEventListener('beforeunload', beforeUnloadListener);
+                })
+                // Pre/post save/delete: apply toast
+                .on('inlineTextboxEditor.preSave', function () {
+                    toast.toastActivate({text: 'Saving...'});
+                })
+                .on('inlineTextboxEditor.preDelete', function () {
+                    toast.toastActivate({text: 'Deleting...'})
+                })
+                .on('inlineTextboxEditor.save', function () {
+                    toast.toastTimeout({text: 'Saved', css: 'success'});
+                })
+                .on('inlineTextboxEditor.delete', function () {
+                    toast.toastTimeout({text: 'Deleted', css: 'success'});
+                })
+                .on('inlineTextboxEditor.saveFail', function () {
+                    toast.toastTimeout({text: 'Could not save textbox', css: 'alert'});
+                })
+                .on('inlineTextboxEditor.deleteFail', function () {
+                    toast.toastTimeout({text: 'Could not delete textbox', css: 'alert'});
+                })
+                // Post-delete: set the textbox to empty and submit config
+                .on('inlineTextboxEditor.delete', function () {
+                    configForm
+                        .find('select[name="textbox"]')
+                        .val(0);
+                    configForm.submit();
+                })
+                .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
+                    dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
+                });
+
+
+            // Dialog for creation of a textbox
+            addTextboxForm.alaressValidate({
+                submitHandler: function (form) {
+                    // Disable submit actions
+                    // TODO split alaressValidate's submit handler into beforeSubmit (disable inputs) and submit actions
+                    var $submit    = $(form).find('input[type=submit]'),
+                        submitText = $submit.val(),
+                        formData   = new FormData(form);
+
+                    $submit.prop("disabled", true).text('Working...');
+
+                    // And submit form via AJAX
+                    toast.toastActivate({text: 'Creating textbox...'});
+                    $.ajax(
+                        form.action,
+                        {
+                            method: form.method,
+                            data:   JSON.stringify({
+                                heading: formData.get('heading'),
+                                body:    formData.get('body'),
+                            }),
+                            dataType: 'json',
+                            contentType: 'application/json',
+                        }
+                    ).done(function (response) {
+                        // Reload the component, close the dialog
+                        addTextboxModal.foundation('reveal', 'close');
+                        toast.toastTimeout({text: 'Created', css: 'success'});
+
+                        // Set the component's configuration:
+                        // * Textbox: the ID of the newly created textbox
+                        // * Heading: the newly created textbox's heading
+                        configForm
+                            .find('select[name="textbox"]')
+                            .append($('<option>')
+                                .attr('value', response.id)
+                                .text(response.heading)
+                            )
+                            .val(response.id);
+                        configForm
+                            .find('input[name="componentname"]')
+                            .val(response.heading);
+                        configForm.submit();
+                    }).fail(function () {
+                        toast.toastTimeout({text: 'Could not create textbox', css: 'alert'});
+                    }).always(function () {
+                        $submit.prop("disabled", false).text(submitText);
+                    });
+                }
+            });
+        });
+    </script>
+{% endautoescape %}

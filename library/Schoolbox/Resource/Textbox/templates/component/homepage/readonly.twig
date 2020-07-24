@@ -1,0 +1,20 @@
+{##
+ # Read-only version of homepage textbox component.
+ #
+ # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
+ # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
+ # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ #}
+
+{% set textboxExists = textbox is not null and textbox.id is not null %}
+
+{% if textboxExists and textbox.body is defined and textbox.body != '' %}
+    <div class="content">
+        <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-textbox"></i>
+        <p>There is no content to view at this time.</p>
+    </div>
+{% endif %}

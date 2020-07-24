@@ -34,8 +34,11 @@ class Resource implements ModuleConfigInterface
         $webDavBrowserModule = new Schoolbox\Resource\Browser\WebDav\Module($di);
         $webDavBrowserModule->init('/drives');
 
-        $folderModule = new \Schoolbox\Resource\Folder\Module($di);
+        $folderModule = new Schoolbox\Resource\Folder\Module($di);
         $folderModule->init('/resource');
+
+        $textboxModule = new Schoolbox\Resource\Textbox\Module($di);
+        $textboxModule->init('/textbox');
 
         // Commented out as:
         // * it's unused
