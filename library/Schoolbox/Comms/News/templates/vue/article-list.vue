@@ -71,29 +71,29 @@
             }).catch(function (error) {
                 console.log(error);
             });
-            //
-            // // Listen for window state change
-            // if (self.modifyWindowState) {
-            //     window.onpopstate = function(event) {
-            //         if (!event.state) {
-            //             // Return to defaults
-            //             self.page = self.initialPage;
-            //             self.onPaginate(self.page, true);
-            //             self.tabSelected = self.initialTopic;
-            //             self.onTabChange(self.tabSelected, true, true);
-            //         } else {
-            //             if (event.state.page) {
-            //                 self.page = event.state.page;
-            //                 self.onPaginate(event.state.page, true);
-            //             }
-            //
-            //             if (event.state.tab) {
-            //                 self.tabSelected = event.state.tab;
-            //                 self.onTabChange(event.state.tab, true, true);
-            //             }
-            //         }
-            //     };
-            // }
+
+            // Listen for window state change
+            if (self.data.modifyWindowState) {
+                window.onpopstate = function(event) {
+                    if (!event.state) {
+                        // Return to defaults
+                        self.page = self.data.initialPage;
+                        self.onPaginate(self.page, true);
+                        self.tabSelected = self.initialTopic;
+                        self.onTabChange(self.tabSelected, true, true);
+                    } else {
+                        if (event.state.page) {
+                            self.page = event.state.page;
+                            self.onPaginate(event.state.page, true);
+                        }
+
+                        if (event.state.tab) {
+                            self.tabSelected = event.state.tab;
+                            self.onTabChange(event.state.tab, true, true);
+                        }
+                    }
+                };
+            }
         },
         methods: {
             /*
@@ -208,53 +208,53 @@
             }
         },
         computed: {
-            // // The total pages to show for pagination buttons
-            // pageCount: function () {
-            //     return Math.ceil(this.filteredArticles.length / this.configSearchTypeLimit);
-            // },
-            //
-            // // The current set of articles showing for the page
-            // currentArticles: function() {
-            //     // Short circuit if there's nothing in filteredArticles
-            //     if (!this.filteredArticles.length) {
-            //         return [];
-            //     }
-            //
-            //     // If there's a limit- just return 0 to that limit
-            //     if (this.limit) {
-            //         return this.filteredArticles.slice(0, this.limit);
-            //     }
-            //
-            //     // If pagination is disabled- just return all the filtered articles
-            //     // At the time of writing- this isn't reachable because disablePagination is only on when limit is also on
-            //     // But, include this in case this is ever wanted
-            //     if (this.disablePagination) {
-            //         return this.filteredArticles;
-            //     }
-            //
-            //     // Otherwise- work out the current set of articles based on the items per page, and the current page
-            //     var limit = this.configSearchTypeLimit;
-            //     var offset = (this.page-1) * limit;
-            //     var total = offset + limit;
-            //
-            //     return this.filteredArticles.slice(offset, total);
-            // },
-            //
-            // // When to show the 'show more' component action
-            // showMoreLink: function() {
-            //     return !this.articlesLoading && this.showMore && this.currentArticles.length;
-            // }
+            // The total pages to show for pagination buttons
+            pageCount: function () {
+                return Math.ceil(this.filteredArticles.length / this.data.configSearchTypeLimit);
+            },
+
+            // The current set of articles showing for the page
+            currentArticles: function() {
+                // Short circuit if there's nothing in filteredArticles
+                if (!this.data.filteredArticles.length) {
+                    return [];
+                }
+
+                // If there's a limit- just return 0 to that limit
+                if (this.limit) {
+                    return this.data.filteredArticles.slice(0, this.limit);
+                }
+
+                // If pagination is disabled- just return all the filtered articles
+                // At the time of writing- this isn't reachable because disablePagination is only on when limit is also on
+                // But, include this in case this is ever wanted
+                if (this.data.disablePagination) {
+                    return this.filteredArticles;
+                }
+
+                // Otherwise- work out the current set of articles based on the items per page, and the current page
+                var limit = this.data.configSearchTypeLimit;
+                var offset = (this.page-1) * limit;
+                var total = offset + limit;
+
+                return this.data.filteredArticles.slice(offset, total);
+            },
+
+            // When to show the 'show more' component action
+            showMoreLink: function() {
+                return !this.articlesLoading && this.data.showMore && this.currentArticles.length;
+            }
         },
         filters: {
-            // formatCommentCountMeta: function (value) {
-            //     var suffix = ' comment';
-            //
-            //     if (value > 1) {
-            //         suffix = ' comments';
-            //     }
-            //
-            //     return value + suffix;
-            // },
+            formatCommentCountMeta: function (value) {
+                var suffix = ' comment';
+
+                if (value > 1) {
+                    suffix = ' comments';
+                }
+
+                return value + suffix;
+            },
         }
     }
 </script>
@@ -286,7 +286,7 @@
                         </li>
                     </template>
 
-<!--                    <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">-->
+                    <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in this.currentArticles">
 <!--                        <div class="list-item">-->
 <!--                            <div class="small-12 card wrap-down">-->
 <!--                                <template v-if="article.featureImage">-->
@@ -337,7 +337,7 @@
 <!--                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>-->
 <!--                            </div>-->
 <!--                        </article>-->
-<!--                    </li>-->
+                    </li>
                 </ul>
 
 <!--                <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">-->
