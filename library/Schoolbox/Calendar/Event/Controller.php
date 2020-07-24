@@ -717,6 +717,61 @@ class Controller extends Base
 
 
     /**
+     * Moves this event to a new time, without changing its duration, attendance
+     * or any other fields.
+     *
+     * @api   POST /calendar/event/{eventId}/move
+     * @since 20.1
+     *
+     * @param Event $event
+     */
+    public function postMove(Event $event): void
+    {
+        // Do not modify anything except the event's start and end
+        // Amount to move by will be in "minuteDelta", allday flag in "allDay"
+        $minuteDelta = $this->request->post->getInt('minuteDelta');
+        $allDay      = $this->request->post->getBool('allDay');
+        if ($event->getStartDateTime()) {
+            $event->setStartDateTime($event->getStartDateTime()->addMinutes($minuteDelta));
+            if ($allDay) {
+                $event->setStartDateTime($event->getStartDateTime()->startOfDay());
+            }
+        }
+        if ($event->getEndDateTime()) {
+            $event->setEndDateTime($event->getEndDateTime()->addMinutes($minuteDelta));
+            if ($allDay) {
+                $event->setEndDateTime($event->getEndDateTime()->startOfDay());
+            }
+        }
+
+        $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+
+        // And save it
+        $eventRelations = new EventRelations(
+            $event->getAccess(),
+            $event->getFolderCollection()->getPropertyValues('setCategoryId'),
+            $event->getRoleCollection()->getPropertyValues('roleId'),
+            array_column($payload['attendees']['guests'], 'id'),
+            // Attendance is dirty because this has moved
+            true
+        );
+
+        // Efficacy is only this item for now.
+        // It should be able to be: all instances, or all in the future
+        (new EventRecurrenceMapper($this->eventMapper))->save(
+            $event,
+            EventRecurrenceMapper::EFFICACY_SELF,
+            null,
+            null,
+            $event->getStartDateTime(),
+            $event->getEndDateTime(),
+            $event->getAccess(),
+            $eventRelations
+        );
+    }
+
+
+    /**
      * Delete an event, or a set of events from a series
      *
      * @param Event $event
