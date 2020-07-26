@@ -58,14 +58,14 @@ class Controller extends Base
     public function getIndex()
     {
         //Start Range
-        $start = \Alaress_Date_Format::newNaturalDate('-2 weeks');
+        $start = \Alaress_Date_Format::newNaturalDate('-1 weeks');
         $end = \Alaress_Date_Format::now();
 
         $folderpb = $this->folderMapper->getPredicateBuilder();
-        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true]);
+        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true,'order'=>['deleted_at'=>'DESC']]);
 
         $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
-        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true]);
+        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true, 'order'=>['deleted_at'=>'DESC']]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
             'pageCurrent' => self::PAGE_CURRENT,
@@ -81,19 +81,11 @@ class Controller extends Base
      */
     public function restoreFolder()
     {
-        try {
-            try {
-                $folder = $this->folderMapper->findById($this->getRequest()->post['id']);
-            } catch (ModelDeleted $e) {
-                $this->folderMapper->restoreSoftDeleted($e->getDeletedObject());
-                $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
-                return;
-            }
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Folder doesn't exist; noop
-             */
-        }
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
+        $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->getRequest()->post['id']]);
+        $recursiveUndeleter->restoreSoftDeletedModels();
+
+        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
 
     /**
