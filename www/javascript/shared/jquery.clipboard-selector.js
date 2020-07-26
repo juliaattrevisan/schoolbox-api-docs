@@ -114,13 +114,13 @@ $.fn.clipboardSelector = function(options) {
             event.preventDefault();
 
             // Copy and paste button - show only when ready
-            var button = $(config.copy).hide();
-            var client = new ZeroClipboard(button);
+            // var button = $(config.copy).hide();
+            // var client = new ZeroClipboard(button);
 
             config.onReady();
-            client.on('ready', function() {
-                config.onZeroClipboardReady();
-            });
+            // client.on('ready', function() {
+            //     config.onZeroClipboardReady();
+            // });
         });
     }
 }
