@@ -33,8 +33,8 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $isAdministrator, null);
-        $this->register('POST', '/folder/restore', 'restoreFolder', $isAdministrator, null);
-        $this->register('POST', '/assessment/restore', 'restoreAssessment', $isAdministrator, null);
+        $this->register('POST', '/folder', 'restoreFolder', $isAdministrator, null);
+        $this->register('POST', '/assessment', 'restoreAssessment', $isAdministrator, null);
     }
 
     /**

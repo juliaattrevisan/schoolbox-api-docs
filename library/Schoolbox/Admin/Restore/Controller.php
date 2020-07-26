@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Mapper\Exception\Deleted as ModelDeleted;
 
 class Controller extends Base
 {
@@ -79,7 +80,19 @@ class Controller extends Base
      */
     public function restoreFolder()
     {
-
+        try {
+            try {
+                $folder = $this->folderMapper->findById($this->getRequest()->post['id']);
+            } catch (ModelDeleted $e) {
+                $this->folderMapper->restoreSoftDeleted($e->getDeletedObject());
+                $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
+                return;
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Folder doesn't exist; noop
+             */
+        }
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 
     /**
@@ -89,6 +102,19 @@ class Controller extends Base
      */
     public function restoreAssessment()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', []));
+        try {
+            try {
+                $assessment = $this->assessmentMapper->findById($this->getRequest()->post['id']);
+            } catch (ModelDeleted $e) {
+                $this->assessmentMapper->restoreSoftDeleted($e->getDeletedObject());
+                $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
+                return;
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Assessment doesn't exist; noop
+             */
+        }
+
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }

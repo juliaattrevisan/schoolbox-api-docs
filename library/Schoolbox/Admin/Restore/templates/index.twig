@@ -3,16 +3,38 @@
 
 <script>
     $(function() {
+        var $toast = $('[data-toast]');
+
         $('[data-restore-folder]').click(function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to recover this folder?',
                 confirmEvent: function() {
-                    $.post('/adminv2/restore/folder', {
-                        id: $(event.target).attr('data-delete')
+                    var config = {text: 'Restoring folder...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreFolder') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-folder')
+                        }
                     })
-                    .done(function() {
+                    .success(function() {
+                        $toast.toastTimeout({
+                            text: 'Folder recovered!',
+                            css: 'success'
+                        });
                         $(event.target).closest('tr').remove();
+                    })
+                    .error(function(response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: temp.message,
+                            css: 'alert'
+                        });
                     });
                 }
             });
@@ -23,11 +45,31 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to recover this assessment?',
                 confirmEvent: function() {
-                    $.post('/adminv2/restore/assessment', {
-                        id: $(event.target).attr('data-delete')
+                    var config = {text: 'Restoring assessment...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('restore.restoreAssessment') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-restore-assessment')
+                        }
                     })
-                    .done(function() {
+                    .success(function() {
+                        $toast.toastTimeout({
+                            text: 'Assessment recovered!',
+                            css: 'success'
+                        });
                         $(event.target).closest('tr').remove();
+                    })
+                    .error(function(response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: temp.message,
+                            css: 'alert'
+                        });
                     });
                 }
             });
@@ -96,6 +138,7 @@
                 </table>
             </div>
         </section>
-
     </div>
 </div>
+<div id='toaster' class="toast" data-toast></div>
+
