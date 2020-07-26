@@ -6,8 +6,9 @@
  */
 namespace Schoolbox\Admin\Restore;
 
-use Alaress\Authorizer\Rule\IsConfigOn;
 use Alaress\Web\Controller\Base;
+use Psr\Log\NullLogger;
+use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -102,19 +103,10 @@ class Controller extends Base
      */
     public function restoreAssessment()
     {
-        try {
-            try {
-                $assessment = $this->assessmentMapper->findById($this->getRequest()->post['id']);
-            } catch (ModelDeleted $e) {
-                $this->assessmentMapper->restoreSoftDeleted($e->getDeletedObject());
-                $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
-                return;
-            }
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Assessment doesn't exist; noop
-             */
-        }
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
+        $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->getRequest()->post['id']]);
+        $recursiveUndeleter->restoreSoftDeletedModels();
 
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
 }
