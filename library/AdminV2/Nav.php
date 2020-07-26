@@ -55,6 +55,8 @@ class AdminV2_Nav
             'import/directImport'      => ['name' => 'Direct Import',               'visible' => true],
             'filters'                  => ['name' => 'Filters',                     'visible' => true],
             'feature-tours'            => ['name' => 'Feature Tours',               'visible' => true],
+            'restore'                  => ['name' => 'Restore',                     'visible' => true],
+
         ];
     }
 

@@ -1,0 +1,101 @@
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<script>
+    $(function() {
+        $('[data-restore-folder]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this folder?',
+                confirmEvent: function() {
+                    $.post('/adminv2/restore/folder', {
+                        id: $(event.target).attr('data-delete')
+                    })
+                    .done(function() {
+                        $(event.target).closest('tr').remove();
+                    });
+                }
+            });
+        });
+
+        $('[data-restore-assessment]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to recover this assessment?',
+                confirmEvent: function() {
+                    $.post('/adminv2/restore/assessment', {
+                        id: $(event.target).attr('data-delete')
+                    })
+                    .done(function() {
+                        $(event.target).closest('tr').remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab>
+            <dd class="active"><a href="#panel1-1">Folder</a></dd>
+            <dd><a href="#panel1-2">Assessment</a></dd>
+        </dl>
+        <section class="content tabs-content">
+            <div class="content active" id="panel1-1">
+                <table>
+                    <thead>
+                    <tr>
+                        <td>Folder Name</td>
+                        <td>Deleted On</td>
+                        <td>Restore</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for folder in deletedFolders %}
+                    <tr>
+                        <td>{{ folder.nameWithCodes }}</td>
+                        <td>{{ folder.deletedAt.long }}</td>
+                        <td><a data-restore-folder="{{ folder.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="content" id="panel1-2">
+                <table>
+                    <thead>
+                    <tr>
+                        <td>Assessment Name</td>
+                        <td>Type</td>
+                        <td>Location</td>
+                        <td>Deleted On</td>
+                        <td>Restore</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for assessment in deletedAssessments %}
+                    <tr>
+
+                        <td>{{ assessment.title }}</td>
+                        <td>    {% if assessment.hasProject %}
+                                Project
+                            {% elseif assessment.hasTask %}
+                                Task
+                            {% elseif assessment.hasQuiz %}
+                                Quiz
+                            {% elseif assessment.hasDueWork %}
+                                Due Work
+                            {% endif %}</td>
+                        <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
+                        <td>{{ assessment.deletedAt.long }}</td>
+                        <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</div>

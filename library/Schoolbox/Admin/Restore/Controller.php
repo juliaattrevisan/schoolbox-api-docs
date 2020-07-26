@@ -1,0 +1,94 @@
+<?php
+/**
+ * @author      James Leckie <james.leckie@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+namespace Schoolbox\Admin\Restore;
+
+use Alaress\Authorizer\Rule\IsConfigOn;
+use Alaress\Web\Controller\Base;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+
+class Controller extends Base
+{
+    private const PAGE_CURRENT = 'restore';
+
+    /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
+
+    /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+    /**
+     * Controller constructor.
+     *
+     * @param ErrorMapper  $errorMapper
+     * @param FolderMapper $folderMapper
+     */
+    public function __construct(
+        ErrorMapper $errorMapper,
+        FolderMapper $folderMapper,
+        AssessmentMapper $assessmentMapper
+    )
+    {
+        $this->errorMapper = $errorMapper;
+        $this->folderMapper = $folderMapper;
+        $this->assessmentMapper = $assessmentMapper;
+    }
+
+    /**
+     * Load $templateName
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getIndex()
+    {
+        //Start Range
+        $start = \Alaress_Date_Format::newNaturalDate('-2 weeks');
+        $end = \Alaress_Date_Format::now();
+
+        $folderpb = $this->folderMapper->getPredicateBuilder();
+        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true]);
+
+        $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
+        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true]);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
+            'pageCurrent' => self::PAGE_CURRENT,
+            'deletedFolders' => $deletedFolders,
+            'deletedAssessments' => $deletedAssessments,
+        ]));
+    }
+
+    /**
+     * Load $templateName
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function restoreFolder()
+    {
+
+    }
+
+    /**
+     * Load $templateName
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function restoreAssessment()
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', []));
+    }
+}
