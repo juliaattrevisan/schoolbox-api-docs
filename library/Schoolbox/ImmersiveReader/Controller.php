@@ -10,49 +10,33 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Proxy\Server as ProxyServer;
 
 class Controller extends Base
 {
-
-    private $tenant_id;
-    private $client_id;
-    private $client_secret;
-    private $subdomain;
-
     /**
-     * @var Client
-     */
-    private $httpClient;
-
-    /**
-     * Controller constructor.
-     **/
-    public function __construct()
-    {
-       $this->httpClient = new Client();
-
-       $this->tenant_id = $this->getConfigLoader()->get('office365_tenant_id');
-       $this->client_id = $this->getConfigLoader()->get('office365_client');
-       $this->client_secret = $this->getConfigLoader()->get('office365_secret');
-       $this->subdomain = $this->getConfigLoader()->get('office365_immersive_reader_name');
-
-    }
-
-    /**
-     * Load $templateName
+     * This function does an oAuth request to Azure and gets back a token which it provides to the user via JSON
+     * This enables the user to then use the Immersive Reader service with a short lived token.
+     * This is done on the backend to protect the server secret from the end user.
      *
-     * @param string $templateName
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getTokenAndSubdomain()
     {
+        $tenant_id = $this->getConfigLoader()->get('office365_tenant_id');
+        $client_id = $this->getConfigLoader()->get('office365_client');
+        $client_secret = $this->getConfigLoader()->get('office365_secret');
+        $subdomain = $this->getConfigLoader()->get('office365_immersive_reader_name');
+
+        $httpClient = new Client(['curl' => ProxyServer::getInstance()->buildCurlOptions()]);
+
         try {
-            $result = $this->httpClient->post('https://login.windows.net/' . $this->tenant_id . '/oauth2/token',
+            $result = $httpClient->post('https://login.windows.net/' . $tenant_id . '/oauth2/token',
                 [
                     'headers'     => ['Content-Type' => 'application/x-www-form-urlencoded'],
                     'form_params' => [
-                        'client_id'     => $this->client_id,
-                        'client_secret' => $this->client_secret,
+                        'client_id'     => $client_id,
+                        'client_secret' => $client_secret,
                         'resource'      => 'https://cognitiveservices.azure.com/',
                         'grant_type'    => 'client_credentials',
                     ],
@@ -69,7 +53,7 @@ class Controller extends Base
         $authToken = json_decode($result->getBody()->getContents());
 
         if($authToken->access_token) {
-            $output = ['token'=>$authToken->access_token, 'subdomain' => $this->subdomain];
+            $output = ['token'=>$authToken->access_token, 'subdomain' => $subdomain];
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($output)
             );

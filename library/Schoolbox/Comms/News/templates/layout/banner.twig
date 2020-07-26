@@ -1,63 +1,4 @@
 {% import '@commsNews/macro/indicator.twig' as indicator %}
-<script>
-
-    function getTokenAndSubdomainAsync() {
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                url: "/immersive-reader/getAuth",
-                type: "GET",
-                success: function (data) {
-                    if (data.error) {
-                        reject(data.error);
-                    } else {
-                        resolve(data);
-                    }
-                },
-                error: function (err) {
-                    reject(err);
-                }
-            });
-        });
-    }
-
-    function handleLaunchImmersiveReader() {
-        getTokenAndSubdomainAsync()
-                .then(function (response) {
-                    const token = response["token"];
-                    const subdomain = response["subdomain"];
-
-                    // Learn more about chunk usage and supported MIME types https://docs.microsoft.com/en-us/azure/cognitive-services/immersive-reader/reference#chunk
-                    const data = {
-                        title: 'Immersive Reader',
-                        chunks: [{
-                            content: $("#ir-content").html(),
-                            mimeType: "text/html"
-                        }]
-                    };
-
-                    // Learn more about options https://docs.microsoft.com/en-us/azure/cognitive-services/immersive-reader/reference#options
-                    const options = {
-                        "onExit": exitCallback,
-                        "uiZIndex": 2000
-                    };
-
-                    ImmersiveReader.launchAsync(token, subdomain, data, options)
-                            .catch(function (error) {
-                                alert("Error in launching the Immersive Reader. Check the console.");
-                                console.log(error);
-                            });
-                })
-                .catch(function (error) {
-                    alert("Error in getting the Immersive Reader token and subdomain. Check the console.");
-                    console.log(error);
-                });
-    }
-
-    function exitCallback() {
-        console.log("This is the callback function. It is executed when the Immersive Reader closes.");
-    }
-
-</script>
 <div class="small-12 island">
     {% if article.featureImage %}
         <section class="banner content">
@@ -71,7 +12,15 @@
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
         </div>
-        <div class='immersive-reader-button' onclick='handleLaunchImmersiveReader()'></div>
+        {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
+            <script src="/javascript/shared/jquery.immersive-reader.js" type="text/javascript"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-immersive-reader]').immersiveReader({title: '{{ article.title }}' });
+                });
+            </script>
+            <div class='immersive-reader-button' id="ir-button" data-immersive-reader="button"></div>
+        {% endif %}
 
         {# TODO this metadata should be in a span tag, but that causes the audience-container to flip out #}
         <div class="meta">
@@ -122,7 +71,7 @@
                 </div>
             </span>
         </div>
-        <article id="ir-content">
+        <article>
             {{ article.body|purify }}
         </article>
     </section>
