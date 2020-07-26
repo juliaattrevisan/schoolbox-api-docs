@@ -89,11 +89,7 @@
          */
         function execute() {
             var button = config.element;
-            console.log('attaching event');
-            console.log(config.content);
-            console.log(config.title);
             $(button).on('click',  function(event) {
-                console.log('button click');
                 event.preventDefault();
                 handleLaunchImmersiveReader(config.title, config.content)
             });
