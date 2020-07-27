@@ -13,6 +13,7 @@
             'get-index-route',
             'config-save-for-later',
             'locale-news-plural',
+            'saved-article-ids',
             'articles-loading',
             'current-articles'
         ],
@@ -77,9 +78,9 @@
 
             <nav>
                 <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNewsPlural"></a>
-<!--                <a v-if="configSaveForLater" @click="saveForLater(article)"-->
-<!--                   :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]"-->
-<!--                   title="Save for later"></a>-->
+                <a v-if="configSaveForLater" @click="saveForLater(article)"
+                   :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]"
+                   title="Save for later"></a>
             </nav>
 
             <article v-if="compactMode">

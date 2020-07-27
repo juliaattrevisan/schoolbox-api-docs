@@ -234,6 +234,7 @@
                     :get-index-route="this.getIndexRoute"
                     :config-save-for-later="this.configSaveForLater"
                     :locale-news-plural="this.localeNewsPlural"
+                    :saved-article-ids="this.savedArticleIds"
                     :articles-loading="this.articlesLoading"
                     :current-articles="this.currentArticles"
                 ></layout-list>
