@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\Grid\Importer\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 
 /**
  * Test for the CSV importer factory.
@@ -37,6 +38,7 @@ TEST1;
         yield 'empty descriptors' => [
             $this->buildStream($test1),
             5,
+            new DueWorkModel(),
             ['', '', '', '',],
             [
                 [
@@ -108,6 +110,7 @@ TEST2;
         yield 'mark range on' => [
             $this->buildStream($test2),
             5,
+            new DueWorkModel(),
             ['', '', '', '',],
             [
                 [
@@ -153,6 +156,7 @@ TEST2;
         yield 'mark-per-cap on' => [
             $this->buildStream($test3),
             5,
+            new DueWorkModel(),
             ['', '', '', '',],
             [
                 [
@@ -186,6 +190,11 @@ TEST2;
             1,
             2,
         ];
+
+
+        // New cases:
+        // legacy markPerCapability setting on
+        // legacy markPerCapability setting off
     }
 
 
@@ -193,17 +202,19 @@ TEST2;
      * @dataProvider getTestBuildData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory::build
      *
-     * @param resource $fp
-     * @param int      $maxLevels
-     * @param array    $expectedLevels
-     * @param array    $expectedCapabilities
-     * @param bool     $expectedUseMarkRange
-     * @param int|null $expectedCapabilityMarkType
-     * @param int|null $expectedCapabilityGradeGroup
+     * @param resource     $fp
+     * @param int          $maxLevels
+     * @param DueWorkModel $dueWork
+     * @param array        $expectedLevels
+     * @param array        $expectedCapabilities
+     * @param bool         $expectedUseMarkRange
+     * @param int|null     $expectedCapabilityMarkType
+     * @param int|null     $expectedCapabilityGradeGroup
      */
     public function testBuild(
         $fp,
         int $maxLevels,
+        DueWorkModel $dueWork,
         array $expectedLevels,
         array $expectedCapabilities,
         bool $expectedUseMarkRange,
@@ -211,7 +222,7 @@ TEST2;
         ?int $expectedCapabilityGradeGroup
     ): void {
         $factory  = new CsvImporterFactory();
-        $importer = $factory->build($fp, $maxLevels);
+        $importer = $factory->build($fp, $maxLevels, $dueWork);
         $this->assertSame($expectedLevels, $importer->getLevels());
         $this->assertSame($expectedCapabilities, $importer->retrieveCapabilitiesWithIndicators());
         $this->assertSame($expectedUseMarkRange, $importer->isUseMarkRange());

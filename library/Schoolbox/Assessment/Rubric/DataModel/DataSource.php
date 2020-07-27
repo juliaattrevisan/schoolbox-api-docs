@@ -903,11 +903,11 @@ class DataSource
      *                                  or persisting the rowset
      * @return void
      */
-    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, $maxLevels): void
+    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): void
     {
         // Create the factory
         $importerFactory = new CsvImporterFactory();
-        $importer        = $importerFactory->build($file->readStream(), $maxLevels);
+        $importer        = $importerFactory->build($file->readStream(), $maxLevels, $dueWork);
 
 
         // Add to the rowset as necessary

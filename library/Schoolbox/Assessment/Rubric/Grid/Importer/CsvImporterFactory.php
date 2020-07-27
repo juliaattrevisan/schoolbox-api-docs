@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Importer;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use UnexpectedValueException;
 
 /**
@@ -18,14 +20,19 @@ class CsvImporterFactory
     /**
      * Attempt to parse a CSV import from a file.
      *
-     * @param resource $fp
-     * @param int      $maxLevels The max number of levels to parse
+     * @param resource     $fp
+     * @param int          $maxLevels The max number of levels to parse
+     * @param DueWorkModel $dueWork   The due work `$fp` is to be imported into.
+     *                                Required for legacy mark-per-capability
+     *                                import: this will set the cap mark type
+     *                                and grade group field to this due work's.
+     *
      * @return CsvImporter
      * @throws UnexpectedValueException if the header isn't parsable as a
      *                                  rubric CSV
      *                                  (must have at least 3 columns)
      */
-    public function build($fp, int $maxLevels): CsvImporter
+    public function build($fp, int $maxLevels, DueWorkModel $dueWork): CsvImporter
     {
         $headerRow = $this->readCsvLine($fp, $maxLevels);
         if (!is_array($headerRow) || count($headerRow) < 3) {
@@ -71,6 +78,23 @@ class CsvImporterFactory
 
                 case 'capabilityGradeGroup':
                     $capabilityGradeGroup = (int)$value;
+                    break;
+
+                // Legacy mark-per-capability setting, superseded by capabilityMarkType.
+                // if on: set capability mark type + grade group to due work's, or Total if that type is None
+                // If off: set capability mark type to None, or Total if due work's mark type is None
+                case 'markPerCapability':
+                    if ($boolValue) {
+                        $capabilityMarkType = (int)$dueWork->getMarkType()->getId();
+                        if ($dueWork->getGradeGroup()) {
+                            $capabilityGradeGroup = $dueWork->getGradeGroup()->getId();
+                        } else {
+                            $capabilityGradeGroup = null;
+                        }
+                    } else {
+                        $capabilityMarkType = null;
+                        $capabilityGradeGroup = null;
+                    }
                     break;
 
                 default:
