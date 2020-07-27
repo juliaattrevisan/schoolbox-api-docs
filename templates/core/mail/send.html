@@ -79,8 +79,10 @@ $(function() {
     $('#cc').selectizeSelector($.extend({}, options, {value: {CC}}))
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
-    // dialogs for copying email fields
+    // Set up clipboard copy on copy button
+    new ClipboardJS('#copy-button');
 
+    // dialogs for copying email fields
     $('[data-role="copy-emails"]').each(function(index, element) {
         $.fn.clipboardSelector({
             exportActivator: $(element),
@@ -94,7 +96,7 @@ $(function() {
                 var dialogUrl = $('#copy-email-text');
 
                 dialogUrl.html(text);
-                dialog.foundation('reveal','open');
+                dialog.foundation('reveal', 'open');
 
                 /* Bypass foundation bug
                  * https://github.com/zurb/foundation/issues/4746
@@ -247,7 +249,7 @@ $(function() {
         <input type="radio" name="separator" value="comma" id="commaSep" checked><label for="commaSep" >Comma Separated</label>
         <input type="radio" name="separator" value="colon" id="colonSep"><label for="colonSep" >Semi-Colon Separated</label>
     </fieldset>
-    <button id="copy-button" data-clipboard-target="copy-email-text" class="icon-copy">Copy to Clipboard</button>
+    <button id="copy-button" data-clipboard-target="#copy-email-text" class="icon-copy">Copy to Clipboard</button>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 

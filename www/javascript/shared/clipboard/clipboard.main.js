@@ -1,3 +1,4 @@
 import clipboard from 'clipboard/dist/clipboard.min';
 
-window.Clipboard = clipboard;
+// Install clipboard extension into window
+window.ClipboardJS = clipboard;
