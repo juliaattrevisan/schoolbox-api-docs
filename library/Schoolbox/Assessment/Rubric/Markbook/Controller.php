@@ -628,7 +628,6 @@ class Controller extends Base
     private function generateHumanReadableMarks(array $students, array $assessments): array
     {
         $decimalHydrator   = new Decimal();
-        $booleanHydrator   = new Boolean();
         $markSchemeFactory = new MarkScheme\Factory();
         $totalMarkScheme   = new MarkScheme\TotalMarkFractional();
 
