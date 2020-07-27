@@ -1,6 +1,7 @@
 <script>
     import FullCalendar       from '@fullcalendar/vue'
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+    import ExportUrlModal     from './exportUrlModal';
     import interactionPlugin  from "@fullcalendar/interaction";
     import listPlugin         from "@fullcalendar/list";
     import momentPlugin       from "@fullcalendar/moment";
@@ -19,6 +20,7 @@
             ViewEventModal,
             FullCalendar,
             RevealModal,
+            ExportUrlModal,
         },
         created() {
             this.ENDPOINTS = ENDPOINTS;
@@ -253,10 +255,7 @@
         </div>
 
 
-        <reveal-modal ref="exportModal">
-            <div>Use the following address to subscribe your favourite calendar application to a live feed.</div>
-            <textarea readonly rows="6" v-text="config.exportUrl"></textarea>
-        </reveal-modal>
+        <export-url-modal ref="exportModal" :url="config.exportUrl" />
     </div>
 </template>
 

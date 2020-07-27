@@ -1,6 +1,7 @@
 <script>
-    import RevealModal from '@schoolbox/reveal-modal'
-    import qs          from 'qs';
+    import RevealModal    from '@schoolbox/reveal-modal'
+    import ExportUrlModal from './exportUrlModal';
+    import qs             from 'qs';
 
     export default {
         name: "export-modal",
@@ -22,7 +23,7 @@
                 }
             };
         },
-        components: {RevealModal},
+        components: {ExportUrlModal, RevealModal},
         methods: {
             /**
              * Open this modal.
@@ -136,11 +137,6 @@
             </ul>
         </form>
 
-
-        <reveal-modal ref="feedUrlModal">
-            <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
-            <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-            <div class="alert-box">{{ exportUrl }}</div>
-        </reveal-modal>
+        <export-url-modal ref="feedUrlModal" :url="exportUrl" />
     </reveal-modal>
 </template>
