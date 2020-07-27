@@ -226,6 +226,7 @@
                 <layout-list
                     :query-string-referrer="this.queryStringReferrer"
                     :query-string-topic="this.queryStringTopic"
+                    :change-tab-on-meta="this.changeTabOnMeta"
                     :referrer="this.referrer"
                     :compact-mode="this.compactMode"
                     :get-index-route="this.getIndexRoute"

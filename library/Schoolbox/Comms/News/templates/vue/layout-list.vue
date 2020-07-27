@@ -7,6 +7,7 @@
         props: [
             'query-string-referrer',
             'query-string-topic',
+            'change-tab-on-meta',
             'referrer',
             'compact-mode',
             'get-index-route',
@@ -20,8 +21,6 @@
             return {
             }
         }
-
-        // changeTabOnMeta
     }
 </script>
 
