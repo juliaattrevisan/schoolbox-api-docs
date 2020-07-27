@@ -30,8 +30,8 @@
 
                 'compactMode': this.data.compactMode,
                 // showMore: accessed via this.data.showMore
-                // itemlayout
-                // fallbackimage
+                'itemLayout': this.data.itemLayout,
+                'fallbackImage': this.data.fallbackImage,
 
                 'getIndexRoute': this.data.getIndexRoute,
                 // getArticlesRoute: accessed via this.data.getArticlesRoute
@@ -224,20 +224,28 @@
                 </template>
             </dl>
             <div class="tabs-content no-margin">
-
-                <layout-list
-                    :query-string-referrer="this.queryStringReferrer"
-                    :query-string-topic="this.queryStringTopic"
-                    :change-tab-on-meta="this.changeTabOnMeta"
-                    :referrer="this.referrer"
-                    :compact-mode="this.compactMode"
-                    :get-index-route="this.getIndexRoute"
-                    :config-save-for-later="this.configSaveForLater"
-                    :locale-news-plural="this.localeNewsPlural"
-                    :saved-article-ids="this.savedArticleIds"
-                    :articles-loading="this.articlesLoading"
-                    :current-articles="this.currentArticles"
-                ></layout-list>
+                <template v-if="this.itemLayout === 'list'">
+                    <layout-list
+                        :query-string-referrer="this.queryStringReferrer"
+                        :query-string-topic="this.queryStringTopic"
+                        :change-tab-on-meta="this.changeTabOnMeta"
+                        :referrer="this.referrer"
+                        :compact-mode="this.compactMode"
+                        :fallback-image="this.fallbackImage"
+                        :get-index-route="this.getIndexRoute"
+                        :config-save-for-later="this.configSaveForLater"
+                        :locale-news-plural="this.localeNewsPlural"
+                        :saved-article-ids="this.savedArticleIds"
+                        :articles-loading="this.articlesLoading"
+                        :current-articles="this.currentArticles"
+                    ></layout-list>
+                </template>
+                <template v-else-if="this.itemLayout === 'list-reversed'">
+                    insert your component here
+                </template>
+                <template v-else-if="this.itemLayout === 'card'">
+                    insert your component here
+                </template>
 
                 <div class="empty-state no-margin" v-if="!this.filteredArticles.length && !this.articlesLoading">
                     <i class="icon-news"></i>

@@ -10,6 +10,7 @@
             'change-tab-on-meta',
             'referrer',
             'compact-mode',
+            'fallback-image',
             'get-index-route',
             'config-save-for-later',
             'locale-news-plural',
