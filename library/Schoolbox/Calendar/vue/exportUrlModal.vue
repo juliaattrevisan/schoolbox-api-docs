@@ -19,15 +19,26 @@
              */
             open() {
                 this.$refs.modal.open();
-                this.clipboardJs = new ClipboardJs(
-                    this.$refs.button,
-                    {
-                        target: () => this.$refs.urlInput,
-                    }
-                );
-
-                // Figure out an onclose event
             },
+        },
+
+        /**
+         * On mount: instantiate the clipboardJS object
+         */
+        mounted() {
+            this.clipboardJs = new ClipboardJs(
+                this.$refs.button,
+                {
+                    target: () => this.$refs.urlInput,
+                }
+            );
+        },
+
+        /**
+         * On destroy: clean up the clipboardJS object
+         */
+        beforeDestroy() {
+            this.clipboardJs.destroy();
         },
     }
 </script>
