@@ -365,11 +365,11 @@
                 </div>
             </div>
 
-<!--            <div class="component-action" v-if="showMoreLink">-->
-<!--                <section>-->
-<!--                    <a :href="getIndexRoute + '?' + queryStringTopic + '=' + tabSelected" class="button">View More</a>-->
-<!--                </section>-->
-<!--            </div>-->
+            <div class="component-action" v-if="this.showMoreLink">
+                <section>
+                    <a :href="this.getIndexRoute + '?' + this.queryStringTopic + '=' + this.tabSelected" class="button">View More</a>
+                </section>
+            </div>
         </section>
 <!--        <Paginate-->
 <!--                v-if="!this.data.disablePagination && this.data.currentArticles.length && this.data.pageCount > 1"-->
