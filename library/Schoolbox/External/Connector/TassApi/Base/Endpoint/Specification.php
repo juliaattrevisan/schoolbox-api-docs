@@ -51,16 +51,19 @@ class Specification implements ISpecification
              */
             [
                 'method' => 'getStudents',
+                'version' => 3,
                 'args' => [
                     'currentstatus' => 'current'
                 ]
             ],
+
 
             /* Emergency contacts
              * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
              */
             [
                 'method' => 'getCommunicationRulesDetails',
+                'version' => 2,
                 'args' => [
                     'currentstatus' => 'current',
                     'commtype' => 'ec'
@@ -77,6 +80,7 @@ class Specification implements ISpecification
              */
             [
                 'method' => 'getCommunicationRulesDetails',
+                'version' => 2,
                 'args' => [
                     'currentstatus' => 'current',
                     'commtype' => 'all'
@@ -100,6 +104,7 @@ class Specification implements ISpecification
              */
             [
                 'method' => 'getConfNote',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -108,6 +113,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getConfAttachment',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -121,18 +127,21 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getConfNotes',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalAsthmaManagement',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalCondition',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'mcond_code' => 'AST'
@@ -140,6 +149,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalConditionAttachment',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'mcond_code' => 'AST',
@@ -148,12 +158,14 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalConditions',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalConfNote',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -162,6 +174,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalConfNoteAttachment',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -171,18 +184,21 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalConfNotes',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalGeneral',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalIllness',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'ill_date' => '2019-04-12',
@@ -192,6 +208,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalImmunisation',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'imm_code' => 'TY',
@@ -199,12 +216,14 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalImmunisations',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalNote',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -213,6 +232,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalNoteAttachment',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -222,12 +242,14 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalNotes',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalPractitioner',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'prac_num' => 9
@@ -235,18 +257,21 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getMedicalPractitioners',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalSupplementaries',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getMedicalSupplementary',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'msupp_desc' => 'DEN'
@@ -254,6 +279,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getNote',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -262,6 +288,7 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getNoteAttachment',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                     'note_cat' => 'GEN',
@@ -271,18 +298,21 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getNotes',
+                'version' => 2,
                 'args' => [
                     'studcode' => '123456',
                 ]
             ],
             [
                 'method' => 'getStudentUD',
+                'version' => 2,
                 'args' => [
                     'code' => '123456',
                 ]
             ],
             [
                 'method' => 'getStudentUDArea',
+                'version' => 2,
                 'args' => [
                     'code' => '123456',
                     'areacode' => 1
@@ -290,18 +320,21 @@ class Specification implements ISpecification
             ],
             [
                 'method' => 'getStudentUDAreaSetup',
+                'version' => 2,
                 'args' => [
                     'includelookups' => true
                 ]
             ],
             [
                 'method' => 'getStudentUDSetup',
+                'version' => 2,
                 'args' => [
                     'includelookups' => true
                 ]
             ],
             [
                 'method' => 'getStudentsDetails',
+                'version' => 2,
                 'args' => [
                     'currentstatus' => 'current'
                 ]
@@ -312,18 +345,21 @@ class Specification implements ISpecification
              */
             [
                 'method' => 'getAdmins',
+                'version' => 2,
                 'args' => [
                     'user_code' => 'all',
                 ]
             ],
             [
                 'method' => 'getEmployees',
+                'version' => 2,
                 'args' => [
                     'user_code' => 'all',
                 ]
             ],
             [
                 'method' => 'getParents',
+                'version' => 2,
                 'args' => [
                     'user_code' => 'all',
                 ]
@@ -351,7 +387,7 @@ class Specification implements ISpecification
             } else {
                 $endpoints[] = [
                     'message' => $path['method'],
-                    'reason' => $errorMessage,
+                    'reason' => "v{$path['version']} {$errorMessage}",
                     'status' => ISpecification::STATUS_MISSING
                 ];
             }
