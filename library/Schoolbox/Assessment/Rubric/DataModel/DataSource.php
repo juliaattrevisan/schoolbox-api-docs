@@ -48,8 +48,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Model;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedbackModel;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -158,7 +158,7 @@ class DataSource
 
                 if ($getUsages) {
                     foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
-                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new Model())
+                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWorkModel())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
                     }
@@ -172,7 +172,7 @@ class DataSource
             if ($getUsages) {
                 foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
-                        = (new Model())
+                        = (new DueWorkModel())
                             ->setId($indicatorUsage['id'])
                             ->setTitle($indicatorUsage['title']);
                 }
@@ -344,18 +344,18 @@ class DataSource
     /**
      * Retrieve a grid for the given assessment.
      *
-     * @param Model $assessment
-     * @param bool        $getUsages
+     * @param DueWorkModel $assessment
+     * @param bool         $getUsages
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(Model $assessment, bool $getUsages): Grid
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages): Grid
     {
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
 
         // Not a due work? This has an empty grid
-        if (!$assessment instanceof Model) {
+        if (!$assessment instanceof DueWorkModel) {
             return $grid;
         }
 
@@ -872,7 +872,7 @@ class DataSource
         // Which feedbacks are getting checked?
         $feedbackIds = [];
         foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback instanceof DueWork\Feedback\Model
+            if ($feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
                 $feedbackIds[] = $feedback->getId();
@@ -897,9 +897,9 @@ class DataSource
     /**
      * Imports a rubric grid from a CSV into the given due work.
      *
-     * @param IStorage      $file
-     * @param Model $dueWork
-     * @param int           $maxLevels
+     * @param IStorage     $file
+     * @param DueWorkModel $dueWork
+     * @param int          $maxLevels
      *
      * @throws UnexpectedValueException if the importer couldn't be built
      * @throws UnexpectedValueException if a capability or indicator could not
@@ -908,7 +908,7 @@ class DataSource
      *                                  or persisting the rowset
      * @return void
      */
-    public function importGridFromCsv(IStorage $file, Model $dueWork, $maxLevels): void
+    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, $maxLevels): void
     {
         // Create the factory
         $importerFactory = new CsvImporterFactory();
@@ -1118,8 +1118,8 @@ class DataSource
      *   - assessment
      *   - descriptor (student result)
      *
-     * @param GenericCollection|Model[] $dueWorks
-     * @param User                      $student
+     * @param GenericCollection|DueWorkModel[] $dueWorks
+     * @param User                             $student
      *
      * @return array $longitude
      * @throws UnderflowException
