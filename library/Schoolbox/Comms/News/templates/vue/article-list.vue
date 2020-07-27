@@ -9,25 +9,42 @@
         },
         data() {
             return {
-                'page': this.data.page,
-                'articlesLoading': this.data.articlesLoading,
-                'topics': this.data.topics,
-                'allArticles': this.data.allArticles,
-                'savedArticleIds': this.data.savedArticleIds,
-                'filteredArticles': this.data.filteredArticles,
                 'queryStringPage': this.data.queryStringPage,
                 'queryStringReferrer': this.data.queryStringReferrer,
                 'queryStringTopic': this.data.queryStringTopic,
-                'referrer': this.data.referrer,
-                'getIndexRoute': this.data.getIndexRoute,
-                'changeTabOnMeta': this.data.changeTabOnMeta,
-                'configSaveForLater': this.data.configSaveForLater,
-                'localeNewsPlural': this.data.localeNewsPlural,
-                'compactMode': this.data.compactMode,
-                'tabSelected': this.data.tabSelected,
+
                 'topicAll': this.data.topicAll,
+                // showTopicByDefault: accessed via this.data.showTopicByDefault
+                'changeTabOnMeta': this.data.changeTabOnMeta,
+
+                // initialPage: accessed via this.data.initialPage
                 'limit': this.data.limit,
-                'configSearchTypeLimit': this.data.configSearchTypeLimit
+                // disablePagination: accessed via this.data.disablePagination
+
+                'referrer': this.data.referrer,
+
+                'compactMode': this.data.compactMode,
+                // showMore: accessed via this.data.showMore
+                // itemlayout
+                // fallbackimage
+
+                'getIndexRoute': this.data.getIndexRoute,
+                // getArticlesRoute: accessed via this.data.getArticlesRoute
+                // getSavedArticlesRoute: accessed via this.data.getSavedArticlesRoute
+
+                'configSaveForLater': this.data.configSaveForLater,
+                'configSearchTypeLimit': this.data.configSearchTypeLimit,
+                'localeNewsPlural': this.data.localeNewsPlural,
+
+                'allArticles': this.data.allArticles,
+                'savedArticleIds': this.data.savedArticleIds,
+                'filteredArticles': this.data.filteredArticles,
+                'topics': this.data.topics,
+
+                'page': this.data.page,
+                'articlesLoading': this.data.articlesLoading,
+                'tabSelected': this.data.tabSelected,
+                'initialTopic': this.data.initialTopic
             }
         },
         mounted: function () {
