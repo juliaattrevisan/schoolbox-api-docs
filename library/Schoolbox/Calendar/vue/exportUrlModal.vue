@@ -8,18 +8,25 @@
             'url',
         ],
         components: {RevealModal},
+        data() {
+            return {
+                clipboardJs: null
+            }
+        },
         methods: {
             /**
              * Open this modal.
              */
             open() {
                 this.$refs.modal.open();
-                new ClipboardJs(
+                this.clipboardJs = new ClipboardJs(
                     this.$refs.button,
                     {
                         target: () => this.$refs.urlInput,
                     }
-                )
+                );
+
+                // Figure out an onclose event
             },
         },
     }
