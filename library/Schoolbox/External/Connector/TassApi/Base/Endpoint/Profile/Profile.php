@@ -478,9 +478,9 @@ class Profile implements IStrategy
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile): void
     {
 
-        $data = $this->api->retrieveDocument('getParents', [
-            'user_code' => 'all'
-        ]);
+//        $data = $this->api->retrieveDocument('getParents', [
+//            'user_code' => 'all'
+//        ]);
     }
 
 
