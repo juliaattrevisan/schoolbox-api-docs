@@ -79,9 +79,6 @@ $(function() {
     $('#cc').selectizeSelector($.extend({}, options, {value: {CC}}))
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
-    // Set up clipboard copy on copy button
-    new ClipboardJS('#copy-button');
-
     // dialogs for copying email fields
     $('[data-role="copy-emails"]').each(function(index, element) {
         $.fn.clipboardSelector({
@@ -89,23 +86,13 @@ $(function() {
             onReady: function() {
 
                 // get html-escaped version of text, really annoying
-                var target = $('#'+$(element).attr('data-copy-emails-for'));
-                var text = $('<div />').text(target.val()).html();
-
-                var dialog = $('#email-modal');
-                var dialogUrl = $('#copy-email-text');
+                var target    = $('#'+$(element).attr('data-copy-emails-for')),
+                    text      = $('<div />').text(target.val()).html(),
+                    dialog    = $('#email-modal'),
+                    dialogUrl = $('#copy-email-text');
 
                 dialogUrl.html(text);
                 dialog.foundation('reveal', 'open');
-
-                /* Bypass foundation bug
-                 * https://github.com/zurb/foundation/issues/4746
-                 */
-                dialog.on('opened', function() {
-                    dialogUrl.select();
-
-                    $('#copy-button').show();
-                });
             }
         });
     });
