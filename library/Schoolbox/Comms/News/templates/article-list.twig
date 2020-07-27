@@ -112,12 +112,12 @@
     'changeTabOnMeta': changeTabOnMeta,
     'initialPage': initialPage,
     'initialTopic': '',
-    'modifyWindowState': modifyWindowState ?: 'false',
-    'compactMode': compactMode is defined ? compactMode : 'false',
-    'disablePagination': disablePagination is defined ? disablePagination : 'false',
+    'modifyWindowState': modifyWindowState ?: false,
+    'compactMode': compactMode is defined ? compactMode : false,
+    'disablePagination': disablePagination is defined ? disablePagination : false,
     'limit': limit is defined ? limit : 0,
-    'showTopicByDefault': showTopicByDefault is defined and showTopicByDefault ? 'true' : 'false',
-    'showMore': showMore is defined ? showMore : 'false'
+    'showTopicByDefault': showTopicByDefault is defined and showTopicByDefault,
+    'showMore': showMore is defined ? showMore : false
 } %}
 <div id="news-component">
     <article-list :data="{{ articleListData | json_encode }}"></article-list>
