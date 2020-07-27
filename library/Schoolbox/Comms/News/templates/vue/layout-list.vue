@@ -1,6 +1,9 @@
 <script>
+    import articleListMixin from './article-list-mixin';
+
     export default {
         name: "layout-list",
+        mixins: [articleListMixin],
         props: [
             'query-string-referrer',
             'query-string-topic',
@@ -18,9 +21,7 @@
             }
         }
 
-        // onTabChange
         // changeTabOnMeta
-        // saveForLater
     }
 </script>
 
