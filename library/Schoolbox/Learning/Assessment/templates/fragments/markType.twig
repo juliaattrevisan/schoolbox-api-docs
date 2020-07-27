@@ -13,6 +13,7 @@
  # @param $selectedGradeGroup int|null     The grade group currently selected
  # @param $defaultGradeGroup  int          Set in admin via default_grade_group config var
  # @param $renderMaxMark      bool         True allows the maxMark input field to exist
+ # @param $markTypeLabel      string       The label text for the mark type selector
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -42,7 +43,7 @@
 <div class="row">
     <div class="small-12 medium-6 columns">
         <label>
-            Mark Type
+            {{ markTypeLabel | default('Mark Type') }}
             <select id="{{ context }}markType" name="{{ context }}markType">
                 {% for index, title in allMarkTypes %}
                     <option value="{{ index }}"{% if index == (selectedMarkType ?? '') %} selected{% endif %}>{{ title }}</option>

@@ -103,7 +103,8 @@
         selectedMarkType: assessment.markType.id ?? null,
         selectedGradeGroup: assessment.gradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: true
+        renderMaxMark: true,
+        markTypeLabel: 'Mark Type',
     } %}
 
     {% include '@learningAssessment/fragments/rubric.twig' with {
