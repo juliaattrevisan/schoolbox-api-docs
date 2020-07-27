@@ -669,14 +669,19 @@ class Controller extends Base
                  */
                 $capabilityGradeGroup = null;
 
+                // Capability mark type only needs to be set once, too
+                $capabilityMarkType = null;
+
                 foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
 
                     /* Set Capability Mark Type
                      */
-                    $capabilityMarkType = MarkTypeMapper::getInstance()
-                        ->createModel()
-                        ->setId($capabilityMarks['markTypeId']);
+                    if (null === $capabilityMarkType) {
+                        $capabilityMarkType = MarkTypeMapper::getInstance()
+                            ->createModel()
+                            ->setId($capabilityMarks['markTypeId']);
+                    }
 
                     /* Only try to fetch a Capability Grade Group once
                      */
