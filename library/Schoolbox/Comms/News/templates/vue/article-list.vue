@@ -1,11 +1,14 @@
 <script>
+    import LayoutList from './layout-list.vue';
+
     export default {
         name: "article-list",
         props: [
             'data'
         ],
         components: {
-            'Paginate': VuejsPaginate
+            'Paginate': VuejsPaginate,
+            'LayoutList': LayoutList
         },
         data() {
             return {
@@ -311,6 +314,9 @@
                 </template>
             </dl>
             <div class="tabs-content no-margin">
+
+                <layout-list></layout-list>
+
                 <ul class="information-list">
                     <template v-if="this.articlesLoading">
                         <li class="actions-small-1" v-for="n in 3">
