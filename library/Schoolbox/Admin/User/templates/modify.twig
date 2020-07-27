@@ -696,28 +696,28 @@
 
 {% if token is defined %}
 <div data-reveal id="userToken" class="reveal-modal">
-    <h2>User Token</h2>
     <p>
         Use this token within the "Authorization" header of requests to the Schoolbox
         API, to perform requests as this user. Use the "Bearer" auth type.
     </p>
-    <div class="row">
-        <div class="small-12 island">
-            <div class="alert-box scrollable">
-                {{ token }}
-            </div>
-        </div>
-    </div>
     <p>
         The Schoolbox API is documented at
         <a href="https://api.schoolbox.com.au/" target="_blank">https://api.schoolbox.com.au/</a>.
     </p>
+    <textarea readonly id="userToken-text" rows="6">{{ token }}</textarea>
+    <div class="component-action">
+        <section>
+            <button id="copy-button" data-clipboard-target="#userToken-text">Copy to Clipboard</button>
+        </section>
+    </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 {% endif %}
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/components/clipboard.bundle.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript">
     $(function () {
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");
@@ -986,6 +986,12 @@
             messages: {
                 body: "Please enter a message"
             }
+        });
+
+
+        // Copy user token to clipboard
+        $.fn.clipboardSelector({
+            exportActivator: $('a[data-reveal-id="userToken"]'),
         });
     });
 </script>
