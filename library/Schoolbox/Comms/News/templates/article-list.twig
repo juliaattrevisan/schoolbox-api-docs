@@ -11,13 +11,13 @@
  # Topics
  # @param string $topicAll             The topic slug for the 'all' tab
  # @param string|null $topic           The topic slug to load, as chosen by the user
- # @param bool $showTopicByDefault     If true, preselects the first topic tab if a topic wasn't chosen by user
+ # @param bool $showTopicByDefault     If true, preselects the first topic tab if a topic wasn't chosen by user (used for the dashboard component)
  # @param bool $changeTabOnMeta        On click of a topic in a news card meta- whether to change tab on the current page or not
  #
  # Pagination
- # @param int|null $initialPage        The page number to load by default
+ # @param int|null $initialPage        The page number to load by default, used for history API
  # @param int $limit                   Number of items to display per page
- # @param bool $disablePagination      If true, the pagination palette doesn't render
+ # @param bool $disablePagination      If true, the pagination palette doesn't render and shows everything (used for the dashboard component)
  #
  # Referrers and Redirects
  # @param bool $modifyWindowState      If true, push changes to the window state to simulate browser history
@@ -26,98 +26,79 @@
  #
  # Layout
  # @param string $compactMode          Bool for compactMode layout (removes the blurb from the news card)
- # @param bool $showMore               If true, enables the Show More link under articles
+ # @param bool $showMore               If true, enables the Show More link under article list
  # @param string|null $itemLayout      A string corresponding to which Item Layout was chosen in component config
  # @param string|null $fallbackImage   A string corresponding to which Fallback Image was chosen in component config
+ #
+ # Vue Payload: uses these vars but for some reason we're defining them out here
+ # You might be able to specify them in the data() of article-list.vue but can
+ # save that for another day
+ #
+ # Routes
+ # @param string $getIndexRoute          Route for news feed page
+ # @param string $getArticlesRoute       Route for retrieving all the articles
+ # @param string $getSavedArticlesRoute  Route for retrieving all the articles
+ #
+ # Config
+ # @param bool $configSaveForLater       Config for whether save for later is enabled
+ # @param int $configSearchTypeLimit     Config that's used for number of items per page
+ # @param string $localeNewsPlural       Localisation of news
+ #
+ # Data stacks for Article/Topic ids
+ # @param array $allArticles             *All* the author's articles
+ # @param array $savedArticles           A unique list of article ids that the user has currently saved
+ # @param array $filteredArticles        A container for a filtered list of authored articles. Will be populated as all articles on load
+ # @param array $$topics                 A unique list of topics built from the article json
+ #
+ # Initial Conditions
+ # @param int $page                      The active page on the pagination
+ # @param bool $articlesLoading          Whether the articles are still being loaded or not; used to show the placeholder loader
+ # @param string $tabSelected            If topic has come from the controller- use that to set default tab selected
+ # @param string $initialTopic           The initial topic a user started on, has to be set dynamically below after component has mounted
  #}
-
 {% if not initialPage %}
     {% set initialPage = 1 %}
 {% endif %}
 
-{# page: The active page on the pagination
- #
- # articlesLoading: Whether the articles are still being loaded or not
- # Used to show the placeholder loader
- #
- # topics: A unique list of topics built from the article json
- # Used to display tab options
- #
- # allArticles: *All* the author's articles
- #
- # filteredArticles: A container for a filtered list of authored articles
- # Will be populated as all articles on load
- #
- # getArticlesRoute: Route for retrieving all the articles
- #
- # getSavedArticlesRoute: Route for retrieving all the articles
- #
- # getIndexRoute: Route for news feed page
- #
- # configSaveForLater: Config for whether save for later is enabled
- #
- # configSearchTypeLimit: Config that's used for number of items per page
- #
- # localeNewsPlural: Localisation of news
- #
- # queryStringPage, queryStringReferrer, queryStringTopic: Strings to use for params in the URL
- #
- # topicAll: Object for the 'all' tab
- #
- # tabSelected: If topic has come from the controller- use that to set default tab selected
- #
- # referrer: Referrer for stats logging
- #
- # changeTabOnMeta: Controls whether clicking on a topic in a news card meta will just change tab on the current screen,
- # or link off to the news feed page
- #
- # initialPage: The initial page the user started on, used for history API
- #
- # initialTopic: The initial topic a user started on, has to be set dynamically below after component has mounted
- #
- # modifyWindowState: Controls whether this will modify the window state at all (going to disable this on dashboard component)
- #
- # compactMode: Removes the blurb
- #
- # disablePagination: Disables the pagination and shows everything (used for the dashboard component)
- #
- # limit: Limits the total number of articles (used for dashboard component)
- #
- # showTopicByDefault: Skips over the 'all' tab and shows the first topic by default (used for the dashboard component)
- #
- # showMore: Controls whether the 'show more' component link is enabled or not
- #}
 {% set articleListData = {
-    'page': initialPage,
-    'articlesLoading': true,
-    'topics': [],
-    'allArticles': [],
-    'savedArticleIds': [],
-    'filteredArticles': [],
-    'getArticlesRoute': routeLookup('commsNews.getListForIndex'),
-    'getSavedArticlesRoute': routeLookup('commsNewsSaveForLater.getList'),
-    'getIndexRoute': routeLookup('commsNews.getIndex'),
-    'configSaveForLater': config.save_for_later,
-    'configSearchTypeLimit': config.search_type_limit,
-    'localeNewsPlural': locale.news.plural,
     'queryStringPage': queryStringPage,
     'queryStringReferrer': queryStringReferrer,
     'queryStringTopic': queryStringTopic,
+
     'topicAll': {
         name: 'All',
         slug: 'all'
     },
-    'tabSelected': topic,
-    'referrer': referrer,
-    'changeTabOnMeta': changeTabOnMeta,
-    'initialPage': initialPage,
-    'initialTopic': '',
-    'modifyWindowState': modifyWindowState ?: false,
-    'compactMode': compactMode is defined ? compactMode : false,
-    'disablePagination': disablePagination is defined ? disablePagination : false,
-    'limit': limit is defined ? limit : 0,
     'showTopicByDefault': showTopicByDefault is defined and showTopicByDefault,
-    'showMore': showMore is defined ? showMore : false
+    'changeTabOnMeta': changeTabOnMeta,
+
+    'initialPage': initialPage,
+    'limit': limit is defined ? limit : 0,
+    'disablePagination': disablePagination is defined ? disablePagination : false,
+
+    'modifyWindowState': modifyWindowState ?: false,
+    'referrer': referrer,
+
+    'compactMode': compactMode is defined ? compactMode : false,
+    'showMore': showMore is defined ? showMore : false,
+
+    'getIndexRoute': routeLookup('commsNews.getIndex'),
+    'getArticlesRoute': routeLookup('commsNews.getListForIndex'),
+    'getSavedArticlesRoute': routeLookup('commsNewsSaveForLater.getList'),
+
+    'configSaveForLater': config.save_for_later,
+    'configSearchTypeLimit': config.search_type_limit,
+    'localeNewsPlural': locale.news.plural,
+
+    'allArticles': [],
+    'savedArticleIds': [],
+    'filteredArticles': [],
+    'topics': [],
+
+    'page': initialPage,
+    'articlesLoading': true,
+    'tabSelected': topic,
+    'initialTopic': ''
 } %}
 <div id="news-component">
     <article-list :data="{{ articleListData | json_encode }}"></article-list>
