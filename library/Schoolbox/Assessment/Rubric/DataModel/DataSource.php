@@ -354,11 +354,6 @@ class DataSource
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
 
-        // Not a due work? This has an empty grid
-        if (!$assessment instanceof DueWorkModel) {
-            return $grid;
-        }
-
         // Assessment isn't persisted yet? This has an empty grid
         if (!$assessment->getId()) {
             return $grid;
