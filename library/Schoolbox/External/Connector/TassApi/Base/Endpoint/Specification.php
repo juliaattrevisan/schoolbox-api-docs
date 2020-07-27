@@ -58,34 +58,10 @@ class Specification implements ISpecification
             ],
 
 
-            /* Emergency contacts
-             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
-             */
-            [
-                'method' => 'getCommunicationRulesDetails',
-                'version' => 2,
-                'args' => [
-                    'currentstatus' => 'current',
-                    'commtype' => 'ec'
-                ]
-            ],
-
-
             /**
              * Parent Profile nodes
              */
 
-            /* Parents come out in the m_* and f_* nodes
-             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
-             */
-            [
-                'method' => 'getCommunicationRulesDetails',
-                'version' => 2,
-                'args' => [
-                    'currentstatus' => 'current',
-                    'commtype' => 'all'
-                ]
-            ],
 
 
             /**
@@ -102,6 +78,95 @@ class Specification implements ISpecification
              * Full Diagnostic
              * Tass doesn't seem to have implemented a lot of things, let's scout ahead
              */
+
+            /* Version 3
+             */
+            [
+                'method' => 'getCampuses',
+                'version' => 3,
+                'args' => [
+                    'codeonly' => 'false'
+                ]
+            ],
+            [
+                'method' => 'getStudentSubjects',
+                'version' => 3,
+                'args' => [
+                    'lmsflag' => 'Y'
+                ]
+            ],
+            [
+                'method' => 'getStudentTimetable',
+                'version' => 3,
+                'args' => [
+                    'student_code' => '12345'
+                ]
+            ],
+            [
+                'method' => 'getTeacherSubjects',
+                'version' => 3,
+                'args' => [
+                    'code' => 'all'
+                ]
+            ],
+            [
+                'method' => 'getTeacherTimetable',
+                'version' => 3,
+                'args' => [
+                    'teacher_code' => 'all',
+                    'year_num' => '10',
+                    'semester' => '1',
+                ]
+            ],
+            [
+                'method' => 'getTeachers',
+                'version' => 3,
+                'args' => [
+                    'currentstatus' => 'current',
+                ]
+            ],
+            [
+                'method' => 'getTimetableCalendar',
+                'version' => 3,
+                'args' => [
+                    'tt_id' => '1',
+                ]
+            ],
+            [
+                'method' => 'getTimetables',
+                'version' => 3,
+                'args' => [
+                    'year_num' => '10',
+                    'period' => '1'
+                ]
+            ],
+
+            /* Version 2
+             */
+
+            /* Emergency contacts
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
+             */
+            [
+                'method' => 'getCommunicationRulesDetails',
+                'version' => 2,
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'ec'
+                ]
+            ],
+            /* Parents come out in the m_* and f_* nodes
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
+             */
+            [
+                'method' => 'getCommunicationRulesDetails',
+                'version' => 2,
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'all'
+                ]
+            ],
+
             [
                 'method' => 'getConfNote',
                 'version' => 2,
