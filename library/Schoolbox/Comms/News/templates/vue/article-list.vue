@@ -359,10 +359,10 @@
                     </li>
                 </ul>
 
-<!--                <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">-->
-<!--                    <i class="icon-news"></i>-->
-<!--                    <p>No ${ localeNewsPlural } to view at this time.</p>-->
-<!--                </div>-->
+                <div class="empty-state no-margin" v-if="!this.filteredArticles.length && !this.articlesLoading">
+                    <i class="icon-news"></i>
+                    <p>No {{ this.data.localeNewsPlural }} to view at this time.</p>
+                </div>
             </div>
 
 <!--            <div class="component-action" v-if="showMoreLink">-->
