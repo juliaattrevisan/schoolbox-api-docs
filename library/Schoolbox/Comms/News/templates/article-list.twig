@@ -9,7 +9,7 @@
  # @param string $queryStringTopic     The string to use for topic param name in the URL
  #
  # Topics
- # @param string $topicAll             The topic slug for the 'all' tab
+ # @param array $topicAll              The topic name and slug for the 'all' tab
  # @param string|null $topic           The topic slug to load, as chosen by the user
  # @param bool $showTopicByDefault     If true, preselects the first topic tab if a topic wasn't chosen by user (used for the dashboard component)
  # @param bool $changeTabOnMeta        On click of a topic in a news card meta- whether to change tab on the current page or not
@@ -65,10 +65,7 @@
     'queryStringReferrer': queryStringReferrer,
     'queryStringTopic': queryStringTopic,
 
-    'topicAll': {
-        name: 'All',
-        slug: 'all'
-    },
+    'topicAll': topicAll,
     'showTopicByDefault': showTopicByDefault is defined and showTopicByDefault,
     'changeTabOnMeta': changeTabOnMeta,
 

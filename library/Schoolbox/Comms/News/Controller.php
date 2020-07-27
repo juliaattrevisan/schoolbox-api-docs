@@ -769,7 +769,10 @@ class Controller extends Base
          * Specifically applies to the index page which loads slightly differently than component variant
          */
         $data = [
-            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => Mapper::TOPIC_ALL_SLUG,
+            ],
             'topic' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
             'initialPage' => $params->getPageNum(),
@@ -941,7 +944,10 @@ class Controller extends Base
         $data = [
             'initialContent' => $content,
             'topics' => $topics,
-            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => Mapper::TOPIC_ALL_SLUG,
+            ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
             'page' => $this->getRequest()->query['page'],

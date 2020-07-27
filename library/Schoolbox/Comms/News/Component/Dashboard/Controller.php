@@ -47,7 +47,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             /* Topics
              */
-            'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => News\Mapper::TOPIC_ALL_SLUG,
+            ],
             'showTopicByDefault' => !$this->getConfig('default'),
 
             /* Pagination
