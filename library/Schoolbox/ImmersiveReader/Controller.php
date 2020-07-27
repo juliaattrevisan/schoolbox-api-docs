@@ -42,20 +42,21 @@ class Controller extends Base
                     ],
                 ]
             );
+
+            $authToken = json_decode($result->getBody()->getContents(), true);
+
+            if($authToken['access_token']) {
+                $output = ['token'=>$authToken['access_token'], 'subdomain' => $subdomain];
+                $this->getResponse()->content->set(
+                    $this->buildJsonOutput($output)
+                );
+            }
+
         } catch (ClientException $e ) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($problem->asArray())
-            );
-        }
-
-        $authToken = json_decode($result->getBody()->getContents());
-
-        if($authToken->access_token) {
-            $output = ['token'=>$authToken->access_token, 'subdomain' => $subdomain];
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($output)
             );
         }
     }
