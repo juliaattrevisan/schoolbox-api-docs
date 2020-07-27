@@ -9,7 +9,7 @@
         },
         data() {
             return {
-                'page': this.page,
+                'page': this.data.page,
                 'articlesLoading': this.data.articlesLoading,
                 'topics': this.data.topics,
                 'allArticles': this.data.allArticles,
@@ -25,7 +25,9 @@
                 'localeNewsPlural': this.data.localeNewsPlural,
                 'compactMode': this.data.compactMode,
                 'tabSelected': this.data.tabSelected,
-                'topicAll': this.data.topicAll
+                'topicAll': this.data.topicAll,
+                'limit': this.data.limit,
+                'configSearchTypeLimit': this.data.configSearchTypeLimit
             }
         },
         mounted: function () {
@@ -371,17 +373,17 @@
                 </section>
             </div>
         </section>
-<!--        <Paginate-->
-<!--                v-if="!this.data.disablePagination && this.data.currentArticles.length && this.data.pageCount > 1"-->
-<!--                v-model="this.data.page"-->
-<!--                :page-count="this.data.pageCount"-->
-<!--                :container-class="'pagination'"-->
-<!--                :prev-text="'‹'"-->
-<!--                :next-text="'›'"-->
-<!--                :prev-link-class="'arrow'"-->
-<!--                :next-link-class="'arrow'"-->
-<!--                :disabled-class="'unavailable'"-->
-<!--                :click-handler="onPaginate"-->
-<!--        ></Paginate>-->
+        <Paginate
+                v-if="!this.data.disablePagination && this.currentArticles.length && this.pageCount > 1"
+                v-model="page"
+                :page-count="pageCount"
+                :container-class="'pagination'"
+                :prev-text="'‹'"
+                :next-text="'›'"
+                :prev-link-class="'arrow'"
+                :next-link-class="'arrow'"
+                :disabled-class="'unavailable'"
+                :click-handler="onPaginate"
+        ></Paginate>
     </div>
 </template>
