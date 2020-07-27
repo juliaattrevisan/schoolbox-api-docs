@@ -64,7 +64,7 @@
                         <span v-if="article.topics.length">in
                             <template v-for="(topic, index) in article.topics">
                                 <template v-if="index">, </template>
-<!--                                <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">{{ topic.name }}</a>-->
+                                <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">{{ topic.name }}</a>
                                 <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">{{ topic.name }}</a>
                             </template>
                         </span>

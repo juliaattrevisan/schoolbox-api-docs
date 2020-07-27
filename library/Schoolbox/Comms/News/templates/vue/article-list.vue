@@ -1,8 +1,10 @@
 <script>
     import LayoutList from './layout-list.vue';
+    import articleListMixin from './article-list-mixin';
 
     export default {
         name: "article-list",
+        mixins: [articleListMixin],
         props: [
             'data'
         ],
