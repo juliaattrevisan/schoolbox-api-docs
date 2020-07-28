@@ -44,7 +44,7 @@
                     </a>
                 </div>
             </template>
-            <template v-if="!article.featureImage">
+            <template v-else>
                 <div class="card-feature-avatar">
                     <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
                         <img :src="article.author._links.avatar.href + '&size=square64'">
