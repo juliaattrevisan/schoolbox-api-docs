@@ -18,12 +18,22 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
  */
 class MockCsvImporterFactory extends AbstractCsvImporterFactory
 {
-    private const MAPPING = [
+    /**
+     * Mapping from slugs to IDs.
+     *
+     * Made public so that they may be used in tests.
+     */
+    public const MAPPING = [
         MarkType::SLUG_PERCENT => 1,
         MarkType::SLUG_LETTER  => 2,
         MarkType::SLUG_TOTAL   => 3,
         MarkType::SLUG_NONE    => 6,
     ];
+
+
+    /**
+     * @inheritDoc
+     */
     protected function convertMarkTypeSlugToId(?string $slug): ?int
     {
         return self::MAPPING[$slug] ?? null;
