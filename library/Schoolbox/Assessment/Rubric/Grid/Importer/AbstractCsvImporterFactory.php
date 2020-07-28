@@ -93,7 +93,7 @@ abstract class AbstractCsvImporterFactory
                         $capabilityMarkTypeSlug = $markTypeSlug === MarkType::SLUG_NONE
                             ? MarkType::SLUG_TOTAL
                             : $markTypeSlug;
-                        if ($dueWork->getGradeGroup()) {
+                        if ($capabilityMarkTypeSlug === MarkType::SLUG_LETTER && $dueWork->getGradeGroup()) {
                             $capabilityGradeGroup = $dueWork->getGradeGroup()->getId();
                         }
                     } else {
