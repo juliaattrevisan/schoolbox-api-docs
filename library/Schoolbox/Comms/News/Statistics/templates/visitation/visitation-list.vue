@@ -23,7 +23,6 @@
          */
         props: [
             'payload',
-            'some-other-var'
         ],
 
         /**
@@ -71,15 +70,14 @@
 </script>
 <template>
     <div>
-        Vue components must have exactly one node directly inside the <em>template</em> node itself.
-
-        <p>Test the contents of the payload:</p>
-        <ul>
-            <li>{{ this.payload.cat }}</li>
-            <li>{{ this.payload.dog }}</li>
-            <li>{{ this.payload.horse }}</li>
-            <li>{{ this.payload.rhino }}</li>
-            <li>{{ this.someOtherVar }}</li>
-        </ul>
+        <div class="row">
+            <div class="small-12 columns">
+                <ul class="information-list">
+                    <li v-for="user in this.payload.users">
+                        {{ user.firstname }} {{ user.lastname }}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>

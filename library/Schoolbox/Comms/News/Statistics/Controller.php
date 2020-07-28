@@ -152,7 +152,7 @@ class Controller extends Base
     public function getVisitation(News\Model $article): void
     {
 
-        /* Compute the recipients so author can identify
+        /* Compute the audienced recipients so author can identify
          */
         $userIds = $this->userResolver->findUsersForArticle($article);
 
@@ -164,6 +164,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
+            'users' => $users
         ])->setTitle("Visits for {$article->getTitle()}"));
     }
 }
