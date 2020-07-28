@@ -51,8 +51,9 @@
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
-    // Default event duration is 1 hour
-    const DEFAULT_EVENT_DURATION = 60 * 60 * 1000;
+    // Default event duration is 1 hour, default allday event span is 1 day
+    const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
+    const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
     export default {
         components: {
@@ -371,11 +372,18 @@
              */
             onEventDrop(eventDropInfo) {
                 // If an event is moved from all-day to a time:
-                // it won't have an end date.
-                // Assume it lasts 1 hour in this case.
+                // it won't have an end date, assume it lasts 1 hour
                 if (eventDropInfo.oldEvent.allDay && !eventDropInfo.event.allDay) {
                     eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getTime() + DEFAULT_EVENT_DURATION));
                 }
+
+                // If event is moved from a time to all-day:
+                // it won't have an end date either, assume it lasts 1 day
+                if (!eventDropInfo.oldEvent.allDay && eventDropInfo.event.allDay) {
+                    eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getDate() + DEFAULT_ALLDAY_EVENT_DAYS));
+                }
+
+                // And move the event
                 this.moveEvent(eventDropInfo.event);
             },
 
