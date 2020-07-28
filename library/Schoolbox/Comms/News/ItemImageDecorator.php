@@ -57,9 +57,9 @@ class ItemImageDecorator implements IDecorator
          * in the component's config
          */
         if ('' === (string)$json['featureImage']) {
-            if ($this->itemImage === 'author') {
+            if ($this->itemImage === \Component_Config_ItemImage::IMAGE_AUTHOR) {
                 $json['featureImage'] = $json['author']['_links']['avatar']['href'];
-            } elseif ($this->itemImage === 'school-logo') {
+            } elseif ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO) {
                 $json['featureImage'] = 'find logo from db';
             } else {
                 $json['featureImage'] = '';
