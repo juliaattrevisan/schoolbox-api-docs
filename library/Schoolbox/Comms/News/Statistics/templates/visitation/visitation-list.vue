@@ -22,7 +22,8 @@
          * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
          */
         props: [
-            'payload'
+            'payload',
+            'some-other-var'
         ],
 
         /**
@@ -78,6 +79,7 @@
             <li>{{ this.payload.dog }}</li>
             <li>{{ this.payload.horse }}</li>
             <li>{{ this.payload.rhino }}</li>
+            <li>{{ this.someOtherVar }}</li>
         </ul>
     </div>
 </template>
