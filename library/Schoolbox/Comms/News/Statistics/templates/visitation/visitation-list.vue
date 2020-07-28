@@ -71,5 +71,13 @@
 <template>
     <div>
         Vue components must have exactly one node directly inside the <em>template</em> node itself.
+
+        <p>Test the contents of the payload:</p>
+        <ul>
+            <li>{{ this.payload.cat }}</li>
+            <li>{{ this.payload.dog }}</li>
+            <li>{{ this.payload.horse }}</li>
+            <li>{{ this.payload.rhino }}</li>
+        </ul>
     </div>
 </template>
