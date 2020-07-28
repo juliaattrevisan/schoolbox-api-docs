@@ -85,19 +85,19 @@ abstract class AbstractCsvImporterFactory
 
                 // Legacy mark-per-capability setting, superseded by capabilityMarkType.
                 // if on: set capability mark type + grade group to due work's, or Total if that type is None
-                // If off: set capability mark type to None, or Total if due work's mark type is None
+                // If off: set capability mark type to None
                 case 'markPerCapability':
                     $markTypeSlug         = $dueWork->getMarkType()->getSlug();
                     $capabilityGradeGroup = null;
                     if ($boolValue) {
-                        $capabilityMarkTypeSlug = $markTypeSlug;
+                        $capabilityMarkTypeSlug = $markTypeSlug === MarkType::SLUG_NONE
+                            ? MarkType::SLUG_TOTAL
+                            : $markTypeSlug;
                         if ($dueWork->getGradeGroup()) {
                             $capabilityGradeGroup = $dueWork->getGradeGroup()->getId();
                         }
                     } else {
-                        $capabilityMarkTypeSlug = $markTypeSlug === MarkType::SLUG_NONE
-                            ? MarkType::SLUG_TOTAL
-                            : $markTypeSlug;
+                        $capabilityMarkTypeSlug = MarkType::SLUG_NONE;
                     }
                     break;
 
