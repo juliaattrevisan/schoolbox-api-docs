@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Importer;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use UnexpectedValueException;
 
@@ -17,6 +18,29 @@ use UnexpectedValueException;
  */
 class CsvImporterFactory
 {
+    // Need to pass in the due work mapper here?
+    // Alternately, pass in the fallback cap mark type and grade group
+
+    /**
+     * The mark type mapper: required so that mark type slugs may be translated
+     * to mark types
+     *
+     * @var MarkTypeMapper
+     */
+    private $markTypeMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param MarkTypeMapper $markTypeMapper
+     */
+    public function __construct(MarkTypeMapper $markTypeMapper)
+    {
+        $this->markTypeMapper = $markTypeMapper;
+    }
+
+
     /**
      * Attempt to parse a CSV import from a file.
      *
@@ -43,10 +67,10 @@ class CsvImporterFactory
         // useMarkRange:      On/Off
         // capabilityMarkType: int|null
         // capabilityGradeGroup: int|null
-        $useMarkRange       = false;
-        $capabilityMarkType = null;
-        $capabilityGradeGroup = null;
-        $settingCells      = [$headerRow[0], $headerRow[1], $headerRow[2]];
+        $useMarkRange           = false;
+        $capabilityMarkTypeSlug = null;
+        $capabilityGradeGroup   = null;
+        $settingCells           = [$headerRow[0], $headerRow[1], $headerRow[2]];
         foreach ($settingCells as $settingCell) {
             $settingPair = explode(':', $settingCell);
             $setting     = $settingPair[0] ?? '';
@@ -73,7 +97,7 @@ class CsvImporterFactory
                     break;
 
                 case 'capabilityMarkType':
-                    $capabilityMarkType = (int)$value;
+                    $capabilityMarkTypeSlug = $value;
                     break;
 
                 case 'capabilityGradeGroup':
@@ -84,16 +108,17 @@ class CsvImporterFactory
                 // if on: set capability mark type + grade group to due work's, or Total if that type is None
                 // If off: set capability mark type to None, or Total if due work's mark type is None
                 case 'markPerCapability':
+                    $markTypeSlug         = $dueWork->getMarkType()->getSlug();
+                    $capabilityGradeGroup = null;
                     if ($boolValue) {
-                        $capabilityMarkType = (int)$dueWork->getMarkType()->getId();
+                        $capabilityMarkTypeSlug = $markTypeSlug;
                         if ($dueWork->getGradeGroup()) {
                             $capabilityGradeGroup = $dueWork->getGradeGroup()->getId();
-                        } else {
-                            $capabilityGradeGroup = null;
                         }
                     } else {
-                        $capabilityMarkType = null;
-                        $capabilityGradeGroup = null;
+                        $capabilityMarkTypeSlug = $markTypeSlug === MarkType::SLUG_NONE
+                            ? MarkType::SLUG_TOTAL
+                            : $markTypeSlug;
                     }
                     break;
 
@@ -153,6 +178,16 @@ class CsvImporterFactory
 
             $square[] = $row;
         }
+
+        // Convert capability mark type slug into an ID
+        $capabilityMarkType = null;
+        if (isset($capabilityMarkTypeSlug)) {
+            $capabilityMarkTypes = $this->markTypeMapper->findIdsByColumnList(['slug' => $capabilityMarkTypeSlug]);
+            if (count($capabilityMarkTypes)) {
+                [$capabilityMarkType] = $capabilityMarkTypes;
+            }
+        }
+
         return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $capabilityMarkType, $capabilityGradeGroup);
     }
 
