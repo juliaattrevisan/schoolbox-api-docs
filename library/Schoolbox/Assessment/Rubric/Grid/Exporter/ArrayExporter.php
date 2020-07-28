@@ -49,7 +49,7 @@ class ArrayExporter
         $assessment           = $grid->getAssessment();
 
         if ($assessment instanceof DueWork) {
-            $capabilityMarkType   = $assessment->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getId() : MarkType::TYPE_NONE;
+            $capabilityMarkType   = $assessment->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
             $capabilityGradeGroup = $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null;
             $usingMarkRange       = $assessment->getUseMarkRange();
         }
