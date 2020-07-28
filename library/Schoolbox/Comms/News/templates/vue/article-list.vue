@@ -1,5 +1,7 @@
 <script>
     import LayoutList from './layout-list.vue';
+    import LayoutListReversed from './layout-list-reversed.vue';
+    import LayoutCard from './layout-card.vue';
     import articleListMixin from './article-list-mixin';
 
     export default {
@@ -10,7 +12,9 @@
         ],
         components: {
             'Paginate': VuejsPaginate,
-            'LayoutList': LayoutList
+            'LayoutList': LayoutList,
+            'LayoutListReversed': LayoutListReversed,
+            'LayoutCard': LayoutCard
         },
         data() {
             return {
@@ -241,10 +245,36 @@
                     ></layout-list>
                 </template>
                 <template v-else-if="this.itemLayout === 'list-reversed'">
-                    insert your component here
+                    <layout-list-reversed
+                            :query-string-referrer="this.queryStringReferrer"
+                            :query-string-topic="this.queryStringTopic"
+                            :change-tab-on-meta="this.changeTabOnMeta"
+                            :referrer="this.referrer"
+                            :compact-mode="this.compactMode"
+                            :fallback-image="this.fallbackImage"
+                            :get-index-route="this.getIndexRoute"
+                            :config-save-for-later="this.configSaveForLater"
+                            :locale-news-plural="this.localeNewsPlural"
+                            :saved-article-ids="this.savedArticleIds"
+                            :articles-loading="this.articlesLoading"
+                            :current-articles="this.currentArticles"
+                    ></layout-list-reversed>
                 </template>
                 <template v-else-if="this.itemLayout === 'card'">
-                    insert your component here
+                    <layout-card
+                            :query-string-referrer="this.queryStringReferrer"
+                            :query-string-topic="this.queryStringTopic"
+                            :change-tab-on-meta="this.changeTabOnMeta"
+                            :referrer="this.referrer"
+                            :compact-mode="this.compactMode"
+                            :fallback-image="this.fallbackImage"
+                            :get-index-route="this.getIndexRoute"
+                            :config-save-for-later="this.configSaveForLater"
+                            :locale-news-plural="this.localeNewsPlural"
+                            :saved-article-ids="this.savedArticleIds"
+                            :articles-loading="this.articlesLoading"
+                            :current-articles="this.currentArticles"
+                    ></layout-card>
                 </template>
 
                 <div class="empty-state no-margin" v-if="!this.filteredArticles.length && !this.articlesLoading">
