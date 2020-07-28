@@ -1886,6 +1886,7 @@ $train-line-unvisited-color: $content-ui-background;
 
 article {
     @extend .clearfix;
+    font-size: rem-calc(($base-font-size - 2));
     // Scroll WYSIWYG content areas when wide tables exist.
     overflow-x: auto;
     overflow-y: hidden;

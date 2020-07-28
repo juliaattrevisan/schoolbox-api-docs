@@ -1,3 +1,71 @@
+#news-component {
+  .card {
+    padding: 1rem;
+
+    > a > img {
+      margin: 0 1rem 0 0;
+
+      @media #{$medium-down} {
+        width: (5 * rem-calc($base-font-size));
+      }
+    }
+    &.reversed {
+      img {
+        float: right;
+        margin: 0 0 0 1rem;
+      }
+      .card-actions {
+        display: flex;
+        nav {
+          min-width: 5.25rem;
+        }
+        [class^="icon-"],
+        [class*=" icon-"] {
+          color: $anchor-font-color;
+          margin: 0;
+          padding: 0;
+          line-height: strip-unit($global-button-height);
+          text-align: center;
+          width: $global-button-height;
+          height: $global-button-height;
+
+          &:before {
+            padding-right: 0;
+            float: none;
+          }
+          &[disabled], &.disabled {
+            opacity: 0.33;
+          }
+          &.selected {
+            color: $content-ui-selected;
+            background-color: $content-ui-foreground;
+          }
+          &:hover {
+            background-color: rgba(0,0,0,0.1);
+            text-decoration: none;
+          }
+        }
+      }
+      .spacer {
+        flex-grow: 1;
+      }
+    }
+    h3 {
+      font-weight: $font-weight-semibold;
+      margin-bottom: .5rem;
+    }
+    .icon-pin {
+      margin: -0.5rem .5rem 0 -1rem;
+    }
+    article {
+      padding-top: .5rem;
+    }
+    .article-read-more {
+      text-transform: uppercase;
+    }
+  }
+}
+
 .news-post {
     .banner {
         display: flex;
@@ -7,8 +75,7 @@
     .banner img {
         align-self: center;
     }
-    .detail,
-    article {
+    .detail, article {
         margin: 0 auto;
         max-width: 45rem;
     }
