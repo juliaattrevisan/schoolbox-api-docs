@@ -17,6 +17,7 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 /**
  * Class Module
@@ -102,6 +103,10 @@ class Module extends BaseModule
             'databaseInternal' => $injector->lazy(function () {
                 return $this->getInjector()->get('databaseInternal');
             }),
+            'statisticsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Cumulative\Mapper::class),
+            'userResolver' => $injector->lazyGet('commsNewsUserResolver'),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
         ];
     }
 

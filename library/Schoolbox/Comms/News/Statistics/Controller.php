@@ -9,6 +9,8 @@ namespace Schoolbox\Comms\News\Statistics;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\UserMapper;
 
 /**
  * Class Controller
@@ -37,20 +39,38 @@ class Controller extends Base
 
 
     /**
+     * @var UserResolver
+     */
+    private $userResolver;
+
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+
+    /**
      * Controller constructor.
      *
      * @param IConnector        $databaseInternal
      * @param Mapper            $statisticsMapper
      * @param Cumulative\Mapper $statisticsCumulativeMapper
+     * @param UserResolver      $userResolver
+     * @param UserMapper        $userMapper
      */
     public function __construct(
         IConnector $databaseInternal,
         Mapper $statisticsMapper,
-        Cumulative\Mapper $statisticsCumulativeMapper
+        Cumulative\Mapper $statisticsCumulativeMapper,
+        UserResolver $userResolver,
+        UserMapper $userMapper
     ) {
         $this->database = $databaseInternal;
         $this->statisticsMapper = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
+        $this->userResolver = $userResolver;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -64,7 +84,7 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getOverview(News\Model $article)
+    public function getOverview(News\Model $article): void
     {
         $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
 
@@ -110,7 +130,7 @@ class Controller extends Base
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
      */
-    public function getInteractionsVsTime(News\Model $article)
+    public function getInteractionsVsTime(News\Model $article): void
     {
         $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
         $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
@@ -131,9 +151,19 @@ class Controller extends Base
      */
     public function getVisitation(News\Model $article): void
     {
+
+        /* Compute the recipients so author can identify
+         */
+        $userIds = $this->userResolver->findUsersForArticle($article);
+
+        if (\count($userIds)) {
+            $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
+        } else {
+            $users = $this->userMapper->createCollection();
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
         ])->setTitle("Visits for {$article->getTitle()}"));
-
     }
 }
