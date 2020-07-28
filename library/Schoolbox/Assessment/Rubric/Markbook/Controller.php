@@ -432,8 +432,6 @@ class Controller extends Base
                 'name'         => $row['capability_name'],
                 'indicators'   => $indicators,
                 'show'         => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
-                'markTypeId'   => $row['capability_mark_type_id'],
-                'gradeGroupId' => $row['capability_grade_group_id'],
             ];
 ;
             // Stuff everything about the assessment into an array
@@ -442,7 +440,8 @@ class Controller extends Base
                 'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
-                'gradeGroupId'   => $row['assessment_grade_group_id'],
+                'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
+                'capabilityGradeGroupId'   => $row['capability_grade_group_id'],
                 'isMarkPerCapability' => $row['assessment_is_mark_per_capability'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
@@ -524,7 +523,6 @@ class Controller extends Base
                 vrm.capability_max_value      AS capability_max_value,
                 vrm.capability_mark_type_id   AS capability_mark_type_id,
                 vrm.capability_grade_group_id AS capability_grade_group_id,
-
                 vrm.descriptor_name      AS descriptor_name,
                 vrm.indicator_id         AS indicator_id,
                 vrm.indicator_mark       AS indicator_mark,
@@ -592,8 +590,8 @@ class Controller extends Base
                 /* Capabilities' Mark Type and Grade Group can be represented differently to
                  * their Assessments' Mark Type and Grade Group
                  */
-                $capData['markTypeId'] = $row['capability_mark_type_id'];
-                $capData['gradeGroupId'] = $row['capability_grade_group_id'];
+                $capData['capabilityMarkTypeId'] = $row['capability_mark_type_id'];
+                $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
             }
             $capabilityMarks[$row['capability_id']] = $capData;
 
@@ -635,26 +633,11 @@ class Controller extends Base
             foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
 
                 $assessmentMaxMark = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
-                $assessmentMarkType = $assessments[$assessmentId]['markType'];
-
-                // Create some things the markscheme factory wants our Due Work to have
-                try {
-                    $gradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['gradeGroupId']);
-                } catch (Mapper\Exception $e) {
-                    $gradeGroup = null;
-                }
-
-                $markType = new MarkType();
-                $markType->setId($assessmentMarkType);
 
                 // Fill out a Due Work with the data we need for the markscheme factory to work
                 $stubAssessment = new DueWork\Model();
                 $stubAssessment->setId($assessmentId);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
-                $stubAssessment->setMarkType($markType);
-                if ($gradeGroup !== null) {
-                    $stubAssessment->setGradeGroup($gradeGroup);
-                }
 
                 /* Set Capability Grade Group - it has a bunch of data we need from hydration
                  * such as levels etc. so have to hydrate it
@@ -666,34 +649,29 @@ class Controller extends Base
                  * Therefore if we have a non-null $capabilityGradeGroup we can just skip trying
                  * to fetch it from the db altogether
                  */
-                $capabilityGradeGroup = null;
 
-                // Capability mark type only needs to be set once, too
-                $capabilityMarkType = null;
+                /* Set Capability Mark Type */
+                $capabilityMarkType = MarkTypeMapper::getInstance()
+                                                    ->createModel()
+                                                    ->setId($assessments[$assessmentId]['capabilityMarkTypeId']);
+
+                /* Only try to fetch a Capability Grade Group once
+                 */
+                $capabilityGradeGroup = null;
+                if ( $assessments[$assessmentId]['capabilityGradeGroupId'] !== null) {
+                    try {
+                        $capabilityGradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['capabilityGradeGroupId']);
+                    } catch (Mapper\Exception $e) {
+                        // Noop
+                    }
+                }
+
+                $stubAssessment->setCapabilityMarkType($capabilityMarkType);
+                $stubAssessment->setCapabilityGradeGroup($capabilityGradeGroup);
 
                 foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
 
-                    /* Set Capability Mark Type
-                     */
-                    if (null === $capabilityMarkType) {
-                        $capabilityMarkType = MarkTypeMapper::getInstance()
-                            ->createModel()
-                            ->setId($capabilityMarks['markTypeId']);
-                    }
-
-                    /* Only try to fetch a Capability Grade Group once
-                     */
-                    if (null === $capabilityGradeGroup && $capabilityMarks['gradeGroupId'] !== null) {
-                        try {
-                            $capabilityGradeGroup = $this->gradeGroupMapper->findById($capabilityMarks['gradeGroupId']);
-                        } catch (Mapper\Exception $e) {
-                            // noop
-                        }
-                    }
-
-                    $stubAssessment->setCapabilityMarkType($capabilityMarkType);
-                    $stubAssessment->setCapabilityGradeGroup($capabilityGradeGroup);
 
                     if ($capabilityDatabaseMark !== null) {
                         $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);
