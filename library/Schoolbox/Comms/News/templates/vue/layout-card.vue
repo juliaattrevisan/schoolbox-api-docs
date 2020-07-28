@@ -53,7 +53,7 @@
                         <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">{{ article.author.fullname }}</a>
                         <template v-else>{{ article.author.fullname }}</template>
                     </span>
-                    <span> &mdash; <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time></span>
+                    <span> &mdash; <time :title="article.publishAt.long">{{ article.publishAt.relativeTime }}</time></span>
                     <span v-if="article.topics.length">
                         in
                         <template v-for="(topic, index) in article.topics">
