@@ -81,8 +81,8 @@
     'itemLayout': itemLayout is defined ? itemLayout : 'list',
     'fallbackImage': fallbackImage is defined ? fallbackImage : 'feature-image',
 
-    'getIndexRoute': routeLookup('commsNews.getIndex'),
-    'getArticlesRoute': routeLookup('commsNews.getListForIndex'),
+    'getIndexRoute': routeLookup('commsNews.getIndexRoute'),
+    'getArticlesRoute': getArticlesRoute,
     'getSavedArticlesRoute': routeLookup('commsNewsSaveForLater.getList'),
 
     'configSaveForLater': config.save_for_later,
@@ -99,6 +99,7 @@
     'tabSelected': topic,
     'initialTopic': ''
 } %}
+
 <div id="news-component">
     <article-list :data="{{ articleListData | json_encode }}"></article-list>
 </div>
