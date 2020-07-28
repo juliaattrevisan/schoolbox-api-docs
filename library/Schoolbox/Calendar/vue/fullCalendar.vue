@@ -51,6 +51,9 @@
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
+    // Default event duration is 1 hour
+    const DEFAULT_EVENT_DURATION = 60 * 60 * 1000;
+
     export default {
         components: {
             Toast,
@@ -367,6 +370,12 @@
              * @param eventDropInfo
              */
             onEventDrop(eventDropInfo) {
+                // If an event is moved from all-day to a time:
+                // it won't have an end date.
+                // Assume it lasts 1 hour in this case.
+                if (eventDropInfo.oldEvent.allDay && !eventDropInfo.event.allDay) {
+                    eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getTime() + DEFAULT_EVENT_DURATION));
+                }
                 this.moveEvent(eventDropInfo.event);
             },
 
