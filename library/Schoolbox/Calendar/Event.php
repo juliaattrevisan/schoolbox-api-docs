@@ -517,9 +517,9 @@ class Event implements ISoftDeletable
     /**
      * Get category
      *
-     * @return Folder
+     * @return Folder|null
      */
-    public function getCategory(): Folder
+    public function getCategory(): ?Folder
     {
         return $this->folder;
     }

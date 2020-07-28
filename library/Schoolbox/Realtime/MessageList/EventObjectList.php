@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Notification\Instance\Instance;
 use Predis\ClientInterface;
 use Predis\Command\RawCommand;
 use Predis\Response\ServerException;
@@ -88,4 +89,11 @@ class EventObjectList extends AbstractList
         return $this->name;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function unset(Instance $instance): void
+    {
+        // noop
+    }
 }

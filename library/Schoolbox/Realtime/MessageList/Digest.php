@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Realtime\MessageList;
 
+use Alaress\Async\Notification\Instance\Instance;
+
 class Digest extends AbstractList
 {
     /**
@@ -18,4 +20,11 @@ class Digest extends AbstractList
         return 'digest';
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function unset(Instance $instance): void
+    {
+        // noop
+    }
 }

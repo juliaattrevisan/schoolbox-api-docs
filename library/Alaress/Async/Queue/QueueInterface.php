@@ -57,4 +57,12 @@ interface QueueInterface
      * @return void
      */
     public function fetchIntoBundle(NotificationBundle $bundle, $dropCache = false);
+
+    /**
+     * Unset single instance from a queue
+     *
+     * @param Instance $instance
+     * @return void
+     */
+    public function unset(Instance $instance): void;
 }

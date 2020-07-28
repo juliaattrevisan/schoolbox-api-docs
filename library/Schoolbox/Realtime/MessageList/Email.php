@@ -110,4 +110,12 @@ class Email implements QueueInterface
             $bundle->appendInstance($this->messageInstance);
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function unset(Instance $instance): void
+    {
+        // noop
+    }
 }

@@ -15,6 +15,8 @@ use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -102,6 +104,7 @@ class Controller extends Base
     public function postCreate(Event $event): void
     {
         $guests = $this->attendanceMapper->findAttendances($event);
+        $oldGuestIds = array_column($guests, 'id');
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         /* You can only create attendances if we let you
@@ -109,10 +112,9 @@ class Controller extends Base
         $ids = [];
 
         if ((new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))) {
-            $newGuests = explode(',', $this->request->post['guests'] ?? '');
-            $oldGuests = array_column($guests, 'id');
+            $newGuestIds = explode(',', $this->request->post->get('guests') ?? '');
 
-            $ids = array_diff($newGuests, $oldGuests);
+            $ids = array_diff($newGuestIds, $oldGuestIds);
         }
 
         /* Added a user who's already in the list
@@ -138,6 +140,10 @@ class Controller extends Base
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
 
+        /** @var EventMapper $eventMapper */
+        $eventMapper = $this->attendanceMapper->getJoinMapper('event');
+        (new EventRecurrenceMapper($eventMapper, $this->attendanceMapper))->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $event->setGuests($oldGuestIds));
+
         /* Regenerate a new payload for the people currently invited
          */
         $this->getCurrent($event);
@@ -156,10 +162,17 @@ class Controller extends Base
      */
     public function postDelete(Event $event): void
     {
+        $guests = $this->attendanceMapper->findAttendances($event);
+        $oldGuestIds = array_column($guests, 'id');
+
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id' => $this->request->post['userId']
+            'user_id' => $this->request->post->get('userId'),
         ]);
+
+        /** @var EventMapper $eventMapper */
+        $eventMapper = $this->attendanceMapper->getJoinMapper('event');
+        (new EventRecurrenceMapper($eventMapper, $this->attendanceMapper))->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $event->setGuests($oldGuestIds));
 
         /* Regenerate a new html fragment for the people currently invited
          */

@@ -14,8 +14,11 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
+use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Mapper;
+use Schoolbox\MapperFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -25,17 +28,45 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\Calendar\Event\Attendance\Mapper as AttendanceMapper;
 
 class EventNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_UPCOMING = 'upcoming';
     const TRIGGER_UPDATED  = 'updated';
+    const TRIGGER_INVITED  = 'invited';
 
     // how many minutes prior to an event the notification should go out
     const UPCOMING_WINDOW = 10;
 
     private const EVENT_DETAIL_URL = '/calendar/event/%d';
+
+    // attributes to notify when updated
+    private const UPDATE_ATTR = ['title', 'detail', 'location', 'startDateTime', 'attendance', 'maxAttendees'];
+
+    /**
+     * @inheritdoc
+     * @throws ServiceNotFound
+     */
+    public static function getSetters(ContainerInterface $di): array
+    {
+        /** @var MapperFactory $mf */
+        $mf = $di->get('mapperFactory');
+
+        return [
+            'setMapper'           => $mf->getLazy(EventMapper::class),
+            'setAttendanceMapper' => $mf->getLazy(AttendanceMapper::class),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($configLoader)
+    {
+        parent::__construct($configLoader);
+    }
 
     /**
      * @return string
@@ -45,6 +76,19 @@ class EventNotifier extends AbstractModuleNotifier
         return NSMapper::NS_CALENDAR;
     }
 
+    /** @var EventMapper */
+    protected $mapper;
+
+    /** @var AttendanceMapper */
+    private $attendanceMapper;
+
+    /**
+     * @param AttendanceMapper $attendanceMapper
+     */
+    public function setAttendanceMapper(AttendanceMapper $attendanceMapper): void
+    {
+        $this->attendanceMapper = $attendanceMapper;
+    }
 
     /**
      * @param TriggerBundle $bundle
@@ -54,38 +98,33 @@ class EventNotifier extends AbstractModuleNotifier
     {
         /** @var Event $event */
         $event = $bundle->getEvent()->getObject();
-        $start = $event->getStartDateTime()->getUnixTimeStamp();
-
-        // if this event is in the past, we don't want to know about it
-        if ($start < time()) {
-            return;
-        }
+        $diff  = $bundle->getEvent()->getDiff();
+        /** @var Event $previous */
+        $previous = $this->buildPrevious($event, $diff);
 
         $method = $bundle->getMethod();
-        if ($method === Mapper::METHOD_CREATE) {
+
+        $previousVisible = $previous && $previous->isPublished() && $previous->getEndDateTime()->isFuture();
+        $eventVisible    = $event->isPublished() && $event->getEndDateTime()->isFuture();
+
+        /**
+         * Created or published
+         */
+        if ($eventVisible
+            && ($method === Mapper::METHOD_CREATE || ($method === Mapper::METHOD_UPDATE && !$previousVisible))) {
             // advise 10 minutes before start
-            $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
+            $bundle->attach(self::TRIGGER_UPCOMING, $event->getStartDateTime()->addSeconds(-60 * self::UPCOMING_WINDOW)->getUnixTimeStamp());
+            if ($event->getAttendance()) {
+                $bundle->attach(self::TRIGGER_INVITED, self::IMMEDIATELY);
+            }
             return;
         }
 
-        if ($method === Mapper::METHOD_UPDATE) {
-            // Bundle the updated trigger only if event was and is published
-            if ($event->isPublished() && !$this->isNewlyPublished($bundle->getEvent()->getDiff())) {
-                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-            }
-
-            // Bundle the upcoming trigger
-            if ($event->inSeries()) {
-                // attach a custom trigger for handling the event recurrence
-                $upcoming = [$this, 'getNextSeriesTime'];
-            } else {
-                $upcoming = $start - (60 * self::UPCOMING_WINDOW);
-            }
-            $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
-            return;
-        }
-
-        if ($method === Mapper::METHOD_DELETE) {
+        /**
+         * Deleted or unpublished
+         */
+        if ($method === Mapper::METHOD_DELETE
+            || ($method === Mapper::METHOD_UPDATE && $previousVisible && !$eventVisible)) {
             // Detach all existing triggers, and trigger the deleted event
             // (which retracts all messages for this event already in the queue)
             $bundle->detachEach([
@@ -95,6 +134,33 @@ class EventNotifier extends AbstractModuleNotifier
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
             return;
         }
+
+        /**
+         * Updated past event or no-change
+         */
+        if ($diff === null
+            || (\count($diff) === 1 && \array_key_exists('updatedAt', $diff))
+            || (!$eventVisible && !$previousVisible)) {
+            return;
+        }
+
+        /**
+         * Updated
+         */
+        // information that we care
+        if (count(array_intersect(array_keys($diff), self::UPDATE_ATTR)) > 0) {
+            $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+        }
+
+        // Bundle the upcoming trigger
+        if ($event->inSeries()) {
+            // attach a custom trigger for handling the event recurrence
+            $upcoming = [$this, 'getNextSeriesTime'];
+        } else {
+            $upcoming = $event->getStartDateTime()->addSeconds(-60 * self::UPCOMING_WINDOW)->getUnixTimeStamp();
+        }
+        $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
+        $bundle->attach(self::TRIGGER_INVITED, self::IMMEDIATELY);
     }
 
 
@@ -108,7 +174,7 @@ class EventNotifier extends AbstractModuleNotifier
         $object = $event->getObject();
 
         try {
-            $next = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
+            $next = $this->mapper->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
         } catch (MapperException $e) {
             // this event is not part of a series, don't try to reschedule
             return -1;
@@ -138,7 +204,7 @@ class EventNotifier extends AbstractModuleNotifier
      * @param Event  $event
      * @return Builder
      */
-    protected function newBuilder($trigger, $roleType, $event)
+    protected function newBuilder(string $trigger, string $roleType, Event $event): Builder
     {
         $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
@@ -146,7 +212,7 @@ class EventNotifier extends AbstractModuleNotifier
             // we need to stack based on series if that's possible
             ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId()))
             ->setBody($event->getDetail())
-            ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
+            ->addTopic("calendar.{$event->getId()}.$trigger")
             ->addFilter('roletype', [$roleType])
             ->setSeverity(Logger::INFO);
 
@@ -161,10 +227,10 @@ class EventNotifier extends AbstractModuleNotifier
     /**
      * @param string $roleType
      * @param Event  $event
-     * @param User   $author
+     * @param User   $effector
      * @return Envelope
      */
-    protected function notifyUpcoming($roleType, $event, $author)
+    protected function notifyUpcoming(string $roleType, Event $event, User $effector): Envelope
     {
         // If the event is not yet published, do not notify
         if (!$event->isPublished()) {
@@ -188,13 +254,13 @@ class EventNotifier extends AbstractModuleNotifier
 
 
     /**
-     * @param string $roleType
-     * @param Event  $event
-     * @param User   $effector
-     * @param array  $diff
+     * @param string      $roleType
+     * @param Event       $event
+     * @param User        $effector
+     * @param array |null $diff
      * @return Envelope
      */
-    protected function notifyUpdated($roleType, $event, $effector, $diff = null)
+    protected function notifyUpdated(string $roleType, Event $event, User $effector, ?array $diff = null): Envelope
     {
         // If the event is not yet published, the update never happened
         if (!$event->isPublished()) {
@@ -224,7 +290,7 @@ class EventNotifier extends AbstractModuleNotifier
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                         'old'  => new Param($diff['title'][1]),
-                        'new'  => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
+                        'new'  => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
                 );
             $instances[] = $bob->build();
@@ -236,7 +302,7 @@ class EventNotifier extends AbstractModuleNotifier
             $bob->setTitle(':event has moved from :old to :new')
                 ->setParams(
                     [
-                        'event' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
+                        'event' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         'old'   => new Param($diff['location'][1]),
                         'new'   => new Param($event->getLocation()),
                     ]
@@ -246,31 +312,35 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         // time changed
-        if (isset($diff['start_datetime'])) {
+        if (isset($diff['startDateTime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                        'name' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
+                        'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         'time' => new Param($event->getStartDateTime()->getShort()),
                     ]
                 );
 
             $instances[] = $bob->build();
-            unset($diff['start_datetime']);
+            unset($diff['startDateTime']);
         }
 
         // something else changed
-        if (count($diff)) {
+        if (count(array_intersect(array_keys($diff), self::UPDATE_ATTR))) {
             $bob->setTitle(':user updated the event :name')
                 ->setParams(
                     [
                         'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                        'name' => new Param($event->getTitle(),sprintf(self::EVENT_DETAIL_URL, $event->getId())),
+                        'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
                 );
 
             $instances[] = $bob->build();
+        }
+
+        if (empty($instances)) {
+            return new Envelope();
         }
 
         return $this->notify($event, $instances);
@@ -282,7 +352,7 @@ class EventNotifier extends AbstractModuleNotifier
      * @param Instance[] $instances
      * @return Envelope
      */
-    protected function notify(Event $event, $instances)
+    protected function notify(Event $event, array $instances): Envelope
     {
         $envelope = new Envelope();
 
@@ -330,72 +400,180 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User  $effector
      * @return Envelope
      */
-    public function notifyStudentUpcoming($event, $author)
+    public function notifyStudentUpcoming(Event $event, User $effector): Envelope
     {
-        return $this->notifyUpcoming(Role::STUDENT, $event, $author);
+        return $this->notifyUpcoming(Role::STUDENT, $event, $effector);
     }
 
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User  $effector
      * @return Envelope
      */
-    public function notifyStaffUpcoming($event, $author)
+    public function notifyStaffUpcoming(Event $event, User $effector): Envelope
     {
-        return $this->notifyUpcoming(Role::STAFF, $event, $author);
+        return $this->notifyUpcoming(Role::STAFF, $event, $effector);
     }
 
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User  $effector
      * @return Envelope
      */
-    public function notifyParentUpcoming($event, $author)
+    public function notifyParentUpcoming(Event $event, User $effector): Envelope
     {
-        return $this->notifyUpcoming(Role::PARENT, $event, $author);
+        return $this->notifyUpcoming(Role::PARENT, $event, $effector);
     }
 
 
     /**
-     * @param Event $event
-     * @param User  $author
-     * @param array $diff
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated($event, $author, $diff = null)
+    public function notifyStudentUpdated(Event $event, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyUpdated(Role::STUDENT, $event, $author, $diff);
+        return $this->notifyUpdated(Role::STUDENT, $event, $effector, $diff);
     }
 
 
     /**
-     * @param Event $event
-     * @param User  $author
-     * @param array $diff
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffUpdated($event, $author, $diff = null)
+    public function notifyStaffUpdated(Event $event, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyUpdated(Role::STAFF, $event, $author, $diff);
+        return $this->notifyUpdated(Role::STAFF, $event, $effector, $diff);
     }
 
 
     /**
-     * @param Event $event
-     * @param User  $author
-     * @param array $diff
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated($event, $author, $diff = null)
+    public function notifyParentUpdated(Event $event, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyUpdated(Role::PARENT, $event, $author, $diff);
+        return $this->notifyUpdated(Role::PARENT, $event, $effector, $diff);
     }
 
+    /**
+     * @param string     $roleType
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    protected function notifyInvited(string $roleType, Event $event, User $effector, ?array $diff = null): Envelope
+    {
+        $envelop = new Envelope();
+
+        if (null === $diff) {
+            $newlyInvited = array_column($this->attendanceMapper->findAttendances($event), 'id');
+        } elseif ($diff['guests']) {
+            $newlyInvited = array_diff($diff['guests'][0], $diff['guests'][1]);
+        }
+
+        if (empty($newlyInvited)) {
+            return $envelop;
+        }
+
+        /** @var Event $event */
+        try {
+            $event = $this->mapper->findById($event->getId());
+        } catch (MapperException $e) {
+            return $envelop;
+        }
+
+        $bob = $this->newBuilder(self::TRIGGER_INVITED, $roleType, $event)
+                    ->setTitle(':user invited you to :name')
+                    ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
+                    ->setParams(
+                        [
+                            'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                            'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
+                        ]);
+
+        foreach ($newlyInvited as $guest) {
+            $envelop->targetToUser($guest, $bob->build());
+        }
+        // removing no longer invited users is handled by notifySystemInvited
+
+        return $envelop;
+    }
+
+    /**
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyStudentInvited(Event $event, User $effector, ?array $diff = null): Envelope
+    {
+        return $this->notifyInvited(Role::STUDENT, $event, $effector, $diff);
+    }
+
+
+    /**
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyStaffInvited(Event $event, User $effector, ?array $diff = null): Envelope
+    {
+        return $this->notifyInvited(Role::STAFF, $event, $effector, $diff);
+    }
+
+
+    /**
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyParentInvited(Event $event, User $effector, ?array $diff = null): Envelope
+    {
+        return $this->notifyInvited(Role::PARENT, $event, $effector, $diff);
+    }
+
+    /**
+     * Retracts invitation from users who is no longer invited to this event
+     * @param Event      $event
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifySystemInvited(Event $event, User $effector, ?array $diff = null): Envelope
+    {
+        $envelop = new Envelope();
+
+        if (null === $diff) {
+            return $envelop;
+        }
+
+        $noLongerInvited = array_diff($diff['guests'][1], $diff['guests'][0]);
+        if (empty($noLongerInvited)) {
+            return $envelop;
+        }
+        $bobRetract = new Builder(false);
+        $bobRetract->setNamespace(NSMapper::NS_CALENDAR)
+                   ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId()))
+                   ->addTopic("calendar.{$event->getId()}." . self::TRIGGER_INVITED)
+                   ->setTitle(':user invited you to :name');
+        $envelop->retractForUsers($bobRetract->build(), $noLongerInvited);
+
+        return $envelop;
+    }
 
     /**
      * On deletion of an event, retract all notifications relating to it.

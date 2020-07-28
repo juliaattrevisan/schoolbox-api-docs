@@ -86,4 +86,14 @@ class Composite implements QueueInterface
             $queue->fetchIntoBundle($bundle, $dropCache);
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function unset(Instance $instance): void
+    {
+        foreach ($this->queues as $queue) {
+            $queue->unset($instance);
+        }
+    }
 }

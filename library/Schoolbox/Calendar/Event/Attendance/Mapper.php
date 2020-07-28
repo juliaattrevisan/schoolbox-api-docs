@@ -130,4 +130,13 @@ class Mapper extends \Schoolbox\Mapper
 
         return $pairs;
     }
+
+    /**
+     * Taken care by EventRecurrenceMapper
+     * @inheritDoc
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }

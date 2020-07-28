@@ -10,10 +10,12 @@ namespace Schoolbox\Realtime\Routing;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\Composite;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
@@ -159,25 +161,32 @@ class QueueSorter implements FilterInterface
      * Process retract requests
      *
      * @param Instance $instance
+     * @param null|int $userId
      * @return bool
      */
-    public function processRetract(Instance $instance): bool
+    public function processRetract(Instance $instance, ?int $userId): bool
     {
+        $topic = implode(',', $instance->getTopics());
         if ($instance->isActionRetractSingle()) {
             /** @var MessageList\Retractor $retractor */
             $retractor = $this->listFactory->retract();
-            $this->log->debug("[QueueSorter] retracting single " . $retractor->getRedisMsgKey($instance));
+            $this->log->debug("[QUEUE SORTER] retracting single {$topic} " . $retractor->getRedisMsgKey($instance));
             $retractor->push($instance);
         } elseif ($instance->isActionRetractAll()) {
-            if (!empty($instance->getEventObjectId())) {
+            if (!empty($instance->getEventObjectId()) && null === $userId) {
                 /** @var MessageList\EventObjectList $retractor */
                 $retractor = $this->listFactory->eventObjectList($instance->getEventObjectId());
-                $this->log->debug("[QueueSorter] retracting event object " . $instance->getEventObjectId());
+                $this->log->debug("[QUEUE SORTER] retracting event object " . $instance->getEventObjectId() . " for {$topic}");
                 $retractor->retract();
+            } elseif ($userId !== null) {
+                /** @var Composite $retractor */
+                $retractor = $this->listFactory->instant($userId);
+                $this->log->debug("[QUEUE SORTER] retracting {$topic} for user {$userId}");
+                $retractor->unset($instance);
             } else {
                 /** @var MessageList\Retractor $retractor */
                 $retractor = $this->listFactory->retractLike();
-                $this->log->debug("[QueueSorter] retracting all like " . $retractor->getRedisMsgKey($instance));
+                $this->log->debug("[QUEUE SORTER] retracting all {$topic} like " . $retractor->getRedisMsgKey($instance));
                 $retractor->push($instance);
             }
         }
@@ -210,6 +219,7 @@ class QueueSorter implements FilterInterface
      *              `* RoutePermission::INSTANT`
      *              `* RoutePermission::PUSH`
      *              `* RoutePermission::EMAIL`
+     * @throws MapperException
      */
     private function getReroutedLevel(User $user, Instance $instance): array
     {
