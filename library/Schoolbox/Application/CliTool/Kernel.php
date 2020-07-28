@@ -85,13 +85,14 @@ class Kernel extends CliKernelAbstract
      */
     public function __construct(App $app, array $options = [])
     {
+        $this->parseCommandLineOptions($app);
+
         parent::__construct($options[self::OPTION_LEVEL] ?? null);
 
         $this->validateOptions($options);
         $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
-        $this->parseCommandLineOptions($app);
         $this->checkSystemUserRootStatus($app);
         $this->outStream = $this->getOutputStream();
 
