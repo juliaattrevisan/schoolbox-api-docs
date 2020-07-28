@@ -179,17 +179,35 @@ class CsvImporterFactory
             $square[] = $row;
         }
 
-        // Convert capability mark type slug into an ID
-        $capabilityMarkType = null;
-        if (isset($capabilityMarkTypeSlug)) {
-            $capabilityMarkTypes = $this->markTypeMapper->findIdsByColumnList(['slug' => $capabilityMarkTypeSlug]);
-            if (count($capabilityMarkTypes)) {
-                [$capabilityMarkType] = $capabilityMarkTypes;
+        return new CsvImporter(
+            $levels,
+            array_values($capabilities),
+            $square,
+            $useMarkRange,
+            $this->convertMarkTypeSlugToId($capabilityMarkTypeSlug),
+            $capabilityGradeGroup
+        );
+    }
+
+
+    /**
+     * Converts the mark type slug in the CSV import to its corresponding ID.
+     *
+     * @param string|null $slug
+     * @return int|null
+     */
+    private function convertMarkTypeSlugToId(?string $slug): ?int
+    {
+        $markType = null;
+        if (isset($slug)) {
+            $markTypes = $this->markTypeMapper->findIdsByColumnList(['slug' => $slug]);
+            if (count($markTypes)) {
+                [$markType] = $markTypes;
             }
         }
-
-        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $capabilityMarkType, $capabilityGradeGroup);
+        return $markType;
     }
+
 
 
     /**
