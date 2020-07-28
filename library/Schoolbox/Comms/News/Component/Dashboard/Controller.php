@@ -66,7 +66,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
              */
             'compactMode' => $this->getConfig('compactMode'),
             'itemLayout' => $this->getConfig('itemLayout'),
-            'fallbackImage' => $this->getConfig('itemImage')
+            'fallbackImage' => $this->getConfig('itemImage'),
+
+            /* Routes
+             */
+            'getArticlesRoute' => $this->getRouter()->generate('commsNews.getListForIndex') . '?' . http_build_query([
+                News\Querystring::ITEM_IMAGE => $this->getConfig('itemImage')
+            ])
         ]);
     }
 }

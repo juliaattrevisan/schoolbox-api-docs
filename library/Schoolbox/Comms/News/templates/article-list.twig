@@ -82,7 +82,7 @@
     'fallbackImage': fallbackImage is defined ? fallbackImage : 'feature-image',
 
     'getIndexRoute': routeLookup('commsNews.getIndexRoute'),
-    'getArticlesRoute': getArticlesRoute,
+    'getArticlesRoute': getArticlesRoute is defined ? getArticlesRoute : routeLookup('commsNews.getListForIndex'),
     'getSavedArticlesRoute': routeLookup('commsNewsSaveForLater.getList'),
 
     'configSaveForLater': config.save_for_later,
