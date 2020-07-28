@@ -17,6 +17,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\UserMapper;
 
 /**
  * Mapper for queued video processes.
@@ -46,6 +47,7 @@ class QueueMapper extends Mapper {
         $this->hasModel(Queue::class);
         $this->uses('video_queue_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->joins('uploaded_by', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('status', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
         $this->uses('duration', self::TYPE_INTEGER);
@@ -132,9 +134,11 @@ class QueueMapper extends Mapper {
 
         $query = "
             SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('user', 'u')},
                         {$storageMapper->getColumnString('s')},
 				        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        {$table}
+            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
 			JOIN   {$this->getJoinSql('storage', '', 's')}
 			LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
         ";
@@ -163,10 +167,13 @@ class QueueMapper extends Mapper {
         /** @var MimetypeMapper $mimeMapper */
         $mimeMapper = $storageMapper->getJoinMapper('allowedFileExtension');
 
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             /** @var Queue $record */
-            $record = $this->hydrate($row);
+            $record = $this->hydrate($row)->setUser($userMapper->hydrate($row, 'u'));
 
             // Can't hydrate storage if there isn't a hash
 

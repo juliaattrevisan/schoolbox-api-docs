@@ -51,7 +51,7 @@
 
             {% for status in statusOrder %}
 
-                {% for video in queue[status] %}
+                {% for video in queue[status]|default([]) %}
 
                     {% if loop.first %}
                         <h2 class="subheader">
@@ -60,8 +60,9 @@
                         <table data-sortable>
                             <thead>
                             <tr>
-                                <th>Uploaded</th>
-                                <th>Name</th>
+                                <th>Uploaded At</th>
+                                <th>Uploaded By</th>
+                                <th>File Name</th>
                                 <th>Duration</th>
                                 <th>Size</th>
                                 <th>Mime</th>
@@ -71,6 +72,7 @@
                     {% endif %}
                             <tr>
                                 <td>{{ video.createdAt.database }}</td>
+                                <td>{% if video.user %}<a href="/search/user/{{ video.user.id }}">{{ video.user.fullName }}</a>{% else %}Unknown{% endif %}</td>
                                 <td>{{ video.storage.filename }}</td>
                                 <td>{{ video.duration }}</td>
                                 <td data-order="{{ video.storage.size  }}">{{ video.storage.size | bytes }}</td>

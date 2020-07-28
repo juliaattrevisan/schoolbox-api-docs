@@ -173,6 +173,7 @@ class Mapper extends BaseMapper implements Receiver
             $videoQ = $mapper->createModel();
             $videoQ->setStorage($storage);
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
+            $videoQ->setUser($this->getSessionUser());
 
             $mapper->save($videoQ);
         }
