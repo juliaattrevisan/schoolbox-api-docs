@@ -55,28 +55,39 @@ class CsvImporter
 
     /**
      * Does the imported CSV have per-capability marks?
+     * This is the capability mark type id now
      *
-     * @var bool
+     * @var int|null
      */
-    private $markPerCapability;
+    private $capabilityMarkType;
+
+
+    /**
+     * Does the imported CSV have a grade group specified for its associated mark type?
+     *
+     * @var int|null
+     */
+    private $capabilityGradeGroup;
 
 
     /**
      * Constructor
      *
-     * @param array $levels
-     * @param array $capabilities
-     * @param array $square
-     * @param bool  $useMarkRange
-     * @param bool  $markPerCapability
+     * @param array    $levels
+     * @param array    $capabilities
+     * @param array    $square
+     * @param bool     $useMarkRange
+     * @param int|null $capabilityMarkType
+     * @param int|null $capabilityGradeGroup
      */
-    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, bool $markPerCapability)
+    public function __construct(array $levels, array $capabilities, array $square, bool $useMarkRange, ?int $capabilityMarkType, ?int $capabilityGradeGroup)
     {
-        $this->levels            = $levels;
-        $this->capabilities      = $capabilities;
-        $this->square            = $square;
-        $this->useMarkRange      = $useMarkRange;
-        $this->markPerCapability = $markPerCapability;
+        $this->levels               = $levels;
+        $this->capabilities         = $capabilities;
+        $this->square               = $square;
+        $this->useMarkRange         = $useMarkRange;
+        $this->capabilityMarkType   = $capabilityMarkType;
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
     }
 
 
@@ -90,11 +101,20 @@ class CsvImporter
 
 
     /**
-     * @return bool
+     * @return int|null
      */
-    public function isMarkPerCapability(): bool
+    public function getCapabilityMarkType(): ?int
     {
-        return $this->markPerCapability;
+        return $this->capabilityMarkType;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getCapabilityGradeGroup(): ?int
+    {
+        return $this->capabilityGradeGroup;
     }
 
 

@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
@@ -47,7 +48,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
-use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedbackModel;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
@@ -156,7 +158,7 @@ class DataSource
 
                 if ($getUsages) {
                     foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
-                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
+                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWorkModel())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
                     }
@@ -170,7 +172,7 @@ class DataSource
             if ($getUsages) {
                 foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
-                        = (new DueWork\Model())
+                        = (new DueWorkModel())
                             ->setId($indicatorUsage['id'])
                             ->setTitle($indicatorUsage['title']);
                 }
@@ -342,20 +344,15 @@ class DataSource
     /**
      * Retrieve a grid for the given assessment.
      *
-     * @param IAssessable $assessment
-     * @param bool        $getUsages
+     * @param DueWorkModel $assessment
+     * @param bool         $getUsages
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(IAssessable $assessment, bool $getUsages): Grid
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages): Grid
     {
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
-
-        // Not a due work? This has an empty grid
-        if (!$assessment instanceof DueWork\Model) {
-            return $grid;
-        }
 
         // Assessment isn't persisted yet? This has an empty grid
         if (!$assessment->getId()) {
@@ -465,7 +462,7 @@ class DataSource
 
             // Max value is derived from indicators, if mark-per-cap is off
             $capabilityUsage->setMaxValue(
-                $assessment->getMarkPerCapability()
+                $assessment->isMarkPerCapability()
                     ? $capabilityUsageModel->getMaxValue()
                     : $capabilityUsage->calculateMaxValueFromIndicators()
             );
@@ -870,7 +867,7 @@ class DataSource
         // Which feedbacks are getting checked?
         $feedbackIds = [];
         foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback instanceof DueWork\Feedback\Model
+            if ($feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
                 $feedbackIds[] = $feedback->getId();
@@ -895,9 +892,9 @@ class DataSource
     /**
      * Imports a rubric grid from a CSV into the given due work.
      *
-     * @param IStorage      $file
-     * @param DueWork\Model $dueWork
-     * @param int           $maxLevels
+     * @param IStorage     $file
+     * @param DueWorkModel $dueWork
+     * @param int          $maxLevels
      *
      * @throws UnexpectedValueException if the importer couldn't be built
      * @throws UnexpectedValueException if a capability or indicator could not
@@ -906,7 +903,7 @@ class DataSource
      *                                  or persisting the rowset
      * @return void
      */
-    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
+    public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, $maxLevels): void
     {
         // Create the factory
         $importerFactory = new CsvImporterFactory();
@@ -951,8 +948,12 @@ class DataSource
 
 
         // Now start building the grid
+        $capabilityMarkType = SubmissionBox\MarkTypeMapper::getInstance()->createModel()->setId($importer->getCapabilityMarkType());
+        $capabilityGradeGroup = Group\Mapper::getInstance()->createModel()->setId($importer->getCapabilityGradeGroup());
+
         $dueWork
-            ->setMarkPerCapability($importer->isMarkPerCapability())
+            ->setCapabilityMarkType($capabilityMarkType)
+            ->setCapabilityGradeGroup($capabilityGradeGroup)
             ->setUseMarkRange($importer->isUseMarkRange());
         $grid = new Grid($dueWork, $rowSet);
 
@@ -1112,8 +1113,8 @@ class DataSource
      *   - assessment
      *   - descriptor (student result)
      *
-     * @param GenericCollection|DueWork\Model[] $dueWorks
-     * @param User                              $student
+     * @param GenericCollection|DueWorkModel[] $dueWorks
+     * @param User                             $student
      *
      * @return array $longitude
      * @throws UnderflowException
@@ -1174,7 +1175,7 @@ class DataSource
                     ri.name AS indicator_name,
                     a.id AS assessment_id,
                     a.title AS assessment_title,
-                    sb.rubric_mark_per_capability,
+                    sb.rubric_capability_mark_type_id,
                     sb.mark_type,
                     rl.name as level,
                     rd.description,
@@ -1215,7 +1216,7 @@ class DataSource
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
                     'name'                       => $row['assessment_title'],
-                    'rubric_mark_per_capability' => $row['rubric_mark_per_capability'],
+                    'rubric_capability_mark_type_id' => $row['rubric_capability_mark_type_id'],
                     'descriptor'                 => $row['description'],
                     'level'                      => $row['level'],
                     'max_value'                  => $row['max_value'],
@@ -1296,7 +1297,7 @@ class DataSource
                         $boxPlot = new Summary($indicator);
                         $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = $boxPlot->getSummary();
                         $assessmentList[$assessmentId]['name'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['name'];
-                        $assessmentList[$assessmentId]['rubric_mark_per_capability'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['rubric_mark_per_capability'];
+                        $assessmentList[$assessmentId]['rubric_capability_mark_type_id'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['rubric_capability_mark_type_id'];
                     }
                 }
             }

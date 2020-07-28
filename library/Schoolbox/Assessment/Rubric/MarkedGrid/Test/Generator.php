@@ -10,9 +10,12 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+
+
 /**
  * Generator for test data for marked grid tests.
  */
@@ -54,6 +57,12 @@ class Generator
 
 
     /**
+     * @var DueWork\Model
+     */
+    private $dueWork;
+
+
+    /**
      * Build a marked grid.
      *
      * @param array $capabilities     The capabilities that comprise the grid's
@@ -81,7 +90,15 @@ class Generator
     ): RubricMarkedGrid\MarkedGrid
     {
         // Build a grid and row set
-        $grid   = (new RubricGrid\Test\Generator())->generateGrid($capabilities, $levels, $capabilityUsages);
+        $gridGenerator = new RubricGrid\Test\Generator();
+
+        /* Optionally use a different DueWork instance than the hardcoded default
+         */
+        if ($this->dueWork) {
+            $gridGenerator->setDueWork($this->dueWork);
+        }
+
+        $grid = $gridGenerator->generateGrid($capabilities, $levels, $capabilityUsages);
         $rowSet = $grid->getRowSet();
 
 
@@ -150,5 +167,16 @@ class Generator
         );
         $markedGrid->setCapabilityMarks($capabilityMarkObjects);
         return $markedGrid;
+    }
+
+
+    /**
+     * @param DueWork\Model $dueWork
+     * @return $this
+     */
+    public function setDueWork(DueWork\Model $dueWork): self
+    {
+        $this->dueWork = $dueWork;
+        return $this;
     }
 }

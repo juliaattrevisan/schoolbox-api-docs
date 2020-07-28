@@ -11,7 +11,7 @@
 <table>
     <tr><td>&nbsp;</td>
         {% for activity_id, activity in rubricAssessmentList  %}
-            {% if activity.rubric_mark_per_capability %}
+            {% if activity.rubric_capability_mark_type_id %}
             <td>
                 {% set activityAssessment = assessments.by('id', activity_id) %}
                 {% if activityAssessment %}
@@ -40,7 +40,7 @@
         <tr>
             <td><b>{{ capability.name | nl2br }}</b></td>
             {% for activity_id, activity in rubricAssessmentList %}
-                {% if activity.rubric_mark_per_capability %}
+                {% if activity.rubric_capability_mark_type_id %}
                 {% set activity = indicator is defined and indicator.activities[activity_id] %}
                 <td>
                     {% if capability.mark[activity_id] is defined %}

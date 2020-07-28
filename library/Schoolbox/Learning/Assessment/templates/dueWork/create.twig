@@ -93,15 +93,31 @@
      #}
     {% set markTypeLetterGrade = 2 %}
     {% set markTypeTotalMark = 3 %}
+    {% set markTypeNone = 6 %}
 
-    {% include '@learningAssessment/fragments/markType.twig' %}
+    {% include '@learningAssessment/fragments/markType.twig' with {
+        context: '',
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        selectedMarkType: assessment.markType.id ?? null,
+        selectedGradeGroup: assessment.gradeGroup.id ?? null,
+        defaultGradeGroup: defaultGradeGroup,
+        renderMaxMark: true,
+        markTypeLabel: 'Mark Type',
+    } %}
+
     {% include '@learningAssessment/fragments/rubric.twig' with {
         rubricGrid: rubricGrid,
         rubricAttachZone: rubricAttachZone,
         resultSets: rubricResultSets,
         rubricHasMarks: rubricHasMarks,
         assessment: assessment,
-        markTypeTotalMark: markTypeTotalMark
+        markTypeTotalMark: markTypeTotalMark,
+        capabilityMarkTypes: capabilityMarkTypes,
+        capabilityGradingSchemes: capabilityGradingSchemes,
+        defaultGradeGroup: defaultGradeGroup,
+        markTypeNone: markTypeNone
     } only %}
 </fieldset>
 

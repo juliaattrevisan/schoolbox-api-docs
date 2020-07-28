@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Importer\Test;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter;
 use PHPUnit\Framework\TestCase;
 
@@ -72,7 +73,8 @@ class CsvImporterTest extends TestCase
                 ],
             ],
             false,
-            false
+            MarkType::TYPE_NONE,
+            null
         );
 
         yield 'capabilities not in use' => [
@@ -166,7 +168,8 @@ class CsvImporterTest extends TestCase
                 ],
             ],
             false,
-            false
+            MarkType::TYPE_NONE,
+            null
         );
 
         yield 'capability with indicators' => [

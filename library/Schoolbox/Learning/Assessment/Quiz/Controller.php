@@ -9,6 +9,11 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use DomainException;
+use PDOException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
@@ -18,6 +23,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -28,6 +35,7 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -40,15 +48,18 @@ use Schoolbox\Assessment\Term;
  */
 class Controller extends Assessment\Controller
 {
+
     /**
      * @var QuizMapper
      */
     private $quizMapper;
 
+
     /**
      * @var QuizSectionMapper
      */
     private $quizSectionMapper;
+
 
     /**
      * @var QuizAttemptMapper
@@ -101,8 +112,10 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws ServiceNotFound
+     * @throws RouteNotFound
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
@@ -120,7 +133,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/quiz/status.twig",
+                '@learningAssessment/quiz/status.twig',
                 $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
@@ -133,13 +146,16 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws Deleted
+     * @throws ServiceNotFound
+     * @throws DomainException
+     * @throws PDOException
+     * @throws DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
         $quiz = $this->quizMapper->loadSectionsAndQuestions($quiz);
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
@@ -186,7 +202,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/quiz/summary/student.twig",
+                '@learningAssessment/quiz/summary/student.twig',
                 $twigData,
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -202,8 +218,9 @@ class Controller extends Assessment\Controller
      * @param string|null $explicitReturnUrl
      * @param string      $defaultReturnUrl
      * @return string
+     * @throws Exception
      */
-    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = '')
+    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = ''): string
     {
         /**
          * Always go to the screen when a quiz has been created,
@@ -254,19 +271,21 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @return array
      */
-    protected function getAssessmentTwigData(IAssessable $assessment)
+    protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $data['acceptingResponses']= true;
         return $data;
     }
+
 
     /**
      * Converts an assessment_id to a Quiz
      *
      * @param int $assessmentId
      * @return Quiz
+     * @throws Exception
      */
-    protected function getQuizForAssessmentId($assessmentId)
+    protected function getQuizForAssessmentId($assessmentId): Quiz
     {
         /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();

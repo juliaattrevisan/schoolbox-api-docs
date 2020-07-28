@@ -7,7 +7,7 @@
 {% set capabilityMaxFromIndicators   = groupUsage.calculateMaxValueFromIndicators %}
 {% set capabilityNormMark = capabilityMark is not null ? capabilityMark.retrieveNormalizedMark : null %}
 
-{% set markScheme = capabilityMark.markScheme ?? rubricGrid.assessment.markScheme %}
+{% set markScheme = rubricGrid.capabilityMarkScheme ?? rubricGrid.assessment.markScheme %}
 {% set markType   = markScheme.generateContext %}
 {% if showGroupTotal %}
     {% set letterGradeBracket = null %}

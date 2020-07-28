@@ -148,6 +148,31 @@ class Generator
 
 
     /**
+     * The rubric grid will be built around this DueWork instance
+     * You can override it post-construction if you need to change its attributes etc.
+     *
+     * This seemingly-odd shim introduced so that generateGrid() could work on something
+     * different the prescribed hardcoded DueWork instance without altering method signatures
+     *
+     * @var DueWork
+     */
+    private $dueWork;
+
+
+    /**
+     * Generator constructor.
+     */
+    public function __construct()
+    {
+        // Build a grid that uses the row set
+        $this->dueWork = (new DueWork())
+            ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
+            ->setMaxMark(100);
+
+    }
+
+
+    /**
      * Build a grid.
      *
      * @param array $capabilities     The capabilities that comprise the grid's
@@ -178,9 +203,7 @@ class Generator
 
 
         // Build a grid that uses the row set
-        $dueWork = (new DueWork())
-            ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
-            ->setMaxMark(100);
+        $dueWork = $this->dueWork;
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
 
 
@@ -225,5 +248,16 @@ class Generator
         }
 
         return $grid;
+    }
+
+
+    /**
+     * @param DueWork $dueWork
+     * @return $this
+     */
+    public function setDueWork(DueWork $dueWork): self
+    {
+        $this->dueWork = $dueWork;
+        return $this;
     }
 }

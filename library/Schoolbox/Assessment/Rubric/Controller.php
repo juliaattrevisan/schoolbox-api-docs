@@ -12,6 +12,8 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
@@ -66,6 +68,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var MarkTypeMapper
+     */
+    private $markTypeMapper;
+
+
+    /**
      * Constructor
      *
      * @param RubricDataSource     $mapper
@@ -74,6 +82,7 @@ class Controller extends BaseController
      * @param Capability\Mapper    $groupMapper
      * @param Indicator\Mapper     $criterionMapper
      * @param RosettaStone         $rosettaStone
+     * @param MarkTypeMapper       $markTypeMapper
      */
     public function __construct(
         RubricDataSource $mapper,
@@ -81,7 +90,8 @@ class Controller extends BaseController
         FolderMapper $folderMapper,
         Capability\Mapper $groupMapper,
         Indicator\Mapper $criterionMapper,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        MarkTypeMapper $markTypeMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
@@ -89,6 +99,7 @@ class Controller extends BaseController
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;
         $this->rosettaStone         = $rosettaStone;
+        $this->markTypeMapper       = $markTypeMapper;
     }
 
 
@@ -312,19 +323,37 @@ class Controller extends BaseController
             return;
         }
 
-        $context = [
-            'formField'              => $post->get('formField', 'rb'),
-            'rubricGrid'             => $assessment->getRubricGrid(),
-            'levelLimit'             => $maxLevels,
-            'usingMarkPerCapability' => $assessment->getMarkPerCapability(),
-            'usingMarkRange'         => $assessment->getUseMarkRange(),
+        /* Obtain the grid html separately from the other rubric settings
+         *
+         * Otherwise you have to infer the settings from what might have been visible in the grid
+         */
+        $fragment = $this->buildUnthemedHtmlOutput('@rubric/grid-editable.twig', $context = [
+            'formField'  => $post->get('formField', 'rb'),
+            'rubricGrid' => $assessment->getRubricGrid(),
+            'levelLimit' => $maxLevels,
+        ])->getAsString();
+
+        $payload = [
+
+            /* Capability Mark Type value, if applicable
+             */
+            'capabilityMarkType' => $assessment->getCapabilityMarkType() ? $assessment->getCapabilityMarkType()->getId() : null,
+
+            /* Capability Grade Group value, if applicable
+             */
+            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
+
+            /* Use Mark Range switch; grid-editable doesn't use this var
+             * This compiled payload ends up in grid-csv.twig as result of async request
+             */
+            'useMarkRange' => $assessment->getUseMarkRange(),
+
+            /* The rubric grid resulting from the csv import
+             */
+            'fragment' => $fragment,
         ];
 
-        $this->getResponse()->content->set([
-            'data'     => $context,
-            'format'   => 'nochrome',
-            'template' => '@rubric/grid-editable.twig'
-        ]);
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 
     /**
@@ -338,13 +367,40 @@ class Controller extends BaseController
         $post         = $this->request->post->get('rb');
         $assessmentId = key($post);
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
+
         if (!$assessment instanceof DueWork) {
             // This is an error. How do I generate one?
             // Note: I can't download rubrics for due works that don't exist yet
             $this->sendError('Can only download rubrics for due work');
             return;
         }
-        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
+
+        /* Find the MarkType instance associated with whatever was POSTed
+         */
+        $markType = null;
+
+        if ($this->request->post['capability-markType']) {
+            try {
+                $markType = MarkTypeMapper::getInstance()->findById($this->request->post['capability-markType']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendError('Unknown capability mark type selected');
+            }
+        }
+
+        /* Find the Grade Group instance associated with whatever was POSTed
+         */
+        $gradeGroup = null;
+
+        if ($this->request->post['capability-gradingScheme'] !== null) {
+            try {
+                $gradeGroup = Group\Mapper::getInstance()->findById($this->request->post['capability-gradingScheme']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->sendError('Unknown capability grade group selected');
+            }
+        }
+
+        $assessment->setCapabilityMarkType($markType)
+                   ->setCapabilityGradeGroup($gradeGroup)
                    ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
@@ -396,7 +452,7 @@ class Controller extends BaseController
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
-            ->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
+            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)$this->request->post['capability-markType']))
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),

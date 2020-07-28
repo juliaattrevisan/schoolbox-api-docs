@@ -62,9 +62,20 @@
             $.post(url, postdata).done(function (data) {
 
                 // dump in the new data
-                target.html(data).promise().done(function() {
+                target.html(data.fragment).promise().done(function() {
                     // Fire a custom event, this is used on dueWork/create.twig to update a field on import
                     $('#rubric-attachable{{ idSuffix }}').trigger('rubric-grid-imported');
+
+                    /* Set switches and dropdowns via payload values
+                     */
+                    body.find('#capability-markType').val(data.capabilityMarkType).trigger('change');
+                    body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
+
+                    if (data.useMarkRange) {
+                        body.find('#useMarkRange').prop('checked', true);
+                    } else {
+                        body.find('#useMarkRange').prop('checked', false);
+                    }
                 });
 
             }).fail(function (data) {
@@ -82,23 +93,9 @@
                 wrap.find('[data-hideable]').removeClass('hide');
                 wrap.find('[data-waiting-msg]').addClass('hide');
 
-                // Is mark-per-capability on in the rubric? switch it on in the main form
-                body.find('#markPerCapability').prop(
-                    'checked',
-                    $('#rubric-attachable{{ idSuffix }}').find('input[data-group-max-value]:visible').length > 0
-                );
-
-                // Is use mark range on in the rubric?
-                // (There's no way to infer this other than some attribute on the grid)
-                body.find('#useMarkRange').prop(
-                    'checked',
-                    body.find('input[data-descriptor-uses-mark-range]').length > 0
-                );
-
                 // you're free to leave now
                 submits.prop('disabled', false);
             });
-
         });
 
         {% if rubricGrid.assessment.id %}
@@ -109,7 +106,8 @@
                 .attr('action', '/rubric/csv')
                 .attr('method', 'post')
                 .append($('table[data-rubric]').clone())
-                .append($('#markPerCapability').clone())
+                .append($('#capability-markType').clone())
+                .append($('#capability-gradingScheme').clone())
                 .append($('#useMarkRange').clone());
 
             frm.on('submit', function () {

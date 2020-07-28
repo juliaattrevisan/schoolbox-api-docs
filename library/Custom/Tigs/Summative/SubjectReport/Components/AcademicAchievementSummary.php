@@ -38,7 +38,7 @@ class AcademicAchievementSummary extends AbstractMatrix
             'grid'                => $dueWork->getRubricGrid(),
             'useMarkRange'        => $dueWork->getUseMarkRange(),
             'showDescriptorValue' => true,
-            'showGroupTotal'      => $dueWork->getMarkPerCapability(),
+            'showGroupTotal'      => $dueWork->isMarkPerCapability(),
             'showRubricTotal'     => true,
             'capabilityMarks'     => null,
         ];

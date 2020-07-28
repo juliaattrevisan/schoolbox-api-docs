@@ -11,8 +11,14 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use Eportfolio\ShowcaseMapper;
+use ICollection;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -45,6 +51,7 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -54,7 +61,13 @@ use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
+use UnexpectedValueException;
 
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Learning\Assessment\DueWork
+ */
 class Controller extends Assessment\Controller
 {
     /** @var RubricResultSetMapper */
@@ -124,12 +137,13 @@ class Controller extends Assessment\Controller
         $this->kamiMapper            = $kamiMapper;
     }
 
+
     /**
      * Determine if there are any submission files available for download on the assessment
      * @param IAssessable $assessment
      * @return bool
      */
-    private function hasDownloadableSubmissionFiles($assessment)
+    private function hasDownloadableSubmissionFiles($assessment): bool
     {
         // Grab all participants in the assessment
 
@@ -152,6 +166,7 @@ class Controller extends Assessment\Controller
         return false;
     }
 
+
     /**
      * This gives you a summary of progress made within an Assessment
      * It is the consolidation of pages previously known as "quickmark" and "quiz review"
@@ -160,9 +175,12 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
-     * @throws \InvalidArgumentException If assessment due date is null.
+     * @throws ServiceNotFound
+     * @throws InvalidArgumentException If assessment due date is null.
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function getStatus(IAssessable $assessment)
+    public function getStatus(IAssessable $assessment): void
     {
         // Only display download link if there are actually files to download
 
@@ -179,7 +197,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/dueWork/status.twig",
+                '@learningAssessment/dueWork/status.twig',
                 $twigData, "Status of {$assessment->getTitle()}", 'submission'
             )
         );
@@ -192,8 +210,11 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @throws ServiceNotFound
+     * @throws MapperException
+     * @throws PDOException
      * @throws RouteNotFound
+     * @throws ServiceNotFound
+     * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -273,11 +294,12 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/dueWork/summary/student.twig",
+                '@learningAssessment/dueWork/summary/student.twig',
                 $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );
     }
+
 
     /**
      * Sanitize a string for use in filename
@@ -285,17 +307,20 @@ class Controller extends Assessment\Controller
      * @param string $string
      * @return string
      */
-    private function sanitizeForFilename($string) {
+    private function sanitizeForFilename($string): string
+    {
         return preg_replace("/[^A-Za-z0-9\-. ]/", '_', $string);
     }
+
 
     /**
      * Download all student submissions for a given assessable
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @since 165
      * @param IAssessable $assessment
+     * @throws MapperException
      */
-    public function downloadSubmissions(IAssessable $assessment)
+    public function downloadSubmissions(IAssessable $assessment): void
     {
         // Retrieve all participants
 
@@ -371,14 +396,20 @@ class Controller extends Assessment\Controller
         $zip->download();
     }
 
+
     /**
      * Shows a rubric overview
      *
      * @api   GET /learning/assessments/:assessmentId/overview
      * @since 165
      * @param IAssessable|Model $assessment
+     * @throws DomainException
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
-    public function getOverview(IAssessable $assessment)
+    public function getOverview(IAssessable $assessment): void
     {
         // Sort participant by lastname, firstname, and id
         $participants = $assessment->getParticipantUsers()->sortByCallback(static function (User $participantA, User $participantB) {
@@ -414,14 +445,21 @@ class Controller extends Assessment\Controller
         ]);
     }
 
+
     /**
      * Downloads a rubric overview
      *
      * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
      * @since 165
      * @param IAssessable|Model $assessment
+     * @throws DefinitionException
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws Exception
      */
-    public function downloadOverview(IAssessable $assessment)
+    public function downloadOverview(IAssessable $assessment): void
     {
         if(!$assessment->getUseRubric()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
@@ -471,10 +509,10 @@ class Controller extends Assessment\Controller
     /**
      * Get rubric marks given for each indicator.
      *
-     * @param \ICollection|Participant[] $participants
+     * @param ICollection|Participant[] $participants
      * @return IndicatorMark[][] Grouped in sets indexed by user.id
      */
-    private function getMarks(\ICollection $participants): array
+    private function getMarks(ICollection $participants): array
     {
         $marks = [];
 
@@ -575,13 +613,14 @@ class Controller extends Assessment\Controller
         return $data;
     }
 
+
     /**
      * The array data should obviously be in a CSV-compatible format (ie. rectangle)
      *
      * @param array $array
      * @return string
      */
-    protected function array2csv(array $array)
+    protected function array2csv(array $array): string
     {
         $fp = fopen('php://temp', 'w');
         foreach ($array as $row) {
@@ -683,12 +722,14 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Try to use a pseudo-standardised json payload return structure (I think)
+     *
      * @param string $errorMessage
      * @param string $redirectTo
      * @param int    $errorCode
-     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @throws InvalidStatusCode
      */
-    private function configureResponseWithError(string $errorMessage, string $redirectTo, int $errorCode = 403)
+    private function configureResponseWithError(string $errorMessage, string $redirectTo, int $errorCode = 403): void
     {
         $rs = $this->getResponse();
 
@@ -705,6 +746,7 @@ class Controller extends Assessment\Controller
         }
     }
 
+
     /**
      * Save a Response, on behalf of a User, for a particular Assessment
      *
@@ -712,15 +754,16 @@ class Controller extends Assessment\Controller
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @return void
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws Exception
+     * @throws InvalidStatusCode
      * @throws MapperException If unable to create new Response object
      * @throws MapperException\Deleted If specified Response is deleted
+     * @throws PDOException If unable to save the Response
      * @throws RouteNotFound If unable to generate a specified Route
-     * @throws \Aura\Web\Exception\InvalidStatusCode
-     * @throws \LogicException If files are not saved prior to insertion into kami upload queue
-     * @throws \PDOException If unable to save the Response
-     * @throws \UnexpectedValueException
      * @throws ServiceNotFound
+     * @throws UnexpectedValueException
+     * @throws LogicException If files are not saved prior to insertion into kami upload queue
+     * @throws \Schoolbox\File\Exception
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -789,10 +832,8 @@ class Controller extends Assessment\Controller
 
             // Validate attachment list can actually be built
             try {
-                /** @var IStorage[] $attachments */
                 $attachments = $factory->build($rq->post['attachment'])->getAll();
-
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $errorMessage = 'One or more files were not able to be attached';
                 $redirect = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
@@ -864,7 +905,6 @@ class Controller extends Assessment\Controller
         if ($isFinal) {
             $this->enqueueKamiUploads($response->getAllFiles());
         }
-
 
         /* Save stubble record and send each file in the Submission to Plagscan
          * if the Submission was saved successfully
@@ -958,7 +998,7 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/received
      * @since 17.0
      */
-    public function postStatusAcknowledge(IAssessable $assessment, User $student)
+    public function postStatusAcknowledge(IAssessable $assessment, User $student): void
     {
         try {
             $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
@@ -968,7 +1008,7 @@ class Controller extends Assessment\Controller
                 'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
             ];
             $code = 200;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $data = [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -999,11 +1039,11 @@ class Controller extends Assessment\Controller
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @throws RouteNotFound
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
      * @since 18.0
      */
-    public function postSelfAcknowledge(IAssessable $assessment, User $student)
+    public function postSelfAcknowledge(IAssessable $assessment, User $student): void
     {
         $participant = $assessment->getParticipantIfExtant($student);
         $selfReview  = $assessment instanceof Model && $assessment->isSelfAssessable();
@@ -1039,7 +1079,7 @@ class Controller extends Assessment\Controller
                 'location'      => $this->getRouteIfAuthorized($route, $params, $this->getUser()),
             ];
             $code = 200;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $data = [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -1059,6 +1099,7 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
+     * @throws UnexpectedValueException
      * @api   POST /learning/assessments/:assessmentId/:studentId/ack
      * @since 17.0
      */
@@ -1072,7 +1113,7 @@ class Controller extends Assessment\Controller
                 'assessment'  => $participant->getAssessable(),
             ]));
             $code = 200;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -1090,7 +1131,8 @@ class Controller extends Assessment\Controller
      * @param User                     $student
      * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
-     * @throws \PDOException If something went wrong in the save process
+     * @throws PDOException If something went wrong in the save process
+     * @throws UnexpectedValueException
      */
     private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
@@ -1121,8 +1163,9 @@ class Controller extends Assessment\Controller
     /**
      * @param Model|IAssessable $assessment
      * @return array
+     * @throws UnexpectedValueException
      */
-    protected function getAssessmentTwigData(IAssessable $assessment)
+    protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
 
@@ -1152,8 +1195,10 @@ class Controller extends Assessment\Controller
      *
      * @param Model $dueWork
      * @return array
+     * @throws MapperException
+     * @throws UnexpectedValueException
      */
-    private function generateRubricTwigData(Model $dueWork)
+    private function generateRubricTwigData(Model $dueWork): array
     {
         $data = [];
 
@@ -1167,7 +1212,7 @@ class Controller extends Assessment\Controller
         $rs = new Collection();
 
         foreach ($resultSets as $result) {
-            if (!$rs[$result->getResultSetId()] instanceof \ICollection) {
+            if (!$rs[$result->getResultSetId()] instanceof ICollection) {
                 $rs[$result->getResultSetId()] = $this->resultSetMapper->createCollection();
             }
             $rs[$result->getResultSetId()][$result->getValue()] = $result;
@@ -1204,8 +1249,11 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws InvalidStatusCode
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function patchUpdateAssessment(IAssessable $assessment)
+    public function patchUpdateAssessment(IAssessable $assessment): void
     {
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
@@ -1223,7 +1271,6 @@ class Controller extends Assessment\Controller
         /* Persist checkbox setting
          */
         try {
-            /** @var SubmissionBox $submitBox */
             $submitBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
             $submitBox->setSkipUnsubmitted($skipUnsubmitted);
             SubmissionBoxMapper::getInstance()->save($submitBox);
@@ -1245,8 +1292,9 @@ class Controller extends Assessment\Controller
      *
      * @param Collection|SubmissionFile[] $files
      * @return GenericCollection|Kami\Model[]
-     * @throws \PDOException
-     * @throws \LogicException If files have not yet been saved
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     private function enqueueKamiUploads(Collection $files): GenericCollection
     {
@@ -1260,7 +1308,7 @@ class Controller extends Assessment\Controller
         // Check files have been saved so Kami docs can point to them
         $fileIds = $files->map(function (SubmissionFile $file) {
             if (empty($file->getId())) {
-                throw new \LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
+                throw new LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
             }
             return $file->getId();
         });

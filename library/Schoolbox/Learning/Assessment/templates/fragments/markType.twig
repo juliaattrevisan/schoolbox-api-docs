@@ -1,133 +1,90 @@
+{##
+ # markType
+ #
+ # Renders two dropdowns corresponding to a set of Mark Type instances
+ # and a set of Grade Group instances. The latter conditionally shows,
+ # depending on the setting of the former.
+ #
+ # @param $context            string       A string prefix for namespacing, so you can reuse this fragment in the same template
+ # @param $assessment         IAssessable  An assessment instance
+ # @param $allMarkTypes       array        tuples for (id, name) of mark types
+ # @param $allGradeSchemes    array        tuples for (id, name) of grading schemes
+ # @param $selectedMarkType   int|null     The mark type currently selected
+ # @param $selectedGradeGroup int|null     The grade group currently selected
+ # @param $defaultGradeGroup  int          Set in admin via default_grade_group config var
+ # @param $renderMaxMark      bool         True allows the maxMark input field to exist
+ # @param $markTypeLabel      string       The label text for the mark type selector
+ #}
+
 {# Letter Grade enables Grading Scheme
  # Total Mark enables Maximum Available Marks
  #}
 {% set markTypeLetterGrade = 2 %}
 {% set markTypeTotalMark = 3 %}
 
-<script type="text/javascript">
+{# Suffix the context with a hyphen, if context was specified
+ # This makes ids more bearable to read
+ #}
+{% if context|length %}
+    {% set context = context ~ '-' %}
+{% endif %}
+
+<script type="text/javascript" src="/javascript/shared/assessment/jquery.markType-gradingScheme.js"></script>
+<script>
     $(function() {
-        var $markTypeDropdown = $('#markType');
-        var $maxMarkDiv = $('[data-max-mark]');
-        var $gradeSchemeDiv = $('[data-grading-scheme]');
-
-        /**
-         * Show max mark
-         */
-        function showMaxMark() {
-            $maxMarkDiv.show();
-        }
-
-        /**
-         * Hide max mark
-         */
-        function hideMaxMark() {
-            $maxMarkDiv.hide();
-        }
-
-        /**
-         * Show grading scheme
-         */
-        function showGradingScheme() {
-            $gradeSchemeDiv.show();
-
-            // Populate the grade scale modal with the default scheme selected
-            populateScaleModal();
-        }
-
-        /**
-         * Hide grading scheme
-         */
-        function hideGradingScheme() {
-            $gradeSchemeDiv.hide();
-        }
-
-
-        /* Mark Type switcher
-         */
-        $markTypeDropdown.on('change', function () {
-
-            if ($(this).val() == {{ markTypeTotalMark }}) {
-                showMaxMark();
-            } else {
-                hideMaxMark();
-            }
-
-            if ($(this).val() == {{ markTypeLetterGrade }}) {
-                showGradingScheme();
-            } else {
-                hideGradingScheme();
-            }
+        $.fn.markTypeGradingScheme({
+            context: '{{ context }}',
+            markTypeTotalMark: '{{ markTypeTotalMark }}',
+            markTypeLetterGrade: '{{ markTypeLetterGrade }}',
         });
-
-        // Initiate
-        $markTypeDropdown.trigger('change');
-
-        // Populate the grade scale modal on scheme change
-        $('#gradingScheme').change(populateScaleModal);
-
-        /**
-         * Put a title and grade scale into a modal based on the currently selected scheme
-         */
-        function populateScaleModal() {
-            var $schemeSelect = $('#gradingScheme'),
-                schemeName = $schemeSelect.find(':selected').text(),
-                schemeId = $schemeSelect.val(),
-                schemeTemplate = $('[data-grading-scale=' + schemeId +']').html();
-
-            // Populate the modal title with scheme name
-            $('#gradeScaleTitle').text(schemeName);
-
-            // Populate the modal body with the scheme table
-            $('#gradeScaleDesc').html(schemeTemplate);
-        }
     });
 </script>
 
 <div class="row">
     <div class="small-12 medium-6 columns">
         <label>
-            Mark Type
-            <select id="markType" name="markType">
+            {{ markTypeLabel | default('Mark Type') }}
+            <select id="{{ context }}markType" name="{{ context }}markType">
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}"{% if index == (assessment.markType.id ?? '') %} selected{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"{% if index == (selectedMarkType ?? '') %} selected{% endif %}>{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
     </div>
 
-
-    <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
-        <label for="maxMark">
+    {% if renderMaxMark %}
+    <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
+        <label for="{{ context }}maxMark">
             Maximum Available Marks
-            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark?? '' }}" />
+            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" />
         </label>
     </div>
+    {% endif %}
 
-    <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
-        <label for="gradingScheme">{{ locale.grading.proper }} Scheme</label>
+    <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme="{{ context }}">
+        <label for="{{ context }}gradingScheme">{{ locale.grading.proper }} Scheme</label>
         <div class="input-group">
             {% include 'sub/select.twig' with {
                 selectData: {
-                    id: 'gradingScheme'
+                    id: context ~ 'gradingScheme'
                 },
-                name: 'gradingScheme',
+                name: context ~ 'gradingScheme',
                 options: allGradeSchemes,
-                preselected: assessment.gradeGroup.id ?? null,
+                preselected: selectedGradeGroup ?: defaultGradeGroup,
                 pairs: {
                     value: 'id',
                     label: 'name'
                 }
-            }
-            %}
-            <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>
+            } %}
+            <button type="button" class="button" data-reveal-id="{{ context }}gradeScale">Show {{ locale.grades.proper }} Scale</button>
         </div>
     </div>
 </div>
 
 {# 'Show grade scale' modal #}
-<div data-reveal class="reveal-modal" id="gradeScale" role="dialog" aria-hidden="true" aria-labelledby="gradeScaleTitle" aria-describedby="gradeScaleDesc">
-    <h2 id="gradeScaleTitle">{# placeholder for scheme name via js #}</h2>
-    <div id="gradeScaleDesc">{# placeholder for grade scale via js #}</div>
+<div data-reveal class="reveal-modal" id="{{ context }}gradeScale" role="dialog" aria-hidden="true" aria-labelledby="gradeScaleTitle" aria-describedby="gradeScaleDesc">
+    <h2 id="{{ context }}gradeScaleTitle">{# placeholder for scheme name via js #}</h2>
+    <div id="{{ context }}gradeScaleDesc">{# placeholder for grade scale via js #}</div>
     <a class="close-reveal-modal" aria-label="Close">
         <span aria-hidden="true">&#215;</span>
     </a>
@@ -138,7 +95,7 @@
  #}
 {% for scheme in allGradeSchemes %}
     {% set gradeLevelsReversed = scheme.gradeLevels|reverse %}
-    <script type="text/template" data-grading-scale="{{ scheme.id }}">
+    <script type="text/template" data-grading-scale="{{ context }}{{ scheme.id }}">
         <div class="scrollable">
             <table>
                 <tbody>

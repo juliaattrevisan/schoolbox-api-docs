@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use function array_intersect;
 use function array_merge;
 use function array_unique;
@@ -118,7 +119,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $dueWorkAlias                                             = 'dw';
         [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
         [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
-        [$markPerCapWhere]                                        = $this->getClauseMarkPerCap($markPerCap, $dueWorkAlias);
+        [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCapability($markPerCap, $dueWorkAlias);
         [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
         [$termDJoin, $termDWhere, $termDParams]                   = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         [$termCJoin, $termCWhere, $termCParams]                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
@@ -160,6 +161,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $unitImplParams,
             $unitSpecParams,
             $uImpSpcParams,
+            $markPerCapParams,
             $temporalParams,
             $rubricUsageParams,
             $termDParams,
@@ -662,7 +664,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * If the filters include the 'none' option, also fetch assessments that don't use rubrics
 
-     * @param Collection|null $markPerCap
+     * @param Collection|null $markPerCapability
      * @param string          $dueWorkAlias
      * @return array
      * @throws InvalidColumnException
@@ -670,17 +672,17 @@ class IdFinder extends Filter\AbstractIdFinder
      * We don't to join to `submission_box` here:
      * @see getClauseAType
      */
-    private function getClauseMarkPerCap(?Collection $markPerCap, string $dueWorkAlias): array
+    private function getClauseMarkPerCapability(?Collection $markPerCapability, string $dueWorkAlias): array
     {
         // Do we not wish to apply this filter?
-        if (null === $markPerCap) {
+        if (null === $markPerCapability) {
             // Always return the row, no params
             return ['TRUE', []];
         }
 
-        $pb                   = $this->getMapper()->getPredicateBuilder();
+        $pb = $this->getMapper()->getPredicateBuilder();
 
-        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)) {
+        if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_NONE)) {
             // Not a DueWork
             $pb->isNull("$dueWorkAlias.id");
 
@@ -688,14 +690,14 @@ class IdFinder extends Filter\AbstractIdFinder
             $pb->isFalse("$dueWorkAlias.use_rubric");
         }
 
-        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->isTrue("$dueWorkAlias.rubric_mark_per_capability");
+        if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_ON)) {
+            $pb->notEquals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
-        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->isFalse("$dueWorkAlias.rubric_mark_per_capability");
+        if ($markPerCapability->keyExists(MarkPerCap\Definition::KEY_OFF)) {
+            $pb->equals("$dueWorkAlias.rubric_capability_mark_type_id", MarkType::TYPE_NONE);
         }
 
-        return ['('. implode(' OR ', $pb->getWhere()) . ')'];
+        return ['('. implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
     }
 
 

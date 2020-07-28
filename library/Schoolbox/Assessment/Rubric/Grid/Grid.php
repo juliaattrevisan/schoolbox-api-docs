@@ -8,12 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use DomainException;
+use RangeException;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
 /**
  * A rubric grid.
@@ -33,8 +37,9 @@ class Grid
 {
     /**
      * The assessment for which the grid exists.
+     * Rubric Grids only exist for DueWork instances, for now.
      *
-     * @var IAssessable
+     * @var DueWork
      */
     private $assessment;
 
@@ -68,17 +73,26 @@ class Grid
 
 
     /**
+     * Capabilities' values can be represented differently than the assessment's
+     *
+     * @var MarkSchemeFactory
+     */
+    private $markSchemeFactory;
+
+
+    /**
      * Constructor
      *
-     * @param IAssessable $assessment
-     * @param RowSet      $rowSet
+     * @param DueWork $assessment
+     * @param RowSet  $rowSet
      */
-    public function __construct(IAssessable $assessment, RowSet $rowSet)
+    public function __construct(DueWork $assessment, RowSet $rowSet)
     {
-        $this->assessment       = $assessment;
-        $this->rowSet           = $rowSet;
-        $this->capabilityUsages = new GenericCollection(CapabilityUsage::class);
-        $this->levels           = new GenericCollection(Level::class);
+        $this->assessment        = $assessment;
+        $this->rowSet            = $rowSet;
+        $this->capabilityUsages  = new GenericCollection(CapabilityUsage::class);
+        $this->levels            = new GenericCollection(Level::class);
+        $this->markSchemeFactory = new MarkSchemeFactory();
     }
 
 
@@ -124,11 +138,13 @@ class Grid
     /**
      * Does this rubric grid use mark-per-capability?
      *
+     * If your mark type is None, or not set, then you're not using Mark per Capability.
+     *
      * @return bool
      */
     public function isMarkPerCapability(): bool
     {
-        return $this->assessment instanceof DueWork && $this->assessment->getMarkPerCapability();
+        return $this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability();
     }
 
 
@@ -239,7 +255,7 @@ class Grid
      */
     public function isCapabilityMarkShown(Capability $capability): bool
     {
-        if (!($this->assessment instanceof DueWork && $this->assessment->getMarkPerCapability())) {
+        if (!($this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability())) {
             return false;
         }
 
@@ -302,9 +318,23 @@ class Grid
 
 
     /**
-     * @return IAssessable
+     * Get an IMarkScheme instance for translation of capability marks specifically,
+     * and separately from its parent assessment
+     *
+     * @return IMarkScheme
+     * @throws DomainException
+     * @throws RangeException
      */
-    public function getAssessment(): IAssessable
+    public function getCapabilityMarkScheme(): IMarkScheme
+    {
+        return $this->markSchemeFactory->spawnForCapability($this->getAssessment());
+    }
+
+
+    /**
+     * @return DueWork
+     */
+    public function getAssessment(): DueWork
     {
         return $this->assessment;
     }

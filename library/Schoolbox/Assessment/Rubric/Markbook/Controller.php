@@ -19,6 +19,7 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
@@ -98,6 +99,7 @@ class Controller extends Base
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\Mapper                      $filterMapper
+     * @param Translator                         $translator
      */
     public function __construct(
         IConnector $internalDb,
@@ -373,20 +375,22 @@ class Controller extends Base
 
         $sql  = "
             SELECT
-                vr.assessment_id                  AS assessment_id,
-                vr.assessment_grade_group_id      AS assessment_grade_group_id,
-                vr.assessment_title               AS assessment_name,
-                vr.assessment_max_mark            AS assessment_max_mark,
-                vr.assessment_mark_type           AS assessment_mark_type,
-                vr.assessment_grade_group_id      AS assessment_grade_group_id,
-                vr.assessment_mark_per_capability AS assessment_rubric_group_marks,
-                vr.assessment_weight              AS assessment_weight,
-                vr.capability_id                  AS capability_id,
-                vr.capability_name                AS capability_name,
-                vr.capability_max_value           AS capability_max_value,
-                vr.indicator_id                   AS indicator_id,
-                vr.indicator_name                 AS indicator_name,
-                vr.indicator_max_value            AS indicator_max_value
+                vr.assessment_id                             AS assessment_id,
+                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
+                vr.assessment_title                          AS assessment_name,
+                vr.assessment_max_mark                       AS assessment_max_mark,
+                vr.assessment_mark_type                      AS assessment_mark_type,
+                vr.assessment_grade_group_id                 AS assessment_grade_group_id,
+                vr.assessment_weight                         AS assessment_weight,
+                vr.capability_id                             AS capability_id,
+                vr.capability_name                           AS capability_name,
+                vr.capability_max_value                      AS capability_max_value,
+                vr.capability_mark_type_id                   AS capability_mark_type_id,
+                vr.capability_grade_group_id                 AS capability_grade_group_id,
+                IF(vr.capability_mark_type_id = :none, 0, 1) AS assessment_is_mark_per_capability,
+                vr.indicator_id                              AS indicator_id,
+                vr.indicator_name                            AS indicator_name,
+                vr.indicator_max_value                       AS indicator_max_value
             FROM v_rubric vr
             WHERE {$whereClause}
             ORDER BY
@@ -396,7 +400,7 @@ class Controller extends Base
                 vr.indicator_sequence,
                 vr.indicator_id
         ";
-        $stmt = $this->internalDb->prepareQuery($sql);
+        $stmt = $this->internalDb->prepareQuery($sql, ['none' => MarkType::TYPE_NONE]);
 
         $capabilities = [];
         $indicators   = [];
@@ -425,19 +429,20 @@ class Controller extends Base
 
             $capabilityMaxValue                  = $decimalHydrator->hydrate($row['capability_max_value']);
             $capabilities[$row['capability_id']] = [
-                'name'       => $row['capability_name'],
-                'indicators' => $indicators,
-                'show'       => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
+                'name'         => $row['capability_name'],
+                'indicators'   => $indicators,
+                'show'         => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
             ];
-
+;
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name'           => $row['assessment_name'],
                 'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
                 'maxMark'        => $row['assessment_max_mark'],
                 'markType'       => $row['assessment_mark_type'],
-                'gradeGroupId'   => $row['assessment_grade_group_id'],
-                'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
+                'capabilityMarkTypeId'     => $row['capability_mark_type_id'],
+                'capabilityGradeGroupId'   => $row['capability_grade_group_id'],
+                'isMarkPerCapability' => $row['assessment_is_mark_per_capability'],
                 'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
@@ -509,13 +514,15 @@ class Controller extends Base
 
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
             SELECT
-                vrm.assessment_id        AS assessment_id,
-                vrm.student_id           AS student_id,
-                u.firstname              AS student_firstname,
-                u.lastname               AS student_lastname,
-                vrm.capability_id        AS capability_id,
-                vrm.capability_mark      AS capability_mark,
-                vrm.capability_max_value AS capability_max_value,
+                vrm.assessment_id             AS assessment_id,
+                vrm.student_id                AS student_id,
+                u.firstname                   AS student_firstname,
+                u.lastname                    AS student_lastname,
+                vrm.capability_id             AS capability_id,
+                vrm.capability_mark           AS capability_mark,
+                vrm.capability_max_value      AS capability_max_value,
+                vrm.capability_mark_type_id   AS capability_mark_type_id,
+                vrm.capability_grade_group_id AS capability_grade_group_id,
                 vrm.descriptor_name      AS descriptor_name,
                 vrm.indicator_id         AS indicator_id,
                 vrm.indicator_mark       AS indicator_mark,
@@ -577,8 +584,14 @@ class Controller extends Base
                 'indicators' => $indicatorMarks,
             ];
             if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark'] = $assessments[$row['assessment_id']]['usesMarkPerCap'] ? $row['capability_mark'] : null;
+                $capData['databaseMark'] = $assessments[$row['assessment_id']]['isMarkPerCapability'] ? $row['capability_mark'] : null;
                 $capData['maxMark']      = $row['capability_max_value'];
+
+                /* Capabilities' Mark Type and Grade Group can be represented differently to
+                 * their Assessments' Mark Type and Grade Group
+                 */
+                $capData['capabilityMarkTypeId'] = $row['capability_mark_type_id'];
+                $capData['capabilityGradeGroupId'] = $row['capability_grade_group_id'];
             }
             $capabilityMarks[$row['capability_id']] = $capData;
 
@@ -613,39 +626,52 @@ class Controller extends Base
     private function generateHumanReadableMarks(array $students, array $assessments): array
     {
         $decimalHydrator   = new Decimal();
-        $booleanHydrator   = new Boolean();
         $markSchemeFactory = new MarkScheme\Factory();
         $totalMarkScheme   = new MarkScheme\TotalMarkFractional();
 
         foreach ($students as $studentId => $student) {
             foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
 
-                $assessmentMaxMark        = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
-                $assessmentMarkType       = $assessments[$assessmentId]['markType'];
-                $assessmentUsesMarkPerCap = $booleanHydrator->hydrate($assessments[$assessmentId]['usesMarkPerCap']);
-
-                // Create some things the markscheme factory wants our Due Work to have
-                try {
-                    $gradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['gradeGroupId']);
-                } catch (Mapper\Exception $e) {
-                    $gradeGroup = null;
-                }
-
-                $markType = new MarkType();
-                $markType->setId($assessmentMarkType);
+                $assessmentMaxMark = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
 
                 // Fill out a Due Work with the data we need for the markscheme factory to work
                 $stubAssessment = new DueWork\Model();
                 $stubAssessment->setId($assessmentId);
-                $stubAssessment->setMarkPerCapability($assessmentUsesMarkPerCap);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
-                $stubAssessment->setMarkType($markType);
-                if ($gradeGroup !== null) {
-                    $stubAssessment->setGradeGroup($gradeGroup);
+
+                /* Set Capability Grade Group - it has a bunch of data we need from hydration
+                 * such as levels etc. so have to hydrate it
+                 *
+                 * We've made an assumption that Capability Mark Types and Capability Grade Groups
+                 * can only be set for *all* Capabilities in an assessment; not individual Capabilities
+                 * They all have the same representation; they cannot differ among themselves
+                 *
+                 * Therefore if we have a non-null $capabilityGradeGroup we can just skip trying
+                 * to fetch it from the db altogether
+                 */
+
+                /* Set Capability Mark Type */
+                $capabilityMarkType = MarkTypeMapper::getInstance()
+                                                    ->createModel()
+                                                    ->setId($assessments[$assessmentId]['capabilityMarkTypeId']);
+
+                /* Only try to fetch a Capability Grade Group once
+                 */
+                $capabilityGradeGroup = null;
+                if ( $assessments[$assessmentId]['capabilityGradeGroupId'] !== null) {
+                    try {
+                        $capabilityGradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['capabilityGradeGroupId']);
+                    } catch (Mapper\Exception $e) {
+                        // Noop
+                    }
                 }
+
+                $stubAssessment->setCapabilityMarkType($capabilityMarkType);
+                $stubAssessment->setCapabilityGradeGroup($capabilityGradeGroup);
 
                 foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
+
 
                     if ($capabilityDatabaseMark !== null) {
                         $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);

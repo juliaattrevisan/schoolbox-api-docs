@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
@@ -80,11 +81,19 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $rubricGrid;
 
     /**
-     * This DueWork's Rubric has Mark Per Capability on
+     * The rubric capability's mark type, if chosen
      *
-     * @var bool
+     * @var MarkType|null
      */
-    protected $markPerCapability = false;
+    protected $capabilityMarkType;
+
+
+    /**
+     * The rubric capability's grade group, if chosen
+     *
+     * @var SubmissionBox\GradeLevel\Group\Model|null
+     */
+    protected $capabilityGradeGroup;
 
     /**
      * This DueWork's Rubric has Use Mark Range on
@@ -728,20 +737,20 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return boolean
+     * @return MarkType|null
      */
-    public function getMarkPerCapability() : bool
+    public function getCapabilityMarkType() : ?MarkType
     {
-        return $this->markPerCapability;
+        return $this->capabilityMarkType;
     }
 
     /**
-     * @param boolean $markPerCapability
+     * @param MarkType|null $capabilityMarkType
      * @return $this
      */
-    public function setMarkPerCapability(bool $markPerCapability)
+    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
-        $this->markPerCapability = $markPerCapability;
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
 
@@ -833,6 +842,36 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         $this->similarityCheckEnabled = $similarityCheckEnabled;
         return $this;
+    }
+
+    /**
+     * @return SubmissionBox\GradeLevel\Group\Model|null
+     */
+    public function getCapabilityGradeGroup(): ?SubmissionBox\GradeLevel\Group\Model
+    {
+        return $this->capabilityGradeGroup;
+    }
+
+    /**
+     * @param SubmissionBox\GradeLevel\Group\Model|null $capabilityGradeGroup
+     * @return Model
+     */
+    public function setCapabilityGradeGroup(?SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup): self
+    {
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
+        return $this;
+    }
+
+
+    /**
+     * Whether this assessment has a meaningful mark per capability setting activated
+     * If null, or None, then mark per capability is presumed ot be off.
+     *
+     * @return bool
+     */
+    public function isMarkPerCapability(): bool
+    {
+        return $this->capabilityMarkType !== null && $this->capabilityMarkType->getId() !== MarkType::TYPE_NONE;
     }
 
 

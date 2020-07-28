@@ -13,28 +13,49 @@ use Schoolbox;
 
 class MarkType
 {
-    /** @deprecated - Use SLUG_PERCENT */
-    const TYPE_PERCENT    = 1;
-    /** @deprecated - Use SLUG_LETTER */
-    const TYPE_LETTER     = 2;
-    /** @deprecated - Use SLUG_TOTAL */
-    const TYPE_TOTAL      = 3;
-    /** @deprecated - Use SLUG_FREE */
-    const TYPE_FREE       = 4;
-    /** @deprecated - Use SLUG_RUBRIC */
-    const TYPE_RUBRIC     = 5;
-    /** @deprecated - Use SLUG_NONE */
-    const TYPE_NONE       = 6;
-    /** @deprecated - Use SLUG_COMPLETION */
-    const TYPE_COMPLETION = 7;
 
-    const SLUG_PERCENT    = 'percent';
-    const SLUG_LETTER     = 'letter';
-    const SLUG_TOTAL      = 'raw';
-    const SLUG_FREE       = 'free';
-    const SLUG_RUBRIC     = 'rubric'; // TODO whatttt is this
-    const SLUG_NONE       = 'none';
-    const SLUG_COMPLETION = 'completion';
+    /* These integer consts reference submission_mark_type.mark_type_id column
+     * Some schools have altered their lookup table's contents, causing the consts
+     * to desync. I don't know how that resolved itself, but we can't accommodate
+     * that usage with the consts below.
+     *
+     * Most of the swamp uses these consts in an important manner so we can't just
+     * delete them; where possible, try to use the slugs in preference to the consts.
+     */
+
+    /** @deprecated - Use SLUG_PERCENT */
+    public const TYPE_PERCENT    = 1;
+
+    /** @deprecated - Use SLUG_LETTER */
+    public const TYPE_LETTER     = 2;
+
+    /** @deprecated - Use SLUG_TOTAL */
+    public const TYPE_TOTAL      = 3;
+
+    /** @deprecated - Use SLUG_FREE */
+    public const TYPE_FREE       = 4;
+
+    /** @deprecated - Use SLUG_RUBRIC */
+    public const TYPE_RUBRIC     = 5;
+
+    /** @deprecated - Use SLUG_NONE */
+    public const TYPE_NONE       = 6;
+
+    /** @deprecated - Use SLUG_COMPLETION */
+    public const TYPE_COMPLETION = 7;
+
+    /* Use these slugs to lookup instances of MarkType from submission_mark_type
+     * in case ids became desynced due to data fudging. There isn't particularly
+     * widespread use of this yet, but if you have no choice, fall back to the
+     * consts described above.
+     */
+    public const SLUG_PERCENT    = 'percent';
+    public const SLUG_LETTER     = 'letter';
+    public const SLUG_TOTAL      = 'raw';
+    public const SLUG_FREE       = 'free';
+    public const SLUG_RUBRIC     = 'rubric'; // TODO whatttt is this
+    public const SLUG_NONE       = 'none';
+    public const SLUG_COMPLETION = 'completion';
 
     /**
      * @var int

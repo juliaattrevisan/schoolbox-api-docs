@@ -132,8 +132,22 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /** @var bool */
     protected $useRubric;
 
-    /** @var bool */
-    protected $markedPerCapability;
+
+    /**
+     * The mark type chosen to represent capability totals
+     *
+     * @var MarkType|null
+     */
+    protected $capabilityMarkType;
+
+
+    /**
+     * The grade group associated with Letter Grade capability mark type
+     *
+     * @var GradeLevel\Group\Model|null
+     */
+    protected $capabilityGradeGroup;
+
 
     /** @var bool */
     protected $markedUsingRange;
@@ -551,33 +565,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @deprecated mapper method
-     * @return boolean
+     * @return MarkType|null
      */
-    public function getMarkedPerCapability()
+    public function getCapabilityMarkType(): ?MarkType
     {
-        return $this->isMarkedPerCapability();
+        return $this->capabilityMarkType;
     }
 
 
     /**
-     * @return bool
+     * @param MarkType|null $capabilityMarkType
+     * @return $this
      */
-    public function isMarkedPerCapability()
+    public function setCapabilityMarkType(?MarkType $capabilityMarkType): self
     {
-        return $this->markedPerCapability;
-    }
-
-
-    /**
-     * @param boolean $markedPerCapability
-     * @return static
-     */
-    public function setMarkedPerCapability($markedPerCapability)
-    {
-        $this->markedPerCapability = $markedPerCapability;
+        $this->capabilityMarkType = $capabilityMarkType;
         return $this;
     }
+
 
     /**
      * @deprecated mapper method
@@ -676,7 +681,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param  GradeLevel\Group\Model $gradeGroup
+     * @param GradeLevel\Group\Model $gradeGroup
      * @return $this
      */
     public function setGradeGroup($gradeGroup)
@@ -866,6 +871,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setExternalId(?string $externalId): self
     {
         $this->externalId = $externalId;
+        return $this;
+    }
+
+    /**
+     * @return GradeLevel\Group\Model|null
+     */
+    public function getCapabilityGradeGroup(): ?GradeLevel\Group\Model
+    {
+        return $this->capabilityGradeGroup;
+    }
+
+    /**
+     * @param GradeLevel\Group\Model|null $capabilityGradeGroup
+     * @return $this
+     */
+    public function setCapabilityGradeGroup(?GradeLevel\Group\Model $capabilityGradeGroup): self
+    {
+        $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
     }
 }

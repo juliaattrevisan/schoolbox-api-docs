@@ -1,15 +1,20 @@
-{#
-Usage:
-
-{% include '@learningAssessment/fragments/rubric.twig' with {
-    rubricAttachZone: array,
-    resultSets:       array,
-    rubricHasMarks:   bool
-    assessment:       IAssessable
-    markTypeTotalMark: int
-} only %}
-
-#}
+{##
+ # Rubric
+ #
+ # This is the assessment creational/updational section concerning the rubric grid.
+ # It appears on the assessment modify screen at the bottom.
+ #
+ # @param $rubricGrid               Grid         An instance of Grid
+ # @param $rubricAttachZone         array        An attachzone, for uploading rubric csvs
+ # @param $resultSets               array        A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
+ # @param $rubricHasMarks           bool         Whether students have a feedback using this rubric grid
+ # @param $assessment               IAssessable  An assessment instance
+ # @param $markTypeTotalMark        int          The id of the Total Mark instance
+ # @param $capabilityMarkTypes      array        Tuples for (id, name) Mark Types available for rubric capabilities
+ # @param $capabilityGradingSchemes array        Tuples for (id, name) Grading Schemes available for rubric capabilities
+ # @param defaultGradeGroup         int          Set in admin via default_grade_group config var
+ # @param markTypeNone              int          The id of the mark type "None" (usually int 6)
+ #}
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
     <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
@@ -47,6 +52,7 @@ Usage:
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 <script type="text/javascript">
     $(function() {
+        const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
 
         var $rubric = $('table[data-rubric]');
 
@@ -233,7 +239,7 @@ Usage:
             var $groupMaxValueInputs = $('[data-group-max-value]'),
                 $groupMaxValueRows = $('[data-group-max-value-row]');
 
-            if (!$('#markPerCapability').prop('checked')) {
+            if (parseInt($('#capability-markType').val()) === capabilityMarkTypeNone) {
                 // Not using mark-per-group? Easy, hide all max value inputs
                 $groupMaxValueRows.addClass('hide');
                 $groupMaxValueInputs.addClass('hide').prop('disabled', true);
@@ -280,7 +286,7 @@ Usage:
         // Show/hide group marks based upon mark-per-group (NOT capability)
         // Only show the group mark if at least one criterion is selected
         // in the group
-        $("#markPerCapability").change(toggleGroupMaxValues);
+        $("#capability-markType").change(toggleGroupMaxValues);
         $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
     });
 </script>
@@ -300,20 +306,21 @@ Usage:
 </div>
 <fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
     <legend>Rubric marking options</legend>
+
+    {% include '@learningAssessment/fragments/markType.twig' with {
+        context: 'capability',
+        assessment: assessment,
+        allMarkTypes: capabilityMarkTypes,
+        allGradeSchemes: capabilityGradingSchemes,
+        selectedMarkType: assessment.capabilityMarkType.id ?? null,
+        selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
+        defaultGradeGroup: defaultGradeGroup,
+        renderMaxMark: false,
+        markTypeLabel: 'Capability Mark Type',
+    } %}
+
     <div class="row">
-        <div class="small-12 medium-6 columns">
-            <div id="markPerCapabilityPanel">
-                <label for="markPerCapability">Mark Per-{{ locale.rubricGroup.proper }}</label>
-                <div class="switch round">
-                    <input name="markPerCapability" id="markPerCapability" type="checkbox" {% if assessment.markPerCapability %}checked="checked"{% endif %} />
-                    <label for="markPerCapability">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="small-12 medium-6 columns">
+        <div class="small-12 columns">
             <div id="useMarkRangePanel">
                 <label for="useMarkRange">Use Mark Range</label>
                 <div class="switch round">
@@ -338,7 +345,7 @@ Usage:
                 rubricGrid: rubricGrid,
                 attachzone: rubricAttachZone,
                 folderId: assessment.context.folder.id,
-                usingMarkPerCapability: assessment.markPerCapability,
+                usingMarkPerCapability: assessment.isMarkPerCapability,
                 usingMarkRange: assessment.useMarkRange,
                 idSuffix: idSuffix ?? '',
             } only %}

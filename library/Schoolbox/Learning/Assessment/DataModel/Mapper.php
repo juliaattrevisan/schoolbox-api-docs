@@ -415,6 +415,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('work_type', 'wt')},
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
+                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
+                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
@@ -434,6 +436,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
+            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
+            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
@@ -703,6 +707,8 @@ class Mapper extends BaseMapper
                 $model->setDueWork(
                     $this->hydrateJoin($row, 'duework', 'd')
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
+                        ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
+                        ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
                 );
                 $dueWorkIds[] = $row['d.id'];
             } else {
@@ -1054,6 +1060,7 @@ class Mapper extends BaseMapper
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception
      */
     protected function augmentListWithGradeGroups($modelList)
     {
@@ -1071,6 +1078,16 @@ class Mapper extends BaseMapper
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
+                    );
+                }
+            }
+
+            /* Rubric Capability Grade Groups only apply to submission boxes (DueWork instances)
+             */
+            if ($submodel instanceof SubmissionBox) {
+                if ($submodel->getCapabilityGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
+                    $submodel->setCapabilityGradeGroup(
+                        $gradeGroupMapper->findByIdWithFallback($submodel->getCapabilityGradeGroup()->getId())
                     );
                 }
             }
