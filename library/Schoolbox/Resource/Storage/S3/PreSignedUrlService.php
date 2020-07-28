@@ -11,6 +11,7 @@ use Alaress_Date_Format as AlaressDateFormat;
 use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 
 class PreSignedUrlService
 {
@@ -127,7 +128,7 @@ class PreSignedUrlService
 
         return $this->s3Client->getCommand('GetObject', [
             'Bucket'                     => $this->bucket,
-            'Key'                        => $resourcePath,
+            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $resourcePath,
             'ResponseCacheControl'       => $cacheControl,
             'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
             'ResponseContentType'        => $contentType,

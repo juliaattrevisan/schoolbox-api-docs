@@ -14,6 +14,7 @@ use Monolog\Logger;
 use PDO;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\FilesystemFactory;
 use function array_combine;
 use function array_key_exists;
 use function count;
@@ -43,9 +44,6 @@ use function trim;
  */
 class FileNester extends CliTool\App
 {
-    // Name of top level directory that all storage files will reside below
-    private const PREFIX_STORAGE = 'storage/';
-
     private const OPT_LONG_ACTION = 'action:';
 
     private const ACTION_MOVE = 'move';
@@ -147,7 +145,7 @@ class FileNester extends CliTool\App
     public function run(): void
     {
         $this->startTime = time();
-        $this->getLogger()->info(sprintf("S3 File Copy/Move to top-level directory '/%s'", self::PREFIX_STORAGE));
+        $this->getLogger()->info(sprintf("S3 File Copy/Move to top-level directory '/%s'", FilesystemFactory::PREFIX_STORAGE));
         $this->parseArgs();
         $this->buildDependencies();
         $this->processFiles();
@@ -285,7 +283,7 @@ class FileNester extends CliTool\App
             // Unrelated backup/DR file?
             $this->getLogger()->info("File is a 'backup/DR' file, ignoring");
             $this->countBackupFiles++;
-        } elseif (strpos($fileInS3, self::PREFIX_STORAGE) === 0) {
+        } elseif (strpos($fileInS3, FilesystemFactory::PREFIX_STORAGE) === 0) {
             // Already nested under /storage top-level dir?
             $this->getLogger()->info("File appears to be a already be nested, ignoring");
             $this->countNestedFiles++;
@@ -333,7 +331,7 @@ class FileNester extends CliTool\App
             }
         }
 
-        $migrated = self::PREFIX_STORAGE . $fileInS3;
+        $migrated = FilesystemFactory::PREFIX_STORAGE . $fileInS3;
         if (array_key_exists($migrated, $this->filesInS3)) {
             $this->getLogger()->info("Corresponding nested file found");
             if ($this->actionMode === self::ACTION_MOVE) {

@@ -31,6 +31,10 @@ class FilesystemFactory
     public const FILE_SYSTEM_ADAPTER_LOCAL = 'local';
     public const FILE_SYSTEM_ADAPTER_AWS_S3 = 'awsS3';
 
+    // All storage files in S3 will have this prefix in their key
+    public const PREFIX_STORAGE = 'storage/';
+
+
     /**
      * @param string $storageDir
      * @return MountManager
@@ -99,6 +103,6 @@ class FilesystemFactory
             'version'     => $otfs_s3_version,
         ]);
 
-        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket), $fsConfig);
+        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, self::PREFIX_STORAGE), $fsConfig);
     }
 }

@@ -19,6 +19,7 @@ use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use function array_key_exists;
 use function basename;
@@ -168,7 +169,7 @@ class Migration extends CliTool\App
             'version'     => $s3Version,
         ]);
 
-        return new Filesystem(new AwsS3Adapter($client, $s3Bucket));
+        return new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
     }
 
 
