@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Importer\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
+use Schoolbox\Assessment\Rubric\Grid\Importer\MockCsvImporterFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 
 /**
@@ -221,7 +221,7 @@ TEST2;
         ?int $expectedCapabilityMarkType,
         ?int $expectedCapabilityGradeGroup
     ): void {
-        $factory  = new CsvImporterFactory();
+        $factory  = new MockCsvImporterFactory();
         $importer = $factory->build($fp, $maxLevels, $dueWork);
         $this->assertSame($expectedLevels, $importer->getLevels());
         $this->assertSame($expectedCapabilities, $importer->retrieveCapabilitiesWithIndicators());
