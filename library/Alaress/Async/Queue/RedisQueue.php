@@ -14,6 +14,7 @@ use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\Param;
 use ErrorException;
 use InvalidArgumentException;
+use Predis\Client;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
 use Predis\Transaction\MultiExec;
@@ -22,7 +23,7 @@ abstract class RedisQueue implements QueueInterface
 {
 
 
-    /** @var ClientInterface */
+    /** @var Client */
     protected $redis;
 
 
@@ -267,7 +268,7 @@ abstract class RedisQueue implements QueueInterface
         }
 
         if (!empty($ids)) {
-            $this->redis->transaction(function (MultiExec $tx) use ($ids, $instance) {
+            $this->redis->transaction(function (MultiExec $tx) use ($ids) {
                 $tx->srem($this->getRedisSetKey(), $ids);
             });
         }
