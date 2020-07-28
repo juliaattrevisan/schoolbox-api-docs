@@ -8,11 +8,11 @@
 #}
 
 {% set tileContent %}
-    <div class="card-feature-image"
+    <div class="card-class-image"
          style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
 {% endset %}
 
-<div class="card-new small-12">
+<div class="v-card small-12">
     {% if homepageUrl %}
         <a href="{{ homepageUrl }}">{{ tileContent }}</a>
     {% else %}
