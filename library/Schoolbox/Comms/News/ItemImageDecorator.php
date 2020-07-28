@@ -45,6 +45,7 @@ class ItemImageDecorator implements IDecorator
         $this->itemImage = $itemImage;
     }
 
+
     /**
      * @param array  $json
      * @param object $model
@@ -79,7 +80,7 @@ class ItemImageDecorator implements IDecorator
                             'auth' => ''
                         ],
                         'image' => [
-                            'href' => $json['author']['_links']['avatar']['href'],
+                            'href' => '/portrait?id=' . $model->getAuthor()->getId(),
                             'auth' => '',
                         ]
                     ]
