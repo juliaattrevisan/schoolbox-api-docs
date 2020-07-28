@@ -3,10 +3,12 @@
  #
  # Twig container from which to launch our vue component with the provided payload
  #
- # @param User[] $users  A collection of User instances who were audienced
+ # @param User[] $users                     A collection of User instances who were audienced
+ # @param Statistics\Model[] $visitorStats  A collection of Statistics instances for this article
  #}
 {% set payload = {
-    'users': users
+    'users': users,
+    'visitors': visitors
 } %}
 
 <h1>Container for Vue initialisation</h1>

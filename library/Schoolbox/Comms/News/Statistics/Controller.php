@@ -152,19 +152,62 @@ class Controller extends Base
     public function getVisitation(News\Model $article): void
     {
 
-        /* Compute the audienced recipients so author can identify
+        /* The user ids who were audienced
          */
-        $userIds = $this->userResolver->findUsersForArticle($article);
+        $currentlyAudiencedIds = $this->userResolver->findUsersForArticle($article);
 
-        if (\count($userIds)) {
-            $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
-        } else {
-            $users = $this->userMapper->createCollection();
+        /* The user ids who visited at least once
+         */
+        $stats = $this->statisticsMapper->findByColumn('article_id', $article->getId());
+        $visitorIds = $stats->getPropertyValues('userId');
+
+        /* The union of both audienced ids and visitor ids shows everyone who should
+         * actually appear in the report; index by user id for lookupping
+         */
+        $userIds = array_merge($currentlyAudiencedIds, $visitorIds);
+        $users = $this->userMapper->findByColumn('id', $userIds)->indexBy('id')->getAll();
+
+        /* Process Statistics instances to find most recent visit for each person who visited
+         * Initialise the stack first
+         */
+        $visitors = [];
+
+        foreach ($users as $user) {
+            $visitors[$user->getId()] = [
+                'id' => $user->getId(),
+                'role' => $user->getRole()->getName(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+                'fullname' => $user->getFullname(),
+                'occursAt' => null
+            ];
+        }
+
+        /* Then superposition any visitation data on top of that stack
+         */
+        foreach ($stats as $stat) {
+            $visitorId = $stat->getUserId();
+
+            if (null === $visitors[$visitorId]['occursAt'] || $visitors[$visitorId]['occursAt']['timestamp'] < $stat->getOccursAt()->getUnixTimestamp()) {
+
+                /* First time encountering this user id, so initialise their visitation date
+                 * Or, compare dates and only remember the more recent one
+                 */
+                $visitors[$visitorId]['occursAt'] = [
+                    'timestamp' => $stat->getOccursAt()->getUnixTimestamp(),
+                    'date' => $stat->getOccursAt()->getShort()
+                ];
+            }
+
+            /* TODO Edge case
+             *  Does the hyperdrive know about deleted users/do we care about deleted users?
+             */
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-            'users' => $users
+            'users' => $users,
+            'visitors' => $visitors
         ])->setTitle("Visits for {$article->getTitle()}"));
     }
 }
