@@ -87,9 +87,14 @@ abstract class AbstractCsvImporterFactory
                 // if on: set capability mark type + grade group to due work's, or Total if that type is None
                 // If off: set capability mark type to None
                 case 'markPerCapability':
-                    $markTypeSlug         = $dueWork->getMarkType()->getSlug();
                     $capabilityGradeGroup = null;
                     if ($boolValue) {
+                        // No known mark type?
+                        // Fall back to Percent for now, as that's the default type for new due works
+                        $markType               = $dueWork->getMarkType();
+                        $markTypeSlug           = $markType instanceof MarkType
+                            ? $markType->getSlug()
+                            : MarkType::SLUG_PERCENT;
                         $capabilityMarkTypeSlug = $markTypeSlug === MarkType::SLUG_NONE
                             ? MarkType::SLUG_TOTAL
                             : $markTypeSlug;

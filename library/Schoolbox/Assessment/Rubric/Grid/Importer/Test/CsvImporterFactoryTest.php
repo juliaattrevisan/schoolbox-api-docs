@@ -233,7 +233,17 @@ TEST;
             ],
         ];
 
-        // Mark type none + mark-per-cap: import as Total mark type
+        yield 'mark-per-cap legacy on: null mark type => assume percent' => [
+            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            $legacyTestLevelCount,
+            new DueWorkModel(),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
+            null,
+        ];
+
         yield 'mark-per-cap legacy on: mark type none => cap mark type total' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
             $legacyTestLevelCount,
@@ -297,7 +307,17 @@ TEST;
 ,,15,10,5,1,0
 TEST;
 
-        // Mark type none + mark-per-cap off
+        yield 'mark-per-cap legacy off: null mark type => assume none' => [
+            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            $legacyTestLevelCount,
+            new DueWorkModel(),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
+            null,
+        ];
+
         yield 'mark-per-cap legacy off: mark type none' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
             $legacyTestLevelCount,
