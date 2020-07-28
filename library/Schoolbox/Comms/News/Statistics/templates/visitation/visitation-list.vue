@@ -22,6 +22,7 @@
          * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
          */
         props: [
+            'payload'
         ],
 
         /**

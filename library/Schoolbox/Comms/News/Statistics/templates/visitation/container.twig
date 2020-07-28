@@ -9,7 +9,7 @@
 <p>Our vue component gets initialised here</p>
 
 <div id="visitation-list-container">
-    <visitation-list :data="{{ payload | json_encode }}"></visitation-list>
+    <visitation-list :payload="{{ payload | json_encode }}"></visitation-list>
 </div>
 
 <!-- You need this; spawns after you "npm run build" for the first time -->
