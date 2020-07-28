@@ -18,14 +18,18 @@
         /**
          * Set up options
          *
-         * @param options
+         * @param {Object} options element: the button element, defaults to the element the plugin was called on
+         *                         title:   the title of the immersive reader
+         *                         article: the article to read in the reader, defaults to the first article in the
+         *                                  button's parent
+         * @param {jQuery} element the element the plugin was called on
          * @returns {*}
          */
         function init(options, element) {
             var defaults = {
                 element: element,
                 title: 'Immersive Reader',
-                content: $(element).parent().find('article')[0].innerHTML
+                article: $(element).parent().find('article')[0],
             }
 
             var derived = {
@@ -91,7 +95,7 @@
             var button = config.element;
             $(button).on('click',  function(event) {
                 event.preventDefault();
-                handleLaunchImmersiveReader(config.title, config.content)
+                handleLaunchImmersiveReader(config.title, config.article.innerHTML)
             });
         }
     }
