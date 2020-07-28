@@ -183,6 +183,16 @@ class Controller extends Base
             ];
         }
 
+        /* Sort by surname
+         */
+        uasort($visitors, static function ($a, $b) {
+            if ($a['lastname'] === $b['lastname']) {
+                return $a['firstname'] > $b['firstname'];
+            }
+
+            return ($a['lastname'] > $b['lastname']);
+        });
+
         /* Then superposition any visitation data on top of that stack
          */
         foreach ($stats as $stat) {
