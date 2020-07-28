@@ -78,7 +78,7 @@
                         </template>
                     </span>
                     <span v-if="article.metadata && article.metadata.commentCount > 0">
-                        | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount | formatCommentCountMeta }</a>
+                        | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
                     </span>
                 </p>
 
