@@ -1,3 +1,16 @@
+{% set payload = {
+    'cat': 'Cat',
+    'dog': 'Dog',
+    'horse': 'Horse',
+    'rhino': 'Rhino'
+} %}
+
 <h1>Container for Vue initialisation</h1>
 <p>Our vue component gets initialised here</p>
 
+<div id="visitation-list-container">
+    <visitation-list :data="{{ payload | json_encode }}"></visitation-list>
+</div>
+
+<!-- You need this; spawns after you "npm run build" for the first time -->
+<script src="/javascript/components/visitationList.bundle.js"></script>
