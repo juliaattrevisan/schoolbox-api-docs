@@ -8,11 +8,13 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
-use function count;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+use function count;
 
 
 class Controller extends BaseController
@@ -29,6 +31,25 @@ class Controller extends BaseController
     /** @var Page\Option\Defaults\Mapper $defaultsMapper */
     private $defaultsMapper;
 
+
+    /**
+     * @var Selection\Mapper
+     */
+    private $selectionMapper;
+
+
+    /**
+     * @var RoleMapper
+     */
+    private $roleMapper;
+
+
+    /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
+
     /** @var RosettaStone */
     private $rosettaStone;
 
@@ -38,6 +59,9 @@ class Controller extends BaseController
      * @param Page\Mapper                 $pageMapper
      * @param Page\Option\Mapper          $optionsMapper
      * @param Page\Option\Defaults\Mapper $defaultsMapper
+     * @param Selection\Mapper            $selectionMapper
+     * @param RoleMapper                  $roleMapper
+     * @param ErrorMapper                 $errorMapper
      * @param RosettaStone                $rosettaStone
      */
     public function __construct(
@@ -45,13 +69,19 @@ class Controller extends BaseController
         Page\Mapper $pageMapper,
         Page\Option\Mapper $optionsMapper,
         Page\Option\Defaults\Mapper $defaultsMapper,
+        Selection\Mapper $selectionMapper,
+        RoleMapper $roleMapper,
+        ErrorMapper $errorMapper,
         RosettaStone $rosettaStone
     ) {
-        $this->filterMapper   = $filterMapper;
-        $this->pageMapper     = $pageMapper;
-        $this->optionsMapper  = $optionsMapper;
-        $this->defaultsMapper = $defaultsMapper;
-        $this->rosettaStone   = $rosettaStone;
+        $this->filterMapper    = $filterMapper;
+        $this->pageMapper      = $pageMapper;
+        $this->optionsMapper   = $optionsMapper;
+        $this->defaultsMapper  = $defaultsMapper;
+        $this->selectionMapper = $selectionMapper;
+        $this->roleMapper      = $roleMapper;
+        $this->errorMapper     = $errorMapper;
+        $this->rosettaStone    = $rosettaStone;
     }
 
 
@@ -67,11 +97,11 @@ class Controller extends BaseController
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
-            'filtersPerPage'           => $filtersPerPage,
-            'pageLabels'               => $this->buildFilteredPageLabels(),
-            'showCourseMarkbook'       => $this->getConfigLoader()->get('course_markbook_enable'),
-            'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
-            'pageCurrent'              => basename($this->getRequest()->query->get('page')),
+            'filtersPerPage'     => $filtersPerPage,
+            'pageLabels'         => $this->buildFilteredPageLabels(),
+            'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
+            'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
+            'pageCurrent'        => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
 
@@ -98,13 +128,30 @@ class Controller extends BaseController
             $pageFilters[$class] = $definition->getFilter()->getPages()[$page];
         }
 
+        // Only output roles in the role types this filter supports
+        $roleTypes      = Role::getRoleTypes();
+        $rolesForFilter = [];
+        foreach ($roleTypes as $roleType) {
+            foreach ($pageFilters as $pageFilter) {
+                foreach ($pageFilter->getOptions() as $option) {
+                    if (isset($option->getDefaults()[$roleType])) {
+                        if (!isset($rolesForFilter[$roleType])) {
+                            $rolesForFilter[$roleType] = $this->roleMapper->findByColumn('group_type', $roleType);
+                        }
+                        break 2;
+                    }
+                }
+            }
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
-            'page'                     => $page,
-            'definitions'              => $definitions,
-            'pageFilters'              => $pageFilters,
-            'roleTypes'                => Role::getRoleTypes(),
-            'pageLabels'               => $this->buildFilteredPageLabels(),
-            'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
+            'page'               => $page,
+            'definitions'        => $definitions,
+            'pageFilters'        => $pageFilters,
+            'roleTypes'          => $roleTypes,
+            'rolesForFilter'     => $rolesForFilter,
+            'pageLabels'         => $this->buildFilteredPageLabels(),
+            'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
 
@@ -201,6 +248,25 @@ class Controller extends BaseController
             ->notIn('role_type', Page\Model::getPageRoleTypes()[$page]);
         $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 
+        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+    }
+
+
+    /**
+     * Push default selections to users in the given roles.
+     *
+     * @api   POST /adminv2/filters/{page}/pushDefaultSelections
+     * @since 20.1
+     *
+     * @param string $page
+     */
+    public function postPushDefaultSelections(string $page): void
+    {
+        $roleIds = $this->request->post->get('role', []);
+        if (!is_array($roleIds) || empty($roleIds)) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+        $this->selectionMapper->deleteSelectionsForRoleIds($roleIds, $page);
         $this->response->content->set($this->buildJsonOutput(['status' => 200]));
     }
 

@@ -174,6 +174,40 @@
                     });
             }
         });
+
+
+        // Validate form input
+        $('#push-selections-modal-form').alaressValidate({
+            rules: {
+                'role[]': {
+                    required: true,
+                    minlength: { param: 1 }
+                }
+            },
+            submitHandler: function (form) {
+                var $submit = $(form).find('input[type=submit]');
+                $submit.prop("disabled", true);
+
+                // Post this form
+                var toast = $('#toast');
+                toast.toastActivate({text: 'Working...'});
+                $.ajax(
+                    form.action,
+                    {
+                        method: form.method,
+                        data: $(form).serializeArray(),
+                        dataType: 'json',
+                    }
+                ).done(function () {
+                    toast.toastTimeout({text: 'Done'});
+                    $('#push-selections-modal-form').foundation('reveal', 'close');
+                }).fail(function (xhr) {
+                    toast.toastTimeout({text: 'Push failed: ' + xhr.responseJSON.message, css: 'alert', duration: 5000});
+                }).always(function () {
+                    $submit.prop("disabled", false);
+                });
+            }
+        });
     });
 </script>
 
@@ -185,7 +219,7 @@
     }
 </style>
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12">
         <h1>{{ pageName }}</h1>
 
@@ -193,6 +227,14 @@
             <li class="icon-{{ entityIcon }}">Filtered entity: {{ entityName }}</li>
         </ul>
     </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li>
+            <a class="icon-export" data-reveal-id="push-selections-modal" href="#">Push Default Selections to Roles...</a>
+        </li>
+    </ul>
 </div>
 
 <div class="row">
@@ -321,5 +363,28 @@
     </form>
 </div>
 
+<div id="push-selections-modal" class="reveal-modal" data-reveal aria-labelledby="push-selections-modal-title" aria-hidden="true" role="dialog">
+    <h2 id="push-selections-modal-title">Push Default Selections to Roles</h2>
+    <p class="meta">
+        This will clear the selections that users within the selected roles have
+        made for this page's filters, and replace them with the currently saved
+        defaults for their role type.
+    </p>
+    <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections', { page: page }) }}">
+        {% for roleType, roles in rolesForFilter if roles is not empty %}
+            <fieldset class="checklist">
+                <legend>{{ roleType | capitalize }}</legend>
+                <section>
+                    {% for role in roles %}
+                        <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
+                        <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
+                    {% endfor %}
+                </section>
+            </fieldset>
+        {% endfor %}
+        <input type="submit" class="expand" value="Push to Selected Roles" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
 
-
+<div id="toast" class="toast"></div>

@@ -85,6 +85,30 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Deletes selections for page `$page`, for all users whose role is in
+     * `$roleIds`.
+     *
+     * (Deleting a user's selected filters will cause their selections to reset
+     *  back to the default values in `filter_default` for their roletype.)
+     *
+     * @param array  $roleIds
+     * @param string $page
+     */
+    public function deleteSelectionsForRoleIds(array $roleIds, string $page): void
+    {
+        $builder = $this->getPredicateBuilder()
+            ->in('u.group_id', $roleIds)
+            ->equals('fs.page', $page);
+        $query = $this->getDatabase()->prepare("
+            DELETE fs FROM {$this->table} fs
+            INNER JOIN {$this->getJoinSql('user', 'fs', 'u')}
+            WHERE {$builder->getWhereIntersect()}
+        ");
+        $query->execute($builder->getParams());
+    }
+
+
+    /**
      * No notifications.
      *
      * @param object $object

@@ -8,8 +8,10 @@ namespace Schoolbox\Filter;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use \Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\RoleMapper;
 
 /**
  * Class Module
@@ -55,6 +57,7 @@ class Module extends AlaressModule
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);
         $this->register('POST', '/{page}', 'postSavePageSettings', $isSuper, $loadFactoryFactory);
+        $this->register('POST', '/{page}/pushDefaultSelections', 'postPushDefaultSelections', $isSuper, $loadFactoryFactory);
     }
 
 
@@ -65,11 +68,14 @@ class Module extends AlaressModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'filterMapper'   => $this->getMapperFactory()->getLazy(Mapper::class),
-            'pageMapper'     => $this->getMapperFactory()->getLazy(Page\Mapper::class),
-            'optionsMapper'  => $this->getMapperFactory()->getLazy(Page\Option\Mapper::class),
-            'defaultsMapper' => $this->getMapperFactory()->getLazy(Page\Option\Defaults\Mapper::class),
-            'rosettaStone'   => $injector->lazyGet('l10n'),
+            'filterMapper'    => $this->getMapperFactory()->getLazy(Mapper::class),
+            'pageMapper'      => $this->getMapperFactory()->getLazy(Page\Mapper::class),
+            'optionsMapper'   => $this->getMapperFactory()->getLazy(Page\Option\Mapper::class),
+            'defaultsMapper'  => $this->getMapperFactory()->getLazy(Page\Option\Defaults\Mapper::class),
+            'selectionMapper' => $this->getMapperFactory()->getLazy(Selection\Mapper::class),
+            'roleMapper'      => $this->getMapperFactory()->getLazy(RoleMapper::class),
+            'errorMapper'     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'rosettaStone'    => $injector->lazyGet('l10n'),
         ]));
     }
 
