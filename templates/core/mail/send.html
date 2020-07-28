@@ -3,7 +3,7 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/components/clipboard.bundle.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript">
 $(function() {
@@ -80,30 +80,19 @@ $(function() {
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
     // dialogs for copying email fields
-
     $('[data-role="copy-emails"]').each(function(index, element) {
         $.fn.clipboardSelector({
             exportActivator: $(element),
             onReady: function() {
 
                 // get html-escaped version of text, really annoying
-                var target = $('#'+$(element).parent('label').attr('for'));
-                var text = $('<div />').text(target.val()).html();
-
-                var dialog = $('#email-modal');
-                var dialogUrl = $('#copy-email-text');
+                var target    = $('#'+$(element).attr('data-copy-emails-for')),
+                    text      = $('<div />').text(target.val()).html(),
+                    dialog    = $('#email-modal'),
+                    dialogUrl = $('#copy-email-text');
 
                 dialogUrl.html(text);
-                dialog.foundation('reveal','open');
-
-                /* Bypass foundation bug
-                 * https://github.com/zurb/foundation/issues/4746
-                 */
-                dialog.on('opened', function() {
-                    dialogUrl.select();
-
-                    $('#copy-button').show();
-                });
+                dialog.foundation('reveal', 'open');
             }
         });
     });
@@ -192,7 +181,7 @@ $(function() {
                     <div class="small-2 large-1 columns">
                         <label for="to">
                             Copy
-                            <a data-role="copy-emails" class="button icon-copy" title="Show addresses for copy"></a>
+                            <a data-role="copy-emails" data-copy-emails-for="to" class="button icon-copy" title="Show addresses for copy"></a>
                         </label>
                     </div>
                 </fieldset>
@@ -205,7 +194,7 @@ $(function() {
                     <div class="small-2 large-1 columns">
                         <label for="cc">
                             Copy
-                            <a data-role="copy-emails" class="button icon-copy" title="Show addresses for copy"></a>
+                            <a data-role="copy-emails" data-copy-emails-for="cc" class="button icon-copy" title="Show addresses for copy"></a>
                         </label>
                     </div>
                     <div class="small-10 large-11 columns">
@@ -217,7 +206,7 @@ $(function() {
                     <div class="small-2 large-1 columns">
                         <label for="bcc">
                             Copy
-                            <a data-role="copy-emails" class="button icon-copy" title="Show addresses for copy"></a>
+                            <a data-role="copy-emails" data-copy-emails-for="bcc" class="button icon-copy" title="Show addresses for copy"></a>
                         </label>
                     </div>
                 </fieldset>
@@ -241,13 +230,17 @@ $(function() {
 </div>
 
 <div id="email-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-    <p>Use this to copy the addresses to your clipboard for use in other email programs</p>
+    <p>Use this to copy the addresses to your clipboard for use in other email programs.</p>
     <textarea readonly id="copy-email-text" rows="6"></textarea>
     <fieldset class="radiolist" >
         <input type="radio" name="separator" value="comma" id="commaSep" checked><label for="commaSep" >Comma Separated</label>
         <input type="radio" name="separator" value="colon" id="colonSep"><label for="colonSep" >Semi-Colon Separated</label>
     </fieldset>
-    <button id="copy-button" data-clipboard-target="copy-email-text" class="icon-copy">Copy to Clipboard</button>
+    <div class="component-action">
+        <section>
+            <button id="copy-button" data-clipboard-target="#copy-email-text">Copy to Clipboard</button>
+        </section>
+    </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 

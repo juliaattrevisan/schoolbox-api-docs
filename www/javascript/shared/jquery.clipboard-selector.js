@@ -60,12 +60,6 @@ $.fn.clipboardSelector = function(options) {
             onReady: function() {
                 defaultOnReady();
             },
-
-            /* Executes when ZeroClipboard is ready.
-             * This won't always happen, because it relies on Flash
-             * (whose presence isn't reliable!)
-             */
-            onZeroClipboardReady: function() {}
         }
 
         var derived = {
@@ -113,14 +107,10 @@ $.fn.clipboardSelector = function(options) {
         $(config.exportActivator).click(function(event) {
             event.preventDefault();
 
-            // Copy and paste button - show only when ready
-            var button = $(config.copy).hide();
-            var client = new ZeroClipboard(button);
-
+            // ZeroClipboard was not ready immediately.
+            // ClipboardJS is, so no need to hide and then show the button
+            var client = new ClipboardJS(config.copy);
             config.onReady();
-            client.on('ready', function() {
-                config.onZeroClipboardReady();
-            });
         });
     }
 }
