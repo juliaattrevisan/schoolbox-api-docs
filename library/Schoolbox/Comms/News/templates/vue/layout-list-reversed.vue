@@ -64,12 +64,12 @@
                 </div>
 
                 <p class="meta">
-                <span>
-                    <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by</template>
-                    <template v-else>By</template>
-                    <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">{{ article.author.fullname }}</a>
-                    <template v-else>{{ article.author.fullname }}</template>
-                </span>
+                    <span>
+                        <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by</template>
+                        <template v-else>By</template>
+                        <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">{{ article.author.fullname }}</a>
+                        <template v-else>{{ article.author.fullname }}</template>
+                    </span>
                     <span> &mdash; <time :title="article.publishAt.long">{{ article.publishAt.relativeTime }}</time></span>
                     <span v-if="article.topics.length">
                     in
@@ -78,10 +78,10 @@
                         <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">{{ topic.name }}</a>
                         <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">{{ topic.name }}</a>
                     </template>
-                </span>
-                    <span v-if="article.metadata && article.metadata.commentCount > 0">
-                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
-                </span>
+                    </span>
+                        <span v-if="article.metadata && article.metadata.commentCount > 0">
+                    | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
+                    </span>
                 </p>
 
                 <article v-if="!compactMode">

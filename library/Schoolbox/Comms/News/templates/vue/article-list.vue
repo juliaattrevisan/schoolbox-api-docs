@@ -246,34 +246,34 @@
                 </template>
                 <template v-else-if="this.itemLayout === 'list-reversed'">
                     <layout-list-reversed
-                            :query-string-referrer="this.queryStringReferrer"
-                            :query-string-topic="this.queryStringTopic"
-                            :change-tab-on-meta="this.changeTabOnMeta"
-                            :referrer="this.referrer"
-                            :compact-mode="this.compactMode"
-                            :fallback-image="this.fallbackImage"
-                            :get-index-route="this.getIndexRoute"
-                            :config-save-for-later="this.configSaveForLater"
-                            :locale-news-plural="this.localeNewsPlural"
-                            :saved-article-ids="this.savedArticleIds"
-                            :articles-loading="this.articlesLoading"
-                            :current-articles="this.currentArticles"
+                        :query-string-referrer="this.queryStringReferrer"
+                        :query-string-topic="this.queryStringTopic"
+                        :change-tab-on-meta="this.changeTabOnMeta"
+                        :referrer="this.referrer"
+                        :compact-mode="this.compactMode"
+                        :fallback-image="this.fallbackImage"
+                        :get-index-route="this.getIndexRoute"
+                        :config-save-for-later="this.configSaveForLater"
+                        :locale-news-plural="this.localeNewsPlural"
+                        :saved-article-ids="this.savedArticleIds"
+                        :articles-loading="this.articlesLoading"
+                        :current-articles="this.currentArticles"
                     ></layout-list-reversed>
                 </template>
                 <template v-else-if="this.itemLayout === 'card'">
                     <layout-card
-                            :query-string-referrer="this.queryStringReferrer"
-                            :query-string-topic="this.queryStringTopic"
-                            :change-tab-on-meta="this.changeTabOnMeta"
-                            :referrer="this.referrer"
-                            :compact-mode="this.compactMode"
-                            :fallback-image="this.fallbackImage"
-                            :get-index-route="this.getIndexRoute"
-                            :config-save-for-later="this.configSaveForLater"
-                            :locale-news-plural="this.localeNewsPlural"
-                            :saved-article-ids="this.savedArticleIds"
-                            :articles-loading="this.articlesLoading"
-                            :current-articles="this.currentArticles"
+                        :query-string-referrer="this.queryStringReferrer"
+                        :query-string-topic="this.queryStringTopic"
+                        :change-tab-on-meta="this.changeTabOnMeta"
+                        :referrer="this.referrer"
+                        :compact-mode="this.compactMode"
+                        :fallback-image="this.fallbackImage"
+                        :get-index-route="this.getIndexRoute"
+                        :config-save-for-later="this.configSaveForLater"
+                        :locale-news-plural="this.localeNewsPlural"
+                        :saved-article-ids="this.savedArticleIds"
+                        :articles-loading="this.articlesLoading"
+                        :current-articles="this.currentArticles"
                     ></layout-card>
                 </template>
 
