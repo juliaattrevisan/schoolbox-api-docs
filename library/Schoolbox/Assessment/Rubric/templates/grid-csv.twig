@@ -77,7 +77,9 @@
                     /* Set switches and dropdowns via payload values
                      */
                     body.find('#capability-markType').val(data.capabilityMarkType).trigger('change');
-                    body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
+                    if (data.capabilityGradeGroup) {
+                        body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
+                    }
 
                     if (data.useMarkRange) {
                         body.find('#useMarkRange').prop('checked', true);
