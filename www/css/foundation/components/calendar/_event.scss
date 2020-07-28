@@ -118,18 +118,33 @@
 }
 
 // RSVP Buttons
+.component-action .rsvp {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 1rem;
+
+  .attend-label {
+    font-size: rem-calc(($base-font-size - 2));
+    margin-right: 1rem;
+  }
+}
 .rsvp {
 
   // Enforce css specificity
   &.flex-list.buttons a {
     &.accepted {
       background-color: tint($success-color, 74%);
+      border: 1px solid $success-color;
       color: $success-color;
+      font-weight: 600;
     }
 
     &.declined {
       background-color: tint($alert-color, 74%);
+      border: 1px solid $alert-color;
       color: $alert-color;
+      font-weight: 600;
     }
   }
 
