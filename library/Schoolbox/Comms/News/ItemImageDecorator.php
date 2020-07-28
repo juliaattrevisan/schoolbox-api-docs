@@ -69,9 +69,7 @@ class ItemImageDecorator implements IDecorator
          * in the component's config
          */
         if ('' === (string)$json['featureImage']) {
-            if ($this->itemImage === \Component_Config_ItemImage::IMAGE_AUTHOR) {
-                $json['featureImage'] = '';
-            } elseif ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO && null !== $this->logo) {
+            if ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO && null !== $this->logo) {
                 $json['featureImage'] = [
                     'hash'   => $this->logo->getHash(),
                     'size'   => $this->logo->getSize(),
@@ -88,6 +86,9 @@ class ItemImageDecorator implements IDecorator
                     ]
                 ];
             } else {
+
+                /* None and Author result in feature image remaining empty
+                 */
                 $json['featureImage'] = '';
             }
         }
