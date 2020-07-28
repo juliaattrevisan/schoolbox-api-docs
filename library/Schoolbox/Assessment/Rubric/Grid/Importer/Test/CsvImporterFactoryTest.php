@@ -101,7 +101,7 @@ TEST1;
 
 
         $test2 = <<<TEST2
-"capabilityMarkType: 6","capabilityGradeGroup: 3","useMarkRange: On",,,,
+"capabilityMarkType: none","capabilityGradeGroup: 3","useMarkRange: On",,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 ,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
@@ -147,7 +147,7 @@ TEST2;
 
 
         $test3= <<<TEST2
-"capabilityMarkType: 1","capabilityGradeGroup: 2","useMarkRange: Off",,,,
+"capabilityMarkType: percent","capabilityGradeGroup: 2","useMarkRange: Off",,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
