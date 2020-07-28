@@ -67,6 +67,8 @@ class ItemImageDecorator implements IDecorator
 
         /* If a feature image for a news article doesn't exist, then use the Fallback specified
          * in the component's config
+         *
+         * None and Author result in feature image remaining empty
          */
         if ('' === (string)$json['featureImage']) {
             if ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO && null !== $this->logo) {
@@ -85,11 +87,6 @@ class ItemImageDecorator implements IDecorator
                         ]
                     ]
                 ];
-            } else {
-
-                /* None and Author result in feature image remaining empty
-                 */
-                $json['featureImage'] = '';
             }
         }
 
