@@ -121,4 +121,19 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
+
+
+    /**
+     * See who viewed $article
+     *
+     * @param News\Model $article
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getVisitation(News\Model $article): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
+            'article' => $article,
+        ])->setTitle("Visits for {$article->getTitle()}"));
+
+    }
 }
