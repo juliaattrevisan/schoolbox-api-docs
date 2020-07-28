@@ -906,7 +906,8 @@ class DataSource
     public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): void
     {
         // Create the factory
-        $importerFactory = new CsvImporterFactory();
+        $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
+        $importerFactory = new CsvImporterFactory($markTypeMapper);
         $importer        = $importerFactory->build($file->readStream(), $maxLevels, $dueWork);
 
 
@@ -948,7 +949,7 @@ class DataSource
 
 
         // Now start building the grid
-        $capabilityMarkType = SubmissionBox\MarkTypeMapper::getInstance()->createModel()->setId($importer->getCapabilityMarkType());
+        $capabilityMarkType   = $markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
         $capabilityGradeGroup = Group\Mapper::getInstance()->createModel()->setId($importer->getCapabilityGradeGroup());
 
         $dueWork
