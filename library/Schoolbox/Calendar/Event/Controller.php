@@ -727,16 +727,18 @@ class Controller extends Base
      */
     public function postMove(Event $event): void
     {
-        // Do not modify anything except the event's start and end
-        $start = new Alaress_Date_Format($this->request->post->get('start'), \DateTime::ATOM);
-        $end   = new Alaress_Date_Format($this->request->post->get('end'), \DateTime::ATOM);
-        if ($this->request->post->getBool('allDay')) {
+        // Do not modify anything except the event's start/end/allDay
+        $start  = new Alaress_Date_Format($this->request->post->get('start'), \DateTime::ATOM);
+        $end    = new Alaress_Date_Format($this->request->post->get('end'), \DateTime::ATOM);
+        $allDay = $this->request->post->getBool('allDay');
+        if ($allDay) {
             $event->setStartDate($start->getDatabase());
             $event->setEndDate($end->getDatabase());
         } else {
             $event->setStartDateTime($start);
             $event->setEndDateTime($end);
         }
+        $event->setAllDay($allDay);
 
         $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
 
