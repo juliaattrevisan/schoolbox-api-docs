@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Importer\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Importer\MockCsvImporterFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 
@@ -153,7 +154,7 @@ TEST2;
 ,"Indicator 2",a,b,c,d,e
 ,,15,10,5,1,0
 TEST2;
-        yield 'mark-per-cap on' => [
+        yield 'mark-per-cap percent' => [
             $this->buildStream($test3),
             5,
             new DueWorkModel(),
@@ -193,8 +194,89 @@ TEST2;
 
 
         // New cases:
-        // legacy markPerCapability setting on
-        // legacy markPerCapability setting off
+        // legacy markPerCapability setting on, test with various due work mark types
+        $legacyTest = <<<TEST
+"markPerCapability: on","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        $legacyTestLevelCount           = 5;
+        $legacyTestExpectedLevels       = ['', '', '', '',];
+        $legacyTestExpectedCapabilities = [
+            [
+                'name'       => 'Test Capability 1',
+                'maxValue'   => 9,
+                'indicators' => [
+                    [
+                        'name'        => 'Indicator 1',
+                        'descriptors' => [
+                            ['name' => 'a', 'value' => 15,],
+                            ['name' => 'b', 'value' => 10,],
+                            ['name' => 'c', 'value' => 5,],
+                            ['name' => 'd', 'value' => 1,],
+                            ['name' => 'e', 'value' => 0,],
+                        ],
+                    ],
+                    [
+                        'name'        => 'Indicator 2',
+                        'descriptors' => [
+                            ['name' => 'a', 'value' => 15,],
+                            ['name' => 'b', 'value' => 10,],
+                            ['name' => 'c', 'value' => 5,],
+                            ['name' => 'd', 'value' => 1,],
+                            ['name' => 'e', 'value' => 0,],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        // Mark type none + mark-per-cap: import as Total mark type
+        yield 'mark-per-cap legacy on: mark type none' => [
+            $this->buildStream($legacyTest),
+            $legacyTestLevelCount,
+            (new DueWorkModel())->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE)),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_TOTAL],
+            null,
+        ];
+
+        yield 'mark-per-cap legacy on: mark type percent' => [
+            $this->buildStream($legacyTest),
+            $legacyTestLevelCount,
+            (new DueWorkModel())->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT)),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
+            null,
+        ];
+
+        yield 'mark-per-cap legacy on: mark type total' => [
+            $this->buildStream($legacyTest),
+            $legacyTestLevelCount,
+            (new DueWorkModel())->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL)),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_TOTAL],
+            null,
+        ];
+
+        yield 'mark-per-cap legacy on: mark type letter' => [
+            $this->buildStream($legacyTest),
+            $legacyTestLevelCount,
+            (new DueWorkModel())->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER)),
+            $legacyTestExpectedLevels,
+            $legacyTestExpectedCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            null,
+        ];
     }
 
 
