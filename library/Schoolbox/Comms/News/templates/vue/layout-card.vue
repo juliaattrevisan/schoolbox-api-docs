@@ -27,12 +27,27 @@
 </script>
 
 <template>
+    <div>
+    <div class="v-card-list">
+        <div class="v-card card skeleton" v-if="articlesLoading" v-for="n in 3">
+            <div class="img"></div>
+            <h3></h3>
+            <p class="meta"></p>
+        </div>
+    </div>
     <div class="v-card-list">
         <div class="v-card card wrap-down" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
             <template v-if="article.featureImage">
                 <div class="card-feature-image">
                     <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
                         <img :src="article.featureImage._links.image.href + '&size=vcardImageLarge'">
+                    </a>
+                </div>
+            </template>
+            <template v-if="!article.featureImage">
+                <div class="card-feature-avatar">
+                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                        <img :src="article.author._links.avatar.href + '&size=square64'">
                     </a>
                 </div>
             </template>
@@ -80,5 +95,6 @@
                    title="Save for later"></a>
             </div>
         </div>
+    </div>
     </div>
 </template>
