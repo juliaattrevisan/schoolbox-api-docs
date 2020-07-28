@@ -79,6 +79,15 @@ class Querystring
      */
     public const COMPONENT_ID = 'cid';
 
+
+    /**
+     * Querystring param for Fallback Image, as specified in News Dashboard component config
+     * May exist conditionally and therefore be null
+     * Used to decide which image represent an article in dashboard news lists
+     */
+    public const ITEM_IMAGE = 'im';
+
+
     /**
      * An array of key/value pairs corresponding to GET params
      *
