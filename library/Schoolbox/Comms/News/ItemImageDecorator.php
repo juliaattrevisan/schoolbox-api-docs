@@ -70,22 +70,7 @@ class ItemImageDecorator implements IDecorator
          */
         if ('' === (string)$json['featureImage']) {
             if ($this->itemImage === \Component_Config_ItemImage::IMAGE_AUTHOR) {
-                $json['featureImage'] = [
-                    'hash' => '',
-                    'size' => '',
-                    'mime' => '',
-                    '_links' => [
-                        'fetch' => [
-                            'href' => '',
-                            'auth' => ''
-                        ],
-                        'image' => [
-                            'href' => '/portrait?id=' . $model->getAuthor()->getId(),
-                            'auth' => '',
-                        ]
-                    ]
-                ];
-                $json['author']['_links']['avatar']['href'];
+                $json['featureImage'] = '';
             } elseif ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO && null !== $this->logo) {
                 $json['featureImage'] = [
                     'hash'   => $this->logo->getHash(),
