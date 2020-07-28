@@ -17,7 +17,6 @@ use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Manager;
-use Schoolbox\Resource\Storage\S3\FileNester;
 use UnexpectedValueException;
 use function trim;
 
