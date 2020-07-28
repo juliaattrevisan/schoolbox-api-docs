@@ -51,13 +51,6 @@
                     </a>
                 </div>
             </template>
-            <template v-if="!article.featureImage">
-                <div class="card-feature-avatar">
-                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                        <img :src="article.author._links.avatar.href + '&size=square64'">
-                    </a>
-                </div>
-            </template>
             <div class="card-content">
                 <h3><a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a></h3>
 
