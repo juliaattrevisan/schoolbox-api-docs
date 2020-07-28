@@ -158,7 +158,7 @@ class Controller extends Base
 
         /* The user ids who visited at least once
          */
-        $stats = $this->statisticsMapper->findByColumn('article_id', $article->getId());
+        $stats = $this->statisticsMapper->findByColumn('article_id', $article->getId())->sortBy('occursAt');
         $visitorIds = $stats->getPropertyValues('userId');
 
         /* The union of both audienced ids and visitor ids shows everyone who should
@@ -172,13 +172,15 @@ class Controller extends Base
          */
         $visitors = [];
 
-        foreach ($users as $user) {
-            $visitors[$user->getId()] = [
-                'id' => $user->getId(),
-                'role' => $user->getRole()->getName(),
-                'firstname' => $user->getFirstname(),
-                'lastname' => $user->getLastname(),
-                'fullname' => $user->getFullname(),
+        /* TODO Extract this subset of data as a custom query
+         */
+        foreach ($userIds as $userId) {
+            $visitors[$userId] = [
+                'id' => $users[$userId]->getId(),
+                'role' => $users[$userId]->getRole()->getName(),
+                'firstname' => $users[$userId]->getFirstname(),
+                'lastname' => $users[$userId]->getLastname(),
+                'fullname' => $users[$userId]->getFullname(),
                 'occursAt' => null
             ];
         }
