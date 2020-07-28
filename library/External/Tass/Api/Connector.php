@@ -15,6 +15,7 @@ use External\Tass\Api\Exception\UdParseException;
 use External\Tass\Api\Exception\Unauthorised;
 use GuzzleHttp;
 use GuzzleHttp\ClientInterface;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\TokenCodec;
 use function in_array;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
