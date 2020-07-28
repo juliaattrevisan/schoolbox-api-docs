@@ -6,9 +6,19 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
+use Schoolbox\Resource\Storage\IStorage;
 
 class ItemImageDecorator implements IDecorator
 {
+
+
+    /**
+     * An IStorage instance representing the school logo
+     *
+     * @var IStorage|null
+     */
+    private $logo;
+
 
     /**
      * Path to an image that should be used to represent the article
@@ -26,11 +36,12 @@ class ItemImageDecorator implements IDecorator
     /**
      * MetadataDecorator constructor.
      *
-     * @param string|null $itemImage
-     *
+     * @param IStorage|null $logo
+     * @param string|null   $itemImage
      */
-    public function __construct(?string $itemImage)
+    public function __construct(?IStorage $logo, ?string $itemImage)
     {
+        $this->logo = $logo;
         $this->itemImage = $itemImage;
     }
 
@@ -58,9 +69,38 @@ class ItemImageDecorator implements IDecorator
          */
         if ('' === (string)$json['featureImage']) {
             if ($this->itemImage === \Component_Config_ItemImage::IMAGE_AUTHOR) {
-                $json['featureImage'] = $json['author']['_links']['avatar']['href'];
-            } elseif ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO) {
-                $json['featureImage'] = 'find logo from db';
+                $json['featureImage'] = [
+                    'hash' => '',
+                    'size' => '',
+                    'mime' => '',
+                    '_links' => [
+                        'fetch' => [
+                            'href' => '',
+                            'auth' => ''
+                        ],
+                        'image' => [
+                            'href' => $json['author']['_links']['avatar']['href'],
+                            'auth' => '',
+                        ]
+                    ]
+                ];
+                $json['author']['_links']['avatar']['href'];
+            } elseif ($this->itemImage === \Component_Config_ItemImage::IMAGE_SCHOOL_LOGO && null !== $this->logo) {
+                $json['featureImage'] = [
+                    'hash'   => $this->logo->getHash(),
+                    'size'   => $this->logo->getSize(),
+                    'mime'   => $this->logo->getMimetype()->getMime(),
+                    '_links' => [
+                        'fetch' => [
+                            'href' => "/storage/fetch.php?hash={$this->logo->getHash()}",
+                            'auth' => ''
+                        ],
+                        'image' => [
+                            'href' => "/storage/image.php?hash={$this->logo->getHash()}",
+                            'auth' => '',
+                        ]
+                    ]
+                ];
             } else {
                 $json['featureImage'] = '';
             }

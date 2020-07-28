@@ -867,16 +867,29 @@ class Controller extends Base
             );
         }
 
+        /* Build the ItemImage decorator
+         */
+        $hash = (string)$this->getConfigLoader()->get('skin_logo_large');
+        $itemImage = null;
+
+        if ('' !== $hash) {
+            try {
+                $itemImage = Storage\Mapper::getInstance()->findByHash($hash);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop - hash no longer exists
+            }
+        }
+
         $articles = $articles->jsonSerialize(
             new PropertyDecorator(
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
                 new MetadataDecorator($commentCounts),
-                new ItemImageDecorator($this->getRequest()->query->get(Querystring::ITEM_IMAGE))
+                new ItemImageDecorator($itemImage, $this->getRequest()->query->get(Querystring::ITEM_IMAGE))
             )
         );
-        print_r($articles);
+
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
 
