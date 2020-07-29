@@ -156,7 +156,7 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-        ])->setTitle("Visits for {$article->getTitle()}"));
+        ])->setTitle("Visitors for {$article->getTitle()}"));
     }
 
 
