@@ -186,13 +186,13 @@ class Controller extends Base
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],
-                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}")
+                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
+                'role' => $stat['role']
             ];
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($visitors));
     }
-
 
 
     /**
@@ -204,40 +204,79 @@ class Controller extends Base
     public function getFull(News\Model $article): void
     {
 
+        /* The user data for those who visited at least once
+         */
+        $statement = $this->statisticsMapper->getDatabase()->prepare("
+            SELECT
+                s1.user_id, s1.occurs_at,
+                u.title, u.firstname, u.lastname,
+                r.`name` AS `role`
+            FROM {$this->statisticsMapper->getTable()} s1
+            LEFT JOIN {$this->statisticsMapper->getTable()} s2
+                ON s1.user_id = s2.user_id
+                AND s1.occurs_at < s2.occurs_at
+            LEFT JOIN `user` u ON s1.user_id = u.id
+            LEFT JOIN `groups` r ON u.group_id = r.id
+            WHERE s2.id IS NULL AND s1.article_id = :articleId
+            ORDER BY s1.occurs_at DESC
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $visitors = [];
+
+        foreach ($statement as $stat) {
+            $visitors[$stat['user_id']] = [
+                'id' => $stat['user_id'],
+                'occurs_at' => $stat['occurs_at'],
+                'title' => $stat['title'],
+                'firstname' => $stat['firstname'],
+                'lastname' => $stat['lastname'],
+                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
+                'role' => $stat['role']
+            ];
+        }
+
         /* The user ids who were audienced
          */
         $currentlyAudiencedIds = $this->userResolver->findUsersForArticle($article);
 
-        /* The user ids who visited at least once
+        /* This diff represents users that didn't visit the article, so we'll need to get
+         * their details separately; they won't have any data from visiting. To minimise
+         * hydration and mapper funsies, try to get a minimal set
          */
-        $stats = $this->statisticsMapper->findByColumn('article_id', $article->getId())->sortBy('occursAt');
-        $visitorIds = $stats->getPropertyValues('userId');
+        $tempIds = array_diff($currentlyAudiencedIds, array_keys($visitors));
+        $tempUsers = $this->userMapper->findByColumn('id', $tempIds);
 
-        /* The union of both audienced ids and visitor ids shows everyone who should
-         * actually appear in the report; index by user id for lookupping
+        /* Dispense with all the object data we don't actually use and store it as a flat
+         * hierarchy instead, so we can overlay it with visitor data
          */
-        $userIds = array_merge($currentlyAudiencedIds, $visitorIds);
-        $users = $this->userMapper->findByColumn('id', $userIds)->indexBy('id')->getAll();
+        $users = [];
 
-        /* Process Statistics instances to find most recent visit for each person who visited
-         * Initialise the stack first
-         */
-        $visitors = [];
-
-        /* TODO Extract this subset of data as a custom query
-         */
-        foreach ($userIds as $userId) {
-            $visitors[$userId] = [
-                'id' => $users[$userId]->getId(),
-                'role' => $users[$userId]->getRole()->getName(),
-                'firstname' => $users[$userId]->getFirstname(),
-                'lastname' => $users[$userId]->getLastname(),
-                'fullname' => $users[$userId]->getFullname(),
-                'occursAt' => null
+        foreach ($tempUsers as $tempUser) {
+            $users[] = [
+                'id' => $tempUser->getId(),
+                'occurs_at' => null,
+                'title' => $tempUser->getTitle(),
+                'firstname' => $tempUser->getFirstname(),
+                'lastname' => $tempUser->getLastname(),
+                'fullname' => $tempUser->getFullName(),
+                'role' => $tempUser->getRole()->getName()
             ];
         }
 
-        /* Sort by surname
+        unset($tempUsers);
+
+        /* Superimpose visitor data over user data
+         * This will also insert visitors who aren't currently in the audience
+         */
+        foreach ($visitors as $id => $visitor) {
+            $users[$id] = $visitor;
+        }
+
+        /* Sort by surname, then by firstname
          */
         uasort($visitors, static function ($a, $b) {
             if ($a['lastname'] === $b['lastname']) {
@@ -247,30 +286,12 @@ class Controller extends Base
             return ($a['lastname'] > $b['lastname']);
         });
 
-        /* Then superposition any visitation data on top of that stack
+        /* TODO Edge case
+         *  Does the hyperdrive know about deleted users/do we care about deleted users?
          */
-        foreach ($stats as $stat) {
-            $visitorId = $stat->getUserId();
-
-            if (null === $visitors[$visitorId]['occursAt'] || $visitors[$visitorId]['occursAt']['timestamp'] < $stat->getOccursAt()->getUnixTimestamp()) {
-
-                /* First time encountering this user id, so initialise their visitation date
-                 * Or, compare dates and only remember the more recent one
-                 */
-                $visitors[$visitorId]['occursAt'] = [
-                    'timestamp' => $stat->getOccursAt()->getUnixTimestamp(),
-                    'date' => $stat->getOccursAt()->getShort()
-                ];
-            }
-
-            /* TODO Edge case
-             *  Does the hyperdrive know about deleted users/do we care about deleted users?
-             */
-        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
             'article' => $article,
-            'users' => $users,
             'visitors' => $visitors
         ])->setTitle("Visits for {$article->getTitle()}"));
     }
