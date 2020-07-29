@@ -1,5 +1,6 @@
 <script>
     import axios from "axios";
+    import {ENDPOINTS} from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 
     export default {
 
@@ -56,12 +57,31 @@
          * kind of like window.onload
          */
         mounted: function () {
+            let self = this;
 
             /* Show skeleton
              */
+            this.loading = true;
 
             /* Fetch payload asynchronously
              */
+            let request = {
+                url: ENDPOINTS.payloadTop10Path(this.payload.article.id),
+                method: 'get',
+                responseType: 'json'
+            }
+
+            axios.request(request)
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                        }
+                    })
+                    .then(function() {
+                        self.loading = false;
+                    });
 
             /* Load into vue component
              */

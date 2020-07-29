@@ -84,7 +84,8 @@ module.exports = {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             '@schoolbox': path.resolve(__dirname, "vue/components"),
-            '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue")
+            '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
+            '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
