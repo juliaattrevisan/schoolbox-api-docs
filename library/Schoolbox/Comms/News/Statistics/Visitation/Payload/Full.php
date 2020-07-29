@@ -167,6 +167,6 @@ class Full
          *  Does the hyperdrive know about deleted users/do we care about deleted users?
          */
 
-        return $users;
+        return array_values($users);
     }
 }
