@@ -1,4 +1,6 @@
 <script>
+    import axios from "axios";
+
     export default {
 
         /**
@@ -50,6 +52,18 @@
          * kind of like window.onload
          */
         mounted: function () {
+
+            /* Show skeleton
+             */
+
+            /* Fetch payload asynchronously
+             */
+
+            /* Load into vue component
+             */
+
+            /* Hide skeleton
+             */
         },
 
         /**
@@ -72,7 +86,7 @@
     <div>
         <div class="row">
             <div class="small-12 columns">
-                <h2>Audienced Users + Visitors</h2>
+                <h2>Top 10 Visitors</h2>
 
                 <ul class="information-list">
                     <li v-for="user in this.payload.users">
