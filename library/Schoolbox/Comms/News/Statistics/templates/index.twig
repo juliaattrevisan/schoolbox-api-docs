@@ -71,12 +71,20 @@
     <div class="small-12 island">
         <h2 class="subheader">Recent Visitors</h2>
 
-        {% include '@commsNewsStatistics/recent-visitors.twig' with {
-            article: article,
-            users: recentVisitors
-        } %}
+        {% if recentVisitors|length %}
+            {% include '@commsNewsStatistics/recent-visitors.twig' with {
+                article: article,
+                users: recentVisitors
+            } %}
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-staff"></i>
+                <p>Nobody has visited yet.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
+
 
 {# Historical Dailies: temporarily disabled
  #
