@@ -15,14 +15,9 @@
     </div>
 </div>
 
-<div id="visitation-list-top10-container">
-    <visitation-list-top10 :payload="{{ payload | json_encode }}"></visitation-list-top10>
-</div>
-
 <div id="visitation-list-full-container">
     <visitation-list-full :payload="{{ payload | json_encode }}"></visitation-list-full>
 </div>
 
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="/javascript/components/visitationListTop10.bundle.js"></script>
 <script src="/javascript/components/visitationListFull.bundle.js"></script>
