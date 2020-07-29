@@ -133,15 +133,12 @@
                         <template v-else>
                             <li v-for="user in this.users">
                                 <div class="card small-12">
-                                    <a href="#" title="View Profile">
+                                    <a :href="'/search/user/' + user.id" :title="user.fullname + ' (last visited ' + user.occursAt.relative + ')'">
                                         <img :src="'/portrait.php?userId=' + user.id + '&size=square64'" alt="View Profile" />
+
                                         <p>{{ user.fullname }}</p>
                                     </a>
                                     <p class="meta">{{ user.role }}</p>
-
-                                    <template v-if="user.occursAt">
-                                        <p class="meta">Last visited {{ user.occursAt }}</p>
-                                    </template>
                                 </div>
                             </li>
                         </template>
