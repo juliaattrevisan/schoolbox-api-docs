@@ -94,12 +94,27 @@
                             self.loading = false;
                         }
                     })
-                    .then(function() {
+                    .then(function () {
 
                         /* Hide skeleton
                          */
                         self.loading = false;
                     });
+
+            /* Set up listener for window history state, for pagination refresh
+             * Don't pushState when window.onpopstate executes otherwise the Back
+             * button will only work once.
+             *
+             * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
+             */
+            window.onpopstate = function (event) {
+                if (!event.state) {
+                    // Return to defaults
+                    self.page = 1;
+                } else if (event.state.page) {
+                    self.page = event.state.page;
+                }
+            }
         },
 
         /**
