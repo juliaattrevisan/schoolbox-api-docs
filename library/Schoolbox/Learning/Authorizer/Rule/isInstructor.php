@@ -12,7 +12,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use InvalidArgumentException;
-use Alaress\Authorizer\Rule;
 
 
 /**
@@ -42,7 +41,7 @@ class isInstructor extends AbstractParticipationRule
      * @param array     $params
      * @param User|null $user
      * @return bool
-     * @throws Failure\Unauthorized If user
+     * @throws Failure\Unauthorized If user is not an instructor of this class
      * @throws InvalidArgumentException If unable to locate an User instance in route params
      */
     public function authorize(array $params = [], User $user = null)
@@ -54,12 +53,14 @@ class isInstructor extends AbstractParticipationRule
             throw new InvalidArgumentException('No user supplied to authorize');
         }
 
-        $hasReadOnly = (new Rule\HasServicePermission(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ))->authorize($params, $user);
-
-        if($hasReadOnly) {
-            return false;
+        /* If the user only has READ access via group permissions, they are not permitted as an instructor */
+        foreach($user->getAccessList() as $access) {
+            if( $access->getService() == UserAccess::SERVICE_HOMEPAGE
+            && $access->getAccessLevel() == UserAccess::ACCESS_READ
+            && $access->getServiceIdentifier() == $folder->getId() ) {
+                throw new Failure\Unauthorized();
+            }
         }
-
 
         if ($user->getRole()->isStaff() || $this->access->isInstructor($user, $folder)) {
             return true;
