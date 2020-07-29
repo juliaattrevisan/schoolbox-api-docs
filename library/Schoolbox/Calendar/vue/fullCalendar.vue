@@ -401,6 +401,15 @@
                         allDay: event.allDay,
                     };
 
+                // Account for the difference in all-day end date between FullCalendar and Schoolbox:
+                // * Schoolbox events are inclusive of the end date
+                // * FullCalendar events are exclusive
+                // This means that all-day events need their end date set back
+                // one day before being sent to Schoolbox.
+                if (event.allDay) {
+                    data.end = this.toMoment(event.end).add({days: -1}).format();
+                }
+
                 // TODO this needs to consider events in series
                 axios
                     .post(
