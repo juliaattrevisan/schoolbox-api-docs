@@ -6,10 +6,20 @@
  # @param News\Model $article  An instance of News\Model
  # @param int $numPerPage      Number of articles per page to display, for pagination
  #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+
 {% set payload = {
     'article': article,
     'numPerPage': 25
 } %}
+
+{{ bread.crumbs(
+    [locale.news.properPlural, routeLookup('commsNews.getIndex')],
+    [article.title |default("(untitled)"), routeLookup('commsNews.getDetail', {articleId: article.id})],
+    ['Statistics', routeLookup('commsNewsStatistics.getOverview', {articleId: article.id})],
+    ['Visitors']
+) }}
 
 <div class="row">
     <div class="small-12 columns">
