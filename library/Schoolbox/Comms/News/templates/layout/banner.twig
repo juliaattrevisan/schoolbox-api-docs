@@ -1,5 +1,4 @@
 {% import '@commsNews/macro/indicator.twig' as indicator %}
-
 <div class="small-12 island">
     {% if article.featureImage %}
         <section class="banner content">
@@ -8,10 +7,20 @@
     {% endif %}
 
     <section class="detail content">
+
         <div class="title-section">
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
         </div>
+        {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
+            <script src="/javascript/shared/jquery.immersive-reader.js" type="text/javascript"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-immersive-reader]').immersiveReader({title: '{{ article.title | escape('js') }}' });
+                });
+            </script>
+            <div class='immersive-reader-button' id="ir-button" data-immersive-reader="button"></div>
+        {% endif %}
 
         {# TODO this metadata should be in a span tag, but that causes the audience-container to flip out #}
         <div class="meta">
