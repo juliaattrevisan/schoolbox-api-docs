@@ -8,8 +8,12 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Transform;
 
 use Aws\S3\S3Client;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model;
 
 
 class Seeder extends App
@@ -24,12 +28,21 @@ class Seeder extends App
      */
     private $bucket;
 
+    /**
+     * @var StorageMapper
+     */
+    private $storageMapper;
+
+    /**
+     * @var array
+     */
+    private $transcodeImages;
+
     /** @inheritDoc */
     public function getShortOpts(): array
     {
         return ['h'];
     }
-
 
     /** @inheritDoc */
     public function getLongOpts(): array
@@ -49,11 +62,14 @@ class Seeder extends App
             exit(Kernel::EXIT_STATUS_OK);
         }
 
-        $this->buildDependencies();
+        $this->buildDependencies()->prepareData()->seed();
    }
 
 
-   private function buildDependencies(): void
+    /**
+     * @return Seeder
+     */
+   private function buildDependencies(): Seeder
    {
        $config = $this->getConfig();
 
@@ -68,12 +84,165 @@ class Seeder extends App
            ]
        );
 
-       $this->bucket    = trim($config->get('otfs_s3_bucket') ?? '');
+       $this->bucket        = trim($config->get('otfs_s3_bucket') ?? '');
+       $this->storageMapper = StorageMapper::getInstance();
+
+       $this->createStorageTransformSchema();
+
+       return $this;
    }
 
-   private function createStorageTransformSchema()
+    /**
+     * Create storage_transform table IF IT DOESN'T EXISTS yet.
+     *
+     * Columns: hash, transform and size
+     * Also add constraint with storage table.
+     */
+   private function createStorageTransformSchema(): void
    {
-       //TODO: Create storage_transform table if it doesn't exists
+       $this->getDatabaseInternal()->executeQuery("CREATE TABLE IF NOT EXISTS `storage_transform` (
+            `hash` VARCHAR(100) NULL COLLATE 'ascii_general_ci',
+            `transform` VARCHAR(16) NULL,
+            `size` INT(11) NULL,
+            UNIQUE INDEX `unique_hash_transform` (`hash` ASC, `transform` ASC),
+            INDEX `index_hash` (`hash` ASC),
+            CONSTRAINT `fk_storage_transform` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE CASCADE ON UPDATE CASCADE
+        )");
+   }
+
+    /**
+     * @return Seeder
+     */
+   private function prepareData(): Seeder
+   {
+       // Get all images in storage table
+       $images = $this->storageMapper->findAll()->filter(static function($test) {
+            return strpos($test->getMimetype()->getMime(), 'image/') === 0;
+       });
+
+       /** @var Model $image */
+       if ($images) {
+           foreach ($images as $key => $image) {
+               // Investigate file directories for available transcodes
+               $this->generateListsOfTranscodedImages($image->getFilesystem(), $image);
+           }
+       }
+
+       $this->getLogger()->notice("Image transcode count: " . count($this->transcodeImages));
+
+       return $this;
+   }
+
+    /**
+     * @param FilesystemInterface $fileSystem
+     * @param Model               $image
+     */
+   private function generateListsOfTranscodedImages(FilesystemInterface $fileSystem, Model $image): void
+   {
+       $imagePath = $fileSystem->getAdapter()->getPathPrefix() . $image->getPath();
+
+        if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
+            $this->getTranscodedImagesInS3Fs($imagePath);
+        } else {
+            $this->getTranscodedImagesInLocalFs($imagePath);
+        }
+   }
+
+    /**
+     * @param string $filePath
+     */
+   private function getTranscodedImagesInLocalFs(string $filePath): void
+   {
+       $dir = opendir(dirname($filePath));
+
+       while (($entry = readdir($dir)) !== false) {
+           if ($entry === '.' || $entry === '..') {
+               continue;
+           }
+
+           if (strpos($entry, '-') !== false) {
+               $file = explode('-', $entry, 2);
+               if (count($file) > 1) {
+                   $this->transcodeImages[] = [
+                       'hash' => $file[0],
+                       'transform' => $file[1],
+                       'size' => (int)filesize($filePath),
+                   ];
+                   $this->getLogger()->info($entry);
+               }
+           }
+       }
+
+       closedir($dir);
+   }
+
+    /**
+     * @param string $filePath
+     */
+   private function getTranscodedImagesInS3Fs(string $filePath): void
+   {
+       $itemsInFolder = $this->s3Client->listObjects([
+           'Bucket' => $this->bucket,
+           'Prefix' => dirname($filePath),
+       ]);
+
+       if (count($itemsInFolder['Contents']) > 0) {
+           foreach ($itemsInFolder['Contents'] as $item) {
+               $basename = basename($item['Key']);
+               if (strpos($basename,'-') !== false) {
+                   $file = explode('-', $basename, 2);
+                   if (count($file) > 1) {
+                       $this->transcodeImages[] = [
+                           'hash' => $file[0],
+                           'transform' => $file[1],
+                           'size' => (int) $item['Size'],
+                       ];
+                   }
+                   $this->getLogger()->info($basename);
+               }
+           }
+       }
+   }
+
+   private function seed(): void
+   {
+       if ($this->perform()) {
+           $this->getLogger()->info('Running in perform mode (-p): new records will be inserted in the storage_transform table (IF ANY)');
+
+           $insertQuery = $this->getDatabaseInternal()->prepareQuery(
+               "INSERT INTO `storage_transform` (`hash`, `transform`, `size`) VALUES (:hash, :transform, :size)"
+           );
+
+           if ($this->transcodeImages) {
+               foreach ($this->transcodeImages as $key => $image) {
+                   if (!$this->checkIfRecordExists($image['hash'], $image['transform'])) {
+                       $insertQuery->execute([
+                           'hash' => $image['hash'],
+                           'transform' => $image['transform'],
+                           'size' => $image['size'],
+                       ]);
+
+                       $this->getLogger()->info('Added image transforms for: ' . $image['hash'] . ' in storage_transform table');
+                   }
+               }
+           }
+       } else {
+           $this->getLogger()->notice('Running in dry-run mode: use -p to insert record to database');
+       }
+   }
+
+    /**
+     * @param string $hash
+     * @param string $transform
+     *
+     * @return bool
+     */
+   private function checkIfRecordExists(string $hash, string $transform): bool
+   {
+       $query = $this->getDatabaseInternal()->prepareQuery("SELECT 1 FROM `storage_transform` WHERE `hash` = :hash AND `transform` = :transform");
+       $query->bindInputs(['hash' => $hash, 'transform' => $transform,])->execute();
+
+       return (bool) $query->rowCount();
    }
 
     /**
