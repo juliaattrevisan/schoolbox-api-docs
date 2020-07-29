@@ -8,12 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Transform;
 
 use Aws\S3\S3Client;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model;
 
 
 class Seeder extends App
@@ -37,6 +36,11 @@ class Seeder extends App
      * @var StorageMapper
      */
     private $storageMapper;
+
+    /**
+     * @var string
+     */
+    private $storageAdapter;
 
     /**
      * @var array
@@ -89,9 +93,10 @@ class Seeder extends App
            ]
        );
 
-       $this->bucket        = trim($config->get('otfs_s3_bucket') ?? '');
-       $this->storageMapper = StorageMapper::getInstance();
-       $this->storageDir    = trim($config->get('storage_dir'));
+       $this->bucket            = trim($config->get('otfs_s3_bucket') ?? '');
+       $this->storageMapper     = StorageMapper::getInstance();
+       $this->storageDir        = trim($config->get('storage_dir'));
+       $this->storageAdapter    = trim($config->get(ConfigMapper::NAME_OTFS_ADAPTER));
 
        $this->createStorageTransformSchema();
 
@@ -122,15 +127,18 @@ class Seeder extends App
    private function prepareData(): Seeder
    {
        // Get all images in storage table
-       $images = $this->storageMapper->findAll()->filter(static function(Model $images) {
-            return strpos($images->getMimetype()->getMime(), 'image/') === 0;
-       });
+       $getImagesQuery = "SELECT s.hash, aft.mime FROM storage s 
+                        LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension 
+                        LEFT JOIN allowedFileTypes aft ON aft.fileTypeID = afe.fileTypeID 
+                        WHERE aft.mime LIKE 'image/%'
+                        ";
+
+       $images = $this->getDatabaseInternal()->executeQuery($getImagesQuery)->fetchAll();
 
        if ($images) {
-           /** @var Model $image */
            foreach ($images as $key => $image) {
                // Investigate file directories for available transcodes
-               $this->generateListsOfTranscodedImages($image->getFilesystem(), $image);
+               $this->generateListsOfTranscodedImages($image);
            }
        }
 
@@ -140,15 +148,16 @@ class Seeder extends App
    }
 
     /**
-     * @param Filesystem $fileSystem
-     * @param Model      $image
+     * @param array $image
      */
-   private function generateListsOfTranscodedImages(Filesystem $fileSystem, Model $image): void
+   private function generateListsOfTranscodedImages(array $image): void
    {
-        if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
-            $this->getTranscodedImagesInS3Fs('storage/' . $image->getPath());
+        $path = sprintf("%s%s", chunk_split($image['hash'], 5, '/'), $image['hash']);
+
+        if ($this->storageAdapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+            $this->getTranscodedImagesInS3Fs(FilesystemFactory::PREFIX_STORAGE . $path);
         } else {
-            $this->getTranscodedImagesInLocalFs($this->storageDir . "/" . $image->getPath());
+            $this->getTranscodedImagesInLocalFs($this->storageDir . "/" . $path);
         }
    }
 
