@@ -28,13 +28,11 @@
 
 <template>
     <ul class="information-list">
-        <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
-            <div class="list-item">
-                <div class="small-12 card skeleton">
-                    <div class="img"></div>
-                    <h3></h3>
-                    <p class="meta"></p>
-                </div>
+        <li v-if="articlesLoading" v-for="n in 3">
+            <div class="small-12 card skeleton news">
+                <div class="img"></div>
+                <h3></h3>
+                <p class="meta"></p>
             </div>
         </li>
 
