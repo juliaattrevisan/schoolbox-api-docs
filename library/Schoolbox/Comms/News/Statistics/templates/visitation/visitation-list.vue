@@ -72,20 +72,14 @@
     <div>
         <div class="row">
             <div class="small-12 columns">
-                <h2>Audienced Users</h2>
+                <h2>Audienced Users + Visitors</h2>
+
                 <ul class="information-list">
                     <li v-for="user in this.payload.users">
-                        {{ user.firstname }} {{ user.lastname }}
-                    </li>
-                </ul>
+                        {{ user.id }} {{ user.role }} {{ user.fullname }}
 
-                <h2>Visitors</h2>
-                <ul class="information-list">
-                    <li v-for="visitor in this.payload.visitors">
-                        {{ visitor.id }} {{ visitor.role }} {{ visitor.fullname }}
-
-                        <template v-if="visitor.occursAt">
-                            {{ visitor.occursAt.timestamp }} {{ visitor.occursAt.date }}
+                        <template v-if="user.occursAt">
+                            {{ user.occursAt }}
                         </template>
                     </li>
                 </ul>
