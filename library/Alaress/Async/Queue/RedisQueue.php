@@ -257,20 +257,5 @@ abstract class RedisQueue implements QueueInterface
      */
     protected abstract function getMessageKeyPattern();
 
-    /**
-     * @inheritDoc
-     */
-    public function unset(Instance $instance): void
-    {
-        $ids = [];
-        foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {
-            $ids[] = $id;
-        }
 
-        if (!empty($ids)) {
-            $this->redis->transaction(function (MultiExec $tx) use ($ids) {
-                $tx->srem($this->getRedisSetKey(), $ids);
-            });
-        }
-    }
 }

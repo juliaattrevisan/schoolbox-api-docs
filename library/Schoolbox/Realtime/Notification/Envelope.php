@@ -173,18 +173,4 @@ class Envelope extends InstanceBundle
         // Binding name is arbitrary, this won't ever get sent to anyone
         $this->bind(Instance::ACTION_RETRACT_ALL, $instance);
     }
-
-    /**
-     * Retracts this message from the user.
-     * @param Instance $instance
-     * @param int[]    $userIds
-     */
-    public function retractForUsers(Instance $instance, array $userIds): void
-    {
-        $instance->setAction(Instance::ACTION_RETRACT_ALL);
-        // Binding name is arbitrary, this won't ever get sent to anyone
-        foreach ($userIds as $userId) {
-            $this->bind(Instance::ACTION_RETRACT_ALL . $userId, $instance);
-        }
-    }
 }

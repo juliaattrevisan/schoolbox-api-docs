@@ -120,12 +120,4 @@ class Retractor extends AbstractList
     {
         throw new BadMethodCallException('Retract queues do not support suffix');
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function unset(Instance $instance):void
-    {
-        // noop
-    }
 }

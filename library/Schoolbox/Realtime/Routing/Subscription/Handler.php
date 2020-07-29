@@ -143,18 +143,10 @@ class Handler implements IConsumer, EventListener
                     $userIds = [];
 
                 } elseif ($instance->isActionRetractAll()) {
-                    // retract-all deletes the instance
-                    // retract-all<userId> removes the instance from the user set
-                    preg_match('/\.retract-all([0-9]*)\./', $topic, $match);
-                    $userIds = (isset($match[1]) && is_numeric($match[1])) ? [(int)$match[1]] : [];
-                    if (empty($userIds)) {
-                        // Retract actions route to nobody in particular
-                        $msgType = 'full retraction';
-                        $suffix  = 'nobody in particular';
-                    } else {
-                        $msgType = 'retraction';
-                        $suffix = json_encode($userIds);
-                    }
+                    // Retract actions route to nobody in particular
+                    $msgType = 'full retraction';
+                    $suffix  = 'nobody in particular';
+                    $userIds = [];
 
                 } else {
                     $msgType   = 'send';

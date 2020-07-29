@@ -92,12 +92,4 @@ class Mobile implements QueueInterface
     {
         // noop: this "list" doesn't contain things
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function unset(Instance $instance): void
-    {
-        // noop
-    }
 }

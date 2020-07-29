@@ -102,13 +102,7 @@ class RouteTXRX implements TXRX
 
         // Is a retract action
         if ($instance->isActionRetract()) {
-            if (!empty($userIds) && is_array($userIds)) {
-                foreach ($userIds as $userId) {
-                    $tx->put("{$key}-retract", [$instance, $userId, self::TYPE_RETRACT]);
-                }
-            } else {
-                $tx->put("{$key}-retract", [$instance, null, self::TYPE_RETRACT]);
-            }
+            $tx->put("{$key}-retract", [$instance, null, self::TYPE_RETRACT]);
             return;
         }
 
@@ -169,7 +163,7 @@ class RouteTXRX implements TXRX
                         // no need to clone, but just in case
                         $retractInstance = clone $instance;
                         $retractInstance->setAction(Instance::ACTION_RETRACT_ALL);
-                        $this->sorter->processRetract($retractInstance, $userId);
+                        $this->sorter->processRetract($retractInstance);
                         // process after retracting
                         $count += $this->sorter->process($user, $instance) ? 1 : 0;
                         // re-add to object list, so that this can be retracted next time
@@ -179,7 +173,7 @@ class RouteTXRX implements TXRX
                     $count += $this->sorter->process($user, $instance) ? 1 : 0;
                     break;
                 case self::TYPE_RETRACT:
-                    $this->sorter->processRetract($instance, $userId);
+                    $this->sorter->processRetract($instance);
                     break;
                 case self::TYPE_OBJECT:
                     $this->sorter->processEventObjectList($instance);
