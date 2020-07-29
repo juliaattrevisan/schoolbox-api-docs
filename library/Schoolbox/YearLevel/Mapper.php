@@ -33,6 +33,7 @@ class Mapper extends Schoolbox\Mapper
     public const COL_DISPLAY_RUBRIC_GRADE      = 'display_rubric_grade';
     public const COL_DISPLAY_CAPABILITY_GRADE  = 'display_capability_grade';
     public const COL_DISPLAY_PROGRESSION_GRADE = 'display_progression_grade';
+    public const COL_SHOW_RUBRIC_POINTS        = 'show_rubric_points';
     public const COL_SEQUENCE                  = 'sequence';
     public const COL_CREATED_AT                = 'created_at';
     public const COL_UPDATED_AT                = 'updated_at';
@@ -59,6 +60,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses(self::COL_DISPLAY_RUBRIC_GRADE, self::TYPE_BOOLEAN);
         $this->uses(self::COL_DISPLAY_CAPABILITY_GRADE, self::TYPE_BOOLEAN);
         $this->uses(self::COL_DISPLAY_PROGRESSION_GRADE, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_SHOW_RUBRIC_POINTS, self::TYPE_BOOLEAN);
         $this->uses(self::COL_SEQUENCE, self::TYPE_INTEGER);
         $this->uses(self::COL_CREATED_AT, self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses(self::COL_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

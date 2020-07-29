@@ -15,9 +15,9 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * A rubric grid.
@@ -147,6 +147,22 @@ class Grid
         return $this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability();
     }
 
+    /**
+     * Descriptor value display setting from folder year level
+     * @return bool
+     */
+    public function showDescriptorValue(): bool
+    {
+        if (!$this->assessment instanceof DueWork) {
+            return false;
+        }
+        $folder = $this->assessment->getContext()->getFolder();
+        if (!($folder instanceof Folder) || !$folder->getYearLevels() || $folder->getYearLevels()->count() === 0) {
+            return true;
+        }
+        $showDescriptorValue = array_unique($folder->getYearLevels()->getPropertyValues('showRubricPoints'));
+        return count($showDescriptorValue) > 1 ? true : (bool)$showDescriptorValue[0];
+    }
 
     /**
      * Return the group usage for a given group, or null if this grid doesn't

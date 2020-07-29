@@ -71,6 +71,11 @@ class Model implements ISoftDeletable, Sequential
     private $displayProgressionGrade;
 
     /**
+     * @var bool
+     */
+    private $showRubricPoints;
+
+    /**
      * @return string
      */
     public function getName(): ?string
@@ -211,6 +216,24 @@ class Model implements ISoftDeletable, Sequential
     public function setDisplayProgressionGrade($displayProgressionGrade): self
     {
         $this->displayProgressionGrade = $displayProgressionGrade;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowRubricPoints(): bool
+    {
+        return $this->showRubricPoints;
+    }
+
+    /**
+     * @param bool $showRubricPoints
+     * @return static
+     */
+    public function setShowRubricPoints($showRubricPoints): self
+    {
+        $this->showRubricPoints = $showRubricPoints;
         return $this;
     }
 }
