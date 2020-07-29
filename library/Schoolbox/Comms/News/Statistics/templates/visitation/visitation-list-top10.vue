@@ -43,6 +43,10 @@
          */
         data() {
             return {
+
+                /* True, when data is currently loading; used to show skeleton
+                 */
+                'loading': true
             }
         },
 
@@ -85,18 +89,35 @@
 <template>
     <div>
         <div class="row">
-            <div class="small-12 columns">
-                <h2>Top 10 Visitors</h2>
+            <div class="small-12 island">
+                <h2 class="subheader">Top 10 Visitors</h2>
 
-                <ul class="information-list">
-                    <li v-for="user in this.payload.users">
-                        {{ user.id }} {{ user.role }} {{ user.fullname }}
-
-                        <template v-if="user.occursAt">
-                            {{ user.occursAt }}
+                <section>
+                    <ul class="information-list">
+                        <template v-if="this.loading">
+                            <li v-for="n in 3">
+                                <div class="list-item">
+                                    <div class="small-12 card skeleton">
+                                        <div class="img"></div>
+                                        <h3></h3>
+                                        <p class="meta"></p>
+                                    </div>
+                                </div>
+                            </li>
                         </template>
-                    </li>
-                </ul>
+                        <template v-else>
+                            <ul class="information-list">
+                                <li v-for="user in this.payload.users">
+                                    {{ user.id }} {{ user.role }} {{ user.fullname }}
+
+                                    <template v-if="user.occursAt">
+                                        {{ user.occursAt }}
+                                    </template>
+                                </li>
+                            </ul>
+                        </template>
+                    </ul>
+                </section>
             </div>
         </div>
     </div>
