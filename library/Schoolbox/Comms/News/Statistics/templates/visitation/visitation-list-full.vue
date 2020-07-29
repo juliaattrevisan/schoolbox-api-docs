@@ -58,11 +58,7 @@
 
                 /* The current page number
                  */
-                page: 1,
-
-                /* Number of items per page
-                 */
-                numPerPage: 5
+                page: 1
             }
         },
 
@@ -131,7 +127,7 @@
              * The total number of pages available for the data set obtained
              */
             pageCount: function () {
-                return Math.ceil(this.allUsers.length / this.numPerPage);
+                return Math.ceil(this.allUsers.length / this.payload.numPerPage);
             },
 
 
@@ -143,8 +139,8 @@
                     return [];
                 }
 
-                const offset = (this.page-1) * this.numPerPage;
-                const total = offset + this.numPerPage;
+                const offset = (this.page-1) * this.payload.numPerPage;
+                const total = offset + this.payload.numPerPage;
 
                 return this.allUsers.slice(offset, total);
             }

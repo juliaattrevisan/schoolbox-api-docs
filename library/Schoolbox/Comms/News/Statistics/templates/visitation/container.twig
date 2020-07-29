@@ -4,9 +4,11 @@
  # Twig container from which to launch our vue component with the provided payload
  #
  # @param News\Model $article  An instance of News\Model
+ # @param int $numPerPage      Number of articles per page to display, for pagination
  #}
 {% set payload = {
-    'article': article
+    'article': article,
+    'numPerPage': 50
 } %}
 
 <div class="row">
