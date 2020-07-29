@@ -137,11 +137,15 @@
                             </template>
                             <template v-else>
                                 <tr v-for="user in this.users">
-                                    <td>{{ user.fullname }}</td>
+                                    <td>
+                                        <a :href="'/search/user/' + user.id" :title="user.fullname + ' (last visited ' + user.occursAt.relative + ')'">
+                                            {{ user.fullname }}
+                                        </a>
+                                    </td>
                                     <td>{{ user.role }}</td>
                                     <td>
                                         <template v-if="user.occursAt">
-                                            {{ user.occursAt.absolute }} ({{user.occursAt.relative}})
+                                            {{ user.occursAt.nice }} ({{user.occursAt.relative}})
                                         </template>
                                     </td>
                                 </tr>
