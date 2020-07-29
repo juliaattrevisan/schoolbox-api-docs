@@ -1,5 +1,6 @@
 <script>
     import axios from "axios";
+    import Paginate from 'vuejs-paginate'
     import {ENDPOINTS} from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 
     export default {
@@ -34,6 +35,7 @@
          * at the top of the file.
          */
         components: {
+            'Paginate': Paginate
         },
 
         /**
@@ -49,9 +51,14 @@
                  */
                 'loading': true,
 
-                /* The list of users who visited this article, obtained asynchronously
+                /* The full list of users who visited this article, obtained asynchronously
+                 * This stack gets paginated elsewhere
                  */
-                'users': []
+                'allUsers': [],
+
+                /* The current page number
+                 */
+                page: 1
             }
         },
 
@@ -80,7 +87,7 @@
 
                         /* Load into vue component
                          */
-                        self.users = response.data;
+                        self.allUsers = response.data;
                     })
                     .catch(error => {
                         if (error.response) {
@@ -100,6 +107,31 @@
          * Access the results of a function as if they were a property of an object.
          */
         computed: {
+
+            /**
+             * The total number of pages available for the data set obtained
+             */
+            pageCount: function () {
+                const NUM_PER_PAGE = 5;
+
+                return Math.ceil(this.allUsers.length / NUM_PER_PAGE);
+            },
+
+
+            /**
+             * Calculate the paginated subset of all data
+             */
+            users: function() {
+                if (!this.allUsers.length) {
+                    return [];
+                }
+
+                const NUM_PER_PAGE = 5;
+                const offset = (this.page-1) * NUM_PER_PAGE;
+                const total = offset + NUM_PER_PAGE;
+
+                return this.allUsers.slice(offset, total);
+            }
         },
 
         /**
@@ -108,6 +140,18 @@
          * other ordinary javascript that you might have written before.
          */
         methods: {
+
+            /**
+             * Update the pushState history in the browser to simulate navigation
+             * with async requests
+             *
+             * @param page int - The page to change to
+             */
+            onPaginate: function (page) {
+                const params = '?' + 'p=' + page;
+
+                window.history.pushState({page: page}, '', params);
+            },
         }
     }
 </script>
@@ -152,6 +196,19 @@
                         </tbody>
                     </table>
                 </section>
+                <template v-if="!this.loading">
+                    <Paginate
+                        v-model="page"
+                        :page-count="pageCount"
+                        :container-class="'pagination'"
+                        :prev-text="'‹'"
+                        :next-text="'›'"
+                        :prev-link-class="'arrow'"
+                        :next-link-class="'arrow'"
+                        :disabled-class="'unavailable'"
+                        :click-handler="onPaginate"
+                    ></Paginate>
+                </template>
             </div>
         </div>
     </div>
