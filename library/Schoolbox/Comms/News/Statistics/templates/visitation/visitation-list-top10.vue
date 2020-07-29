@@ -118,7 +118,7 @@
                 <h2 class="subheader">Top 10 Visitors</h2>
 
                 <section>
-                    <ul class="information-list">
+                    <ul class="grid small-block-grid-1 medium-block-grid-2">
                         <template v-if="this.loading">
                             <li v-for="n in 3">
                                 <div class="list-item">
@@ -146,6 +146,11 @@
                             </li>
                         </template>
                     </ul>
+                    <div class="component-action">
+                        <section>
+                            <a href="#" class="button">View all</a>
+                        </section>
+                    </div>
                 </section>
             </div>
         </div>
