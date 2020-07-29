@@ -68,6 +68,7 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{articleId}', 'getOverview', $viewStats, $preloadArticle);
         $this->register('GET', '/{articleId}/visitation', 'getVisitation', $viewStats, $preloadArticle);
+        $this->register('GET', '/{articleId}/visitation/top10', 'getTop10', $viewStats, $preloadArticle);
     }
 
 

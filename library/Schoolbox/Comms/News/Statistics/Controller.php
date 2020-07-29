@@ -144,6 +144,58 @@ class Controller extends Base
 
 
     /**
+     * Get the most recent 10 visitors to $article
+     *
+     * @param News\Model $article
+     * @throws \PDOException
+     */
+    public function getTop10(News\Model $article): void
+    {
+
+        /* The user ids who visited at least once
+         *
+         * Users can have multiple records per article if their referrers are different so we can't
+         * just take the first ten items in the findByColumn() stack
+         */
+        $statement = $this->statisticsMapper->getDatabase()->prepare("
+            SELECT
+                s1.user_id, s1.occurs_at,
+                u.title, u.firstname, u.lastname,
+                r.`name` AS `role`
+            FROM {$this->statisticsMapper->getTable()} s1
+            LEFT JOIN {$this->statisticsMapper->getTable()} s2
+                ON s1.user_id = s2.user_id
+                AND s1.occurs_at < s2.occurs_at
+            LEFT JOIN `user` u ON s1.user_id = u.id
+            LEFT JOIN `groups` r ON u.group_id = r.id
+            WHERE s2.id IS NULL AND s1.article_id = :articleId
+            ORDER BY s1.occurs_at DESC
+            LIMIT 10
+        ");
+
+        $statement->execute([
+            'articleId' => $article->getId()
+        ]);
+
+        $visitors = [];
+
+        foreach ($statement as $stat) {
+            $visitors[] = [
+                'id' => $stat['user_id'],
+                'occurs_at' => $stat['occurs_at'],
+                'title' => $stat['title'],
+                'firstname' => $stat['firstname'],
+                'lastname' => $stat['lastname'],
+                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}")
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($visitors));
+    }
+
+
+
+    /**
      * See who viewed $article
      *
      * @param News\Model $article
