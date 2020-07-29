@@ -135,11 +135,9 @@ class Seeder extends App
 
        $images = $this->getDatabaseInternal()->executeQuery($getImagesQuery)->fetchAll();
 
-       if ($images) {
-           foreach ($images as $key => $image) {
-               // Investigate file directories for available transcodes
-               $this->generateListsOfTranscodedImages($image);
-           }
+       foreach ($images as $key => $image) {
+           // Investigate file directories for available transcodes
+           $this->generateListsOfTranscodedImages($image);
        }
 
        $this->getLogger()->notice("Image transcode count: " . count($this->transcodeImages));
@@ -226,19 +224,18 @@ class Seeder extends App
                "INSERT INTO `storage_transform` (`hash`, `transform`, `size`) VALUES (:hash, :transform, :size)"
            );
 
-           if ($this->transcodeImages) {
-               foreach ($this->transcodeImages as $key => $image) {
-                   if (!$this->checkIfRecordExists($image['hash'], $image['transform'])) {
-                       $insertQuery->execute([
-                           'hash' => $image['hash'],
-                           'transform' => $image['transform'],
-                           'size' => $image['size'],
-                       ]);
+           foreach ($this->transcodeImages as $key => $image) {
+               if (!$this->checkIfRecordExists($image['hash'], $image['transform'])) {
+                   $insertQuery->execute([
+                       'hash' => $image['hash'],
+                       'transform' => $image['transform'],
+                       'size' => $image['size'],
+                   ]);
 
-                       $this->getLogger()->info('Added image transforms for: ' . $image['hash'] . ' in storage_transform table');
-                   }
+                   $this->getLogger()->info('Added image transforms for: ' . $image['hash'] . ' in storage_transform table');
                }
            }
+
        } else {
            $this->getLogger()->notice('Running in dry-run mode: use -p to insert record to database');
        }
