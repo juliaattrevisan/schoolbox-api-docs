@@ -97,7 +97,7 @@ class Full
         foreach ($statement as $stat) {
             $visitors[$stat['user_id']] = [
                 'id' => $stat['user_id'],
-                'occurs_at' => $stat['occurs_at'],
+                'occursAt' => $stat['occurs_at'],
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],
@@ -125,7 +125,7 @@ class Full
         foreach ($tempUsers as $tempUser) {
             $users[] = [
                 'id' => $tempUser->getId(),
-                'occurs_at' => null,
+                'occursAt' => null,
                 'title' => $tempUser->getTitle(),
                 'firstname' => $tempUser->getFirstname(),
                 'lastname' => $tempUser->getLastname(),

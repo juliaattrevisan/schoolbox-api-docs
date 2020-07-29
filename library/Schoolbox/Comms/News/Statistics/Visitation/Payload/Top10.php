@@ -75,7 +75,7 @@ class Top10
         foreach ($statement as $stat) {
             $visitors[] = [
                 'id' => $stat['user_id'],
-                'occurs_at' => $stat['occurs_at'],
+                'occursAt' => $stat['occurs_at'],
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],
