@@ -49,16 +49,20 @@
 
                 /* True, when data is currently loading; used to show skeleton
                  */
-                'loading': true,
+                loading: true,
 
                 /* The full list of users who visited this article, obtained asynchronously
                  * This stack gets paginated elsewhere
                  */
-                'allUsers': [],
+                allUsers: [],
 
                 /* The current page number
                  */
-                page: 1
+                page: 1,
+
+                /* Number of items per page
+                 */
+                numPerPage: 5
             }
         },
 
@@ -127,9 +131,7 @@
              * The total number of pages available for the data set obtained
              */
             pageCount: function () {
-                const NUM_PER_PAGE = 5;
-
-                return Math.ceil(this.allUsers.length / NUM_PER_PAGE);
+                return Math.ceil(this.allUsers.length / this.numPerPage);
             },
 
 
@@ -141,9 +143,8 @@
                     return [];
                 }
 
-                const NUM_PER_PAGE = 5;
-                const offset = (this.page-1) * NUM_PER_PAGE;
-                const total = offset + NUM_PER_PAGE;
+                const offset = (this.page-1) * this.numPerPage;
+                const total = offset + this.numPerPage;
 
                 return this.allUsers.slice(offset, total);
             }
