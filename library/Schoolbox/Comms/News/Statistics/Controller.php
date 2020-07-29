@@ -144,6 +144,18 @@ class Controller extends Base
 
 
     /**
+     * @param News\Model $article
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getVisitation(News\Model $article): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
+            'article' => $article,
+        ])->setTitle("Visits for {$article->getTitle()}"));
+    }
+
+
+    /**
      * Get the most recent 10 visitors to $article
      *
      * @param News\Model $article
@@ -151,47 +163,10 @@ class Controller extends Base
      */
     public function getTop10(News\Model $article): void
     {
+        $payload = (new Visitation\Payload\Top10($this->statisticsMapper))
+            ->generate($article);
 
-        /* The user ids who visited at least once
-         *
-         * Users can have multiple records per article if their referrers are different so we can't
-         * just take the first ten items in the findByColumn() stack
-         */
-        $statement = $this->statisticsMapper->getDatabase()->prepare("
-            SELECT
-                s1.user_id, s1.occurs_at,
-                u.title, u.firstname, u.lastname,
-                r.`name` AS `role`
-            FROM {$this->statisticsMapper->getTable()} s1
-            LEFT JOIN {$this->statisticsMapper->getTable()} s2
-                ON s1.user_id = s2.user_id
-                AND s1.occurs_at < s2.occurs_at
-            LEFT JOIN `user` u ON s1.user_id = u.id
-            LEFT JOIN `groups` r ON u.group_id = r.id
-            WHERE s2.id IS NULL AND s1.article_id = :articleId
-            ORDER BY s1.occurs_at DESC
-            LIMIT 10
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $visitors = [];
-
-        foreach ($statement as $stat) {
-            $visitors[] = [
-                'id' => $stat['user_id'],
-                'occurs_at' => $stat['occurs_at'],
-                'title' => $stat['title'],
-                'firstname' => $stat['firstname'],
-                'lastname' => $stat['lastname'],
-                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
-                'role' => $stat['role']
-            ];
-        }
-
-        $this->getResponse()->content->set($this->buildJsonOutput($visitors));
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 
 
@@ -199,100 +174,20 @@ class Controller extends Base
      * See who viewed $article
      *
      * @param News\Model $article
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getFull(News\Model $article): void
     {
+        $payload = (new Visitation\Payload\Full($this->statisticsMapper, $this->userResolver, $this->userMapper))
+            ->generate($article);
 
-        /* The user data for those who visited at least once
-         */
-        $statement = $this->statisticsMapper->getDatabase()->prepare("
-            SELECT
-                s1.user_id, s1.occurs_at,
-                u.title, u.firstname, u.lastname,
-                r.`name` AS `role`
-            FROM {$this->statisticsMapper->getTable()} s1
-            LEFT JOIN {$this->statisticsMapper->getTable()} s2
-                ON s1.user_id = s2.user_id
-                AND s1.occurs_at < s2.occurs_at
-            LEFT JOIN `user` u ON s1.user_id = u.id
-            LEFT JOIN `groups` r ON u.group_id = r.id
-            WHERE s2.id IS NULL AND s1.article_id = :articleId
-            ORDER BY s1.occurs_at DESC
-        ");
-
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
-
-        $visitors = [];
-
-        foreach ($statement as $stat) {
-            $visitors[$stat['user_id']] = [
-                'id' => $stat['user_id'],
-                'occurs_at' => $stat['occurs_at'],
-                'title' => $stat['title'],
-                'firstname' => $stat['firstname'],
-                'lastname' => $stat['lastname'],
-                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
-                'role' => $stat['role']
-            ];
-        }
-
-        /* The user ids who were audienced
-         */
-        $currentlyAudiencedIds = $this->userResolver->findUsersForArticle($article);
-
-        /* This diff represents users that didn't visit the article, so we'll need to get
-         * their details separately; they won't have any data from visiting. To minimise
-         * hydration and mapper funsies, try to get a minimal set
-         */
-        $tempIds = array_diff($currentlyAudiencedIds, array_keys($visitors));
-        $tempUsers = $this->userMapper->findByColumn('id', $tempIds);
-
-        /* Dispense with all the object data we don't actually use and store it as a flat
-         * hierarchy instead, so we can overlay it with visitor data
-         */
-        $users = [];
-
-        foreach ($tempUsers as $tempUser) {
-            $users[] = [
-                'id' => $tempUser->getId(),
-                'occurs_at' => null,
-                'title' => $tempUser->getTitle(),
-                'firstname' => $tempUser->getFirstname(),
-                'lastname' => $tempUser->getLastname(),
-                'fullname' => $tempUser->getFullName(),
-                'role' => $tempUser->getRole()->getName()
-            ];
-        }
-
-        unset($tempUsers);
-
-        /* Superimpose visitor data over user data
-         * This will also insert visitors who aren't currently in the audience
-         */
-        foreach ($visitors as $id => $visitor) {
-            $users[$id] = $visitor;
-        }
-
-        /* Sort by surname, then by firstname
-         */
-        uasort($visitors, static function ($a, $b) {
-            if ($a['lastname'] === $b['lastname']) {
-                return $a['firstname'] > $b['firstname'];
-            }
-
-            return ($a['lastname'] > $b['lastname']);
-        });
-
-        /* TODO Edge case
-         *  Does the hyperdrive know about deleted users/do we care about deleted users?
-         */
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/visitation/container.twig', [
-            'article' => $article,
-            'users' => $users
-        ])->setTitle("Visits for {$article->getTitle()}"));
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 }
