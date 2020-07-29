@@ -47,7 +47,11 @@
 
                 /* True, when data is currently loading; used to show skeleton
                  */
-                'loading': true
+                'loading': true,
+
+                /* The list of users who visited this article, obtained asynchronously
+                 */
+                'users': []
             }
         },
 
@@ -73,21 +77,22 @@
 
             axios.request(request)
                     .then(function (response) {
-                        console.log(response);
+
+                        /* Load into vue component
+                         */
+                        self.users = response.data;
                     })
                     .catch(error => {
                         if (error.response) {
+                            self.loading = false;
                         }
                     })
                     .then(function() {
+
+                        /* Hide skeleton
+                         */
                         self.loading = false;
                     });
-
-            /* Load into vue component
-             */
-
-            /* Hide skeleton
-             */
         },
 
         /**
@@ -126,15 +131,19 @@
                             </li>
                         </template>
                         <template v-else>
-                            <ul class="information-list">
-                                <li v-for="user in this.payload.users">
-                                    {{ user.id }} {{ user.role }} {{ user.fullname }}
+                            <li v-for="user in this.users">
+                                <div class="card small-12">
+                                    <a href="#" title="View Profile">
+                                        <img :src="'/portrait.php?userId=' + user.id + '&size=square64'" alt="View Profile" />
+                                        <p>{{ user.fullname }}</p>
+                                    </a>
+                                    <p class="meta">{{ user.role }}</p>
 
                                     <template v-if="user.occursAt">
-                                        {{ user.occursAt }}
+                                        <p class="meta">Last visited {{ user.occursAt }}</p>
                                     </template>
-                                </li>
-                            </ul>
+                                </div>
+                            </li>
                         </template>
                     </ul>
                 </section>
