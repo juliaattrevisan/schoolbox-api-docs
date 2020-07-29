@@ -9,7 +9,7 @@ namespace Schoolbox\Resource\Storage\Transform;
 
 use Aws\S3\S3Client;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -29,6 +29,11 @@ class Seeder extends App
     private $bucket;
 
     /**
+     * @var string
+     */
+    private $storageDir;
+
+    /**
      * @var StorageMapper
      */
     private $storageMapper;
@@ -36,7 +41,7 @@ class Seeder extends App
     /**
      * @var array
      */
-    private $transcodeImages;
+    private $transcodeImages = [];
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -86,6 +91,7 @@ class Seeder extends App
 
        $this->bucket        = trim($config->get('otfs_s3_bucket') ?? '');
        $this->storageMapper = StorageMapper::getInstance();
+       $this->storageDir    = trim($config->get('storage_dir'));
 
        $this->createStorageTransformSchema();
 
@@ -116,12 +122,12 @@ class Seeder extends App
    private function prepareData(): Seeder
    {
        // Get all images in storage table
-       $images = $this->storageMapper->findAll()->filter(static function($test) {
-            return strpos($test->getMimetype()->getMime(), 'image/') === 0;
+       $images = $this->storageMapper->findAll()->filter(static function(Model $images) {
+            return strpos($images->getMimetype()->getMime(), 'image/') === 0;
        });
 
-       /** @var Model $image */
        if ($images) {
+           /** @var Model $image */
            foreach ($images as $key => $image) {
                // Investigate file directories for available transcodes
                $this->generateListsOfTranscodedImages($image->getFilesystem(), $image);
@@ -134,17 +140,15 @@ class Seeder extends App
    }
 
     /**
-     * @param FilesystemInterface $fileSystem
-     * @param Model               $image
+     * @param Filesystem $fileSystem
+     * @param Model      $image
      */
-   private function generateListsOfTranscodedImages(FilesystemInterface $fileSystem, Model $image): void
+   private function generateListsOfTranscodedImages(Filesystem $fileSystem, Model $image): void
    {
-       $imagePath = $fileSystem->getAdapter()->getPathPrefix() . $image->getPath();
-
         if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
-            $this->getTranscodedImagesInS3Fs($imagePath);
+            $this->getTranscodedImagesInS3Fs('storage/' . $image->getPath());
         } else {
-            $this->getTranscodedImagesInLocalFs($imagePath);
+            $this->getTranscodedImagesInLocalFs($this->storageDir . "/" . $image->getPath());
         }
    }
 
