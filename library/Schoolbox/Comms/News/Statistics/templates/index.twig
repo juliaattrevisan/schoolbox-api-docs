@@ -72,6 +72,7 @@
         <h2 class="subheader">Recent Visitors</h2>
 
         {% include '@commsNewsStatistics/recent-visitors.twig' with {
+            article: article,
             users: recentVisitors
         } %}
     </div>
