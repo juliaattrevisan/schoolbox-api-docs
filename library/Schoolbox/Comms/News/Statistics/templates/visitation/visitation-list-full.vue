@@ -173,53 +173,61 @@
             <div class="small-12 island">
                 <h2 class="subheader">All Visitors</h2>
 
-                <section>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Last Visited</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template v-if="this.loading">
-                                <tr v-for="n in 3">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                <template v-if="this.allUsers.length || this.loading">
+                    <section>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Last Visited</th>
                                 </tr>
-                            </template>
-                            <template v-else>
-                                <tr v-for="user in this.users">
-                                    <td>
-                                        <a :href="'/search/user/' + user.id" :title="user.fullname">
-                                            {{ user.fullname }}
-                                        </a>
-                                    </td>
-                                    <td>{{ user.role }}</td>
-                                    <td>
-                                        <template v-if="user.occursAt">
-                                            {{ user.occursAt.nice }} ({{user.occursAt.relative}})
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </section>
-                <template v-if="!this.loading">
-                    <Paginate
-                        v-model="page"
-                        :page-count="pageCount"
-                        :container-class="'pagination'"
-                        :prev-text="'‹'"
-                        :next-text="'›'"
-                        :prev-link-class="'arrow'"
-                        :next-link-class="'arrow'"
-                        :disabled-class="'unavailable'"
-                        :click-handler="onPaginate"
-                    ></Paginate>
+                            </thead>
+                            <tbody>
+                                <template v-if="this.loading">
+                                    <tr v-for="n in 3">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </template>
+                                <template v-else>
+                                    <tr v-for="user in this.users">
+                                        <td>
+                                            <a :href="'/search/user/' + user.id" :title="user.fullname">
+                                                {{ user.fullname }}
+                                            </a>
+                                        </td>
+                                        <td>{{ user.role }}</td>
+                                        <td>
+                                            <template v-if="user.occursAt">
+                                                {{ user.occursAt.nice }} ({{user.occursAt.relative}})
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </section>
+                    <template v-if="!this.loading">
+                        <Paginate
+                            v-model="page"
+                            :page-count="pageCount"
+                            :container-class="'pagination'"
+                            :prev-text="'‹'"
+                            :next-text="'›'"
+                            :prev-link-class="'arrow'"
+                            :next-link-class="'arrow'"
+                            :disabled-class="'unavailable'"
+                            :click-handler="onPaginate"
+                        ></Paginate>
+                    </template>
+                </template>
+                <template v-else>
+                    <div class="empty-state" v-if="!this.loading">
+                        <i class="icon-staff"></i>
+                        <p>Nobody has visited yet.</p>
+                    </div>
                 </template>
             </div>
         </div>
