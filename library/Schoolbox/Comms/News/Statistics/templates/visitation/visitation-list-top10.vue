@@ -70,7 +70,7 @@
             /* Fetch payload asynchronously
              */
             let request = {
-                url: ENDPOINTS.payloadFullPath(this.payload.article.id),
+                url: ENDPOINTS.payloadTop10Path(this.payload.article.id),
                 method: 'get',
                 responseType: 'json'
             }
@@ -115,46 +115,6 @@
     <div>
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">All Visitors</h2>
-
-
-                <section>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Last Visited</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template v-if="this.loading">
-                                <tr v-for="n in 3">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </template>
-                            <template v-else>
-                                <tr v-for="user in this.users">
-                                    <td>
-                                        <a :href="'/search/user/' + user.id" :title="user.fullname + ' (last visited ' + user.occursAt.relative + ')'">
-                                            {{ user.fullname }}
-                                        </a>
-                                    </td>
-                                    <td>{{ user.role }}</td>
-                                    <td>
-                                        <template v-if="user.occursAt">
-                                            {{ user.occursAt.nice }} ({{user.occursAt.relative}})
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </section>
-
-
                 <h2 class="subheader">Top 10 Visitors</h2>
 
                 <section>
@@ -173,11 +133,20 @@
                         <template v-else>
                             <li v-for="user in this.users">
                                 <div class="card small-12">
-                                    <a :href="'/search/user/' + user.id" :title="user.fullname + ' (last visited ' + user.occursAt.relative + ')'">
-                                        <img :src="'/portrait.php?userId=' + user.id + '&size=square64'" alt="View Profile" />
+                                    <template v-if="user.occursAt">
+                                        <a :href="'/search/user/' + user.id" :title="user.fullname + ' (last visited ' + user.occursAt.relative + ')'">
+                                            <img :src="'/portrait.php?userId=' + user.id + '&size=square64'" alt="View Profile" />
 
-                                        <p>{{ user.fullname }}</p>
-                                    </a>
+                                            <p>{{ user.fullname }}</p>
+                                        </a>
+                                    </template>
+                                    <template v-else>
+                                        <a :href="'/search/user/' + user.id" :title="user.fullname">
+                                            <img :src="'/portrait.php?userId=' + user.id + '&size=square64'" alt="View Profile" />
+
+                                            <p>{{ user.fullname }}</p>
+                                        </a>
+                                    </template>
                                     <p class="meta">{{ user.role }}</p>
                                 </div>
                             </li>
