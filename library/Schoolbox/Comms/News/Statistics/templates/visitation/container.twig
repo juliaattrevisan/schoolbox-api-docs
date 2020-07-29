@@ -9,12 +9,15 @@
     'article': article
 } %}
 
-<h1>Container for Vue initialisation</h1>
-<p>Our vue component gets initialised here</p>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ article.title }}</h1>
+    </div>
+</div>
 
 <div id="visitation-list-container">
-    <visitation-list :payload="{{ payload | json_encode }}"></visitation-list>
+    <visitation-list-top10 :payload="{{ payload | json_encode }}"></visitation-list-top10>
 </div>
 
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="/javascript/components/visitationList.bundle.js"></script>
+<script src="/javascript/components/visitationListTop10.bundle.js"></script>

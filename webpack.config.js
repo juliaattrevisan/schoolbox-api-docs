@@ -16,7 +16,7 @@ module.exports = {
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
         eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
         calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
-        visitationList: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list.js'
+        visitationListTop10: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list-top10.js'
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),

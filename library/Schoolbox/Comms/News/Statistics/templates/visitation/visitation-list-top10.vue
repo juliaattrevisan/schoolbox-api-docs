@@ -6,7 +6,7 @@
          * The name of the component that we have here. This name will be used in the container
          * to spawn this component.
          */
-        name: "visitation-list",
+        name: "visitation-list-top10",
 
         /**
          * Mixins.
