@@ -18,9 +18,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Role;
+use Schoolbox\Learning\Authorizer\Rule\isInstructor;
 
 
 class Module extends BaseModule
