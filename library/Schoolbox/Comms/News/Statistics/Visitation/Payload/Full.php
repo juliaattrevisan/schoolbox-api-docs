@@ -155,7 +155,7 @@ class Full
 
         /* Sort by surname, then by firstname
          */
-        uasort($visitors, static function ($a, $b) {
+        uasort($users, static function ($a, $b) {
             if ($a['lastname'] === $b['lastname']) {
                 return $a['firstname'] > $b['firstname'];
             }
