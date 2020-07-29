@@ -162,17 +162,10 @@ class Controller extends Base
      */
     public function postDelete(Event $event): void
     {
-        $guests = $this->attendanceMapper->findAttendances($event);
-        $oldGuestIds = array_column($guests, 'id');
-
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id' => $this->request->post->get('userId'),
+            'user_id'  => $this->request->post->get('userId'),
         ]);
-
-        /** @var EventMapper $eventMapper */
-        $eventMapper = $this->attendanceMapper->getJoinMapper('event');
-        (new EventRecurrenceMapper($eventMapper, $this->attendanceMapper))->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $event->setGuests($oldGuestIds));
 
         /* Regenerate a new html fragment for the people currently invited
          */

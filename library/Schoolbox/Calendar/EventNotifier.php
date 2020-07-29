@@ -506,7 +506,6 @@ class EventNotifier extends AbstractModuleNotifier
         foreach ($newlyInvited as $guest) {
             $envelop->targetToUser($guest, $bob->build());
         }
-        // removing no longer invited users is handled by notifySystemInvited
 
         return $envelop;
     }
@@ -544,35 +543,6 @@ class EventNotifier extends AbstractModuleNotifier
     public function notifyParentInvited(Event $event, User $effector, ?array $diff = null): Envelope
     {
         return $this->notifyInvited(Role::PARENT, $event, $effector, $diff);
-    }
-
-    /**
-     * Retracts invitation from users who is no longer invited to this event
-     * @param Event      $event
-     * @param User       $effector
-     * @param array|null $diff
-     * @return Envelope
-     */
-    public function notifySystemInvited(Event $event, User $effector, ?array $diff = null): Envelope
-    {
-        $envelop = new Envelope();
-
-        if (null === $diff) {
-            return $envelop;
-        }
-
-        $noLongerInvited = array_diff($diff['guests'][1], $diff['guests'][0]);
-        if (empty($noLongerInvited)) {
-            return $envelop;
-        }
-        $bobRetract = new Builder(false);
-        $bobRetract->setNamespace(NSMapper::NS_CALENDAR)
-                   ->setHref(sprintf(self::EVENT_DETAIL_URL, $event->getId()))
-                   ->addTopic("calendar.{$event->getId()}." . self::TRIGGER_INVITED)
-                   ->setTitle(':user invited you to :name');
-        $envelop->retractForUsers($bobRetract->build(), $noLongerInvited);
-
-        return $envelop;
     }
 
     /**
