@@ -81,8 +81,9 @@ class Controller extends Base
      *
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \PDOException
      */
     public function getOverview(News\Model $article): void
     {
@@ -117,6 +118,10 @@ class Controller extends Base
              * Temporarily disabled
              */
             // 'historic' => $interactions->fetchHistoric($article),
+
+            /* Recent Visitors to this article
+             */
+            'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper))->generate($article)
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 

@@ -67,6 +67,16 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Recent Visitors</h2>
+
+        {% include '@commsNewsStatistics/recent-visitors.twig' with {
+            users: recentVisitors
+        } %}
+    </div>
+</div>
+
 {# Historical Dailies: temporarily disabled
  #
  # This seems to confuse people a lot, and there's a lot of numbers here
