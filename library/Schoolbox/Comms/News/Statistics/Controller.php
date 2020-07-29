@@ -201,7 +201,7 @@ class Controller extends Base
      * @param News\Model $article
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getVisitation(News\Model $article): void
+    public function getFull(News\Model $article): void
     {
 
         /* The user ids who were audienced
