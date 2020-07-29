@@ -84,10 +84,10 @@
 
                 <article v-if="!compactMode">
                     <div v-html="article.blurb"></div>
-                    <div class="article-read-more">
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
-                    </div>
                 </article>
+                <div class="article-read-more">
+                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                </div>
             </div>
         </li>
     </ul>

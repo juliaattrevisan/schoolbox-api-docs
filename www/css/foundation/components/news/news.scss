@@ -46,6 +46,10 @@
           }
         }
       }
+      .card-feature-avatar {
+        float: right;
+        margin: 0 0 0 1rem;
+      }
       .spacer {
         flex-grow: 1;
       }
@@ -61,6 +65,7 @@
       padding-top: .5rem;
     }
     .article-read-more {
+      margin-top: .5rem;
       text-transform: uppercase;
     }
   }

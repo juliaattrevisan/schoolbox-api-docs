@@ -76,12 +76,12 @@
                         </span>
                     </p>
 
-                    <article>
+                    <article v-if="!compactMode" >
                         <div v-html="article.blurb"></div>
                     </article>
                 </div>
                 <div class="card-actions">
-                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">Read more</a>
+                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
                     <div class="card-spacer"></div>
                     <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNewsPlural"></a>
                     <a v-if="configSaveForLater" @click="saveForLater(article)"
