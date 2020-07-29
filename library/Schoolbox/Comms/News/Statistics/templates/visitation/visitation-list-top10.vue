@@ -70,7 +70,7 @@
             /* Fetch payload asynchronously
              */
             let request = {
-                url: ENDPOINTS.payloadTop10Path(this.payload.article.id),
+                url: ENDPOINTS.payloadFullPath(this.payload.article.id),
                 method: 'get',
                 responseType: 'json'
             }
@@ -115,6 +115,42 @@
     <div>
         <div class="row">
             <div class="small-12 island">
+                <h2 class="subheader">All Visitors</h2>
+
+
+                <section>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Last Visited</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-if="this.loading">
+                                <tr v-for="n in 3">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="user in this.users">
+                                    <td>{{ user.fullname }}</td>
+                                    <td>{{ user.role }}</td>
+                                    <td>
+                                        <template v-if="user.occursAt">
+                                            {{ user.occursAt.absolute }} ({{user.occursAt.relative}})
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </section>
+
+
                 <h2 class="subheader">Top 10 Visitors</h2>
 
                 <section>

@@ -95,9 +95,14 @@ class Full
         $visitors = [];
 
         foreach ($statement as $stat) {
+            $relative = (new \Alaress_Date_Format($stat['occurs_at'], \Alaress_Date_Format::DATABASE_FORMAT))->getRelativeTime();
+
             $visitors[$stat['user_id']] = [
                 'id' => $stat['user_id'],
-                'occursAt' => $stat['occurs_at'],
+                'occursAt' => [
+                    'relative' => $relative,
+                    'absolute' => $stat['occurs_at']
+                ],
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],

@@ -8,6 +8,10 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_VISITATION_PAYLOAD_FULL: '/news/statistics/{articleId}/visitation/full',
 
+    /* Url for the Full report
+     */
+    URL_VISITATION_FULL: '/news/statistics/{articleId}/visitation/full',
+
     /**
      * Generate a path via const
      *
