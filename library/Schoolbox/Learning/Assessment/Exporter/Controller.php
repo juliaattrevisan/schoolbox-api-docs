@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
@@ -106,10 +105,9 @@ class Controller extends BaseController
      * @since 165
      *
      * @param IAssessable $assessment Assessment specification
+     * @throws MapperException
+     * @throws RouteNotFound
      * @throws ServiceNotFound
-     * @throws \DomainException
-     * @throws DefinitionException
-     * @throws \UnexpectedValueException|MapperException
      */
     public function getExportForm(IAssessable $assessment): void
     {
@@ -125,6 +123,16 @@ class Controller extends BaseController
         // Load participants into imported assessments
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
 
+        $breadcrumbs = [
+            ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
+            [$assessment->getBaseContext()->getTitle(), '/homepage/' . $assessment->getBaseContext()->getFolder()->getId()],
+        ];
+        if ($assessment->getContext() instanceof Project) {
+            $breadcrumbs[] = [$assessment->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId'=>$assessment->getContext()->getId()])];
+        }
+        $breadcrumbs[] = [$assessment->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId'=>$assessment->getId()])];
+        $breadcrumbs[] = ['Export', '#'];
+
         $data = [
             'assessmentSpec'   => $assessment,
             'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
@@ -133,6 +141,7 @@ class Controller extends BaseController
             'imported'         => $imported,
             'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
             'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'breadcrumbs'      => $breadcrumbs
         ];
 
         $template = '@learningAssessmentExporter/export.twig';

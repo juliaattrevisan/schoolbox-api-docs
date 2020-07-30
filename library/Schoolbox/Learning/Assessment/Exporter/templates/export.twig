@@ -10,7 +10,8 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{#{{ bread.crumbsArray(breadcrumbs) }}#}
+
+{{ bread.crumbsArray(breadcrumbs) }}
 <script type="text/javascript">
     $(function () {
         var $importForm   = $('#importForm'),
@@ -31,7 +32,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Export {{ assessmentSpec.typeName }}: {{ assessmentSpec.title }}</h1>
+        <h1>Export {{ assessmentSpec.title }}</h1>
     </div>
 </div>
 <div class="row">
@@ -39,7 +40,7 @@
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
-                <p>There are no open classes that currently use this {{ locale.unit }}.</p>
+                <p>There are no open classes that currently use this  {{ assessmentSpec.context is project ? 'project' : locale.unit }}.</p>
             </div>
         </div>
     {% else %}
