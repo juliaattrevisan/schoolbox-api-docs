@@ -672,6 +672,9 @@ $rotate-span-width: 11rem;
 %content {
     padding: rem-calc(($base-font-size - 4));
 
+    .subheader {
+        margin-top: 0;
+    }
     p:last-child{
         margin: 0;
     }
