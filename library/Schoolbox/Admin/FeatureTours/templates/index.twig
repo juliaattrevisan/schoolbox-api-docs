@@ -7,37 +7,33 @@
         <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
             <section>
                 <fieldset class="content">
-
                     <div class="small-12 columns">
                         <label for="tours-enabled">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
-                        <span class="switch">
+                        <div class="switch">
                             <input id="tours-enabled" type="checkbox" name="enabled" {% if toursEnabled %}checked{% endif %}/>
                             <label for="tours-enabled">
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
-                        </span>
+                        </div>
                     </div>
-
                 </fieldset>
 
                 <fieldset class="content {% if not toursEnabled %}hide{% endif %}" id="available-tours">
-
                     <legend>Available Tours</legend>
 
                     <ul class="information-list">
-
                         {% for tour in tours %}
                             <li>
                                 <div class="list-item">
                                     <div class="card small-1">
-                                    <span class="switch">
-                                        <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
-                                        <label for="tour-enable-{{ tour.uuid }}">
-                                            <span>On</span>
-                                            <span>Off</span>
-                                        </label>
-                                    </span>
+                                        <div class="switch">
+                                            <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
+                                            <label for="tour-enable-{{ tour.uuid }}">
+                                                <span>On</span>
+                                                <span>Off</span>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="card small-11">
                                         <h3>{{ tour.title }}</h3>
@@ -48,10 +44,8 @@
                                 </div>
                             </li>
                         {% endfor %}
-
                     </ul>
                 </fieldset>
-
             </section>
 
             <div class="row">
@@ -59,9 +53,7 @@
                     <input type="submit" name="submit" value="Save">
                 </div>
             </div>
-
         </form>
-
     </div>
 </div>
 
