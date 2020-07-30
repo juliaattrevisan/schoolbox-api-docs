@@ -32,7 +32,9 @@
 {% endblock helpText %}
 
 {% block form %}
-    {% if not hasExternalDb %}
-        {{ parent() }}
+    {% if hasExternalDb is defined %}
+        {% if not hasExternalDb %}
+            {{ parent() }}
+        {% endif %}
     {% endif %}
 {% endblock form %}
