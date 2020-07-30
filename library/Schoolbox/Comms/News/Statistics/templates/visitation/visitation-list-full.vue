@@ -171,8 +171,6 @@
     <div>
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">All Visitors</h2>
-
                 <template v-if="this.allUsers.length || this.loading">
                     <section>
                         <table>
