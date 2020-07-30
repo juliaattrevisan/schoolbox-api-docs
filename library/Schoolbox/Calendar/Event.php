@@ -429,9 +429,9 @@ class Event implements ISoftDeletable
     /**
      * Get access
      *
-     * @return int
+     * @return null|int
      */
-    public function getAccess(): int
+    public function getAccess(): ?int
     {
         return $this->access;
     }

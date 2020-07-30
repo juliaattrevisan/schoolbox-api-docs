@@ -450,4 +450,14 @@ class EventConnector extends EventMapper
         $this->user = $user;
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function populateGuests($event)
+    {
+        // do nothing
+        return $event;
+    }
+
 }

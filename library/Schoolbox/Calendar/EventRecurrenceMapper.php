@@ -13,7 +13,6 @@ use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use DateTime;
 use Schoolbox;
-use Schoolbox\Calendar\Event\Attendance\Mapper as AttendanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
@@ -42,20 +41,13 @@ class EventRecurrenceMapper
     protected $firstEventIdInSeries = 0;
 
     /**
-     * @var AttendanceMapper
-     */
-    private $attendanceMapper;
-
-    /**
      * Constructor
      *
      * @param EventMapper      $eventMapper
-     * @param AttendanceMapper $attendanceMapper
      */
-    public function __construct($eventMapper, AttendanceMapper $attendanceMapper)
+    public function __construct($eventMapper)
     {
         $this->eventMapper      = $eventMapper;
-        $this->attendanceMapper = $attendanceMapper;
     }
 
     /**
@@ -161,7 +153,7 @@ class EventRecurrenceMapper
 
             /* Remember first event id in a series
              */
-            $this->firstEventIdInSeries = $event->getId();
+            $this->setFirstEventIdInSeries($event->getId());
 
             try {
                 /** @var Event $previous */
@@ -170,8 +162,7 @@ class EventRecurrenceMapper
                     $event->getId(),
                     ['cache' => false]
                 );
-                $guests = $this->attendanceMapper->findAttendances($previous);
-                $previous->setGuests(array_column($guests, 'id'));
+                $previous = $this->eventMapper->populateGuests($previous);
             } catch (MapperException $e) {
                 $previous = null;
             }
@@ -391,18 +382,11 @@ class EventRecurrenceMapper
             return false;
         }
 
-        $currentGuests = $this->attendanceMapper->findAttendances($object);
-        $currentGuestIds = array_column($currentGuests, 'id');
-
         try {
             // TODO: diff doesn't work for roles, folders and campuses
             $diff = $previous && ($verb != Schoolbox\Mapper::METHOD_DELETE) ? $this->eventMapper->diff($object, $previous) : null;
         } catch (MapperException $e) {
             return false;
-        }
-        // add guests to diff
-        if ($previous && $currentGuestIds !== $previous->getGuests()) {
-            $diff['guests'] = [$currentGuestIds, $previous->getGuests()];
         }
         $this->eventMapper->getEventPropagator()->propagate($sessionData['user'], $verb, $object, $this->eventMapper, $diff);
         return true;
@@ -428,8 +412,8 @@ class EventRecurrenceMapper
 
             /* Remember first event id in a series
              */
-            if (!$this->firstEventIdInSeries) {
-                $this->firstEventIdInSeries = $event->getId();
+            if (!$this->getFirstEventIdInSeries()) {
+                $this->setFirstEventIdInSeries($event->getId());
             }
 
             // Assign relations
@@ -515,5 +499,25 @@ class EventRecurrenceMapper
         }
 
         return $collection;
+    }
+
+    /**
+     * Set first event id in series
+     *
+     * @param int $firstEventIdInSeries
+     */
+    protected function setFirstEventIdInSeries($firstEventIdInSeries)
+    {
+        $this->firstEventIdInSeries = $firstEventIdInSeries;
+    }
+
+    /**
+     * Get first event id in series
+     *
+     * @return int
+     */
+    public function getFirstEventIdInSeries()
+    {
+        return $this->firstEventIdInSeries;
     }
 }

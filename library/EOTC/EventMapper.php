@@ -18,6 +18,7 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -710,5 +711,21 @@ class EventMapper extends CalendarEventMapper
     public function homepageClean($cid)
     {
         // noop
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function populateGuests($event)
+    {
+        return $event;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function diff($objectA, $objectB = null, $keys = [0, 1])
+    {
+        return Mapper::diff($objectA, $objectB, $keys);
     }
 }

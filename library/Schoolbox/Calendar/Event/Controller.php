@@ -311,7 +311,7 @@ class Controller extends Base
 
         /* Recurrence
          */
-        $recurrence = $event->getSeriesId() ? (new EventRecurrenceMapper($this->eventMapper, $this->attendanceMapper))->getSeriesRecurrence($event) : [];
+        $recurrence = $event->getSeriesId() ? (new EventRecurrenceMapper($this->eventMapper))->getSeriesRecurrence($event) : [];
 
         /* Folders that you can choose, plus their current selection states
          */
@@ -708,7 +708,7 @@ class Controller extends Base
 
         /* Save this event and any recurring incidents too
          */
-        (new EventRecurrenceMapper($this->eventMapper, $this->attendanceMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
+        (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         /* Apply redirect - go back to the place from whence you came
          */

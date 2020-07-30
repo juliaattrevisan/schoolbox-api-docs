@@ -17,6 +17,7 @@ use Alaress_Date_Format;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Schoolbox\Calendar\Event\Attendance\Model as EventAttendance;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -43,7 +44,7 @@ class EventNotifier extends AbstractModuleNotifier
     private const EVENT_DETAIL_URL = '/calendar/event/%d';
 
     // attributes to notify when updated
-    private const UPDATE_ATTR = ['title', 'detail', 'location', 'startDateTime', 'attendance', 'maxAttendees'];
+    private const UPDATE_ATTR = ['title', 'detail', 'location', 'startDateTime', 'maxAttendees'];
 
     /**
      * @inheritdoc
@@ -58,14 +59,6 @@ class EventNotifier extends AbstractModuleNotifier
             'setMapper'           => $mf->getLazy(EventMapper::class),
             'setAttendanceMapper' => $mf->getLazy(AttendanceMapper::class),
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($configLoader)
-    {
-        parent::__construct($configLoader);
     }
 
     /**
@@ -394,6 +387,16 @@ class EventNotifier extends AbstractModuleNotifier
                 throw new \DomainException("Event not Campus, Group or Personal");
         }
 
+        // notify to invitees excluding declined
+        $guests = $this->attendanceMapper->findAttendances($event);
+        foreach ($guests as $guest) {
+            if ($guest['status'] === EventAttendance::STATUS_DECLINED) {
+                continue;
+            }
+            foreach ($instances as $instance) {
+                $envelope->targetToUser($guest['id'], $instance);
+            }
+        }
         return $envelope;
     }
 
@@ -475,23 +478,23 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyInvited(string $roleType, Event $event, User $effector, ?array $diff = null): Envelope
     {
-        $envelop = new Envelope();
+        $envelope = new Envelope();
 
         if (null === $diff) {
             $newlyInvited = array_column($this->attendanceMapper->findAttendances($event), 'id');
-        } elseif ($diff['guests']) {
-            $newlyInvited = array_diff($diff['guests'][0], $diff['guests'][1]);
+        } elseif (isset($diff['guests'])) {
+            $newlyInvited = array_diff($diff['guests'][0] ?? [], $diff['guests'][1] ?? []);
         }
 
         if (empty($newlyInvited)) {
-            return $envelop;
+            return $envelope;
         }
 
         /** @var Event $event */
         try {
             $event = $this->mapper->findById($event->getId());
         } catch (MapperException $e) {
-            return $envelop;
+            return $envelope;
         }
 
         $bob = $this->newBuilder(self::TRIGGER_INVITED, $roleType, $event)
@@ -504,10 +507,10 @@ class EventNotifier extends AbstractModuleNotifier
                         ]);
 
         foreach ($newlyInvited as $guest) {
-            $envelop->targetToUser($guest, $bob->build());
+            $envelope->targetToUser($guest, $bob->build());
         }
 
-        return $envelop;
+        return $envelope;
     }
 
     /**

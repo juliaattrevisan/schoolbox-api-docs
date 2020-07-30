@@ -15,7 +15,6 @@ use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -54,20 +53,25 @@ class Controller extends Base
 
 
     /**
+     * @var EventRecurrenceMapper
+     */
+    private $eventRecurrenceMapper;
+
+    /**
      * Controller constructor.
      *
-     * @param Error\Mapper $errorMapper
-     * @param Mapper       $attendanceMapper
-     * @param UserMapper   $userMapper
+     * @param Error\Mapper          $errorMapper
+     * @param Mapper                $attendanceMapper
+     * @param UserMapper            $userMapper
+     * @param EventRecurrenceMapper $eventRecurrenceMapper
      */
     public function __construct(
-        Error\Mapper $errorMapper,
-        Mapper $attendanceMapper,
-        UserMapper $userMapper
+        Error\Mapper $errorMapper, Mapper $attendanceMapper, UserMapper $userMapper, EventRecurrenceMapper $eventRecurrenceMapper
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->attendanceMapper = $attendanceMapper;
-        $this->userMapper = $userMapper;
+        $this->errorMapper           = $errorMapper;
+        $this->attendanceMapper      = $attendanceMapper;
+        $this->userMapper            = $userMapper;
+        $this->eventRecurrenceMapper = $eventRecurrenceMapper;
     }
 
 
@@ -127,6 +131,9 @@ class Controller extends Base
             return;
         }
 
+        $previous = clone $event;
+        $previous->setGuests($oldGuestIds);
+
         /* Don't exceed the maximum number of guests, if one was specified
          */
         if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
@@ -140,9 +147,7 @@ class Controller extends Base
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
 
-        /** @var EventMapper $eventMapper */
-        $eventMapper = $this->attendanceMapper->getJoinMapper('event');
-        (new EventRecurrenceMapper($eventMapper, $this->attendanceMapper))->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $event->setGuests($oldGuestIds));
+        $this->eventRecurrenceMapper->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $previous);
 
         /* Regenerate a new payload for the people currently invited
          */
