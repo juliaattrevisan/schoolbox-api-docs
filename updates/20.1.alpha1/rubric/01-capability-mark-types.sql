@@ -6,4 +6,4 @@ ALTER TABLE `submission_box`
 -- rubric_mark_per_capability is now known as rubric_capability_mark_type_id
 
 ALTER TABLE `submission_box`
-    CHANGE COLUMN `rubric_mark_per_capability` `rubric_capability_mark_type_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
+    CHANGE COLUMN `rubric_mark_per_capability` `rubric_capability_mark_type_id` INT(11) UNSIGNED NULL DEFAULT '0' ;
