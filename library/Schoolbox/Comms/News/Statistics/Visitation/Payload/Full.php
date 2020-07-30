@@ -119,9 +119,24 @@ class Full
         /* This diff represents users that didn't visit the article, so we'll need to get
          * their details separately; they won't have any data from visiting. To minimise
          * hydration and mapper funsies, try to get a minimal set
+         *
+         * Calculate diff,
+         * Cast everything to int to prevent weirdness,
+         * Implode into a sql-compatible piece,
+         * Shank it in
          */
-        $tempIds = array_diff($currentlyAudiencedIds, array_keys($visitors));
-        $tempUsers = $this->userMapper->findByColumn('id', $tempIds);
+        $tempIds = implode(',', array_map('\intval', array_diff($currentlyAudiencedIds, array_keys($visitors))));
+
+        $tempUsers = $this->userMapper->getDatabase()->prepare("
+            SELECT
+                u.id, u.title, u.firstname, u.lastname,
+                r.`name` AS `role`
+            FROM {$this->userMapper->getTable()} u
+            LEFT JOIN `groups` r ON u.group_id = r.id
+            WHERE u.id IN ({$tempIds})
+        ");
+
+        $tempUsers->execute();
 
         /* Dispense with all the object data we don't actually use and store it as a flat
          * hierarchy instead, so we can overlay it with visitor data
@@ -130,13 +145,13 @@ class Full
 
         foreach ($tempUsers as $tempUser) {
             $users[] = [
-                'id' => $tempUser->getId(),
+                'id' => $tempUser['id'],
                 'occursAt' => null,
-                'title' => $tempUser->getTitle(),
-                'firstname' => $tempUser->getFirstname(),
-                'lastname' => $tempUser->getLastname(),
-                'fullname' => $tempUser->getFullName(),
-                'role' => $tempUser->getRole()->getName()
+                'title' => $tempUser['title'],
+                'firstname' => $tempUser['firstname'],
+                'lastname' => $tempUser['lastname'],
+                'fullname' => trim("{$tempUser['title']} {$tempUser['firstname']} {$tempUser['lastname']}"),
+                'role' => $tempUser['role']
             ];
         }
 
