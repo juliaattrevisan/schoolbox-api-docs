@@ -120,6 +120,10 @@ class Full
          */
         $currentlyAudiencedIds = $this->userResolver->findUsersForArticle($article);
 
+        /* TODO Edge case
+         *  Does the hyperdrive know about deleted users/do we care about deleted users?
+         */
+
         /* This diff represents users that didn't visit the article, so we'll need to get
          * their details separately; they won't have any data from visiting. To minimise
          * hydration and mapper funsies, try to get a minimal set
@@ -175,10 +179,6 @@ class Full
 
             return ($a['lastname'] > $b['lastname']);
         });
-
-        /* TODO Edge case
-         *  Does the hyperdrive know about deleted users/do we care about deleted users?
-         */
 
         return array_values($users);
     }
