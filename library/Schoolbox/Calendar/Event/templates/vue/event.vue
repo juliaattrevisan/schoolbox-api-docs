@@ -493,6 +493,17 @@
                     <h1>{{ this.event.title }}</h1>
                     <div class="event-type label" :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</div>
                 </div>
+                <div class="meta">
+                    <span v-html="byLine"></span>
+                    <template v-if="audiencesMeta"> |
+                        <span v-if="this.isCampusEvent"><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
+                        <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
+                        <span v-else-if="this.isGroupEvent">
+                            <span v-html="audiencesMeta"></span>
+                            <span v-if="this.event.audiences.folders.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
+                        </span>
+                    </template>
+                </div>
                 <article v-html="this.event.detail"></article>
             </section>
         </div>
