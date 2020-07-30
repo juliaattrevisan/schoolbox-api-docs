@@ -172,24 +172,26 @@
         <div class="row">
             <div class="small-12 island">
                 <template v-if="this.allUsers.length || this.loading">
-                    <section>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Role</th>
-                                    <th>Last Visited</th>
-                                </tr>
-                            </thead>
+                    <template v-if="this.loading">
+                        <table class="skeleton">
                             <tbody>
-                                <template v-if="this.loading">
-                                    <tr v-for="n in 3">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                            <tr v-for="n in 3">
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </template>
+                    <template v-else>
+                        <section>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Last Visited</th>
                                     </tr>
-                                </template>
-                                <template v-else>
+                                </thead>
+                                <tbody>
                                     <tr v-for="user in this.users">
                                         <td>
                                             <a :href="'/search/user/' + user.id" :title="user.fullname">
@@ -203,10 +205,10 @@
                                             </template>
                                         </td>
                                     </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </section>
+                                </tbody>
+                            </table>
+                        </section>
+                    </template>
                     <template v-if="!this.loading">
                         <Paginate
                             v-model="page"

@@ -1436,31 +1436,10 @@ $selector-width: 2.25rem;
     }
 }
 
-
 .socialstream-preview {
   background-color: $snow;
   font-size: $paragraph-font-size;
   padding: 1rem;
-}
-
-
-// Tables
-.table-actions{
-    [class^="icon-"]:before,
-    [class*=" icon-"]:before{
-        opacity: 0.5;
-        padding: rem-calc(($base-font-size - 2));
-        @include single-transition(all, 0.15s, linear);
-    }
-}
-
-tr:hover{
-    .table-actions{
-        [class^="icon-"]:before,
-        [class*=" icon-"]:before{
-            opacity: 1;
-        }
-    }
 }
 
 // Reveal
