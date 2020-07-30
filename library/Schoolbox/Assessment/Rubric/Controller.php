@@ -74,6 +74,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var Group\Mapper
+     */
+    private $gradeGroupMapper;
+
+
+    /**
      * Constructor
      *
      * @param RubricDataSource     $mapper
@@ -83,6 +89,7 @@ class Controller extends BaseController
      * @param Indicator\Mapper     $criterionMapper
      * @param RosettaStone         $rosettaStone
      * @param MarkTypeMapper       $markTypeMapper
+     * @param Group\Mapper         $gradeGroupMapper
      */
     public function __construct(
         RubricDataSource $mapper,
@@ -91,7 +98,8 @@ class Controller extends BaseController
         Capability\Mapper $groupMapper,
         Indicator\Mapper $criterionMapper,
         RosettaStone $rosettaStone,
-        MarkTypeMapper $markTypeMapper
+        MarkTypeMapper $markTypeMapper,
+        Group\Mapper $gradeGroupMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
@@ -100,6 +108,7 @@ class Controller extends BaseController
         $this->criterionMapper      = $criterionMapper;
         $this->rosettaStone         = $rosettaStone;
         $this->markTypeMapper       = $markTypeMapper;
+        $this->gradeGroupMapper     = $gradeGroupMapper;
     }
 
 
@@ -307,6 +316,17 @@ class Controller extends BaseController
             } else {
                 // can't work with that
                 throw new \Schoolbox\Mapper\Exception('No folder or box ID set');
+            }
+
+            // Use the mark type and grade group from the form,
+            // instead of what is persisted
+            $markTypeId = $post->get('markTypeId');
+            if ($markTypeId) {
+                $assessment->setMarkType($this->markTypeMapper->findById($markTypeId));
+            }
+            $gradeGroupId = $post->get('gradeGroupId');
+            if ($gradeGroupId) {
+                $assessment->setGradeGroup($this->gradeGroupMapper->findById($gradeGroupId));
             }
 
             // attempt to build the grid
