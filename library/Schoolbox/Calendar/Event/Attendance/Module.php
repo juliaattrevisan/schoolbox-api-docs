@@ -24,6 +24,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -140,9 +141,12 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
-            'attendanceMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'eventMapper'           => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'attendanceMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
+            'eventRecurrenceMapper' => $injector->lazyNew(EventRecurrenceMapper::class, [
+                'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
+            ]),
         ];
     }
 

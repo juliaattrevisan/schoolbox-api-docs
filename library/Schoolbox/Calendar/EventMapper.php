@@ -7,18 +7,20 @@
 namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
+use Event\Source\Mapper as EventSourceMapper;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\Calendar\Event\Attendance\Mapper as AttendanceMapper;
 use Schoolbox\Calendar\Relation\Category;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -195,7 +197,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * @param PDOStatement $statement
      * @return GenericCollection|Event[]
-     * @throws Exception
+     * @throws MapperException
      * @throws Schoolbox\Mapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -207,13 +209,14 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $folderMapper = $this->getJoinMapper('event_folder');
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
+        /** @var Schoolbox\RoleMapper $userRoleMapper */
         $userRoleMapper = $this->getJoinMapper('owner.role');
 
         /* Hydrate or die
          */
         $allEvents = [];
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             /* Assemble event pieces
              */
@@ -352,7 +355,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Post-save hook method
      *
      * @param Event $event
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
@@ -501,14 +504,14 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Assign source to an event
      *
      * @param Event $event
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
     private function createSource($event)
     {
         if ($event->getSource() != null && $event->getSource() != ""){
-            $sourceMapper = \Event\Source\Mapper::getInstance();
+            $sourceMapper = EventSourceMapper::getInstance();
 
             $source = $sourceMapper->createModel();
             $source->setCreatedAt($event->getCreatedAt());
@@ -549,7 +552,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * @param string $endDate
      * @param bool   $excludeResourceBookings
      * @return Collection
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws Schoolbox\Mapper\DefinitionException
      */
@@ -587,7 +590,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * @param int                 $seriesId
      * @param Alaress_Date_Format $now
      * @return Event
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      */
     public function findNextInSeries($seriesId, Alaress_Date_Format $now = null)
@@ -619,7 +622,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ));
 
         if (!$series->count()) {
-            throw new \Schoolbox\Mapper\Exception("No events in given series");
+            throw new MapperException("No events in given series");
         }
 
         return $series->first();
@@ -643,8 +646,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Removes all events from this folder ID
      *
      * @param int $fid
-     * @throws Exception
-     * @throws Exception\Deleted
+     * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws Schoolbox\Mapper\DefinitionException
      */
     public function homepageClean($fid)
@@ -662,6 +665,34 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             // soft delete events do not belong to any folder; if there is any
             $this->deleteEvents($folderSpecificEventIds);
         }
+    }
+
+    /**
+     * Populates guests
+     * @param Event $event
+     * @return Event
+     */
+    public function populateGuests($event)
+    {
+        $guests = AttendanceMapper::getInstance()->findAttendances($event);
+        $event->setGuests(array_column($guests, 'id'));
+        return $event;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function diff($objectA, $objectB = null, $keys = [0, 1])
+    {
+        /** @var Event $objectA */
+        /** @var Event $objectB */
+        $objectA = $this->populateGuests($objectA);
+        $diff    = parent::diff($objectA, $objectB, $keys);
+        // need to explicitly add guests to diff
+        if ($objectB && $objectA->getGuests() !== $objectB->getGuests()) {
+            $diff['guests'] = [$objectA->getGuests(), $objectB->getGuests()];
+        }
+        return $diff;
     }
 
     /**
@@ -703,8 +734,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
     /**
      * @param array $eventIds
-     * @throws Exception
-     * @throws Exception\Deleted
+     * @throws MapperException
      */
     private function deleteEvents(array $eventIds): void
     {

@@ -15,6 +15,7 @@ use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -52,20 +53,25 @@ class Controller extends Base
 
 
     /**
+     * @var EventRecurrenceMapper
+     */
+    private $eventRecurrenceMapper;
+
+    /**
      * Controller constructor.
      *
-     * @param Error\Mapper $errorMapper
-     * @param Mapper       $attendanceMapper
-     * @param UserMapper   $userMapper
+     * @param Error\Mapper          $errorMapper
+     * @param Mapper                $attendanceMapper
+     * @param UserMapper            $userMapper
+     * @param EventRecurrenceMapper $eventRecurrenceMapper
      */
     public function __construct(
-        Error\Mapper $errorMapper,
-        Mapper $attendanceMapper,
-        UserMapper $userMapper
+        Error\Mapper $errorMapper, Mapper $attendanceMapper, UserMapper $userMapper, EventRecurrenceMapper $eventRecurrenceMapper
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->attendanceMapper = $attendanceMapper;
-        $this->userMapper = $userMapper;
+        $this->errorMapper           = $errorMapper;
+        $this->attendanceMapper      = $attendanceMapper;
+        $this->userMapper            = $userMapper;
+        $this->eventRecurrenceMapper = $eventRecurrenceMapper;
     }
 
 
@@ -102,6 +108,7 @@ class Controller extends Base
     public function postCreate(Event $event): void
     {
         $guests = $this->attendanceMapper->findAttendances($event);
+        $oldGuestIds = array_column($guests, 'id');
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
         /* You can only create attendances if we let you
@@ -109,10 +116,9 @@ class Controller extends Base
         $ids = [];
 
         if ((new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))) {
-            $newGuests = explode(',', $this->request->post['guests'] ?? '');
-            $oldGuests = array_column($guests, 'id');
+            $newGuestIds = explode(',', $this->request->post->get('guests') ?? '');
 
-            $ids = array_diff($newGuests, $oldGuests);
+            $ids = array_diff($newGuestIds, $oldGuestIds);
         }
 
         /* Added a user who's already in the list
@@ -124,6 +130,9 @@ class Controller extends Base
             $this->getCurrent($event);
             return;
         }
+
+        $previous = clone $event;
+        $previous->setGuests($oldGuestIds);
 
         /* Don't exceed the maximum number of guests, if one was specified
          */
@@ -137,6 +146,8 @@ class Controller extends Base
                 ->setUser($this->userMapper->createModel()->setId($id))
                 ->setStatus(Event\Attendance\Model::STATUS_PENDING));
         }
+
+        $this->eventRecurrenceMapper->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $previous);
 
         /* Regenerate a new payload for the people currently invited
          */
@@ -158,7 +169,7 @@ class Controller extends Base
     {
         $this->attendanceMapper->deleteByColumnList([
             'event_id' => $event->getId(),
-            'user_id' => $this->request->post['userId']
+            'user_id'  => $this->request->post->get('userId'),
         ]);
 
         /* Regenerate a new html fragment for the people currently invited

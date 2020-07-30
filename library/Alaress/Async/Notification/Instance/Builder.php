@@ -81,6 +81,8 @@ class Builder implements BuilderInterface
 		$this->topics    = array();
 		$this->params    = array();
 		$this->meta      = array();
+		// Twig template requires body
+		$this->setBody('');
 
 		$this->namespace = '';
 		$this->title     = '';
