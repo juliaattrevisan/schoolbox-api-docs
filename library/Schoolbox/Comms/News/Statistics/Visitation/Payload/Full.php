@@ -72,6 +72,10 @@ class Full
     public function generate(News\Model $article): array
     {
         /* The user data for those who visited at least once
+         *
+         * This sql query looks weird because it performs a groupwise maximum
+         * without investing in a subselect
+         * https://stackoverflow.com/questions/15211479/groupwise-maximum
          */
         $statement = $this->statisticsMapper->getDatabase()->prepare("
             SELECT
