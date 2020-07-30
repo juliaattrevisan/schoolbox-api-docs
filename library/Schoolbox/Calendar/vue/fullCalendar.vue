@@ -18,6 +18,8 @@
     import axios                      from 'axios'
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
+    import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
+    import {ATTENDANCE_STATUS}        from '@schoolboxCalendarEvent/attendance-status';
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -48,6 +50,10 @@
     const FORMAT_DISPLAY_TIME = 'h:mma';
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
+
+    // Default event duration is 1 hour, default allday event span is 1 day
+    const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
+    const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
     export default {
         components: {
@@ -354,16 +360,7 @@
              * @param eventResizeInfo
              */
             onEventResize(eventResizeInfo) {
-                // TODO this needs to consider events in series
-                let event = eventResizeInfo.event,
-                    data  = {
-                        eventId: event?.extendedProps?.data?.meta?.eventId,
-                        resize:  true,
-                        start:   this.toMoment(event.start).format(),
-                        end:     this.toMoment(event.end).format(),
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+                this.moveEvent(eventResizeInfo.event);
             },
 
             /**
@@ -374,16 +371,60 @@
              * @param eventDropInfo
              */
             onEventDrop(eventDropInfo) {
-                let event = eventDropInfo.event,
-                    delta = toDuration(eventDropInfo.delta),
-                    data  = {
-                        eventId:     event?.extendedProps?.data?.meta?.eventId,
-                        minuteDelta: delta.asMinutes(),
-                        allDay:      event.allDay,
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+                // If an event is moved from all-day to a time:
+                // it won't have an end date, assume it lasts 1 hour
+                if (eventDropInfo.oldEvent.allDay && !eventDropInfo.event.allDay) {
+                    eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getTime() + DEFAULT_EVENT_DURATION));
+                }
+
+                // If event is moved from a time to all-day:
+                // it won't have an end date either, assume it lasts 1 day
+                if (!eventDropInfo.oldEvent.allDay && eventDropInfo.event.allDay) {
+                    eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getDate() + DEFAULT_ALLDAY_EVENT_DAYS));
+                }
+
+                // And move the event
+                this.moveEvent(eventDropInfo.event);
             },
+
+
+            /**
+             * Moves an existing event to its new start and end time.
+             *
+             * @param {Object} event
+             */
+            moveEvent(event) {
+                let self = this,
+                    data = {
+                        start:  this.toMoment(event.start).format(),
+                        end:    this.toMoment(event.end).format(),
+                        allDay: event.allDay,
+                    };
+
+                // Account for the difference in all-day end date between FullCalendar and Schoolbox:
+                // * Schoolbox events are inclusive of the end date
+                // * FullCalendar events are exclusive
+                // This means that all-day events need their end date set back
+                // one day before being sent to Schoolbox.
+                if (event.allDay) {
+                    data.end = this.toMoment(event.end).add({days: -1}).format();
+                }
+
+                // TODO this needs to consider events in series
+                axios
+                    .post(
+                        ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                        qs.stringify(data)
+                    )
+                    .then(function () {
+                        // Once done: all attendees are set back to Pending
+                        if (event?.extendedProps?.data?.attendance?.status?.current) {
+                            event.extendedProps.data.attendance.status.current = ATTENDANCE_STATUS.PENDING;
+                            self.$refs.fullCalendar.getApi().rerenderEvents();
+                        }
+                    });
+            },
+
 
             /**
              * Helper function for converting a Date object to a Moment object.

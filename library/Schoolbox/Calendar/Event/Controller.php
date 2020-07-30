@@ -717,6 +717,59 @@ class Controller extends Base
 
 
     /**
+     * Moves this event to a new time, without changing its duration, attendance
+     * or any other fields.
+     *
+     * @api   POST /calendar/event/{eventId}/move
+     * @since 20.1
+     *
+     * @param Event $event
+     */
+    public function postMove(Event $event): void
+    {
+        // Do not modify anything except the event's start/end/allDay
+        $start  = new Alaress_Date_Format($this->request->post->get('start'), \DateTime::ATOM);
+        $end    = new Alaress_Date_Format($this->request->post->get('end'), \DateTime::ATOM);
+        $allDay = $this->request->post->getBool('allDay');
+        if ($allDay) {
+            $event->setStartDate($start->getDatabase());
+            $event->setEndDate($end->getDatabase());
+        } else {
+            $event->setStartDateTime($start);
+            $event->setEndDateTime($end);
+        }
+        $event->setAllDay($allDay);
+
+        $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+
+        // And save it
+        $eventRelations = new EventRelations(
+            $event->getAccess(),
+            $event->getFolderCollection()->getPropertyValues('setCategoryId'),
+            $event->getRoleCollection()->getPropertyValues('roleId'),
+            array_column($payload['attendees']['guests'], 'id'),
+            // Attendance is dirty because this has moved
+            true
+        );
+
+        // Efficacy is only this item for now.
+        // It should be able to be: all instances, or all in the future
+        (new EventRecurrenceMapper($this->eventMapper))->save(
+            $event,
+            EventRecurrenceMapper::EFFICACY_SELF,
+            null,
+            null,
+            $event->getStartDateTime(),
+            $event->getEndDateTime(),
+            $event->getAccess(),
+            $eventRelations
+        );
+
+        // No real need to return anything
+    }
+
+
+    /**
      * Delete an event, or a set of events from a series
      *
      * @param Event $event
