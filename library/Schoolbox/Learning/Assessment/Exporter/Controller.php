@@ -125,6 +125,16 @@ class Controller extends BaseController
         // Load participants into imported assessments
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
 
+        $breadcrumbs = [
+            ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
+            [$assessment->getBaseContext()->getTitle(), '/homepage/'.$assessment->getBaseContext()->getFolder()->getId()],
+            [$assessment->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment',['assessmentId'=>$assessment->getId()])],
+        ];
+        if($assessment->getContext() instanceof Project) {
+            $breadcrumbs[] = [$assessment->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment',['assessmentId'=>$assessment->getContext()->getId()])];
+        }
+        $breadcrumbs[] = ['Export', '#'];
+
         $data = [
             'assessmentSpec'   => $assessment,
             'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
@@ -133,6 +143,7 @@ class Controller extends BaseController
             'imported'         => $imported,
             'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
             'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'breadcrumbs'      => $breadcrumbs
         ];
 
         $template = '@learningAssessmentExporter/export.twig';
