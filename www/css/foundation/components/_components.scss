@@ -42,7 +42,8 @@
 }
 
 .component-action{
-    section{
+    section {
+        display: flex;
         background-color: rgba(0,0,0,0.02) !important;
         border-top: 1px solid $body-bg;
         border-bottom: 3px solid $body-bg;
@@ -91,6 +92,9 @@
         @extend .meta;
         font-size: 0.8125rem;
         padding: 0.5rem 0.5rem 0;
+    }
+    .spacer {
+        flex-grow: 1;
     }
 }
 

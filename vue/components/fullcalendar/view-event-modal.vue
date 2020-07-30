@@ -690,37 +690,39 @@
                                 <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
                             </span>
                         </div>
-
-                        <!-- Various buttons -->
-                        <span v-if="eventExtendedProps.folder.id">
-                            <a class="button"
-                               :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
-                        </span>
-                        <span v-if="eventExtendedProps.links.view">
-                            <a class="button"
-                               :href="eventExtendedProps.links.view">View More Details</a>
-                        </span>
-                        <span v-if="eventExtendedProps.classAttendance.url">
-                            <a class="button"
-                               :href="eventExtendedProps.classAttendance.url"
-                               :target="eventExtendedProps.classAttendance.target">Mark Attendance</a>
-                        </span>
-                        <span v-if="eventExtendedProps.links.modify">
-                            <a class="button"
-                               :href="eventExtendedProps.links.modify">Modify</a>
-                        </span>
-                        <span v-if="eventExtendedProps.links.delete">
-                            <a class="button"
-                               :href="eventExtendedProps.links.delete"
-                               @click.prevent="$refs.eventDeleteModal.open">Delete</a>
-                        </span>
-                        <!-- Booking buttons: handle random events -->
-                        <span v-for="action in eventExtendedProps.booking.actions">
-                            <a class="button"
-                               :data-booking-action="String(action.action)"
-                               @click="clickBookingButton($event)"
-                               :href="action.href || '#'">{{ action.label }}</a>
-                        </span>
+                        <span class="spacer"></span>
+                        <div>
+                            <!-- Various buttons -->
+                            <span v-if="eventExtendedProps.folder.id">
+                                <a class="button"
+                                   :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
+                            </span>
+                            <span v-if="eventExtendedProps.links.view">
+                                <a class="button"
+                                   :href="eventExtendedProps.links.view">View More Details</a>
+                            </span>
+                            <span v-if="eventExtendedProps.classAttendance.url">
+                                <a class="button"
+                                   :href="eventExtendedProps.classAttendance.url"
+                                   :target="eventExtendedProps.classAttendance.target">Mark Attendance</a>
+                            </span>
+                            <span v-if="eventExtendedProps.links.modify">
+                                <a class="button"
+                                   :href="eventExtendedProps.links.modify">Modify</a>
+                            </span>
+                            <span v-if="eventExtendedProps.links.delete">
+                                <a class="button"
+                                   :href="eventExtendedProps.links.delete"
+                                   @click.prevent="$refs.eventDeleteModal.open">Delete</a>
+                            </span>
+                            <!-- Booking buttons: handle random events -->
+                            <span v-for="action in eventExtendedProps.booking.actions">
+                                <a class="button"
+                                   :data-booking-action="String(action.action)"
+                                   @click="clickBookingButton($event)"
+                                   :href="action.href || '#'">{{ action.label }}</a>
+                            </span>
+                        </div>
                     </section>
                 </div>
             </template>

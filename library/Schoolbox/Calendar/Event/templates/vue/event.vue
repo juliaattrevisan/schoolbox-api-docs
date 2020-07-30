@@ -476,38 +476,31 @@
 </script>
 
 <template>
-    <div>
-        <div class="small-12 columns" v-if="canModify()">
-            <div class="actions-small-2 row">
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="actions-small-1 row" v-if="canModify()">
+                <div class="list-item"></div>
                 <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
-            <h2 class="subheader">Event Details</h2>
             <section class="detail content">
                 <div class="title-section">
+                    <time class="icon">
+                        <strong> {{ monthDisplay }}</strong>
+                        <span>{{ dateDisplay }}</span>
+                    </time>
                     <h1>{{ this.event.title }}</h1>
                     <div class="event-type label" :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</div>
-                </div>
-                <div class="meta">
-                    <span v-html="byLine"></span>
-                    <template v-if="audiencesMeta"> |
-                        <span v-if="this.isCampusEvent"><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
-                        <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
-                        <span v-else-if="this.isGroupEvent">
-                            <span v-html="audiencesMeta"></span>
-                            <span v-if="this.event.audiences.folders.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
-                        </span>
-                    </template>
                 </div>
                 <article v-html="this.event.detail"></article>
             </section>
         </div>
 
         <div class="small-12 medium-4 island">
-            <h2 class="subheader">Date and Time</h2>
             <section class="detail">
                 <div class="content">
+                    <h2 class="subheader">Date and Time</h2>
                     <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
                     <div v-if="this.event.location">
                         <h2 class="subheader">Location</h2>
@@ -518,9 +511,8 @@
 
             <template v-if="showGuestsPanel()">
                 <h2 class="subheader">Guests</h2>
-
                     <template v-if="this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable)">
-                        <section class="content">
+                        <section class="content attending">
                             <p><strong>Attending?</strong></p>
 
                             <ul class="flex-list buttons rsvp">
