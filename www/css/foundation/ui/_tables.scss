@@ -3,6 +3,32 @@ table th {
   position: relative; // This is to stop the user's viewport from jumping when there's a checkbox inside of a cell
 }
 
+// Table Skeleton
+table.skeleton {
+  tr {
+    height: 2rem;
+  }
+}
+
+// Table Actions
+.table-actions {
+  [class^="icon-"]:before,
+  [class*=" icon-"]:before{
+    opacity: 0.5;
+    padding: rem-calc(($base-font-size - 2));
+    @include single-transition(all, 0.15s, linear);
+  }
+}
+
+tr:hover {
+  .table-actions{
+    [class^="icon-"]:before,
+    [class*=" icon-"]:before{
+      opacity: 1;
+    }
+  }
+}
+
 #marksheet-styles tr td {
   vertical-align: middle;
 }

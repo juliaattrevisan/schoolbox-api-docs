@@ -1,0 +1,35 @@
+{##
+ # Recent Visitors
+ #
+ # @param News\Model $article  An instance of News\Model, a news article
+ # @param array $users         A list of users who recently visited
+ #}
+<section>
+    <ul class="grid small-block-grid-1 medium-block-grid-2">
+        {% for user in users %}
+        <li>
+            <div class="card small-12">
+                {% if user.occursAt %}
+                    <a href="/search/user/{{ user.id }}" title="{{ user.fullname }} (last visited {{ user.occursAt.relative }})">
+                        <img src="/portrait.php?id={{ user.id }}&size=square64" alt="View Profile" />
+
+                        <p>{{ user.fullname }}</p>
+                    </a>
+                {% else %}
+                    <a href="/search/user/{{ user.id }}" title="{{ user.fullname }}">
+                        <img src="/portrait.php?userId={{ user.id }}&size=square64" alt="View Profile" />
+
+                        <p>{{ user.fullname }}</p>
+                    </a>
+                {% endif %}
+                <p class="meta">{{ user.role }}</p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="component-action">
+        <section>
+            <a href="{{ routeLookupIfAuthorized('commsNewsStatistics.getVisitation', { articleId: article.id }) }}" class="button">View all</a>
+        </section>
+    </div>
+</section>

@@ -67,6 +67,25 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Recent Visitors</h2>
+
+        {% if recentVisitors|length %}
+            {% include '@commsNewsStatistics/recent-visitors.twig' with {
+                article: article,
+                users: recentVisitors
+            } %}
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-staff"></i>
+                <p>Nobody has visited yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
 {# Historical Dailies: temporarily disabled
  #
  # This seems to confuse people a lot, and there's a lot of numbers here

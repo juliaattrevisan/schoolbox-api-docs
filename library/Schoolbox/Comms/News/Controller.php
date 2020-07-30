@@ -90,12 +90,7 @@ class Controller extends Base
      */
     private $folderMapper;
 
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
+      /**
      * @var Audience\Mapper
      */
     private $audienceMapper;
@@ -1272,31 +1267,6 @@ class Controller extends Base
             }
         }
         return true;
-    }
-
-
-    /**
-     * Compute the recipients so author can identify
-     *
-     * @api /news/:articleId/recipients
-     * @since 18.1
-     *
-     * @param Model $article
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     */
-    public function getRecipients(Model $article): void
-    {
-        $userIds = $this->userResolver->findUsersForArticle($article);
-
-        if (\count($userIds)) {
-            $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
-        } else {
-            $users = $this->userMapper->createCollection();
-        }
-
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/recipients.twig', ['users' => $users]));
     }
 
 
