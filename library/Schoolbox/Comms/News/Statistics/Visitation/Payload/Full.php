@@ -155,8 +155,6 @@ class Full
             ];
         }
 
-        unset($tempUsers);
-
         /* Superimpose visitor data over user data
          * This will also insert visitors who aren't currently in the audience
          */
