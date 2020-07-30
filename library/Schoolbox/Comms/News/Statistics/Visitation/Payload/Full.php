@@ -116,10 +116,6 @@ class Full
          */
         $currentlyAudiencedIds = $this->userResolver->findUsersForArticle($article);
 
-        // temp
-        $currentlyAudiencedIds[] = 3;
-        $currentlyAudiencedIds[] = 130;
-
         /* This diff represents users that didn't visit the article, so we'll need to get
          * their details separately; they won't have any data from visiting. To minimise
          * hydration and mapper funsies, try to get a minimal set
