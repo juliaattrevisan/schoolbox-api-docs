@@ -78,7 +78,7 @@
                                 <span class="rb-description">
                                     {{- descriptor.description|nl2br -}}
                                 </span>
-                                {% if descriptor.hasValue and config.rubric_show_points and showDescriptorValue %}
+                                {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
                                     <span class="rb-value used" >
                                         {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
                                             {% if isMarkDisplayed %}

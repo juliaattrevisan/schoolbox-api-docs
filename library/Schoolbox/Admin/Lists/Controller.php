@@ -752,7 +752,7 @@ class Controller extends Base
             'fields' => [
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
-                    'width'     => 3,
+                    'width'     => 2,
                     'maxLength' => 150,
                     'mandatory' => true,
                 ],
@@ -804,6 +804,13 @@ class Controller extends Base
                 'displayProgressionGrade' => [
                     'caption'   => 'Display Progression Graph',
                     'tooltip'   => 'If toggled to \'ON\', a line graph of student progress over time will be displayed on the grades page.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                'showRubricPoints' => [
+                    'caption'   => 'Show Points on Rubrics',
+                    'tooltip'   => 'If toggled to \'ON\', rubrics will display the number of points associated and attained for each level of a capability.',
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,

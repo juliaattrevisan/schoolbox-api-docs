@@ -530,9 +530,11 @@ class Controller extends Base
             $tabs['graph'] = ['label' => 'Class Results'];
         }
 
+        $showRubricPoints = false;
         if ($longitudinalRubric) {
             if ($canSeeRubricGrade) {
                 $tabs['descriptors'] = ['label' => 'Learning Levels'];
+                $showRubricPoints = $this->isTabEnabled('rubricPoints', $subject);
             }
 
             if ($canSeeCapabilityGrade) {
@@ -594,6 +596,7 @@ class Controller extends Base
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
                 'graph'                 => $graph,
                 'longitudinalRubric'    => $longitudinalRubric,
+                'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getAsString(),
@@ -616,6 +619,10 @@ class Controller extends Base
             case 'descriptors':
                 $configName   = 'enable_grades_criteria';
                 $propertyName = 'displayRubricGrade';
+                break;
+            case 'rubricPoints': // this is not a tab, but...
+                $configName   = 'rubric_show_points';
+                $propertyName = 'showRubricPoints';
                 break;
             case 'capabilities':
                 $configName   = 'grade_capability_display';
