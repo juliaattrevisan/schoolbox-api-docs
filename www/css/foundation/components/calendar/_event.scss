@@ -10,20 +10,17 @@
   }
 
   time.icon {
-    font-size: 1rem;
     display: block;
     position: relative;
-    min-width: 3.5rem;
-    min-height: 4rem;
-    background-color: #fff;
-    margin-top: .58rem;
+    min-width: 3rem;
+    background-color: $white;
   }
 
   time.icon * {
     display: block;
     width: 100%;
-    font-size: 1rem;
-    font-weight: bold;
+    font-size: .875rem;
+    font-weight: 600;
     text-align: center;
     line-height: 1.2;
   }
@@ -32,16 +29,15 @@
     background-color: $content-ui-foreground;
     position: absolute;
     top: 0;
-    color: #fff;
+    color: $white;
     text-transform: uppercase;
   }
 
   time.icon span {
     border: 1px solid $content-ui-foreground;
     color: $content-ui-foreground;
-    font-size: 1.875rem;
-    letter-spacing: -0.05rem;
-    padding-top: 1.1rem;
+    font-size: 1.5rem;
+    padding-top: 1rem;
   }
 
   time {
