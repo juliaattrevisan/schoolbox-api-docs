@@ -21,7 +21,6 @@
         components: {},
         data() {
             return {
-                'fallbackImage': data.fallbackImage
             }
         }
     }
@@ -45,14 +44,11 @@
                             <img :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
                         </a>
                     </template>
-
-                    <template v-else>
-                        <div v-bind:class="{hide: fallbackImage === 'none'}">
-                            <div class="card-feature-avatar">
-                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                    <img :src="article.author._links.avatar.href + '&size=square64'">
-                                </a>
-                            </div>
+                    <template v-else-if="fallbackImage !== 'none'">
+                        <div class="card-feature-avatar">
+                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                                <img :src="article.author._links.avatar.href + '&size=square64'">
+                            </a>
                         </div>
                     </template>
 
