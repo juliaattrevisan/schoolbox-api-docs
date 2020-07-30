@@ -12,7 +12,6 @@ use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Mapper\Exception\Deleted as ModelDeleted;
 
 class Controller extends Base
 {
@@ -83,7 +82,16 @@ class Controller extends Base
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
         $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->getRequest()->post['id']]);
-        $recursiveUndeleter->restoreSoftDeletedModels();
+        $db = $this->folderMapper->getDatabase();
+        $db->beginTransaction();
+        try {
+            $recursiveUndeleter->restoreSoftDeletedModels();
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            $this->sendError("Unable to restore models, rolling back.");
+            exit(1);
+        }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
@@ -97,7 +105,16 @@ class Controller extends Base
     {
         $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
         $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->getRequest()->post['id']]);
-        $recursiveUndeleter->restoreSoftDeletedModels();
+        $db = $this->assessmentMapper->getDatabase();
+        $db->beginTransaction();
+        try {
+            $recursiveUndeleter->restoreSoftDeletedModels();
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            $this->sendError("Unable to restore models, rolling back.");
+            exit(1);
+        }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
