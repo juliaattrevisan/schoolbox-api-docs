@@ -134,17 +134,20 @@ class Full
          * Shank it in
          */
         $tempIds = implode(',', array_map('\intval', array_diff($currentlyAudiencedIds, array_keys($visitors))));
+        if (empty($tempIds)) {
+            $tempUsers = [];
+        } else {
+            $tempUsers = $this->userMapper->getDatabase()->prepare("
+                SELECT
+                    u.id, u.title, u.firstname, u.lastname,
+                    r.`name` AS `role`
+                FROM {$this->userMapper->getTable()} u
+                LEFT JOIN `groups` r ON u.group_id = r.id
+                WHERE u.id IN ({$tempIds})
+            ");
 
-        $tempUsers = $this->userMapper->getDatabase()->prepare("
-            SELECT
-                u.id, u.title, u.firstname, u.lastname,
-                r.`name` AS `role`
-            FROM {$this->userMapper->getTable()} u
-            LEFT JOIN `groups` r ON u.group_id = r.id
-            WHERE u.id IN ({$tempIds})
-        ");
-
-        $tempUsers->execute();
+            $tempUsers->execute();
+        }
 
         /* Dispense with all the object data we don't actually use and store it as a flat
          * hierarchy instead, so we can overlay it with visitor data
