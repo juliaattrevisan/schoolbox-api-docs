@@ -69,6 +69,15 @@
       text-transform: uppercase;
     }
   }
+  .v-card {
+    @media #{$small-only} {
+      flex-basis: 100%;
+    }
+    @media #{$medium-only} {
+      flex-basis: 50%;
+    }
+    flex: 0 0 33.33%;
+  }
 }
 
 .skeleton.news > .img {
