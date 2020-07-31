@@ -82,9 +82,8 @@
                     </span>
                 </p>
 
-                <article v-if="!compactMode">
-                    <div v-html="article.blurb"></div>
-                </article>
+                <article v-if="!isCompactMode" v-html="article.blurb"></article>
+
                 <div class="article-read-more">
                     <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
                 </div>

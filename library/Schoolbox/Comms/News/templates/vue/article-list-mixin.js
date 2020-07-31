@@ -2,6 +2,18 @@
  * Shared between each of the Layout components
  */
 export default {
+    computed: {
+
+        /**
+         * Detect whether Compact Mode is on
+         *
+         * @param option
+         * @returns {boolean}
+         */
+        isCompactMode() {
+            return parseInt(this.compactMode) !== 0;
+        }
+    },
     methods: {
         /*
          * Changing topic tab
