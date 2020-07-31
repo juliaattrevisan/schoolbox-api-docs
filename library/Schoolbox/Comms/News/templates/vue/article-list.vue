@@ -200,17 +200,6 @@
             showMoreLink: function() {
                 return !this.articlesLoading && this.data.showMore && this.currentArticles.length;
             }
-        },
-        filters: {
-            formatCommentCountMeta: function (value) {
-                var suffix = ' comment';
-
-                if (value > 1) {
-                    suffix = ' comments';
-                }
-
-                return value + suffix;
-            },
         }
     }
 </script>

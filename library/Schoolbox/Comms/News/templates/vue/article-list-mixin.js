@@ -1,3 +1,6 @@
+/**
+ * Shared between each of the Layout components
+ */
 export default {
     methods: {
         /*
@@ -90,6 +93,25 @@ export default {
                 console.log(error);
                 $toast.toastTimeout({text: toastFailMessage, duration: 2000, css: 'alert'});
             });
+        }
+    },
+
+    filters: {
+
+        /**
+         * Pluralise the comment count string
+         *
+         * @param value
+         * @returns {string}
+         */
+        formatCommentCountMeta: function (value) {
+            let suffix = ' comment';
+
+            if (value > 1) {
+                suffix += 's';
+            }
+
+            return value + suffix;
         }
     }
 }
