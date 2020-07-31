@@ -122,10 +122,3 @@
     min-height: 0;
     max-height: 92px;
 }
-
-
-/* Dashboard component indents this heading for some reason
- */
-.Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header {
-    padding-left: 0;
-}
