@@ -43,7 +43,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnderflowException;
 use UnexpectedValueException;
