@@ -368,8 +368,7 @@
   .v-card {
     display: flex;
     flex-flow: column nowrap;
-    flex: 1 0 25%;
-    min-width: rem-calc(260);
+    flex: 0 0 33.33%;
     padding: 1rem;
 
     .card-content {
