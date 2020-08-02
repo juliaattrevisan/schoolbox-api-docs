@@ -143,8 +143,8 @@ TEST2;
                 ],
             ],
             true,
-            6,
-            3,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
+            null,
         ];
 
 
@@ -189,10 +189,55 @@ TEST2;
                 ],
             ],
             false,
-            1,
-            2,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
+            null,
         ];
 
+
+        $test4= <<<TEST
+"capabilityMarkType: letter:1","useMarkRange: Off",,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter:1' => [
+            $this->buildStream($test4),
+            5,
+            new DueWorkModel(),
+            ['', '', '', '', '',],
+            [
+                [
+                    'name'       => 'Test Capability 1',
+                    'maxValue'   => 9,
+                    'indicators' => [
+                        [
+                            'name'        => 'Indicator 1',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'Indicator 2',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            1,
+        ];
 
         // legacy markPerCapability setting on
         $legacyTestMarkPerCapabilityOn = <<<TEST
