@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Grid\Importer;
 /**
  * Helper class for importing a rubric grid from a CSV.
  */
-class CsvImporter
+class CsvImporter implements IImporter
 {
     /**
      * The levels in the imported CSV.

@@ -173,7 +173,7 @@ class Controller extends Assessment\Controller
      * @throws DomainException
      * @throws PDOException
      * @throws DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void

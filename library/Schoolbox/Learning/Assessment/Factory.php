@@ -8,10 +8,14 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Exception as ResourceException;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -127,14 +131,18 @@ class Factory
      */
     protected $curriculumNodes;
 
+    /** @var IAssessable */
+    private $original;
+
     /**
      * Factory constructor.
-     * @param User $creator
-     * @param array $post (an array of post vars from the create/update forms)
-     * @param string|null $assessmentType
+     * @param User             $creator
+     * @param array            $post (an array of post vars from the create/update forms)
+     * @param string|null      $assessmentType
+     * @param IAssessable|null $original
      * @throws UnexpectedValueException
      */
-    public function __construct(User $creator, $post, $assessmentType)
+    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
     {
         $this->setAssessmentType(trim($post['assessmentType']));
         $this->setContext($post['context']);
@@ -225,6 +233,7 @@ class Factory
         $this->setMaxAttempts(intval($post['maxAttempts']));
         $this->setMarkVisibility(intval($post['visibility']));
         $this->setCompletionMessage($post['completion_message']);
+        $this->original = $original;
     }
 
     /**
@@ -235,12 +244,9 @@ class Factory
      *
      * @param IAssessable|null $assessment
      * @return IAssessable
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \RangeException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
+     * @throws ResourceException
+     * @throws ServiceNotFound
      */
     public function produce(IAssessable $assessment = null): IAssessable
     {
@@ -257,11 +263,9 @@ class Factory
      *
      * @return IAssessable
      * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \RangeException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
+     * @throws ResourceException
+     * @throws ServiceNotFound
      */
     private function produceNew(): IAssessable
     {
@@ -287,9 +291,10 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      * @throws \RangeException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
+     * @throws ResourceException
      */
     private function produceFromExistingAssessment(IAssessable $assessment): IAssessable
     {
@@ -305,6 +310,8 @@ class Factory
                 $this->getSummator()
             );
         } elseif ($assessment instanceof DueWork) {
+            /** @var DueWork $originalDueWork */
+            $originalDueWork = $this->original;
             $decorator = new DueWorkDecorator(
                 $this->getAcceptOnline(),
                 $this->getMarkType(),
@@ -317,7 +324,8 @@ class Factory
                 $this->getRubricData(),
                 $this->getAttachedFiles(),
                 $this->getSelfReviewable(),
-                $this->getSimilarityCheckEnabled()
+                $this->getSimilarityCheckEnabled(),
+                $originalDueWork
             );
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
@@ -359,7 +367,7 @@ class Factory
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        if($this->workType){
+        if ($this->workType){
             $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
         } else {
             $assessment->setWorkType(null);
@@ -375,7 +383,7 @@ class Factory
         if (isset($selectedNodesCsv[0])) {
             $selectedNodes = explode(',', $selectedNodesCsv[0]);
 
-            $assessment->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->findByColumn('id', $selectedNodes));
+            $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
         }
 
         /* Decorate with Assessable-specific data

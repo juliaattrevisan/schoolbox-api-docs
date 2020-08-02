@@ -18,10 +18,12 @@
             if (selected.length !== 1 || selected[0]['id'] === 'undefined') {
                 return;
             }
-            $.post('{{ routeLookup('learningAssessment.postMoveAssessment', {assessment: assessment, assessmentId: assessment.id}) }}',
+            $.post('{{ routeLookup('learningAssessment.postChangeLocation', {assessment: assessment, assessmentId: assessment.id}) }}',
                     {contextId: selected[0]['id']}
             ).success(function (response) {
-                window.location.href = response.returnUrl;
+                $('#locationTitle').val(response['contextTitle']);
+                $('#locationId').val(response['contextId']);
+                $locationReveal.foundation('reveal', 'close');
             }).error(function (response) {
                 $(selected[0]['id']).addClass('error').attr('title', response.error);
             });
@@ -32,19 +34,12 @@
         });
     });
 </script>
-{% if assessment.context is project %}
-    {% set locationTitle = assessment.baseContext.title~' > '~assessment.context.title %}
-    {% set locationId = 'project-'~assessment.context.id %}
-{% else %}
-    {% set locationTitle = assessment.baseContext.title %}
-    {% set locationId = 'unit-'~assessment.context.id %}
-{% endif %}
 <div class="row">
     <div class="small-12 columns">
         <label>Assessment Location</label>
         <div class="input-group">
-            <input type="hidden" id="locationId" name="locationId" value="{{ locationId }}">
-            <input id="locationTitle" name="locationTitle" type="text" value="{{ locationTitle }}" class="valid"
+            <input type="hidden" id="locationId" name="locationId" value="{{ assessment.context.locationId }}">
+            <input id="locationTitle" name="locationTitle" type="text" value="{{ assessment.context.locationTitle }}" class="valid"
                    aria-invalid="false" readonly="readonly">
             <a class="adtp-btn" data-adtp-btn="" id="change-location">Change Location<span
                         class="splash animate"></span></a>

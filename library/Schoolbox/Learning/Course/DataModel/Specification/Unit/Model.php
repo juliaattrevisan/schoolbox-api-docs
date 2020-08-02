@@ -141,4 +141,20 @@ class Model extends AbstractUnit
     {
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationId(): string
+    {
+        return 'unit-' . $this->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationTitle(): string
+    {
+        return $this->getTitle();
+    }
 }

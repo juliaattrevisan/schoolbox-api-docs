@@ -255,4 +255,20 @@ class Model extends AbstractUnit
     {
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationId(): string
+    {
+        return '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationTitle(): string
+    {
+        return '';
+    }
 }

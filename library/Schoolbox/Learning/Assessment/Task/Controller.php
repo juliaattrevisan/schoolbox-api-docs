@@ -9,10 +9,6 @@ namespace Schoolbox\Learning\Assessment\Task;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
-use DomainException;
-use InvalidArgumentException;
-use LogicException;
-use PDOException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Cyberhound\Url\Translator;
@@ -27,7 +23,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -40,7 +35,6 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
-use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -113,11 +107,8 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws MapperException
      * @throws ServiceNotFound
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws Exception
-     * @throws UnexpectedValueException
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -151,15 +142,8 @@ class Controller extends Assessment\Controller
      * @since 165
      * @param IAssessable|Task $assessment
      * @param User             $student
-     * @throws Exception
-     * @throws InsufficientHydrationException If lack of hydration
-     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws LogicException
-     * @throws PDOException If unable to save task response to DB
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
-     * @throws DomainException
      * @throws MapperException
+     * @throws ServiceNotFound
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -288,19 +272,9 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @param User              $student
-     * @return void
-     * @throws Exception
-     * @throws InvalidStatusCode if value is invalid
-     * @throws \InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws \PDOException If unable to save task response to DB
-     * @throws ApplicationException If synchronous request and something went wrong
-     * @throws InsufficientHydrationException If unable to perform some logic because an object lacks hydration
-     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws InvalidStatusCode if value is invalid
-     * @throws LogicException
-     * @throws PDOException If unable to save task response to DB
+     * @throws InvalidStatusCode
+     * @throws MapperException
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -362,15 +336,7 @@ class Controller extends Assessment\Controller
      * 6. Learners users may not create a new response if an instructor has marked them as complete
      *
      * @param TaskResponse $response
-     * @throws ConcurrentModificationException If participant already has the task completion status - and don't want to log.
-     * @throws Exception
-     * @throws InsufficientHydrationException If task object has not been sufficiently hydrated
-     * @throws InvalidArgumentException
-     * @throws InvalidTaskResponseException If task response is not saveable - and we want to log.
-     * @throws LogicException
-     * @throws UnexpectedValueException
      * @throws MapperException
-     * @todo This should all be wrapped up in an auth rule
      */
     protected function assertSaveability(TaskResponse $response): void
     {
@@ -435,15 +401,8 @@ class Controller extends Assessment\Controller
      * @param int         $completionStatus status to mark
      * @param IAssessable $assessment
      * @param User        $student
-     * @return TaskResponse $taskResponse Created task response
-     * @throws ConcurrentModificationException If participant already has the task completion status.
-     * @throws Exception
-     * @throws InsufficientHydrationException If task object is insufficiently hydrated
-     * @throws InvalidArgumentException If we attempt to give a task feedback a null response
-     * @throws InvalidTaskResponseException If proposed Task Response is invalid for some reasons
-     * @throws LogicException
-     * @throws PDOException If unable to save task response to DB
-     * @throws UnexpectedValueException
+     * @return TaskResponse
+     * @throws MapperException
      */
     private function saveTaskResponse(int $completionStatus, IAssessable $assessment, User $student): Response\Model
     {

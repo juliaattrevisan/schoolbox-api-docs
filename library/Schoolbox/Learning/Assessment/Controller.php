@@ -12,7 +12,6 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
@@ -65,9 +64,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
-    /** @var UnitSpecificationMapper */
-    private $unitSpecificationMapper;
-
     /** @var Replicator */
     private $replicator;
     /**
@@ -100,14 +96,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper);
 
         $this->bakery                    = $bakery;
         $this->workTypeMapper            = $workTypeMapper;
         $this->termMapper                = $termMapper;
         $this->replicator                = $replicator;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
-        $this->unitSpecificationMapper   = $unitSpecificationMapper;
     }
 
 
@@ -294,7 +289,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             [
                 'units'        => $allUnitSpecs,
                 'unitProjects' => $unitProjects,
-                'current'      => ($assessment->getContext() instanceof Project ? 'project' : 'unit') . '-' . $assessment->getContext()->getId(),
+                'current'      => $assessment->getContext()->getLocationId()
             ]
         ));
     }
@@ -302,46 +297,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Moves assessment
      * @param IAssessable $assessment
-     * @throws RouteNotFound
      */
-    public function postMoveAssessment(IAssessable $assessment): void
+    public function postChangeLocation(IAssessable $assessment): void
     {
-        $context = $this->getRequest()->post->get('contextId');
-        [$contextType, $contextId] = explode('-', $context);
-        if ($contextType === 'unit') {
-            try {
-                $context = $this->unitSpecificationMapper->findById($contextId);
-            } catch (MapperException $e) {
-                return;
-            }
-        } elseif ($contextType === 'project') {
-            try {
-                $context = $this->getAssessmentMapper()->findById($contextId);
-            } catch (MapperException $e) {
-                return;
-            }
-            if ($context->isImplementation() || !$context->getBaseAssessable() instanceof Project) {
-                return;
-            }
-        }
+        $newLocationId = $this->getRequest()->post->get('contextId');
+        $newContext = $this->getRelocatedContext($assessment, $newLocationId);
 
-        if ($context === $assessment->getContext()) {
-            return;
-        }
-
-        $db = $this->getUserMapper()->getDatabase();
-        $db->beginTransaction();
-
-        $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $this->getUser());
-
-        try {
-            $this->getAssessmentMapper()->delete($assessment);
-        } catch (MapperException $e) {
-            $db->rollback();
-        }
-        $db->commit();
-        $this->redirect($this->getRouter()->generate('learningAssessment.getUpdateAssessmentForm',
-            ['assessmentId' => $newAssessment->getId(), 'assessment' => $newAssessment]));
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'contextTitle' => $newContext ? $newContext->getLocationTitle() : '',
+            'contextId'    => $newContext ? $newContext->getLocationId() : '',
+        ]));
     }
 
     /**
@@ -354,12 +319,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param IAssessable $assessment
-     * @throws DefinitionException
-     * @throws Exception
-     * @throws LogicException
+     * @throws ControllerException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
-     * @throws \Alaress\Web\Controller\Exception
+     * @throws \Exception
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
@@ -395,7 +357,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if ($postReturnUrl) {
             $returnUrl = Redirect::decode($postReturnUrl);
         } else {
-            $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, $internalReturnUrl);
+            $returnUrl = $this->determineRedirect($assessmentInfo['assessment'], $postReturnUrl, $internalReturnUrl);
         }
 
         // we're done here
@@ -407,7 +369,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Get an overview of rubric marks
      *
      * @param IAssessable $assessment
-     * @throws Exception
+     * @throws \Exception
      */
     public function getOverview(IAssessable $assessment): void
     {
@@ -420,7 +382,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Download overview of rubric marks
      *
      * @param IAssessable $assessment
-     * @throws Exception
+     * @throws \Exception
      */
     public function downloadOverview(IAssessable $assessment): void
     {
@@ -612,7 +574,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @param IAssessable $assessment
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function patchUpdateAssessment(IAssessable $assessment): void
     {

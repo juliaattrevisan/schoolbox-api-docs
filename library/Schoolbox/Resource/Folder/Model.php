@@ -682,4 +682,20 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         $displayGradePages = array_unique($this->getYearLevels()->getPropertyValues('displayGradePage'));
         return count($displayGradePages) > 1 ? true : $displayGradePages[0];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationId(): string
+    {
+        return '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationTitle(): string
+    {
+        return '';
+    }
 }
