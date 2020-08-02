@@ -26,7 +26,7 @@ class CsvImporterFactoryTest extends TestCase
      */
     public function getTestBuildData(): iterable
     {
-        $test1 = <<<TEST1
+        $test1 = <<<TEST
 ,,,,,,
 cap2,ind1,,,,,
 ,,0,2,4,6,8
@@ -36,7 +36,7 @@ cap1,ind3,,,,,
 ,,0,2,4,6,8
 ,ind4,,,,,
 ,,0,2,4,6,8
-TEST1;
+TEST;
         yield 'empty descriptors' => [
             $this->buildStream($test1),
             5,
@@ -102,13 +102,13 @@ TEST1;
         ];
 
 
-        $test2 = <<<TEST2
-"capabilityMarkType: none","useMarkRange: On",,,,
+        $test2 = <<<TEST
+"capabilityMarkType: none","useMarkRange: On",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 ,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
 ,,15,10,5,1,0
-TEST2;
+TEST;
         yield 'mark range on' => [
             $this->buildStream($test2),
             5,
@@ -148,13 +148,13 @@ TEST2;
         ];
 
 
-        $test3= <<<TEST2
-"capabilityMarkType: percent","useMarkRange: Off",,,,
+        $test3= <<<TEST
+"capabilityMarkType: percent","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
 ,,15,10,5,1,0
-TEST2;
+TEST;
         yield 'mark-per-cap percent' => [
             $this->buildStream($test3),
             5,
@@ -195,7 +195,7 @@ TEST2;
 
 
         $test4= <<<TEST
-"capabilityMarkType: letter:1","useMarkRange: Off",,,,
+"capabilityMarkType: letter:1","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
