@@ -41,7 +41,7 @@ TEST1;
             $this->buildStream($test1),
             5,
             new DueWorkModel(),
-            ['', '', '', '',],
+            ['', '', '', '', '',],
             [
                 [
                     'name'       => 'cap2',
@@ -113,7 +113,7 @@ TEST2;
             $this->buildStream($test2),
             5,
             new DueWorkModel(),
-            ['', '', '', '',],
+            ['', '', '', '', '',],
             [
                 [
                     'name'       => 'Test Capability 1',
@@ -159,7 +159,7 @@ TEST2;
             $this->buildStream($test3),
             5,
             new DueWorkModel(),
-            ['', '', '', '',],
+            ['', '', '', '', '',],
             [
                 [
                     'name'       => 'Test Capability 1',
@@ -203,7 +203,7 @@ TEST2;
 ,,15,10,5,1,0
 TEST;
         $legacyTestLevelCount           = 5;
-        $legacyTestExpectedLevels       = ['', '', '', '',];
+        $legacyTestExpectedLevels       = ['', '', '', '', '',];
         $legacyTestExpectedCapabilities = [
             [
                 'name'       => 'Test Capability 1',
