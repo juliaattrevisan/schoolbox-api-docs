@@ -39,9 +39,8 @@ class ArrayExporter
         $square = array_fill(0, (2 * $height) + 1, array_fill(0, $width + 2, ''));
 
 
-        // Mark-per-capability: On/Off
+        // Capability Mark Type: slug, then grade group if applicable
         // Use Mark Range: On/Off
-        // (Put these in first two cells, default them to OFF on import)
         // TODO markPerCapability should be localized, as should the input
         $capabilityMarkType   = null;
         $capabilityGradeGroup = null;
@@ -54,15 +53,18 @@ class ArrayExporter
             $usingMarkRange       = $assessment->getUseMarkRange();
         }
 
-        $square[0][0] = 'capabilityMarkType: ' . $capabilityMarkType;
-        $square[0][1] = 'capabilityGradeGroup: ' . $capabilityGradeGroup;
-        $square[0][2] = 'useMarkRange: ' . ($usingMarkRange ? 'On' : 'Off');
+        if ($capabilityMarkType === MarkType::SLUG_LETTER && isset($capabilityGradeGroup)) {
+            $square[0][0] = 'capabilityMarkType: ' . $capabilityMarkType . ':' . $capabilityGradeGroup;
+        } else {
+            $square[0][0] = 'capabilityMarkType: ' . $capabilityMarkType;
+        }
+        $square[0][1] = 'useMarkRange: ' . ($usingMarkRange ? 'On' : 'Off');
 
 
         // first row is level names
         $levelColumn = 0;
         foreach ($grid->getLevels() as $level) {
-            $square[0][$levelColumn + 3] = $level->getName();
+            $square[0][$levelColumn + 2] = $level->getName();
             $levelColumn++;
         }
 
