@@ -130,6 +130,7 @@ abstract class AbstractCsvImporterFactory
         // build the square, extracting data as we go
         $capabilities    = [];
         $isLastRowNewCap = false;
+        $levelCount      = count($levels);
         while ($row = $this->readCsvLine($fp, $maxLevels)) {
             if ($isLastRowNewCap) {
                 $capMaxValue     = $row[0];
@@ -160,8 +161,16 @@ abstract class AbstractCsvImporterFactory
                 FILTER_NULL_ON_FAILURE
             );
 
-            $square[] = $row;
+            // How many descriptors are there in this row?
+            // We'll need to ensure every descriptor has a matching level.
+            $rowDescriptorCount = count($row) - 2;
+            $levelCount         = max($levelCount, $rowDescriptorCount);
+            $square[]           = $row;
         }
+
+        // The square may have more columns than there are levels.
+        // Expand the levels to the size of the square.
+        $levels = array_pad($levels, $levelCount, '');
 
         return new CsvImporter(
             $levels,
