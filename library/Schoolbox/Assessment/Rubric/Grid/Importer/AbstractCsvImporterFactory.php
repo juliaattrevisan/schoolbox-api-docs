@@ -43,15 +43,14 @@ abstract class AbstractCsvImporterFactory
         }
 
         // First three cells may be settings:
-        // useMarkRange:      On/Off
-        // capabilityMarkType: int|null
-        // capabilityGradeGroup: int|null
+        // useMarkRange:       On/Off
+        // capabilityMarkType: string (a MarkType::SLUG_* constant), followed by an int grade group
         $useMarkRange           = false;
         $capabilityMarkTypeSlug = null;
         $capabilityGradeGroup   = null;
-        $settingCells           = [$headerRow[0], $headerRow[1], $headerRow[2]];
+        $settingCells           = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
-            $settingPair = explode(':', $settingCell);
+            $settingPair = explode(':', $settingCell, 2);
             $setting     = $settingPair[0] ?? '';
             $value       = trim($settingPair[1] ?? '');
 
@@ -76,11 +75,10 @@ abstract class AbstractCsvImporterFactory
                     break;
 
                 case 'capabilityMarkType':
-                    $capabilityMarkTypeSlug = $value;
-                    break;
-
-                case 'capabilityGradeGroup':
-                    $capabilityGradeGroup = (int)$value;
+                    [$capabilityMarkTypeSlug, $capabilityGradeGroup] = array_pad(explode(':', $value), 2, null);
+                    if (isset($capabilityGradeGroup)) {
+                        $capabilityGradeGroup = (int)$capabilityGradeGroup;
+                    }
                     break;
 
                 // Legacy mark-per-capability setting, superseded by capabilityMarkType.
