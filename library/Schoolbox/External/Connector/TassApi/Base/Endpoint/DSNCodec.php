@@ -18,6 +18,12 @@ use DomainException;
  *
  * But we only support two, so we combine them into one string
  *
+ * The Tass API system is actually a coalition of smaller product API products.
+ * Tass actually has multiple sets of credentials. Each set of credentials access
+ * a smaller subset of this coalition of products. Fortunately they had the foresight
+ * to format each set of credentials similarly. Therefore, we can assign a DSN_FORMAT
+ * that applies to each set of credentials which are all supplied on one line in our ui
+ *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
 class DSNCodec
@@ -25,8 +31,13 @@ class DSNCodec
 
     /**
      * DSN format
+     *
+     * Product Module (e.g. Student Details API, Identity Management API, LMS Integration API)
+     * followed by a colon
+     * followed by key-value pairs
+     * separated by comma
      */
-    private const DSN_FORMAT = '/companycode=([A-Za-z0-9]+);appcode=([A-Za-z0-9]+);token=([A-Za-z0-9=]+)/';
+    private const DSN_FORMAT = '/([a-zA-Z0-9]+):companycode=([A-Za-z0-9]+);appcode=([A-Za-z0-9]+);token=([A-Za-z0-9=]+)/';
 
 
     /**
@@ -38,30 +49,52 @@ class DSNCodec
      */
     public function decode(string $dsn): array
     {
-        preg_match(self::DSN_FORMAT, $dsn, $matches);
+        $dsnParts = explode(',', $dsn);
+        $struct = [];
 
-        if (!count($matches)) {
-            throw new DomainException('Tass API DSN: could not decode; check company code, app code and token format');
+        foreach ($dsnParts as $dsnPart) {
+            $matches = [];
+            preg_match(self::DSN_FORMAT, $dsnPart, $matches);
+
+            if (!count($matches)) {
+                throw new DomainException('Tass API DSN: could not decode; check company code, app code and token format');
+            }
+
+            $struct[$matches[1]] = [
+                'companycode' => $matches[2],
+                'appcode' => $matches[3],
+                'token' => $matches[4]
+            ];
         }
 
-        return [
-            'companycode' => $matches[1],
-            'appcode' => $matches[2],
-            'token' => $matches[3]
-        ];
+        return $struct;
     }
 
 
     /**
-     * Encode a dsn string
+     * Encode a dsn string for a particular tass product
      *
-     * @param string $companycode
-     * @param string $appcode
-     * @param string $token
+     * $parts consists of module, companycode, appcode, token strings and pairs
+     *
+     * @param array $parts
      * @return string
      */
-    public function encode(string $companycode, string $appcode, string $token): string
+    public function encode(array $parts): string
     {
-        return "companycode={$companycode};appcode={$appcode};token={$token}";
+        $struct = [];
+
+        foreach ($parts as $module => $pairs) {
+            $module = "{$module}:";
+
+            $tuples = [];
+
+            foreach ($pairs as $key => $value) {
+                $tuples[] = "{$key}={$value}";
+            }
+
+            $struct[] = $module . implode(';', $tuples);
+        }
+
+        return implode(',', $struct);
     }
 }
