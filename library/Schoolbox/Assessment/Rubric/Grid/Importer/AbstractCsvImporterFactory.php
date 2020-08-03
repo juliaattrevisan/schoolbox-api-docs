@@ -75,9 +75,15 @@ abstract class AbstractCsvImporterFactory
                     break;
 
                 case 'capabilityMarkType':
-                    [$capabilityMarkTypeSlug, $capabilityGradeGroup] = array_pad(explode(':', $value), 2, null);
-                    if (isset($capabilityGradeGroup)) {
+                    [$capabilityMarkTypeSlug, $capabilityGradeGroup] = array_pad(
+                        array_map('trim', explode(':', $value)),
+                        2,
+                        null
+                    );
+                    if (!empty($capabilityGradeGroup)) {
                         $capabilityGradeGroup = (int)$capabilityGradeGroup;
+                    } else {
+                        $capabilityGradeGroup = null;
                     }
                     break;
 
