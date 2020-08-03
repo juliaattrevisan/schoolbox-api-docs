@@ -43,6 +43,12 @@ class Profile implements IStrategy
 
 
     /**
+     * One of these five fields will appear in general_details area depending on your tass installation
+     */
+    private const STUDIES_CODE_POSSIBILITIES = ['lui_number', 'bos_number', 'vsn_number', 'tqa_number', 'wa_student_number'];
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -184,11 +190,12 @@ class Profile implements IStrategy
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
             $specialNeeds = trim((string)$student['other_school_details']['learning_support']) === self::SPECIAL_NEEDS;
-            $studiesCode = trim((string)$student['general_details']['usi']);
+            $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
             $username = trim((string)$student['general_details']['student_code']);
             $yearLevel = trim((string)$student['school_details']['year_group']);
+
 
             /* Dates
              */
@@ -478,6 +485,33 @@ class Profile implements IStrategy
 //    }
 //
 //
+
+    /**
+     * Studies Code is one of five possible fields that could exist
+     *
+     * Each of the filve possible fields depends on which state you're in
+     * so I guess it depends on each tass installation
+     *
+     * Try each of the five possibilities until one exists
+     *
+     * @param array $student
+     * @return string
+     */
+    private function findStudiesCode(array $student): string
+    {
+        $studiesCode = '';
+
+        foreach (self::STUDIES_CODE_POSSIBILITIES as $studiesCodePossibility) {
+            if (isset($student['general_details'][$studiesCodePossibility])) {
+                $studiesCode = trim((string)$student['general_details'][$studiesCodePossibility]);
+                break;
+            }
+        }
+
+        return $studiesCode;
+    }
+
+
     /**
      * Find medical data for student
      *
