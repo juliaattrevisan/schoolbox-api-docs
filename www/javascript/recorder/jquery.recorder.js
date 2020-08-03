@@ -181,16 +181,6 @@
      * @returns {RecorderPlugin}
      */
     RecorderPlugin.prototype._attemptFlashSetup = function() {
-        // Is Flash even supported? I expect SWFObject to be present to determine that.
-        this.flash.supported =
-            swfobject
-            && swfobject.hasFlashPlayerVersion
-            && swfobject.hasFlashPlayerVersion('10.1')
-        ;
-        if (this.isFlashSupported()) {
-            this.flash.recorder = Recorder;
-            this.flash.recorder.initialize(this.options.flash.recorderOptions);
-        }
         return this;
     };
 
@@ -608,12 +598,12 @@
     };
 
     /**
-     * Is the Flash recorder supported?
+     * Is the Flash recorder supported? (No, it is not)
      *
      * @returns {boolean}
      */
     RecorderPlugin.prototype.isFlashSupported = function() {
-        return this.flash.supported;
+        return false;
     };
 
     /**
