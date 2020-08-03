@@ -12,7 +12,6 @@ use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 
 class Seeder extends App
@@ -31,11 +30,6 @@ class Seeder extends App
      * @var string
      */
     private $storageDir;
-
-    /**
-     * @var StorageMapper
-     */
-    private $storageMapper;
 
     /**
      * @var string
@@ -94,7 +88,6 @@ class Seeder extends App
        );
 
        $this->bucket            = trim($config->get('otfs_s3_bucket') ?? '');
-       $this->storageMapper     = StorageMapper::getInstance();
        $this->storageDir        = trim($config->get('storage_dir'));
        $this->storageAdapter    = trim($config->get(ConfigMapper::NAME_OTFS_ADAPTER));
 
