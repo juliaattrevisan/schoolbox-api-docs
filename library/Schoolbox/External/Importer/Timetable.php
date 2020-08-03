@@ -69,7 +69,7 @@ class Timetable extends AbstractImporter
     public static function getFormat()
     {
         return [
-            'Term Campus'       => 'The campus to import a timetable for (must already be imported)',
+            'Term Identifier'   => 'The term identifier to import a timetable for (must already be imported)',
             'Term Title'        => 'The name of the term (must already be imported)',
             'Period Day'        => 'The day number that this period is on (must already be imported)',
             'Period Title'      => 'The name of this period (must already be imported)',
@@ -137,29 +137,29 @@ class Timetable extends AbstractImporter
 
             // Load timetable cycle from DB or cache
             $termTitle  = $row['Term Title'];
-            $termCampus = $row['Term Campus'];
+            $termIdentifier = $row['Term Identifier'];
 
             /* Reuse an instance of TimetableCycle that we previously fetched
              */
-            if (isset($timetableCycleCache[$termTitle][$termCampus])) {
-                $timetableCycle = $timetableCycleCache[$termTitle][$termCampus];
+            if (isset($timetableCycleCache[$termTitle][$termIdentifier])) {
+                $timetableCycle = $timetableCycleCache[$termTitle][$termIdentifier];
             } else {
                 try {
                     $timetableCycle = $this->timetableCycleMapper->findOneByColumnList([
                         'title' => $termTitle,
-                        'ext_timetable_code' => $termCampus
+                        'cycle_identifier' => $termIdentifier
                     ]);
 
-                    $timetableCycleCache[$termTitle][$termCampus] = $timetableCycle;
+                    $timetableCycleCache[$termTitle][$termIdentifier] = $timetableCycle;
                 } catch (Mapper\Exception $e) {
 
                     /* Can't assign ClassEntry instances to Cycles that don't exist
                      * Cycles need to be created with Timetable Structure first
                      */
                     $this->log->warning(sprintf(
-                        'Term "%s" for campus "%s" not found: skipping!',
+                        'Term "%s" for term identifier "%s" not found: skipping!',
                         $termTitle,
-                        $termCampus
+                        $termIdentifier
                     ));
 
                     continue;
@@ -190,11 +190,11 @@ class Timetable extends AbstractImporter
                      * Periods need to be created with Timetable Structure first
                      */
                     $this->log->warning(sprintf(
-                        'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
+                        'Period "%s", day "%s" for term "%s" / term identifier "%s" not found: skipping!',
                         $periodTitle,
                         $periodDay,
                         $termTitle,
-                        $termCampus
+                        $termIdentifier
                     ));
 
                     continue;

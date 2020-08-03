@@ -14,7 +14,7 @@
                 <li>You must upload your entire timetable in one CSV - any existing timetable will be deleted.</li>
                 <li>You must have first uploaded your timetable structure.</li>
                 <li>
-                    The values you enter for <strong>Term Campus</strong>, <strong>Term Title</strong>,
+                    The values you enter for <strong>Term Identifier</strong>, <strong>Term Title</strong>,
                     <strong>Period Day</strong> and <strong>Period Title</strong> must exactly match a row
                     in your timetable structure.
                 </li>
@@ -30,9 +30,3 @@
 
     {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 {% endblock helpText %}
-
-{% block form %}
-    {% if not hasExternalDb %}
-        {{ parent() }}
-    {% endif %}
-{% endblock form %}

@@ -1,4 +1,17 @@
-{% if useInlineCSS %}
+{##
+ # Lines
+ #
+ # Renders out Import Preview log contents line by line
+ #
+ # The useInlineCSS option was added because the original styles were too verbose
+ # and needed to be minimised. Some sort of limit was reached when viewing very large
+ # log files, but idk why we added this unique approach instead of fixing the original problem
+ # which was to reduce the amount of html rendering; css styles are precompiled already
+ #
+ # @param bool $useInlineCSS  Whether to use a lightweight inline stylesheet equivalent
+ # @param array $log          An array of log messages to render via findLogs()
+ #}
+{% if useInlineCSS is defined and useInlineCSS %}
     {% include '@upsRuleset/log/inline-css.twig' %}
 {% endif %}
 

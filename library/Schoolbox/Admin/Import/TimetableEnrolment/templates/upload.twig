@@ -28,9 +28,3 @@
 
     {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 {% endblock helpText %}
-
-{% block form %}
-    {% if not hasExternalDb %}
-        {{ parent() }}
-    {% endif %}
-{% endblock form %}
