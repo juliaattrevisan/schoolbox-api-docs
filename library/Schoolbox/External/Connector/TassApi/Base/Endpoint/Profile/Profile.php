@@ -604,6 +604,38 @@ class Profile implements IStrategy
 
 
     /**
+     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
+     * I guess sfa_num stands for Split Family Access number or something
+     *
+     * @param string $node
+     * @param string $identifier
+     * @param string $sfaNum
+     * @return string
+     */
+    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    {
+        /* Do some funny prefix stuff for parents
+         */
+        if ($this->fatherNode === $node) {
+            $externalId = "P{$identifier}";
+        } else {
+            $externalId = "{$this->spousePrefix}{$identifier}";
+        }
+
+        /* If this was a split family, chuck a $sfaNum into the mix
+         *
+         * After 99,999 students pass through a tass system, this scheme will stop working
+         * due to collisions between old ids and new ones with prefix
+         */
+        if ('' !== $sfaNum) {
+            $externalId .= $sfaNum;
+        }
+
+        return $externalId;
+    }
+
+
+    /**
      * Import parent profile data for a given student
      *
      * @param UserProfile\Model $studentBaseProfile
@@ -634,15 +666,9 @@ class Profile implements IStrategy
                 /* Each parent in the family
                  */
                 foreach (self::PARENT_PERSON_NODES as $node) {
+                    $identifier = trim((string)$familyRecord['username']);
 
-                    /* Do some funny prefix stuff for parents
-                     */
-                    if ($this->fatherNode === $node) {
-                        $externalId = trim((string)$familyRecord['username']);
-                    } else {
-                        $externalId = "{$this->spousePrefix}-{$familyRecord['username']}";
-                    }
-
+                    $externalId = $this->deriveExternalId($node, $identifier, $familyRecord['sfa_num']);
                     $email = trim((string)$familyRecord[$node]['e_mail']);
                     $firstname = trim((string)$familyRecord[$node]['preferred_name']);
                     $lastname = trim((string)$familyRecord[$node]['surname']);
