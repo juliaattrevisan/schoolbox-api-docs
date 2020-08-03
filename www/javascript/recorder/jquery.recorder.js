@@ -1,5 +1,6 @@
 /**
- * Audio recorder plugin, with both MediaRecorder and WebRTC versions.
+ * Audio recorder plugin, with both MediaRecorder and WebRTC versions: uses
+ * MediaRecorder preferentially, then falls back to WebRTC.
  *
  * This plugin provides no interface, but triggers events that an interface can
  * attach to.
