@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
+use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -295,6 +296,33 @@ class Profile implements IStrategy
              */
             $emergencyContacts = $this->findEmergencyContacts($externalId);
 
+            /**
+             * Emergency Contacts
+             * ...because we didn't normalise it, I'm hardcoding these
+             */
+            if (\count($emergencyContacts)) {
+                if (isset($emergencyContacts[0])) {
+                    $studentProfile
+                        ->setEmergencyContactName1($emergencyContacts[0]['name'])
+                        ->setEmergencyContactPhone1($emergencyContacts[0]['phone'])
+                        ->setEmergencyContactPhoneAlt1($emergencyContacts[0]['alt']);
+                }
+
+                if (isset($emergencyContacts[1])) {
+                    $studentProfile
+                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
+                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone'])
+                        ->setEmergencyContactPhoneAlt2($emergencyContacts[1]['alt']);
+                }
+
+                if (isset($emergencyContacts[2])) {
+                    $studentProfile
+                        ->setEmergencyContactName3($emergencyContacts[2]['name'])
+                        ->setEmergencyContactPhone3($emergencyContacts[2]['phone'])
+                        ->setEmergencyContactPhoneAlt3($emergencyContacts[2]['alt']);
+                }
+            }
+
             /* Log it
              */
             $this->log->info(sprintf(
@@ -351,20 +379,57 @@ class Profile implements IStrategy
      * @param string $studentCode
      * @return array
      * @throws RuntimeException
+     * @throws DomainException
      */
     public function findEmergencyContacts(string $studentCode): array
     {
+        $emergencyContacts = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+            'currentstatus' => 'current',
+            'commtype' => 'ec',
+            'code' => $studentCode
+        ]);
 
-        /* TODO: Apparently Emergency Contacts come out of a not-yet-implemented endpoint getCommunicationRulesDetails
-         *  with the commtype = 'ec'...but that endpoint is 501 Not Implemented.
+        /* For some reason, everyone spawns in the 0th element here - not sure what else
+         * appears in commrules[1] or commrules[2] etc.
          */
-//        $data = $this->api->retrieveDocument('getCommunicationRulesDetails', [
-//            'currentstatus' => 'current',
-//            'commtype' => 'ec',
-//            'code' => $studentCode
-//        ]);
+        $stack = [];
 
-        return [];
+        if (\count($emergencyContacts['commrules'])) {
+            foreach ($emergencyContacts['commrules'][0]['addresses'] as $emergencyContact) {
+
+                /* Sigh mothers and fathers appear in the same record
+                 * To prevent duping, designate a key for them
+                 */
+                $father = "{$emergencyContact['f_preferred_name']} {$emergencyContact['f_surname']}";
+                $mother = "{$emergencyContact['m_preferred_name']} {$emergencyContact['m_surname']}";
+
+                /* Phone numbers are indeterminant; we can't tell to whom they belong
+                 * because this is a family record - because Tass
+                 */
+                $homePhone = $emergencyContact['home_phone'];
+
+                /* Find first non-empty mobile phone number (null !== '')
+                 */
+                $mobilePhones = array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]);
+                $mobilePhone = \count($mobilePhones) ? $mobilePhones[0] : '';
+
+                /* Father record seems to precede mother record...as per "traditional norms"
+                 */
+                $stack[$father] = [
+                    'name' => $father,
+                    'phone' => (string)$homePhone,
+                    'alt' => (string)$mobilePhone
+                ];
+
+                $stack[$mother] = [
+                    'name' => $mother,
+                    'phone' => (string)$emergencyContact['home_phone'],
+                    'alt' => (string)$mobilePhone
+                ];
+            }
+        }
+
+        return array_values($stack);
     }
 
 //
@@ -419,7 +484,7 @@ class Profile implements IStrategy
      * @param string $studentCode
      * @return string|null
      * @throws RuntimeException
-     * @throws \DomainException
+     * @throws DomainException
      */
     private function findMedicalAlert(string $studentCode): ?string
     {
