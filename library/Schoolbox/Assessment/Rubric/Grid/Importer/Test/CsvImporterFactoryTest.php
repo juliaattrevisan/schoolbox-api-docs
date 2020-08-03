@@ -194,6 +194,64 @@ TEST;
         ];
 
 
+        $test5= <<<TEST
+"capabilityMarkType: letter : 1","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter:1 with spaces' => [
+            $this->buildStream($test5),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            1,
+        ];
+
+
+        $test6 = <<<TEST
+"capabilityMarkType: letter:","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter with empty grade group' => [
+            $this->buildStream($test6),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            null,
+        ];
+
+
+        $test7 = <<<TEST
+"capabilityMarkType: letter","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter with null grade group' => [
+            $this->buildStream($test7),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            null,
+        ];
+
+
+
         // legacy markPerCapability setting on
         $legacyTestMarkPerCapabilityOn = <<<TEST
 "markPerCapability: on","useMarkRange: Off",,,,,
