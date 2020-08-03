@@ -21,7 +21,6 @@
     "classnames": "^2.2.6",
     "clipboard": "^2.0.6",
     "core-js": "^3.4.5",
-    "es6-object-assign": "1.1.0",
     "flatpickr": "^4.6.3",
     "locutus": "^2.0.11",
     "lodash": "4.17.19",
