@@ -192,11 +192,23 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
         $this->log->info('Accessing api endpoint');
-        $api = new Api($this->host, $this->key);
+
+        $modules = [
+            DSNCodec::MODULE_LMS_INTEGRATION,
+            DSNCodec::MODULE_STUDENT_DETAILS,
+            DSNCodec::MODULE_IDENTITY_MANAGEMENT
+        ];
+
+        foreach ($modules as $module) {
+            $api[$module] = new Api($this->host, $this->key, $module);
+        }
 
         /* Purge previously-imported profile relationships and classes
          */

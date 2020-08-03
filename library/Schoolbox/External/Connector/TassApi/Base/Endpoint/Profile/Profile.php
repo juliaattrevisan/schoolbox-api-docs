@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 
@@ -95,7 +96,7 @@ class Profile implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param Api                             $api
+     * @param Api[]                           $api
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -105,7 +106,7 @@ class Profile implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Api $api,
+        array $api,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -164,7 +165,7 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $students = $this->api->retrieveDocument('getStudents', [
+        $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
@@ -179,6 +180,7 @@ class Profile implements IStrategy
             $form = trim((string)$student['school_details']['form_class']);
             $gender = trim((string)$student['general_details']['gender']);
             $lastname = trim((string)$student['general_details']['surname']);
+            $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
             $specialNeeds = trim((string)$student['other_school_details']['learning_support']) === self::SPECIAL_NEEDS;
             $studiesCode = trim((string)$student['general_details']['usi']);
@@ -411,18 +413,32 @@ class Profile implements IStrategy
 //    }
 //
 //
-//    /**
-//     * Find medical data for student
-//     *
-//     * @param array|null $medical
-//     * @return string|null
-//     */
-//    private function findMedicalAlert(?array $medical): ?string
-//    {
-//        /* TODO Fill in medical data
-//         */
-//        return null;
-//    }
+    /**
+     * Find medical data for student
+     *
+     * @param string $studentCode
+     * @return string|null
+     * @throws RuntimeException
+     * @throws \DomainException
+     */
+    private function findMedicalAlert(string $studentCode): ?string
+    {
+        $medicalConditions = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
+            'studcode' => $studentCode,
+        ]);
+
+        /* Count the number of medical conditions that afflict this student
+         *
+         * If there are any, just leave a message about that, but don't list
+         * the specific details in case there are too many, or there are
+         * sensitive topics that we shouldn't reveal
+         */
+        if (\count($medicalConditions['data'])) {
+            return 'This student has medical conditions.';
+        }
+
+        return null;
+    }
 //
 //
 //    /**
