@@ -58,6 +58,15 @@ class Factory
 
 
     /**
+     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
+     * because tass doesn't treat parents independently of families.
+     *
+     * @var string
+     */
+    private $spousePrefix;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -130,6 +139,7 @@ class Factory
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $key
+     * @param string                          $spousePrefix
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -147,6 +157,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        string $spousePrefix,
 
         /* Profile pieces
          */
@@ -169,6 +180,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->spousePrefix = $spousePrefix;
 
         /* Profile pieces
          */
@@ -230,6 +242,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->spousePrefix,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,

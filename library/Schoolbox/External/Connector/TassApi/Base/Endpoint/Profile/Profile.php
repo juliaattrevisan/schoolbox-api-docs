@@ -59,6 +59,14 @@ class Profile implements IStrategy
 
 
     /**
+     * Default spouse prefix
+     *
+     * @var string
+     */
+    private const DEFAULT_SPOUSE_PREFIX = 'S';
+
+
+    /**
      * The node corresponding to a father's data in a Family record.
      * I have a fear that this will be different per tass implementation somewhere but, for now,
      * presume that 'person2' is (and always is) the papa
@@ -86,6 +94,15 @@ class Profile implements IStrategy
      * @var Api
      */
     private $api;
+
+
+    /**
+     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
+     * because tass doesn't treat parents independently of families.
+     *
+     * @var string
+     */
+    private $spousePrefix;
 
 
     /**
@@ -124,6 +141,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Api[]                           $api
+     * @param string                          $spousePrefix
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -134,6 +152,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        string $spousePrefix,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -143,6 +162,11 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+
+        /* Calculate a spouse prefix if one was set; otherwise use a default
+         * Shanked from that Tass Helper class
+         */
+        $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -610,7 +634,15 @@ class Profile implements IStrategy
                 /* Each parent in the family
                  */
                 foreach (self::PARENT_PERSON_NODES as $node) {
-                    $externalId = (string)$parentId;
+
+                    /* Do some funny prefix stuff for parents
+                     */
+                    if ($this->fatherNode === $node) {
+                        $externalId = trim((string)$familyRecord['username']);
+                    } else {
+                        $externalId = "{$this->spousePrefix}-{$familyRecord['username']}";
+                    }
+
                     $email = trim((string)$familyRecord[$node]['e_mail']);
                     $firstname = trim((string)$familyRecord[$node]['preferred_name']);
                     $lastname = trim((string)$familyRecord[$node]['surname']);
@@ -620,13 +652,10 @@ class Profile implements IStrategy
                     $relationship = trim((string)$familyRecord[$node]['description']);
                     $title = trim((string)$familyRecord[$node]['title']);
 
-                    /* TODO Do some funny prefix stuff for parents
+                    /* $username is the result of that $externalId calculation
+                     * but you can override this in UPS anyway
                      */
-                    if ($this->fatherNode === $node) {
-                        $username = "spouseprefix-{$familyRecord['username']}";
-                    } else {
-                        $username = trim((string)$familyRecord['username']);
-                    }
+                    $username = $externalId;
 
                     try {
                         $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
