@@ -43,8 +43,12 @@ class Queue extends ResourceVideo
     /** @var string $message */
     protected $message;
 
-    /** @var User $user */
-    protected $user;
+    /**
+     * We may or may not know the user who's action resulted in this entity being created.
+     *
+     * @var null|User $user
+     */
+    private $user;
 
     /** @var string $type */
     protected $type;
@@ -758,19 +762,18 @@ class Queue extends ResourceVideo
     }
 
     /**
-     * @return User
+     * @return null|User
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
     /**
-     * @param User $user
-     *
-     * @return self|$this
+     * @param null|User $user
+     * @return $this
      */
-    public function setUser($user)
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
