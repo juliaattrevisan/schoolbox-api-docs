@@ -586,26 +586,15 @@ class Profile implements IStrategy
             /* TODO Fill in these basic parent vars
              */
             $externalId = '';
-            $username = '';
+            $email = '';
             $firstname = '';
             $lastname = '';
-            $email = '';
             $phoneHome = '';
-            $phoneWork = '';
             $phoneMobile = '';
+            $phoneWork = '';
             $relationship = '';
             $title = '';
-
-            /* Parents without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for parent %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
+            $username = '';
 
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);

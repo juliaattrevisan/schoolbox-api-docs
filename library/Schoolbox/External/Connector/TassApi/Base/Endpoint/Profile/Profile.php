@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use DomainException;
 use InvalidArgumentException;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
@@ -18,6 +19,8 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\Mapper\Exception;
+use UnexpectedValueException;
 
 /**
  * Class Profile
@@ -558,32 +561,128 @@ class Profile implements IStrategy
         ];
     }
 
+
     /**
      * Import parent profile data for a given student
      *
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $parents
+     * @throws Exception
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $parents): void
     {
+        $studentId = $studentBaseProfile->getExternalId();
 
         /* Parents that were preloaded for this student will exist in the lookup array
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
-        $studentId = $studentBaseProfile->getExternalId();
-
         if (isset($parents['lookup'][$studentId])) {
             foreach ($parents['lookup'][$studentId] as $parentId => $value) {
                 $this->log->info("Adding parent {$parentId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
 
-                print_r($parents['index'][$parentId]);
-
-                /* Assign vars as usual
+                /* The Family Record contains both parents' data, in adjacent nodes,
+                 * with the keys 'person1' and 'person2'. person2 seems to be the father's data
+                 * and comes first (mhmm)  and person1 is the mother's. I haven't seen any further
+                 * parents in the dev data from Tass, but I presume there to be more.
                  */
+                $familyRecord = $parents['index'][$parentId];
 
-
-                /* Save it
+                /* Each parent in the family
                  */
+                foreach (['person1', 'person2'] as $node) {
+                    $externalId = (string)$parentId;
+                    $email = trim((string)$familyRecord[$node]['e_mail']);
+                    $firstname = trim((string)$familyRecord[$node]['preferred_name']);
+                    $lastname = trim((string)$familyRecord[$node]['surname']);
+                    $phoneHome = '';
+                    $phoneMobile = '';
+                    $phoneWork = '';
+                    $relationship = trim((string)$familyRecord[$node]['description']);
+                    $title = trim((string)$familyRecord[$node]['title']);
+
+                    /* TODO Do some funny prefix stuff for parents
+                     */
+                    if ('person1' === $node) {
+                        $username = "spouseprefix-{$familyRecord['username']}";
+                    } else {
+                        $username = trim((string)$familyRecord['username']);
+                    }
+
+                    try {
+                        $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                        $parentBaseProfile = $parentProfile->getBaseProfile();
+                    } catch (Exception $e) {
+                        $parentProfile = $this->parentProfileMapper->createModel();
+                        $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                        $parentProfile->setBaseProfile($parentBaseProfile);
+                    }
+
+                    $parentBaseProfile
+                        ->setExternalId($externalId)
+                        ->setTitle($title)
+                        ->setFirstname($firstname)
+                        ->setLastname($lastname);
+
+                    /* Log it
+                     */
+                    $this->log->info(sprintf(
+                        'Adding base profile for %s',
+                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                    ));
+
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $this->baseProfileMapper->save($parentBaseProfile);
+                    }
+
+                    $parentProfile
+                        ->setPhoneHome($phoneHome)
+                        ->setPhoneWork($phoneWork)
+                        ->setMobile($phoneMobile)
+                        ->setEmail($email)
+                        ->setUsername($username);
+
+                    /* Log it
+                     */
+                    $this->log->info(sprintf(
+                        'Adding parent profile for %s',
+                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                    ));
+
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $this->parentProfileMapper->save($parentProfile);
+                    }
+
+                    /* Manufacture relations
+                     */
+
+                    /* Log it
+                     */
+                    $this->log->info(sprintf(
+                        'Adding relation between %s, the %s of %s',
+                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                        trim($relationship),
+                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                    ));
+
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $relationship = $this->relationshipMapper->createModel()
+                            ->setUserProfile($parentBaseProfile)
+                            ->setChildProfile($studentBaseProfile)
+                            ->setType($relationship);
+
+                        $this->relationshipMapper->save($relationship);
+                    }
+                }
             }
         } else {
             $this->log->info("No parents found for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
