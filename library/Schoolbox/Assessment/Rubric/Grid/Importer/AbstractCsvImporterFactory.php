@@ -43,15 +43,14 @@ abstract class AbstractCsvImporterFactory
         }
 
         // First three cells may be settings:
-        // useMarkRange:      On/Off
-        // capabilityMarkType: int|null
-        // capabilityGradeGroup: int|null
+        // useMarkRange:       On/Off
+        // capabilityMarkType: string (a MarkType::SLUG_* constant), followed by an int grade group
         $useMarkRange           = false;
         $capabilityMarkTypeSlug = null;
         $capabilityGradeGroup   = null;
-        $settingCells           = [$headerRow[0], $headerRow[1], $headerRow[2]];
+        $settingCells           = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
-            $settingPair = explode(':', $settingCell);
+            $settingPair = explode(':', $settingCell, 2);
             $setting     = $settingPair[0] ?? '';
             $value       = trim($settingPair[1] ?? '');
 
@@ -76,11 +75,16 @@ abstract class AbstractCsvImporterFactory
                     break;
 
                 case 'capabilityMarkType':
-                    $capabilityMarkTypeSlug = $value;
-                    break;
-
-                case 'capabilityGradeGroup':
-                    $capabilityGradeGroup = (int)$value;
+                    [$capabilityMarkTypeSlug, $capabilityGradeGroup] = array_pad(
+                        array_map('trim', explode(':', $value)),
+                        2,
+                        null
+                    );
+                    if (!empty($capabilityGradeGroup)) {
+                        $capabilityGradeGroup = (int)$capabilityGradeGroup;
+                    } else {
+                        $capabilityGradeGroup = null;
+                    }
                     break;
 
                 // Legacy mark-per-capability setting, superseded by capabilityMarkType.
@@ -130,6 +134,7 @@ abstract class AbstractCsvImporterFactory
         // build the square, extracting data as we go
         $capabilities    = [];
         $isLastRowNewCap = false;
+        $levelCount      = count($levels);
         while ($row = $this->readCsvLine($fp, $maxLevels)) {
             if ($isLastRowNewCap) {
                 $capMaxValue     = $row[0];
@@ -160,8 +165,16 @@ abstract class AbstractCsvImporterFactory
                 FILTER_NULL_ON_FAILURE
             );
 
-            $square[] = $row;
+            // How many descriptors are there in this row?
+            // We'll need to ensure every descriptor has a matching level.
+            $rowDescriptorCount = count($row) - 2;
+            $levelCount         = max($levelCount, $rowDescriptorCount);
+            $square[]           = $row;
         }
+
+        // The square may have more columns than there are levels.
+        // Expand the levels to the size of the square.
+        $levels = array_pad($levels, $levelCount, '');
 
         return new CsvImporter(
             $levels,

@@ -26,7 +26,7 @@ class CsvImporterFactoryTest extends TestCase
      */
     public function getTestBuildData(): iterable
     {
-        $test1 = <<<TEST1
+        $test1 = <<<TEST
 ,,,,,,
 cap2,ind1,,,,,
 ,,0,2,4,6,8
@@ -36,175 +36,84 @@ cap1,ind3,,,,,
 ,,0,2,4,6,8
 ,ind4,,,,,
 ,,0,2,4,6,8
-TEST1;
-        yield 'empty descriptors' => [
-            $this->buildStream($test1),
-            5,
-            new DueWorkModel(),
-            ['', '', '', '',],
+TEST;
+        $emptyDescriptorTestLevels       = ['', '', '', '', '',];
+        $emptyDescriptorTestCapabilities = [
             [
-                [
-                    'name'       => 'cap2',
-                    'maxValue'   => null,
-                    'indicators' => [
-                        [
-                            'name'        => 'ind1',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'ind2',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
+                'name'       => 'cap2',
+                'maxValue'   => null,
+                'indicators' => [
+                    [
+                        'name'        => 'ind1',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
                         ],
                     ],
-                ],
-                [
-                    'name'       => 'cap1',
-                    'maxValue'   => null,
-                    'indicators' => [
-                        [
-                            'name'        => 'ind3',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'ind4',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
+                    [
+                        'name'        => 'ind2',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
                         ],
                     ],
                 ],
             ],
+            [
+                'name'       => 'cap1',
+                'maxValue'   => null,
+                'indicators' => [
+                    [
+                        'name'        => 'ind3',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
+                        ],
+                    ],
+                    [
+                        'name'        => 'ind4',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        yield 'empty descriptors' => [
+            $this->buildStream($test1),
+            5,
+            new DueWorkModel(),
+            $emptyDescriptorTestLevels,
+            $emptyDescriptorTestCapabilities,
             false,
             null,
             null
         ];
 
 
-        $test2 = <<<TEST2
-"capabilityMarkType: none","capabilityGradeGroup: 3","useMarkRange: On",,,,
+        $test2 = <<<TEST
+"capabilityMarkType: none","useMarkRange: On",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 ,,15,10,5,1,0
-,"Indicator 2",a,b,c,d,e
-,,15,10,5,1,0
-TEST2;
-        yield 'mark range on' => [
-            $this->buildStream($test2),
-            5,
-            new DueWorkModel(),
-            ['', '', '', '',],
-            [
-                [
-                    'name'       => 'Test Capability 1',
-                    'maxValue'   => null,
-                    'indicators' => [
-                        [
-                            'name'        => 'Indicator 1',
-                            'descriptors' => [
-                                ['name' => 'a', 'value' => 15,],
-                                ['name' => 'b', 'value' => 10,],
-                                ['name' => 'c', 'value' => 5,],
-                                ['name' => 'd', 'value' => 1,],
-                                ['name' => 'e', 'value' => 0,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'Indicator 2',
-                            'descriptors' => [
-                                ['name' => 'a', 'value' => 15,],
-                                ['name' => 'b', 'value' => 10,],
-                                ['name' => 'c', 'value' => 5,],
-                                ['name' => 'd', 'value' => 1,],
-                                ['name' => 'e', 'value' => 0,],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            true,
-            6,
-            3,
-        ];
-
-
-        $test3= <<<TEST2
-"capabilityMarkType: percent","capabilityGradeGroup: 2","useMarkRange: Off",,,,
-"Test Capability 1","Indicator 1",a,b,c,d,e
-9,,15,10,5,1,0
-,"Indicator 2",a,b,c,d,e
-,,15,10,5,1,0
-TEST2;
-        yield 'mark-per-cap percent' => [
-            $this->buildStream($test3),
-            5,
-            new DueWorkModel(),
-            ['', '', '', '',],
-            [
-                [
-                    'name'       => 'Test Capability 1',
-                    'maxValue'   => 9,
-                    'indicators' => [
-                        [
-                            'name'        => 'Indicator 1',
-                            'descriptors' => [
-                                ['name' => 'a', 'value' => 15,],
-                                ['name' => 'b', 'value' => 10,],
-                                ['name' => 'c', 'value' => 5,],
-                                ['name' => 'd', 'value' => 1,],
-                                ['name' => 'e', 'value' => 0,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'Indicator 2',
-                            'descriptors' => [
-                                ['name' => 'a', 'value' => 15,],
-                                ['name' => 'b', 'value' => 10,],
-                                ['name' => 'c', 'value' => 5,],
-                                ['name' => 'd', 'value' => 1,],
-                                ['name' => 'e', 'value' => 0,],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            false,
-            1,
-            2,
-        ];
-
-
-        // legacy markPerCapability setting on
-        $legacyTestMarkPerCapabilityOn = <<<TEST
-"markPerCapability: on","useMarkRange: Off",,,,,
-"Test Capability 1","Indicator 1",a,b,c,d,e
-9,,15,10,5,1,0
 ,"Indicator 2",a,b,c,d,e
 ,,15,10,5,1,0
 TEST;
-        $legacyTestLevelCount           = 5;
-        $legacyTestExpectedLevels       = ['', '', '', '',];
-        $legacyTestExpectedCapabilities = [
+        $standardTestLevelCount   = 5;
+        $standardTestLevels       = ['', '', '', '', '',];
+        $standardTestCapabilities = [
             [
                 'name'       => 'Test Capability 1',
                 'maxValue'   => 9,
@@ -233,12 +142,133 @@ TEST;
             ],
         ];
 
+
+        // For this test only: capability mark value is null
+        $markPerCapOffTestCapabilities                = $standardTestCapabilities;
+        $markPerCapOffTestCapabilities[0]['maxValue'] = null;
+        yield 'mark-per-cap off, mark range on' => [
+            $this->buildStream($test2),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $markPerCapOffTestCapabilities,
+            true,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
+            null,
+        ];
+
+
+        $test3= <<<TEST
+"capabilityMarkType: percent","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap percent' => [
+            $this->buildStream($test3),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
+            null,
+        ];
+
+
+        $test4= <<<TEST
+"capabilityMarkType: letter:1","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter:1' => [
+            $this->buildStream($test4),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            1,
+        ];
+
+
+        $test5= <<<TEST
+"capabilityMarkType: letter : 1","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter:1 with spaces' => [
+            $this->buildStream($test5),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            1,
+        ];
+
+
+        $test6 = <<<TEST
+"capabilityMarkType: letter:","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter with empty grade group' => [
+            $this->buildStream($test6),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            null,
+        ];
+
+
+        $test7 = <<<TEST
+"capabilityMarkType: letter","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+        yield 'mark-per-cap letter with null grade group' => [
+            $this->buildStream($test7),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
+            null,
+        ];
+
+
+
+        // legacy markPerCapability setting on
+        $legacyTestMarkPerCapabilityOn = <<<TEST
+"markPerCapability: on","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+
         yield 'mark-per-cap legacy on: null mark type => assume percent' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             new DueWorkModel(),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
             null,
@@ -246,12 +276,12 @@ TEST;
 
         yield 'mark-per-cap legacy on: mark type none => cap mark type total' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_TOTAL],
             null,
@@ -259,12 +289,12 @@ TEST;
 
         yield 'mark-per-cap legacy on: mark type percent' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_PERCENT],
             null,
@@ -272,12 +302,12 @@ TEST;
 
         yield 'mark-per-cap legacy on: mark type total' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_TOTAL],
             null,
@@ -285,13 +315,13 @@ TEST;
 
         yield 'mark-per-cap legacy on: mark type letter + grade group' => [
             $this->buildStream($legacyTestMarkPerCapabilityOn),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
                 ->setGradeGroup((new GradeGroup())->setId(1))
             ,
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_LETTER],
             1,
@@ -309,10 +339,10 @@ TEST;
 
         yield 'mark-per-cap legacy off: null mark type => assume none' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             new DueWorkModel(),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
@@ -320,12 +350,12 @@ TEST;
 
         yield 'mark-per-cap legacy off: mark type none' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
@@ -333,12 +363,12 @@ TEST;
 
         yield 'mark-per-cap legacy off: mark type percent' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
@@ -346,12 +376,12 @@ TEST;
 
         yield 'mark-per-cap legacy off: mark type total' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
@@ -359,14 +389,57 @@ TEST;
 
         yield 'mark-per-cap legacy off: mark type letter + grade group' => [
             $this->buildStream($legacyTestMarkPerCapabilityOff),
-            $legacyTestLevelCount,
+            $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
                 ->setGradeGroup((new GradeGroup())->setId(1)),
-            $legacyTestExpectedLevels,
-            $legacyTestExpectedCapabilities,
+            $standardTestLevels,
+            $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
+            null,
+        ];
+
+
+        // Edge case: there's less levels than descriptors
+        // Expand list of levels out to the max number of descriptors
+        $noLevelsTest = <<<TEST
+,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+
+        yield 'no levels provided' => [
+            $this->buildStream($noLevelsTest),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            null,
+            null,
+        ];
+
+
+        // If there's more levels than the level count:
+        $tooManyLevelsTest = <<<TEST
+,,,,,,,,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e,f,g,h,i,j
+9,,15,10,5,1,0,0,0,0,0,0
+,"Indicator 2",a,b,c,d,e,f,g,h,i,j
+,,15,10,5,1,0,0,0,0,0,0
+TEST;
+
+        yield 'too many levels provided' => [
+            $this->buildStream($tooManyLevelsTest),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            null,
             null,
         ];
     }
