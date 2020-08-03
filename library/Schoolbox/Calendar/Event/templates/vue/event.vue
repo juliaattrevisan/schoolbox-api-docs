@@ -542,7 +542,7 @@
                             </span>
 
                             <template v-if="canInviteAttendees()">
-                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Start typing the name of a user" v-model="selected">
+                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Search for people to invite" v-model="selected">
                                     <template slot="option" slot-scope="option">
                                         <div class="d-center">
                                             {{ option.name }}
