@@ -1,7 +1,7 @@
 /* Button Dimensions
  */
 @mixin button-dimensions() {
-	height: $global-button-height;
+	min-height: $global-button-height;
 	padding: $global-button-padding;
     line-height: inherit;
 	position: relative;
