@@ -37,65 +37,67 @@ cap1,ind3,,,,,
 ,ind4,,,,,
 ,,0,2,4,6,8
 TEST;
-        yield 'empty descriptors' => [
-            $this->buildStream($test1),
-            5,
-            new DueWorkModel(),
-            ['', '', '', '', '',],
+        $emptyDescriptorTestLevels       = ['', '', '', '', '',];
+        $emptyDescriptorTestCapabilities = [
             [
-                [
-                    'name'       => 'cap2',
-                    'maxValue'   => null,
-                    'indicators' => [
-                        [
-                            'name'        => 'ind1',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'ind2',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
+                'name'       => 'cap2',
+                'maxValue'   => null,
+                'indicators' => [
+                    [
+                        'name'        => 'ind1',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
                         ],
                     ],
-                ],
-                [
-                    'name'       => 'cap1',
-                    'maxValue'   => null,
-                    'indicators' => [
-                        [
-                            'name'        => 'ind3',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
-                        ],
-                        [
-                            'name'        => 'ind4',
-                            'descriptors' => [
-                                ['name' => '', 'value' => 0,],
-                                ['name' => '', 'value' => 2,],
-                                ['name' => '', 'value' => 4,],
-                                ['name' => '', 'value' => 6,],
-                                ['name' => '', 'value' => 8,],
-                            ],
+                    [
+                        'name'        => 'ind2',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
                         ],
                     ],
                 ],
             ],
+            [
+                'name'       => 'cap1',
+                'maxValue'   => null,
+                'indicators' => [
+                    [
+                        'name'        => 'ind3',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
+                        ],
+                    ],
+                    [
+                        'name'        => 'ind4',
+                        'descriptors' => [
+                            ['name' => '', 'value' => 0,],
+                            ['name' => '', 'value' => 2,],
+                            ['name' => '', 'value' => 4,],
+                            ['name' => '', 'value' => 6,],
+                            ['name' => '', 'value' => 8,],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        yield 'empty descriptors' => [
+            $this->buildStream($test1),
+            5,
+            new DueWorkModel(),
+            $emptyDescriptorTestLevels,
+            $emptyDescriptorTestCapabilities,
             false,
             null,
             null
@@ -395,6 +397,49 @@ TEST;
             $standardTestCapabilities,
             false,
             MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
+            null,
+        ];
+
+
+        // Edge case: there's less levels than descriptors
+        // Expand list of levels out to the max number of descriptors
+        $noLevelsTest = <<<TEST
+,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST;
+
+        yield 'no levels provided' => [
+            $this->buildStream($noLevelsTest),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            null,
+            null,
+        ];
+
+
+        // If there's more levels than the level count:
+        $tooManyLevelsTest = <<<TEST
+,,,,,,,,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e,f,g,h,i,j
+9,,15,10,5,1,0,0,0,0,0,0
+,"Indicator 2",a,b,c,d,e,f,g,h,i,j
+,,15,10,5,1,0,0,0,0,0,0
+TEST;
+
+        yield 'too many levels provided' => [
+            $this->buildStream($tooManyLevelsTest),
+            $standardTestLevelCount,
+            new DueWorkModel(),
+            $standardTestLevels,
+            $standardTestCapabilities,
+            false,
+            null,
             null,
         ];
     }
