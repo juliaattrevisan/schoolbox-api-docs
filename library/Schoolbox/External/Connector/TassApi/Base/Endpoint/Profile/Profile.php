@@ -480,6 +480,7 @@ class Profile implements IStrategy
         ]);
 
         $lookup = [];
+        $index = [];
 
         foreach ($parents['parents'] as $row) {
             foreach ($row as $parentId => $parent) {
@@ -543,6 +544,7 @@ class Profile implements IStrategy
                 if (isset($parent['students'])) {
                     foreach ($parent['students'] as $studentId) {
                         $lookup[$studentId][$parentId] = $parentId;
+                        $index[$parentId] = $parent;
                     }
                 } else {
                     $this->log->critical("Parent records for parent {$parentId} malformed.");
@@ -552,7 +554,7 @@ class Profile implements IStrategy
 
         return [
             'lookup' => $lookup,
-            'index' => $parents['parents']
+            'index' => $index
         ];
     }
 
@@ -565,7 +567,27 @@ class Profile implements IStrategy
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $parents): void
     {
 
-        print_r($parents['lookup'][$studentBaseProfile->getExternalId()]);
+        /* Parents that were preloaded for this student will exist in the lookup array
+         * Otherwise the student doesn't have any parents in tass, for whatever reason
+         */
+        $studentId = $studentBaseProfile->getExternalId();
+
+        if (isset($parents['lookup'][$studentId])) {
+            foreach ($parents['lookup'][$studentId] as $parentId => $value) {
+                $this->log->info("Adding parent {$parentId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+
+                print_r($parents['index'][$parentId]);
+
+                /* Assign vars as usual
+                 */
+
+
+                /* Save it
+                 */
+            }
+        } else {
+            $this->log->info("No parents found for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+        }
     }
 
 
