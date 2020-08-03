@@ -5469,11 +5469,6 @@
       "integrity": "sha1-mEcocL8igTL8vdhoEputEsPAKeM=",
       "dev": true
     },
-    "promise-polyfill": {
-      "version": "8.1.0",
-      "resolved": "https://registry.npmjs.org/promise-polyfill/-/promise-polyfill-8.1.0.tgz",
-      "integrity": "sha1-MAWdpU0TWM6QWsWB8ofhhK7fmV0="
-    },
     "prr": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/prr/-/prr-1.0.1.tgz",

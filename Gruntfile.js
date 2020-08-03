@@ -137,9 +137,6 @@ const jsSrc = {
         // Lodash
         'node_modules/lodash/lodash.js',
 
-        // Promise polyfill
-        'node_modules/promise-polyfill/dist/polyfill.js',
-
         // MS Immersive Reader
         'node_modules/@microsoft/immersive-reader-sdk/lib/immersive-reader-sdk.js',
 
