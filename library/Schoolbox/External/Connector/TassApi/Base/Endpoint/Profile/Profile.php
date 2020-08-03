@@ -52,6 +52,23 @@ class Profile implements IStrategy
 
 
     /**
+     * Parents records are actually Family records; Family records contain exactly two nodes,
+     * one for each parent, plus some miscellaneous stuff
+     */
+    private const PARENT_PERSON_NODES = ['person2', 'person1'];
+
+
+    /**
+     * The node corresponding to a father's data in a Family record.
+     * I have a fear that this will be different per tass implementation somewhere but, for now,
+     * presume that 'person2' is (and always is) the papa
+     *
+     * @var string
+     */
+    private $fatherNode = 'person2';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -592,7 +609,7 @@ class Profile implements IStrategy
 
                 /* Each parent in the family
                  */
-                foreach (['person1', 'person2'] as $node) {
+                foreach (self::PARENT_PERSON_NODES as $node) {
                     $externalId = (string)$parentId;
                     $email = trim((string)$familyRecord[$node]['e_mail']);
                     $firstname = trim((string)$familyRecord[$node]['preferred_name']);
@@ -605,7 +622,7 @@ class Profile implements IStrategy
 
                     /* TODO Do some funny prefix stuff for parents
                      */
-                    if ('person1' === $node) {
+                    if ($this->fatherNode === $node) {
                         $username = "spouseprefix-{$familyRecord['username']}";
                     } else {
                         $username = trim((string)$familyRecord['username']);
