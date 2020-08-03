@@ -30,6 +30,14 @@ class DSNCodec
 {
 
     /**
+     * Consts corresponding to each of the Tass systems
+     */
+    public const MODULE_LMS_INTEGRATION = 'lmsintegration';
+    public const MODULE_STUDENT_DETAILS = 'studentdetails';
+    public const MODULE_IDENTITY_MANAGEMENT = 'identitymanagement';
+
+
+    /**
      * DSN format
      *
      * Product Module (e.g. Student Details API, Identity Management API, LMS Integration API)

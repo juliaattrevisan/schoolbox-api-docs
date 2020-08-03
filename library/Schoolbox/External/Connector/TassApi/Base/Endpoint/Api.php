@@ -78,15 +78,17 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
+     * @param string $module One of the MODULE_* consts defined in DSNCodec
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    public function __construct(string $host, string $dsn)
+    public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
         $this->dsn = $dsn;
 
-        $this->client = $this->initClient($host, $dsn, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($host, $dsn, $module,self::DEFAULT_TIMEOUT);
     }
 
 
@@ -95,17 +97,25 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
+     * @param string $module
      * @param int    $timeout
      * @return Client
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    private function initClient(string $host, string $dsn, int $timeout): Client
+    private function initClient(string $host, string $dsn, string $module, int $timeout): Client
     {
 
-        /* Figure out all the credential parts: company code, app code, token
+        /* Figure out all the credential parts: module, company code, app code, token
          */
-        $this->credentials = (new DSNCodec())->decode($dsn);
+        $dsnParts = (new DSNCodec())->decode($dsn);
+
+        if (!isset($dsnParts[$module])) {
+            throw new DomainException("Tass API DSN: Invalid module name {$module}");
+        }
+
+        $this->credentials = $dsnParts[$module];
 
         /* Set up a token codec which does some security stuff based on the
          * params provided to its generateToken() method
