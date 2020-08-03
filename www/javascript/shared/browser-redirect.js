@@ -1,7 +1,7 @@
 /**
  * Redirect to the upgrade.php page if browser is not supported
- * Currently: IE10 or lower
+ * No IE versions are supported: `"ActiveXObject" in window` ought to detect IE
  */
-if (Function('/*@cc_on return document.documentMode<=10@*/')()) {
+if ("ActiveXObject" in window) {
     window.location.href = '/upgrade.php';
 }
