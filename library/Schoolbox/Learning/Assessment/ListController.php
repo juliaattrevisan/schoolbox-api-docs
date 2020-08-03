@@ -18,7 +18,6 @@ use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -443,7 +442,7 @@ class ListController extends Web\Controller\Base
              */
 
             // Clear assessment if the context is changed
-            $relocatedContext   = $this->getRelocatedContext($assessment, $postData['locationId'] ?? '');
+            $relocatedContext   = $assessment ? $this->getRelocatedContext($assessment, $postData['locationId'] ?? '') : '';
             $originalAssessment = null;
             if ($relocatedContext) {
                 $postData['context'] = $relocatedContext;
@@ -454,7 +453,7 @@ class ListController extends Web\Controller\Base
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
             $assessment        = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->transactor->transact($assessment, $before);
+            $transactionSummary = $this->transactor->transact($assessment, $before, $originalAssessment);
 
             // assessment is saved; persist plans
 
@@ -465,17 +464,10 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
-            if ($originalAssessment) {
-                if ($originalAssessment instanceof Quiz) {
-                    \Schoolbox\Learning\Quiz\Mapper::getInstance()->copyQuizConstituents($originalAssessment->getId(), $assessment->getId());
-                }
-
-                $this->assessmentMapper->delete($originalAssessment);
-                // redirect to new context
+            if ($relocatedContext) {
+                // Unset returnURL to redirect to destination
                 $this->getRequest()->post->offsetUnset(Redirect::RETURN_URL);
-                $transactionSummary[Redirect::RETURN_URL] = "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}";
             }
-
             $db->commit();
             // Retrieve assessment, as I need the assessment's participation
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
@@ -696,7 +688,7 @@ class ListController extends Web\Controller\Base
      * Gets new context, if the assessment's context has been changed
      * @param IAssessable $assessment
      * @param string|null $locationId
-     * @return IAssessable|null
+     * @return AssessmentContext|null
      */
     public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
     {
@@ -708,7 +700,10 @@ class ListController extends Web\Controller\Base
                 if (isset($match[1]) && $match[1] === 'unit') {
                     return $this->unitSpecificationMapper->findById($match[2]);
                 } elseif (isset($match[1]) && $match[1] === 'project') {
-                    return $this->assessmentMapper->findById($match[2]);
+                    $project = $this->assessmentMapper->findById($match[2]);
+                    if ($project instanceof Project) {
+                        return $project;
+                    }
                 }
             } catch (MapperException $e) {
                 // noop

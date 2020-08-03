@@ -6,6 +6,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -100,12 +103,29 @@ if (!empty($_POST)) {
         'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])
     ));
 
+    /** @var AssessmentDataSource $dataSource */
+    $dataSource = $this->getDi()->get('assessmentDataSource');
+    $assessment = $dataSource->findById($assess['assessment_id']);
+
     /* Render out breadcrumbs
      */
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
     $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
+
+    if ($assessment->getContext() instanceof Project) {
+        $crumbs = array_merge($crumbs, [
+            [
+                'text'  => $assessment->getContext()->getTitle(),
+                'href'  => $this->getDi()->get('router')->generate('learningAssessment.getStatus', [
+                    'assessmentId' => $assessment->getContext()->getId(),
+                    'assessment'   => $assessment->getContext(),
+                ]),
+                'class' => '',
+            ],
+        ]);
+    }
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [

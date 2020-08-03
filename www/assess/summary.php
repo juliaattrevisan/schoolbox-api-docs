@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Redirect;
@@ -45,9 +46,10 @@ $dataSource = $this->getDi()->get('assessmentDataSource');
 
 /** @var Alaress\Authorizer\Authorizer $authorizer */
 $authorizer = $this->getDi()->get('authorizer');
-$params     =  [
+$assessment = $dataSource->findById($assess['assessment_id']);
+$params = [
     'assessmentId' => $assess['assessment_id'],
-    'assessment'   => $dataSource->findById($assess['assessment_id']),
+    'assessment'   => $assessment,
 ];
 if (!$authorizer->isPathAuthorizedForUser('learningQuiz.getQuizSummary', $params, $_SESSION['user'])) {
     error(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
@@ -127,6 +129,19 @@ $trail = new \Schoolbox\Breadcrumbs();
 
 // get a crunchy biscuit base
 $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
+
+if ($assessment->getContext() instanceof Project) {
+    $crumbs = array_merge($crumbs, [
+        [
+            'text'  => $assessment->getContext()->getTitle(),
+            'href'  => $this->getDi()->get('router')->generate('learningAssessment.getStatus', [
+                'assessmentId' => $assessment->getContext()->getId(),
+                'assessment'   => $assessment->getContext(),
+            ]),
+            'class' => '',
+        ],
+    ]);
+}
 
 // sprinkle some crumbs on top
 $crumbs = array_merge($crumbs, [

@@ -15,10 +15,12 @@ use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -78,6 +80,10 @@ class Transactor
      */
     protected $submissionFileMapper;
 
+    /**
+     * @var QuizMapper
+     */
+    protected $quizMapper;
 
     /**
      * @var Router
@@ -94,6 +100,7 @@ class Transactor
      * @param AssessmentMapperProxy                 $assessmentMapperProxy
      * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
      * @param SingleFile\Mapper                     $submissionFileMapper
+     * @param QuizMapper                            $quizMapper
      * @param Router                                $router
      */
     public function __construct(
@@ -103,6 +110,7 @@ class Transactor
         AssessmentMapperProxy $assessmentMapperProxy,
         DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
         SingleFile\Mapper $submissionFileMapper,
+        QuizMapper $quizMapper,
         Router $router
     ) {
         $this->folderMapper = $folderMapper;
@@ -111,6 +119,7 @@ class Transactor
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->plagscanMapper = $plagscanMapper;
         $this->submissionFileMapper = $submissionFileMapper;
+        $this->quizMapper = $quizMapper;
         $this->router = $router;
     }
 
@@ -120,6 +129,7 @@ class Transactor
      *
      * @param IAssessable $assessment
      * @param array       $before
+     * @param IAssessable|null $originalAssessment
      * @return array
      * @throws MapperException
      * @throws MapperException\Deleted
@@ -129,7 +139,7 @@ class Transactor
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function transact(IAssessable $assessment, array $before = []): array
+    public function transact(IAssessable $assessment, array $before = [], ?IAssessable $originalAssessment = null): array
     {
         $this->assessment = $assessment;
 
@@ -175,6 +185,16 @@ class Transactor
             }
 
             $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
+        }
+
+        // If relocated, remove original assessment
+        if ($originalAssessment && $this->assessment->getId() !== $originalAssessment->getId()) {
+            if ($this->assessment instanceof Quiz) {
+                $this->quizMapper->copyQuizConstituents($originalAssessment->getId(), $this->assessment->getId());
+            }
+            $this->assessmentMapperProxy->delete($originalAssessment);
+            // redirect to new context
+            $returnUrl = "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}";
         }
 
         /* The conclusion of how $returnUrl was derived

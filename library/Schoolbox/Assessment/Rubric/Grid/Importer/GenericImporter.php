@@ -123,23 +123,27 @@ class GenericImporter implements IImporter
             $capabilities = [];
             foreach ($this->grid->getRowSet()->getCapabilities() as $capability) {
                 $indicators = [];
+                $capUsage   = $this->grid->retrieveCapabilityUsage($capability);
+                if (!$capUsage) {
+                    continue;
+                }
                 foreach ($capability->getIndicators() as $indicator) {
-                    $indUsage    = $this->grid->retrieveIndicatorUsage($indicator);
+                    $indUsage = $this->grid->retrieveIndicatorUsage($indicator);
+                    if (!$indUsage) {
+                        continue;
+                    }
                     $descriptors = [];
-                    if ($indUsage) {
-                        foreach ($indUsage->getDescriptors() as $descriptor) {
-                            $descriptors[] = [
-                                'name'  => $descriptor->getDescription(),
-                                'value' => $descriptor->getMaxValue(),
-                            ];
-                        }
+                    foreach ($indUsage->getDescriptors() as $descriptor) {
+                        $descriptors[] = [
+                            'name'  => $descriptor->getDescription(),
+                            'value' => $descriptor->getMaxValue(),
+                        ];
                     }
                     $indicators[] = [
                         'name'        => $indicator->getName(),
                         'descriptors' => $descriptors,
                     ];
                 }
-                $capUsage       = $this->grid->retrieveCapabilityUsage($capability);
                 $capabilities[] = [
                     'name'       => $capability->getName(),
                     'maxValue'   => $capUsage ? $capUsage->getMaxValue() : null,
