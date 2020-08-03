@@ -235,22 +235,6 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-//            /* Fish out a staff member via their user code
-//             */
-//            $tutor = $this->findTutor((string)$student->Tutor);
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $housemaster = $this->findHousemaster($academicHouse);
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $formTeacher = $this->findFormTeacher($form);
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
-
             /* Smoosh it all together
              */
             $studentProfile
@@ -349,18 +333,6 @@ class Profile implements IStrategy
         }
     }
 
-//    /**
-//     * Find comments info for a given student
-//     *
-//     * @return string
-//     */
-//    private function findComments(): string
-//    {
-//        /* TODO Fill in comments
-//          */
-//        return '';
-//    }
-
 
     /**
      * Convert a date from possibly null/empty value
@@ -439,52 +411,6 @@ class Profile implements IStrategy
         return array_values($stack);
     }
 
-//
-//    /**
-//     * Find a form teacher from their form code
-//     *
-//     * @return array
-//     */
-//    private function findFormTeacher(): array
-//    {
-//        /* TODO Fill in these form teacher vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find a housemaster from their house name
-//     *
-//     * @return array
-//     */
-//    private function findHousemaster(): array
-//    {
-//        /* TODO Fill in these housemaster vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find legal alerts
-//     *
-//     * @return string|null
-//     */
-//    private function findLegal(): ?string
-//    {
-//        /* TODO Fill in these legal alert vars
-//         */
-//        return null;
-//    }
-//
-//
 
     /**
      * Studies Code is one of five possible fields that could exist
@@ -538,51 +464,6 @@ class Profile implements IStrategy
 
         return null;
     }
-//
-//
-//    /**
-//     * Find out if this student has special needs
-//     *
-//     * @return bool
-//     */
-//    private function findSpecialNeeds(): bool
-//    {
-//        /* TODO Fill in these special needs vars
-//         */
-//        return false;
-//    }
-//
-//
-//    /**
-//     * Find a tutor from their id
-//     *
-//     * @return array
-//     */
-//    private function findTutor(): array
-//    {
-//        /* TODO Fill in these tutor vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find a year level coordinator from their year level
-//     *
-//     * @return array
-//     */
-//    private function findYearLevelCoordinator(): array
-//    {
-//        /* TODO Fill in these ylc vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
 
 
     /**
