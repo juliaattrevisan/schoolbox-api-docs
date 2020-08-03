@@ -170,48 +170,40 @@ class Profile implements IStrategy
             /* TODO Fill in these basic student vars
              */
             $externalId = '';
-            $username = '';
-            $title = '';
-            $firstname = '';
-            $lastname = '';
-            $campus = '';
+            $academicHouse = '';
+            $boardingStatus = false;
+            $campusName = '';
+            $comments = '';
             $dob = '';
             $email = '';
-            $enrolmentDate = '';
+            $firstname = '';
             $form = '';
             $gender = '';
-            $academicHouse = '';
-            $leavingDate = '';
+            $lastname = '';
             $legal = '';
+            $medicalAlert = '';
+            $messages = '';
             $mobile = '';
             $studiesCode = '';
+            $title = '';
             $tutor = '';
             $tutorGroup = '';
+            $username = '';
             $yearLevel = '';
+
+            /* TODO Fill in these dates
+             */
+            $enrolmentDate = '';
+            $leavingDate = '';
 
             /* Flags
              */
             /* TODO Fill in these flag vars
              */
-            $boardingStatus = false;
             $esl = false;
             $ib = false;
             $ilp = false;
-            $medicalAlert = '';
-            $messages = '';
             $specialNeeds = false;
-            $comments = '';
-
-            /* Students without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
 
             /* Find out if this externalId already has a student profile
              * If one already exists, load it, update it, then save it
