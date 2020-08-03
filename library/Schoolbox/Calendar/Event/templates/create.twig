@@ -287,24 +287,8 @@
                     <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
                         <div class="row">
                             <div class="small-12 columns">
-                                <label>
-                                    Show Guest List
-                                    <div class="switch">
-                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
-                                        <label for="showAttendees">
-                                            <span>On</span>
-                                            <span>Off</span>
-                                        </label>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="small-12 columns">
-                                <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
-                                <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
-                            </div>
-                            <div class="small-12 columns">
-                                <label>Add Guests</label>
-                                <input id='add-guests' name="guests" type='text' value='' placeholder="Start typing the name of a user" />
+                                <label>Invite Guests</label>
+                                <input id='add-guests' name="guests" type='text' value='' placeholder="Search for people to invite" />
                                 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
                                 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
                                 <script type="text/javascript">
@@ -326,6 +310,23 @@
                                     });
                                 </script>
                             </div>
+                            <div class="small-12 medium-6 columns">
+                                <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
+                                <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <label>
+                                    Show Guest List <span class="hint has-tip tip-top" title="Control the visibility of the guest list to other guests, you will always see the guest list." data-tooltip>?</span>
+                                    <div class="switch">
+                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
+                                        <label for="showAttendees">
+                                            <span>On</span>
+                                            <span>Off</span>
+                                        </label>
+                                    </div>
+                                </label>
+                            </div>
+
                         </div>
 
                         {# Show the Guests input if attendance is enabled
