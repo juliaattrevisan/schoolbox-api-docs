@@ -18,15 +18,12 @@
     "@microsoft/immersive-reader-sdk": "^1.1.0",
     "@types/classnames": "^2.2.9",
     "axios": "0.18.1",
-    "classnames": "^2.2.6",
     "clipboard": "^2.0.6",
     "core-js": "^3.4.5",
-    "es6-object-assign": "1.1.0",
     "flatpickr": "^4.6.3",
     "locutus": "^2.0.11",
     "lodash": "4.17.19",
     "moment": "^2.24.0",
-    "promise-polyfill": "8.1.0",
     "qs": "^6.9.1",
     "ucid": "^1.0.0",
     "vue": "2.6.10",
@@ -77,8 +74,7 @@
         {
           "targets": {
             "browsers": [
-              "defaults",
-              "IE 11"
+              "defaults"
             ]
           },
           "useBuiltIns": "usage",
