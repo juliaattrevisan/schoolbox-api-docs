@@ -44,7 +44,7 @@
 .component-action{
     section {
         display: flex;
-        justify-content: right;
+        justify-content: flex-end;
         background-color: rgba(0,0,0,0.02) !important;
         border-top: 1px solid $body-bg;
         border-bottom: 3px solid $body-bg;
