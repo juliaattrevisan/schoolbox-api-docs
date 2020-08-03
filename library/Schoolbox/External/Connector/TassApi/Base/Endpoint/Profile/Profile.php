@@ -250,7 +250,7 @@ class Profile implements IStrategy
                 ->setUsername($username)
                 ->setAlertComment(null)
                 ->setAlertLegal(null)
-                ->setAlertMedical(null)
+                ->setAlertMedical($medicalAlert)
                 ->setAlertMessage(null)
                 ->setCampusName($campusName)
                 ->setEmail($email)
