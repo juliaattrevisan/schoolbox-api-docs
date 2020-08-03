@@ -198,3 +198,16 @@
     cursor: pointer;
   }
 }
+
+/* Dashboard component indents this heading for some reason
+ */
+.Schoolbox_Calendar_Component_Dashboard_Controller {
+  .fc-widget-header {
+    padding: 0;
+
+    .fc-list-heading-main {
+      @extend h2;
+      @extend .subheader;
+    }
+  }
+}
