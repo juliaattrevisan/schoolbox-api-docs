@@ -7,11 +7,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     <title>Your browser is no longer supported</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-au" />
-    <script>
-      //  if (!Function('/*@cc_on return document.documentMode<=10@*/')()) {
-        //    window.location.href = '/';
-        //}
-    </script>
     <link rel="stylesheet" type="text/css" href="/css/core/chrome-foundation.css?v=<?php echo Scrub::text(Config::get('site_version'));?>" />
 </head>
 <body>
