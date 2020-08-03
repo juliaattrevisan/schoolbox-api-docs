@@ -27,6 +27,7 @@ $crumb-border-size: 0;
 $crumb-slash: "";
 
 $breadcrumb-color: $content-ui-foreground;
+$breadcrumb-noclick-color: #9a9a9a;
 $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
@@ -45,29 +46,26 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
   overflow: hidden;
   li {
     a { // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
-      // DONE isn't this just content-ui-background after all?
-      color: $breadcrumb-bg-color;
-      //color: scale-color($breadcrumb-noclick-bg-color, $lightness: -40%);
-      line-height: rem-calc($base-font-size);
-      padding: rem-calc(($base-font-size / 2));
-      padding-left: rem-calc($base-font-size);
-      background-color: $breadcrumb-noclick-bg-color;
+      background-color: $breadcrumb-bg-color;
+      color: $breadcrumb-noclick-color;
+      cursor: text;
+      line-height: $base-font-size;
+      padding: .5rem .5rem .5rem 1rem;
       position: relative;
       display: block;
       float: left;
       margin-right: 0;
       white-space: nowrap;
-      cursor: text;
 
       &:before,
       &:after {
+        @include single-transition(all, 0.15s, linear);
+        border-top: $base-font-size solid transparent;
+        border-bottom: $base-font-size solid transparent;
         content: " ";
         display: block;
         width: 0;
         height: 0;
-        border-top: rem-calc($base-font-size) solid transparent;
-        @include single-transition(all, 0.15s, linear);
-        border-bottom: rem-calc($base-font-size) solid transparent;
         position: absolute;
         top: 50%;
         margin-top: rem-calc($base-font-size) * -1;
@@ -81,7 +79,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
       }
 
       &:after {
-        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-noclick-bg-color;
+        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
       }
 
       // Styles when it actually contains a link
@@ -116,7 +114,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
       }
 
       &:not([href]) {
-        color: $breadcrumb-color;
+        color: $breadcrumb-noclick-color;
       }
     }
 
