@@ -18,9 +18,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Role;
+use Schoolbox\Learning\Authorizer\Rule\isInstructor;
 
 
 class Module extends BaseModule
@@ -60,14 +59,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
-                    static function (array $params) {
-                        return $params['folderId'];
-                    },
-                    Access::getInstance()
-                )
+                new isInstructor(Access::getInstance())
             )
         );
 
