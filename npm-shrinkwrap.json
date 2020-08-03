@@ -1913,11 +1913,6 @@
         }
       }
     },
-    "classnames": {
-      "version": "2.2.6",
-      "resolved": "https://registry.npmjs.org/classnames/-/classnames-2.2.6.tgz",
-      "integrity": "sha1-Q5Nb/90pHzJtrQogUwmzjQD2UM4="
-    },
     "clipboard": {
       "version": "2.0.6",
       "resolved": "https://registry.npmjs.org/clipboard/-/clipboard-2.0.6.tgz",
