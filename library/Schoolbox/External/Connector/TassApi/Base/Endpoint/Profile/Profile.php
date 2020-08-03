@@ -172,6 +172,8 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        $parents = $this->preloadParentLookup();
+
         $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
@@ -329,7 +331,7 @@ class Profile implements IStrategy
 
             /* Time for importing parents
              */
-            $this->importParentsOfStudent($studentBaseProfile);
+            $this->importParentsOfStudent($studentBaseProfile, $parents);
         }
     }
 
@@ -467,16 +469,103 @@ class Profile implements IStrategy
 
 
     /**
+     * Preload parents into a lookup
+     *
+     * This is probably going to be faster if we build a hash lookup of parents
+     */
+    private function preloadParentLookup(): array
+    {
+        $parents = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
+            'user_code' => 'all'
+        ]);
+
+        $lookup = [];
+
+        foreach ($parents['parents'] as $row) {
+            foreach ($row as $parentId => $parent) {
+
+                /* Tass generally adheres to $parent['students'] data structure
+                 *
+                        Array
+                        (
+                            [web_access] =>
+                            [user_code] => 10620
+                            [person2] => Array
+                            [person1] => Array
+                            ...
+
+                 * ...EXCEPT when they've joined onto an email address table somewhere, at which point
+                 * their own api structure mutates slightly into something nonstandard,
+                 * where $parent becomes a 0-indexed array instead of the usual key-value tuple content.
+                 *
+                 * no joke. I can't make this stuff up even on a bad day.
+
+                        Array
+                        (
+                            [0] => Array
+                                (
+                                    [web_access] => 1
+                                    [user_code] => 10119
+                                    [person2] => Array
+                                    [address] => Array
+                                        (
+                                            [4] => Array
+                                                (
+                                                    [email2] =>
+                                                    [email1] => jones@nowhere.com
+                                                )
+                                        )
+                                    [person1] => Array
+                                )
+                            [1] => Array
+                                (
+                                    [web_access] => 1
+                                    [user_code] => 10119
+                                    [person2] => Array
+                                    [address] => Array
+                                        (
+                                            [3] => Array
+                                                (
+                                                    [email2] =>
+                                                    [email1] =>
+                                                )
+                                            [5] => Array
+                                                (
+                                                    [email2] =>
+                                                    [email1] => jones@nowhere.com
+                                                )
+                                        )
+                                    [person1] => Array
+                                )
+                        )
+
+                 */
+                if (isset($parent['students'])) {
+                    foreach ($parent['students'] as $studentId) {
+                        $lookup[$studentId][$parentId] = $parentId;
+                    }
+                } else {
+                    $this->log->critical("Parent records for parent {$parentId} malformed.");
+                }
+            }
+        }
+
+        return [
+            'lookup' => $lookup,
+            'index' => $parents['parents']
+        ];
+    }
+
+    /**
      * Import parent profile data for a given student
      *
      * @param UserProfile\Model $studentBaseProfile
+     * @param array             $parents
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $parents): void
     {
 
-//        $data = $this->api->retrieveDocument('getParents', [
-//            'user_code' => 'all'
-//        ]);
+        print_r($parents['lookup'][$studentBaseProfile->getExternalId()]);
     }
 
 
