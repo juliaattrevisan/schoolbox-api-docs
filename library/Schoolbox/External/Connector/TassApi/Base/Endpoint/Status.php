@@ -20,10 +20,17 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 class Status implements IStatus
 {
 
+
     /**
-     * @var Api
+     * @var string
      */
-    private $api;
+    private $host;
+
+
+    /**
+     * @var string
+     */
+    private $key;
 
 
     /**
@@ -31,12 +38,11 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
-     * @throws DomainException
-     * @throws InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
-        $this->api = new Api($host, $key);
+        $this->host = $host;
+        $this->key = $key;
     }
 
 
@@ -44,11 +50,14 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws DomainException
+     * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
     public function isReachable(): bool
     {
         try {
-            $this->api->retrieveDocument('getStudents', [
+            (new Api($this->host, $this->key, DSNCodec::MODULE_LMS_INTEGRATION))->retrieveDocument('getStudents', [
                 'currentstatus' => 'current'
             ]);
 
@@ -65,10 +74,12 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
     public function getReport(): array
     {
-        $specification = new Specification($this->api);
+        $specification = new Specification($this->host, $this->key);
 
         try {
             return $specification->check();

@@ -13,7 +13,7 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 /**
  * Class Specification
  *
- * This explores an xml output to check whether certain nodes exist
+ * This explores an api output to check whether certain nodes exist
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
@@ -21,19 +21,27 @@ class Specification implements ISpecification
 {
 
     /**
-     * @var IApi
+     * @var string
      */
-    private $api;
+    private $host;
+
+
+    /**
+     * @var string
+     */
+    private $dsn;
 
 
     /**
      * Specification constructor.
      *
-     * @param IApi $api
+     * @param string $host
+     * @param string $dsn
      */
-    public function __construct(IApi $api)
+    public function __construct(string $host, string $dsn)
     {
-        $this->api = $api;
+        $this->host = $host;
+        $this->dsn = $dsn;
     }
 
 
@@ -41,47 +49,38 @@ class Specification implements ISpecification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
+     * @throws \DomainException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \InvalidArgumentException
      */
     public function check(): array
     {
+        $modules = [
+            DSNCodec::MODULE_LMS_INTEGRATION,
+            DSNCodec::MODULE_STUDENT_DETAILS,
+            DSNCodec::MODULE_IDENTITY_MANAGEMENT
+        ];
+
+        foreach ($modules as $module) {
+            $api[$module] = new Api($this->host, $this->dsn, $module);
+        }
+
         $paths = [
 
             /**
-             * Student Profile nodes
-             */
-            [
-                'method' => 'getStudents',
-                'version' => 3,
-                'args' => [
-                    'currentstatus' => 'current'
-                ]
-            ],
-
-
-            /**
-             * Parent Profile nodes
-             */
-
-
-
-            /**
-             * Staff Profile nodes
-             */
-
-
-            /**
-             * Timetable nodes
-             */
-
-
-            /**
              * Full Diagnostic
-             * Tass doesn't seem to have implemented a lot of things, let's scout ahead
+             *
+             * Tass is a coalition of API subsystems:
+             *   LMS Integration, Student Details, Identity Management
+             *
+             * We need access to all three to complete the mission
              */
 
-            /* Version 3
+            /* LMS Integration Version 3
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/lms-integration
              */
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getCampuses',
                 'version' => 3,
                 'args' => [
@@ -89,6 +88,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getStudentSubjects',
                 'version' => 3,
                 'args' => [
@@ -96,6 +96,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getStudentTimetable',
                 'version' => 3,
                 'args' => [
@@ -103,6 +104,15 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
+                'method' => 'getStudents',
+                'version' => 3,
+                'args' => [
+                    'currentstatus' => 'current'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getTeacherSubjects',
                 'version' => 3,
                 'args' => [
@@ -110,6 +120,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getTeacherTimetable',
                 'version' => 3,
                 'args' => [
@@ -119,6 +130,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getTeachers',
                 'version' => 3,
                 'args' => [
@@ -126,6 +138,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getTimetableCalendar',
                 'version' => 3,
                 'args' => [
@@ -133,6 +146,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
+                'api' => $api[DSNCodec::MODULE_LMS_INTEGRATION],
                 'method' => 'getTimetables',
                 'version' => 3,
                 'args' => [
@@ -141,296 +155,326 @@ class Specification implements ISpecification
                 ]
             ],
 
-            /* Version 2
-             * Obsoleted, but kept here just in case you need to diagnose Tass demoting us
-             * to using the wrong API endpoint set during dev
+            /* Student Details Version 3
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details
              */
 
-//            /* Emergency contacts
-//             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
-//             */
-//            [
-//                'method' => 'getCommunicationRulesDetails',
-//                'version' => 2,
-//                'args' => [
-//                    'currentstatus' => 'current',
-//                    'commtype' => 'ec'
-//                ]
-//            ],
-//            /* Parents come out in the m_* and f_* nodes
-//             * https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getCommunicationRulesDetails.md
-//             */
-//            [
-//                'method' => 'getCommunicationRulesDetails',
-//                'version' => 2,
-//                'args' => [
-//                    'currentstatus' => 'current',
-//                    'commtype' => 'all'
-//                ]
-//            ],
-//
-//            [
-//                'method' => 'getConfNote',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0'
-//                ]
-//            ],
-//            [
-//                'method' => 'getConfAttachment',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
-//
-//                    /* lol, mcond_code is a sample param that doesn't match their own spec
-//                     * mcond_code is a Medical Conditions code
-//                     */
-//                ]
-//            ],
-//            [
-//                'method' => 'getConfNotes',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalAsthmaManagement',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalCondition',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'mcond_code' => 'AST'
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalConditionAttachment',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'mcond_code' => 'AST',
-//                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalConditions',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalConfNote',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalConfNoteAttachment',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalConfNotes',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalGeneral',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalIllness',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'ill_date' => '2019-04-12',
-//                    'ill_time' => '08:49:00.0',
-//                    'mcond_code' => 'ACC',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalImmunisation',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'imm_code' => 'TY',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalImmunisations',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalNote',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalNoteAttachment',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalNotes',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalPractitioner',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'prac_num' => 9
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalPractitioners',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalSupplementaries',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getMedicalSupplementary',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'msupp_desc' => 'DEN'
-//                ]
-//            ],
-//            [
-//                'method' => 'getNote',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                ]
-//            ],
-//            [
-//                'method' => 'getNoteAttachment',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                    'note_cat' => 'GEN',
-//                    'note_date' => '2019-05-30 15:11:58.0',
-//                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
-//                ]
-//            ],
-//            [
-//                'method' => 'getNotes',
-//                'version' => 2,
-//                'args' => [
-//                    'studcode' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getStudentUD',
-//                'version' => 2,
-//                'args' => [
-//                    'code' => '123456',
-//                ]
-//            ],
-//            [
-//                'method' => 'getStudentUDArea',
-//                'version' => 2,
-//                'args' => [
-//                    'code' => '123456',
-//                    'areacode' => 1
-//                ]
-//            ],
-//            [
-//                'method' => 'getStudentUDAreaSetup',
-//                'version' => 2,
-//                'args' => [
-//                    'includelookups' => true
-//                ]
-//            ],
-//            [
-//                'method' => 'getStudentUDSetup',
-//                'version' => 2,
-//                'args' => [
-//                    'includelookups' => true
-//                ]
-//            ],
-//            [
-//                'method' => 'getStudentsDetails',
-//                'version' => 2,
-//                'args' => [
-//                    'currentstatus' => 'current'
-//                ]
-//            ],
-//
-//            /* Stuff from IdM Identity Management API
-//             * https://github.com/TheAlphaSchoolSystemPTYLTD/IdM
-//             */
-//            [
-//                'method' => 'getAdmins',
-//                'version' => 2,
-//                'args' => [
-//                    'user_code' => 'all',
-//                ]
-//            ],
-//            [
-//                'method' => 'getEmployees',
-//                'version' => 2,
-//                'args' => [
-//                    'user_code' => 'all',
-//                ]
-//            ],
-//            [
-//                'method' => 'getParents',
-//                'version' => 2,
-//                'args' => [
-//                    'user_code' => 'all',
-//                ]
-//            ],
+            [
+                /* Emergency contacts
+                 */
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getCommunicationRulesDetails',
+                'version' => 3,
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'ec'
+                ]
+            ],
+            [
+                /* Parents come out in the m_* and f_* nodes
+                 */
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getCommunicationRulesDetails',
+                'version' => 3,
+                'args' => [
+                    'currentstatus' => 'current',
+                    'commtype' => 'all'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getConfNote',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getConfAttachment',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
+
+                    /* lol, mcond_code is a sample param that doesn't match their own spec
+                     * mcond_code is a Medical Conditions code
+                     */
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getConfNotes',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalAsthmaManagement',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalCondition',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'mcond_code' => 'AST'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalConditionAttachment',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'mcond_code' => 'AST',
+                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalConditions',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalConfNote',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalConfNoteAttachment',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalConfNotes',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalGeneral',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalIllness',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'ill_date' => '2019-04-12',
+                    'ill_time' => '08:49:00.0',
+                    'mcond_code' => 'ACC',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalImmunisation',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'imm_code' => 'TY',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalImmunisations',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalNote',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalNoteAttachment',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalNotes',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalPractitioner',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'prac_num' => 9
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalPractitioners',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalSupplementaries',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getMedicalSupplementary',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'msupp_desc' => 'DEN'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getNote',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getNoteAttachment',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                    'note_cat' => 'GEN',
+                    'note_date' => '2019-05-30 15:11:58.0',
+                    'attach_id' => '2F8F9A77-E2B9-28D5-611EDE1D0A66D623'
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getNotes',
+                'version' => 3,
+                'args' => [
+                    'studcode' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getStudentUD',
+                'version' => 3,
+                'args' => [
+                    'code' => '123456',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getStudentUDArea',
+                'version' => 3,
+                'args' => [
+                    'code' => '123456',
+                    'areacode' => 1
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getStudentUDAreaSetup',
+                'version' => 3,
+                'args' => [
+                    'includelookups' => true
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getStudentUDSetup',
+                'version' => 3,
+                'args' => [
+                    'includelookups' => true
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_STUDENT_DETAILS],
+                'method' => 'getStudentsDetails',
+                'version' => 3,
+                'args' => [
+                    'currentstatus' => 'current'
+                ]
+            ],
+
+            /* IdM Identity Management Version 3
+             * https://github.com/TheAlphaSchoolSystemPTYLTD/IdM
+             */
+            [
+                'api' => $api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+                'method' => 'getAdmins',
+                'version' => 3,
+                'args' => [
+                    'user_code' => 'all',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+                'method' => 'getEmployees',
+                'version' => 3,
+                'args' => [
+                    'user_code' => 'all',
+                ]
+            ],
+            [
+                'api' => $api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+                'method' => 'getParents',
+                'version' => 3,
+                'args' => [
+                    'user_code' => 'all',
+                ]
+            ],
         ];
 
         $endpoints = [];
@@ -439,7 +483,7 @@ class Specification implements ISpecification
             $errorMessage = '';
 
             try {
-                $result = (bool)$this->api->retrieveDocument($path['method'], $path['args']);
+                $result = (bool)$path['api']->retrieveDocument($path['method'], $path['args']);
             } catch (RuntimeException $e) {
                 $errorMessage = $e->getMessage();
                 $result = false;
