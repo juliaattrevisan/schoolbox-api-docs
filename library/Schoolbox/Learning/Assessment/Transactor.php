@@ -142,7 +142,7 @@ class Transactor
     public function transact(IAssessable $assessment, array $before = [], ?IAssessable $originalAssessment = null): array
     {
         $this->assessment = $assessment;
-
+        $relocated = false;
         // Verify that the context of the assessment is valid
         $assessmentContext = $this->assessment->getContext();
 
@@ -193,15 +193,15 @@ class Transactor
                 $this->quizMapper->copyQuizConstituents($originalAssessment->getId(), $this->assessment->getId());
             }
             $this->assessmentMapperProxy->delete($originalAssessment);
-            // redirect to new context
-            $returnUrl = "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}";
+            $relocated = true;
         }
 
         /* The conclusion of how $returnUrl was derived
          */
         return [
-            'assessment' => $this->assessment,
-            Redirect::RETURN_URL => $returnUrl
+            'assessment'         => $this->assessment,
+            Redirect::RETURN_URL => $returnUrl,
+            'relocated'          => $relocated,
         ];
     }
 

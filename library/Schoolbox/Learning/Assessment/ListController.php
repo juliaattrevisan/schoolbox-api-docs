@@ -187,14 +187,19 @@ class ListController extends Web\Controller\Base
             $post = $this->getRequest()->post->getArrayCopy();
             $post['context'] = $context;
 
-            [$assessment, $defaultReturnUrl] = array_values($this->persistAssessment($this->getUser(), $post));
+            $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
 
-            $type       = AssessmentType::objectToString($assessment);
+            $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
-            $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
+            $this->redirect($controller->determineRedirect(
+                $assessmentInfo['assessment'],
+                $explicitReturnUrl,
+                $assessmentInfo[Redirect::RETURN_URL],
+                $assessmentInfo['relocated'])
+            );
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
@@ -464,10 +469,6 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
-            if ($relocatedContext) {
-                // Unset returnURL to redirect to destination
-                $this->getRequest()->post->offsetUnset(Redirect::RETURN_URL);
-            }
             $db->commit();
             // Retrieve assessment, as I need the assessment's participation
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());

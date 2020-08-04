@@ -83,10 +83,16 @@ abstract class AbstractUnit implements ISoftDeletable, AssessmentContext, IAsses
     /**
      * @inheritDoc
      */
-    abstract function getLocationId(): string;
+    public function getLocationId(): string
+    {
+        return 'unit-' . $this->getId();
+    }
 
     /**
      * @inheritDoc
      */
-    abstract function getLocationTItle(): string;
+    public function getLocationTitle(): string
+    {
+        return $this->getTitle();
+    }
 }

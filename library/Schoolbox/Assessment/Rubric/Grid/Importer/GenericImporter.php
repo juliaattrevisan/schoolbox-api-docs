@@ -133,11 +133,11 @@ class GenericImporter implements IImporter
                         continue;
                     }
                     $descriptors = [];
-                    foreach ($indUsage->getDescriptors() as $descriptor) {
-                        $descriptors[] = [
-                            'name'  => $descriptor->getDescription(),
-                            'value' => $descriptor->getMaxValue(),
-                        ];
+                    foreach ($this->grid->getLevels() as $key => $level) {
+                        $descriptor    = $indUsage->retrieveDescriptor($key);
+                        $descriptors[] = $descriptor ? ['name'  => $descriptor->getDescription(),
+                                                        'value' => $descriptor->getMaxValue(),
+                        ] : null;
                     }
                     $indicators[] = [
                         'name'        => $indicator->getName(),

@@ -212,6 +212,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        // Relocation is available only for update
+        $data['canRelocate'] = false;
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
@@ -249,12 +252,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        $data['canRelocate'] = $assessment->isSpecification() && !($assessment instanceof Project);
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
     /**
      * Gets a list of units and projects, to which the assessment can be moved
+     * @api   /learning/assessments/:assessmentId/locations
+     * @since 201
      * @param IAssessable $assessment
      */
     public function getLocationForm(IAssessable $assessment): void
@@ -295,21 +301,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     }
 
     /**
-     * Moves assessment
-     * @param IAssessable $assessment
-     */
-    public function postChangeLocation(IAssessable $assessment): void
-    {
-        $newLocationId = $this->getRequest()->post->get('contextId');
-        $newContext = $this->getRelocatedContext($assessment, $newLocationId);
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'contextTitle' => $newContext ? $newContext->getLocationTitle() : '',
-            'contextId'    => $newContext ? $newContext->getLocationId() : '',
-        ]));
-    }
-
-    /**
      * Save the data when creating a specific kind of Assessment
      *
      * This happens after the common details are saved and after
@@ -342,8 +333,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $this->getRequest()->post,
                 $assessment
             );
-
-            $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
 
@@ -353,12 +342,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $postReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
-
-        if ($postReturnUrl) {
-            $returnUrl = Redirect::decode($postReturnUrl);
-        } else {
-            $returnUrl = $this->determineRedirect($assessmentInfo['assessment'], $postReturnUrl, $internalReturnUrl);
-        }
+        $returnUrl     = $this->determineRedirect(
+            $assessmentInfo['assessment'],
+            $postReturnUrl,
+            $assessmentInfo[Redirect::RETURN_URL],
+            $assessmentInfo['relocated']
+        );
 
         // we're done here
         $this->redirect($returnUrl);
@@ -536,10 +525,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param IAssessable $assessment
      * @param string|null $postReturnUrl an encoded URL
      * @param string      $defaultReturnUrl
+     * @param bool        $relocated
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = ''): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
     {
         /**
          * First priority is a the post return URL
@@ -547,9 +537,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * Otherwise go to default return url
          */
         if ($postReturnUrl) {
-            return Redirect::decode($postReturnUrl);
+            $returnUrl = Redirect::decode($postReturnUrl);
+            if ($relocated && strpos($returnUrl, '/homepage/') === 0) {
+                return '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+            }
+            return $returnUrl;
         } elseif ($assessment->getContext() instanceof Project) {
-            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+            return $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
         }
 
         return $defaultReturnUrl;

@@ -205,12 +205,13 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
-     * @param string|null $explicitReturnUrl
+     * @param string|null $postReturnUrl
      * @param string      $defaultReturnUrl
+     * @param bool        $relocated
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = ''): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
     {
         /**
          * Always go to the status screen when a project has been created,
@@ -218,8 +219,8 @@ class Controller extends Assessment\Controller
          */
         $redirect = $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
 
-        if ($explicitReturnUrl) {
-            $redirect .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
+        if ($postReturnUrl) {
+            $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
         }
 
         return $redirect;

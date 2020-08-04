@@ -1,11 +1,11 @@
 <div id='location-tree' class="content">
     {% for unit in units %}
         <ul>
-            <li id='unit-{{ unit.id }}' class='' data-jstree='{"type":"unit"}'>
+            <li id='{{ unit.locationId }}' data-title='{{ unit.locationTitle }}' class='' data-jstree='{"type":"unit"}'>
                 {{ unit.title }}
                 <ul>
                     {% for project in unitProjects[unit.id] %}
-                        <li id="project-{{ project.id }}" data-location="" class=""
+                        <li id="{{ project.locationId }}" data-title='{{ project.locationTitle }}' class=""
                             data-jstree='{"type":"project"}'>
                             {{ project.title }}
                         </li>
@@ -28,7 +28,6 @@
             .on('ready.jstree', function (event, jstree) {
                 $(this).jstree('open_all');
                 $(this).jstree('select_node', '{{ current }}');
-                $(this).jstree('disable_node', '{{ current }}');
             })
             .jstree({
                 core: {

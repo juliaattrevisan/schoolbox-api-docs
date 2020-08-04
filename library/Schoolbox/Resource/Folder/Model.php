@@ -688,7 +688,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getLocationId(): string
     {
-        return '';
+        return 'folder-' . $this->getId();
     }
 
     /**
@@ -696,6 +696,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getLocationTitle(): string
     {
-        return '';
+        return $this->getTitle();
     }
 }

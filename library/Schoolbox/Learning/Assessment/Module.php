@@ -161,8 +161,7 @@ class Module extends BaseModule
         $this->register('POST',  "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission, $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',      $canAckSubmission, $preloadParticipant); // p
 
-        $this->register('POST',   "$assRoute/locations",             'getLocationForm',          $canModify,        $preloadAssessment); // a || c
-        $this->register('POST',   "$assRoute/move",                  'postChangeLocation',       $canModify,        $preloadAssessment); // a || c
+        $this->register('POST',   "$assRoute/locations",             'getLocationForm',          $canModify,        $preloadAssessment);
     }
 
 
