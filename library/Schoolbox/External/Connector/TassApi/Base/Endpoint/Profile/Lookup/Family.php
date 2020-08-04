@@ -79,6 +79,12 @@ class Family
 
 
     /**
+     * @var string
+     */
+    private $motherNode = 'person1';
+
+
+    /**
      * An array of phone numbers indexed by family code
      *
      * @var array
@@ -149,7 +155,7 @@ class Family
          * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
          */
         if ('' !== $sfaNum) {
-            $externalId .= $sfaNum;
+            $externalId .= $sfaNum ;
         }
 
         return $externalId;
@@ -290,93 +296,71 @@ class Family
                      * usually the father, using external_tass_addnum_father and checking whether
                      * address[external_tass_addnum_father] is set.
                      */
+                    foreach ($family as $node) {
 
-                    /* Then you can detect which one is the secondary parent (spouse), which is
-                     * usually the mother, using external_tass_addnum_mother and checking whether
-                     * address[external_tass_addnum_mother] is set.
-                     */
+                        /* Then you can detect which one is the secondary parent (spouse), which is
+                         * usually the mother, using external_tass_addnum_mother and checking whether
+                         * address[external_tass_addnum_mother] is set.
+                         *
+                         * Note that some schools try to switch primary parents to mother
+                         * and secondary parents to father. We aren't doing that here.
+                         * Subclass this lookup if you want to do crazy things like that.
+                         */
+                        if (isset($node['address'][$this->addnumFather])) {
 
-                    /* Note that some schools try to switch primary parents to mother
-                     * and secondary parents to father. We aren't doing that here.
-                     * Subclass this lookup if you want to do crazy things like that.
-                     */
+                            /* Anyway, once you identify fathers, construct a parent using their node
+                             * which is apparently person2.
+                             */
+                            $person = $node[$this->fatherNode];
+                            $person['externalId'] = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                    /* Anyway, once you identify fathers, construct a parent using their node
-                     * which is apparently person2.
-                     */
+                            /* Merge phone numbers from another lookup which extracted data
+                             * from some other endpoint
+                             */
+                            $person['addresses'] = $this->phones[$node['user_code']];
 
-                    /* Merge phone numbers from another lookup which extracted data
-                     * from some other endpoint
-                     */
+                            /* Each split parent comes with their own students[] node, so index that
+                             * in particular for each student in $lookup
+                             */
+                            foreach($node['students'] as $student) {
+                                $lookup[$student][] = $person['externalId'];
+                            }
 
-                    /* Each split parent comes with their own students[] node, so index that
-                     * in particular for each student in $lookup
-                     */
+                            $index[$person['externalId']] = $person;
+                        } elseif (isset($node['address'][$this->addnumMother])) {
 
-                    /* Once you identify mothers, construct a parent using their node
-                     * which is apparently person1.
-                     */
+                            /* Once you identify mothers, construct a parent using their node
+                             * which is apparently person1.
+                             */
+                            $person = $node[$this->motherNode];
+                            $person['externalId'] = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                    /* Merge phone numbers from another lookup which extracted data
-                     * from some other endpoint
-                     */
+                            /* Merge phone numbers from another lookup which extracted data
+                             * from some other endpoint
+                             */
+                            $person['addresses'] = $this->phones[$node['user_code']];
 
-                    /* Each split parent comes with their own students[] node, so index that
-                     * in particular for each student in $lookup
-                     */
+                            /* Each split parent comes with their own students[] node, so index that
+                             * in particular for each student in $lookup
+                             */
+                            foreach($node['students'] as $student) {
+                                $lookup[$student][] = $person['externalId'];
+                            }
+
+                            $index[$person['externalId']] = $person;
+                        } else {
+
+                            /* Unknown parent type; skip this for now since we can't tell
+                             * whether this is a father or a mother
+                             *
+                             * TODO: probably log it somewhere
+                             */
+                            continue;
+                        }
+                    }
                 }
             }
         }
-
-
-
-
-//        foreach ($families['parents'] as $row) {
-//            foreach ($row as $parentId => $family) {
-//
-//
-//                if (isset($family['students'])) {
-//                    foreach ($family['students'] as $studentId) {
-//                        $lookup[$studentId][$parentId] = $parentId;
-//                        $index[$parentId] = $family;
-//                    }
-//                } else {
-//
-//                    /* Maintain a list of broken records that we skipped
-//                     */
-//                    $malformed[] = $parentId;
-//
-//                    /* Wrap around the brokenness like scar tissue
-//                     * Keep track of split family parents and their related students
-//                     */
-//                    foreach ($family as $splitParent) {
-//                        foreach ($family['students'] as $studentId) {
-//                            $lookup[$studentId][$parentId] = $parentId;
-//                            $index[$parentId] = $family;
-//                        }
-//                    }
-//
-//
-//                    /* We know that all elements are the same, except for the address node
-//                     * so we can just use the first element of $family as a basis
-//                     */
-//                    $newFamily = $family[0];
-//
-//                    /* Then merge all the address nodes from every other node in $family
-//                     */
-//                    $mergedAddresses = array_merge(...$family)['addresses'];
-//
-//                    /* Then take the address nodes and shank it on top of $newFamily
-//                     * API "repaired", "Funding secured."
-//                     */
-//                    $newFamily['addresses'] = $mergedAddresses;
-//
-//                    /* Index this new version of $family instead of the old
-//                     */
-//
-//                }
-//            }
-//        }
 
         return [
             'lookup' => $lookup,
