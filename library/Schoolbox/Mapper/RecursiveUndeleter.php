@@ -30,6 +30,7 @@ use Alaress_Date_NullDate;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
 use http\Exception\UnexpectedValueException;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -312,13 +313,14 @@ class RecursiveUndeleter
      * Ensure the soft-delete registry contains the specified mapper
      *
      * @param string $mapperClass
+     * @throws OutOfBoundsException
      */
     private function checkRegistry($mapperClass): void
     {
         // check this mapper is in our registry
         if (!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
             $this->logger->error('Mapper is not registered in soft-delete registry. Unable to un-delete children');
-            throw new \OutOfBoundsException('Mapper is not registered in soft-delete registry. Unable to un-delete children');
+            throw new OutOfBoundsException('Mapper is not registered in soft-delete registry. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' found in registry", $mapperClass));
 
@@ -327,7 +329,7 @@ class RecursiveUndeleter
         // check this mapper is defined properly in our registry
         if (!is_array($childMappers)) {
             $this->logger->error('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
-            throw new \OutOfBoundsException('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
+            throw new OutOfBoundsException('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' has child mappers defined in registry", $mapperClass));
     }
@@ -335,6 +337,7 @@ class RecursiveUndeleter
     /**
      * Load an instance of the root mapper from the table name
      * @param string $table
+     * @throws UnexpectedValueException
      * @return IMapper
      */
     public function loadMapper(string $table): IMapper
