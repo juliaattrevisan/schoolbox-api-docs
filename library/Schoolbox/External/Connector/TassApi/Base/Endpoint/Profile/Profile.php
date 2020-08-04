@@ -51,13 +51,6 @@ class Profile implements IStrategy
     private const STUDIES_CODE_POSSIBILITIES = ['lui_number', 'bos_number', 'vsn_number', 'tqa_number', 'wa_student_number'];
 
 
-//    /**
-//     * Parents records are actually Family records; Family records contain exactly two nodes,
-//     * one for each parent, plus some miscellaneous stuff
-//     */
-//    private const PARENT_PERSON_NODES = ['person2', 'person1'];
-//
-
     /**
      * @var LoggerInterface
      */
@@ -213,16 +206,12 @@ class Profile implements IStrategy
 
         /* Also alert any broken tass api payloads that we detected in lookups
          */
-        foreach ($families['malformed'] as $malformed) {
+        foreach ($families['unknown'] as $unknown) {
             $this->log->critical(sprintf(
-                'Parent records for family %s malformed.',
-                $malformed
+                'Cannot identify father/mother records for family record %s',
+                $unknown
             ));
         }
-
-        /* Haven't encounterd any malformed data in this place yet
-         */
-        $phones = (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate();
 
         /* Process each current student, and their parents too
          */
@@ -249,7 +238,6 @@ class Profile implements IStrategy
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
             $username = trim((string)$student['general_details']['student_code']);
             $yearLevel = trim((string)$student['school_details']['year_group']);
-
 
             /* Dates
              */
@@ -383,7 +371,7 @@ class Profile implements IStrategy
 
             /* Time for importing parents
              */
-            $this->importParentsOfStudent($studentBaseProfile, $families, $phones);
+            $this->importParentsOfStudent($studentBaseProfile, $families);
         }
     }
 
@@ -525,13 +513,12 @@ class Profile implements IStrategy
      *
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $families
-     * @param array             $phones
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families, array $phones): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
@@ -546,7 +533,7 @@ class Profile implements IStrategy
 
                 /* Each parent in the family
                  */
-                $email = trim((string)$parent['e_mail']); // TODO I think this comes from a different place
+                $email = trim((string)$parent['e_mail']);
                 $firstname = trim((string)$parent['preferred_name']);
                 $lastname = trim((string)$parent['surname']);
                 $phoneHome = (string)($parent['phone']['home'] ?? '');

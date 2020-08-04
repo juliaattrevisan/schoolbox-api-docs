@@ -30,7 +30,10 @@ class Family
 
 
     /**
-     * Parent nodes inside a family data struct
+     * Parents records are actually Family records; Family records contain exactly two nodes,
+     * one for each parent, plus some miscellaneous stuff.
+     *
+     * These two nodes have the following keys and we use them to identify father and mother details.
      */
     private const PARENT_PERSON_NODES = ['person2', 'person1'];
 

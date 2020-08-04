@@ -75,8 +75,8 @@ class Phone
                  * Note that '' !== null
                  */
                 $mobile = array_filter([$address['mobile_phone_1'], $address['mobile_phone_2']])[0] ?? '';
-                $home = array_filter([$address['home_phone']])[0] ?? '';
-                $work = array_filter([$address['business_phone']])[0] ?? '';
+                $home = $address['home_phone'];
+                $work = $address['business_phone'];
 
                 /* Stack it up for quick reference later
                  */
