@@ -12,5 +12,5 @@ INSERT INTO `localisation` (
              'Studies Code',
              'Studies Codes',
              true,
-             'an'
+             'a'
          );
