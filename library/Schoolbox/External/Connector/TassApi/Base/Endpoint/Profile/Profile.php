@@ -59,24 +59,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Default spouse prefix
-     *
-     * @var string
-     */
-    private const DEFAULT_SPOUSE_PREFIX = 'S';
-
-
-    /**
-     * The node corresponding to a father's data in a Family record.
-     * I have a fear that this will be different per tass implementation somewhere but, for now,
-     * presume that 'person2' is (and always is) the papa
-     *
-     * @var string
-     */
-    private $fatherNode = 'person2';
-
-
-    /**
      * @var LoggerInterface
      */
     private $log;
