@@ -411,18 +411,10 @@
                 }
 
                 // TODO this needs to consider events in series
-                axios
-                    .post(
-                        ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
-                        qs.stringify(data)
-                    )
-                    .then(function () {
-                        // Once done: all attendees are set back to Pending
-                        if (event?.extendedProps?.data?.attendance?.status?.current) {
-                            event.extendedProps.data.attendance.status.current = ATTENDANCE_STATUS.PENDING;
-                            self.$refs.fullCalendar.getApi().rerenderEvents();
-                        }
-                    });
+                axios.post(
+                    ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                    qs.stringify(data)
+                );
             },
 
 
