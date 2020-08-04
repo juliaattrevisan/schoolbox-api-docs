@@ -181,8 +181,11 @@ class Profile implements IStrategy
     {
         /* Build some lookups to save on traversal and api banging
          */
-        $families = (new Lookup\Family($this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT], $this->spousePrefix))
-            ->generate();
+        $families = (new Lookup\Family(
+            $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+            $this->spousePrefix,
+            (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
+        ))->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
          */

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -26,6 +27,12 @@ class Family
      * @var string
      */
     private const DEFAULT_SPOUSE_PREFIX = 'S';
+
+
+    /**
+     * Parent nodes inside a family data struct
+     */
+    private const PARENT_PERSON_NODES = ['person2', 'person1'];
 
 
     /**
@@ -56,14 +63,23 @@ class Family
 
 
     /**
+     * An array of phone numbers indexed by family code
+     *
+     * @var array
+     */
+    private $phones;
+
+
+    /**
      * Family constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
      * @param IApi   $api
      * @param string $spousePrefix
+     * @param array  $phones
      */
-    public function __construct(IApi $api, string $spousePrefix)
+    public function __construct(IApi $api, string $spousePrefix, array $phones)
     {
         $this->api = $api;
 
@@ -71,6 +87,10 @@ class Family
          * Shanked from that Tass Helper class
          */
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
+
+        /* Phone lookup; data from another endpoint
+         */
+        $this->phones = $phones;
     }
 
 
@@ -115,6 +135,9 @@ class Family
      */
     public function generate(): array
     {
+
+        /* Grab all the families
+         */
         $families = $this->api->retrieveDocument('getParents', [
             'user_code' => 'all'
         ]);
@@ -204,18 +227,28 @@ class Family
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
                      */
+                    foreach (self::PARENT_PERSON_NODES as $node) {
+                        $person = $family[$node];
+                        $person['externalId'] = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                    /* Assign studentIds to each of their externalIds, as per the
-                     * $family['students'] node
-                     */
+                        /* Assign studentIds to each of their externalIds, as per the
+                         * $family['students'] node
+                         */
+                        $person['students'] = $family['students'];
 
-                    /* Merge phone numbers from another lookup which extracted data
-                     * from some other endpoint
-                     */
+                        /* Merge phone numbers from another lookup which extracted data
+                         * from some other endpoint
+                         */
+                        $person['addresses'] = $this->phones[$family['user_code']];
 
-                    /* Index each parent by their externalId
-                     */
+                        /* Index each parent by their externalId
+                         */
+                        foreach($person['students'] as $student) {
+                            $lookup[$student][] = $person['externalId'];
+                        }
 
+                        $index[$person['externalId']] = $person;
+                    }
                 } else {
 
                     /* Split family
