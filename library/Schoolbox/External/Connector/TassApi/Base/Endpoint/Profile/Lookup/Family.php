@@ -39,6 +39,22 @@ class Family
 
 
     /**
+     * The node corresponding to a father's data in a Family record.
+     * I have a fear that this will be different per tass implementation somewhere but, for now,
+     * presume that 'person2' is (and always is) the papa
+     *
+     * @var string
+     */
+    private $fatherNode = 'person2';
+
+
+    /**
+     * @var string
+     */
+    private $motherNode = 'person1';
+
+
+    /**
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
      * @var IApi
@@ -69,22 +85,6 @@ class Family
      * @var int
      */
     private $addnumMother;
-
-
-    /**
-     * The node corresponding to a father's data in a Family record.
-     * I have a fear that this will be different per tass implementation somewhere but, for now,
-     * presume that 'person2' is (and always is) the papa
-     *
-     * @var string
-     */
-    private $fatherNode = 'person2';
-
-
-    /**
-     * @var string
-     */
-    private $motherNode = 'person1';
 
 
     /**
