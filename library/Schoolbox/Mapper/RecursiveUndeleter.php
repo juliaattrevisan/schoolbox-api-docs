@@ -29,7 +29,7 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
-use http\Exception\UnexpectedValueException;
+use UnexpectedValueException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
