@@ -39,22 +39,24 @@
         <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
             <div class="list-item">
                 <div class="small-12 card wrap-down">
-                    <template v-if="article.featureImage">
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
-                        </a>
-                    </template>
-                    <template v-else-if="fallbackImage === 'author'">
-                        <div class="card-feature-avatar">
+                    <template v-if="!isCompactMode">
+                        <template v-if="article.featureImage">
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img :src="article.author._links.avatar.href + '&size=square64'">
+                                <img :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
                             </a>
-                        </div>
-                    </template>
-                    <template v-else-if="fallbackImage === 'school-logo'">
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="'/images/logo.php?logo=skin_logo_large&size=normal'">
-                        </a>
+                        </template>
+                        <template v-else-if="fallbackImage === 'author'">
+                            <div class="card-feature-avatar">
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                                    <img :src="article.author._links.avatar.href + '&size=square64'">
+                                </a>
+                            </div>
+                        </template>
+                        <template v-else-if="fallbackImage === 'school-logo'">
+                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                                <img :src="'/images/logo.php?logo=skin_logo_large&size=normal'">
+                            </a>
+                        </template>
                     </template>
                     <h3><a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a></h3>
 
@@ -82,7 +84,7 @@
                     <article>
                         <div v-if="!isCompactMode" v-html="article.blurb"></div>
                         <div class="article-read-more">
-                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readmore.string"></a>
                         </div>
                     </article>
 

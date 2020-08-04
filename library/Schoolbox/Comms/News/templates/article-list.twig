@@ -76,10 +76,10 @@
     'modifyWindowState': modifyWindowState ?: false,
     'referrer': referrer,
 
-    'compactMode': compactMode is defined ? compactMode : false,
+    'compactMode': compactMode is defined ? compactMode : 0,
     'showMore': showMore is defined ? showMore : false,
     'itemLayout': itemLayout is defined ? itemLayout : 'list',
-    'fallbackImage': fallbackImage is defined ? fallbackImage : 'feature-image',
+    'fallbackImage': fallbackImage is defined ? fallbackImage : 'author',
 
     'getIndexRoute': routeLookup('commsNews.getIndex'),
     'getArticlesRoute': getArticlesRoute is defined ? getArticlesRoute : routeLookup('commsNews.getListForIndex'),
