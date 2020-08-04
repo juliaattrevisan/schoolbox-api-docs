@@ -12,7 +12,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Admin\Restore\Controller;
 use Twig_Error_Loader;
 
 class Module extends BaseModule
