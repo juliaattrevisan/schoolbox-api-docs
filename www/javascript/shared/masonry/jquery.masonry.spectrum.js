@@ -242,35 +242,19 @@
     };
 
     /**
-     * TODO: refactor hardcoding out of this method
      * Updates colors for the given element
      *
-     * @param element Element to update
+     * @param element Color var to update
      * @param color   Color to update to
      * @returns {*}
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
-        var tinyColor   = new tinycolor(color);
-        var colorString = tinyColor.toRgbString();
-        var matches = element.match(/^(.*?)_(.*)/);
-        if (matches) {
-            var column = this.masonry.columns.filter('[data-position="'+matches[1]+'"]');
-            switch (matches[2]) {
-                case 'font_primary':
-                    column.find('.island section').css({color: colorString});
-                    break;
-                case 'bg_primary':
-                    column.find('.island section').css({backgroundColor: colorString});
-                    break;
-                case 'head_font':
-                    column.find('.component-titlebar h2 > *, .component-titlebar nav > *').css({color: colorString});
-                    break;
-                case 'head_bg':
-                    column.find('.component-titlebar').css({backgroundColor: colorString});
-                    break;
-            }
-        }
+        var tinyColor   = new tinycolor(color),
+            colorString = tinyColor.toRgbString();
+        // Set the value of the CSS var on the masonry's element,
+        // as that's where the color vars are defined
+        this.masonry.element.style.setProperty('--' + element.replace(/_/g, '-'), colorString);
     };
 
     /**

@@ -2,47 +2,64 @@
 
 <!-- Styles for text  -->
 <style type="text/css">
+    #component-layout {
+        --top-head-bg:        {top_head_bg};
+        --top-head-font:      {top_head_font};
+        --top-font-primary:   {top_font_primary};
+        --top-bg-primary:     {top_bg_primary};
+
+        --left-head-bg:       {left_head_bg};
+        --left-head-font:     {left_head_font};
+        --left-font-primary:  {left_font_primary};
+        --left-bg-primary:    {left_bg_primary};
+
+        --right-head-bg:      {right_head_bg};
+        --right-head-font:    {right_head_font};
+        --right-font-primary: {right_font_primary};
+        --right-bg-primary:   {right_bg_primary};
+    }
+
     /** Make these styles more specific than topbar styles  **/
     #component-layout .column-top .component-titlebar {
-        background-color: {top_head_bg};
+        background-color: var(--top-head-bg);
     }
 
     #component-layout .column-top .component-titlebar h2, #component-layout .column-top .component-titlebar a {
-        color: {top_head_font};
+        color: var(--top-head-font);
     }
 
     #component-layout .column-top .island section {
-        color: {top_font_primary};
-        background-color: {top_bg_primary};
+        color: var(--top-font-primary);
+        background-color: var(--top-bg-primary);
     }
 
     #component-layout .column-left .component-titlebar {
-        background-color: {left_head_bg};
+        background-color: var(--left-head-bg);
     }
 
     #component-layout .column-left .component-titlebar h2, #component-layout .column-left .component-titlebar a {
-        color: {left_head_font};
+        color: var(--left-head-font);
     }
 
     #component-layout .column-left .island section {
-        color: {left_font_primary};
-        background-color: {left_bg_primary};
+        color: var(--left-font-primary);
+        background-color: var(--left-bg-primary);
     }
 
     #component-layout .column-right .component-titlebar {
-        background-color: {right_head_bg};
+        background-color: var(--right-head-bg);
     }
 
     #component-layout .column-right .component-titlebar h2, #component-layout .column-right .component-titlebar a {
-        color: {right_head_font};
+        color: var(--right-head-font);
     }
 
     #component-layout .column-right .island section {
-        color: {right_font_primary};
-        background-color: {right_bg_primary};
+        color: var(--right-font-primary);
+        background-color: var(--right-bg-primary);
     }
 
-    <!-- Special Effects for Action Buttons -->
+    /** Special Effects for Action Buttons **/
     #component-layout .column-top .component-titlebar nav a,
     #component-layout .column-left .component-titlebar nav a,
     #component-layout .column-right .component-titlebar nav a
