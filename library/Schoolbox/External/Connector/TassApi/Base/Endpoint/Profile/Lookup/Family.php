@@ -77,6 +77,13 @@ class Family
                  * where $parent becomes a 0-indexed array instead of the usual key-value tuple content.
                  *
                  * no joke. I can't make this stuff up even on a bad day.
+                 *
+                 * TODO Fiddle with tass config settings
+                 *  Due to the indexing one can surmise that the father is in a particular address[] element
+                 *  and the mother is in another particular address[] element. There are tass configs
+                 *  which indicate where father and mother nodes exist:
+                 *      external_tass_addnum_mother, external_tass_addnum_father
+                 *
 
                         Array
                         (
