@@ -117,8 +117,7 @@ $input-border-color:			   $form-border-color;
 // DONE modify RGBA instead of tint
 $row-hover-background:             css-tint($content-ui-hover, 87%);
 
-// DONE use CSS darken
-$row-action-hover-background:      css-darken($content-ui-hover, 7%);
+$row-action-hover-background:      $content-ui-hover;
 
 // Colours
 $primary-color:					#f0f !default;
