@@ -25,9 +25,9 @@ class Controller extends Base
     private const TIME_FRAME = '-1 weeks';
 
     /**
-     * @var ErrorMapper
+     * Recursively undelete all children if they are deleted within this timeframe of the parent in seconds
      */
-    private $errorMapper;
+    public const RESTORE_WINDOW = '120';
 
     /**
      * @var AssessmentMapper
@@ -39,19 +39,18 @@ class Controller extends Base
      */
     private $folderMapper;
 
+
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper  $errorMapper
-     * @param FolderMapper $folderMapper
+     * @param FolderMapper       $folderMapper
+     * @param AssessmentMapper   $assessmentMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
         FolderMapper $folderMapper,
         AssessmentMapper $assessmentMapper
     )
     {
-        $this->errorMapper = $errorMapper;
         $this->folderMapper = $folderMapper;
         $this->assessmentMapper = $assessmentMapper;
     }
@@ -98,7 +97,7 @@ class Controller extends Base
      */
     public function restoreFolder()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
         $recursiveUndeleter->findDeletedModels($this->folderMapper, [$this->getRequest()->post['id']]);
         $db = $this->folderMapper->getDatabase();
         $db->beginTransaction();
@@ -107,8 +106,7 @@ class Controller extends Base
             $db->commit();
         } catch (\Throwable $e) {
             $db->rollBack();
-            $this->sendError("Unable to restore models, rolling back.");
-            exit(1);
+            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
@@ -121,7 +119,7 @@ class Controller extends Base
      */
     public function restoreAssessment()
     {
-        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), 120);
+        $recursiveUndeleter = new RecursiveUndeleter(new NullLogger(), self::RESTORE_WINDOW);
         $recursiveUndeleter->findDeletedModels($this->assessmentMapper, [$this->getRequest()->post['id']]);
         $db = $this->assessmentMapper->getDatabase();
         $db->beginTransaction();
@@ -130,8 +128,7 @@ class Controller extends Base
             $db->commit();
         } catch (\Throwable $e) {
             $db->rollBack();
-            $this->sendError("Unable to restore models, rolling back.");
-            exit(1);
+            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));

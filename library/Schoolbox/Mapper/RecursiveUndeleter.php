@@ -29,6 +29,7 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
+use http\Exception\UnexpectedValueException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -317,7 +318,7 @@ class RecursiveUndeleter
         // check this mapper is in our registry
         if (!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
             $this->logger->error('Mapper is not registered in soft-delete registry. Unable to un-delete children');
-            exit(1);
+            throw new \OutOfBoundsException('Mapper is not registered in soft-delete registry. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' found in registry", $mapperClass));
 
@@ -326,15 +327,17 @@ class RecursiveUndeleter
         // check this mapper is defined properly in our registry
         if (!is_array($childMappers)) {
             $this->logger->error('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
-            exit(1);
+            throw new \OutOfBoundsException('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' has child mappers defined in registry", $mapperClass));
     }
 
     /**
      * Load an instance of the root mapper from the table name
+     * @param string $table
+     * @return IMapper
      */
-    public function loadMapper($table)
+    public function loadMapper(string $table): IMapper
     {
         // Use the specified root table to find the root mapper
         /** @var IMapper $mapperClass */
@@ -356,7 +359,7 @@ class RecursiveUndeleter
         }
 
         $this->logger->error("No mapper found in registry with table: '{$table}'");
-        exit(1);
+        throw new UnexpectedValueException("No mapper found in registry with table: '{$table}'");
     }
 
 

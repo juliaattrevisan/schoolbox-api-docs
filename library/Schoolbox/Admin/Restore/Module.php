@@ -12,6 +12,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Psr\Log\NullLogger;
+use Schoolbox\Mapper\RecursiveUndeleter;
 use Twig_Error_Loader;
 
 class Module extends BaseModule
@@ -49,15 +51,6 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
-                ]
-            )
-        );
     }
 
     /**
