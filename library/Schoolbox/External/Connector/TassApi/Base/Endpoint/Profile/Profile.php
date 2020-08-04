@@ -549,9 +549,9 @@ class Profile implements IStrategy
                 $email = trim((string)$parent['e_mail']); // TODO I think this comes from a different place
                 $firstname = trim((string)$parent['preferred_name']);
                 $lastname = trim((string)$parent['surname']);
-                $phoneHome = (string)($parent['addresses']['homePhone'] ?? '');
-                $phoneMobile = (string)($parent['addresses']['mobile'] ?? '');
-                $phoneWork = (string)($parent['addresses']['workPhone'] ?? '');
+                $phoneHome = (string)($parent['phone']['home'] ?? '');
+                $phoneMobile = (string)($parent['phone']['mobile'] ?? '');
+                $phoneWork = (string)($parent['phone']['work'] ?? '');
                 $relationship = trim((string)$parent['description']);
                 $title = trim((string)$parent['title']);
 

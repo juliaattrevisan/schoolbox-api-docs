@@ -75,15 +75,15 @@ class Phone
                  * Note that '' !== null
                  */
                 $mobile = array_filter([$address['mobile_phone_1'], $address['mobile_phone_2']])[0] ?? '';
-                $homePhone = array_filter([$address['home_phone']])[0] ?? '';
-                $workPhone = array_filter([$address['business_phone']])[0] ?? '';
+                $home = array_filter([$address['home_phone']])[0] ?? '';
+                $work = array_filter([$address['business_phone']])[0] ?? '';
 
                 /* Stack it up for quick reference later
                  */
                 $stack[$address['parent_code']] = [
                     'mobile' => trim((string)$mobile),
-                    'homePhone' => trim((string)$homePhone),
-                    'workPhone' => trim((string)$workPhone)
+                    'home' => trim((string)$home),
+                    'work' => trim((string)$work)
                 ];
             }
         }

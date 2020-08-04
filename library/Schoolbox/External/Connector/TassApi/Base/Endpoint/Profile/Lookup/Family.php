@@ -378,13 +378,15 @@ class Family
         /* Merge phone numbers from another lookup which extracted data
          * from some other endpoint
          */
-        $person['addresses'] = $this->phones[$family['user_code']] ?? null;
+        $person['phone'] = $this->phones[$family['user_code']] ?? null;
 
         /* Index each parent by their externalId
          */
         foreach($person['students'] as $student) {
             $this->lookup[$student][] = $person['externalId'];
         }
+
+        new \Alaress_Probe($family);
 
         $this->index[$person['externalId']] = $person;
     }
