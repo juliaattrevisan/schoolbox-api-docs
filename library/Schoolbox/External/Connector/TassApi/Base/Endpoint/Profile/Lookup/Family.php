@@ -307,52 +307,44 @@ class Family
                      * Each split parent comes with their own students[] node, so index that
                      * in particular for each student in $lookup
                      */
-                    foreach ($family as $node) {
+                    foreach ($family as $subfamily) {
 
                         /* Note that some schools try to switch primary parents to mother
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
                          */
-                        if (isset($node['address'][$this->addnumFather])) {
+                        if (isset($subfamily['address'][$this->addnumFather])) {
 
                             /* Anyway, once you identify fathers, construct a parent using their node
                              * which is apparently person2.
                              */
-                            $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
+                            $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            $person = $this->processParentNode($this->fatherNode, $personExternalId, $node);
-
-                            /* Rearrange contents of $person['address'] to find their first non-null email address
-                             */
-                            $person['e_mail'] = array_filter([
-                                $node['address'][$this->addnumFather]['email1'] ?? '',
-                                $node['address'][$this->addnumFather]['email2'] ?? ''
-                            ])[0] ?? '';
-
-                            $this->index[$person['externalId']] = $person;
-                        } elseif (isset($node['address'][$this->addnumMother])) {
+                            $this->index[$personExternalId] = $this->processSplitParentNode(
+                                $this->fatherNode,
+                                $personExternalId,
+                                $subfamily,
+                                $this->addnumFather
+                            );
+                        } elseif (isset($subfamily['address'][$this->addnumMother])) {
 
                             /* Once you identify mothers, construct a parent using their node
                              * which is apparently person1.
                              */
-                            $personExternalId = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
+                            $personExternalId = $this->deriveExternalId($this->motherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            $person = $this->processParentNode($this->motherNode, $personExternalId, $node);
-
-                            /* Rearrange contents of $person['address'] to find their email address
-                             */
-                            $person['e_mail'] = array_filter([
-                                $node['address'][$this->addnumMother]['email1'] ?? '',
-                                $node['address'][$this->addnumMother]['email2'] ?? ''
-                            ])[0] ?? '';
-
-                            $this->index[$person['externalId']] = $person;
+                            $this->index[$personExternalId] = $this->processSplitParentNode(
+                                $this->motherNode,
+                                $personExternalId,
+                                $subfamily,
+                                $this->addnumMother
+                            );
                         } else {
 
                             /* Unknown parent type; skip this for now since we can't tell
                              * whether this is a father or a mother
                              */
-                            $malformed[] = $node['user_code'];
+                            $malformed[] = $subfamily['user_code'];
 
                             continue;
                         }
@@ -374,6 +366,30 @@ class Family
                 'split' => $split
             ],
         ];
+    }
+
+
+    /**
+     * Update $parent details by mining Split Parent format in a particular way to get their email addresses
+     *
+     * @param string $node
+     * @param string $externalId
+     * @param array  $family
+     * @param int    $addnum
+     * @return array
+     */
+    private function processSplitParentNode(string $node, string $externalId, array $family, int $addnum): array
+    {
+        $person = $this->processParentNode($node, $externalId, $family);
+
+        /* Rearrange contents of $person['address'] to find their first non-null email address
+         */
+        $person['e_mail'] = array_filter([
+            $family['address'][$addnum]['email1'] ?? '',
+            $family['address'][$addnum]['email2'] ?? ''
+        ])[0] ?? '';
+
+        return $person;
     }
 
 
