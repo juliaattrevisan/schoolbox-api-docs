@@ -134,14 +134,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        if($date == 0) {
+        if ($date == 0) {
             $date = time();
         }
 
         // Return 0 if weekend
-        if(date('N', $date) >= 6) {
+        if (date('N', $date) >= 6) {
             return 0;
         }
+
+        // Increase timestamp to get business day properly
+        $date++;
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
@@ -176,6 +179,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             }
 
             $currentDay = $businessDays % $row['DAYS_IN_CYCLE'];
+
+            if ($currentDay == 0) {
+                return $row['DAYS_IN_CYCLE'];
+            }
 
             return $currentDay;
         }
@@ -311,7 +318,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus,
-            $this->getDayNumber($campus, $date->getUnixTimeStamp()+1));
+            $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
 
