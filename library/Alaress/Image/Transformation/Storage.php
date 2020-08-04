@@ -135,6 +135,17 @@ class Storage extends BaseTransformation
             ],
         ],
 
+        /* Vertical style card image */
+        'vcardImageLarge'                  => [
+            [
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 300,
+                    'height' => 150,
+                ],
+            ],
+        ],
+
         /* Card images are 2:1 ratio.  So this is used on class card */
         'cardImageLarge'                  => [
             [

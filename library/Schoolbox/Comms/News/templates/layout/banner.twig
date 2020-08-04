@@ -339,9 +339,10 @@
 
                         // Anchored? go to the element once the component has been loaded
                         // We will need to do this for now to make the anchor behaviour more consistent
-                        if (window.location.hash == '#discussion')
+                        if (window.location.hash === '#discussion')
                         {
-                            var offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight() + $('.news-article').offset().top;
+                            const offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight() + $('#discussion').offset().top;
+
                             $("html, body").animate({ scrollTop: offset }, 500);
                         }
 

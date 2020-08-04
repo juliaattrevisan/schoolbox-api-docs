@@ -43,7 +43,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnderflowException;
 use UnexpectedValueException;
@@ -769,7 +768,10 @@ class Controller extends Base
          * Specifically applies to the index page which loads slightly differently than component variant
          */
         $data = [
-            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => Mapper::TOPIC_ALL_SLUG,
+            ],
             'topic' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
             'initialPage' => $params->getPageNum(),
@@ -941,7 +943,10 @@ class Controller extends Base
         $data = [
             'initialContent' => $content,
             'topics' => $topics,
-            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => Mapper::TOPIC_ALL_SLUG,
+            ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
             'page' => $this->getRequest()->query['page'],

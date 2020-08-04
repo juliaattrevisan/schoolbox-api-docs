@@ -34,21 +34,45 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        $limit = Component_Config_Size::SIZE_ALL === (int)$this->getConfig('size')
-            ? self::HARD_LIMIT
-            : (int)$this->getConfig('size');
+        $limit = Component_Config_Size::SIZE_ALL === (int)$this->getConfig('size') ? self::HARD_LIMIT : (int)$this->getConfig('size');
 
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
+
+            /* Core and querystring params
+             */
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
-            'compactMode' => $this->getConfig('compactMode'),
-            'limit' => $limit,
-            'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
-            'returnUrl' => News\Querystring::encode('/'),
             'queryStringPage' => News\Querystring::PAGE_NUMBER,
             'queryStringReferrer' => News\Querystring::REFERRER,
             'queryStringTopic' => News\Querystring::TOPIC_SLUG,
+
+            /* Topics
+             */
+            'topicAll' => [
+                'name' => 'All',
+                'slug' => News\Mapper::TOPIC_ALL_SLUG,
+            ],
             'showTopicByDefault' => !$this->getConfig('default'),
+
+            /* Pagination
+             */
+            'limit' => $limit,
+
+            /* Referrers and Redirects
+             */
+            'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
+            'returnUrl' => News\Querystring::encode('/'),
+
+            /* Layout
+             */
+            'compactMode' => $this->getConfig('compactMode'),
+            'itemLayout' => $this->getConfig('itemLayout'),
+            'fallbackImage' => $this->getConfig('itemImage'),
+
+            /* Routes
+             */
+            'getArticlesRoute' => $this->getRouter()->generate('commsNews.getListForIndex') . '?' . http_build_query([
+                News\Querystring::ITEM_IMAGE => $this->getConfig('itemImage')
+            ])
         ]);
     }
 }
