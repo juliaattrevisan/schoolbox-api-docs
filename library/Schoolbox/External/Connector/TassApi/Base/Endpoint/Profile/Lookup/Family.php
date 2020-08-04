@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -197,7 +196,7 @@ class Family
 
         $unknown = [];
 
-        /* Tass generally adheres to $parent['students'] data structure
+        /* Tass generally adheres to $parent data structure
          *
                 Array
                 (
