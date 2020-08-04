@@ -87,11 +87,12 @@
                     </span>
                 </p>
 
-                <article v-if="!isCompactMode" v-html="article.blurb"></article>
-
-                <div class="article-read-more">
-                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
-                </div>
+                <article>
+                    <div v-if="!isCompactMode" v-html="article.blurb"></div>
+                    <div class="article-read-more">
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                    </div>
+                </article>
             </div>
         </li>
     </ul>

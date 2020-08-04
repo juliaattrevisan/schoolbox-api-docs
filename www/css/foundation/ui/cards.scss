@@ -29,18 +29,31 @@
     margin-bottom: 1rem;
     margin-right: 1rem;
     min-height: 6rem;
-    width: 200px;
+    width: rem-calc(200);
     float: left;
+
+    @media #{$medium-down} {
+      min-height: 3rem;
+      width: 6rem;
+    }
 
     a {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 6rem;
+
+      @media #{$medium-down} {
+        min-height: 3rem;
+      }
     }
     img {
       border-radius: 50%;
       margin: 0;
+
+      @media #{$medium-down} {
+        width: 2rem;
+      }
     }
   }
 
@@ -456,6 +469,15 @@
     > .img {
       margin: 0 0 1rem 0;
       width: 100%;
+    }
+  }
+  @media #{$medium-down} {
+    .card-feature-avatar,
+    .card-feature-avatar a {
+      min-height: 6rem;
+    }
+    .card-feature-avatar img{
+      width: 4rem;
     }
   }
 }

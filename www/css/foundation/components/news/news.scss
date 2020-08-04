@@ -6,7 +6,7 @@
       margin: 0 1rem 0 0;
 
       @media #{$medium-down} {
-        width: (5 * rem-calc($base-font-size));
+        width: 6rem;
       }
     }
     &.reversed {
