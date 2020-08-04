@@ -366,7 +366,8 @@ class Family
             'unknown' => $unknown,
             'count' => [
                 'nuclear' => $nuclear,
-                'split' => $split
+                'split' => $split,
+                'unknown' => \count($unknown),
             ],
         ];
     }

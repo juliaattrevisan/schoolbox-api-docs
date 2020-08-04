@@ -373,6 +373,22 @@ class Profile implements IStrategy
              */
             $this->importParentsOfStudent($studentBaseProfile, $families);
         }
+
+        /* Show some basic diagnostics
+         */
+        $this->log->info(sprintf(
+            'Nuclear families: %s. Split families: %s',
+            $families['count']['nuclear'],
+            $families['count']['split']
+        ));
+
+        if ($families['count']['unknown']) {
+            $this->log->warning(sprintf(
+                'Unidentifiable data: %s (%s)',
+                $families['count']['unknown'],
+                implode(', ', $families['unknown'])
+            ));
+        }
     }
 
 
