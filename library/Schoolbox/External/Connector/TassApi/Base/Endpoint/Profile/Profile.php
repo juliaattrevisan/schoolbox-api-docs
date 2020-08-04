@@ -629,6 +629,8 @@ class Profile implements IStrategy
          *
          * After 99,999 students pass through a tass system, this scheme will stop working
          * due to collisions between old ids and new ones with prefix
+         *
+         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
          */
         if ('' !== $sfaNum) {
             $externalId .= $sfaNum;
