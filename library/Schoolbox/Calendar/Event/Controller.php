@@ -641,16 +641,17 @@ class Controller extends Base
         $maxAttendees  = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
         $showAttendees = (bool)$this->request->post['showAttendees'];
 
-        /* Decide if the Attendance settings need to be reset
-         *
-         * You don't need to change RSVP statuses if something non-critical changes such as
-         * updating the description to fix spelling mistakes, changing headings, etc.
-         *
-         * For now, changing datetimes requires people to respond again
-         */
-        $attendanceDirty = $event->getStartDateTime() && $event->getEndDateTime() && (
-                ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
-                ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
+        // As of SA-10697 attendances are not reset on changing event time
+//        /* Decide if the Attendance settings need to be reset
+//         *
+//         * You don't need to change RSVP statuses if something non-critical changes such as
+//         * updating the description to fix spelling mistakes, changing headings, etc.
+//         *
+//         * For now, changing datetimes requires people to respond again
+//         */
+//        $attendanceDirty = $event->getStartDateTime() && $event->getEndDateTime() && (
+//                ($event->getStartDateTime()->getUnixTimeStamp() !== $startDate->getUnixTimeStamp()) ||
+//                ($event->getEndDateTime()->getUnixTimeStamp() !== $endDate->getUnixTimeStamp()));
 
         /* Invited guests
          */
@@ -688,7 +689,7 @@ class Controller extends Base
             ->setMaxAttendees($maxAttendees)
             ->setShowAttendees($showAttendees)
             ->setAttendance($attendance)
-            ->setAttendanceDirty($attendanceDirty);
+            ->setAttendanceDirty(false);
 
         /* Check minimum requirements for checkbox arrays
          *
@@ -704,7 +705,7 @@ class Controller extends Base
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, $attendanceDirty);
+        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, false);
 
         /* Save this event and any recurring incidents too
          */
@@ -748,8 +749,7 @@ class Controller extends Base
             $event->getFolderCollection()->getPropertyValues('setCategoryId'),
             $event->getRoleCollection()->getPropertyValues('roleId'),
             array_column($payload['attendees']['guests'], 'id'),
-            // Attendance is dirty because this has moved
-            true
+            false
         );
 
         // Efficacy is only this item for now.
