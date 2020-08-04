@@ -297,14 +297,17 @@ class Family
                      * In that way you can determine which one is the primary parent, which is
                      * usually the father, using external_tass_addnum_father and checking whether
                      * address[external_tass_addnum_father] is set.
+                     *
+                     * Then you can detect which one is the secondary parent (spouse), which is
+                     * usually the mother, using external_tass_addnum_mother and checking whether
+                     * address[external_tass_addnum_mother] is set.
+                     *
+                     * Each split parent comes with their own students[] node, so index that
+                     * in particular for each student in $lookup
                      */
                     foreach ($family as $node) {
 
-                        /* Then you can detect which one is the secondary parent (spouse), which is
-                         * usually the mother, using external_tass_addnum_mother and checking whether
-                         * address[external_tass_addnum_mother] is set.
-                         *
-                         * Note that some schools try to switch primary parents to mother
+                        /* Note that some schools try to switch primary parents to mother
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
                          */
@@ -315,9 +318,6 @@ class Family
                              */
                             $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                            /* Each split parent comes with their own students[] node, so index that
-                             * in particular for each student in $lookup
-                             */
                             $this->processParentNode($this->fatherNode, $personExternalId, $node);
                         } elseif (isset($node['address'][$this->addnumMother])) {
 
@@ -326,9 +326,6 @@ class Family
                              */
                             $personExternalId = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                            /* Each split parent comes with their own students[] node, so index that
-                             * in particular for each student in $lookup
-                             */
                             $this->processParentNode($this->motherNode, $personExternalId, $node);
                         } else {
 
