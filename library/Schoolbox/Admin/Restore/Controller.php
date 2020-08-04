@@ -8,16 +8,21 @@ namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
-use Schoolbox\Learning\Assessment\Datamodel\Model as Assessment;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 
 class Controller extends Base
 {
     private const PAGE_CURRENT = 'restore';
+
+    /**
+     * Period of time that you can restore items, older than this will not be displayed
+     */
+    private const TIME_FRAME = '-1 weeks';
 
     /**
      * @var ErrorMapper
@@ -59,7 +64,7 @@ class Controller extends Base
     public function getIndex()
     {
         //Start Range
-        $start = \Alaress_Date_Format::newNaturalDate('-1 weeks');
+        $start = \Alaress_Date_Format::newNaturalDate(self::TIME_FRAME);
         $end = \Alaress_Date_Format::now();
 
         $folderpb = $this->folderMapper->getPredicateBuilder();
