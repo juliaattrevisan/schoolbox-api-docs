@@ -37,6 +37,9 @@ class Family
 
 
     /**
+     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
+     * because tass doesn't treat parents independently of families.
+     *
      * @var string
      */
     private $spousePrefix;
@@ -63,7 +66,11 @@ class Family
     public function __construct(IApi $api, string $spousePrefix)
     {
         $this->api = $api;
-        $this->spousePrefix = $spousePrefix;
+
+        /* Calculate a spouse prefix if one was set; otherwise use a default
+         * Shanked from that Tass Helper class
+         */
+        $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
     }
 
 
@@ -308,7 +315,7 @@ class Family
 //
 //                }
 //            }
-        }
+//        }
 
         return [
             'lookup' => $lookup,

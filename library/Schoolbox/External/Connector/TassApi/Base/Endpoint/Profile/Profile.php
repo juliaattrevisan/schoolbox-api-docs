@@ -51,12 +51,12 @@ class Profile implements IStrategy
     private const STUDIES_CODE_POSSIBILITIES = ['lui_number', 'bos_number', 'vsn_number', 'tqa_number', 'wa_student_number'];
 
 
-    /**
-     * Parents records are actually Family records; Family records contain exactly two nodes,
-     * one for each parent, plus some miscellaneous stuff
-     */
-    private const PARENT_PERSON_NODES = ['person2', 'person1'];
-
+//    /**
+//     * Parents records are actually Family records; Family records contain exactly two nodes,
+//     * one for each parent, plus some miscellaneous stuff
+//     */
+//    private const PARENT_PERSON_NODES = ['person2', 'person1'];
+//
 
     /**
      * @var LoggerInterface
@@ -144,12 +144,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-
-        /* Calculate a spouse prefix if one was set; otherwise use a default
-         * Shanked from that Tass Helper class
-         */
-        $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
-
+        $this->spousePrefix = $spousePrefix;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -186,7 +181,8 @@ class Profile implements IStrategy
     {
         /* Build some lookups to save on traversal and api banging
          */
-        $families = (new Lookup\Family($this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]))->generate();
+        $families = (new Lookup\Family($this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT], $this->spousePrefix))
+            ->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
          */
@@ -498,40 +494,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
-     * I guess sfa_num stands for Split Family Access number or something
-     *
-     * @param string $node
-     * @param string $identifier
-     * @param string $sfaNum
-     * @return string
-     */
-    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
-    {
-        /* Do some funny prefix stuff for parents
-         */
-        if ($this->fatherNode === $node) {
-            $externalId = "P{$identifier}";
-        } else {
-            $externalId = "{$this->spousePrefix}{$identifier}";
-        }
-
-        /* If this was a split family, chuck a $sfaNum into the mix
-         *
-         * After 99,999 students pass through a tass system, this scheme will stop working
-         * due to collisions between old ids and new ones with prefix
-         *
-         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
-         */
-        if ('' !== $sfaNum) {
-            $externalId .= $sfaNum;
-        }
-
-        return $externalId;
-    }
-
-
-    /**
      * Import parent profile data for a given student
      *
      * @param UserProfile\Model $studentBaseProfile
@@ -565,7 +527,7 @@ class Profile implements IStrategy
                 foreach (self::PARENT_PERSON_NODES as $node) {
                     $identifier = trim((string)$familyRecord['username']);
 
-                    $externalId = $this->deriveExternalId($node, $identifier, $familyRecord['sfa_num']);
+//                    $externalId = $this->deriveExternalId($node, $identifier, $familyRecord['sfa_num']);
                     $email = trim((string)$familyRecord[$node]['e_mail']);
                     $firstname = trim((string)$familyRecord[$node]['preferred_name']);
                     $lastname = trim((string)$familyRecord[$node]['surname']);
