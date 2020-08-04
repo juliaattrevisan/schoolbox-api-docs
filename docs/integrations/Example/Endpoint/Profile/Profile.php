@@ -12,7 +12,6 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
@@ -20,8 +19,6 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -119,11 +116,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-        /* Purge old relations before re-inserting them
-         */
-        if ($this->perform) {
-            $this->relationshipMapper->truncate();
-        }
 
         /* Import students' profile data
          * Import their specific parents' profile data
@@ -137,20 +129,6 @@ class Profile implements IStrategy
         $this->log->info('Processing staff.');
 
         $this->importStaff();
-
-        /* Remove any orphaned profiles
-         */
-        if ($this->perform) {
-            $orphans = (new OrphanRemover(
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))->remove();
-
-            $this->log->info("Removed {$orphans} orphaned profiles.");
-        }
     }
 
 
