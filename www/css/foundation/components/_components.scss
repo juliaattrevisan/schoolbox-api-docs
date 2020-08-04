@@ -2,6 +2,65 @@
  * Component styles for Dashboard, Homepage, Eportfolio
  *********************************************************/
 
+// Color variables for component layouts
+
+/** Make these styles more specific than topbar styles  **/
+#component-layout .column-top .component-titlebar {
+  background-color: var(--top-head-bg);
+}
+
+#component-layout .column-top .component-titlebar h2,
+#component-layout .column-top .component-titlebar a {
+  color: var(--top-head-font);
+}
+
+#component-layout .column-top .island section {
+  color: var(--top-font-primary);
+  background-color: var(--top-bg-primary);
+}
+
+#component-layout .column-left .component-titlebar {
+  background-color: var(--left-head-bg);
+}
+
+#component-layout .column-left .component-titlebar h2,
+#component-layout .column-left .component-titlebar a {
+  color: var(--left-head-font);
+}
+
+#component-layout .column-left .island section {
+  color: var(--left-font-primary);
+  background-color: var(--left-bg-primary);
+}
+
+#component-layout .column-right .component-titlebar {
+  background-color: var(--right-head-bg);
+}
+
+#component-layout .column-right .component-titlebar h2,
+#component-layout .column-right .component-titlebar a {
+  color: var(--right-head-font);
+}
+
+#component-layout .column-right .island section {
+  color: var(--right-font-primary);
+  background-color: var(--right-bg-primary);
+}
+
+/** Special Effects for Action Buttons **/
+#component-layout .column-top .component-titlebar nav a,
+#component-layout .column-left .component-titlebar nav a,
+#component-layout .column-right .component-titlebar nav a {
+  opacity: 0.5;
+}
+
+#component-layout .column-top .component-titlebar nav a:hover,
+#component-layout .column-left .component-titlebar nav a:hover,
+#component-layout .column-right .component-titlebar nav a:hover {
+  opacity: 1;
+  background-color: transparent;
+}
+
 /* This is used in Masonry, in admin, to configure where your
  * components are on Dashboard/Homepage/ePortfolio
  */
