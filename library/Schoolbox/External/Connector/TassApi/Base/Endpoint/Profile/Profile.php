@@ -216,7 +216,18 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $families = $this->preloadParentLookup();
+        /* Build some lookups to save on traversal and api banging
+         */
+        $families = (new Lookup\Family($this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]))->generate();
+
+        /* Also alert any broken tass api payloads that we detected in lookups
+         */
+        foreach ($families['malformed'] as $malformed) {
+            $this->log->critical(sprintf(
+                'Parent records for family %s malformed.',
+                $malformed
+            ));
+        }
 
         $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
@@ -513,100 +524,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Preload parents into a lookup
-     *
-     * This is probably going to be faster if we build a hash lookup of parents
-     */
-    private function preloadParentLookup(): array
-    {
-        $families = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
-            'user_code' => 'all'
-        ]);
-
-        $lookup = [];
-        $index = [];
-
-        /* TODO: Might have to shank parents' mobile numbers from another api endpoint
-         */
-
-        foreach ($families['parents'] as $row) {
-            foreach ($row as $parentId => $family) {
-
-                /* Tass generally adheres to $parent['students'] data structure
-                 *
-                        Array
-                        (
-                            [web_access] =>
-                            [user_code] => 10620
-                            [person2] => Array
-                            [person1] => Array
-                            ...
-
-                 * ...EXCEPT when they've joined onto an email address table somewhere, at which point
-                 * their own api structure mutates slightly into something nonstandard,
-                 * where $parent becomes a 0-indexed array instead of the usual key-value tuple content.
-                 *
-                 * no joke. I can't make this stuff up even on a bad day.
-
-                        Array
-                        (
-                            [0] => Array
-                                (
-                                    [web_access] => 1
-                                    [user_code] => 10119
-                                    [person2] => Array
-                                    [address] => Array
-                                        (
-                                            [4] => Array
-                                                (
-                                                    [email2] =>
-                                                    [email1] => jones@nowhere.com
-                                                )
-                                        )
-                                    [person1] => Array
-                                )
-                            [1] => Array
-                                (
-                                    [web_access] => 1
-                                    [user_code] => 10119
-                                    [person2] => Array
-                                    [address] => Array
-                                        (
-                                            [3] => Array
-                                                (
-                                                    [email2] =>
-                                                    [email1] =>
-                                                )
-                                            [5] => Array
-                                                (
-                                                    [email2] =>
-                                                    [email1] => jones@nowhere.com
-                                                )
-                                        )
-                                    [person1] => Array
-                                )
-                        )
-
-                 */
-                if (isset($family['students'])) {
-                    foreach ($family['students'] as $studentId) {
-                        $lookup[$studentId][$parentId] = $parentId;
-                        $index[$parentId] = $family;
-                    }
-                } else {
-                    $this->log->critical("Parent records for family {$parentId} malformed.");
-                }
-            }
-        }
-
-        return [
-            'lookup' => $lookup,
-            'index' => $index
-        ];
-    }
-
-
-    /**
      * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
      * I guess sfa_num stands for Split Family Access number or something
      *
@@ -762,7 +679,11 @@ class Profile implements IStrategy
                 }
             }
         } else {
-            $this->log->info("No parents found for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+            $this->log->warning(sprintf(
+                'No parents found for student %s %s',
+                $studentId,
+                "{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"
+            ));
         }
     }
 
