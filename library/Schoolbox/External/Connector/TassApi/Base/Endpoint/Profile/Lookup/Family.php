@@ -51,7 +51,7 @@ class Family
         $families = $this->api->retrieveDocument('getParents', [
             'user_code' => 'all'
         ]);
-
+print_r($families);die();
         $lookup = [];
         $index = [];
         $malformed = [];
@@ -83,6 +83,9 @@ class Family
                  *  and the mother is in another particular address[] element. There are tass configs
                  *  which indicate where father and mother nodes exist:
                  *      external_tass_addnum_mother, external_tass_addnum_father
+                 *
+                 * TODO The "malformed" data occurs with split families so they end up with separate records
+                 *  that contain similar, thought no always identical, data; but with the same parent_code
                  *
 
                         Array
@@ -132,9 +135,38 @@ class Family
                     }
                 } else {
 
-                    /* Maintain a list of broken records that we skipped
-                     */
-                    $malformed[] = $parentId;
+//                    /* Maintain a list of broken records that we skipped
+//                     */
+//                    $malformed[] = $parentId;
+//
+//                    /* Wrap around the brokenness like scar tissue
+//                     * Keep track of split family parents and their related students
+//                     */
+//                    foreach ($family as $splitParent) {
+//                        foreach ($family['students'] as $studentId) {
+//                            $lookup[$studentId][$parentId] = $parentId;
+//                            $index[$parentId] = $family;
+//                        }
+//                    }
+//
+//
+//                    /* We know that all elements are the same, except for the address node
+//                     * so we can just use the first element of $family as a basis
+//                     */
+//                    $newFamily = $family[0];
+//
+//                    /* Then merge all the address nodes from every other node in $family
+//                     */
+//                    $mergedAddresses = array_merge(...$family)['addresses'];
+//
+//                    /* Then take the address nodes and shank it on top of $newFamily
+//                     * API "repaired", "Funding secured."
+//                     */
+//                    $newFamily['addresses'] = $mergedAddresses;
+//
+//                    /* Index this new version of $family instead of the old
+//                     */
+
                 }
             }
         }
