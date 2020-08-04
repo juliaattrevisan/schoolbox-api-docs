@@ -281,7 +281,9 @@ class Family
                     foreach (self::PARENT_PERSON_NODES as $node) {
                         $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                        $this->processParentNode($node, $personExternalId, $family);
+                        $person = $this->processParentNode($node, $personExternalId, $family);
+
+                        $this->index[$person['externalId']] = $person;
                     }
 
                     $nuclear++;
@@ -318,7 +320,12 @@ class Family
                              */
                             $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                            $this->processParentNode($this->fatherNode, $personExternalId, $node);
+                            $person = $this->processParentNode($this->fatherNode, $personExternalId, $node);
+
+                            /* Rearrange contents of $person['address'] to find their email address
+                             */
+
+                            $this->index[$person['externalId']] = $person;
                         } elseif (isset($node['address'][$this->addnumMother])) {
 
                             /* Once you identify mothers, construct a parent using their node
@@ -326,7 +333,12 @@ class Family
                              */
                             $personExternalId = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
-                            $this->processParentNode($this->motherNode, $personExternalId, $node);
+                            $person = $this->processParentNode($this->motherNode, $personExternalId, $node);
+
+                            /* Rearrange contents of $person['address'] to find their email address
+                             */
+
+                            $this->index[$person['externalId']] = $person;
                         } else {
 
                             /* Unknown parent type; skip this for now since we can't tell
@@ -363,9 +375,9 @@ class Family
      * @param string $node
      * @param string $externalId
      * @param array  $family
-     * @return mixed
+     * @return array
      */
-    private function processParentNode(string $node, string $externalId, array $family): void
+    private function processParentNode(string $node, string $externalId, array $family): array
     {
         $person = $family[$node];
         $person['externalId'] = $externalId;
@@ -386,8 +398,6 @@ class Family
             $this->lookup[$student][] = $person['externalId'];
         }
 
-        new \Alaress_Probe($family);
-
-        $this->index[$person['externalId']] = $person;
+        return $person;
     }
 }
