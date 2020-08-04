@@ -8,8 +8,10 @@ namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
+use Schoolbox\Learning\Assessment\Datamodel\Model as Assessment;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
@@ -61,10 +63,21 @@ class Controller extends Base
         $end = \Alaress_Date_Format::now();
 
         $folderpb = $this->folderMapper->getPredicateBuilder();
+
         $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true,'order'=>['deleted_at'=>'DESC']]);
+
+        // Filter folders where the parent is deleted, these cannot be restored
+        $deletedFolders = $deletedFolders->filter(function (Folder $node) {
+            return !$node->getParent()->isDeleted();
+        });
 
         $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
         $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true, 'order'=>['deleted_at'=>'DESC']]);
+
+        // Filter assessments where the context is deleted, these cannot be restored
+        $deletedAssessments = $deletedAssessments->filter(function (Assessment $node) {
+            return !$node->getAssessmentContext()->isDeleted();
+        });
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
             'pageCurrent' => self::PAGE_CURRENT,
