@@ -71,6 +71,10 @@ class EventRelations
      * setting from being lost, this bool is set when the datetime changes; changing the title
      * and description (for example) of an event shouldn't reset one's RSVP choices
      *
+     * Note that as of SA-10697 guests no longer need to re-confirm their
+     * attendance if an event's time changes; therefore, it's unlikely that
+     * this flag will ever need to be set to true.
+     *
      * @var bool
      */
     private $attendanceDirty;
