@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
@@ -214,6 +215,12 @@ class Profile implements IStrategy
             ));
         }
 
+        /* Haven't encounterd any malformed data in this place yet
+         */
+        $phones = (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate();
+
+        /* Process each current student, and their parents too
+         */
         $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
@@ -371,7 +378,7 @@ class Profile implements IStrategy
 
             /* Time for importing parents
              */
-            $this->importParentsOfStudent($studentBaseProfile, $families);
+            $this->importParentsOfStudent($studentBaseProfile, $families, $phones);
         }
     }
 
@@ -547,12 +554,13 @@ class Profile implements IStrategy
      *
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $families
+     * @param array             $phones
      * @throws Exception
      * @throws PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families, array $phones): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
@@ -579,9 +587,9 @@ class Profile implements IStrategy
                     $email = trim((string)$familyRecord[$node]['e_mail']);
                     $firstname = trim((string)$familyRecord[$node]['preferred_name']);
                     $lastname = trim((string)$familyRecord[$node]['surname']);
-                    $phoneHome = '';
-                    $phoneMobile = '';
-                    $phoneWork = '';
+                    $phoneHome = $phones[$parentId]['homePhone'] ?? '';
+                    $phoneMobile = $phones[$parentId]['mobile'] ?? '';
+                    $phoneWork = $phones[$parentId]['workPhone'] ?? '';
                     $relationship = trim((string)$familyRecord[$node]['description']);
                     $title = trim((string)$familyRecord[$node]['title']);
 
