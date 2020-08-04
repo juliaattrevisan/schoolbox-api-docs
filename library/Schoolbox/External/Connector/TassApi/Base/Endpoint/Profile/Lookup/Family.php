@@ -21,6 +21,14 @@ class Family
 {
 
     /**
+     * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
+     *
+     * @var IApi
+     */
+    private $api;
+
+
+    /**
      * Family constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
