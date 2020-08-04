@@ -322,8 +322,12 @@ class Family
 
                             $person = $this->processParentNode($this->fatherNode, $personExternalId, $node);
 
-                            /* Rearrange contents of $person['address'] to find their email address
+                            /* Rearrange contents of $person['address'] to find their first non-null email address
                              */
+                            $person['e_mail'] = array_filter([
+                                $person['address'][$this->addnumFather]['email1'],
+                                $person['address'][$this->addnumFather]['email2']
+                            ])[0] ?? '';
 
                             $this->index[$person['externalId']] = $person;
                         } elseif (isset($node['address'][$this->addnumMother])) {
@@ -337,6 +341,10 @@ class Family
 
                             /* Rearrange contents of $person['address'] to find their email address
                              */
+                            $person['e_mail'] = array_filter([
+                                $person['address'][$this->addnumMother]['email1'],
+                                $person['address'][$this->addnumMother]['email2']
+                            ])[0] ?? '';
 
                             $this->index[$person['externalId']] = $person;
                         } else {
