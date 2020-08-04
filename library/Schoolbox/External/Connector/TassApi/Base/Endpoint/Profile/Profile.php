@@ -539,107 +539,97 @@ class Profile implements IStrategy
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
         if (isset($families['lookup'][$studentId])) {
-            foreach ($families['lookup'][$studentId] as $parentId => $value) {
-                $this->log->info("Adding parent {$parentId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+            foreach ($families['lookup'][$studentId] as $externalId) {
+                $this->log->info("Adding parent {$externalId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
 
-                /* The Family Record contains both parents' data, in adjacent nodes,
-                 * with the keys 'person1' and 'person2'. person2 seems to be the father's data
-                 * and comes first (mhmm)  and person1 is the mother's. I haven't seen any further
-                 * parents in the dev data from Tass, but I presume there to be more.
-                 */
-                $familyRecord = $families['index'][$parentId];
+                $parent = $families['index'][$externalId];
 
                 /* Each parent in the family
                  */
-                foreach (self::PARENT_PERSON_NODES as $node) {
-                    $identifier = trim((string)$familyRecord['username']);
+                $email = trim((string)$parent['e_mail']); // TODO I think this comes from a different place
+                $firstname = trim((string)$parent['preferred_name']);
+                $lastname = trim((string)$parent['surname']);
+                $phoneHome = (string)($parent['addresses']['homePhone'] ?? '');
+                $phoneMobile = (string)($parent['addresses']['mobile'] ?? '');
+                $phoneWork = (string)($parent['addresses']['workPhone'] ?? '');
+                $relationship = trim((string)$parent['description']);
+                $title = trim((string)$parent['title']);
 
-//                    $externalId = $this->deriveExternalId($node, $identifier, $familyRecord['sfa_num']);
-                    $email = trim((string)$familyRecord[$node]['e_mail']);
-                    $firstname = trim((string)$familyRecord[$node]['preferred_name']);
-                    $lastname = trim((string)$familyRecord[$node]['surname']);
-                    $phoneHome = $phones[$parentId]['homePhone'] ?? '';
-                    $phoneMobile = $phones[$parentId]['mobile'] ?? '';
-                    $phoneWork = $phones[$parentId]['workPhone'] ?? '';
-                    $relationship = trim((string)$familyRecord[$node]['description']);
-                    $title = trim((string)$familyRecord[$node]['title']);
+                /* $username is the result of that $externalId calculation
+                 * but you can override this in UPS anyway
+                 */
+                $username = $externalId;
 
-                    /* $username is the result of that $externalId calculation
-                     * but you can override this in UPS anyway
-                     */
-                    $username = $externalId;
+                try {
+                    $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                    $parentBaseProfile = $parentProfile->getBaseProfile();
+                } catch (Exception $e) {
+                    $parentProfile = $this->parentProfileMapper->createModel();
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
 
-                    try {
-                        $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-                        $parentBaseProfile = $parentProfile->getBaseProfile();
-                    } catch (Exception $e) {
-                        $parentProfile = $this->parentProfileMapper->createModel();
-                        $parentBaseProfile = $this->baseProfileMapper->createModel();
+                    $parentProfile->setBaseProfile($parentBaseProfile);
+                }
 
-                        $parentProfile->setBaseProfile($parentBaseProfile);
-                    }
+                $parentBaseProfile
+                    ->setExternalId($externalId)
+                    ->setTitle($title)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname);
 
-                    $parentBaseProfile
-                        ->setExternalId($externalId)
-                        ->setTitle($title)
-                        ->setFirstname($firstname)
-                        ->setLastname($lastname);
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding base profile for %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                ));
 
-                    /* Log it
-                     */
-                    $this->log->info(sprintf(
-                        'Adding base profile for %s',
-                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-                    ));
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($parentBaseProfile);
+                }
 
-                    /* Then save it
-                     */
-                    if ($this->perform) {
-                        $this->baseProfileMapper->save($parentBaseProfile);
-                    }
+                $parentProfile
+                    ->setPhoneHome($phoneHome)
+                    ->setPhoneWork($phoneWork)
+                    ->setMobile($phoneMobile)
+                    ->setEmail($email)
+                    ->setUsername($username);
 
-                    $parentProfile
-                        ->setPhoneHome($phoneHome)
-                        ->setPhoneWork($phoneWork)
-                        ->setMobile($phoneMobile)
-                        ->setEmail($email)
-                        ->setUsername($username);
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding parent profile for %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                ));
 
-                    /* Log it
-                     */
-                    $this->log->info(sprintf(
-                        'Adding parent profile for %s',
-                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-                    ));
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->parentProfileMapper->save($parentProfile);
+                }
 
-                    /* Then save it
-                     */
-                    if ($this->perform) {
-                        $this->parentProfileMapper->save($parentProfile);
-                    }
+                /* Manufacture relations
+                 */
 
-                    /* Manufacture relations
-                     */
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding relation between %s, the %s of %s',
+                    trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                    trim($relationship),
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
 
-                    /* Log it
-                     */
-                    $this->log->info(sprintf(
-                        'Adding relation between %s, the %s of %s',
-                        trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-                        trim($relationship),
-                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-                    ));
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $relationship = $this->relationshipMapper->createModel()
+                        ->setUserProfile($parentBaseProfile)
+                        ->setChildProfile($studentBaseProfile)
+                        ->setType($relationship);
 
-                    /* Then save it
-                     */
-                    if ($this->perform) {
-                        $relationship = $this->relationshipMapper->createModel()
-                            ->setUserProfile($parentBaseProfile)
-                            ->setChildProfile($studentBaseProfile)
-                            ->setType($relationship);
-
-                        $this->relationshipMapper->save($relationship);
-                    }
+                    $this->relationshipMapper->save($relationship);
                 }
             }
         } else {
