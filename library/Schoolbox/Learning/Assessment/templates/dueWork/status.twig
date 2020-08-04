@@ -14,8 +14,10 @@
 {% extends '@learningAssessment/status.twig' %}
 
 {% set labelIncomplete = 'Submission required' %}
+{% set labelFailed     = 'Resubmission required' %}
 {% set labelPending    = 'Marking required' %}
 {% set labelReviewed   = 'Reviewed' %}
+{% set statusFailed    = 'failed' %}
 
 {% set readonly = interactionLocked and not USER.superUser %}
 
@@ -79,8 +81,10 @@
      #}
     {% set pStatusClass %}
         {%- spaceless %}
-            {% if participant.responseRequired or participant.resubmissionRequired %}
+            {% if participant.responseRequired %}
                 {{ statusIncomplete }}
+            {% elseif participant.resubmissionRequired %}
+                {{ statusFailed }}
             {% elseif participant.feedbackRequired %}
                 {{ statusPending }}
             {% else %}
@@ -328,6 +332,7 @@
              - assessment:  the assessment we're looking at
              - participant: the current participant of the iteration
              - statusIncomplete: a string representing the 'incomplete' state
+             - statusFailed: a string representing the 'failed' state
              - statusPending: a string representing the 'pending' state
              - statusReviewed: a string representing the 'reviewed' state
          #}
@@ -337,6 +342,7 @@
                 $(function () {
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
+                        statusFailed: '{{ statusFailed }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
                         reviewedText: '{{ labelReviewed }}',

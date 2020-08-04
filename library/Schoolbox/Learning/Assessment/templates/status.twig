@@ -61,6 +61,14 @@
                     <span class="progress-tick tiny"></span> {{ labelIncomplete }}
                 </label>
             </li>
+            {% if statusFailed is defined %}
+            <li>
+                <input type="checkbox" id="filter-failed" checked="checked" data-status="{{ statusFailed }}" />
+                <label for="filter-failed">
+                    <span class="progress-tick tiny failed"></span> {{ labelFailed }}
+                </label>
+            </li>
+            {% endif %}
             <li>
                 <input type="checkbox" id="filter-act" checked="checked" data-status="{{ statusPending }}" />
                 <label for="filter-act">
