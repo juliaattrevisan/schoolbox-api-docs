@@ -14,7 +14,7 @@
        id="resubmissionRequired-{{ participant.user.id }}"
        name="resubmissionRequired"
        {% if readonly %}readonly{% endif %}
-       {% if feedback.resubmissionRequired ?? false %}checked{% endif %}
+       {% if participant.resubmissionRequired ?? false %}checked{% endif %}
 />
 <label for="resubmissionRequired-{{ participant.user.id }}"
        class="checkbox-label">Resubmission required</label>
