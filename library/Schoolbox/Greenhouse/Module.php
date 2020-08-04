@@ -12,6 +12,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Admin\Restore\Controller;
 use Twig_Error_Loader;
 
 class Module extends BaseModule
@@ -47,10 +48,15 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
-        ];
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
+                ]
+            )
+        );
     }
 
     /**

@@ -2236,11 +2236,6 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Greenhouse/Module.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php

@@ -49,9 +49,15 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
-        ];
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class)
+                ]
+            )
+        );
     }
 
     /**
