@@ -67,6 +67,22 @@ class Factory
 
 
     /**
+     * Set in admin, corresponds to external_tass_addnum_father
+     *
+     * @var int
+     */
+    private $addnumFather;
+
+
+    /**
+     * Set in admin, corresponds to external_tass_addnum_mother
+     *
+     * @var int
+     */
+    private $addnumMother;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -140,6 +156,8 @@ class Factory
      * @param string                          $host
      * @param string                          $key
      * @param string                          $spousePrefix
+     * @param int                             $addnumFather
+     * @param int                             $addnumMother
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -158,6 +176,8 @@ class Factory
         string $host,
         string $key,
         string $spousePrefix,
+        int $addnumFather,
+        int $addnumMother,
 
         /* Profile pieces
          */
@@ -181,6 +201,8 @@ class Factory
         $this->host = $host;
         $this->key = $key;
         $this->spousePrefix = $spousePrefix;
+        $this->addnumFather = $addnumFather;
+        $this->addnumMother = $addnumMother;
 
         /* Profile pieces
          */
@@ -243,6 +265,8 @@ class Factory
                 $this->perform,
                 $api,
                 $this->spousePrefix,
+                $this->addnumFather,
+                $this->addnumMother,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,

@@ -53,6 +53,22 @@ class Family
 
 
     /**
+     * Set in admin, corresponds to external_tass_addnum_father
+     *
+     * @var int
+     */
+    private $addnumFather;
+
+
+    /**
+     * Set in admin, corresponds to external_tass_addnum_mother
+     *
+     * @var int
+     */
+    private $addnumMother;
+
+
+    /**
      * The node corresponding to a father's data in a Family record.
      * I have a fear that this will be different per tass implementation somewhere but, for now,
      * presume that 'person2' is (and always is) the papa
@@ -77,16 +93,28 @@ class Family
      *
      * @param IApi   $api
      * @param string $spousePrefix
+     * @param int    $addnumFather
+     * @param int    $addnumMother
      * @param array  $phones
      */
-    public function __construct(IApi $api, string $spousePrefix, array $phones)
-    {
+    public function __construct(
+        IApi $api,
+        string $spousePrefix,
+        int $addnumFather,
+        int $addnumMother,
+        array $phones
+    ) {
         $this->api = $api;
 
         /* Calculate a spouse prefix if one was set; otherwise use a default
          * Shanked from that Tass Helper class
          */
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
+
+        /* Some admin vars we'll use in this place
+         */
+        $this->addnumFather = $addnumFather;
+        $this->addnumMother = $addnumMother;
 
         /* Phone lookup; data from another endpoint
          */
@@ -254,9 +282,9 @@ class Family
                     /* Split family
                      */
 
-                    /* Each record in $family actually a sub-family; due to tass forcing
+                    /* Each record in $family is actually a sub-family; due to tass forcing
                      * each person come with their spouse. However, each sub-family contains
-                     * addess nodes. Fathers and mother suse different address[n] indexes.
+                     * address nodes. Fathers and mothers use different address[n] indexes.
                      *
                      * In that way you can determine which one is the primary parent, which is
                      * usually the father, using external_tass_addnum_father and checking whether

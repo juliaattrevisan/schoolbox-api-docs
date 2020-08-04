@@ -88,6 +88,22 @@ class Profile implements IStrategy
 
 
     /**
+     * Set in admin, corresponds to external_tass_addnum_father
+     *
+     * @var int
+     */
+    private $addnumFather;
+
+
+    /**
+     * Set in admin, corresponds to external_tass_addnum_mother
+     *
+     * @var int
+     */
+    private $addnumMother;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -124,6 +140,8 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param Api[]                           $api
      * @param string                          $spousePrefix
+     * @param int                             $addnumFather
+     * @param int                             $addnumMother
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -135,6 +153,8 @@ class Profile implements IStrategy
         bool $perform,
         array $api,
         string $spousePrefix,
+        int $addnumFather,
+        int $addnumMother,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -145,6 +165,8 @@ class Profile implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->spousePrefix = $spousePrefix;
+        $this->addnumFather = $addnumFather;
+        $this->addnumMother = $addnumMother;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -184,6 +206,8 @@ class Profile implements IStrategy
         $families = (new Lookup\Family(
             $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
             $this->spousePrefix,
+            $this->addnumFather,
+            $this->addnumMother,
             (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
         ))->generate();
 
