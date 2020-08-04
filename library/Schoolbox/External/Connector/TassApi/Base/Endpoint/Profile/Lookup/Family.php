@@ -192,7 +192,7 @@ class Family
             'user_code' => 'all'
         ]);
 
-        $malformed = [];
+        $unknown = [];
 
         /* Tass generally adheres to $parent['students'] data structure
          *
@@ -344,7 +344,7 @@ class Family
                             /* Unknown parent type; skip this for now since we can't tell
                              * whether this is a father or a mother
                              */
-                            $malformed[] = $subfamily['user_code'];
+                            $unknown[] = $subfamily['user_code'];
 
                             continue;
                         }
@@ -360,7 +360,7 @@ class Family
         return [
             'lookup' => $this->lookup,
             'index' => $this->index,
-            'malformed' => $malformed,
+            'unknown' => $unknown,
             'count' => [
                 'nuclear' => $nuclear,
                 'split' => $split
