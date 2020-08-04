@@ -216,7 +216,7 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $parents = $this->preloadParentLookup();
+        $families = $this->preloadParentLookup();
 
         $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
@@ -375,7 +375,7 @@ class Profile implements IStrategy
 
             /* Time for importing parents
              */
-            $this->importParentsOfStudent($studentBaseProfile, $parents);
+            $this->importParentsOfStudent($studentBaseProfile, $families);
         }
     }
 
@@ -519,7 +519,7 @@ class Profile implements IStrategy
      */
     private function preloadParentLookup(): array
     {
-        $parents = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
+        $families = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
             'user_code' => 'all'
         ]);
 
@@ -529,8 +529,8 @@ class Profile implements IStrategy
         /* TODO: Might have to shank parents' mobile numbers from another api endpoint
          */
 
-        foreach ($parents['parents'] as $row) {
-            foreach ($row as $parentId => $parent) {
+        foreach ($families['parents'] as $row) {
+            foreach ($row as $parentId => $family) {
 
                 /* Tass generally adheres to $parent['students'] data structure
                  *
@@ -588,13 +588,13 @@ class Profile implements IStrategy
                         )
 
                  */
-                if (isset($parent['students'])) {
-                    foreach ($parent['students'] as $studentId) {
+                if (isset($family['students'])) {
+                    foreach ($family['students'] as $studentId) {
                         $lookup[$studentId][$parentId] = $parentId;
-                        $index[$parentId] = $parent;
+                        $index[$parentId] = $family;
                     }
                 } else {
-                    $this->log->critical("Parent records for parent {$parentId} malformed.");
+                    $this->log->critical("Parent records for family {$parentId} malformed.");
                 }
             }
         }
@@ -644,21 +644,21 @@ class Profile implements IStrategy
      * Import parent profile data for a given student
      *
      * @param UserProfile\Model $studentBaseProfile
-     * @param array             $parents
+     * @param array             $families
      * @throws Exception
      * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $parents): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
         /* Parents that were preloaded for this student will exist in the lookup array
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
-        if (isset($parents['lookup'][$studentId])) {
-            foreach ($parents['lookup'][$studentId] as $parentId => $value) {
+        if (isset($families['lookup'][$studentId])) {
+            foreach ($families['lookup'][$studentId] as $parentId => $value) {
                 $this->log->info("Adding parent {$parentId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
 
                 /* The Family Record contains both parents' data, in adjacent nodes,
@@ -666,7 +666,7 @@ class Profile implements IStrategy
                  * and comes first (mhmm)  and person1 is the mother's. I haven't seen any further
                  * parents in the dev data from Tass, but I presume there to be more.
                  */
-                $familyRecord = $parents['index'][$parentId];
+                $familyRecord = $families['index'][$parentId];
 
                 /* Each parent in the family
                  */
