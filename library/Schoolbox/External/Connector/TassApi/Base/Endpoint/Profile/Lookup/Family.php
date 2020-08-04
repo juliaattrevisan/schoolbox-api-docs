@@ -93,6 +93,22 @@ class Family
 
 
     /**
+     * A list of (studentExternalId, parentExternalId) tuples
+     *
+     * @var array
+     */
+    private $lookup = [];
+
+
+    /**
+     * A list of (parentExternalId, parentData) tuples
+     *
+     * @var array
+     */
+    private $index = [];
+
+
+    /**
      * Family constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
@@ -176,8 +192,6 @@ class Family
             'user_code' => 'all'
         ]);
 
-        $lookup = [];
-        $index = [];
         $malformed = [];
 
         /* Tass generally adheres to $parent['students'] data structure
@@ -190,20 +204,15 @@ class Family
                     [person1] => Array
                     ...
 
+         *
          * ...EXCEPT when they've joined onto an email address table somewhere, at which point
          * their own api structure mutates slightly into something nonstandard,
          * where $parent becomes a 0-indexed array instead of the usual key-value tuple content.
          *
          * no joke. I can't make this stuff up even on a bad day.
          *
-         * TODO Fiddle with tass config settings
-         *  Due to the indexing one can surmise that the father is in a particular address[] element
-         *  and the mother is in another particular address[] element. There are tass configs
-         *  which indicate where father and mother nodes exist:
-         *      external_tass_addnum_mother, external_tass_addnum_father
-         *
-         * TODO The "malformed" data occurs with split families so they end up with separate records
-         *  that contain similar, thought no always identical, data; but with the same parent_code
+         * The "malformed" data occurs with split families so they end up with separate records
+         * that contain similar, thought no always identical, data; but with the same parent_code
          *
 
                 Array
@@ -245,6 +254,11 @@ class Family
                         )
                 )
 
+         *
+         * Due to the indexing one can surmise that the father is in a particular address[] element
+         * and the mother is in another particular address[] element. There are tass configs
+         * which indicate where father and mother nodes exist:
+         *      external_tass_addnum_mother, external_tass_addnum_father
          */
 
         /* Tass families come in one of two flavours: nuclear and split
@@ -254,6 +268,9 @@ class Family
          * Schoolbox treats parents as individual entities so we have to divide
          * families' data and complete it as best we can
          */
+        $nuclear = 0;
+        $split = 0;
+
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
                 if (isset($family['students'])) {
@@ -262,27 +279,12 @@ class Family
                      * person1 and person2 need to be each given an externalId
                      */
                     foreach (self::PARENT_PERSON_NODES as $node) {
-                        $person = $family[$node];
-                        $person['externalId'] = $this->deriveExternalId($node, (string)$family['user_code'], '');
+                        $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                        /* Assign studentIds to each of their externalIds, as per the
-                         * $family['students'] node
-                         */
-                        $person['students'] = $family['students'];
-
-                        /* Merge phone numbers from another lookup which extracted data
-                         * from some other endpoint
-                         */
-                        $person['addresses'] = $this->phones[$family['user_code']];
-
-                        /* Index each parent by their externalId
-                         */
-                        foreach($person['students'] as $student) {
-                            $lookup[$student][] = $person['externalId'];
-                        }
-
-                        $index[$person['externalId']] = $person;
+                        $this->processParentNode($node, $personExternalId, $family);
                     }
+
+                    $nuclear++;
                 } else {
 
                     /* Split family
@@ -311,61 +313,82 @@ class Family
                             /* Anyway, once you identify fathers, construct a parent using their node
                              * which is apparently person2.
                              */
-                            $person = $node[$this->fatherNode];
-                            $person['externalId'] = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
-
-                            /* Merge phone numbers from another lookup which extracted data
-                             * from some other endpoint
-                             */
-                            $person['addresses'] = $this->phones[$node['user_code']];
+                            $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
                             /* Each split parent comes with their own students[] node, so index that
                              * in particular for each student in $lookup
                              */
-                            foreach($node['students'] as $student) {
-                                $lookup[$student][] = $person['externalId'];
-                            }
-
-                            $index[$person['externalId']] = $person;
+                            $this->processParentNode($this->fatherNode, $personExternalId, $node);
                         } elseif (isset($node['address'][$this->addnumMother])) {
 
                             /* Once you identify mothers, construct a parent using their node
                              * which is apparently person1.
                              */
-                            $person = $node[$this->motherNode];
-                            $person['externalId'] = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
-
-                            /* Merge phone numbers from another lookup which extracted data
-                             * from some other endpoint
-                             */
-                            $person['addresses'] = $this->phones[$node['user_code']];
+                            $personExternalId = $this->deriveExternalId($this->motherNode, (string)$node['user_code'], (string)$node['sfa_num']);
 
                             /* Each split parent comes with their own students[] node, so index that
                              * in particular for each student in $lookup
                              */
-                            foreach($node['students'] as $student) {
-                                $lookup[$student][] = $person['externalId'];
-                            }
-
-                            $index[$person['externalId']] = $person;
+                            $this->processParentNode($this->motherNode, $personExternalId, $node);
                         } else {
 
                             /* Unknown parent type; skip this for now since we can't tell
                              * whether this is a father or a mother
-                             *
-                             * TODO: probably log it somewhere
                              */
+                            $malformed[] = $node['user_code'];
+
                             continue;
                         }
                     }
+
+                    $split++;
                 }
             }
         }
 
+        /* Return a payload containing lookups, index and some diagnostic data
+         */
         return [
-            'lookup' => $lookup,
-            'index' => $index,
-            'malformed' => $malformed
+            'lookup' => $this->lookup,
+            'index' => $this->index,
+            'malformed' => $malformed,
+            'count' => [
+                'nuclear' => $nuclear,
+                'split' => $split
+            ],
         ];
+    }
+
+
+    /**
+     * Facade method for compiling some parental details
+     *
+     * @param string $node
+     * @param string $externalId
+     * @param array  $family
+     * @return mixed
+     */
+    private function processParentNode(string $node, string $externalId, array $family): void
+    {
+        $person = $family[$node];
+        $person['externalId'] = $externalId;
+
+        /* Assign studentIds to each of their externalIds, as per the
+         * $family['students'] node
+         */
+        $person['students'] = $family['students'];
+
+        /* Merge phone numbers from another lookup which extracted data
+         * from some other endpoint
+         */
+        $person['addresses'] = $this->phones[$family['user_code']];
+
+        /* Index each parent by their externalId
+         */
+        foreach($person['students'] as $student) {
+            $this->lookup[$student][] = $person['externalId'];
+        }
+
+        $this->index[$person['externalId']] = $person;
     }
 }
