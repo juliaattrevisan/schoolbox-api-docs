@@ -67,6 +67,18 @@ class Definition implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $timetableRegistry;
+
+
+    /**
+     * @var Registry
+     */
+    private $cycleRegistry;
+
+
+    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -85,6 +97,8 @@ class Definition implements IStrategy
      * @param bool                  $perform
      * @param Api[]                 $api
      * @param ProfileRegistry       $profileRegistry
+     * @param Registry              $timetableRegistry
+     * @param Registry              $cycleRegistry
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
@@ -93,6 +107,8 @@ class Definition implements IStrategy
         bool $perform,
         array $api,
         ProfileRegistry $profileRegistry,
+        Registry $timetableRegistry,
+        Registry $cycleRegistry,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
@@ -100,6 +116,8 @@ class Definition implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->profileRegistry = $profileRegistry;
+        $this->timetableRegistry = $timetableRegistry;
+        $this->cycleRegistry = $cycleRegistry;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
 
@@ -135,7 +153,7 @@ class Definition implements IStrategy
              * There isn't anything we can do with them
              */
             if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
-                $person = $this->profileRegistry->recall($externalId);
+                $person = $this->profileRegistry->recall((string)$externalId);
 
                 $this->log->warning(sprintf(
                     'Student %s (%s %s) does not have a timetable.',
@@ -145,6 +163,13 @@ class Definition implements IStrategy
                 ));
 
                 continue;
+            } else {
+                $this->log->info(sprintf(
+                    'Student %s (%s %s) has at least one timetable.',
+                    $externalId,
+                    $person['firstname'],
+                    $person['lastname']
+                ));
             }
 
             /* Otherwise, continue on with the first timetable elmeent

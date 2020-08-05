@@ -13,6 +13,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\Registry as TimetableRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -249,6 +250,20 @@ class Factory
          */
         $profileRegistry = new ProfileRegistry();
 
+        /* Timetable Registry
+         *
+         * This registry contains all the timetables we iteratively shanked from an endpoint
+         * so we can trade space for time
+         */
+        $timetableRegistry = new TimetableRegistry();
+
+        /* Cycle Registry
+         *
+         * This registry contains all the cycles we mined from the Timetables we iteratively
+         * shanked from an endpoint so we can trade space for time
+         */
+        $cycleRegistry = new TimetableRegistry();
+
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
@@ -284,6 +299,8 @@ class Factory
                 $this->perform,
                 $api,
                 $profileRegistry,
+                $timetableRegistry,
+                $cycleRegistry,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
