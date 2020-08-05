@@ -170,6 +170,10 @@ class Definition implements IStrategy
              */
             $timetable = $data['student_timetable'][0];
 
+            /* Remember each student's timetable (we'll come back to this later)
+             */
+            $this->timetableRegistry->remember((string)$externalId, $timetable);
+
             /* Use the last known maxDays/maxPeriods info as a starting point
              */
             $ttid = (string)$timetable['TT_ID'];
@@ -189,23 +193,19 @@ class Definition implements IStrategy
                 $maxPeriods = $timetable['PERIODMAX'];
             }
 
-//
-//            /* Remember each student's timetable (we'll come back to this later)
-//             */
-//            $registry->timetableCache[externalId] = data[student_timetable];
-//
-//            /* To find info about Period Times, you need to inspect each Cycle's STRDAYS element
-//             * Each day has its own set of Period Names but we don't support that, so just
-//             * get the longest day's Period setup and apply that scheme universally
-//             */
-//            $longestDay = $cycleCache[data[student_timetable][TT_ID]]['cycleLength'] ?? [];
-//
-//            foreach (data[student_timetable][STRDAYS] as $day => $periods) {
-//                if (\count($periods[PERIODS]) >= maxPeriod) {
-//                    $longestDay = $periods[PERIODS];
-//                }
-//            }
-//
+            /* To find info about Period Times, you need to inspect each Cycle's STRDAYS element
+             * Each day has its own set of Period Names but we don't support that, so just
+             * get the longest day's Period setup and apply that scheme universally
+             */
+            $longestDay = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? [];
+
+            foreach ($timetable['STRDAYS'] as $day => $periods) {
+                if (\count($periods['PERIODS']) >= \count($longestDay)) {
+                    $longestDay = $periods['PERIODS'];
+                }
+            }
+
+            print_r($longestDay);
 //            /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
 //             * as we investigate every data ever
 //             */
