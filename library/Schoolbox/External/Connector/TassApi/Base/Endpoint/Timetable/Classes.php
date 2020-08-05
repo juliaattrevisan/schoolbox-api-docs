@@ -170,51 +170,66 @@ class Classes implements IStrategy
 
         foreach ($timetables as $externalId => $timetable) {
 
-//            /* External Timetable Code (Cycle Identifier)
-//             */
-//            $ext = '';
-//
-//            /* Find all the classes and their details as best we can
-//             *
-//             * Some parts will rely on data to have already been imported into local schema,
-//             * such as period ids, user ids, etc. so we try to get those and assemble them into
-//             * a convenient struct which we can then just ram home
-//             */
-//            /* TODO Create an Iterator which collates subject data
-//             */
-//            $classes = [
-//                /*
-//                    [
-//                        'day' => '',
-//                        'period' => '',
-//                        'class' => [
-//                            'code' => '',
-//                            'name' => ''
-//                        ],
-//                        'room' => [
-//                            'name' => ''
-//                        ],
-//                        'teachers' => [
-//                            [
-//                                'externalId' => '',
-//                                'title' => '',
-//                                'firstname' => '',
-//                                'surname' => '',
-//                                'username' => '',
-//                            ]
-//                        ]
-//                        'student' => [
-//                            [
-//                                'externalId' => '',
-//                                'title' => '',
-//                                'firstname' => '',
-//                                'surname' => '',
-//                                'username' => '',
-//                            ]
-//                        ]
-//                    ]
-//                */
-//            ];
+            /* External Timetable Code (Cycle Identifier)
+             */
+            $ext = (string)$timetable['TT_ID'];
+
+            /* Find all the classes and their details as best we can
+             *
+             * Some parts will rely on data to have already been imported into local schema,
+             * such as period ids, user ids, etc. so we try to get those and assemble them into
+             * a convenient struct which we can then just ram home
+             */
+
+            /* For each Day in $timetable
+             */
+
+            /* For each Period in Day
+             */
+
+            /* Take the 0th element of the Period's Subject's node
+             * (Presume a student can only be in one class on a given (day, period)
+             */
+
+            /* Look up the timetablePeriod instance via day and period indices
+             */
+
+            /* Save class involvement
+             */
+
+            $classes = [
+                /*
+                    [
+                        'day' => '',
+                        'period' => '',
+                        'class' => [
+                            'code' => '',
+                            'name' => ''
+                        ],
+                        'room' => [
+                            'name' => ''
+                        ],
+                        'teachers' => [
+                            [
+                                'externalId' => '',
+                                'title' => '',
+                                'firstname' => '',
+                                'surname' => '',
+                                'username' => '',
+                            ]
+                        ]
+                        'student' => [
+                            [
+                                'externalId' => '',
+                                'title' => '',
+                                'firstname' => '',
+                                'surname' => '',
+                                'username' => '',
+                            ]
+                        ]
+                    ]
+                */
+            ];
 //
 //            foreach ($classes as $class) {
 //
