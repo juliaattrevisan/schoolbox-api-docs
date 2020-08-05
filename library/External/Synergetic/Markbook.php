@@ -56,6 +56,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private const GLOBAL_STAFF_ID = 0;
 
+    /**
+     * These values are set in the config table via a varaible 'synergetic_mark_sync_value'. This will configure what
+     * type of mark we will syncronise back to the SIS.  Either human readable or normalised.  The default is normalised.
+     */
+    private const NORMALISED = 0;
+    private const HUMAN_READABLE = 1;
+
     /** @var External_UserInterface */
     private $externalUser;
 
@@ -74,18 +81,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private $resultTypeCache = [];
 
     /**
+     * The type of mark to sync, normal or human readable
+     * @var int
+     */
+    private $markType;
+
+    /**
      * Constructor
      *
      * If $fileYearOverride and $fileSemesterOverride are provided, they will override both the
      * globally-configured synergetic file year/semester and also each student's file year/semester.
      *
+     * @param int      $markType  This configures to sync normalised (1) or human readable (2)
      * @param int|null $fileYearOverride
      * @param int|null $fileSemesterOverride
-     * @throws Exception
-     * @throws InvalidArgumentException If instantiated with year or semester overridden but not the other
      * @todo There's a heap of dependencies in this class that are plucked from the ether. They should be constructor dependencies, injected by a factory.
      */
-    public function __construct(int $fileYearOverride = null, int $fileSemesterOverride = null)
+    public function __construct(int $markType, int $fileYearOverride = null, int $fileSemesterOverride = null)
     {
         if (null === $fileYearOverride xor null === $fileSemesterOverride) {
             throw new InvalidArgumentException('You must override both year and semester, or neither');
@@ -93,6 +105,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
         $this->setupDatabase();
         $this->externalUser         = new External_User();
+        $this->markType             = $markType;
         $this->fileYearOverride     = $fileYearOverride;
         $this->fileSemesterOverride = $fileSemesterOverride;
     }
@@ -1050,8 +1063,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $activity  = $feedback->getAssessable();
         $marker    = $feedback->getReviewer();
-        $mark      = $feedback->getNormalisedMark();
-        $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
+
+        if($this->markType === self::HUMAN_READABLE) {
+            $markValue = $feedback->getHumanReadableMark();
+        }
+        else {
+            $mark      = $feedback->getNormalisedMark();
+            $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
+        }
+
+
         $comment   = $feedback->getComment();
         return [
             'mark'             => $markValue,

@@ -136,7 +136,7 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
     if ($config->get('external_type') === 'synergetic') {
         try {
-            $markbookExternal = new External_Synergetic_Markbook($year, $semester);
+            $markbookExternal = new External_Synergetic_Markbook($config['synergetic_mark_sync_value'], $year, $semester);
         } catch (InvalidArgumentException $e) {
             $log->error("ERROR: {$e->getMessage()}");
             help($config);
