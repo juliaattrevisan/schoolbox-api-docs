@@ -67,7 +67,7 @@
 </script>
 
 <template>
-    <reveal-modal ref="modal">
+    <reveal-modal ref="modal" size="medium">
         <form class="top" :action="eventExportUrl" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
