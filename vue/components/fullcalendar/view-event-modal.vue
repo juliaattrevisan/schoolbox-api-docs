@@ -550,7 +550,7 @@
 </script>
 
 <template>
-    <reveal-modal ref="modal">
+    <reveal-modal ref="modal" size="medium">
         <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
             <form ref="updateForm" method="post" :action="eventUpdateUrl" @submit.prevent="updateEvent">
                 <input ref="eventIdInput"
