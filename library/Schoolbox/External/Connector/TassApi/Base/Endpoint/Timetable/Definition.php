@@ -300,44 +300,33 @@ class Definition implements IStrategy
             if ($this->perform) {
                 $this->timetableCycleMapper->save($timetableCycle);
             }
-//
-//            $this->log->info(sprintf(
-//                'Associating timetable cycle %s (%s) with campus %s',
-//                $timetableCycle->getId(),
-//                $timetableCycle->getTitle(),
-//                $campus->getName()
-//            ));
-//
-//            /* Save all the periods and associate them with a cycle
-//             */
-//            $dayData = $this->findDays($cycle);
-//
-//            /** @var array $days */
-//            $days = $dayData['days'];
-//
-//            /** @var array $periods */
-//            foreach ($days as $day => $periods) {
-//
-//                /** @var TimetablePeriod $period */
-//                foreach ($periods as $period) {
-//                    $period->setDay($day);
-//                    $period->setCycle($timetableCycle);
-//
-//                    $this->log->info(sprintf(
-//                        'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
-//                        $period->getTitle(),
-//                        $period->getStart(),
-//                        $period->getFinish(),
-//                        $timetableCycle->getId(),
-//                        $timetableCycle->getTitle(),
-//                        $campus->getName()
-//                    ));
-//
-//                    if ($this->perform) {
-//                        $this->timetablePeriodMapper->save($period);
-//                    }
-//                }
-//            }
+
+            /* Save all the periods and associate them with a cycle
+             */
+            $days = $this->findDays($cycle)['days'];
+
+            /** @var array $periods */
+            foreach ($days as $day => $periods) {
+
+                /** @var TimetablePeriod $period */
+                foreach ($periods as $period) {
+                    $period->setDay($day);
+                    $period->setCycle($timetableCycle);
+
+                    $this->log->info(sprintf(
+                        'Creating period %s (%s-%s) in timetable cycle %s (%s)',
+                        $period->getTitle(),
+                        $period->getStart(),
+                        $period->getFinish(),
+                        $timetableCycle->getId(),
+                        $timetableCycle->getTitle()
+                    ));
+
+                    if ($this->perform) {
+                        $this->timetablePeriodMapper->save($period);
+                    }
+                }
+            }
         }
     }
 
@@ -345,11 +334,11 @@ class Definition implements IStrategy
     /**
      * Find all the Days in a given $cycle and the longest Day of them all
      *
-     * @param mixed $cycle
+     * @param array $cycle
      * @return array
      * @throws Exception
      */
-    private function findDays($cycle): array
+    private function findDays(array $cycle): array
     {
         $struct = [
 
@@ -358,9 +347,7 @@ class Definition implements IStrategy
              * Find the day with the most number of periods and assume that to be canonical
              * (some days have no period data)
              */
-            /* TODO Find out how many periods per day there are (maximum)
-             */
-            'maxPeriods' => 0,
+            'maxPeriods' => $cycle['dayLength'],
 
             /* Store all the periods here, indexed by Day
               */
@@ -369,32 +356,12 @@ class Definition implements IStrategy
 
         /* Explore all the Period data
          */
-        /* TODO Get a list of days from endpoint data
-         */
-        $days = [];
+        $days = range(1, $cycle['dayLength']);
+        $periods = array_values($cycle['periods']);
 
-        foreach ($days as $day) {
+        foreach ($days as $i => $dayIndex) {
 
-            /* TODO Get a list of periods from endpoint data
-             */
-            $periods = [];
-
-            /* TODO Decide what day it currently is
-             */
-            $dayIndex = '';
-
-            /* Figure out which day has the most periods
-             * Consider this value and scheme canonical
-             */
-            $numPeriods = \count($periods);
-
-            if ($numPeriods > $struct['maxPeriods']) {
-                $struct['maxPeriods'] = $numPeriods;
-            }
-
-            $struct['days'][$dayIndex] = [];
-
-            /* TODO Build a list of periods in a day
+            /* Build a list of periods in a day
 
             $struct['days'][
                 1 => [
@@ -410,14 +377,11 @@ class Definition implements IStrategy
             ]
              */
             /** @var TimetablePeriod $period */
-            foreach ($periods as $period) {
-
-                /* TODO Fill in these period vars
-                 */
-                $periodName = '';
-                $sequence = '';
-                $start = '';
-                $finish = '';
+            foreach ($periods as $j => $period) {
+                $periodName = $period['PRD_DESC'];
+                $sequence = $j;
+                $start = substr($period['PRD_START'], 11, 8);
+                $finish =substr($period['PRD_END'], 11, 8);
 
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle($periodName)
@@ -432,11 +396,8 @@ class Definition implements IStrategy
             /* Do a quick analysis in case there might be something amiss
              */
             if (!\count($struct['days'][$dayIndex])) {
-
-                /* TODO Fill in these vars
-                 */
-                $cycleId = '';
-                $cycleName = '';
+                $cycleId = $cycle['id'];
+                $cycleName = $cycle['name'];
 
                 $this->log->warning(sprintf(
                     'Cycle %s (%s), Day %s has no periods.',
