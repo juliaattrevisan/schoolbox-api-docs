@@ -11,12 +11,10 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
 use DomainException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -35,8 +33,6 @@ class Definition implements IStrategy
     /**
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept
-     *
-     * TODO Decide if you can find these elsewhere, or just use these defaults
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
