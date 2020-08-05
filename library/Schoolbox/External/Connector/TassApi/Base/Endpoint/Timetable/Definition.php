@@ -218,7 +218,19 @@ class Definition implements IStrategy
 
             foreach ($timetable['STRDAYS'] as $day => $periods) {
                 if (\count($periods['PERIODS']) >= \count($longestDay)) {
-                    $longestDay = $periods['PERIODS'];
+
+                    /* Rename periods, because their names can vary between students
+                     * and timetables; so give them something predictable
+                     */
+                    $temp = [];
+
+                    foreach ($periods['PERIODS'] as $i => $period) {
+                        $period['PRD_DESC'] = 'Period ' . $i;
+
+                        $temp[] = $period;
+                    }
+
+                    $longestDay = $temp;
                 }
             }
 
