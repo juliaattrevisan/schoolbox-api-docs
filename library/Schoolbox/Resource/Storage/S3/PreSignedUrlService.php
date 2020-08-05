@@ -45,30 +45,39 @@ class PreSignedUrlService
     }
 
     /**
+     * @param StorageModel      $storage
      * @param AlaressDateFormat $expireAt
-     * @param string            $attachmentType
-     * @param string            $contentType
-     * @param string            $resourcePath
-     * @param string            $resourceBaseName
-     * @param string            $cacheControl
      * @param string            $size
+     * @param string            $cacheControl
+     * @param string            $attachmentType
      *
      * @return PreSignedUrlDataObject
      */
-    public function generate(AlaressDateFormat $expireAt,
-                             string $attachmentType,
-                             string $contentType,
-                             string $resourcePath,
-                             string $resourceBaseName,
-                             string $cacheControl,
-                             string $size = null): PreSignedUrlDataObject
+    public function generate(
+        StorageModel $storage,
+        AlaressDateFormat $expireAt,
+        string $size = null,
+        string $cacheControl = 'private',
+        string $attachmentType = ''
+    ): PreSignedUrlDataObject
     {
-        $expires       = $expireAt->__toString(); // whatever formatting most appropriate
-        $itemPath      = ($size) ? $resourcePath . '-' . $size : $resourcePath;
-        $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
-        $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
+        $expires        = $expireAt->__toString();
+        $storagePath    = $storage->getPath();
+        $itemPath       = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
 
-        return new PreSignedUrlDataObject($url, $cacheControl, $expires, $itemPath, $size);
+        $commandObject = $this->getObject(
+            $itemPath,
+            $cacheControl,
+            $attachmentType,
+            $storage->getBasename(),
+            $storage->getMime() ?: 'application/octet-stream',
+            $expires
+        );
+
+
+        $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
+
+        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $storage->getPath(), $size);
     }
 
     /**
