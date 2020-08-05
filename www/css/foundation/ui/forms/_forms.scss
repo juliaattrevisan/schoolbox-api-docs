@@ -412,6 +412,7 @@ th, td{
 	&:hover {
 		background-color: $content-ui-background;
 		color: $content-ui-foreground;
+        cursor: pointer;
 	}
 }
 input[type=radio] {
@@ -425,9 +426,6 @@ input[type=radio] {
 		i {
 			color: $content-ui-selected;
 		}
-	}
-	&:disabled + .block {
-		background-color: $white;
 	}
 }
 
