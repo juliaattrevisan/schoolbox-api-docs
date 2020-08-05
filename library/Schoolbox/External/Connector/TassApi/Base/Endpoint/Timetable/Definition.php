@@ -114,19 +114,43 @@ class Definition implements IStrategy
 
         /* Find all the student external ids
          */
-        $students = $this->profileRegistry->recallKeys();
+        $externalIds = $this->profileRegistry->recallKeys();
 
-//        /* Inspect every student's timetable to find the largest quantity of Periods per Day
-//         * This will inform schoolbox's classic idea of a Timetable Definition which must be
-//         * rectangular; every day will have the maximum number of periods in it, even if the
-//         * student's timetable doesn't use it
-//         */
-//        foreach (externalId) {
-//
-//            /* Hit That Api to find every student's timetable and cache it somewhere
-//             * We'll need to operate on it all again later anyway
-//             */
-//            data = getStudentTimetable(externalId);
+        /* Inspect every student's timetable to find the largest quantity of Periods per Day
+         * This will inform schoolbox's classic idea of a Timetable Definition which must be
+         * rectangular; every day will have the maximum number of periods in it, even if the
+         * student's timetable doesn't use it
+         */
+        foreach ($externalIds as $externalId) {
+
+            /* Hit That Api to find every student's timetable and cache it somewhere
+             * We'll need to operate on it all again later anyway
+             */
+            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
+                'student_code' => $externalId
+            ]);
+
+            /* Check that the $externalId has an associated timetable
+             * If not, log that this student didn't have a timetable, then skip them
+             * There isn't anything we can do with them
+             */
+            if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
+                $person = $this->profileRegistry->recall($externalId);
+
+                $this->log->warning(sprintf(
+                    'Student %s (%s %s) does not have a timetable.',
+                    $externalId,
+                    $person['firstname'],
+                    $person['lastname']
+                ));
+
+                continue;
+            }
+
+            /* Otherwise, continue on with the first timetable elmeent
+             * (Not sure how many they can actually have in production)
+             */
+            $timetable = $data['student_timetable'][0];
 //
 //            /* Use the last known maxDays/maxPeriods info as a starting point
 //             */
@@ -180,7 +204,7 @@ class Definition implements IStrategy
 //                'start' => CYCLE_START,
 //                'finish' => CYCLE_END
 //            ];
-//        }
+        }
 
         /* When we're done, we'll have a list of all the students' timetables
          * and a list of all the TT_ID Timetable Cycles + all its counts
