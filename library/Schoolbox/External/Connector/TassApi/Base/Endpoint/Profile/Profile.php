@@ -97,6 +97,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $profileRegistry;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -135,6 +141,7 @@ class Profile implements IStrategy
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
+     * @param Registry                        $profileRegistry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -148,6 +155,7 @@ class Profile implements IStrategy
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        Registry $profileRegistry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -160,6 +168,7 @@ class Profile implements IStrategy
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+        $this->profileRegistry = $profileRegistry;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -372,6 +381,17 @@ class Profile implements IStrategy
             /* Time for importing parents
              */
             $this->importParentsOfStudent($studentBaseProfile, $families);
+
+            /* Remember this student
+             */
+            $this->profileRegistry->remember(
+                $externalId,
+                $externalId,
+                $title,
+                $firstname,
+                $lastname,
+                $username
+            );
         }
 
         /* Show some basic diagnostics

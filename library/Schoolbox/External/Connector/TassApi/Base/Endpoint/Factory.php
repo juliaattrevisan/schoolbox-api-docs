@@ -12,6 +12,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -244,6 +245,10 @@ class Factory
             $api[$module] = new Api($this->host, $this->key, $module);
         }
 
+        /* Profile Registry
+         */
+        $profileRegistry = new ProfileRegistry();
+
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
@@ -267,6 +272,7 @@ class Factory
                 $this->spousePrefix,
                 $this->addnumFather,
                 $this->addnumMother,
+                $profileRegistry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -277,6 +283,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $profileRegistry,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
