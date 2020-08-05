@@ -205,26 +205,25 @@ class Definition implements IStrategy
                 }
             }
 
-            print_r($longestDay);
-//            /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
-//             * as we investigate every data ever
-//             */
-//            $registry->cycleCache[data[student_timetable][TT_ID]] = [
-//                'id' => data[student_timetable][TT_ID],
-//                'name' => data[student_timetable][DESC_TEXT],
-//                'cycleLength' => $maxDays,
-//                'dayLength' => $maxPeriods,
-//
-//                /* Period scheme that we assume can apply universally
-//                 */
-//                'periods' => $longestDay,
-//
-//                /* There doesn't appear to be any info about cycles starting/ending at a particular
-//                 * datetime, so just presume the hardcoded defaults for now
-//                 */
-//                'start' => CYCLE_START,
-//                'finish' => CYCLE_END
-//            ];
+            /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
+             * as we investigate every data ever
+             */
+            $this->cycleRegistry->remember($ttid, [
+                'id' => $ttid,
+                'name' => $timetable['DESC_TEXT'],
+                'cycleLength' => $maxDays,
+                'dayLength' => $maxPeriods,
+
+                /* Period scheme that we assume can apply universally
+                 */
+                'periods' => $longestDay,
+
+                /* There doesn't appear to be any info about cycles starting/ending at a particular
+                 * datetime, so just presume the hardcoded defaults for now
+                 */
+                'start' => self::CYCLE_START,
+                'finish' => self::CYCLE_END
+            ]);
         }
 
         /* When we're done, we'll have a list of all the students' timetables
@@ -234,6 +233,7 @@ class Definition implements IStrategy
          *
          * From here we can then start to manufacture a timetable definition
          */
+        print_r($this->cycleRegistry);
     }
 
 
@@ -243,6 +243,7 @@ class Definition implements IStrategy
     public function import(): void
     {
         $this->preloadAllTimetables();
+
 //        /* TODO Collection of timetable cycle equivalents from the endpoint
 //         */
 //        $cycles = [];
