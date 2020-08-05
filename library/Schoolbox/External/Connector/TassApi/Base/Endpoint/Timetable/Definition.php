@@ -153,7 +153,7 @@ class Definition implements IStrategy
              * There isn't anything we can do with them
              */
             if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
-                $person = $this->profileRegistry->recall((string)$externalId);
+                $person = $this->profileRegistry->recall($externalId);
 
                 $this->log->warning(sprintf(
                     'Student %s (%s %s) does not have a timetable.',
@@ -163,13 +163,6 @@ class Definition implements IStrategy
                 ));
 
                 continue;
-            } else {
-                $this->log->info(sprintf(
-                    'Student %s (%s %s) has at least one timetable.',
-                    $externalId,
-                    $person['firstname'],
-                    $person['lastname']
-                ));
             }
 
             /* Otherwise, continue on with the first timetable elmeent

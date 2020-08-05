@@ -64,6 +64,6 @@ class Registry
      */
     public function recallKeys(): array
     {
-        return array_keys($this->registry);
+        return array_map('strval', array_keys($this->registry));
     }
 }
