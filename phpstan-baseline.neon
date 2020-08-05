@@ -2236,11 +2236,6 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Greenhouse/Module.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php
@@ -3023,7 +3018,7 @@ parameters:
 		-
 			message: "#^Cannot call static method getInstance\\(\\) on \\(int\\|string\\)\\.$#"
 			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleter.php
+			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"

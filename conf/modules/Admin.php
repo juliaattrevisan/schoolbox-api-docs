@@ -88,5 +88,9 @@ class Admin implements ModuleConfigInterface
 
         // Filters
         (new FilterModule($di))->init('/adminv2/filters');
+
+        // Restore (undelete) entities that have been recenetly deleted
+        (new \Schoolbox\Admin\Restore\Module($di))->init('/adminv2/restore');
+
     }
 }

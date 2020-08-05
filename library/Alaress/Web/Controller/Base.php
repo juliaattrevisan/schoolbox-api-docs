@@ -22,6 +22,7 @@ use Alaress\Authorizer\Authorizer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
+use Throwable;
 
 abstract class Base {
     /**
@@ -496,7 +497,7 @@ abstract class Base {
 
         // if this isn't XHR, let the kernel and SitePage take care of
         if (!$this->getRequest()->isXhr()) {
-            throw $this->eg->generateException($errorCode, null, $problem . implode(', ', $resolutions));
+            throw $this->generateException($errorCode, null, $problem . implode(', ', $resolutions));
         }
 
         $this->getResponse()->content->set([
@@ -511,6 +512,17 @@ abstract class Base {
         ]);
     }
 
+    /**
+     * Create an error exception that can be thrown and output by the kernel
+     * @param int|null        $errorCode
+     * @param Throwable|null $previous
+     * @param string          $additionalInfo
+     * @param int             $httpStatusCode
+     * @return \Exception
+     */
+    protected function generateException( ?int $errorCode, Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400) {
+        return $this->eg->generateException($errorCode, $previous, $additionalInfo, $httpStatusCode);
+    }
 
     /**
      * @param IExceptionGenerator $eg
@@ -535,10 +547,10 @@ abstract class Base {
      *
      * Returns whether exception was able to be reported.
      *
-     * @param \Throwable $e The exception you wish to report
+     * @param Throwable $e The exception you wish to report
      * @return bool
      */
-    protected function captureException(\Throwable $e): bool
+    protected function captureException(Throwable $e): bool
     {
         // Not installed?
         if (!$this->sentry instanceof HubInterface) {
