@@ -151,7 +151,7 @@ class Classes implements IStrategy
 
         foreach ($timetables as $timetable) {
 
-            /* TODO External Timetable Code
+            /* TODO External Timetable Code (Cycle Identifier)
              */
             $ext = '';
 

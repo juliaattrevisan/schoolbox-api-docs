@@ -51,6 +51,18 @@ class Classes implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $timetableRegistry;
+
+
+    /**
+     * @var Registry
+     */
+    private $cycleRegistry;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -80,6 +92,8 @@ class Classes implements IStrategy
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Lookup                 $lookup
+     * @param Registry               $timetableRegistry
+     * @param Registry               $cycleRegistry
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -88,6 +102,8 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Lookup $lookup,
+        Registry $timetableRegistry,
+        Registry $cycleRegistry,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -95,6 +111,8 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->lookup = $lookup;
+        $this->timetableRegistry = $timetableRegistry;
+        $this->cycleRegistry = $cycleRegistry;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -138,21 +156,21 @@ class Classes implements IStrategy
         $users = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 
-//
-//        /* TODO Get a list of all the timetables to process
-//         */
-//        $timetables = [];
-//
-//        /* If there aren't any timetables, log it and exit
-//         */
-//        if (!\count($timetables)) {
-//            $this->log->warning('No timetables detected.');
-//            return;
-//        }
-//
-//        foreach ($timetables as $timetable) {
-//
-//            /* TODO External Timetable Code
+        /* Get a list of all the timetables to process
+         * These are indexed by (externalId => timetable) tuple
+         */
+        $timetables = $this->timetableRegistry->recallAll();
+
+        /* If there aren't any timetables, log it and exit
+         */
+        if (!\count($timetables)) {
+            $this->log->warning('No timetables detected.');
+            return;
+        }
+
+        foreach ($timetables as $externalId => $timetable) {
+
+//            /* External Timetable Code (Cycle Identifier)
 //             */
 //            $ext = '';
 //
@@ -248,7 +266,7 @@ class Classes implements IStrategy
 //                    $this->createTimetableClassInvolvement($student, $timetableClass);
 //                }
 //            }
-//        }
+        }
     }
 
 
