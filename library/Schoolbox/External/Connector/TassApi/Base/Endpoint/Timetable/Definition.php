@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
 
+use DomainException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
@@ -116,18 +118,28 @@ class Definition implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->profileRegistry = $profileRegistry;
+
+        /* Store timetableCache and cycleCache in a registry object that its output
+         * can be shared with the next Factory process
+         */
         $this->timetableRegistry = $timetableRegistry;
         $this->cycleRegistry = $cycleRegistry;
+
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
-
-       /* Store timetableCache and cycleCache in a registry object that its output
-        * can be shared with the next Factory process
-        */
     }
 
 
-    private function preloadAllTimetables()
+    /**
+     * Get all the students' timetables, which we use to divine a schoolbox Timetable Definition
+     * In tass, students can have seemingly unique timetables with unique definitions (there isn't
+     * really an equivalent of Timetable Definition in tass) so we have to infer something similar
+     * as best we can
+     *
+     * @throws DomainException
+     * @throws RuntimeException
+     */
+    private function preloadAllTimetables(): void
     {
 
         /* Find all the student external ids
@@ -225,15 +237,6 @@ class Definition implements IStrategy
                 'finish' => self::CYCLE_END
             ]);
         }
-
-        /* When we're done, we'll have a list of all the students' timetables
-         * and a list of all the TT_ID Timetable Cycles + all its counts
-         * and a list of the longest known Day for a given Cycle, so we can
-         * provide the periods' names and times
-         *
-         * From here we can then start to manufacture a timetable definition
-         */
-        print_r($this->cycleRegistry);
     }
 
 
@@ -242,6 +245,16 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
+
+        /* Preload all the students' timetables from everywhere
+         *
+         * When we're done, we'll have a list of all the students' timetables
+         * and a list of all the TT_ID Timetable Cycles, all their counts
+         * and a list of the longest known Day for a given Cycle, so we can
+         * provide the periods' names and times
+         *
+         * From here we can then start to manufacture a timetable definition
+         */
         $this->preloadAllTimetables();
 
 //        /* TODO Collection of timetable cycle equivalents from the endpoint
