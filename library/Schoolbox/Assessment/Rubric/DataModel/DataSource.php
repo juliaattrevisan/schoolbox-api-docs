@@ -32,6 +32,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as LevelMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Importer\IImporter;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
@@ -909,7 +910,18 @@ class DataSource
         $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
         $importerFactory = new CsvImporterFactory($markTypeMapper);
         $importer        = $importerFactory->build($file->readStream(), $maxLevels, $dueWork);
+        $this->importGrid($dueWork, $importer);
+    }
 
+    /**
+     * Imports a rubric grid using importer into the given due work.
+     * @param DueWorkModel $dueWork
+     * @param IImporter    $importer
+     * @throws MapperException
+     */
+    public function importGrid(DueWorkModel $dueWork, IImporter $importer): void
+    {
+        $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
 
         // Add to the rowset as necessary
         $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);

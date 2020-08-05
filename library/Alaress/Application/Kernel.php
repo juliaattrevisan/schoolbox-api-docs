@@ -1280,6 +1280,7 @@ abstract class Kernel
             $di->lazyNew(AssessmentDataSource::class),
             $di->lazyNew(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
             $di->lazyNew(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
+            $di->lazyNew(\Schoolbox\Learning\Quiz\Mapper::class),
             $di->lazyGet('router')
         ]));
 

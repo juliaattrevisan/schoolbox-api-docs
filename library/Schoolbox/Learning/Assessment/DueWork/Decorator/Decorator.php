@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Importer\GenericImporter;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use UnexpectedValueException;
@@ -38,21 +40,25 @@ class Decorator implements DecoratorInterface
 {
     use DueWorkTrait;
 
+    /** @var DueWork|null $original */
+    private $original;
+
     /**
      * Decorator constructor.
      *
-     * @param int        $acceptOnline
-     * @param int        $markType
-     * @param int        $gradingScheme
-     * @param bool       $useRubric
-     * @param int        $capabilityMarkType
-     * @param int|null   $capabilityGradeGroup
-     * @param bool       $useMarkRange
-     * @param float|null $maxMark
-     * @param array|null $rubricData
-     * @param array      $attachedFiles
-     * @param string     $selfReviewable
-     * @param bool       $similarityCheckEnabled
+     * @param int          $acceptOnline
+     * @param int          $markType
+     * @param int          $gradingScheme
+     * @param bool         $useRubric
+     * @param int          $capabilityMarkType
+     * @param int|null     $capabilityGradeGroup
+     * @param bool         $useMarkRange
+     * @param float|null   $maxMark
+     * @param array|null   $rubricData
+     * @param array        $attachedFiles
+     * @param string       $selfReviewable
+     * @param bool         $similarityCheckEnabled
+     * @param DueWork|null $original
      */
     public function __construct(
         int $acceptOnline,
@@ -66,7 +72,8 @@ class Decorator implements DecoratorInterface
         ?array $rubricData,
         array $attachedFiles,
         string $selfReviewable,
-        bool $similarityCheckEnabled
+        bool $similarityCheckEnabled,
+        ?DueWork $original
     ) {
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
@@ -80,6 +87,7 @@ class Decorator implements DecoratorInterface
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
+        $this->original = $original;
     }
 
     /**
@@ -112,6 +120,7 @@ class Decorator implements DecoratorInterface
         $gradingGroup = Mapper::getInstance()->createModel()->setId($this->getGradingScheme());
 
         $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
+        /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
         $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
 
         $assessment->setMarkType($markType);
@@ -129,7 +138,27 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
-        if ($this->getUseRubric()) {
+        if ($this->getUseRubric() && $this->original) {
+            // relocating
+            $rubricMapper = RubricDataSource::getInstance();
+            $gridFactory  = new GridFactory();
+
+            $rowSetBeforeMove = $rubricMapper->retrieveRowSet($this->original->getBaseContext(), true);
+            $existingGrid     = new Grid($this->original, $rowSetBeforeMove);
+            $existingGrid     = $gridFactory->buildFromPostData($existingGrid, $this->rubricData, false);
+
+            $importer = new GenericImporter(
+                $existingGrid,
+                $assessment->getUseMarkRange(),
+                $assessment->getCapabilityMarkType()->getId(),
+                $assessment->getCapabilityGradeGroup()->getId()
+            );
+
+            // Now new assessment should have new grid
+            $rubricMapper->importGrid($assessment, $importer);
+            $markMax = $assessment->getRubricGrid()->calculateMaxValueFromCapabilities();
+            $assessment->setMaxMark($markMax);
+        } elseif ($this->getUseRubric()) {
             $rubricMapper = RubricDataSource::getInstance();
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
@@ -171,7 +200,7 @@ class Decorator implements DecoratorInterface
 
         // Only spawn the mark scheme after the max mark is finalized
         // (as it might have changed from what was submitted to the form)
-        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
+        $markSchemeFactory = new MarkSchemeFactory();
         $assessment->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessment));
 
         /* If there were attachments, accumulate them

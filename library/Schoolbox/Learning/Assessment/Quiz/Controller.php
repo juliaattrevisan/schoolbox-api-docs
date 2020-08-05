@@ -21,10 +21,14 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -70,18 +74,21 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
-     * @param UserMapper             $userMapper
-     * @param ErrorMapper            $errorMapper
-     * @param DataModel\MapperProxy  $assessmentMapper
-     * @param WorkTypeMapper         $workTypeMapper
-     * @param Access                 $access
-     * @param Transactor             $transactor
-     * @param BreadcrumbFactory      $bakery
-     * @param QuizMapper             $quizMapper
-     * @param QuizSectionMapper      $quizSectionMapper
-     * @param QuizAttemptMapper      $quizAttemptMapper
-     * @param Term\Mapper            $termMapper
-     * @param Participant\DataSource $participantDataSource
+     * @param UserMapper                $userMapper
+     * @param ErrorMapper               $errorMapper
+     * @param DataModel\MapperProxy     $assessmentMapper
+     * @param WorkTypeMapper            $workTypeMapper
+     * @param Access                    $access
+     * @param Transactor                $transactor
+     * @param BreadcrumbFactory         $bakery
+     * @param QuizMapper                $quizMapper
+     * @param QuizSectionMapper         $quizSectionMapper
+     * @param QuizAttemptMapper         $quizAttemptMapper
+     * @param Term\Mapper               $termMapper
+     * @param Participant\DataSource    $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param Replicator                $replicator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -95,9 +102,24 @@ class Controller extends Assessment\Controller
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator);
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
@@ -151,7 +173,7 @@ class Controller extends Assessment\Controller
      * @throws DomainException
      * @throws PDOException
      * @throws DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void
@@ -215,22 +237,23 @@ class Controller extends Assessment\Controller
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
-     * @param string|null $explicitReturnUrl
+     * @param string|null $postReturnUrl
      * @param string      $defaultReturnUrl
+     * @param bool        $relocated
      * @return string
      * @throws Exception
      */
-    public function determineRedirect(IAssessable $assessment, $explicitReturnUrl = null, $defaultReturnUrl = ''): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
     {
         /**
          * Always go to the screen when a quiz has been created,
          * but send the return url with it
          */
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        $quiz     = $this->getQuizForAssessmentId($assessment->getId());
         $redirect = "/assess/section/create/{$quiz->getId()}";
 
-        if ($explicitReturnUrl) {
-            $redirect .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
+        if ($postReturnUrl) {
+            $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
         }
         return $redirect;
     }

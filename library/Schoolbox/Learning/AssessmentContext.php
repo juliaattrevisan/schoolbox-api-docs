@@ -90,4 +90,16 @@ interface AssessmentContext
      * @return static
      */
     public function setAssessables(Collection $assessables);
+
+    /**
+     * "id" to identify context
+     * @return string
+     */
+    public function getLocationId(): string;
+
+    /**
+     * User friendly context path
+     * @return string
+     */
+    public function getLocationTitle(): string;
 }

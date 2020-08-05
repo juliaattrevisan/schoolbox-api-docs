@@ -24,6 +24,13 @@
 
     {% include 'sub/attachzone.twig' %}
 
+    {# ----------------------------------------------------------- #}
+    {# Assessment Location #}
+    {# ----------------------------------------------------------- #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
 </fieldset>
 
 

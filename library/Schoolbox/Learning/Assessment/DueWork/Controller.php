@@ -19,6 +19,10 @@ use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
@@ -56,7 +60,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -108,6 +111,9 @@ class Controller extends Assessment\Controller
      * @param Kami\Connector                $kamiConnector
      * @param Kami\Mapper                   $kamiMapper
      * @param Participant\DataSource        $participantDataSource
+     * @param CourseSpecificationMapper     $courseSpecificationMapper
+     * @param UnitSpecificationMapper       $unitSpecificationMapper
+     * @param Replicator                    $replicator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -125,9 +131,24 @@ class Controller extends Assessment\Controller
         SingleFile\Mapper $submissionFileMapper,
         Kami\Connector $kamiConnector,
         Kami\Mapper $kamiMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
@@ -143,7 +164,7 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @return bool
      */
-    private function hasDownloadableSubmissionFiles($assessment): bool
+    private function hasDownloadableSubmissionFiles(IAssessable $assessment): bool
     {
         // Grab all participants in the assessment
 
@@ -334,7 +355,7 @@ class Controller extends Assessment\Controller
         // Create a zip file to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
-        $dateNow = \Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
+        $dateNow = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
         $zip = new Zip($this->getConfigLoader(), "{$titleSanitized}-{$dateNow}.zip");
 
@@ -782,7 +803,7 @@ class Controller extends Assessment\Controller
         if ($isFinal) {
             try {
                 (new ValidFinalisedSubmission())->isSatisfiedBy($assessment, $student, $this->getConfigLoader()->get('submission_window'));
-            } catch (\DomainException $e) {
+            } catch (DomainException $e) {
 
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
@@ -1103,7 +1124,7 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/ack
      * @since 17.0
      */
-    public function postPendingAcknowledge(IAssessable $assessment, User $student)
+    public function postPendingAcknowledge(IAssessable $assessment, User $student): void
     {
         try {
             $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
@@ -1164,6 +1185,7 @@ class Controller extends Assessment\Controller
      * @param Model|IAssessable $assessment
      * @return array
      * @throws UnexpectedValueException
+     * @throws MapperException
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
@@ -1258,7 +1280,7 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+        /** @var DueWork $assessment */
         if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;

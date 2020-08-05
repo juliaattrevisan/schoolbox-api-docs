@@ -6,12 +6,12 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Web\Controller\Exception as ControllerException;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
@@ -22,12 +22,15 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 /**
  * Class Controller
@@ -58,7 +61,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private $termMapper;
 
+    /** @var CourseSpecificationMapper */
+    private $courseSpecificationMapper;
 
+    /** @var Replicator */
+    private $replicator;
     /**
      * Controller constructor.
      *
@@ -71,6 +78,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param BreadcrumbFactory      $bakery
      * @param Term\Mapper            $termMapper
      * @param Participant\DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator    $replicator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -81,13 +91,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
-        Participant\DataSource $participantDataSource
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper);
 
-        $this->bakery         = $bakery;
-        $this->workTypeMapper = $workTypeMapper;
-        $this->termMapper     = $termMapper;
+        $this->bakery                    = $bakery;
+        $this->workTypeMapper            = $workTypeMapper;
+        $this->termMapper                = $termMapper;
+        $this->replicator                = $replicator;
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
     }
 
 
@@ -197,6 +212,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        // Relocation is available only for update
+        $data['canRelocate'] = false;
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
@@ -234,10 +252,53 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        $data['canRelocate'] = $assessment->isSpecification() && !($assessment instanceof Project);
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
+    /**
+     * Gets a list of units and projects, to which the assessment can be moved
+     * @api   /learning/assessments/:assessmentId/locations
+     * @since 201
+     * @param IAssessable $assessment
+     */
+    public function getLocationForm(IAssessable $assessment): void
+    {
+        if ($assessment->isImplementation()) {
+            // not interested
+            return;
+        }
+
+        $currentUnitSpec = $assessment->getBaseContext();
+        try {
+            $currentCourseSpec = $this->courseSpecificationMapper->findByFolderId($currentUnitSpec->getFolder()->getParent()->getId());
+        } catch (MapperException $e) {
+            return;
+        }
+        $allUnitSpecs = $currentCourseSpec->getUnits();
+
+        $unitProjects = new Collection();
+        foreach ($allUnitSpecs as $unitSpec) {
+            $projects    = $this->getAssessmentMapper()->createCollection();
+            $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
+            foreach ($assessables as $assessable) {
+                if (!$assessable instanceof Project) {
+                    continue;
+                }
+                $projects->add($assessable);
+            }
+            $unitProjects->offsetSet($unitSpec->getId(), $projects);
+        }
+        $this->getResponse()->content->set($this->buildContent(
+            '@learningAssessment/fragments/assessmentLocationList.twig',
+            [
+                'units'        => $allUnitSpecs,
+                'unitProjects' => $unitProjects,
+                'current'      => $assessment->getContext()->getLocationId()
+            ]
+        ));
+    }
 
     /**
      * Save the data when creating a specific kind of Assessment
@@ -249,12 +310,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      *
      * @param IAssessable $assessment
-     * @throws DefinitionException
-     * @throws Exception
-     * @throws LogicException
+     * @throws ControllerException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
-     * @throws \Alaress\Web\Controller\Exception
+     * @throws \Exception
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
@@ -275,8 +333,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $this->getRequest()->post,
                 $assessment
             );
-
-            $internalReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
 
@@ -286,12 +342,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $postReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
-
-        if ($postReturnUrl) {
-            $returnUrl = Redirect::decode($postReturnUrl);
-        } else {
-            $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, $internalReturnUrl);
-        }
+        $returnUrl     = $this->determineRedirect(
+            $assessmentInfo['assessment'],
+            $postReturnUrl,
+            $assessmentInfo[Redirect::RETURN_URL],
+            $assessmentInfo['relocated']
+        );
 
         // we're done here
         $this->redirect($returnUrl);
@@ -302,7 +358,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Get an overview of rubric marks
      *
      * @param IAssessable $assessment
-     * @throws Exception
+     * @throws \Exception
      */
     public function getOverview(IAssessable $assessment): void
     {
@@ -315,7 +371,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Download overview of rubric marks
      *
      * @param IAssessable $assessment
-     * @throws Exception
+     * @throws \Exception
      */
     public function downloadOverview(IAssessable $assessment): void
     {
@@ -337,7 +393,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @throws LogicException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {
@@ -469,10 +525,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param IAssessable $assessment
      * @param string|null $postReturnUrl an encoded URL
      * @param string      $defaultReturnUrl
+     * @param bool        $relocated
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = ''): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
     {
         /**
          * First priority is a the post return URL
@@ -480,9 +537,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * Otherwise go to default return url
          */
         if ($postReturnUrl) {
-            return Redirect::decode($postReturnUrl);
+            $returnUrl = Redirect::decode($postReturnUrl);
+            if ($relocated && strpos($returnUrl, '/homepage/') === 0) {
+                return '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+            }
+            return $returnUrl;
         } elseif ($assessment->getContext() instanceof Project) {
-            return $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getContext()->getId() ]);
+            return $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getContext()->getId()]);
         }
 
         return $defaultReturnUrl;
@@ -507,7 +568,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @param IAssessable $assessment
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function patchUpdateAssessment(IAssessable $assessment): void
     {

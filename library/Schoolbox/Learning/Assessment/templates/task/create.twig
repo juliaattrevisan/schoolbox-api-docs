@@ -35,6 +35,14 @@
         Description
         <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
+
+    {# ----------------------------------------------------------- #}
+    {# Assessment Location #}
+    {# ----------------------------------------------------------- #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
 </fieldset>
 
 

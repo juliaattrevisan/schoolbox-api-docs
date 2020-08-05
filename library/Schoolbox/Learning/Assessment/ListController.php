@@ -6,15 +6,13 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
-use InvalidArgumentException;
 use LogicException;
-use PDOException;
-use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
@@ -23,11 +21,11 @@ use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -76,33 +74,35 @@ class ListController extends Web\Controller\Base
     protected $participantDataSource;
 
     /**
+     * @var UnitSpecificationMapper
+     */
+    protected $unitSpecificationMapper;
+
+    /**
      * @var GenericCollection|null $existingParticipationPerUser
      */
     private $existingParticipationPerUser;
 
 
     /**
-     * @param UserMapper             $userMapper
-     * @param Error\Mapper           $errorMapper
-     * @param MapperProxy            $assessmentMapper
-     * @param Access                 $access
-     * @param Transactor             $transactor
-     * @param Participant\DataSource $participantDataSource
+     * @param UserMapper              $userMapper
+     * @param Error\Mapper            $errorMapper
+     * @param MapperProxy             $assessmentMapper
+     * @param Access                  $access
+     * @param Transactor              $transactor
+     * @param Participant\DataSource  $participantDataSource
+     * @param UnitSpecificationMapper $unitSpecificationMapper
      */
     public function __construct(
-        UserMapper $userMapper,
-        Error\Mapper $errorMapper,
-        MapperProxy $assessmentMapper,
-        Access $access,
-        Transactor $transactor,
-        Participant\DataSource $participantDataSource
+        UserMapper $userMapper, Error\Mapper $errorMapper, MapperProxy $assessmentMapper, Access $access, Transactor $transactor, Participant\DataSource $participantDataSource, UnitSpecificationMapper $unitSpecificationMapper
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
-        $this->transactor = $transactor;
-        $this->participantDataSource = $participantDataSource;
+        $this->transactor              = $transactor;
+        $this->participantDataSource   = $participantDataSource;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
     }
 
 
@@ -116,13 +116,7 @@ class ListController extends Web\Controller\Base
      * @since 165
      *
      * @param AssessmentContext $context
-     * @throws Deleted
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws NotFound
-     * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws MapperException
      */
     public function getAssessmentsByContext(AssessmentContext $context)
     {
@@ -193,14 +187,19 @@ class ListController extends Web\Controller\Base
             $post = $this->getRequest()->post->getArrayCopy();
             $post['context'] = $context;
 
-            [$assessment, $defaultReturnUrl] = array_values($this->persistAssessment($this->getUser(), $post));
+            $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
 
-            $type       = AssessmentType::objectToString($assessment);
+            $type       = AssessmentType::objectToString($assessmentInfo['assessment']);
             $controller = $this->getDelegateController($type);
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
-            $this->redirect($controller->determineRedirect($assessment, $explicitReturnUrl, $defaultReturnUrl));
+            $this->redirect($controller->determineRedirect(
+                $assessmentInfo['assessment'],
+                $explicitReturnUrl,
+                $assessmentInfo[Redirect::RETURN_URL],
+                $assessmentInfo['relocated'])
+            );
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
@@ -224,7 +223,7 @@ class ListController extends Web\Controller\Base
      * @throws LogicException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws InvalidColumnException
      */
     public function postReorderAssessments(AssessmentContext $context)
     {
@@ -304,9 +303,8 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/weight/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws Deleted
-     * @throws Exception
      * @throws InvalidStatusCode
+     * @throws MapperException
      */
     public function updateWeight(IAssessable $assessment): void
     {
@@ -327,12 +325,8 @@ class ListController extends Web\Controller\Base
      * @api   POST /learning/visibility/:assessmentId
      *
      * @param IAssessable $assessment
-     * @throws Deleted
-     * @throws Exception
-     * @throws LogicException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      * @throws InvalidStatusCode
+     * @throws MapperException
      */
     public function updateVisibility(IAssessable $assessment): void
     {
@@ -405,6 +399,18 @@ class ListController extends Web\Controller\Base
             ['Learning', $this->router->generate('learning.getClasses')],
             [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
         ];
+        if ($context instanceof Project) {
+            $data['breadcrumbs'][] = [
+                $context->getTitle(),
+                $this->router->generate(
+                    'learningAssessment.getStatus',
+                    [
+                        'assessment'   => $context,
+                        'assessmentId' => $context->getId(),
+                    ]
+                ),
+            ];
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
@@ -419,12 +425,8 @@ class ListController extends Web\Controller\Base
      *
      * @param User              $user
      * @param array|Traversable $postData
-     * @param IAssessable       $assessment
+     * @param IAssessable|null  $assessment
      * @return array
-     * @throws DomainException
-     * @throws Mapper\DefinitionException
-     * @throws RouteNotFound
-     * @throws LogicException|ServiceNotFound
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
@@ -433,7 +435,9 @@ class ListController extends Web\Controller\Base
          *
          * Controller must return early for that to happen
          */
+        $db = $this->getUserMapper()->getDatabase();
         try {
+            $db->beginTransaction();
             // Create a notifier proxy so that I may notify about assessment changes
             $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);
@@ -441,10 +445,20 @@ class ListController extends Web\Controller\Base
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
              */
-            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType']);
-            $assessment = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->transactor->transact($assessment, $before);
+            // Clear assessment if the context is changed
+            $relocatedContext   = $assessment ? $this->getRelocatedContext($assessment, $postData['locationId'] ?? '') : '';
+            $originalAssessment = null;
+            if ($relocatedContext) {
+                $postData['context'] = $relocatedContext;
+                $originalAssessment  = $assessment;
+                $assessment          = null;
+            }
+
+            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
+            $assessment        = $assessmentFactory->produce($assessment);
+
+            $transactionSummary = $this->transactor->transact($assessment, $before, $originalAssessment);
 
             // assessment is saved; persist plans
 
@@ -455,13 +469,14 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
+            $db->commit();
             // Retrieve assessment, as I need the assessment's participation
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
 
             // And send notifications
             $notifier->notify($assessment, $this->getUser(), $before);
-        }
-        catch (Exception|RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
+        } catch (\Exception $e) {
+            $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
@@ -474,11 +489,7 @@ class ListController extends Web\Controller\Base
      * @param GenericCollection|PlanModel[] $plans
      * @param array                         $inclusionFlags  userId => 0 ... excluded, 1 ... included
      * @param array                         $userPlanIndices userId => planId
-     * @throws DomainException
-     * @throws Mapper\DefinitionException
-     * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws MapperException
      */
     private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
     {
@@ -604,10 +615,7 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @param array       $postPlans
      * @return GenericCollection|PlanModel[]
-     * @throws UnexpectedValueException
-     * @throws PDOException
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws MapperException
      */
     private function savePlanData(IAssessable $assessment, array $postPlans = [])
     {
@@ -657,7 +665,7 @@ class ListController extends Web\Controller\Base
                             $planData[$dateField] = null;
                         }
 
-                        $planData[$dateField] = \Alaress_Date_Format::newLocal($planData[$dateField])->getDatabase();
+                        $planData[$dateField] = Alaress_Date_Format::newLocal($planData[$dateField])->getDatabase();
                     }
                 }
 
@@ -677,6 +685,33 @@ class ListController extends Web\Controller\Base
         return $plans;
     }
 
+    /**
+     * Gets new context, if the assessment's context has been changed
+     * @param IAssessable $assessment
+     * @param string|null $locationId
+     * @return AssessmentContext|null
+     */
+    public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
+    {
+        if ($assessment && $locationId
+            && $assessment->isSpecification()
+            && ($assessment->getContext()->getLocationId() !== $locationId)) {
+            preg_match('/(unit|project)-([0-9]+)/', $locationId, $match);
+            try {
+                if (isset($match[1]) && $match[1] === 'unit') {
+                    return $this->unitSpecificationMapper->findById($match[2]);
+                } elseif (isset($match[1]) && $match[1] === 'project') {
+                    $project = $this->assessmentMapper->findById($match[2]);
+                    if ($project instanceof Project) {
+                        return $project;
+                    }
+                }
+            } catch (MapperException $e) {
+                // noop
+            }
+        }
+        return null;
+    }
 
     /**
      * If XHR, return the redirect within JSON, otherwise just tell the browser to do the redirect

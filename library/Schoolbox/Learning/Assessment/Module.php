@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -87,7 +88,7 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws NotFound
      * @throws InvalidPath
      */
@@ -159,6 +160,8 @@ class Module extends BaseModule
         $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission, $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission, $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',      $canAckSubmission, $preloadParticipant); // p
+
+        $this->register('POST',   "$assRoute/locations",             'getLocationForm',          $canModify,        $preloadAssessment);
     }
 
 
@@ -169,7 +172,7 @@ class Module extends BaseModule
      * @return void
      * @throws UnexpectedValueException If unable to recognise IAssessable object
      */
-    public function setControllerFromAssessment(IAssessable $a)
+    public function setControllerFromAssessment(IAssessable $a): void
     {
         // TODO centralise this into a factory
         $map = [
@@ -196,7 +199,7 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws NotFound
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     protected function preloadAssessmentAndStudent(array $params): array
     {
@@ -233,9 +236,9 @@ class Module extends BaseModule
      * @throws Mapper\DefinitionException
      * @throws NotFound
      * @throws UnexpectedValueException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
-    protected function preloadContext(array $params)
+    protected function preloadContext(array $params): array
     {
         try {
             $contextFactory = new Assessment\DataModel\Context\Factory(
@@ -269,9 +272,9 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws UnexpectedValueException If unable to derive project participant collections
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
-    protected function preloadAssessment(array $params, User $student = null)
+    protected function preloadAssessment(array $params, User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
@@ -329,7 +332,12 @@ class Module extends BaseModule
         ]);
         $ac['workTypeMapper']        = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
         $ac['termMapper']            = $this->getMapperFactory()->getLazy(Term\Mapper::class);
-
+        $ac['courseSpecificationMapper'] = $this->getMapperFactory()->getLazy(\Schoolbox\Learning\Course\DataModel\Specification\Mapper::class);
+        $ac['replicator'] = $injector->lazyNew(Replicator::class, [
+            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+            'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
+        ]);
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
@@ -419,7 +427,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {

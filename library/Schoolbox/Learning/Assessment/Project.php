@@ -665,4 +665,20 @@ class Project extends AbstractAssessment implements AssessmentContext
             );
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationId(): string
+    {
+            return 'project-' . $this->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLocationTitle(): string
+    {
+        return $this->getBaseContext()->getTitle() . ' > ' . $this->getTitle();
+    }
 }
