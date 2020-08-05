@@ -19,9 +19,9 @@ class Model implements Serializable
     use SerializeTrait;
 
     /**
-     * @var string
+     * @var \Schoolbox\Resource\Storage\Model|null
      */
-    private $hash;
+    private $storage;
 
     /**
      * @var string
@@ -39,13 +39,13 @@ class Model implements Serializable
     private $presignedUrl;
 
     /**
-     * @param string $hash
+     * @param \Schoolbox\Resource\Storage\Model|null $storage
      *
-     * @return $this
+     * @return Model
      */
-    public function setHash(string $hash): self
+    public function setStorage(?\Schoolbox\Resource\Storage\Model $storage): self
     {
-        $this->hash = $hash;
+        $this->storage = $storage;
 
         return $this;
     }
@@ -75,11 +75,11 @@ class Model implements Serializable
     }
 
     /**
-     * @return string
+     * @return \Schoolbox\Resource\Storage\Model|null
      */
-    public function getHash(): string
+    public function getStorage(): ?\Schoolbox\Resource\Storage\Model
     {
-        return $this->hash;
+        return $this->storage;
     }
 
     /**
