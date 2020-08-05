@@ -387,10 +387,10 @@ class Family
 
         /* Rearrange contents of $person['address'] to find their first non-null email address
          */
-        $person['e_mail'] = array_filter([
+        $person['e_mail'] = array_values(array_filter([
             $family['address'][$addnum]['email1'] ?? '',
             $family['address'][$addnum]['email2'] ?? ''
-        ])[0] ?? '';
+        ]))[0] ?? '';
 
         return $person;
     }

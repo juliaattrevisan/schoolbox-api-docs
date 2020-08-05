@@ -447,8 +447,7 @@ class Profile implements IStrategy
 
                 /* Find first non-empty mobile phone number (null !== '')
                  */
-                $mobilePhones = array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]);
-                $mobilePhone = \count($mobilePhones) ? $mobilePhones[0] : '';
+                $mobilePhone = array_values(array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]))[0] ?? '';
 
                 /* Father record seems to precede mother record...as per "traditional norms"
                  */
