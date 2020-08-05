@@ -7,13 +7,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
 
-use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 /**
  * Class Mapper
@@ -94,8 +92,6 @@ class Mapper extends \Schoolbox\Mapper
             return $collection;
         }
 
-        $presignedUrlService = new PreSignedUrlService($config);
-
         $columnLists = [
             self::FIELD_HASH        => $storageModel->getHash(),
         ];
@@ -104,23 +100,7 @@ class Mapper extends \Schoolbox\Mapper
             $columnLists += [self::FIELD_TRANSFORM   => $transformSize];
         }
 
-        $transformations = $this->findByColumnList($columnLists);
-
-        /** @var Model $transform */
-        foreach ($transformations as $transform) {
-            $presignedUrl = $presignedUrlService->generate(
-                $storageModel,
-                Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                $transform->getTransform()
-            )->getUrl();
-
-            $transform->setPresignedUrl($presignedUrl);
-
-            $collection->add($transform);
-        }
-        $collection->indexBy('transform');
-
-        return $collection;
+        return $this->findByColumnList($columnLists);
     }
 
     /**
@@ -140,27 +120,9 @@ class Mapper extends \Schoolbox\Mapper
             return $collections;
         }
 
-        $presignedUrlService    = new PreSignedUrlService($config);
-
-        $hashes                 = array_unique($collections->getPropertyValues(self::FIELD_HASH));
-        $transforms             = $this->findByColumn(self::FIELD_HASH, $hashes)->groupBy(self::FIELD_HASH);
-        $hydratedCollections    = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByColumn(self::FIELD_HASH, $hashes);
-
-        // Hydrate the transformations into the portrait with pre-signed URL
-        /** @var \Schoolbox\Resource\Storage\Model $collection */
-        foreach ($hydratedCollections as $collection) {
-            /** @var Model $transform */
-            foreach ($transforms[$collection->getHash()] as $transform) {
-                $presignedUrl = $presignedUrlService->generate(
-                    $collection,
-                    Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                    $transform->getTransform()
-                )->getUrl();
-                $transform->setPresignedUrl($presignedUrl);
-                $transforms[$collection->getHash()]->indexBy('transform');
-            }
-        }
-
-        return $transforms;
+        return $this->findByColumn(
+            self::FIELD_HASH,
+            array_unique($collections->getPropertyValues(self::FIELD_HASH))
+        )->groupBy(self::FIELD_HASH);
     }
 }
