@@ -169,23 +169,26 @@ class Definition implements IStrategy
              * (Not sure how many they can actually have in production)
              */
             $timetable = $data['student_timetable'][0];
-//
-//            /* Use the last known maxDays/maxPeriods info as a starting point
-//             */
-//            maxDays = $cycleCache[data[student_timetable][TT_ID]]['cycleLength'] ?? 0;
-//            maxPeriods = $cycleCache[data[student_timetable][TT_ID]]['dayLength'] ?? 0;
-//
-//            /* Remember the largest Day count (cycle length) for this TT_ID
-//             */
-//            if (data[student_timetable][DAYMAX] > maxDays)
-//               maxDays = data[student_timetable][DAYMAX];
-//            }
-//
-//            /* Remember the largest Period count (day length) for this TT_ID
-//             */
-//            if (data[student_timetable][PERIOD_MAX] > maxPeriods) {
-//                maxPeriods = data[student_timetable][PERIOD_MAX];
-//            }
+
+            /* Use the last known maxDays/maxPeriods info as a starting point
+             */
+            $ttid = (string)$timetable['TT_ID'];
+
+            $maxDays = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? 0;
+            $maxPeriods = $this->cycleRegistry->recall($ttid)['dayLength'] ?? 0;
+
+            /* Remember the largest Day count (cycle length) for this TT_ID
+             */
+            if ($timetable['DAYMAX'] > $maxDays) {
+               $maxDays = $timetable['DAYMAX'];
+            }
+
+            /* Remember the largest Period count (day length) for this TT_ID
+             */
+            if ($timetable['PERIODMAX'] > $maxPeriods) {
+                $maxPeriods = $timetable['PERIODMAX'];
+            }
+
 //
 //            /* Remember each student's timetable (we'll come back to this later)
 //             */
