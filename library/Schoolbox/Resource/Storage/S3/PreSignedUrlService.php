@@ -12,6 +12,7 @@ use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 
 class PreSignedUrlService
 {
@@ -77,13 +78,11 @@ class PreSignedUrlService
      */
     private function fileExists(PreSignedUrlDataObject $dataObject): bool
     {
+        $transformationMapper = new TransformMapper();
+
         $size = $dataObject->getSize();
 
-        /**
-         * Add some shortcut, if size isn't provided as most likely if everything was migrated successfully
-         * the original file should exists in bucket
-         */
-        if (is_null($size) || $this->s3Client->doesObjectExist($this->bucket, $dataObject->getItemPath())) {
+        if (is_null($size) || (($size && $transformationMapper->checkIfRecordExists($dataObject->getHash(), $size)))) {
             return true;
         }
 
