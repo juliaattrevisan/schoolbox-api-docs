@@ -267,7 +267,7 @@ class Factory
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
         /* Purge previously-imported profile relationships and classes
          */

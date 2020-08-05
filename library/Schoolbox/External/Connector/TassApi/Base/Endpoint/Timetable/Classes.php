@@ -183,104 +183,109 @@ class Classes implements IStrategy
 
             /* For each Day in $timetable
              */
+            foreach ($timetable['DAYS'] as $dayIndex => $day) {
 
-            /* For each Period in Day
-             */
+                /* For each Period in Day
+                 */
+                foreach ($day['PERIODS'] as $periodIndex => $period) {
 
-            /* Take the 0th element of the Period's Subject's node
-             * (Presume a student can only be in one class on a given (day, period)
-             */
+                    /* Take the 0th element of the Period's Subject's node
+                     * (Presume a student can only be in one class on a given (day, period)
+                     */
+                    $subject = $period['SUBJECTS'][0];
 
-            /* Look up the timetablePeriod instance via day and period indices
-             */
+                    /* Tass doesn't use the date part,
+                     * Tass includes a microseconds part (sigh)
+                     * So we have to ditch these bits and swipe what we need
+                     */
+                    $start = substr($period['PRD_START'], 11, 8);
+                    $finish = substr($period['PRD_END'], 11, 8);
 
-            /* Save class involvement
-             */
-
-            $classes = [
-                /*
-                    [
-                        'day' => '',
-                        'period' => '',
+                    /* Construct a data struct that represents a more sane version of $subject
+                     */
+                    $class = [
+                        'period' => [
+                            'day' => (string)$dayIndex,
+                            'name' => 'Period ' .  $periodIndex,
+                            'sequence' => $periodIndex,
+                            'start' => $start,
+                            'end' => $finish
+                        ],
                         'class' => [
-                            'code' => '',
-                            'name' => ''
+                            'code' => $subject['SUB_CODE'],
+                            'name' => $subject['SUB_DESC'],
                         ],
                         'room' => [
-                            'name' => ''
+                            'name' => $subject['ROOM_CODE']
                         ],
+
+                        /* Assumption: only one teacher per subject
+                         * Can there be more than one teacher, maybe comma-separated?
+                         */
                         'teachers' => [
+                            'externalId' => $subject['TCH_CODE'],
+                            'firstname' => $users[$externalId]['firstname'],
+                            'surname' => $users[$externalId]['lastname'],
+                        ],
+
+                        'students' => [
                             [
-                                'externalId' => '',
-                                'title' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                                'username' => '',
+                                'externalId' => (string)$externalId,
+                                'firstname' => $users[$externalId]['firstname'],
+                                'surname' => $users[$externalId]['lastname'],
                             ]
-                        ]
-                        'student' => [
-                            [
-                                'externalId' => '',
-                                'title' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                                'username' => '',
-                            ]
-                        ]
-                    ]
-                */
-            ];
-//
-//            foreach ($classes as $class) {
-//
-//                /* Look up the period instance by (name, day)
-//                 *
-//                 * If the period doesn't correspond to something in our timetable definition,
-//                 * we can't process it anyway, so skip it
-//                 */
-//                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
-//
-//                $this->log->info(sprintf(
-//                    'Looking for ext_timetable_code %s, day %s, period %s',
-//                    $ext,
-//                    $class['period']['day'],
-//                    $class['period']['name']
-//                ));
-//
-//                if (null === $timetablePeriod) {
-//                    $this->log->warning(sprintf(
-//                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-//                        $class['period']['name'],
-//                        $class['period']['day'],
-//                        $ext
-//                    ));
-//
-//                    continue;
-//                }
-//
-//                /* Assemble the pieces
-//                 */
-//                $timetableClass = $this->createTimetableClass($class);
-//                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-//
-//                /* Process students
-//                 */
-//                foreach ($class['students'] as $student) {
-//
-//                    /* Throw warning, but assign them anyway
-//                     */
-//                    if (!isset($users[$student['username']])) {
-//                        $this->log->warning(sprintf(
-//                            'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
-//                            $student['username'],
-//                            $timetableClass->getName(),
-//                            $timetableClass->getCode()
-//                        ));
-//                    }
-//
-//                    $this->createTimetableClassInvolvement($student, $timetableClass);
-//                }
-//            }
+                        ],
+                    ];
+
+                    /* Look up the period instance by (name, day)
+                     *
+                     * If the period doesn't correspond to something in our timetable definition,
+                     * we can't process it anyway, so skip it
+                     */
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+
+                    $this->log->info(sprintf(
+                        'Looking for ext_timetable_code %s, day %s, period %s',
+                        $ext,
+                        $class['period']['day'],
+                        $class['period']['name']
+                    ));
+
+                    if (null === $timetablePeriod) {
+                        $this->log->warning(sprintf(
+                            'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+                            $class['period']['name'],
+                            $class['period']['day'],
+                            $ext
+                        ));
+
+                        continue;
+                    }
+
+                    /* Assemble the pieces
+                     */
+                    $timetableClass = $this->createTimetableClass($class);
+                    $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+
+                    /* Process students
+                     */
+                    foreach ($class['students'] as $student) {
+
+                        /* Throw warning, but assign them anyway
+                         */
+                        if (!isset($users[$student['externalId']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
+                                $student['externalId'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+
+                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                    }
+                }
+            }
         }
     }
 
@@ -357,26 +362,26 @@ class Classes implements IStrategy
         $timetableClassPeriod = $this->classPeriodMapper->createModel()
             ->setClass($timetableClass)
             ->setPeriod($period)
-            ->setRoom($class['period']['room']['name']);
+            ->setRoom($class['room']['name']);
 
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$class['teachers']['username']])) {
+        if (!isset($users[$class['teachers']['externalId']])) {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; username might not exist in schoolbox user table',
-                $class['teachers']['username'],
+                'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
+                $class['teachers']['externalId'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
 
-        $timetableClassPeriod->setTeacher($class['teachers']['username']);
+        $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
 
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
-            $class['period']['room']['name']
+            $class['room']['name']
         ));
 
         $this->log->info(sprintf(
