@@ -34,11 +34,6 @@ class Model implements Serializable
     private $size;
 
     /**
-     * @var string
-     */
-    private $presignedUrl;
-
-    /**
      * @param \Schoolbox\Resource\Storage\Model|null $storage
      *
      * @return Model
@@ -99,30 +94,10 @@ class Model implements Serializable
     }
 
     /**
-     * @param string $presignedUrl
-     *
-     * @return $this
-     */
-    public function setPresignedUrl(string $presignedUrl): self
-    {
-        $this->presignedUrl = $presignedUrl;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPresignedUrl(): string
-    {
-        return $this->presignedUrl;
-    }
-
-    /**
      * @return array
      */
     public function getDefaultJsonMap(): array
     {
-        return ['transform', 'presignedUrl'];
+        return ['transform'];
     }
 }
