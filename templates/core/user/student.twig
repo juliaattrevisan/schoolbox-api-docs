@@ -235,7 +235,7 @@
                                     {% endblock %}
 
                                     {% block details_studiesCode %}
-                                        {% if externalUser.StudentStudiesCode %}
+                                        {% if externalUser.StudentStudiesCode ?? false %}
                                         <dt class="no-margin small-6 medium-3">{{ locale.studies_code.proper }}:</dt>
                                         <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
                                         {% endif %}
