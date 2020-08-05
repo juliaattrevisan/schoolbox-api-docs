@@ -55,4 +55,15 @@ class Registry
     {
         return $this->registry[$externalId] ?? null;
     }
+
+
+    /**
+     * Return all the keys we remembered
+     *
+     * @return array
+     */
+    public function recallKeys(): array
+    {
+        return array_keys($this->registry);
+    }
 }

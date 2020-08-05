@@ -111,10 +111,11 @@ class Definition implements IStrategy
 
     private function preloadAllTimetables()
     {
-print_r($this->profileRegistry);
-//        /* Find all the student external ids
-//         */
-//
+
+        /* Find all the student external ids
+         */
+        $students = $this->profileRegistry->recallKeys();
+
 //        /* Inspect every student's timetable to find the largest quantity of Periods per Day
 //         * This will inform schoolbox's classic idea of a Timetable Definition which must be
 //         * rectangular; every day will have the maximum number of periods in it, even if the
