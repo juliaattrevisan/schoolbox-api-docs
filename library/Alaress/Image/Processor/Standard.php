@@ -214,6 +214,7 @@ class Standard extends BaseProcessor
      *
      * @return static
      * @throws \Schoolbox\Mapper\Exception
+     * @throws Flysystem\FileNotFoundException
      */
     public function save()
     {
@@ -221,11 +222,7 @@ class Standard extends BaseProcessor
             $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
         }
 
-        Mapper::getInstance()->createRecord(
-            $this->file->getHash(),
-            $this->file->getPath(),
-            $this->file->getSize()
-        );
+        Mapper::getInstance()->createRecord($this->file);
 
         return $this;
     }

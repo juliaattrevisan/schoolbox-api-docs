@@ -33,9 +33,9 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable(self::TABLE_NAME);
         $this->hasModel(Model::class);
-        $this->uses(self::FIELD_HASH, self::TYPE_STRING);
         $this->uses(self::FIELD_TRANSFORM, self::TYPE_STRING);
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
+        $this->joins(self::FIELD_HASH, \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'storage', 'hash');
     }
 
     /**
@@ -59,18 +59,21 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param string $hash
-     * @param string $transform
-     * @param int    $fileSize
+     * @param \Schoolbox\Resource\Storage\Model $storage
      *
      * @throws Exception
+     * @throws \League\Flysystem\FileNotFoundException
      */
-    public function createRecord(string $hash, string $transform, int $fileSize): void
+    public function createRecord(\Schoolbox\Resource\Storage\Model $storage): void
     {
+        $baseName = explode('-', basename($storage->getPath()), 2);
+
         $imageTransformation = new Model();
-        $imageTransformation->setHash($hash)
-            ->setTransform($transform)
-            ->setSize($fileSize);
+
+        $imageTransformation
+            ->setStorage($storage)
+            ->setTransform(end($baseName))
+            ->setSize($storage->getSize());
 
         $this->save($imageTransformation);
     }
