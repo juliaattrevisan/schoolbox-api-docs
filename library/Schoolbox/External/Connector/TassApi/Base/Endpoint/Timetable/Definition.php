@@ -389,8 +389,13 @@ class Definition implements IStrategy
             foreach ($periods as $j => $period) {
                 $periodName = $period['PRD_DESC'];
                 $sequence = $j;
+
+                /* Tass doesn't use the date part,
+                 * Tass includes a microseconds part (sigh)
+                 * So we have to ditch these bits and swipe what we need
+                 */
                 $start = substr($period['PRD_START'], 11, 8);
-                $finish =substr($period['PRD_END'], 11, 8);
+                $finish = substr($period['PRD_END'], 11, 8);
 
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle($periodName)
