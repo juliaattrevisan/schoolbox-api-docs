@@ -55,6 +55,8 @@
     const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
     const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
+    const EVENT_SOURCE_ID = 'events';
+
     export default {
         components: {
             Toast,
@@ -80,6 +82,12 @@
                     start: null,
                     end: null,
                 },
+                eventSources: [
+                    {
+                        id:     EVENT_SOURCE_ID,
+                        events: this.events,
+                    }
+                ]
             }
         },
         computed: {
@@ -448,7 +456,7 @@
              * @param event
              */
             addEvent(event) {
-                this.$refs.fullCalendar.getApi().addEvent(event);
+                this.$refs.fullCalendar.getApi().addEvent(event, EVENT_SOURCE_ID);
             },
 
             /**
@@ -775,7 +783,7 @@
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
-            :events="events"
+            :event-sources="eventSources"
             :event-render="eventRender"
             :view-skeleton-render="viewSkeletonRender"
             @loading="onLoading"
