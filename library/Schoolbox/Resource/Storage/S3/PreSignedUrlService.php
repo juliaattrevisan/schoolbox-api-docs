@@ -12,6 +12,7 @@ use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 
 class PreSignedUrlService
@@ -45,7 +46,7 @@ class PreSignedUrlService
     }
 
     /**
-     * @param StorageModel      $storage
+     * @param Model             $storage
      * @param AlaressDateFormat $expireAt
      * @param string            $size
      * @param string            $cacheControl
@@ -54,7 +55,7 @@ class PreSignedUrlService
      * @return PreSignedUrlDataObject
      */
     public function generate(
-        StorageModel $storage,
+        Model $storage,
         AlaressDateFormat $expireAt,
         string $size = null,
         string $cacheControl = 'private',
