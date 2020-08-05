@@ -14,8 +14,7 @@ use Schoolbox\UserMapper;
 /**
  * Class Lookup
  *
- * Generate a list of known users and known periods so that each xml fragment
- * can receive this same information in an iteration
+ * Generate a list of known users and known periods for creating class involvement
  *
  * @package Schoolbox\External\Connector\Example\Base\Endpoint\Timetable
  */

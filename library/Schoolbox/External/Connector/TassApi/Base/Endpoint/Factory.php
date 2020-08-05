@@ -264,6 +264,11 @@ class Factory
          */
         $cycleRegistry = new TimetableRegistry();
 
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
@@ -303,6 +308,14 @@ class Factory
                 $cycleRegistry,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
+            ))
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Cleanup(
                 $this->log,
