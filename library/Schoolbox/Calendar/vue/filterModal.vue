@@ -106,7 +106,7 @@
 </script>
 
 <template>
-    <reveal-modal ref="modal">
+    <reveal-modal ref="modal" size="medium">
         <form @submit.prevent="applyFilters" action="#">
             <section>
                 <fieldset class="content filter-list">
