@@ -150,8 +150,8 @@ class Decorator implements DecoratorInterface
             $importer = new GenericImporter(
                 $existingGrid,
                 $assessment->getUseMarkRange(),
-                $assessment->getMarkType()->getId(),
-                $capabilityGradeGroup->getId()
+                $assessment->getCapabilityMarkType()->getId(),
+                $assessment->getCapabilityGradeGroup()->getId()
             );
 
             // Now new assessment should have new grid
