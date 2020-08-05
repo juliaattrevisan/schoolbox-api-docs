@@ -45,4 +45,15 @@ class Registry
     {
         return $this->registry[$key] ?? null;
     }
+
+
+    /**
+     * Return all the entire stack
+     *
+     * @return array
+     */
+    public function recallAll(): array
+    {
+        return $this->registry;
+    }
 }

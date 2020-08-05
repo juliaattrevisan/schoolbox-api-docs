@@ -257,10 +257,10 @@ class Definition implements IStrategy
          */
         $this->preloadAllTimetables();
 
-//        /* TODO Collection of timetable cycle equivalents from the endpoint
-//         */
-//        $cycles = [];
-//
+        /* Collection of timetable cycle equivalents from the endpoint
+         */
+        $cycles = $this->cycleRegistry->recallAll();
+
 //        /* A key to identify this cycle and associate it with an luCampus record
 //         */
 //        $ext = 'abc';
