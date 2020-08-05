@@ -164,9 +164,9 @@ class Definition implements IStrategy
              * If not, log that this student didn't have a timetable, then skip them
              * There isn't anything we can do with them
              */
-            if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
-                $person = $this->profileRegistry->recall($externalId);
+            $person = $this->profileRegistry->recall($externalId);
 
+            if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
                 $this->log->warning(sprintf(
                     'Student %s (%s %s) does not have a timetable.',
                     $externalId,
@@ -176,6 +176,15 @@ class Definition implements IStrategy
 
                 continue;
             }
+
+            /* Let us know so we can test with their id
+             */
+            $this->log->info(sprintf(
+                'Processing timetable for student %s (%s %s).',
+                $externalId,
+                $person['firstname'],
+                $person['lastname']
+            ));
 
             /* Otherwise, continue on with the first timetable elmeent
              * (Not sure how many they can actually have in production)
