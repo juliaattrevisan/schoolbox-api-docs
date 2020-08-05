@@ -273,6 +273,13 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
+            ->add(new Timetable\Definition(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->timetableCycleMapper,
+                $this->timetablePeriodMapper
+            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
