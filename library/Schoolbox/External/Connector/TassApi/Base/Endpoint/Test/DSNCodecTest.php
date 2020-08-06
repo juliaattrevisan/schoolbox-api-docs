@@ -30,7 +30,7 @@ class DSNCodecTest extends TestCase
     public function provider_validDSNDecode(): array
     {
         return [
-            'Valid DSN 1' => [
+            'Valid DSN 1 (original order)' => [
                 'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
                 [
                     'studentdetails'=> [
@@ -50,6 +50,27 @@ class DSNCodecTest extends TestCase
                         'appcode' => 'Qvmdbn2764',
                         'token' => 'CVWSEFklrsjdswwwidfnesfd'
                     ]
+                ]
+            ],
+
+            'Valid DSN 2 (random order of module credentials)' => [
+                'lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==',
+                [
+                    'lmsintegration' => [
+                        'companycode' => 789,
+                        'appcode' => 'Qvmdbn2764',
+                        'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                    ],
+                    'identitymanagement' => [
+                        'companycode' => 456,
+                        'appcode' => 'xcjFh28',
+                        'token' => 'ckbj78fj1kdhg=',
+                    ],
+                    'studentdetails'=> [
+                        'companycode' => 123,
+                        'appcode' => 'ADweh189',
+                        'token' => '923nADjl35h0sd7725=='
+                    ],
                 ]
             ],
         ];
