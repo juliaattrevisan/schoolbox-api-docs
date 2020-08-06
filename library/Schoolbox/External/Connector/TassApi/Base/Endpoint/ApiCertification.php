@@ -69,5 +69,7 @@ class ApiCertification implements IStrategy
                 }
             }
         }
+
+        $this->log->info('');
     }
 }

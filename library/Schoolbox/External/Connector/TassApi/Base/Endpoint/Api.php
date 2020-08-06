@@ -44,17 +44,6 @@ class Api implements IApi
 
 
     /**
-     * The dsn string of the Tass API server
-     * This contains strings for companycode, appcode, token
-     *
-     * These are stored in the Endpoint Key field
-     *
-     * @var string
-     */
-    private $dsn;
-
-
-    /**
      * @var ApiUsage
      */
     private $apiUsage;
@@ -82,6 +71,10 @@ class Api implements IApi
     /**
      * Constructor
      *
+     * $dsn is the authentication string of the Tass API server
+     * This contains strings for companycode, appcode, token
+     * These are stored in the Endpoint Key field
+     *
      * @param string $host
      * @param string $dsn
      * @param string $module One of the MODULE_* consts defined in DSNCodec
@@ -92,10 +85,14 @@ class Api implements IApi
     public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
-        $this->dsn = $dsn;
 
-        $this->client = $this->initClient($host, $dsn, $module,self::DEFAULT_TIMEOUT);
+        /* Set up guzzle client
+         */
+        $this->client = $this->initClient($dsn, $module,self::DEFAULT_TIMEOUT);
 
+        /* Record some stats about api usage
+         * Turn this into an Observer pattern if you want to record more details
+         */
         $this->apiUsage = new ApiUsage($module);
     }
 
@@ -103,7 +100,6 @@ class Api implements IApi
     /**
      * Set up guzzle client
      *
-     * @param string $host
      * @param string $dsn
      * @param string $module
      * @param int    $timeout
@@ -112,7 +108,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    private function initClient(string $host, string $dsn, string $module, int $timeout): Client
+    private function initClient(string $dsn, string $module, int $timeout): Client
     {
 
         /* Figure out all the credential parts: module, company code, app code, token
@@ -134,7 +130,7 @@ class Api implements IApi
          */
         return new Client([
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'base_uri' => $host,
+            'base_uri' => $this->host,
             'timeout' => $timeout,
             'http_errors' => false,
         ]);
