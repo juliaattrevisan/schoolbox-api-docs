@@ -425,6 +425,26 @@
       margin-bottom: 1rem;
     }
   }
+  // Content area for Classes/Groups
+  .card-content.classes {
+    padding: 0.5rem 1rem;
+
+    h3 {
+      padding-right: 0;
+      margin-bottom: 0;
+    }
+    h3, .meta {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .card-content.classes[class*="actions-"] {
+    padding-right: 0;
+    nav {
+      top: 0;
+    }
+  }
   .card-spacer {
     flex-grow: 1;
   }
