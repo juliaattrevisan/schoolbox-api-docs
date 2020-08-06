@@ -9,6 +9,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 use UnexpectedValueException;
 
@@ -69,7 +70,11 @@ class Status implements IStatus
         try {
             return $specification->check();
         } catch (\RuntimeException $e) {
-            return ["Cannot access api endpoint: {$e->getMessage()}"];
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => $e->getMessage(),
+                'status' => ISpecification::STATUS_ERROR
+            ]];
         }
     }
 }

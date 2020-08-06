@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 use DomainException;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -84,7 +85,11 @@ class Status implements IStatus
         try {
             return $specification->check();
         } catch (DomainException|RuntimeException $e) {
-            return ["Cannot access api endpoint: {$e->getMessage()}"];
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => $e->getMessage(),
+                'status' => ISpecification::STATUS_ERROR
+            ]];
         }
     }
 }
