@@ -396,6 +396,10 @@ class Family
             $family['address'][$addnum]['email2'] ?? ''
         ]))[0] ?? '';
 
+        /* FIXME $person['phone'] currently contains information shared between both split fam parents
+         * It should probably be cleared to prevent info leaking out to the other split fam parent(s)
+         */
+
         return $person;
     }
 
