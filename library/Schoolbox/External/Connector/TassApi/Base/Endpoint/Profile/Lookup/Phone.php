@@ -73,6 +73,11 @@ class Phone
                  * Look in each and use the first non-empty work and home phone number
                  *
                  * Note that '' !== null
+                 *
+                 * + Assumption: Parents share phone numbers
+                 * Note also that there's no obvious and objective way to tell which
+                 * number(s) belong to each parent. This could be a significant hazard
+                 * for split families.
                  */
                 $mobile = array_values(array_filter([$address['mobile_phone_1'], $address['mobile_phone_2']]))[0] ?? '';
                 $home = $address['home_phone'];

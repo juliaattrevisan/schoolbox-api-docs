@@ -460,8 +460,10 @@ class Profile implements IStrategy
                 $father = "{$emergencyContact['f_preferred_name']} {$emergencyContact['f_surname']}";
                 $mother = "{$emergencyContact['m_preferred_name']} {$emergencyContact['m_surname']}";
 
-                /* Phone numbers are indeterminant; we can't tell to whom they belong
-                 * because this is a family record - because Tass
+                /* + Assumption: Indeterminant phone numbers
+                 * Phone numbers are indeterminant; we can't tell to whom they belong
+                 * because this is a family record - because Tass. This could be
+                 * a significant hazard for split families.
                  */
                 $homePhone = $emergencyContact['home_phone'];
 
@@ -534,6 +536,8 @@ class Profile implements IStrategy
          * If there are any, just leave a message about that, but don't list
          * the specific details in case there are too many, or there are
          * sensitive topics that we shouldn't reveal
+         *
+         * + Assumption: 'data' field contains list of ailments
          */
         if (\count($medicalConditions['data'])) {
             return 'This student has medical conditions.';

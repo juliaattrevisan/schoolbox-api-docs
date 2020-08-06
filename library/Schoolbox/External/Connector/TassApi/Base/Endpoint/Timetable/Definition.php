@@ -182,7 +182,7 @@ class Definition implements IStrategy
                 $person['lastname']
             ));
 
-            /* Otherwise, continue on with the first timetable elmeent
+            /* Otherwise, continue on with the first timetable element
              * (Not sure how many they can actually have in production)
              */
             $timetable = $data['student_timetable'][0];
@@ -219,7 +219,8 @@ class Definition implements IStrategy
             foreach ($timetable['STRDAYS'] as $day => $periods) {
                 if (\count($periods['PERIODS']) >= \count($longestDay)) {
 
-                    /* Rename periods, because their names can vary between students
+                    /* + Assumption: Period naming
+                     * Rename periods, because their names can vary between students
                      * and timetables; so give them something predictable
                      */
                     $temp = [];

@@ -206,7 +206,7 @@ class Classes implements IStrategy
                             'name' => $subject['ROOM_CODE']
                         ],
 
-                        /* Assumption: only one teacher per subject
+                        /* Assumption: Only one teacher per subject
                          * Can there be more than one teacher, maybe comma-separated?
                          */
                         'teachers' => [
