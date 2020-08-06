@@ -56,7 +56,7 @@
                                 {% endblock details_email %}
                             {% endif %}
 
-                            {% if showDetails and not externalUser.SilentPhoneFlag %}
+                            {% if showDetails and not (externalUser.SilentPhoneFlag ?? false) %}
                                 {% if externalUser.HomePhone %}
                                     <dt class="small-12 medium-3">Home Phone:</dt>
                                     <dd class="small-12 medium-9">
@@ -65,7 +65,7 @@
                                 {% endif %}
                             {% endif %}
 
-                            {% if showDetails and not externalUser.SilentMobilePhoneFlag %}
+                            {% if showDetails and not (externalUser.SilentMobilePhoneFlag ?? false) %}
                                 {% if externalUser.MobilePhone %}
                                     <dt class="small-12 medium-3">Mobile Phone:</dt>
                                     <dd class="small-12 medium-9">
