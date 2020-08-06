@@ -20,7 +20,7 @@
                 <a href="/homepage/{{ group.id }}">
                     <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                 </a>
-                <div class="card-content actions-small-1">
+                <div class="card-content class actions-small-1">
                     <div class="list-item">
                         <h3><a href="/homepage/{{ group.id }}" title="{{ group.name }}">{{ group.name }}</a></h3>
                     </div>
