@@ -308,7 +308,6 @@ class Factory
                 $this->perform,
                 $lookup,
                 $timetableRegistry,
-                $cycleRegistry,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper

@@ -19,12 +19,8 @@ use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes
@@ -54,12 +50,6 @@ class Classes implements IStrategy
      * @var Registry
      */
     private $timetableRegistry;
-
-
-    /**
-     * @var Registry
-     */
-    private $cycleRegistry;
 
 
     /**
@@ -93,7 +83,6 @@ class Classes implements IStrategy
      * @param bool                   $perform
      * @param Lookup                 $lookup
      * @param Registry               $timetableRegistry
-     * @param Registry               $cycleRegistry
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -103,7 +92,6 @@ class Classes implements IStrategy
         bool $perform,
         Lookup $lookup,
         Registry $timetableRegistry,
-        Registry $cycleRegistry,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -112,7 +100,6 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->lookup = $lookup;
         $this->timetableRegistry = $timetableRegistry;
-        $this->cycleRegistry = $cycleRegistry;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
