@@ -109,8 +109,8 @@ class Seeder extends App
             `transform` VARCHAR(100) NULL,
             `size` INT(11) NULL,
             UNIQUE INDEX `unique_hash_transform` (`hash` ASC, `transform` ASC),
-            INDEX `index_hash` (`hash` ASC),
-            CONSTRAINT `fk_storage_transform` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE CASCADE ON UPDATE CASCADE
+            INDEX `index_hash` (`hash` ASC)
+            -- CONSTRAINT `fk_storage_transform` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE CASCADE ON UPDATE CASCADE
         )");
    }
 
@@ -120,9 +120,9 @@ class Seeder extends App
    private function prepareData(): Seeder
    {
        // Get all images in storage table
-       $getImagesQuery = "SELECT s.hash, aft.mime FROM storage s 
-                        LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension 
-                        LEFT JOIN allowedFileTypes aft ON aft.fileTypeID = afe.fileTypeID 
+       $getImagesQuery = "SELECT s.hash, aft.mime FROM storage s
+                        LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
+                        LEFT JOIN allowedFileTypes aft ON aft.fileTypeID = afe.fileTypeID
                         WHERE aft.mime LIKE 'image/%'
                         ";
 
@@ -253,7 +253,7 @@ class Seeder extends App
      */
     private function printHelp(): void
     {
-        echo "Options: 
+        echo "Options:
     -h, --help
         Print help message and exit.
     -p, --perform
