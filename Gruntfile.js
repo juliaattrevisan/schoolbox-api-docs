@@ -13,9 +13,6 @@ const jsSrc = {
         // jQuery
         'www/javascript/components/jquery/dist/jquery.js',
 
-        // jQuery placeholder shim
-        'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
-
         // jQuery Validation
         'www/javascript/components/jquery-validation/dist/jquery.validate.js',
         'www/javascript/jquery.alaressValidate.js',
