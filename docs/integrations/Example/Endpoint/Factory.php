@@ -17,7 +17,6 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -94,12 +93,6 @@ class Factory
 
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -142,7 +135,6 @@ class Factory
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      * @param CampusMapper                    $campusMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -166,7 +158,6 @@ class Factory
         /* Timetable pieces
          */
         CampusMapper $campusMapper,
-        UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -189,7 +180,6 @@ class Factory
         /* Timetable pieces
          */
         $this->campusMapper = $campusMapper;
-        $this->userMapper = $userMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;

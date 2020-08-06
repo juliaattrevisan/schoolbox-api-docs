@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
+use DomainException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -19,7 +21,6 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -115,12 +116,6 @@ class Factory
 
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -165,7 +160,6 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -191,7 +185,6 @@ class Factory
 
         /* Timetable pieces
          */
-        UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -216,7 +209,6 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->userMapper = $userMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -228,9 +220,9 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
-     * @throws \DomainException
+     * @throws DomainException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
