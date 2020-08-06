@@ -189,12 +189,16 @@ class DSNCodecTest extends TestCase
                 []
             ],
 
-            'Invalid DSN 11 (case sensitive)' => [
+            'Invalid DSN 12 (case sensitive)' => [
                 'studentdetails:Appcode=ADweh189;Companycode=123;Token=923nADjl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
                 []
             ],
 
-            'Invalid DSN 11 (bad tuple ordering)' => [
+            'Invalid DSN 12 (mixed case)' => [
+                'studentdetails:Companycode=123;appcode=ADweh189;Token=923nADjl35h0sd7725==,identitymanagement:companycode=456;Appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;Token=CVWSEFklrsjdswwwidfnesfd',
+                []
+            ],
+            'Invalid DSN 14 (bad tuple ordering)' => [
                 'studentdetails:appcode=ADweh189;companycode=123;token=923nADjl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
                 []
             ],
