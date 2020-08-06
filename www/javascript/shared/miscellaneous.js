@@ -140,11 +140,6 @@ $(function () {
         }, 300);
     });
 
-    /**
-     * Autoclear the main site search field (works without polyfill in all but IE9)
-     */
-    $('#search-field').placeholder();
-
     // Set up lightboxes globally, group galleries by lightbox relation.
     var lightboxGroups = {};
 
