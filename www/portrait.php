@@ -64,7 +64,8 @@ try {
         $preSignedUrlService = new PreSignedUrlService($config);
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $portrait->load(),
-            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT))
+            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+            $_GET['size']
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
