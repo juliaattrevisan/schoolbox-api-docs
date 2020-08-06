@@ -197,6 +197,9 @@ class Factory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
+                    (int)Loader::getInstance()->get('external_tass_addnum_father'),
+                    (int)Loader::getInstance()->get('external_tass_addnum_mother'),
 
                     /* Profile pieces
                     */

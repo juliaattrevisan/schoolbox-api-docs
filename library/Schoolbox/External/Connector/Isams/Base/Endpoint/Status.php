@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -75,7 +76,11 @@ class Status implements IStatus
         try {
             return $specification->check();
         } catch (\RuntimeException $e) {
-            return ["Cannot access api endpoint: {$e->getMessage()}"];
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => $e->getMessage(),
+                'status' => ISpecification::STATUS_ERROR
+            ]];
         }
     }
 }

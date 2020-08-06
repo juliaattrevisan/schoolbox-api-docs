@@ -32,7 +32,7 @@ class Api implements IApi
     /**
      * Tass API Version Number
      */
-    private const VERSION_NUMBER = 2;
+    private const VERSION_NUMBER = 3;
 
 
     /**
@@ -78,15 +78,17 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
+     * @param string $module One of the MODULE_* consts defined in DSNCodec
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    public function __construct(string $host, string $dsn)
+    public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
         $this->dsn = $dsn;
 
-        $this->client = $this->initClient($host, $dsn, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($host, $dsn, $module,self::DEFAULT_TIMEOUT);
     }
 
 
@@ -95,17 +97,25 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
+     * @param string $module
      * @param int    $timeout
      * @return Client
      * @throws DomainException
      * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    private function initClient(string $host, string $dsn, int $timeout): Client
+    private function initClient(string $host, string $dsn, string $module, int $timeout): Client
     {
 
-        /* Figure out all the credential parts: company code, app code, token
+        /* Figure out all the credential parts: module, company code, app code, token
          */
-        $this->credentials = (new DSNCodec())->decode($dsn);
+        $dsnParts = (new DSNCodec())->decode($dsn);
+
+        if (!isset($dsnParts[$module])) {
+            throw new DomainException("Tass API DSN: Invalid module name {$module}");
+        }
+
+        $this->credentials = $dsnParts[$module];
 
         /* Set up a token codec which does some security stuff based on the
          * params provided to its generateToken() method
@@ -130,6 +140,7 @@ class Api implements IApi
      * @param array  $params
      * @return array
      * @throws RuntimeException
+     * @throws DomainException
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
@@ -152,8 +163,14 @@ class Api implements IApi
             return json_decode($response->getBody()->getContents(), true);
         }
 
-        /* Couldn't decode json, or tass server refused something
+        /* Mine out an error message if you try to access a thing that doesn't exist
          */
-        throw new RuntimeException('Could not access Tass server, or bad json payload returned');
+        if ($response) {
+            throw new RuntimeException("Bad endpoint {$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}");
+        }
+
+        /* Couldn't decode json, or tass server refused something, or something else died
+         */
+        throw new DomainException('Could not access Tass server, or bad json payload returned.');
     }
 }

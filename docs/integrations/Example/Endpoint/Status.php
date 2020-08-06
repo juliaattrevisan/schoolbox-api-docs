@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint;
 
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -51,12 +52,16 @@ class Status implements IStatus
      *
      * @return string
      */
-    public function getReport(): string
+    public function getReport(): array
     {
         try {
             return '';
         } catch (\RuntimeException $e) {
-            return "Cannot access api endpoint: {$e->getMessage()}";
+            return [[
+                 'message' => 'Cannot access api endpoint',
+                 'reason' => $e->getMessage(),
+                 'status' => ISpecification::STATUS_ERROR
+            ]];
         }
     }
 }

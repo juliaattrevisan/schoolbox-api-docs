@@ -222,11 +222,13 @@ class Specification implements ISpecification
             if ($this->batchxml->fetchXml($path)) {
                 $endpoints[] = [
                     'message' => $path,
+                    'reason' => '',
                     'status' => ISpecification::STATUS_OK
                 ];
             } else {
                 $endpoints[] = [
                     'message' => $path,
+                    'reason' => '',
                     'status' => ISpecification::STATUS_MISSING
                 ];
             }
@@ -244,6 +246,7 @@ class Specification implements ISpecification
         if (!\count($timetables)) {
             $endpoints[] = [
                 'message' => 'No PublishedTimetables detected.',
+                'reason' => '',
                 'status' => ISpecification::STATUS_MISSING
             ];
         }
@@ -257,6 +260,7 @@ class Specification implements ISpecification
 
             $endpoints[] = [
                 'message' => $timetableMessage,
+                'reason' => '',
                 'status' => ISpecification::STATUS_OK
             ];
         }
