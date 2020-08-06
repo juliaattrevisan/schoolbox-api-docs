@@ -492,7 +492,7 @@ class Profile implements IStrategy
     /**
      * Studies Code is one of five possible fields that could exist
      *
-     * Each of the filve possible fields depends on which state you're in
+     * Each of the five possible fields depends on which state you're in
      * so I guess it depends on each tass installation
      *
      * Try each of the five possibilities until one exists

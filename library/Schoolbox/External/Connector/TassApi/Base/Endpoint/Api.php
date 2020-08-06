@@ -18,7 +18,7 @@ use RuntimeException;
  * Connects to the Tass endpoint, negotiates all the crypto stuff and returns a data
  * payload for the $method you provided. If it fails, it throws a Runtime exception -
  * it can fail when we can't decode the json data, or when we can't establish connectivity
- * etc. but it neds to throw Runtimes because Status and Specification use that.
+ * etc. but it needs to throw Runtimes because Status and Specification use that.
  */
 class Api implements IApi
 {
