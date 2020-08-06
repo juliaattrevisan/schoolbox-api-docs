@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
 use DomainException;
+use function count;
 
 /**
  * Class DSNCodec
@@ -49,6 +50,13 @@ class DSNCodec
 
 
     /**
+     * The expected key-value tuples per module
+     * At the moment we expect three keys which should have three values
+     */
+    private const EXPECTED_TUPLE = ['companycode', 'appcode', 'token'];
+
+
+    /**
      * Decode a dsn string
      *
      * @param string $dsn
@@ -64,8 +72,18 @@ class DSNCodec
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
 
+            /* Check the dsn format matches correctly
+             */
             if (!count($matches)) {
-                throw new DomainException('Tass API DSN: could not decode; check company code, app code and token format');
+                throw new DomainException('Tass API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
+            }
+
+            /* Check that each module comes with the expected number of key-value pairs
+             *
+             * original dsn string + module + \count(expected_tuple) = 1 + 1 + 3 = 5
+             */
+            if (count($matches) !== count(self::EXPECTED_TUPLE) + 2) {
+                throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
             $struct[$matches[1]] = [
