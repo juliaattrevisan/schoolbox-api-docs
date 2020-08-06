@@ -172,6 +172,7 @@ class Controller extends ConfigController
             'pageCurrent' => 'import/schoolDataImport',
             'report' => $report ?: [[
                 'message' => $message,
+                'reason' => '',
                 'status' => ISpecification::STATUS_ERROR
             ]]
         ]));
