@@ -11,7 +11,6 @@ namespace Alaress\Image\Processor;
 
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
-use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation\Transformation;
 use BadMethodCallException;
 use League\Flysystem;
@@ -214,8 +213,9 @@ class Standard extends BaseProcessor
      * Saves the transformed image
      *
      * @return static
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws Flysystem\FileNotFoundException
+     * @throws \UnexpectedValueException
      */
     public function save()
     {
@@ -224,9 +224,11 @@ class Standard extends BaseProcessor
         }
 
         if ($this->cache->getKey()) {
-            /** @var Storage\Model $storage */
-            $storage = $this->file;
-            Mapper::getInstance()->createRecord($storage, $this->cache->getKey());
+            Mapper::getInstance()->createRecord(
+                $this->file->getHash(),
+                $this->cache->getKey(),
+                $this->file->getSize()
+            );
         }
 
         return $this;

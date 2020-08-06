@@ -7,19 +7,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
 
-use League\Flysystem;
 use PDOException;
-use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
 /**
  * Class Mapper
  * @package Schoolbox\Resource\Storage\Transform
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -37,9 +32,9 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable(self::TABLE_NAME);
         $this->hasModel(Model::class);
+        $this->uses(self::FIELD_HASH, self::TYPE_STRING);
         $this->uses(self::FIELD_TRANSFORM, self::TYPE_STRING);
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
-        $this->joins(self::FIELD_HASH, \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'storage', 'hash');
     }
 
     /**
@@ -65,19 +60,19 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Creates a new Transform record in database
      *
-     * @param Storage\Model $storage
-     * @param string        $transform
+     * @param string $hash
+     * @param string $transform
+     * @param int    $size
      * @throws Exception
-     * @throws Flysystem\FileNotFoundException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function createRecord(\Schoolbox\Resource\Storage\Model $storage, string $transform): void
+    public function createRecord(string $hash, string $transform, int $size): void
     {
         $imageTransformation = $this->createModel()
-                                    ->setStorage($storage)
+                                    ->setHash($hash)
                                     ->setTransform($transform)
-                                    ->setSize($storage->getSize());
+                                    ->setSize($size);
         $this->save($imageTransformation);
     }
 }

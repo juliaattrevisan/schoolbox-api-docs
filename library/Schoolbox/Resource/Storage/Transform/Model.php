@@ -7,21 +7,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
 
-use Alaress\Json\Serializable;
-use Alaress\Json\SerializeTrait;
-
 /**
  * Class Model
  * @package Schoolbox\Resource\Storage\Transform
  */
-class Model implements Serializable
+class Model
 {
-    use SerializeTrait;
-
     /**
-     * @var \Schoolbox\Resource\Storage\Model|null
+     * @var string
      */
-    private $storage;
+    private $hash;
 
     /**
      * @var string
@@ -34,13 +29,13 @@ class Model implements Serializable
     private $size;
 
     /**
-     * @param \Schoolbox\Resource\Storage\Model|null $storage
+     * @param string $hash
      *
      * @return Model
      */
-    public function setStorage(?\Schoolbox\Resource\Storage\Model $storage): self
+    public function setHash(string $hash): self
     {
-        $this->storage = $storage;
+        $this->hash = $hash;
 
         return $this;
     }
@@ -70,17 +65,17 @@ class Model implements Serializable
     }
 
     /**
-     * @return \Schoolbox\Resource\Storage\Model|null
+     * @return string
      */
-    public function getStorage(): ?\Schoolbox\Resource\Storage\Model
+    public function getHash(): ?string
     {
-        return $this->storage;
+        return $this->hash;
     }
 
     /**
      * @return string
      */
-    public function getTransform(): string
+    public function getTransform(): ?string
     {
         return $this->transform;
     }
@@ -88,16 +83,8 @@ class Model implements Serializable
     /**
      * @return int
      */
-    public function getSize(): int
+    public function getSize(): ?int
     {
         return $this->size;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return ['transform'];
     }
 }
