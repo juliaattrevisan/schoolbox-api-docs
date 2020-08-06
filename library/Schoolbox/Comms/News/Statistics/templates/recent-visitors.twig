@@ -29,7 +29,7 @@
     </ul>
     <div class="component-action">
         <section>
-            <a href="{{ routeLookupIfAuthorized('commsNewsStatistics.getVisitation', { articleId: article.id }) }}" class="button">View all</a>
+            <a href="{{ routeLookupIfAuthorized('commsNewsStatistics.getVisitation', { articleId: article.id, article: article }) }}" class="button">View all</a>
         </section>
     </div>
 </section>
