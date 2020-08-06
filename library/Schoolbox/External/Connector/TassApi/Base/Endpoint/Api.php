@@ -55,6 +55,12 @@ class Api implements IApi
 
 
     /**
+     * @var ApiUsage
+     */
+    private $apiUsage;
+
+
+    /**
      * @var TokenCodec
      */
     private $tokenCodec;
@@ -89,6 +95,8 @@ class Api implements IApi
         $this->dsn = $dsn;
 
         $this->client = $this->initClient($host, $dsn, $module,self::DEFAULT_TIMEOUT);
+
+        $this->apiUsage = new ApiUsage($module);
     }
 
 
@@ -144,6 +152,11 @@ class Api implements IApi
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
+
+        /* Record endpoint usage
+         */
+        $this->apiUsage->record($method);
+
         $queryArgs = [
             'method'  => $method,
             'appcode' => $this->credentials['appcode'],
@@ -172,5 +185,14 @@ class Api implements IApi
         /* Couldn't decode json, or tass server refused something, or something else died
          */
         throw new DomainException('Could not access Tass server, or bad json payload returned.');
+    }
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage
+    {
+        return $this->apiUsage;
     }
 }

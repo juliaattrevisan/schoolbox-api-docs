@@ -234,6 +234,8 @@ class Factory
             DSNCodec::MODULE_IDENTITY_MANAGEMENT
         ];
 
+        $api = [];
+
         foreach ($modules as $module) {
             $api[$module] = new Api($this->host, $this->key, $module);
         }
@@ -319,6 +321,10 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new ApiCertification(
+                $this->log,
+                $api
             ));
     }
 }
