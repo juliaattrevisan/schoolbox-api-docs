@@ -428,9 +428,7 @@
   // Content area for Classes/Groups
   .card-content.class {
     padding: 0.5rem 1rem;
-  }
-  .card-content.class[class*="actions-"] {
-    padding-right: 0;
+
     h3 {
       padding-right: 0;
       margin-bottom: 0;
@@ -440,6 +438,9 @@
       overflow: hidden;
       white-space: nowrap;
     }
+  }
+  .card-content.class[class*="actions-"] {
+    padding-right: 0;
     nav {
       top: 0;
     }
