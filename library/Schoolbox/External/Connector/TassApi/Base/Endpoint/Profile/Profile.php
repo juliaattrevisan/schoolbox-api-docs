@@ -551,9 +551,9 @@ class Profile implements IStrategy
                 $email = trim((string)$parent['e_mail']);
                 $firstname = trim((string)$parent['preferred_name']);
                 $lastname = trim((string)$parent['surname']);
-                $phoneHome = (string)($parent['phone']['home'] ?? '');
-                $phoneMobile = (string)($parent['phone']['mobile'] ?? '');
-                $phoneWork = (string)($parent['phone']['work'] ?? '');
+                $phoneHome = trim((string)($parent['phone']['home'] ?? ''));
+                $phoneMobile = trim((string)($parent['phone']['mobile'] ?? ''));
+                $phoneWork = trim((string)($parent['phone']['work'] ?? ''));
                 $relationship = trim((string)$parent['description']);
                 $title = trim((string)$parent['title']);
 
@@ -649,6 +649,86 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        $teachers = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+            'currentstatus' => 'current'
+        ]);
 
+        foreach ($teachers['teachers'] as $staff) {
+            $externalId = trim((string)$staff['teacher_code']);
+            $building = '';
+            $campusName = '';
+            $category = '';
+            $department = trim((string)$staff['department']);
+
+            /* Find the first non-empty email address for staff; it seems that there's a business
+             * email address and a home email address concept going on here
+             */
+            $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
+
+            $firstname = trim((string)$staff['given_names']);
+            $lastname = trim((string)$staff['surname']);
+            $phone = '';
+            $position = '';
+            $room = '';
+            $title = trim((string)$staff['salutation']);
+            $username = trim((string)$staff['portal_user_code']);
+
+            /* Find out if this externalId already has a staff profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                $staffBaseProfile = $staffProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
+            }
+
+            $staffBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
+
+            $staffProfile
+                ->setBuilding($building)
+                ->setCampusName($campusName)
+                ->setCategory($category)
+                ->setDepartment($department)
+                ->setEmail($email)
+                ->setPhone($phone)
+                ->setPositionTitle($position)
+                ->setRoom($room)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding staff profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->staffProfileMapper->save($staffProfile);
+            }
+        }
     }
 }
