@@ -42,6 +42,7 @@ try {
     }
 } catch (\Schoolbox\Mapper\Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    exit;
 }
 
 try {
