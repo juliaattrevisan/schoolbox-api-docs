@@ -12,6 +12,7 @@ use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 
@@ -48,7 +49,7 @@ class PreSignedUrlService
     /**
      * @param Model             $storage
      * @param AlaressDateFormat $expireAt
-     * @param string            $size
+     * @param string|null       $size
      * @param string            $cacheControl
      * @param string            $attachmentType
      *
@@ -82,21 +83,22 @@ class PreSignedUrlService
     }
 
     /**
+     * Returns whether the data object's file exists in the database.
+     *
+     * If so, we assume it exists in the FileSystem.
+     * It is much faster to check the database than the filesystem, especially for AWS S3.
+     *
      * @param PreSignedUrlDataObject $dataObject
      *
      * @return bool
      */
     private function fileExists(PreSignedUrlDataObject $dataObject): bool
     {
-        $transformationMapper = new TransformMapper();
-
         $size = $dataObject->getSize();
 
-        if (is_null($size) || (($size && $transformationMapper->checkIfRecordExists($dataObject->getHash(), $size)))) {
-            return true;
-        }
-
-        return false;
+        return $size === null
+            ? Storage\Mapper::getInstance()->countByColumn('hash', $dataObject->getHash()) > 0
+            : TransformMapper::getInstance()->checkIfRecordExists($dataObject->getHash(), $size);
     }
 
     /**
