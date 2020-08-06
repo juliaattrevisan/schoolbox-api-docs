@@ -68,7 +68,12 @@ try {
     /* Choose a caching method to use
      */
     $key            = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
-    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+    $hash           = Config::get($logo);
+    if (!$hash) {
+        // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
+        throw new Exception("No hash configured for logo '$logo'");
+    }
+    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
     $fileSystem     = $resource->getFilesystem();
 
     if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
