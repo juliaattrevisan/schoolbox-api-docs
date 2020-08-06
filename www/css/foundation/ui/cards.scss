@@ -435,6 +435,11 @@
       padding-right: 0;
       margin-bottom: 0;
     }
+    h3, .meta {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
     nav {
       top: 0;
     }
