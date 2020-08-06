@@ -7,11 +7,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
 
+use League\Flysystem;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage;
+use UnexpectedValueException;
 
 /**
  * Class Mapper
@@ -59,22 +63,21 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * @param \Schoolbox\Resource\Storage\Model $storage
+     * Creates a new Transform record in database
      *
+     * @param Storage\Model $storage
+     * @param string        $transform
      * @throws Exception
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws Flysystem\FileNotFoundException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function createRecord(\Schoolbox\Resource\Storage\Model $storage): void
+    public function createRecord(\Schoolbox\Resource\Storage\Model $storage, string $transform): void
     {
-        $baseName = explode('-', basename($storage->getPath()), 2);
-
-        $imageTransformation = new Model();
-
-        $imageTransformation
-            ->setStorage($storage)
-            ->setTransform(end($baseName))
-            ->setSize($storage->getSize());
-
+        $imageTransformation = $this->createModel()
+                                    ->setStorage($storage)
+                                    ->setTransform($transform)
+                                    ->setSize($storage->getSize());
         $this->save($imageTransformation);
     }
 
