@@ -160,6 +160,7 @@ class Controller extends Base
                 $ds = ldap_connect($this->getConfigLoader()->get('ldap_host'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+                ldap_set_option($ds, LDAP_OPT_TIMELIMIT, 1);
                 $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
 
                 if ($ldapbind) {
@@ -179,6 +180,7 @@ class Controller extends Base
                 $ds = ldap_connect($this->getConfigLoader()->get('ldap_host_alt'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+                ldap_set_option($ds, LDAP_OPT_TIMELIMIT, 1);
                 $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user_alt')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
 
                 if ($ldapbind) {
@@ -195,9 +197,10 @@ class Controller extends Base
 
         // Check WWW
 
-        $context = ProxyServer::getInstance()->getContext();
+        $context = ProxyServer::getInstance()->getContext('http',true);
+        $context['http']['timeout'] = 1;
 
-        if (@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
+        if (@file_get_contents('https://schoolbox.com.au/schoolboxinstaller/status.html', null, stream_context_create($context))) {
             $www_light = 'success';
             $www_status = 'Available';
         } else {
