@@ -219,13 +219,15 @@ class Standard extends BaseProcessor
      */
     public function save()
     {
-        if (!$this->isCached() && $this->getCache()->getKey()) {
-            $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
+        if (!$this->isCached() && $this->cache->getKey()) {
+            $this->filetypeStrategy->save($this->getImage(), $this->cache->loadCache());
         }
 
-        /** @var Storage\Model $storage */
-        $storage = $this->file;
-        Mapper::getInstance()->createRecord($storage, $this->cache->getKey());
+        if ($this->cache->getKey()) {
+            /** @var Storage\Model $storage */
+            $storage = $this->file;
+            Mapper::getInstance()->createRecord($storage, $this->cache->getKey());
+        }
 
         return $this;
     }
