@@ -203,7 +203,7 @@ class Controller extends WebController\Base
              * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
             // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, false);
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
 
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
