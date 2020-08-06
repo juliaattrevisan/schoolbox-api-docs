@@ -11,6 +11,7 @@ namespace Alaress\Image\Processor;
 
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
+use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation\Transformation;
 use BadMethodCallException;
 use League\Flysystem;
@@ -222,7 +223,9 @@ class Standard extends BaseProcessor
             $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
         }
 
-        Mapper::getInstance()->createRecord($this->file);
+        /** @var Storage\Model $storage */
+        $storage = $this->file;
+        Mapper::getInstance()->createRecord($storage, $this->cache->getKey());
 
         return $this;
     }
