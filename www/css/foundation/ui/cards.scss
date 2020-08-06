@@ -426,7 +426,7 @@
     }
   }
   // Content area for Classes/Groups
-  .card-content.class {
+  .card-content.classes {
     padding: 0.5rem 1rem;
 
     h3 {
@@ -439,7 +439,7 @@
       white-space: nowrap;
     }
   }
-  .card-content.class[class*="actions-"] {
+  .card-content.classes[class*="actions-"] {
     padding-right: 0;
     nav {
       top: 0;
