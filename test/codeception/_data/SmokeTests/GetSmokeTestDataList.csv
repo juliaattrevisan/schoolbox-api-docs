@@ -210,10 +210,10 @@ Calendar,"Export calendar",Superuser,https://vagrant.dev.schoolbox.cloud/calenda
 Calendar,"Export calendar",Teacher,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,200
 Calendar,"Export calendar",Student,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,200
 Calendar,"Export calendar",Parent,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809,200
-Calendar,"Create event",Superuser,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
-Calendar,"Create event",Teacher,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
-Calendar,"Create event",Student,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
-Calendar,"Create event",Parent,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
+Calendar,"Create event",Superuser,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
+Calendar,"Create event",Teacher,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
+Calendar,"Create event",Student,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
+Calendar,"Create event",Parent,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1,200
 CMS,"View all folders",Superuser,https://vagrant.dev.schoolbox.cloud/resources/,200
 CMS,"View all folders",Teacher,https://vagrant.dev.schoolbox.cloud/resources/,200
 CMS,"View all folders",Student,https://vagrant.dev.schoolbox.cloud/resources/,200
@@ -286,10 +286,10 @@ LMS,"Visit Class List",Superuser,https://vagrant.dev.schoolbox.cloud/learning/cl
 LMS,"Visit Class List",Teacher,https://vagrant.dev.schoolbox.cloud/learning/class/106,200
 LMS,"Visit Class List",Student,https://vagrant.dev.schoolbox.cloud/learning/class/106,401
 LMS,"Visit Class List",Parent,https://vagrant.dev.schoolbox.cloud/learning/class/106,401
-LMS,"Visit class markbook",Superuser,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,200
-LMS,"Visit class markbook",Teacher,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,200
-LMS,"Visit class markbook",Student,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,401
-LMS,"Visit class markbook",Parent,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=,401
+LMS,"Visit class markbook",Superuser,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106,200
+LMS,"Visit class markbook",Teacher,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106,200
+LMS,"Visit class markbook",Student,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106,401
+LMS,"Visit class markbook",Parent,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106,401
 LMS,"Visit rubric markbook",Superuser,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,200
 LMS,"Visit rubric markbook",Teacher,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,200
 LMS,"Visit rubric markbook",Student,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=,401

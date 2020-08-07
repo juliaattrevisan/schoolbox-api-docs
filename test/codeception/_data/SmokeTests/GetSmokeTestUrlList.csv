@@ -51,7 +51,7 @@ Admin,Configure filters on pending assessment,https://vagrant.dev.schoolbox.clou
 Admin,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
 Calendar,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
 Calendar,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
-Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/modify.php?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
+Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
 CMS,View all folders,https://vagrant.dev.schoolbox.cloud/resources/
 CMS,Add folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/create
 CMS,Modify folder,https://vagrant.dev.schoolbox.cloud/resource/folder/57/modify
@@ -70,7 +70,7 @@ CMS,Manage homepage group,https://vagrant.dev.schoolbox.cloud/group/modify/153
 LMS,Visit pending asses,https://vagrant.dev.schoolbox.cloud/learning/pending/
 LMS,Visit classes,https://vagrant.dev.schoolbox.cloud/learning/classes
 LMS,Visit Class List,https://vagrant.dev.schoolbox.cloud/learning/class/106
-LMS,Visit class markbook,https://vagrant.dev.schoolbox.cloud/learning/markbook/22?1=&2[106]=1&3=&4=&5[4]=1&6=&7=&8=&9=&10=&11=&12=&13=&14=&15=&16=
+LMS,Visit class markbook,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106
 LMS,Visit rubric markbook,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=
 LMS,Visit class,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA
 LMS,View course list,https://vagrant.dev.schoolbox.cloud/course/list
