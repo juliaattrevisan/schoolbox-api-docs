@@ -19,10 +19,11 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 /**
  * Parse date/time strings to get the time only
  *
- * @param string $input
+ * @param string $input  The input date
+ * @param string $format The format to get the time in
  * @return string
  */
-function parseDateTimeString($input)
+function parseDateTimeString($input, $format)
 {
     if (empty(trim($input))) {
         return '';
@@ -31,10 +32,12 @@ function parseDateTimeString($input)
     $timestamp = strtotime($input);
 
     if (!empty($timestamp)) {
-        return date("g:ia", $timestamp);
+        return date($format, $timestamp);
     }
 
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    // This shouldn't be a fatal error: just output empty?
+    return '';
+//    error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
 // Redir if $this doesn't exist (a.k.a this was accessed with a .php extension)
@@ -333,8 +336,8 @@ if ($class) {
                 'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
                 'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
                 'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
-                'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime']),
-                'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime']),
+                'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime'], $outputTimeFormat),
+                'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime'], $outputTimeFormat),
                 'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
             ]);
 
