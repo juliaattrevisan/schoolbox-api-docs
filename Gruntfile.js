@@ -67,7 +67,7 @@ const jsSrc = {
         'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
 
         // DateTime
-        'www/javascript/components/moment/moment.js',
+        'node_modules/moment/moment.js',
 
         // Files And Resource Browser
         'www/socialstream/browser/browser.js',
