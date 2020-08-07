@@ -221,6 +221,12 @@ th, td{
 			flex: 0 0 auto;
 		}
 	}
+    .adtp-btn {
+      line-height: 1.5;
+    }
+    .no-text {
+      min-width: 2.5rem;
+    }
     .selectized.error ~ .selectize-control {
       margin-bottom: 0;
     }
