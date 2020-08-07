@@ -1,6 +1,5 @@
 <script>
     import axios from "axios";
-    import Paginate from 'vuejs-paginate'
     import {ENDPOINTS} from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 
     export default {
@@ -35,7 +34,7 @@
          * at the top of the file.
          */
         components: {
-            'Paginate': Paginate
+            'Paginate': VuejsPaginate
         },
 
         /**
