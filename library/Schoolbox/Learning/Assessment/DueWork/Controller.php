@@ -278,14 +278,12 @@ class Controller extends Assessment\Controller
              */
             'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
-            /* Eportfolio Showcase
-             * Only show the "send to showcase" trophy button to teachers and students, not parents
+            /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
-            'canShowcase' => $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isStudent() && $this->getUser()->getEportfolioEnable()),
-
+            'canShowcase' => $student->getEportfolioEnable() && $assessment->isImplementation() && ($this->getUser()->getRole()->isStaff() || $this->getUser()->getId() === $student->getId()),
             /* Whether or not this assessment is showcased on the user's eportfolio
              */
-            'isShowcased' => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$this->getUser()->getId())
+            'isShowcased' => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),
         ];
 
         $routeArgs = [
