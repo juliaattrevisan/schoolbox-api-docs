@@ -110,7 +110,7 @@ users: function() {
 
 The `pageCount` method is a computed property that tells us the maximum number of pages that are available.
 
-The `users` method is a computed property that takes a _subset of this.allUsers` which we populated asynchronously with a giant pack of data. Instead of iterating over `allUsers`, we actually want to iterate over a subset of it - `users`. The offsets are calculated using the contents of the browser history via `window.onpopstate`.
+The `users` method is a computed property that takes a _subset_ of `this.allUsers` which we populated asynchronously with a giant pack of data. Instead of iterating over `allUsers`, we actually want to iterate over a subset of it - `users`. The offsets are calculated using the contents of the browser history via `window.onpopstate`.
 
 In `user-list.vue`,
 
