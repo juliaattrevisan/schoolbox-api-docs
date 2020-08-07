@@ -51,7 +51,7 @@ To see the output, `npm run build` and visit the Greenhouse url.
 
 ## 3.3 Add more payload args
 
-You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar dat should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.
+You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.
 
 ```html
 {% set hardcodedPayload = {

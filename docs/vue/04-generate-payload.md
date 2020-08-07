@@ -40,7 +40,7 @@ This is going to produce a lot of data that frontend doesn't actually need. We c
     }
 ```
 
-The data provided to twig is a set of `(fullname, role, route)` tuples instead of the fully-populated `User` instances. This establishes a _contract between backend and frontend_ layers in our application. The backend fulfils what the frontend expects to use.
+The data provided to twig is a set of `(fullname, role, route ...)` tuples instead of the fully-populated `User` instances. This establishes a _contract between backend and frontend_ layers in our application. The backend fulfils what the frontend expects to use.
 
 Now we can pass this data to twig, who will then forward it through to Vue for us. We won't need the other example vars for now, so remove them from `prop` - we only need to use the `payload` prop.
 
