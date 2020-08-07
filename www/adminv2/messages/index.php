@@ -31,6 +31,7 @@ $nav = new AdminV2_Nav($this->getDi()->get('config'));
 $nav->parse($this, 'messages');
 $this->setTitle('Admin - Messages');
 
+$this->setBlock(TEMPLATE_content, 'digest_time_step', 'digest_time_step_block');
 $this->setBlock(TEMPLATE_content, 'global_online', 'global_online_block');
 $this->setBlock(TEMPLATE_content, 'global_offline', 'global_offline_block');
 $this->setBlock(TEMPLATE_content, 'digest_offline', 'digest_offline_block');
@@ -39,6 +40,16 @@ $this->setBlock(TEMPLATE_content, 'push_online', 'push_online_block');
 $this->setBlock(TEMPLATE_content, 'push_offline', 'push_offline_block');
 $this->setBlock('digest_online', 'role_digest', 'role_digest_block');
 $this->setBlock('role_digest', 'day_check', 'day_check_block');
+
+
+// set up digest time list
+foreach (range(0, 23) as $hour) {
+    $this->setVar('TIME_STEP', sprintf('%02d:00', $hour));
+    $this->parse('digest_time_step_block', 'digest_time_step', true);
+    $this->setVar('TIME_STEP', sprintf('%02d:30', $hour));
+    $this->parse('digest_time_step_block', 'digest_time_step', true);
+}
+
 
 // global setting
 /** @var IConfigLoader $config */
