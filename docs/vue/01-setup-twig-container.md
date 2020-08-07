@@ -1,4 +1,4 @@
-# Entry Point
+# 1. Vue Container
 
 Vue needs an `entry point` which is where the Vue framework loads. To do it in schoolbox, we'll need an Aura Module. You can set one up yourself or you can invade an existing one.
 
@@ -6,7 +6,7 @@ In this guide we'll use an existing one to prove that we can just *do vue* whene
 
 Have a look in `library/Schoolbox/Greenhouse`. There's a controller and module here. It's a place where you can test twig templates in isolation, for a Greenhouse is where twigs are born.
 
-## 1. Set up a Vue Container in twig town
+## 1.1 Set up a Vue Container in twig town
 
 The first thing we need to do is set up a route to our `Vue Container`. There's nothing special about this, it's just another regular old controller method and module regex.
 

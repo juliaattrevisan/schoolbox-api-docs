@@ -1,4 +1,4 @@
-## 3. Payload Data
+# 3. Payload Data
 
 Now we can start getting data into vue. As per multi-layer application architecture (and unlike twig) there's a clear delineation between the business logic layer and the presentation layer when you use a Vue Component.
 
@@ -10,7 +10,7 @@ In schoolbox, the backend is responsible for collating a payload of facts that t
 
 Let's set up a hardcoded payload for now, to demonstrate usage.
 
-### 3.1 Set up Payload in Container
+## 3.1 Set up Payload in Container
 
 In `container.twig` we can construct a twig data structure then json_encode it as input to the `user-list` Vue Component.
 
@@ -27,7 +27,7 @@ In `container.twig` we can construct a twig data structure then json_encode it a
 </div>
 ```
 
-### 3.2 Access the payload contents in Vue Component
+## 3.2 Access the payload contents in Vue Component
 
 To get to that data, we need to define a `prop` in the Vue Component. In `user-list.vue`,
 
@@ -49,7 +49,7 @@ To see the output, `npm run build` and visit the Greenhouse url.
 
 > If you put it in the wrong place, npm will tell you about it when you try to compile.
 
-### 3.3 Add more payload args
+## 3.3 Add more payload args
 
 You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar dat should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.
 
@@ -79,7 +79,7 @@ You can add more args to provide pieces of info to the `user-list` component. Se
 
 > When you pass scalar values, sometimes you need to wrap them inside apostrophes.
 >
-> `:datetime="some value"` is synonymous with`var datetime = some value` which is syntactically broken, which is why you need apostrophes.
+> `:datetime="some value"` is synonymous with`var datetime = some value` which is syntactically broken; that is why you need apostrophes.
 >
 > `:datetime="'some value'"` is synonymous with`var datetime = 'some value'`, which works. Keep this in mind because it applies throughout all Vue templates too.
 
@@ -108,8 +108,3 @@ npm run build
 ```
 
 Again, note how the camel-case var `stuartMahon` was derived from the hyphen-separated var `stuart-mahon`.
-
-
-
-
-

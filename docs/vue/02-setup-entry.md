@@ -1,13 +1,13 @@
-## 2. Set up a Vue Entry Point
+# 2. Set up a Vue Entry Point
 
 A *Vue Entry Point* is basically a place where the vue frameworks' javascript loads, then starts up a _Vue Component_. From inside this component you can load other components, process data, and do all the fun front-end stuff.
 
 We'll just build a boring old user list for now, so let's call our Vue Component `UserList`.
 
-### 2.1 Vue Component Setup
+## 2.1 Vue Component Setup
 Every Vue Component, when launched from a twig environment, must have exactly one parent html element to itself. It can't share this container element with other Vue Components launched in the same twig file.
 
-#### 2.1.1 html
+### 2.1.1 html
 In the `container.twig` that we built, add this:
 
 ```html
@@ -22,7 +22,7 @@ Note that we decided our component was called `UserList` - this is referenced vi
 
 The `UserList` component we're about to build requires its own javascript stuff so it can start. For now, we can just pile everything we need into `library/Schoolbox/Greenhouse/templates`.
 
-#### 2.1.2 Component Javsacript initialiser
+### 2.1.2 Component Javascript initialiser
 Create `library/Schoolbox/Greenhouse/templates/user-list.js` and put this inside, which will tell vue how to initialise our `UserList` component into its container element.
 
 ```js
@@ -41,7 +41,7 @@ new Vue({
 
  * The `el` arg is the container element's id which we previously named `#user-list-container` but you can call it anything you want here.
 
-#### 2.1.3 Update webpack.config.js
+### 2.1.3 Update webpack.config.js
 Next, we need to add a path to this javascript file in `webpack.config.js` so the compiler knows where to look for it.
 
 At the top, there's a `module.exports` object literal definition. You'll find other schoobox vue components there. Simply add the path to the `user-list.js` file to the `entry` node, which is an index of all the Vue entry points that currently exist.
@@ -50,7 +50,7 @@ At the top, there's a `module.exports` object literal definition. You'll find ot
 userList: './library/Schoolbox/Greenhouse/templates/user-list.js`
 ```
 
-#### 2.1.3 Vue Component basics
+### 2.1.3 Vue Component basics
 
 The `UserList` component requires a basic Vue component javascript to work. This is where the meat of our component will live; it's where we add other components and process data to render on screen.
 
@@ -138,7 +138,7 @@ This is the guts of a vue component. Note that the `name` node is called `user-l
 
 > Vue components' html template must have exactly one parent node. It'll crash out if you try to do otherwise so don't worry if you forget - npm will remind you.
 
-#### 2.1.4 npm run build
+### 2.1.4 npm run build
 
 Now you need to compile it for the first time.
 
@@ -150,7 +150,7 @@ npm run build
 
 If you visit the Greenhouse now, it just won't have done anything...but why? It turns out that you need to do one more thing.
 
-#### 2.1.5 Include the js npm built for you
+### 2.1.5 Include the js npm built for you
 
 If you look in `www/javascript/components`, you'll find a `userList.bundle.js` which npm built for you in the previous step. It won't have existed earlier.
 
