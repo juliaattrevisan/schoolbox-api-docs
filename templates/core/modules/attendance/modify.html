@@ -1,18 +1,6 @@
 <!-- BEGIN custom_head -->
-<script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
 <script type='text/javascript'>
 	$(function() {
-        $('[data-timepicker]').timepicker({
-            'timeFormat':'g:ia',
-            'scrollDefaultNow': true,
-            'step':5,
-            'minTime': '{ATTENDANCE_START}',
-            'maxTime': '{ATTENDANCE_END}',
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-
         var absenceCounter = $('[data-attendance-count]');
         var absenceChecks  = $('[data-attendance-absence]');
         absenceChecks.on('change', function() {
@@ -60,6 +48,12 @@
     });
 </script>
 <!-- END custom_head -->
+
+<datalist id="attendance-time-steps">
+    <!-- BEGIN attendance_time_step -->
+    <option value="{TIME_STEP}">{TIME_STEP}</option>
+    <!-- END attendance_time_step -->
+</datalist>
 
 <div class="row">
     <div class="small-12 columns">
@@ -124,14 +118,24 @@
                             </div>
                         </th>
                         <td class="hide-for-small">
-                            <div class="timepick">
-                                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' data-timepicker value="{STUDENT_ARRIVAL_TIME}" />
-                            </div>
+                            <input type='time'
+                                   list="attendance-time-steps"
+                                   size="8"
+                                   min="{ATTENDANCE_START_FORM_VALUE}"
+                                   max="{ATTENDANCE_END_FORM_VALUE}"
+                                   name='LateArrivalTime[]'
+                                   value="{STUDENT_ARRIVAL_TIME}"
+                            />
                         </td>
                         <td class="hide-for-small">
-                            <div class="timepick">
-                                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' data-timepicker value="{STUDENT_DEPT_TIME}" />
-                            </div>
+                            <input type='time'
+                                   list="attendance-time-steps"
+                                   size="8"
+                                   min="{ATTENDANCE_START_FORM_VALUE}"
+                                   max="{ATTENDANCE_END_FORM_VALUE}"
+                                   name='EarlyDepartureTime[]'
+                                   value="{STUDENT_DEPT_TIME}"
+                            />
                         </td>
                         <td class="hide-for-small">
                             <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]' data-absence-type="{STUDENT_SYNERGY_ID}">

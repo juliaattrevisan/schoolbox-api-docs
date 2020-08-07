@@ -69,6 +69,7 @@ $classCampus = empty($classCampus) ? null : $classCampus;
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
+$this->setBlock(TEMPLATE_content, 'attendance_time_step', 'attendance_time_step_block');
 $this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
 $this->setBlock(TEMPLATE_content, 'class_list_link', 'class_list_link_block');
 
@@ -165,15 +166,33 @@ $startTime   = $definition['start'][$firstPeriodNumber];
 $endTime     = $definition['end'][$lastPeriodNumber];
 $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
 
+
+
 if ($class) {
 
-    // Cosmetic makeup for the masses
+    // Set up attendance time steps
+    // Steps: 5min
+    $inputTimeFormat  = 'g:ia';
+    $outputTimeFormat = 'H:i';
+    $timeStep         = 5;
+    $startTimeObject  = new Alaress_Date_Format($startTime, $inputTimeFormat);
+    $timeObject       = clone $startTimeObject;
+    $endTimeObject    = new Alaress_Date_Format($endTime, $inputTimeFormat);
+    while ($timeObject->lte($endTimeObject)) {
+        $this->setVar('TIME_STEP', $timeObject->getUsingFormat($outputTimeFormat));
+        $this->parse('attendance_time_step_block', 'attendance_time_step', true);
+        $timeObject = $timeObject->addMinutes($timeStep);
+    }
 
+
+    // Cosmetic makeup for the masses
     $this->setVar([
         'FILETYPE' => $fileType,
         'CLASS_CODE' => $class['ClassCampus'] ? $class['ClassCampus'] . '/' . $class['ClassCode'] : $class['ClassCode'],
         'ATTENDANCE_START' => $startTime,
         'ATTENDANCE_END' => $endTime,
+        'ATTENDANCE_START_FORM_VALUE' => $startTimeObject->getUsingFormat($outputTimeFormat),
+        'ATTENDANCE_END_FORM_VALUE' => $endTimeObject->getUsingFormat($outputTimeFormat),
         'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
         'ATTENDANCE_DAY' => $timetableDay,
         'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
