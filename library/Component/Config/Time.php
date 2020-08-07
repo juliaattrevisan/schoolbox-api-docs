@@ -1,5 +1,6 @@
 <?php
 /**
+ * @deprecated No components use this configuration anymore
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
