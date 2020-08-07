@@ -79,7 +79,7 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
         /**
          * Props.
          * Immutable props that were passed to this component, usually via twig, in our setup.
-         * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
+         * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
          */
         props: [
         ],
