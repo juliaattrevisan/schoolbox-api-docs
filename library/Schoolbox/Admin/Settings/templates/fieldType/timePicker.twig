@@ -2,6 +2,10 @@
     name:          string
     value:         string
 #}
-<div class="timepick">
-    <input type="text" class="ui-timepicker-input" name="{{ name }}" value="{{ value }}" {{ required ? 'required ' }}data-timepicker  {% if not editable %}disabled="disabled"{% endif %} />
-</div>
+<input type="time"
+       list="time-steps"
+       name="{{ name }}"
+       value="{{ value }}"
+       {{ required ? 'required ' }}
+       {% if not editable %}disabled="disabled"{% endif %}
+/>
