@@ -157,6 +157,6 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
 
 ```
 
-Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser.
+Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser. Data is produced by a highly-cohesive decoupled class which can be both unit tested and used in a different context (e.g. phplib/twig instead of vue) without having to copypaste a lot.
 
 > Don't forget to dress it up so it looks nice by using our regular styles and so on.
