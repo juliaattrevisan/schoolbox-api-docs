@@ -72,18 +72,14 @@ try {
     $config = $kernel->get('config');
     if ($fileSystem instanceof FilesystemInterface &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
-        $config->get('otfs_image_s3_presigned_urls_enabled')
+        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
 
         $preSignedUrlService = new PreSignedUrlService($config);
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
+            $storage,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            '',
-            ($storage->getMime()) ?: 'application/octet-stream',
-            $storage->getPath(),
-            $storage->getBasename(),
-            'private',
             $size
         );
 

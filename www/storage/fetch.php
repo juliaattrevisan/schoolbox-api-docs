@@ -9,6 +9,7 @@
 
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -31,16 +32,15 @@ try {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 
-            if ($config->get('otfs_s3_presigned_urls_enabled')) {
+            if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService = new PreSignedUrlService($config);
 
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
+                    $resource,
                     Alaress_Date_Format::now()->addDays(1),
-                    $attachmentType,
-                    $contentType,
-                    $resource->getPath(),
-                    $basename,
-                    $cacheControl
+                    null,
+                    $cacheControl,
+                    $attachmentType
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);
