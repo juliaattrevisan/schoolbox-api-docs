@@ -374,33 +374,33 @@ class DataSource
                 if ($feedbackUser->isDeleted()) {
                     continue;
                 }
-                try {
-                    $participant = $assessment->getParticipant($feedbackUser);
-                } catch (UnexpectedValueException $e) {
-                    throw new DomainException($e);
-                }
-                if ($participant->isExcluded()) {
-                    // Don't load interactions for excluded participants.
-                    continue;
-                }
-                $participant->getAllFeedbacks()->add($feedback);
 
-                // Feedbacks may have a stub response.
-                // If so, use it to find the actual response, and associate them together.
-                // (Assume that the stub response lives in the same assessment!)
-                $stubResponse = $feedback->getResponse();
-                if ($stubResponse && $stubResponse->getId()) {
-                    $stubResponseId = $stubResponse->getId();
+                $participant = $assessment->getParticipantIfExtant($feedbackUser);
+                if ($participant && !$participant->isExcluded()) {
+                    $participant->getAllFeedbacks()->add($feedback);
 
-                    foreach ($participant->getAllResponses() as $response) {
-                        // For now assume that the types of response and feedback match
-                        if ($stubResponseId == $response->getId()) {
-                            $response->getAllFeedback()->add($feedback);
-                            $feedback->setResponse($response);
-                            break;
+                    // Feedbacks may have a stub response.
+                    // If so, use it to find the actual response, and associate them together.
+                    // (Assume that the stub response lives in the same assessment!)
+                    $stubResponse = $feedback->getResponse();
+                    if ($stubResponse && $stubResponse->getId()) {
+                        $stubResponseId = $stubResponse->getId();
+
+                        foreach ($participant->getAllResponses() as $response) {
+                            // For now assume that the types of response and feedback match
+                            if ($stubResponseId == $response->getId()) {
+                                $response->getAllFeedback()->add($feedback);
+                                $feedback->setResponse($response);
+                                break;
+                            }
                         }
                     }
                 }
+
+                // Otherwise: `$feedbackUser` is either excluded or not a
+                // participant at all
+                // As above in `loadResponses`: this isn't a fatal error, just
+                // ignore that the user isn't a participant
             }
         }
     }
