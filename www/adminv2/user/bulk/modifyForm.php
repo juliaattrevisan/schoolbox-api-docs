@@ -44,6 +44,7 @@ if (isset($_POST['updateUsers'])) {
     $userMapper->log($message);
 
     $modified = (new \Schoolbox\Admin\User\BulkUpdater(
+        $_SESSION['user'],
         $userMapper,
         $userIds,
         $_POST['apply_campus'],

@@ -8,7 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\User;
 
 use Alaress\Database\Wrapper\Db2\PDOStatement;
+use PDOException;
 use Schoolbox\Collection;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -29,6 +31,14 @@ class BulkUpdater
      * hardcoded value that causes you to leave this value unchanged
      */
     private const UNCHANGED = -1;
+
+
+    /**
+     * The currently logged-in user
+     *
+     * @var User
+     */
+    private $sessionUser;
 
 
     /**
@@ -145,8 +155,25 @@ class BulkUpdater
 
 
     /**
+     * A list of (id, fullname) tuples, for logging
+     *
+     * @var array
+     */
+    private $lookup;
+
+
+    /**
+     * A list of log messages
+     *
+     * @var array
+     */
+    private $messages = [];
+
+
+    /**
      * BulkUpdater constructor.
      *
+     * @param User       $sessionUser
      * @param UserMapper $userMapper
      * @param array      $userIds
      * @param array      $campusIds
@@ -163,6 +190,7 @@ class BulkUpdater
      * @param int        $displayGradeGraph
      */
     public function __construct(
+        User $sessionUser,
         UserMapper $userMapper,
         array $userIds,
         array $campusIds,
@@ -178,6 +206,7 @@ class BulkUpdater
         string $position,
         int $displayGradeGraph
     ) {
+        $this->sessionUser = $sessionUser;
         $this->userMapper = $userMapper;
 
         /* Cast ints to each of these id sets
@@ -223,15 +252,31 @@ class BulkUpdater
          */
         $updated = false;
 
+        /* Gather a set of ids and cast them to ints
+         * Implode them into a csv for a WHERE IN clause
+         */
+        $userIds = implode(',', $this->userIds);
+
+        /* Prepare user lookup
+         * We log messages to the screen, and we need a person's full name here
+         */
+        $this->lookup = $this->prepareLookup($userIds);
+
         /* Set up prepared statements
          */
-        $this->prepareStatements();
+        $this->prepareStatements($userIds);
 
         /* Execute the primary query, which is UPDATE user SET ... WHERE id IN ()
          * That updates the scalars for all selected users in one mega query
          */
         if (\count($this->userUpdateParams)) {
             $this->userUpdateStatement->execute($this->userUpdateParams);
+
+            /* Log the users we brutally updated
+             */
+            foreach ($this->userIds as $userId) {
+                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified user details for {$this->lookup[$userId]} ({$userId})";
+            }
 
             $updated = true;
         }
@@ -252,11 +297,28 @@ class BulkUpdater
 
                 /* TODO Should updating a user's campus also cause the user.updated_at field to change?
                  *  Not sure what users are expecting/how they're interpreting that usage
-                 *  It costs another set of db queries anyway, so I left it out for now
+                 *
+                 * TODO There are three options:
+                 *  1. Update every row specially, for highest accuracy down to the second
+                 *     That costs n(userIds) individual queries, which is horribly expensive but most accurate
+                 *  2. Change updated_at to be the time when the updater successfully finished running
+                 *     This costs one, maybe two, query; but it means everyone will look like they got
+                 *     updated at exactly the same time (not as accurate, but probably best bang for buck)
+                 *  3. updated_at remains unchanged (lowest accuracy)
                  */
+
+                /* Log the users we brutally updated en-masse
+                 */
+                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$this->lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
             }
 
             $updated = true;
+        }
+
+        /* Log messages to this userMapper log output thing
+         */
+        foreach ($this->messages as $message) {
+            $this->userMapper->log($message);
         }
 
         /* If user data was changed (either scalars or campus assignations)
@@ -272,14 +334,38 @@ class BulkUpdater
 
 
     /**
-     * Set up prepared statements
+     * Get a lookup of (id, fullname) tuples
+     *
+     * @param string $userIds
+     * @return array
+     * @throws PDOException
      */
-    private function prepareStatements(): void
+    private function prepareLookup(string $userIds): array
     {
-        /* Gather a set of ids and cast them to ints
-         * Implode them into a csv for a WHERE IN clause
-         */
-        $userIds = implode(',', $this->userIds);
+        $statement = $this->userMapper->getDatabase()->prepare("
+            SELECT id, firstname, lastname FROM `user`
+            WHERE id IN ({$userIds})"
+        );
+
+        $statement->execute();
+
+        $lookup = [];
+
+        foreach ($statement as $row) {
+            $lookup[$row['id']] = "{$row['firstname']} {$row['lastname']}";
+        }
+
+        return $lookup;
+    }
+
+
+    /**
+     * Set up prepared statements
+     *
+     * @param string $userIds
+     */
+    private function prepareStatements(string $userIds): void
+    {
 
         /* Prepared Statements ftw
          *   Campus Deleter
