@@ -285,16 +285,17 @@ class BulkUpdater
         if (\count($this->campusParams)) {
             $this->campusDeleteStatement->execute();
 
-            /* TODO Should updating a user's campus also cause the user.updated_at field to change?
-             *  Not sure what users are expecting/how they're interpreting that usage
+            /* Should updating a user's campus also cause the user.updated_at field to change?
              *
-             * TODO There are three options:
+             * There were three options:
              *  1. Update every row specially, for highest accuracy down to the second
              *     That costs n(userIds) individual queries, which is horribly expensive but most accurate
              *  2. Change updated_at to be the time when the updater successfully finished running
              *     This costs one, maybe two, query; but it means everyone will look like they got
              *     updated at exactly the same time (not as accurate, but probably best bang for buck)
              *  3. updated_at remains unchanged (lowest accuracy)
+             *
+             * We choze (2)
              */
             $this->campusInsertStatement->execute();
 
@@ -318,6 +319,18 @@ class BulkUpdater
          * despite being provided vars
          */
         if ($updated) {
+
+            /* Update user.updated at to be whatever the time is, for all the userIds we were given
+             */
+            $updatedAtStatement = $this->userBulkMapper->getDatabase()->prepare("
+                UPDATE `user` SET updated_at = :currentTime
+                WHERE id IN ({$userIds})
+            ");
+
+            $updatedAtStatement->execute([
+                'currentTime' => \Alaress_Date_Format::now()->getDatabase()
+            ]);
+
             return new Collection($this->userIds);
         }
 
