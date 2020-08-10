@@ -351,14 +351,21 @@ class BulkUpdater
             $this->userUpdateParams['displayGradeGraph'] = $this->displayGradeGraph;
         }
 
-        $userUpdateStatementPlaceholders = implode(",\n", $updatePlaceholder);
+        /* Set updated_at field too, if required
+         */
+        if (\count($updatePlaceholder)) {
+            $updatePlaceholder[] = 'updated_at = :updatedAt';
+            $this->userUpdateParams['updatedAt'] = \Alaress_Date_Format::now()->getDatabase();
 
-        $query = "
-            UPDATE `user`
-            SET {$userUpdateStatementPlaceholders}
-            WHERE id IN ({$userIds})
-        ";
+            $userUpdateStatementPlaceholders = implode(",\n", $updatePlaceholder);
 
-        $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
+            $query = "
+                UPDATE `user`
+                SET {$userUpdateStatementPlaceholders}
+                WHERE id IN ({$userIds})
+            ";
+
+            $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
+        }
     }
 }
