@@ -112,7 +112,9 @@ class Sync extends BaseSync implements ISync
                     RTRIM(s.surname)         AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
-                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = {$addressNumber[$i]}
+                    ON p.par_code = pa.par_code
+                    AND p.cmpy_code = pa.cmpy_code
+                    AND pa.add_num IN ('1', {$addressNumber[$i]})
                 LEFT JOIN pia_sfaccess AS sf
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
