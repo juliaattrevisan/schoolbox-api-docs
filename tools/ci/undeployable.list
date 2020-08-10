@@ -1,10 +1,13 @@
 behat.yml
 bower.json
+codeception.dist.yml
 composer.*
 Gruntfile.js
 node_modules
 package.json
+phpstan*
 phpunit.xml
+puppet-apply.sh
 README.md
 *.log
 sql/vagrant.sql
@@ -24,5 +27,4 @@ www/javascript/components/*/node_modules
 Gemfile*
 .bowerrc
 npm-shrinkwrap.json
-phpstan_run.sh
 .env
