@@ -46,11 +46,19 @@ then
 	exit 1;
 fi
 
+echo "Building SASS into CSS files";
+tools/pkg-build-sass.sh --sass;
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
+
 echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
 echo "Creating artifact";
-tar czf $initialdir/built-artifacts/"$branch"-bower.tar.gz www/javascript/components;
+tar czf $initialdir/built-artifacts/"$branch"-bower.tar.gz www/javascript/components www/css/core/*.css;
 
 echo "Artifact List: `readlink -f $initialdir/built-artifacts/`";
 ls -lhR $initialdir/built-artifacts/;
