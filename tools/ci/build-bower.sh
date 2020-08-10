@@ -58,7 +58,7 @@ echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
 echo "Creating artifact";
-tar czf $initialdir/built-artifacts/"$branch"-bower.tar.gz www/javascript/components www/css/core/chrome-foundation.css
+tar czf $initialdir/built-artifacts/"$branch"-bower.tar.gz www/javascript/components www/css/core/*.css
 
 echo "Artifact List: `readlink -f $initialdir/built-artifacts/`";
 ls -lhR $initialdir/built-artifacts/;
