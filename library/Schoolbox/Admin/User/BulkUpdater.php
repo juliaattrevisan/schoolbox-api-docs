@@ -156,14 +156,6 @@ class BulkUpdater
 
 
     /**
-     * A list of (id, fullname) tuples, for logging
-     *
-     * @var array
-     */
-    private $lookup;
-
-
-    /**
      * A list of log messages
      *
      * @var array
@@ -261,7 +253,7 @@ class BulkUpdater
         /* Prepare user lookup
          * We log messages to the screen, and we need a person's full name here
          */
-        $this->lookup = $this->prepareLookup($userIds);
+        $lookup = $this->prepareLookup($userIds);
 
         /* Set up prepared statements
          */
@@ -276,7 +268,7 @@ class BulkUpdater
             /* Log the users we brutally updated
              */
             foreach ($this->userIds as $userId) {
-                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified user details for {$this->lookup[$userId]} ({$userId})";
+                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified user details for {$lookup[$userId]} ({$userId})";
             }
 
             $updated = true;
@@ -309,7 +301,7 @@ class BulkUpdater
             /* Log the users we brutally updated en-masse
              */
             foreach ($this->campusParams as $campusParam) {
-                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$this->lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
+                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
             }
 
             $updated = true;
