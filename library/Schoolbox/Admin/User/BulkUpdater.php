@@ -263,61 +263,60 @@ class BulkUpdater
         /* Collate SET commands for each of the scalar params provided
          */
         $updatePlaceholder = [];
-        $updateParams = [];
 
         if ('' !== $this->year) {
             $updatePlaceholder[] = 'year = :year';
-            $updateParams['year'] = $this->year;
+            $this->userUpdateParams['year'] = $this->year;
         }
 
         if ('' !== $this->position) {
             $updatePlaceholder[] = 'position_title = :position';
-            $updateParams['position'] = $this->position;
+            $this->userUpdateParams['position'] = $this->position;
         }
 
         if ($this->role !== self::UNCHANGED) {
             $updatePlaceholder[] = 'group_id = :role';
-            $updateParams['role'] = $this->role;
+            $this->userUpdateParams['role'] = $this->role;
         }
 
         if ($this->eportfolioEnabled !== self::UNCHANGED) {
             $updatePlaceholder[] = 'eportfolio_enabled = :eportfolioEnabled';
-            $updateParams['eportfolioEnabled'] = $this->eportfolioEnabled;
+            $this->userUpdateParams['eportfolioEnabled'] = $this->eportfolioEnabled;
         }
 
         if ($this->emailFromUsername !== self::UNCHANGED) {
             $updatePlaceholder[] = 'local_email = :emailFromUsername';
-            $updateParams['emailFromUsername'] = $this->emailFromUsername;
+            $this->userUpdateParams['emailFromUsername'] = $this->emailFromUsername;
         }
 
         if ($this->externalMailClient !== self::UNCHANGED) {
             $updatePlaceholder[] = 'mail_handler = :externalMailClient';
-            $updateParams['externalMailClient'] = $this->externalMailClient;
+            $this->userUpdateParams['externalMailClient'] = $this->externalMailClient;
         }
 
         if ($this->webmail !== self::UNCHANGED) {
             $updatePlaceholder[] = 'webmail = :webmail';
-            $updateParams['webmail'] = $this->webmail;
+            $this->userUpdateParams['webmail'] = $this->webmail;
         }
 
         if ($this->accountEnabled !== self::UNCHANGED) {
             $updatePlaceholder[] = 'enabled = :accountEnabled';
-            $updateParams['accountEnabled'] = $this->accountEnabled;
+            $this->userUpdateParams['accountEnabled'] = $this->accountEnabled;
         }
 
         if ($this->hideContacts !== self::UNCHANGED) {
             $updatePlaceholder[] = 'hide_contacts = :hideContacts';
-            $updateParams['hideContacts'] = $this->hideContacts;
+            $this->userUpdateParams['hideContacts'] = $this->hideContacts;
         }
 
         if ($this->hideTimetable !== self::UNCHANGED) {
             $updatePlaceholder[] = 'hide_timetable = :hideTimetable';
-            $updateParams['hideTimetable'] = $this->hideTimetable;
+            $this->userUpdateParams['hideTimetable'] = $this->hideTimetable;
         }
 
         if ($this->displayGradeGraph !== self::UNCHANGED) {
             $updatePlaceholder[] = 'display_grade_graph = :displayGradeGraph';
-            $updateParams['displayGradeGraph'] = $this->displayGradeGraph;
+            $this->userUpdateParams['displayGradeGraph'] = $this->displayGradeGraph;
         }
 
         $userUpdateStatementPlaceholders = implode(",\n", $updatePlaceholder);
@@ -329,6 +328,5 @@ class BulkUpdater
         ";
 
         $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
-        $this->userUpdateParams = $updateParams;
     }
 }
