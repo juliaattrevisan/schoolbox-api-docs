@@ -196,16 +196,34 @@ class FileNester extends CliTool\App
         $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
         $this->bucketName = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
 
-        $this->getLogger()->debug(sprintf("OTFS Adapter: '%s'", $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER)));
+        $otfsAdapter = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
+        $this->getLogger()->debug(sprintf("OTFS Adapter: '%s'", $otfsAdapter));
         $this->getLogger()->debug("S3 Access Key: '$s3AccessKey'");
         $this->getLogger()->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
         $this->getLogger()->debug("S3 Region: '$s3Region'");
         $this->getLogger()->debug("S3 Version: '$s3Version'");
         $this->getLogger()->debug("S3 Bucket: '$this->bucketName'");
 
-        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($this->bucketName)) {
-            $this->getLogger()->error("Error: S3 config appears invalid");
+        $usingS3   = $otfsAdapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3;
+        $badConfig = empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($this->bucketName);
+
+        // Using S3 but invalid config. Error out.
+        if ($usingS3 && $badConfig) {
+            $this->getLogger()->error("S3 config appears invalid");
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+        }
+        // Using S3 and good config, continue
+        if ($usingS3 && !$badConfig) {
+            $this->getLogger()->notice("S3 config appears valid");
+        }
+        // Not using S3, invalid config. Tool probably not relevant, just exit.
+        if (!$usingS3 && $badConfig) {
+            $this->getLogger()->notice("S3 config appears invalid, but not using S3, exiting");
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
+        }
+        // Not using S3, but S3 config present. Assume files exists in both places (eg Vagrant case)
+        if (!$usingS3 && !$badConfig) {
+            $this->getLogger()->warning("S3 config appears valid, but not using S3, connection error probably ok to ignore");
         }
 
         $this->s3Client = new S3Client([
