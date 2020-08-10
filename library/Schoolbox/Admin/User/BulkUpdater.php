@@ -201,6 +201,12 @@ class BulkUpdater
     public function update(): Collection
     {
 
+        /* No users to change? Nothing to do
+         */
+        if (!\count($this->userIds)) {
+            return new Collection();
+        }
+
         /* Set up prepared statements
          */
         $this->prepareStatements();
