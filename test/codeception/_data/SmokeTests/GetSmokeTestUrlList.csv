@@ -35,9 +35,22 @@ Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messa
 Admin,Configure oAuth providers,https://vagrant.dev.schoolbox.cloud/adminv2/oauth
 Admin,Review registered push apps,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush
 Admin,Review role list,https://vagrant.dev.schoolbox.cloud/adminv2/lists
+Admin,Review house list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house
+Admin,Review residential houses,https://vagrant.dev.schoolbox.cloud/adminv2/lists/residential-house
+Admin,Review drives list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/webdav
+Admin,Review campus list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/campus
+Admin,Review event types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/event-type
 Admin,Review news topics,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news-topic
+Admin,Review submission types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/submission-type
+Admin,Review submission states,https://vagrant.dev.schoolbox.cloud/adminv2/lists/submission-errors
+Admin,Review components,https://vagrant.dev.schoolbox.cloud/adminv2/lists/component-definition
 Admin,Review timetable colours,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour
 Admin,Review pastoral types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type
+Admin,Review pastoral subtypes,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category
+Admin,Review pastoral sis docs,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification
+Admin,Review pastoral severity,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity
+Admin,Review pastoral tags,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags
+Admin,Review year levels,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels
 Admin,Setup LTI provider,https://vagrant.dev.schoolbox.cloud/adminv2/lti
 Admin,View storage usage,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all
 Admin,Review engagement,https://vagrant.dev.schoolbox.cloud/adminv2/engagement
