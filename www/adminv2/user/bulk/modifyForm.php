@@ -43,7 +43,7 @@ if (isset($_POST['updateUsers'])) {
     $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
     $userMapper->log($message);
 
-    (new \Schoolbox\Admin\User\BulkUpdater(
+    $modified = (new \Schoolbox\Admin\User\BulkUpdater(
         $userMapper,
         $userIds,
         $_POST['apply_campus'],

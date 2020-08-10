@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\User;
 
 use Alaress\Database\Wrapper\Db2\PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 
 class BulkUpdater
@@ -193,7 +194,7 @@ class BulkUpdater
     /**
      * Update users
      */
-    public function update(): int
+    public function update(): Collection
     {
 
         /* Set up prepared statements
@@ -203,7 +204,9 @@ class BulkUpdater
         /* Execute the primary query, which is UPDATE user SET ... WHERE id IN ()
          * That updates the scalars for all selected users in one mega query
          */
-        $this->userUpdateStatement->execute($this->userUpdateParams);
+        if (\count($this->userUpdateParams)) {
+            $this->userUpdateStatement->execute($this->userUpdateParams);
+        }
 
         /* Iteratively execute the secondary query which updates campus involvements
          * you might be able to reduce queries further by using delete with joins
@@ -219,7 +222,7 @@ class BulkUpdater
             $this->campusInsertStatement->execute($campusParam);
         }
 
-        return \count($this->userIds);
+        return new Collection($this->userIds);
     }
 
 
@@ -239,7 +242,7 @@ class BulkUpdater
          *   One big updater
          */
         $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
-            "DELETE FROM userCampus WHERE uid IN {$userIds}"
+            "DELETE FROM userCampus WHERE uid IN ({$userIds})"
         );
 
         $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
@@ -254,7 +257,7 @@ class BulkUpdater
                 foreach ($this->campusIds as $campusId) {
                     $this->campusParams[] = [
                         'userId' => $userId,
-                        'campsuId' => $campusId
+                        'campusId' => $campusId
                     ];
                 }
             }
@@ -324,7 +327,7 @@ class BulkUpdater
         $query = "
             UPDATE `user`
             SET {$userUpdateStatementPlaceholders}
-            WHERE id IN {$userIds}
+            WHERE id IN ({$userIds})
         ";
 
         $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
