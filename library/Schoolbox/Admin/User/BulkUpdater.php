@@ -238,6 +238,11 @@ class BulkUpdater
 
             foreach ($this->campusParams as $campusParam) {
                 $this->campusInsertStatement->execute($campusParam);
+
+                /* TODO Should updating a user's campus also cause the user.updated_at field to change?
+                 *  Not sure what users are expecting/how they're interpreting that usage
+                 *  It costs another set of db queries anyway, so I left it out for now
+                 */
             }
 
             $updated = true;
@@ -247,7 +252,7 @@ class BulkUpdater
          * then report back the affected user tally; otherwise, nothing changed
          * despite being provided vars
          */
-        if ($updated){
+        if ($updated) {
             return new Collection($this->userIds);
         }
 
