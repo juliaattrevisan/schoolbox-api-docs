@@ -68,23 +68,24 @@ try {
     /* Choose a caching method to use
      */
     $key            = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
-    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(Config::get($logo));
+    $hash           = Config::get($logo);
+    if (!$hash) {
+        // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
+        throw new Exception("No hash configured for logo '$logo'");
+    }
+    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
     $fileSystem     = $resource->getFilesystem();
 
     if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 
-        if ($config->get('otfs_image_s3_presigned_urls_enabled')) {
+        if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
+                $resource,
                 Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                '',
-                ($resource->getMime()) ?: 'application/octet-stream',
-                $resource->getPath(),
-                $resource->getBasename(),
-                'private',
                 $key
             );
 

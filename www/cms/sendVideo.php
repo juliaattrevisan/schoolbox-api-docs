@@ -116,11 +116,9 @@ if (isset($type) && isset($id)) {
             $preSignedUrlService = new PreSignedUrlService($config);
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
+                $video->getStorage(),
                 Alaress_Date_Format::now()->addDays(1),
-                $mimeType,
-                $mimeType,
-                $video->getTranscodePath(),
-                $video->getStorage()->getBasename(),
+                null,
                 $cacheControl
             );
 

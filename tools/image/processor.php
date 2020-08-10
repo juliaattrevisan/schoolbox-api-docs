@@ -10,23 +10,92 @@ use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Transformation;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+// Need to fork before we open any db connection
+// We should be able to just reconnect in the child, but that's not working for some reason.
+const MAX_WORKERS = 4;                      // default maximum number of workers
+const LIMIT       = 300;                    // default maximum amount of images to be processed
+$workerCount = (int)getenv('MAX_WORKERS', true) ?: MAX_WORKERS;
+$limit       = (int)getenv('LIMIT', true) ?: LIMIT;
+if ($workerCount > $limit) {
+    $workerCount = $limit;
+}
+$workerPids = [];
+$workerIdx  = null;
+for ($i = 0; $i < $workerCount; $i++) {
+    $pid = pcntl_fork();
+    if ($pid === -1) {
+        // Unable to fork.
+        echo "[manager] Unable to start image processing workers";
+        exit(1);
+    }
+    if ($pid) {
+        // Parent Process
+        // Add new worker to the worker list and worker count for tracking
+        $workerPids[] = $pid;
+    } else {
+        // Worker Process
+        $workerPids = null;
+        $workerIdx  = $i;
+        break;
+    }
+}
 
 /**
  * CLI tool for pre-converting images to the most common formats
  */
-$app = new class extends CliTool\App
-{
-
-    private const MAX_WORKERS = 4;                      // default maximum number of workers
+$app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
     private const TIME_INTERVAL = 15;                   // default time period in minutes to look up images for processing
-    private const LIMIT = 300;                          // default maximum amount of images to be processed
-    private const SPINLOCK_WAIT_TIME = 5000;            // default spinlock wait time in microseconds
-    private const WORKER_CLEANUP_TIME = 50000;          // default wait timeout for worker cleanup in microseconds
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
+
+    // List of expected transformations that we expect for each image
+    private const EXPECTED_TRANSFORMS = [
+        'custom' => [
+            'maxsize',
+            'square64',
+            'square128',
+        ],
+        'WxH'    => [
+            [100, 100],
+            [2048, 2048],
+        ],
+    ];
+
+    /**
+     * This manager's worker's PIDs, null if a worker
+     * @var int[]|null
+     */
+    private $workerPids;
+
+    /**
+     * This worker's index, null if the manager
+     * @var int|null
+     */
+    private $workerIdx;
+
+    /**
+     * Total hashes to process across all workers
+     * @var int
+     */
+    private $limit;
+
+
+    /**
+     * @param array|null $workerPids
+     * @param int|null   $workerIdx
+     * @param int        $limit
+     */
+    public function __construct(?array $workerPids, ?int $workerIdx, int $limit)
+    {
+        $this->workerPids = $workerPids;
+        $this->workerIdx  = $workerIdx;
+        $this->limit      = $limit;
+    }
 
 
     /** @inheritdoc */
@@ -37,12 +106,166 @@ $app = new class extends CliTool\App
         ];
     }
 
+    /**
+     * Returns whether this process is the manager and not a worker
+     *
+     * @return bool
+     */
+    private function isManager(): bool
+    {
+        return $this->workerIdx === null;
+    }
+
 
     /** @inheritDoc */
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
+            $this->printHelp();
+            exit;
+        }
+        $this->isManager()
+            ? $this->runManager($this->workerPids)
+            : $this->runWorkerCode($this->workerIdx, $this->limit);
+    }
+
+
+    /**
+     * Runs the manager.
+     *
+     * @param int[] $workerPids
+     */
+    private function runManager(array $workerPids): void
+    {
+        // Just waits for each child to finish.
+        foreach ($workerPids as $workerPid) {
+            pcntl_waitpid($workerPid, $status);
+        }
+        $this->getLogger()->info('[manager] so long, and thanks for all the fish');
+    }
+
+
+    /**
+     * Runs the worker
+     * @param int $workerIdx
+     * @param int $limit
+     */
+    private function runWorkerCode(int $workerIdx, int $limit): void
+    {
+        $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: self::TIME_INTERVAL;
+
+        $hashList      = $this->getHashList($timeInterval, $limit, $workerIdx);
+        $hashObjects   = Storage\Mapper::getInstance()->findByColumn('hash', $hashList);
+        $filesFound    = $hashObjects->getPropertyValues('hash');
+        $filesNotFound = array_diff($hashList, $filesFound);
+
+        foreach ($filesNotFound as $hash) {
+            $this->getLogger()->error(sprintf("[%s] %s: %s", posix_getpid(), $hash, 'File not found'));
+        }
+
+        foreach ($hashObjects as $hashObject) {
+            $this->processHashObject($hashObject);
+        }
+    }
+
+
+    /**
+     * Worker process function
+     *
+     * @param Storage\Model $hashObject
+     */
+    private function processHashObject(Storage\Model $hashObject): void
+    {
+        $hash = $hashObject->getHash();
+        $this->getLogger()->debug(sprintf("[%d] Processing: %s", posix_getpid(), $hash));
+
+        // Check if each transformation size exists cached for this image, otherwise create it
+        foreach (self::EXPECTED_TRANSFORMS as $transformListType => $transformList) {
+            foreach ($transformList as $transformSize) {
+                try {
+                    if ($transformListType === 'WxH') {
+                        // Random Width x Height transformations
+                        $transform     = new Transformation\MyImage((int)$transformSize[0], (int)$transformSize[1]);
+                        $transformSize = implode('x', $transformSize);
+                        $cache         = new Image\Cache\Storage($hashObject, $transformSize);
+                        $image         = new Image\Processor\Freeform(
+                            $cache,
+                            $transform,
+                            new Imagine\Filetype\Factory(),
+                            new Imagine\Processor\Strategy\Factory()
+                        );
+                    } else {
+                        // Preset transformations
+                        $transform = new Image\Transformation\Storage();
+                        $cache     = new Image\Cache\Storage($hashObject, $transformSize);
+                        $image     = new Image\Processor\Standard(
+                            $cache,
+                            $transform,
+                            new Imagine\Filetype\Factory(),
+                            new Imagine\Processor\Strategy\Factory()
+                        );
+                    }
+                    $image->load();
+
+                    if (!$image->isCached()) {
+                        $image->save();
+                        $this->getLogger()->info(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, 'success'));
+                    } else {
+                        $this->getLogger()->debug(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, 'already cached'));
+                    }
+                } catch (Exception $e) {
+                    $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, $e->getMessage()));
+                    $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, $e->getTraceAsString()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a list of hashes to process, exits if none found
+     *
+     * @param int $timeInterval
+     * @param int $limit
+     * @param int $workerIdx
+     * @return string[]
+     */
+    private function getHashList(int $timeInterval, int $limit, int $workerIdx): array
+    {
+        // Retrieve list of images uploaded within the 15 minutes up to a max of 300
+        $query = "
+            SELECT `hash` FROM `storage` s
+            JOIN allowedFileExtension afe ON s.ext = afe.extension
+            JOIN allowedFileTypes aft
+                ON afe.fileTypeID = aft.fileTypeID
+                AND aft.mime LIKE 'image%'
+                AND aft.mime NOT LIKE 'image%svg%'
+            WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
+            ORDER BY s.uploaded_on
+            LIMIT 0, {$limit}";
+
+        $hashList = $this->getDatabaseInternal()->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
+        $hashList = array_filter($hashList, static function (string $hash) use ($workerIdx): bool {
+            // Select a subset of results to be processed by this worker
+            return (int)substr(base_convert($hash, 16, 10), 0, 6) % ($workerIdx + 1) === 0;
+        });
+        if (!count($hashList)) {
+            $this->getLogger()->info(sprintf('[%s] No images found for processing', posix_getpid()));
+            exit(0);
+        }
+        return $hashList;
+    }
+
+
+    /**
+     * Prints help message to STDOUT
+     */
+    private function printHelp(): void
+    {
+        // Only the manager prints help
+        if (!$this->isManager()) {
+            return;
+        }
+        echo <<<HELP
 
 Convert image files into their commonly-accessed transforms. This preconversion trades time for storage
 so that first-time-accesses don't require an on-demand transform which can sometimes slow the system
@@ -52,175 +275,6 @@ Usage: processor.php
 
 
 HELP;
-            exit;
-        }
-
-
-        // Override default values with ENV variables
-        $maxWorkers   = (int)getenv('MAX_WORKERS', true) ?: self::MAX_WORKERS;
-        $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: self::TIME_INTERVAL;
-        $limit        = (int)getenv('LIMIT', true) ?: self::LIMIT;
-
-        $logger = $this->getLogger();
-        $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));
-
-        // List of expected transformations that we expect for each image
-        $expectedTransform = [
-            'custom' => [
-                'maxsize',
-                'square64',
-                'square128',
-            ],
-            'WxH'    => [
-                [100, 100],
-                [2048, 2048],
-            ],
-        ];
-
-        // Retrieve list of images uploaded within the 15 minutes up to a max of 300
-        $hashList = [];
-        $db       = $this->getDatabaseInternal();
-        $query    = "
-    SELECT `hash` FROM `storage` s
-    JOIN allowedFileExtension afe ON s.ext = afe.extension
-    JOIN allowedFileTypes aft
-        ON afe.fileTypeID = aft.fileTypeID
-        AND aft.mime LIKE 'image%'
-        AND aft.mime NOT LIKE 'image%svg%'
-    WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
-    ORDER BY s.uploaded_on
-    LIMIT 0, {$limit}
-";
-        $result   = $db->executeQuery($query)->fetchAll();
-        if (is_iterable($result) && count($result)) {
-            foreach ($result as $row) {
-                $hashList[] = $row['hash'];
-            }
-        } else {
-            $logger->info('[manager] No images found for processing');
-            exit(0);
-        }
-
-        $hashObjects   = \Schoolbox\Resource\Storage\Mapper::getInstance()
-                                                           ->findByColumn('hash', $hashList)
-                                                           ->indexBy('hash');
-        $filesFound    = $hashObjects->getPropertyValues('hash');
-        $filesNotFound = array_diff($hashList, $filesFound);
-
-        if (count($filesNotFound)) {
-            foreach ($filesNotFound as $hash) {
-                $logger->error(sprintf("[manager] %s: %s", $hash, 'File not found'));
-                unset($hashList[$hash]);
-            }
-        }
-
-        $logger->info(sprintf('[manager] Hashes in queue: %d', count($hashList)));
-        $hashItem = 0;
-        $workers  = new class
-        {
-
-            public $count = 0;
-            public $list = [];
-        };
-        while (count($hashList) > 0) {
-            $this->workerCleanup($workers);
-            if ($workers->count >= $maxWorkers) {
-                usleep(self::SPINLOCK_WAIT_TIME);
-                continue;
-            }
-
-            $hash       = $hashList[$hashItem];
-            $hashObject = $hashObjects->getOffset($hash);
-
-            $pid = pcntl_fork();
-            if ($pid === -1) {
-                // Unable to fork.
-                $logger->error("[manager] Unable to start image processing workers");
-                exit(1);
-            }
-            if ($pid) {
-                // Parent Process
-                // Add new worker to the worker list and worker count for tracking
-                $workers->list[$hash] = $pid;
-                $workers->count++;
-
-                // Remove hash from the list as it has been sent for processing
-                unset($hashList[$hashItem]);
-
-                // Set next piece of work in the hashList array
-                $hashItem++;
-
-                usleep(self::SPINLOCK_WAIT_TIME);
-            } else {
-                // Start of Worker Process
-                $workerId = posix_getpid();
-                $logger->debug(sprintf("[%d] Processing: %s", $workerId, $hash));
-
-                // Check if each transformation size exists cached for this image, otherwise create it
-                foreach ($expectedTransform as $transformListType => $transformList) {
-                    foreach ($transformList as $transformSize) {
-                        try {
-                            if ($transformListType === 'WxH') {
-                                // Random Width x Height transformations
-                                $transform     = new Transformation\MyImage((int)$transformSize[0], (int)$transformSize[1]);
-                                $transformSize = implode($transformSize, 'x');
-                                $cache         = new Image\Cache\Storage($hashObject, $transformSize);
-                                $image         = new Image\Processor\Freeform(
-                                    $cache,
-                                    $transform,
-                                    new Imagine\Filetype\Factory(),
-                                    new Imagine\Processor\Strategy\Factory()
-                                );
-                            } else {
-                                // Preset transformations
-                                $transform = new Image\Transformation\Storage();
-                                $cache     = new Image\Cache\Storage($hashObject, $transformSize);
-                                $image     = new Image\Processor\Standard(
-                                    $cache,
-                                    $transform,
-                                    new Imagine\Filetype\Factory(),
-                                    new Imagine\Processor\Strategy\Factory()
-                                );
-                            }
-                            $image->load();
-
-                            if (!$image->isCached()) {
-                                $image->save();
-                                $logger->info(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, 'success'));
-                            } else {
-                                $logger->debug(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, 'already cached'));
-                            }
-                        } catch (Exception $e) {
-                            $logger->error(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, $e->getMessage()));
-                            $logger->error(sprintf("[%d] %s: %s", $workerId, $hash . '-' . $transformSize, $e->getTraceAsString()));
-                        }
-                    }
-                }
-                exit(0);
-            }
-        }
-
-        while ($workers->count > 0) {
-            $this->workerCleanup($workers);
-            usleep(self::WORKER_CLEANUP_TIME);
-        }
-        $logger->info('[manager] so long, and thanks for all the fish');
-    }
-
-
-    private function workerCleanup($workers): void
-    {
-        // Check if worker processes are still running, if not remove from workerList
-        while (pcntl_wait($status, WNOHANG or WUNTRACED) > 0) {
-            usleep(self::SPINLOCK_WAIT_TIME);
-        }
-        while (list($hash, $val) = each($workers->list)) {
-            if (!posix_kill($val, 0)) {
-                unset($workers->list[$hash]);
-                $workers->count--;
-            }
-        }
-        $workers->list = array_values($workers->list);
     }
 };
 

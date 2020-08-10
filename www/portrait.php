@@ -42,6 +42,7 @@ try {
     }
 } catch (\Schoolbox\Mapper\Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    exit;
 }
 
 try {
@@ -58,20 +59,13 @@ try {
 
     if ($fileSystem instanceof Filesystem &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
-        $config->get('otfs_image_s3_presigned_urls_enabled')
+        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
-
         $preSignedUrlService = new PreSignedUrlService($config);
-        $resource = $portrait->load();
-
         $preSignedUrlDataObject = $preSignedUrlService->generate(
+            $portrait->load(),
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-            '',
-            ($resource->getMime()) ?: 'application/octet-stream',
-            $resource->getPath(),
-            $resource->getBasename(),
-            'private',
-            $key
+            $_GET['size']
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);

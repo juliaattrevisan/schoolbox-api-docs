@@ -12,6 +12,7 @@
 use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
@@ -75,16 +76,15 @@ if (is_numeric($_GET['id'])) {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 
-        if ($config->get('otfs_s3_presigned_urls_enabled')) {
+        if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
+                $storage,
                 Alaress_Date_Format::now()->addDays(1),
-                $attachmentType,
-                $contentType,
-                $file->getPath(),
-                $basename,
-                $cacheControl
+                null,
+                $cacheControl,
+                $attachmentType
             );
 
             $preSignedUrlService->download($preSignedUrlDataObject);

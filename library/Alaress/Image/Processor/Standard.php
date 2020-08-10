@@ -11,9 +11,11 @@ namespace Alaress\Image\Processor;
 
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
+use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation\Transformation;
 use BadMethodCallException;
 use League\Flysystem;
+use Schoolbox\Resource\Storage\Transform\Mapper;
 
 class Standard extends BaseProcessor
 {
@@ -202,9 +204,7 @@ class Standard extends BaseProcessor
             header('X-Cache-Status: HIT');
         }
 
-        if (!$this->isCached() && $this->getCache()->getKey()) {
-            $this->save();
-        }
+        $this->save();
 
         $this->getFiletypeStrategy()->stream($this->getImage());
         // will exit
@@ -214,10 +214,26 @@ class Standard extends BaseProcessor
      * Saves the transformed image
      *
      * @return static
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function save()
     {
-        $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
+        if (!$this->isCached() && $this->cache->getKey()) {
+            $this->filetypeStrategy->save($this->getImage(), $this->cache->loadCache());
+        }
+
+        if ($this->cache->getKey()) {
+            /** @var Storage\Model $file */
+            $file = $this->file;
+            Mapper::getInstance()->createRecord(
+                $file->getHash(),
+                $this->cache->getKey(),
+                $this->file->getSize()
+            );
+        }
+
         return $this;
     }
 

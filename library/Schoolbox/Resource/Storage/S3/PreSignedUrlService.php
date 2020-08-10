@@ -12,6 +12,9 @@ use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Model;
+use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 
 class PreSignedUrlService
 {
@@ -44,33 +47,47 @@ class PreSignedUrlService
     }
 
     /**
+     * @param Model             $storage
      * @param AlaressDateFormat $expireAt
-     * @param string            $attachmentType
-     * @param string            $contentType
-     * @param string            $resourcePath
-     * @param string            $resourceBaseName
+     * @param string|null       $size
      * @param string            $cacheControl
-     * @param string            $size
+     * @param string            $attachmentType
      *
      * @return PreSignedUrlDataObject
      */
-    public function generate(AlaressDateFormat $expireAt,
-                             string $attachmentType,
-                             string $contentType,
-                             string $resourcePath,
-                             string $resourceBaseName,
-                             string $cacheControl,
-                             string $size = null): PreSignedUrlDataObject
+    public function generate(
+        Model $storage,
+        AlaressDateFormat $expireAt,
+        string $size = null,
+        string $cacheControl = 'private',
+        string $attachmentType = ''
+    ): PreSignedUrlDataObject
     {
-        $expires       = $expireAt->__toString(); // whatever formatting most appropriate
-        $itemPath      = ($size) ? $resourcePath . '-' . $size : $resourcePath;
-        $commandObject = $this->getObject($itemPath, $cacheControl, $attachmentType, $resourceBaseName, $contentType, $expires);
-        $url           = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
+        $expires        = $expireAt->__toString();
+        $storagePath    = $storage->getPath();
+        $itemPath       = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
 
-        return new PreSignedUrlDataObject($url, $cacheControl, $expires, $itemPath, $size);
+        $commandObject = $this->getObject(
+            $itemPath,
+            $cacheControl,
+            $attachmentType,
+            $storage->getBasename(),
+            $storage->getMime() ?: 'application/octet-stream',
+            $expires
+        );
+
+
+        $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
+
+        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $storage->getPath(), $size);
     }
 
     /**
+     * Returns whether the data object's file exists in the database.
+     *
+     * If so, we assume it exists in the FileSystem.
+     * It is much faster to check the database than the filesystem, especially for AWS S3.
+     *
      * @param PreSignedUrlDataObject $dataObject
      *
      * @return bool
@@ -79,15 +96,9 @@ class PreSignedUrlService
     {
         $size = $dataObject->getSize();
 
-        /**
-         * Add some shortcut, if size isn't provided as most likely if everything was migrated successfully
-         * the original file should exists in bucket
-         */
-        if (is_null($size) || $this->s3Client->doesObjectExist($this->bucket, $dataObject->getItemPath())) {
-            return true;
-        }
-
-        return false;
+        return $size === null
+            ? Storage\Mapper::getInstance()->countByColumn('hash', $dataObject->getHash()) > 0
+            : TransformMapper::getInstance()->checkIfRecordExists($dataObject->getHash(), $size);
     }
 
     /**
