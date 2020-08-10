@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\User;
 
+use Alaress\Database\Wrapper\Db2\PDOStatement;
 use Schoolbox\UserMapper;
 
 class BulkUpdater
@@ -102,19 +103,25 @@ class BulkUpdater
 
 
     /**
-     * @var resource
+     * @var PDOStatement
      */
     private $campusDeleteStatement;
 
 
     /**
-     * @var resource
+     * @var PDOStatement
      */
     private $campusInsertStatement;
 
 
     /**
-     * @var resource
+     * @var array
+     */
+    private $campusParams = [];
+
+
+    /**
+     * @var PDOStatement
      */
     private $userUpdateStatement;
 
@@ -122,7 +129,7 @@ class BulkUpdater
     /**
      * @var array
      */
-    private $userUpdateParams;
+    private $userUpdateParams = [];
 
 
     /**
@@ -193,13 +200,11 @@ class BulkUpdater
          */
         $this->prepareStatements();
 
-        /* Set up a secondary query stack for campus involvements
-         * because we have to delete/insert those specifically for each user
-         */
-
         /* Execute the primary query, which is UPDATE user SET ... WHERE id IN ()
          * That updates the scalars for all selected users in one mega query
          */
+        $this->userUpdateStatement->execute($this->userUpdateParams);
+
 
         /* Iteratively execute the secondary query which updates campus involvements
          * you might be able to reduce queries further by using delete with joins
@@ -237,6 +242,20 @@ class BulkUpdater
         $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
             'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
         );
+
+        /* Set up a secondary query stack for campus involvements
+         * because we have to delete/insert those specifically for each user
+         */
+        if (!in_array(self::UNCHANGED, $this->campusIds, false)) {
+            foreach ($this->userIds as $userId) {
+                foreach ($this->campusIds as $campusId) {
+                    $this->campusParams[] = [
+                        'userId' => $userId,
+                        'campsuId' => $campusId
+                    ];
+                }
+            }
+        }
 
         /* Collate SET commands for each of the scalar params provided
          */
