@@ -30,7 +30,10 @@ class Sync extends BaseSync implements ISync
             $params = array_merge($params, $paramsComm);
         }
 
-        $query    .= '   ORDER BY student_contact_id ASC';
+        // Let the guardian iterator use the specialized contact type
+        // (from `$this->helper->getAddNumFather/Mother()`) preferentially over
+        // the generic contact type (1).
+        $query    .= '   ORDER BY student_contact_id ASC, student_contact_type DESC';
         $iterator = $this->databaseExternal->getQueryIterator($query, $params);
         return new Iterator\Guardian($iterator);
     }
@@ -81,6 +84,7 @@ class Sync extends BaseSync implements ISync
         $placeHolders  = [$placeHolder . '1', $placeHolder . '2'];
         $gender        = ['M', 'F'];
         $addressNumber = [$this->helper->getAddNumFather(), $this->helper->getAddNumMother()]; // quoted
+        $nameFields    = ['p.f_name', 'p.m_name'];
 
         $queries = [];
         $params  = [];
@@ -112,7 +116,9 @@ class Sync extends BaseSync implements ISync
                     RTRIM(s.surname)         AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
-                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = {$addressNumber[$i]}
+                    ON p.par_code = pa.par_code
+                    AND p.cmpy_code = pa.cmpy_code
+                    AND pa.add_num IN ('1', {$addressNumber[$i]})
                 LEFT JOIN pia_sfaccess AS sf
                     ON p.par_code = sf.par_code
                     AND p.cmpy_code = sf.cmpy_code
@@ -126,7 +132,7 @@ class Sync extends BaseSync implements ISync
                     AND pd.cmpy_code = p.cmpy_code
                     AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$placeHolders[$i]}
-                AND   p.f_name IS NOT NULL
+                AND   {$nameFields[$i]} IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
