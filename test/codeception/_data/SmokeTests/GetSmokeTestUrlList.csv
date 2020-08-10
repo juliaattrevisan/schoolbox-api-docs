@@ -49,6 +49,12 @@ Admin,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/up
 Admin,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
 Admin,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
 Admin,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
+Admin,Import school data,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport
+Admin,Import direct import,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport
+Admin,Import import pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral
+Admin,Import timetable Structure,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure
+Admin,Import timetable ,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable
+Admin,Import timetable enrolment,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment
 Calendar,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
 Calendar,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
 Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
