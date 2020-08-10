@@ -195,7 +195,7 @@ Admin,"Review pastoral subtypes",Teacher,https://vagrant.dev.schoolbox.cloud/adm
 Admin,"Review pastoral subtypes",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,401
 Admin,"Review pastoral subtypes",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,401
 Admin,"Review pastoral sis docs",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,200
-Admin,"Review pastoral sis docs",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pa/storal-document-classification,401
+Admin,"Review pastoral sis docs",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
 Admin,"Review pastoral sis docs",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
 Admin,"Review pastoral sis docs",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
 Admin,"Review pastoral severity",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity,200
