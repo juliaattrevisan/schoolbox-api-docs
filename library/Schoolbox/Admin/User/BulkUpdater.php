@@ -11,6 +11,17 @@ use Alaress\Database\Wrapper\Db2\PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 
+/**
+ * Class BulkUpdater
+ *
+ * Mass-update effect applied to all $userIds supplied when there is at least one
+ * scalar param that changes, or at least one campus change
+ *
+ * When you supply a list of users, but leave all their stuff Unchanged (or empty string
+ * which equates to the same effect) then it won't change anything.
+ *
+ * @package Schoolbox\Admin\User
+ */
 class BulkUpdater
 {
 
