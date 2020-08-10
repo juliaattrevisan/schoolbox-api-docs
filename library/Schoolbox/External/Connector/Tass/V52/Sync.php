@@ -30,7 +30,10 @@ class Sync extends BaseSync implements ISync
             $params = array_merge($params, $paramsComm);
         }
 
-        $query    .= '   ORDER BY student_contact_id ASC';
+        // Let the guardian iterator use the specialized contact type
+        // (from `$this->helper->getAddNumFather/Mother()`) preferentially over
+        // the generic contact type (1).
+        $query    .= '   ORDER BY student_contact_id ASC, student_contact_type DESC';
         $iterator = $this->databaseExternal->getQueryIterator($query, $params);
         return new Iterator\Guardian($iterator);
     }
