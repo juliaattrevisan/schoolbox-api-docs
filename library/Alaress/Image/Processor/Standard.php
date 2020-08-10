@@ -14,7 +14,6 @@ use Alaress\Image\Filetype;
 use Alaress\Image\Transformation\Transformation;
 use BadMethodCallException;
 use League\Flysystem;
-use Schoolbox\Resource\Storage\Transform\Mapper;
 
 class Standard extends BaseProcessor
 {
@@ -203,7 +202,9 @@ class Standard extends BaseProcessor
             header('X-Cache-Status: HIT');
         }
 
-        $this->save();
+        if (!$this->isCached() && $this->getCache()->getKey()) {
+            $this->save();
+        }
 
         $this->getFiletypeStrategy()->stream($this->getImage());
         // will exit
@@ -213,17 +214,10 @@ class Standard extends BaseProcessor
      * Saves the transformed image
      *
      * @return static
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws Flysystem\FileNotFoundException
      */
     public function save()
     {
-        if (!$this->isCached() && $this->getCache()->getKey()) {
-            $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
-        }
-
-        Mapper::getInstance()->createRecord($this->file);
-
+        $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
         return $this;
     }
 

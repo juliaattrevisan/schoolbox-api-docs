@@ -108,10 +108,8 @@ class ConfigMapper extends Mapper
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
     public const _CANVAS_URL                        = 'canvas_url';
 
-    public const NAME_OTFS_ADAPTER                   = 'otfs_adapter';
+    public const NAME_OTFS_ADAPTER = 'otfs_adapter';
     public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';
-    public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
-    public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
