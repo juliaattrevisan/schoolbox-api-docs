@@ -207,6 +207,11 @@ class BulkUpdater
             return new Collection();
         }
 
+        /* There's an edge case where you selected users,
+         * but you left all their data set to Unchanged
+         */
+        $updated = false;
+
         /* Set up prepared statements
          */
         $this->prepareStatements();
@@ -216,6 +221,8 @@ class BulkUpdater
          */
         if (\count($this->userUpdateParams)) {
             $this->userUpdateStatement->execute($this->userUpdateParams);
+
+            $updated = true;
         }
 
         /* Iteratively execute the secondary query which updates campus involvements
@@ -232,9 +239,19 @@ class BulkUpdater
             foreach ($this->campusParams as $campusParam) {
                 $this->campusInsertStatement->execute($campusParam);
             }
+
+            $updated = true;
         }
 
-        return new Collection($this->userIds);
+        /* If user data was changed (either scalars or campus assignations)
+         * then report back the affected user tally; otherwise, nothing changed
+         * despite being provided vars
+         */
+        if ($updated){
+            return new Collection($this->userIds);
+        }
+
+        return new Collection();
     }
 
 
