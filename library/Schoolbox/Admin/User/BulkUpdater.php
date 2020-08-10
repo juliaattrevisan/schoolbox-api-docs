@@ -52,6 +52,7 @@ class BulkUpdater
      */
     private $userIds;
 
+
     /**
      * @var array
      */
@@ -292,23 +293,22 @@ class BulkUpdater
         if (\count($this->campusParams)) {
             $this->campusDeleteStatement->execute();
 
+            /* TODO Should updating a user's campus also cause the user.updated_at field to change?
+             *  Not sure what users are expecting/how they're interpreting that usage
+             *
+             * TODO There are three options:
+             *  1. Update every row specially, for highest accuracy down to the second
+             *     That costs n(userIds) individual queries, which is horribly expensive but most accurate
+             *  2. Change updated_at to be the time when the updater successfully finished running
+             *     This costs one, maybe two, query; but it means everyone will look like they got
+             *     updated at exactly the same time (not as accurate, but probably best bang for buck)
+             *  3. updated_at remains unchanged (lowest accuracy)
+             */
+            $this->campusInsertStatement->execute();
+
+            /* Log the users we brutally updated en-masse
+             */
             foreach ($this->campusParams as $campusParam) {
-                $this->campusInsertStatement->execute($campusParam);
-
-                /* TODO Should updating a user's campus also cause the user.updated_at field to change?
-                 *  Not sure what users are expecting/how they're interpreting that usage
-                 *
-                 * TODO There are three options:
-                 *  1. Update every row specially, for highest accuracy down to the second
-                 *     That costs n(userIds) individual queries, which is horribly expensive but most accurate
-                 *  2. Change updated_at to be the time when the updater successfully finished running
-                 *     This costs one, maybe two, query; but it means everyone will look like they got
-                 *     updated at exactly the same time (not as accurate, but probably best bang for buck)
-                 *  3. updated_at remains unchanged (lowest accuracy)
-                 */
-
-                /* Log the users we brutally updated en-masse
-                 */
                 $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$this->lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
             }
 
@@ -377,21 +377,29 @@ class BulkUpdater
                 "DELETE FROM userCampus WHERE uid IN ({$userIds})"
             );
 
-            $this->campusInsertStatement = $this->userBulkMapper->getDatabase()->prepare(
-                'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
-            );
-
             /* Set up a secondary query stack for campus involvements
              * because we have to delete/insert those specifically for each user
              */
+            $campusInsertPlaceholders = [];
+
             foreach ($this->campusIds as $campusId) {
                 foreach ($this->userIds as $userId) {
                     $this->campusParams[] = [
                         'userId'   => $userId,
                         'campusId' => $campusId
                     ];
+
+                    $campusInsertPlaceholders[] = "({$userId}, {$campusId})";
                 }
             }
+
+            /* csv that placeholder set
+             */
+            $campusInsertPlaceholder = implode(",\n", $campusInsertPlaceholders);
+
+            $this->campusInsertStatement = $this->userBulkMapper->getDatabase()->prepare(
+                "INSERT INTO userCampus (uid, campus) VALUES {$campusInsertPlaceholder}"
+            );
         }
 
         /* Collate SET commands for each of the scalar params provided
