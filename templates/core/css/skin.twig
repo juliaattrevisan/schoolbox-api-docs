@@ -16,5 +16,6 @@
         );
     {% endfor %}
 }
-{{ config.skin_custom_css ?? '' | raw }}
+{% set customCss = config.skin_custom_css ?? '' %}
+{{ customCss | raw }}
 {% endautoescape %}
