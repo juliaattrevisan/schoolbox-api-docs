@@ -6,14 +6,26 @@
         /* Avoid woefully inefficient implementations of select-all
          * You can shrink this further but I'm going to humour the select-all-for-group var
          */
-        $('#selectAll').on('click', function(event) {
-            const key = $(this).attr('data-select-all-for-group');
-            const checkboxes = $('[data-select-all-group="'+key+'"]');
+        const selectAll = $('#selectAll');
+        const selector = '[data-select-all-group="users"]';
+        const allCheckboxes = $(selector);
+        const selectedCheckboxes = selector + ':checked';
 
+        selectAll.on('click', function(event) {
             if ($(this).is(':checked')) {
-                checkboxes.prop('checked', true);
+                allCheckboxes.prop('checked', true);
             } else {
-                checkboxes.prop('checked', false);
+                allCheckboxes.prop('checked', false);
+            }
+        });
+
+        /* Checkboxes in the group affect the select-all parent
+         */
+        allCheckboxes.on('change', function(event) {
+            if ($(this).prop('checked') === false) {
+                selectAll.prop('checked', false);
+            } else if ($(selectedCheckboxes).length === allCheckboxes.length) {
+                selectAll.prop('checked', true);
             }
         });
 
