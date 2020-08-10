@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Alaress\Database\Predicate\Builder;
 
 class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
