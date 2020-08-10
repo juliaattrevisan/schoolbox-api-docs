@@ -44,10 +44,11 @@ if (isset($_POST['updateUsers'])) {
     $userMapper->log($message);
 
     (new \Schoolbox\Admin\User\BulkUpdater(
+        $userMapper,
         $userIds,
         $_POST['apply_campus'],
         (int)$_POST['apply_role'],
-        (int)$_POST['apply_year'],
+        $_POST['apply_year'],
         (int)$_POST['apply_eportfolio'],
         (int)$_POST['apply_emailfromusername'],
         (int)$_POST['apply_externalmailclient'],
@@ -55,9 +56,10 @@ if (isset($_POST['updateUsers'])) {
         (int)$_POST['apply_accountenabled'],
         (int)$_POST['apply_hidecontacts'],
         (int)$_POST['apply_hidetimetable'],
-        (int)$_POST['apply_position_title'],
+        $_POST['apply_position_title'],
         (int)$_POST['apply_displaygradegraph']
     ))->update();
+
 
 
 //    /* Modify each user

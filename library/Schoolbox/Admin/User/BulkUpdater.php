@@ -7,8 +7,22 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\User;
 
+use Schoolbox\UserMapper;
+
 class BulkUpdater
 {
+
+    /**
+     * hardcoded value that causes you to leave this value unchanged
+     */
+    private const UNCHANGED = -1;
+
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
 
     /**
      * @var array
@@ -19,6 +33,13 @@ class BulkUpdater
      * @var array
      */
     private $campusIds;
+
+
+    /**
+     * @var int
+     */
+    private $role;
+
 
     /**
      * @var string
@@ -81,24 +102,52 @@ class BulkUpdater
 
 
     /**
+     * @var resource
+     */
+    private $campusDeleteStatement;
+
+
+    /**
+     * @var resource
+     */
+    private $campusInsertStatement;
+
+
+    /**
+     * @var resource
+     */
+    private $userUpdateStatement;
+
+
+    /**
+     * @var array
+     */
+    private $userUpdateParams;
+
+
+    /**
      * BulkUpdater constructor.
      *
-     * @param array  $userIds
-     * @param array  $campusIds
-     * @param string $year
-     * @param int    $eportfolioEnabled
-     * @param int    $emailFromUsername
-     * @param int    $externalMailClient
-     * @param int    $webmail
-     * @param int    $accountEnabled
-     * @param int    $hideContacts
-     * @param int    $hideTimetable
-     * @param string $position
-     * @param int    $displayGradeGraph
+     * @param UserMapper $userMapper
+     * @param array      $userIds
+     * @param array      $campusIds
+     * @param int        $role
+     * @param string     $year
+     * @param int        $eportfolioEnabled
+     * @param int        $emailFromUsername
+     * @param int        $externalMailClient
+     * @param int        $webmail
+     * @param int        $accountEnabled
+     * @param int        $hideContacts
+     * @param int        $hideTimetable
+     * @param string     $position
+     * @param int        $displayGradeGraph
      */
     public function __construct(
+        UserMapper $userMapper,
         array $userIds,
         array $campusIds,
+        int $role,
         string $year,
         int $eportfolioEnabled,
         int $emailFromUsername,
@@ -111,6 +160,7 @@ class BulkUpdater
         int $displayGradeGraph
     )
     {
+        $this->userMapper = $userMapper;
 
         /* Cast ints to each of these id sets
          */
@@ -119,7 +169,8 @@ class BulkUpdater
 
         /* Remember these scalars as they are
          */
-        $this->year = $year;
+        $this->role = $role;
+        $this->year = trim($year);
         $this->eportfolioEnabled = $eportfolioEnabled;
         $this->emailFromUsername = $emailFromUsername;
         $this->externalMailClient = $externalMailClient;
@@ -127,7 +178,7 @@ class BulkUpdater
         $this->accountEnabled = $accountEnabled;
         $this->hideContacts = $hideContacts;
         $this->hideTimetable = $hideTimetable;
-        $this->position = $position;
+        $this->position = trim($position);
         $this->displayGradeGraph = $displayGradeGraph;
     }
 
@@ -138,18 +189,9 @@ class BulkUpdater
     public function update(): int
     {
 
-        /* Prepared Statements ftw
-         *   One big updater
-         *   Campus Deleter
-         *   Campus Adder
+        /* Set up prepared statements
          */
-
-        /* Gather a set of ids and cast them to ints
-         * Implode them into a csv for a WHERE IN clause
-         */
-
-        /* Collate SET commands for each of the scalar params provided
-         */
+        $this->prepareStatements();
 
         /* Set up a secondary query stack for campus involvements
          * because we have to delete/insert those specifically for each user
@@ -170,5 +212,101 @@ class BulkUpdater
 
         die();
         return \count($this->userIds);
+    }
+
+
+    /**
+     * Set up prepared statements
+     */
+    private function prepareStatements(): void
+    {
+        /* Gather a set of ids and cast them to ints
+         * Implode them into a csv for a WHERE IN clause
+         */
+        $userIds = implode(',', $this->userIds);
+
+        /* Prepared Statements ftw
+         *   One big updater
+         *   Campus Deleter
+         *   Campus Adder
+         */
+        $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
+            'DELETE FROM userCampus WHERE uid = :userId'
+        );
+
+        $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
+            'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
+        );
+
+        /* Collate SET commands for each of the scalar params provided
+         */
+        $updatePlaceholder = [];
+        $updateParams = [];
+
+        if ('' !== $this->year) {
+            $updatePlaceholder[] = 'year = :year';
+            $updateParams['year'] = $this->year;
+        }
+
+        if ('' !== $this->position) {
+            $updatePlaceholder[] = 'position_title = :position';
+            $updateParams['position'] = $this->position;
+        }
+
+        if ($this->role !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'group_id = :role';
+            $updateParams['role'] = $this->role;
+        }
+
+        if ($this->eportfolioEnabled !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'eportfolio_enabled = :eportfolioEnabled';
+            $updateParams['eportfolioEnabled'] = $this->eportfolioEnabled;
+        }
+
+        if ($this->emailFromUsername !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'local_email = :emailFromUsername';
+            $updateParams['emailFromUsername'] = $this->emailFromUsername;
+        }
+
+        if ($this->externalMailClient !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'mail_handler = :externalMailClient';
+            $updateParams['externalMailClient'] = $this->externalMailClient;
+        }
+
+        if ($this->webmail !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'webmail = :webmail';
+            $updateParams['webmail'] = $this->webmail;
+        }
+
+        if ($this->accountEnabled !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'enabled = :accountEnabled';
+            $updateParams['accountEnabled'] = $this->accountEnabled;
+        }
+
+        if ($this->hideContacts !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'hide_contacts = :hideContacts';
+            $updateParams['hideContacts'] = $this->hideContacts;
+        }
+
+        if ($this->hideTimetable !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'hide_timetable = :hideTimetable';
+            $updateParams['hideTimetable'] = $this->hideTimetable;
+        }
+
+        if ($this->displayGradeGraph !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'display_grade_graph = :displayGradeGraph';
+            $updateParams['displayGradeGraph'] = $this->displayGradeGraph;
+        }
+
+        $userUpdateStatementPlaceholders = implode(",\n", $updatePlaceholder);
+
+        $query = "
+            UPDATE `user`
+            SET {$userUpdateStatementPlaceholders}
+            WHERE id IN {$userIds}
+        ";
+
+        $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
+        $this->userUpdateParams = $updateParams;
     }
 }
