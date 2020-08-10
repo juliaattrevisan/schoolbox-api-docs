@@ -12,11 +12,6 @@ class PreSignedUrlDataObject
     /**
      * @var string
      */
-    private $hash;
-
-    /**
-     * @var string
-     */
     private $url;
 
     /**
@@ -42,29 +37,19 @@ class PreSignedUrlDataObject
     /**
      * PreSignedUrlDataObject constructor.
      *
-     * @param string      $hash
      * @param string      $url
      * @param string      $cacheControl
      * @param string      $expires
      * @param string      $itemPath
      * @param string|null $size
      */
-    public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath, string $size = null)
+    public function __construct(string $url, string $cacheControl, string $expires, string $itemPath, string $size = null)
     {
-        $this->hash = $hash;
-        $this->url = $url;
-        $this->expires = $expires;
+        $this->url          = $url;
+        $this->expires      = $expires;
         $this->cacheControl = $cacheControl;
-        $this->itemPath = $itemPath;
-        $this->size = $size;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash(): string
-    {
-        return $this->hash;
+        $this->itemPath     = $itemPath;
+        $this->size         = $size;
     }
 
     /**
