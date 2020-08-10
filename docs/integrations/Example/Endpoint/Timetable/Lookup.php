@@ -9,13 +9,11 @@ namespace Schoolbox\External\Connector\Example\Base\Endpoint\Timetable;
 
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 
 /**
  * Class Lookup
  *
- * Generate a list of known users and known periods so that each xml fragment
- * can receive this same information in an iteration
+ * Generate a list of known users and known periods for creating class involvement
  *
  * @package Schoolbox\External\Connector\Example\Base\Endpoint\Timetable
  */
@@ -26,12 +24,6 @@ class Lookup
      * @var TimetablePeriodMapper
      */
     private $timetablePeriodMapper;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
 
 
     /**
@@ -50,12 +42,10 @@ class Lookup
      * Lookup constructor.
      *
      * @param TimetablePeriodMapper  $timetablePeriodMapper
-     * @param UserMapper             $userMapper
      */
-    public function __construct(TimetablePeriodMapper $timetablePeriodMapper, UserMapper $userMapper)
+    public function __construct(TimetablePeriodMapper $timetablePeriodMapper)
     {
         $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -81,23 +71,22 @@ class Lookup
 
 
     /**
-     * Get a list of (user_id, synergy_id) tuples
+     * Get a list of (external_id, sis_user_profile) tuples
      *
      * @return array
      */
     private function initUserLookup(): array
     {
-        $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, synergy_id
-            FROM {$this->userMapper->getTable()} u
-            INNER JOIN `groups` g ON u.`group_id` = g.id
-            WHERE synergy_id IS NOT NULL
-        ");
+        $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
+            SELECT external_id, firstname, lastname
+            FROM sis_user_profile sup
+            WHERE external_id IS NOT NULL
+        ');
 
         $users = [];
 
         foreach ($userStatement as $row) {
-            $users[$row['synergy_id']] = $row['id'];
+            $users[$row['external_id']] = $row;
         }
 
         return $users;

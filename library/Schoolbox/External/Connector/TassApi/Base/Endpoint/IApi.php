@@ -26,4 +26,10 @@ interface IApi
      * @throws RuntimeException
      */
     public function retrieveDocument(string $method, array $params): ?array;
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage;
 }

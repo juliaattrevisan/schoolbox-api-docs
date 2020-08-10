@@ -151,7 +151,7 @@ class Classes implements IStrategy
 
         foreach ($timetables as $timetable) {
 
-            /* TODO External Timetable Code
+            /* TODO External Timetable Code (Cycle Identifier)
              */
             $ext = '';
 
@@ -166,8 +166,13 @@ class Classes implements IStrategy
             $classes = [
                 /*
                     [
-                        'day' => '',
-                        'period' => '',
+                        'period' => [
+                            'day' => '',
+                            'name' => '',
+                            'sequence' => '',
+                            'start' => '',
+                            'end' => ''
+                        ],
                         'class' => [
                             'code' => '',
                             'name' => ''
@@ -178,19 +183,15 @@ class Classes implements IStrategy
                         'teachers' => [
                             [
                                 'externalId' => '',
-                                'title' => '',
                                 'firstname' => '',
                                 'surname' => '',
-                                'username' => '',
                             ]
                         ]
                         'student' => [
                             [
                                 'externalId' => '',
-                                'title' => '',
                                 'firstname' => '',
                                 'surname' => '',
-                                'username' => '',
                             ]
                         ]
                     ]
@@ -235,10 +236,10 @@ class Classes implements IStrategy
 
                     /* Throw warning, but assign them anyway
                      */
-                    if (!isset($users[$student['username']])) {
+                    if (!isset($users[$student['externalId']])) {
                         $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
-                            $student['username'],
+                            'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
+                            $student['externalId'],
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
@@ -323,26 +324,26 @@ class Classes implements IStrategy
         $timetableClassPeriod = $this->classPeriodMapper->createModel()
             ->setClass($timetableClass)
             ->setPeriod($period)
-            ->setRoom($class['period']['room']['name']);
+            ->setRoom($class['room']['name']);
 
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$class['teachers']['username']])) {
+        if (!isset($users[$class['teachers']['externalId']])) {
             $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; username might not exist in schoolbox user table',
-                $class['teachers']['username'],
+                'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
+                $class['teachers']['externalId'],
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
 
-        $timetableClassPeriod->setTeacher($class['teachers']['username']);
+        $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
 
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
-            $class['period']['room']['name']
+            $class['room']['name']
         ));
 
         $this->log->info(sprintf(

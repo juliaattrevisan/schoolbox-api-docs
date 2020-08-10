@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
+use DomainException;
+use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 
@@ -49,9 +51,9 @@ class Specification implements ISpecification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     * @throws \DomainException
+     * @throws DomainException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function check(): array
     {
@@ -511,28 +513,6 @@ class Specification implements ISpecification
                     'status' => ISpecification::STATUS_MISSING
                 ];
             }
-        }
-
-        /* Get a list of all the timetables to process
-         */
-        $timetables = [];
-
-        /* If there aren't any timetables, log it and exit
-         */
-        if (!\count($timetables)) {
-            $endpoints[] = [
-                'message' => 'No timetables detected.',
-                'reason' => '',
-                'status' => ISpecification::STATUS_MISSING
-            ];
-        }
-
-        foreach ($timetables as $timetable) {
-            $endpoints[] = [
-                'message' => '',
-                'reason' => '',
-                'status' => ISpecification::STATUS_OK
-            ];
         }
 
         return $endpoints;

@@ -97,6 +97,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $profileRegistry;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -135,6 +141,7 @@ class Profile implements IStrategy
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
+     * @param Registry                        $profileRegistry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -148,6 +155,7 @@ class Profile implements IStrategy
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        Registry $profileRegistry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -160,6 +168,7 @@ class Profile implements IStrategy
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+        $this->profileRegistry = $profileRegistry;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -372,6 +381,17 @@ class Profile implements IStrategy
             /* Time for importing parents
              */
             $this->importParentsOfStudent($studentBaseProfile, $families);
+
+            /* Remember this student
+             */
+            $this->profileRegistry->remember(
+                $externalId,
+                $externalId,
+                $title,
+                $firstname,
+                $lastname,
+                $username
+            );
         }
 
         /* Show some basic diagnostics
@@ -440,8 +460,10 @@ class Profile implements IStrategy
                 $father = "{$emergencyContact['f_preferred_name']} {$emergencyContact['f_surname']}";
                 $mother = "{$emergencyContact['m_preferred_name']} {$emergencyContact['m_surname']}";
 
-                /* Phone numbers are indeterminant; we can't tell to whom they belong
-                 * because this is a family record - because Tass
+                /* + Assumption: Indeterminant phone numbers
+                 * Phone numbers are indeterminant; we can't tell to whom they belong
+                 * because this is a family record - because Tass. This could be
+                 * a significant hazard for split families.
                  */
                 $homePhone = $emergencyContact['home_phone'];
 
@@ -472,7 +494,7 @@ class Profile implements IStrategy
     /**
      * Studies Code is one of five possible fields that could exist
      *
-     * Each of the filve possible fields depends on which state you're in
+     * Each of the five possible fields depends on which state you're in
      * so I guess it depends on each tass installation
      *
      * Try each of the five possibilities until one exists
@@ -514,6 +536,8 @@ class Profile implements IStrategy
          * If there are any, just leave a message about that, but don't list
          * the specific details in case there are too many, or there are
          * sensitive topics that we shouldn't reveal
+         *
+         * + Assumption: 'data' field contains list of ailments
          */
         if (\count($medicalConditions['data'])) {
             return 'This student has medical conditions.';

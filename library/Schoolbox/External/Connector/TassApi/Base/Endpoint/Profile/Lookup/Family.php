@@ -39,8 +39,11 @@ class Family
 
     /**
      * The node corresponding to a father's data in a Family record.
+     *
      * I have a fear that this will be different per tass implementation somewhere but, for now,
      * presume that 'person2' is (and always is) the papa
+     *
+     * + Assumption: person2 represents the primary parent (typically Father)
      *
      * @var string
      */
@@ -298,6 +301,7 @@ class Family
                      * each person come with their spouse. However, each sub-family contains
                      * address nodes. Fathers and mothers use different address[n] indexes.
                      *
+                     * + Assumption: Detect spouse based on addnum_* indexes
                      * In that way you can determine which one is the primary parent, which is
                      * usually the father, using external_tass_addnum_father and checking whether
                      * address[external_tass_addnum_father] is set.
@@ -391,6 +395,10 @@ class Family
             $family['address'][$addnum]['email1'] ?? '',
             $family['address'][$addnum]['email2'] ?? ''
         ]))[0] ?? '';
+
+        /* FIXME $person['phone'] currently contains information shared between both split fam parents
+         * It should probably be cleared to prevent info leaking out to the other split fam parent(s)
+         */
 
         return $person;
     }

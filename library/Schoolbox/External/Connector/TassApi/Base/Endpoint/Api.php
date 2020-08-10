@@ -18,7 +18,7 @@ use RuntimeException;
  * Connects to the Tass endpoint, negotiates all the crypto stuff and returns a data
  * payload for the $method you provided. If it fails, it throws a Runtime exception -
  * it can fail when we can't decode the json data, or when we can't establish connectivity
- * etc. but it neds to throw Runtimes because Status and Specification use that.
+ * etc. but it needs to throw Runtimes because Status and Specification use that.
  */
 class Api implements IApi
 {
@@ -44,14 +44,9 @@ class Api implements IApi
 
 
     /**
-     * The dsn string of the Tass API server
-     * This contains strings for companycode, appcode, token
-     *
-     * These are stored in the Endpoint Key field
-     *
-     * @var string
+     * @var ApiUsage
      */
-    private $dsn;
+    private $apiUsage;
 
 
     /**
@@ -76,6 +71,10 @@ class Api implements IApi
     /**
      * Constructor
      *
+     * $dsn is the authentication string of the Tass API server
+     * This contains strings for companycode, appcode, token
+     * These are stored in the Endpoint Key field
+     *
      * @param string $host
      * @param string $dsn
      * @param string $module One of the MODULE_* consts defined in DSNCodec
@@ -86,16 +85,21 @@ class Api implements IApi
     public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
-        $this->dsn = $dsn;
 
-        $this->client = $this->initClient($host, $dsn, $module,self::DEFAULT_TIMEOUT);
+        /* Set up guzzle client
+         */
+        $this->client = $this->initClient($dsn, $module,self::DEFAULT_TIMEOUT);
+
+        /* Record some stats about api usage
+         * Turn this into an Observer pattern if you want to record more details
+         */
+        $this->apiUsage = new ApiUsage($module);
     }
 
 
     /**
      * Set up guzzle client
      *
-     * @param string $host
      * @param string $dsn
      * @param string $module
      * @param int    $timeout
@@ -104,7 +108,7 @@ class Api implements IApi
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      */
-    private function initClient(string $host, string $dsn, string $module, int $timeout): Client
+    private function initClient(string $dsn, string $module, int $timeout): Client
     {
 
         /* Figure out all the credential parts: module, company code, app code, token
@@ -126,7 +130,7 @@ class Api implements IApi
          */
         return new Client([
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'base_uri' => $host,
+            'base_uri' => $this->host,
             'timeout' => $timeout,
             'http_errors' => false,
         ]);
@@ -144,6 +148,11 @@ class Api implements IApi
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
+
+        /* Record endpoint usage
+         */
+        $this->apiUsage->record($method);
+
         $queryArgs = [
             'method'  => $method,
             'appcode' => $this->credentials['appcode'],
@@ -172,5 +181,14 @@ class Api implements IApi
         /* Couldn't decode json, or tass server refused something, or something else died
          */
         throw new DomainException('Could not access Tass server, or bad json payload returned.');
+    }
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage
+    {
+        return $this->apiUsage;
     }
 }

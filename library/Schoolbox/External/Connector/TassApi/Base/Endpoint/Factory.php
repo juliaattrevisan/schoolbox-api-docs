@@ -7,17 +7,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
+use DomainException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\Registry as TimetableRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -113,12 +116,6 @@ class Factory
 
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -163,7 +160,6 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -189,7 +185,6 @@ class Factory
 
         /* Timetable pieces
          */
-        UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -214,7 +209,6 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->userMapper = $userMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -226,9 +220,9 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
-     * @throws \DomainException
+     * @throws DomainException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
@@ -240,9 +234,34 @@ class Factory
             DSNCodec::MODULE_IDENTITY_MANAGEMENT
         ];
 
+        $api = [];
+
         foreach ($modules as $module) {
             $api[$module] = new Api($this->host, $this->key, $module);
         }
+
+        /* Profile Registry
+         */
+        $profileRegistry = new ProfileRegistry();
+
+        /* Timetable Registry
+         *
+         * This registry contains all the timetables we iteratively shanked from an endpoint
+         * so we can trade space for time
+         */
+        $timetableRegistry = new TimetableRegistry();
+
+        /* Cycle Registry
+         *
+         * This registry contains all the cycles we mined from the Timetables we iteratively
+         * shanked from an endpoint so we can trade space for time
+         */
+        $cycleRegistry = new TimetableRegistry();
+
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
         /* Purge previously-imported profile relationships and classes
          */
@@ -267,11 +286,31 @@ class Factory
                 $this->spousePrefix,
                 $this->addnumFather,
                 $this->addnumMother,
+                $profileRegistry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new Timetable\Definition(
+                $this->log,
+                $this->perform,
+                $api,
+                $profileRegistry,
+                $timetableRegistry,
+                $cycleRegistry,
+                $this->timetableCycleMapper,
+                $this->timetablePeriodMapper
+            ))
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $lookup,
+                $timetableRegistry,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Cleanup(
                 $this->log,
@@ -281,6 +320,10 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new ApiCertification(
+                $this->log,
+                $api
             ));
     }
 }
