@@ -163,7 +163,13 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
+                if (!this.isAccepted(this.currentAttendanceStatus)) {
+
+                    /* If you haven't already accepted,
+                     * async request to accept invitation
+                     */
+                    this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
+                }
             },
 
 
@@ -172,7 +178,13 @@
              */
             rsvpDecline() {
                 if (this.isInvited(this.currentAttendanceStatus)) {
-                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
+                    if (!this.isDeclined(this.currentAttendanceStatus)) {
+
+                        /* If you're invited, and you haven't already declined,
+                         * async request to decline invitatino
+                         */
+                        this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
+                    }
                 }
             },
 
