@@ -1240,7 +1240,7 @@ class External_Synergetic_User implements External_UserInterface
      * Gets query bindings for student contact type from admin config
      * @return array
      */
-    private function getStudentContactTypeBindings(): array
+    protected function getStudentContactTypeBindings(): array
     {
         if ($this->config->get('external_synergetic_student_contact_types') === '') {
             // No relationships were found, use the default values we had before introducing this feature

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Alaress\Database\Predicate\Builder;
 
 class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
@@ -218,5 +219,92 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
         \Schoolbox\UserMapper::getInstance()->save($user);
 
         return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentContactList(array $externalUserId): array
+    {
+        if (empty($externalUserId)) {
+            return [];
+        }
+
+        /**
+         * Return valid external ID's only and convert it into a string delimited by comma (,) to be used in the
+         * query below using an IN statement.
+         */
+        $validExternalIds = array_filter($externalUserId, function ($externalUserId) {
+            return $this->isExternalIdValid($externalUserId);
+        });
+
+        $predicate = Builder::getArrayBindings($validExternalIds, 'studentIds');
+
+        if (!$validExternalIds) {
+            return [];
+        }
+
+        $contactTypes = $this->getStudentContactTypeBindings();
+
+        $query =
+            "
+            SELECT          a.StudentContactID,
+                            a.StudentContactTitle,
+                            a.StudentContactPreferred,
+                            a.StudentContactSurname,
+                            a.StudentContactDefaultEmail,
+                            a.StudentContactPhoneActual,
+                            a.StudentContactSilentPhoneFlag,
+                            a.StudentContactMobilePhone,
+                            a.StudentContactOccupPhone,
+                            a.StudentContactRelation,
+                            a.StudentContactPrimaryOnlyFlag,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseID END AS StudentContactSpouseID,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseTitle END AS StudentContactSpouseTitle,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpousePreferred END AS StudentContactSpousePreferred,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseSurname END AS StudentContactSpouseSurname,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseMobilePhone END AS StudentContactSpouseMobilePhone,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseOccupPhone END AS StudentContactSpouseOccupPhone,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseDefaultEmail END AS StudentContactSpouseDefaultEmail,
+                            a.StudentContactType,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseRelation END AS StudentContactSpouseRelation,
+                            r.UseEmail AS StudentContactUseEmail,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE rs.UseEmail END AS StudentContactSpouseUseEmail
+            FROM            dbo.uvStudentContactAllAddress a
+            LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
+            LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
+            JOIN            FileSemesters Semester ON
+                                Semester.FileSemester = a.FileSemester AND
+                                Semester.FileYear = a.FileYear AND
+                                Semester.SystemCurrentFlag = 1
+            WHERE           StudentID IN ({$predicate['placeholders']}) AND
+                            StudentContactType IN ({$contactTypes['placeholders']})
+        ";
+
+        $statement = $this->getConnector()->executeQuery(
+            $query,
+            array_merge(
+                $contactTypes['bindings'],
+                $predicate['bindings']
+            )
+        );
+
+        $contacts = $this->clearInvalidValues($statement->fetchAll());
+        $contactIdList = [];
+        $contactReturn = [];
+        //Dedupe contacts when mother and father are both contacts
+        foreach ($contacts as $contact) {
+            if (isset($contactIdList[$contact['StudentContactID']])) {
+                continue;
+            }
+
+            $contactReturn[] = $contact;
+
+            if ($contact['StudentContactID']) {
+                $contactIdList[$contact['StudentContactID']] = true;
+            }
+        }
+
+        return $contactReturn;
     }
 }
