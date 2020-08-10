@@ -11,7 +11,7 @@ use Alaress\Database\Wrapper\Db2\PDOStatement;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\UserBulkMapper;
 
 /**
  * Class BulkUpdater
@@ -42,9 +42,9 @@ class BulkUpdater
 
 
     /**
-     * @var UserMapper
+     * @var UserBulkMapper
      */
-    private $userMapper;
+    private $userBulkMapper;
 
 
     /**
@@ -173,25 +173,25 @@ class BulkUpdater
     /**
      * BulkUpdater constructor.
      *
-     * @param User       $sessionUser
-     * @param UserMapper $userMapper
-     * @param array      $userIds
-     * @param array      $campusIds
-     * @param int        $role
-     * @param string     $year
-     * @param int        $eportfolioEnabled
-     * @param int        $emailFromUsername
-     * @param int        $externalMailClient
-     * @param int        $webmail
-     * @param int        $accountEnabled
-     * @param int        $hideContacts
-     * @param int        $hideTimetable
-     * @param string     $position
-     * @param int        $displayGradeGraph
+     * @param User           $sessionUser
+     * @param UserBulkMapper $userBulkMapper
+     * @param array          $userIds
+     * @param array          $campusIds
+     * @param int            $role
+     * @param string         $year
+     * @param int            $eportfolioEnabled
+     * @param int            $emailFromUsername
+     * @param int            $externalMailClient
+     * @param int            $webmail
+     * @param int            $accountEnabled
+     * @param int            $hideContacts
+     * @param int            $hideTimetable
+     * @param string         $position
+     * @param int            $displayGradeGraph
      */
     public function __construct(
         User $sessionUser,
-        UserMapper $userMapper,
+        UserBulkMapper $userBulkMapper,
         array $userIds,
         array $campusIds,
         int $role,
@@ -207,7 +207,7 @@ class BulkUpdater
         int $displayGradeGraph
     ) {
         $this->sessionUser = $sessionUser;
-        $this->userMapper = $userMapper;
+        $this->userBulkMapper = $userBulkMapper;
 
         /* Cast ints to each of these id sets
          */
@@ -315,10 +315,10 @@ class BulkUpdater
             $updated = true;
         }
 
-        /* Log messages to this userMapper log output thing
+        /* Log messages to this userBulkMapper log output thing
          */
         foreach ($this->messages as $message) {
-            $this->userMapper->log($message);
+            $this->userBulkMapper->log($message);
         }
 
         /* If user data was changed (either scalars or campus assignations)
@@ -342,7 +342,7 @@ class BulkUpdater
      */
     private function prepareLookup(string $userIds): array
     {
-        $statement = $this->userMapper->getDatabase()->prepare("
+        $statement = $this->userBulkMapper->getDatabase()->prepare("
             SELECT id, firstname, lastname FROM `user`
             WHERE id IN ({$userIds})"
         );
@@ -373,11 +373,11 @@ class BulkUpdater
          *   One big updater
          */
         if (\count($this->campusIds)) {
-            $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
+            $this->campusDeleteStatement = $this->userBulkMapper->getDatabase()->prepare(
                 "DELETE FROM userCampus WHERE uid IN ({$userIds})"
             );
 
-            $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
+            $this->campusInsertStatement = $this->userBulkMapper->getDatabase()->prepare(
                 'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
             );
 
@@ -467,7 +467,7 @@ class BulkUpdater
                 WHERE id IN ({$userIds})
             ";
 
-            $this->userUpdateStatement = $this->userMapper->getDatabase()->prepare($query);
+            $this->userUpdateStatement = $this->userBulkMapper->getDatabase()->prepare($query);
         }
     }
 }
