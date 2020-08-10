@@ -34,7 +34,7 @@ class BulkUpdater
     /**
      * @var array
      */
-    private $campusIds;
+    private $campusIds = [];
 
 
     /**
@@ -166,14 +166,18 @@ class BulkUpdater
         int $hideTimetable,
         string $position,
         int $displayGradeGraph
-    )
-    {
+    ) {
         $this->userMapper = $userMapper;
 
         /* Cast ints to each of these id sets
          */
         $this->userIds = array_map('intval', $userIds);
-        $this->campusIds = array_map('intval', $campusIds);
+
+        /* Only update campus assignation if Unchanged was never selected
+         */
+        if (!in_array(self::UNCHANGED, $campusIds, false)) {
+            $this->campusIds = array_map('intval', $campusIds);
+        }
 
         /* Remember these scalars as they are
          */
@@ -216,10 +220,12 @@ class BulkUpdater
          *
          * https://stackoverflow.com/questions/652770/delete-with-join-in-mysql)
          */
-        $this->campusDeleteStatement->execute();
+        if (\count($this->campusParams)) {
+            $this->campusDeleteStatement->execute();
 
-        foreach ($this->campusParams as $campusParam) {
-            $this->campusInsertStatement->execute($campusParam);
+            foreach ($this->campusParams as $campusParam) {
+                $this->campusInsertStatement->execute($campusParam);
+            }
         }
 
         return new Collection($this->userIds);
@@ -241,22 +247,22 @@ class BulkUpdater
          *   Campus Adder
          *   One big updater
          */
-        $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
-            "DELETE FROM userCampus WHERE uid IN ({$userIds})"
-        );
+        if (\count($this->campusIds)) {
+            $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
+                "DELETE FROM userCampus WHERE uid IN ({$userIds})"
+            );
 
-        $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
-            'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
-        );
+            $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
+                'INSERT INTO userCampus (uid, campus) VALUES (:userId, :campusId)'
+            );
 
-        /* Set up a secondary query stack for campus involvements
-         * because we have to delete/insert those specifically for each user
-         */
-        if (!in_array(self::UNCHANGED, $this->campusIds, false)) {
-            foreach ($this->userIds as $userId) {
-                foreach ($this->campusIds as $campusId) {
+            /* Set up a secondary query stack for campus involvements
+             * because we have to delete/insert those specifically for each user
+             */
+            foreach ($this->campusIds as $campusId) {
+                foreach ($this->userIds as $userId) {
                     $this->campusParams[] = [
-                        'userId' => $userId,
+                        'userId'   => $userId,
                         'campusId' => $campusId
                     ];
                 }
