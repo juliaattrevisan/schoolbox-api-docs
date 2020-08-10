@@ -84,6 +84,7 @@ class Sync extends BaseSync implements ISync
         $placeHolders  = [$placeHolder . '1', $placeHolder . '2'];
         $gender        = ['M', 'F'];
         $addressNumber = [$this->helper->getAddNumFather(), $this->helper->getAddNumMother()]; // quoted
+        $nameFields    = ['p.f_name', 'p.m_name'];
 
         $queries = [];
         $params  = [];
@@ -131,7 +132,7 @@ class Sync extends BaseSync implements ISync
                     AND pd.cmpy_code = p.cmpy_code
                     AND (pd.deceased_flg = 'N' OR pd.deceased_flg IS NULL)
                 WHERE p.cmpy_code = :{$placeHolders[$i]}
-                AND   p.f_name IS NOT NULL
+                AND   {$nameFields[$i]} IS NOT NULL
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
