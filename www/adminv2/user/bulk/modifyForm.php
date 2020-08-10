@@ -43,64 +43,46 @@ if (isset($_POST['updateUsers'])) {
     $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
     $userMapper->log($message);
 
-
-    /* Prepared Statements ftw
-     *   One big updater
-     *   Campus Deleter
-     *   Campus Adder
-     */
-
-    /* Gather a set of ids and cast them to ints
-     * Implode them into a csv for a WHERE IN clause
-     */
-
-    /* Collate SET commands for each of the scalar params provided
-     */
-
-    /* Set up a secondary query stack for campus involvements
-     * because we have to delete/insert those specifically for each user
-     */
-
-    /* Execute the primary query, which is UPDATE user SET ... WHERE id IN ()
-     * That updates the scalars for all selected users in one mega query
-     */
-
-    /* Iteratively execute the secondary query which updates campus involvements
-     * you might be able to reduce queries further by using delete with joins
-     * prior to inserting the updated campuses; or doing a diff, but that costs
-     * you a query just to start and even then you need to process all rows
-     * (we won't be in mapper land with its hydration benefits)
-     *
-     * https://stackoverflow.com/questions/652770/delete-with-join-in-mysql)
-     */
+    (new \Schoolbox\Admin\User\BulkUpdater(
+        $userIds,
+        $_POST['apply_campus'],
+        (int)$_POST['apply_role'],
+        (int)$_POST['apply_year'],
+        (int)$_POST['apply_eportfolio'],
+        (int)$_POST['apply_emailfromusername'],
+        (int)$_POST['apply_externalmailclient'],
+        (int)$_POST['apply_webmail'],
+        (int)$_POST['apply_accountenabled'],
+        (int)$_POST['apply_hidecontacts'],
+        (int)$_POST['apply_hidetimetable'],
+        (int)$_POST['apply_position_title'],
+        (int)$_POST['apply_displaygradegraph']
+    ))->update();
 
 
-
-
-
-    /* Modify each user
-     */
-    foreach ($userIds as $currentUserId) {
-        $user = $userMapper->findById($currentUserId);
-
-        $userMapper->bulkModifyUpdate(
-            $user,
-            $_POST['apply_campus'],
-            $_POST['apply_role'],
-            $_POST['apply_year'],
-            $_POST['apply_eportfolio'],
-            $_POST['apply_emailfromusername'],
-            $_POST['apply_externalmailclient'],
-            $_POST['apply_webmail'],
-            $_POST['apply_accountenabled'],
-            $_POST['apply_hidecontacts'],
-            $_POST['apply_hidetimetable'],
-            $_POST['apply_position_title'],
-            $_POST['apply_displaygradegraph']
-        );
-
-        $modified->add($user);
-    }
+//    /* Modify each user
+//     */
+//    foreach ($userIds as $currentUserId) {
+//        $user = $userMapper->findById($currentUserId);
+//
+//        $userMapper->bulkModifyUpdate(
+//            $user,
+//            $_POST['apply_campus'],
+//            $_POST['apply_role'],
+//            $_POST['apply_year'],
+//            $_POST['apply_eportfolio'],
+//            $_POST['apply_emailfromusername'],
+//            $_POST['apply_externalmailclient'],
+//            $_POST['apply_webmail'],
+//            $_POST['apply_accountenabled'],
+//            $_POST['apply_hidecontacts'],
+//            $_POST['apply_hidetimetable'],
+//            $_POST['apply_position_title'],
+//            $_POST['apply_displaygradegraph']
+//        );
+//
+//        $modified->add($user);
+//    }
 } else {
     if (isset($_POST['deleteUsers'])) {
         $userCollection = $userMapper->findByColumn('id', $userIds);
