@@ -205,7 +205,6 @@ class BulkUpdater
          */
         $this->userUpdateStatement->execute($this->userUpdateParams);
 
-
         /* Iteratively execute the secondary query which updates campus involvements
          * you might be able to reduce queries further by using delete with joins
          * prior to inserting the updated campuses; or doing a diff, but that costs
@@ -214,8 +213,12 @@ class BulkUpdater
          *
          * https://stackoverflow.com/questions/652770/delete-with-join-in-mysql)
          */
+        $this->campusDeleteStatement->execute();
 
-        die();
+        foreach ($this->campusParams as $campusParam) {
+            $this->campusInsertStatement->execute($campusParam);
+        }
+
         return \count($this->userIds);
     }
 
@@ -231,12 +234,12 @@ class BulkUpdater
         $userIds = implode(',', $this->userIds);
 
         /* Prepared Statements ftw
-         *   One big updater
          *   Campus Deleter
          *   Campus Adder
+         *   One big updater
          */
         $this->campusDeleteStatement = $this->userMapper->getDatabase()->prepare(
-            'DELETE FROM userCampus WHERE uid = :userId'
+            "DELETE FROM userCampus WHERE uid IN {$userIds}"
         );
 
         $this->campusInsertStatement = $this->userMapper->getDatabase()->prepare(
