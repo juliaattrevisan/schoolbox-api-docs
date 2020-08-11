@@ -802,12 +802,14 @@ class Controller extends Base
                 }
             }
 
+            // Save student
             try {
                 $student = $this->userMapper->findById($studentIdCurrent);
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
             }
 
+            // Save record type
             try {
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
                 $record->setType($type);
@@ -827,23 +829,29 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
-            try {
-                $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
-                $record->setSubType($subtype);
-            } catch (MapperException\Deleted $e) {
-                // Subtype was deleted. Was it changed?
-                // If not, allow it to be saved with the same deleted subtype
-                $deletedSubtype = $e->getDeletedObject();
-                if ($deletedSubtype instanceof PastoralSubTypeModel) {
-                    $existingId = $record->getSubType()
-                        ? $record->getSubType()->getId()
-                        : null;
-                    if ($existingId !== $deletedSubtype->getId()) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            // Save record subtype (or set it to null if it wasn't passed)
+            $subtypeId = $post->get("subtypeId", null);
+            if (isset($subtypeId)) {
+                try {
+                    $subtype = $this->pastoralSubTypeMapper->findById($subtypeId);
+                    $record->setSubType($subtype);
+                } catch (MapperException\Deleted $e) {
+                    // Subtype was deleted. Was it changed?
+                    // If not, allow it to be saved with the same deleted subtype
+                    $deletedSubtype = $e->getDeletedObject();
+                    if ($deletedSubtype instanceof PastoralSubTypeModel) {
+                        $existingId = $record->getSubType()
+                            ? $record->getSubType()->getId()
+                            : null;
+                        if ($existingId !== $deletedSubtype->getId()) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                        }
                     }
+                } catch (MapperException $e) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
-            } catch (MapperException $e) {
-                // Noop, this can be blank
+            } else {
+                $record->setSubType(null);
             }
 
             // Set severity separately from type
