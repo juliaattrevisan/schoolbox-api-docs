@@ -126,44 +126,6 @@ class BulkUpdater
 
 
     /**
-     * @var PDOStatement
-     */
-    private $campusDeleteStatement;
-
-
-    /**
-     * @var PDOStatement
-     */
-    private $campusInsertStatement;
-
-
-    /**
-     * @var array
-     */
-    private $campusParams = [];
-
-
-    /**
-     * @var PDOStatement
-     */
-    private $userUpdateStatement;
-
-
-    /**
-     * @var array
-     */
-    private $userUpdateParams = [];
-
-
-    /**
-     * A list of log messages
-     *
-     * @var array
-     */
-    private $messages = [];
-
-
-    /**
      * BulkUpdater constructor.
      *
      * @param User           $sessionUser
@@ -245,6 +207,10 @@ class BulkUpdater
          */
         $updated = false;
 
+        /* A list of log messages
+         */
+        $messages = [];
+
         /* Gather a set of ids and cast them to ints
          * Implode them into a csv for a WHERE IN clause
          */
@@ -257,21 +223,20 @@ class BulkUpdater
 
         /* Set up prepared statements
          */
-        $this->prepareStatements($userIds);
+        $statements = $this->prepareStatements($userIds);
 
         /* Execute the primary query, which is UPDATE user SET ... WHERE id IN ()
          * That updates the scalars for all selected users in one mega query
          */
-        if (\count($this->userUpdateParams)) {
-            $this->userUpdateStatement->execute($this->userUpdateParams);
+        if (\count($statements['user']['update']['params'])) {
+            $statements['user']['update']['statement']->execute($statements['user']['update']['params']);
+            $updated = true;
 
-            /* Log the users we brutally updated
+            /* Log the users we brutally updated en masse
              */
             foreach ($this->userIds as $userId) {
-                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified user details for {$lookup[$userId]} ({$userId})";
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified user details for {$lookup[$userId]} ({$userId})";
             }
-
-            $updated = true;
         }
 
         /* Iteratively execute the secondary query which updates campus involvements
@@ -282,8 +247,32 @@ class BulkUpdater
          *
          * https://stackoverflow.com/questions/652770/delete-with-join-in-mysql)
          */
-        if (\count($this->campusParams)) {
-            $this->campusDeleteStatement->execute();
+        if (\count($statements['campus']['insert']['params'])) {
+
+            /* Updating a user's campus
+             */
+            $statements['campus']['delete']['statement']->execute();
+            $statements['campus']['insert']['statement']->execute();
+            $updated = true;
+
+            /* Log the users we brutally updated en-masse
+             */
+            foreach ($statements['campus']['insert']['params'] as $campusParam) {
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
+            }
+        }
+
+        /* Log messages to this userBulkMapper log output thing
+         */
+        foreach ($messages as $message) {
+            $this->userBulkMapper->log($message);
+        }
+
+        /* If user data was changed (either scalars or campus assignations)
+         * then report back the affected user tally; otherwise, nothing changed
+         * despite being provided vars
+         */
+        if ($updated) {
 
             /* Should updating a user's campus also cause the user.updated_at field to change?
              *
@@ -297,36 +286,13 @@ class BulkUpdater
              *
              * We choze (2)
              */
-            $this->campusInsertStatement->execute();
-
-            /* Log the users we brutally updated en-masse
-             */
-            foreach ($this->campusParams as $campusParam) {
-                $this->messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
-            }
-
-            $updated = true;
-        }
-
-        /* Log messages to this userBulkMapper log output thing
-         */
-        foreach ($this->messages as $message) {
-            $this->userBulkMapper->log($message);
-        }
-
-        /* If user data was changed (either scalars or campus assignations)
-         * then report back the affected user tally; otherwise, nothing changed
-         * despite being provided vars
-         */
-        if ($updated) {
-
-            /* Update user.updated at to be whatever the time is, for all the userIds we were given
-             */
             $updatedAtStatement = $this->userBulkMapper->getDatabase()->prepare("
                 UPDATE `user` SET updated_at = :currentTime
                 WHERE id IN ({$userIds})
             ");
 
+            /* Update user.updated at to be whatever the time is, for all the userIds we were given
+             */
             $updatedAtStatement->execute([
                 'currentTime' => \Alaress_Date_Format::now()->getDatabase()
             ]);
@@ -368,9 +334,30 @@ class BulkUpdater
      * Set up prepared statements
      *
      * @param string $userIds
+     * @return array
      */
-    private function prepareStatements(string $userIds): void
+    private function prepareStatements(string $userIds): array
     {
+
+        /* A set of queries and their args
+         */
+        $statements = [
+            'campus' => [
+                'delete' => [
+                    'statement' => null
+                ],
+                'insert' => [
+                    'statement' => null,
+                    'params' =>[]
+                ]
+            ],
+            'user' => [
+                'update' => [
+                    'statement' => null,
+                    'params' =>[]
+                ]
+            ],
+        ];
 
         /* Prepared Statements ftw
          *   Campus Deleter
@@ -378,7 +365,7 @@ class BulkUpdater
          *   One big updater
          */
         if (\count($this->campusIds)) {
-            $this->campusDeleteStatement = $this->userBulkMapper->getDatabase()->prepare(
+            $statements['campus']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
                 "DELETE FROM userCampus WHERE uid IN ({$userIds})"
             );
 
@@ -389,7 +376,7 @@ class BulkUpdater
 
             foreach ($this->campusIds as $campusId) {
                 foreach ($this->userIds as $userId) {
-                    $this->campusParams[] = [
+                    $statements['campus']['insert']['params'][] = [
                         'userId'   => $userId,
                         'campusId' => $campusId
                     ];
@@ -402,7 +389,7 @@ class BulkUpdater
              */
             $campusInsertPlaceholder = implode(",\n", $campusInsertPlaceholders);
 
-            $this->campusInsertStatement = $this->userBulkMapper->getDatabase()->prepare(
+            $statements['campus']['insert']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
                 "INSERT INTO userCampus (uid, campus) VALUES {$campusInsertPlaceholder}"
             );
         }
@@ -410,67 +397,68 @@ class BulkUpdater
         /* Collate SET commands for each of the scalar params provided
          */
         $updatePlaceholder = [];
+        $userUpdateParams = [];
 
         if ('' !== $this->year) {
             $updatePlaceholder[] = 'year = :year';
-            $this->userUpdateParams['year'] = $this->year;
+            $userUpdateParams['year'] = $this->year;
         }
 
         if ('' !== $this->position) {
             $updatePlaceholder[] = 'position_title = :position';
-            $this->userUpdateParams['position'] = $this->position;
+            $userUpdateParams['position'] = $this->position;
         }
 
         if ($this->role !== self::UNCHANGED) {
             $updatePlaceholder[] = 'group_id = :role';
-            $this->userUpdateParams['role'] = $this->role;
+            $userUpdateParams['role'] = $this->role;
         }
 
         if ($this->eportfolioEnabled !== self::UNCHANGED) {
             $updatePlaceholder[] = 'eportfolio_enabled = :eportfolioEnabled';
-            $this->userUpdateParams['eportfolioEnabled'] = $this->eportfolioEnabled;
+            $userUpdateParams['eportfolioEnabled'] = $this->eportfolioEnabled;
         }
 
         if ($this->emailFromUsername !== self::UNCHANGED) {
             $updatePlaceholder[] = 'local_email = :emailFromUsername';
-            $this->userUpdateParams['emailFromUsername'] = $this->emailFromUsername;
+            $userUpdateParams['emailFromUsername'] = $this->emailFromUsername;
         }
 
         if ($this->externalMailClient !== self::UNCHANGED) {
             $updatePlaceholder[] = 'mail_handler = :externalMailClient';
-            $this->userUpdateParams['externalMailClient'] = $this->externalMailClient;
+            $userUpdateParams['externalMailClient'] = $this->externalMailClient;
         }
 
         if ($this->webmail !== self::UNCHANGED) {
             $updatePlaceholder[] = 'webmail = :webmail';
-            $this->userUpdateParams['webmail'] = $this->webmail;
+            $userUpdateParams['webmail'] = $this->webmail;
         }
 
         if ($this->accountEnabled !== self::UNCHANGED) {
             $updatePlaceholder[] = 'enabled = :accountEnabled';
-            $this->userUpdateParams['accountEnabled'] = $this->accountEnabled;
+            $userUpdateParams['accountEnabled'] = $this->accountEnabled;
         }
 
         if ($this->hideContacts !== self::UNCHANGED) {
             $updatePlaceholder[] = 'hide_contacts = :hideContacts';
-            $this->userUpdateParams['hideContacts'] = $this->hideContacts;
+            $userUpdateParams['hideContacts'] = $this->hideContacts;
         }
 
         if ($this->hideTimetable !== self::UNCHANGED) {
             $updatePlaceholder[] = 'hide_timetable = :hideTimetable';
-            $this->userUpdateParams['hideTimetable'] = $this->hideTimetable;
+            $userUpdateParams['hideTimetable'] = $this->hideTimetable;
         }
 
         if ($this->displayGradeGraph !== self::UNCHANGED) {
             $updatePlaceholder[] = 'display_grade_graph = :displayGradeGraph';
-            $this->userUpdateParams['displayGradeGraph'] = $this->displayGradeGraph;
+            $userUpdateParams['displayGradeGraph'] = $this->displayGradeGraph;
         }
 
         /* Set updated_at field too, if required
          */
         if (\count($updatePlaceholder)) {
             $updatePlaceholder[] = 'updated_at = :updatedAt';
-            $this->userUpdateParams['updatedAt'] = \Alaress_Date_Format::now()->getDatabase();
+            $userUpdateParams['updatedAt'] = \Alaress_Date_Format::now()->getDatabase();
 
             $userUpdateStatementPlaceholders = implode(",\n", $updatePlaceholder);
 
@@ -480,7 +468,12 @@ class BulkUpdater
                 WHERE id IN ({$userIds})
             ";
 
-            $this->userUpdateStatement = $this->userBulkMapper->getDatabase()->prepare($query);
+            $statements['user']['update'] = [
+                'statement' => $this->userBulkMapper->getDatabase()->prepare($query),
+                'params' => $userUpdateParams,
+            ];
         }
+
+        return $statements;
     }
 }
