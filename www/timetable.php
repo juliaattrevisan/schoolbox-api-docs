@@ -6,6 +6,7 @@
  ************************************************************/
 //timetable object that displays the users timetable
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 if (!isset($this)) {
@@ -16,7 +17,7 @@ if (!isset($this)) {
 
 // If External_DB not enabled do not display page
 if (!Config::get('external_enable')) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $groupHandler     = new Group;
@@ -78,7 +79,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
                 $this->pageNotFound();
             }
         } else {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
     } else {
         // Output my own timetable (all campuses)
@@ -110,7 +111,11 @@ foreach ($userList as $user) {
             $periodCurrent = $timetableHandler->getPeriodNumber($campus, 0, $user);
             $dayCurrent = $timetableHandler->getDayNumber($campus);
 
-            $timetable = $timetableHandler->getFullTimetable($user->getExternalId(), $user->getId(), $campus);
+            try {
+                $timetable = $timetableHandler->getFullTimetable($user->getExternalId(), $user->getId(), $campus);
+            } catch (\Schoolbox\External\Exception $e) {
+                error(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+            }
 
             $classCount = 0;
 
@@ -224,22 +229,22 @@ foreach ($userList as $user) {
                                     }
 
                                     // format teacher output
-                                    if (!in_array($class['staffID'], $staffIdNameMap)) {
+                                    if (!isset($staffIdNameMap[$class['staffID']])) {
+                                        $name = '';
                                         try {
                                             $classStaff = $userMapper->findByExternalId($class['staffID']);
-
-                                            $staffIdNameMap[$class['staffID']] = $classStaff->getFullName();
+                                            $name       = $classStaff->getFullName();
                                         } catch (\Schoolbox\Mapper\Exception $e) {
-                                            if ($class['staffSurname']) {
-                                                $staffIdNameMap[$class['staffID']] = $class['staffSurname'];
-                                                if ($class['staffTitle']) {
-                                                    $staffIdNameMap[$class['staffID']] =
-                                                        "{$class['staffTitle']} {$staffIdNameMap[$class['staffID']]}";
-                                                }
-                                            } else {
-                                                $staffIdNameMap[$class['staffID']] = '';
+                                        }
+                                        // When failed to find the user, use staffSurname it exists
+                                        if (empty($name) && $class['staffSurname']) {
+                                            $name = $class['staffSurname'];
+                                            // Optionally prepend a title, if that exists
+                                            if ($class['staffTitle']) {
+                                                $name = "{$class['staffTitle']} {$name}";
                                             }
                                         }
+                                        $staffIdNameMap[$class['staffID']] = $name;
                                     }
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
