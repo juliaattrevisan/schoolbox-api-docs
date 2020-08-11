@@ -59,7 +59,7 @@
                 {% set indicatorMarkDescriptor = indicatorMark
                     ? indicatorMark.descriptor
                     : null %}
-                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback is defined and selfAssessmentFeedback
                     ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
                     : null %}
 

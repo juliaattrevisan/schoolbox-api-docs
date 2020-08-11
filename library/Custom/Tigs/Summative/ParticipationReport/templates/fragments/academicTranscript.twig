@@ -108,7 +108,7 @@ Data:
                         <div class="column small-12 medium-6 results">
                             <div class="result-group fal">
                                 {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
-                                {% if folderData.falData.data %}
+                                {% if folderData.falData.data ?? false%}
                                     {# Explicit FAL data found, use that #}
                                     {% for label, value in folderData.falData.data %}
                                         <div class="result-item">
@@ -172,7 +172,7 @@ Data:
                                 <div class="result-group hsc-rank">
                                 {% set hasTaskFound = false %}
                                 {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
-                                    {% if folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                    {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
                                         {% set hasTaskFound = true %}
                                         {% set hasInterminGrades = true %}
                                         {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
@@ -225,7 +225,7 @@ Data:
                                  # Used to come from folderData.aasData.data[unitSpec.id]
                                  #}
                                 {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                {% set commentData = folderData.nesaGraphData.data.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                             {% else %}
                                 {# All other comments come from the unitspec #}
                                 {% for unitSpec in folderData.unitSpecs if not commentFound %}
@@ -240,7 +240,7 @@ Data:
                                 {% endfor %}
                             {% endif %}
 
-                            {% if commentData.comment is not null %}
+                            {% if commentData.comment is defined and commentData.comment|length %}
                                 {{ commentData.comment | nl2br }}
                             {% endif %}
                         </div>

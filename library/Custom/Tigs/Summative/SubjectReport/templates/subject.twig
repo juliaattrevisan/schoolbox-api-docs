@@ -189,7 +189,7 @@ Data:
             {% elseif attributes.isHsc %}
                 {% set commentData = hscTaskMarks.data[unitSpecId] %}
             {% endif %}
-            {% if commentData.comment %}
+            {% if commentData.comment is defined and commentData.comment%}
                 <div class="column island small-12 comments">
                     <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
                     <section class="content">
