@@ -268,6 +268,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         'description' => $currentClass['ClassDescription'],
                         'code'        => $currentClass['ClassCode'],
                         'room'        => $currentClass['ClassRoom'],
+                        'campus'      => $campus->getExtTimetableCode(),
                         'staffID'     => $externalUserId,
                         'dayNumber'   => $currentClass['DayNumber'],
                     ];

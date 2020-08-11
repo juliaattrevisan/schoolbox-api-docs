@@ -239,8 +239,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     $periodListAdaption[$periodSequence]['day'][$dayNumber][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
+                        'campus'         => $campus->getExtTimetableCode(),
                         'room'           => $class['room'],
-                        'staffCode'      => $class['synergy_id'],
+                        'staffID'        => $class['synergy_id'],
                         'staffTitle'     => $class['title'],
                         'staffFirstname' => $class['firstname'],
                         'staffSurname'   => $class['lastname'],
@@ -384,8 +385,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     $periodAdaption['class'][$class['code']] = [
                         'description'    => $class['name'],
                         'code'           => $class['code'],
+                        'campus'         => $campus->getExtTimetableCode(),
                         'room'           => $class['room'],
-                        'staffCode'      => $class['synergy_id'],
+                        'staffID'        => $class['synergy_id'],
                         'staffTitle'     => $class['title'],
                         'staffFirstname' => $class['firstname'],
                         'staffLastname'  => $class['lastname'],

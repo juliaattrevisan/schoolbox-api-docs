@@ -254,9 +254,9 @@ class Submission extends SectionAssignment
                  ->setComment($canvasSubmission['comment'])
                  ->setHumanReadableMark($readableMark)
                  ->setNormalizedMark($normMark)
-                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']));
+                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['commented_at']))
+                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['commented_at']))
+                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['commented_at']));
 
         /* Cannot use mappers here to save because:
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
@@ -323,13 +323,17 @@ class Submission extends SectionAssignment
                 submission_fact.published_score as norm_mark,
                 reviewer.sis_user_id as reviewer_id,
                 reviewee.sis_user_id as reviewee_id,
+                submission_dim.graded_at as graded_at,
                 submission_comment_dim.comment as comment,
-                submission_dim.graded_at as graded_at
+                submission_comment_dim.author_id as commenter_id,
+                submission_comment_dim.created_at as comment_created_at,
+                submission_comment_dim.updated_at as comment_updated_at
             FROM assignment_dim
             LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             LEFT JOIN submission_fact ON submission_fact.submission_id = submission_dim.id
-            LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id
+            LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id AND submission_comment_dim.hidden = 'false'
             LEFT JOIN pseudonym_dim as reviewer ON reviewer.user_id = submission_dim.grader_id AND reviewer.workflow_state = 'active'
+            INNER JOIN user_dim as reviewer_user ON reviewer.user_id = reviewer_user.id AND reviewer_user.workflow_state = 'registered'
             LEFT JOIN pseudonym_dim as reviewee ON reviewee.user_id = submission_dim.user_id AND reviewee.workflow_state = 'active'
 
             WHERE {$whereClause}

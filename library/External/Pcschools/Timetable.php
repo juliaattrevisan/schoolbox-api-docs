@@ -285,7 +285,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                         'code'               => $classCode,
                         'campus'             => $timePeriod,
                         'room'               => $dayClass['ROOM'],
-                        'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                        'staffID'            => $teacherExternalId,
                     ];
                 }
             }
@@ -397,7 +397,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                         'code'               => $classCode,
                         'campus'             => $timePeriod,
                         'room'               => $dayClass['ROOM'],
-                        'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                        'staffID'            => $teacherExternalId,
                     ];
                 }
             }
@@ -495,7 +495,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                     'code'               => $classCode,
                     'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
-                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                    'staffID'            => $teacherExternalId,
                 ];
             }
         }
