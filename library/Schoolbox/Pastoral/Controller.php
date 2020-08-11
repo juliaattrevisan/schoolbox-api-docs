@@ -854,6 +854,16 @@ class Controller extends Base
                 $record->setSubType(null);
             }
 
+            // Ensure that subtype belongs to the parent type:
+            // if there is somehow a mismatch, clear the subtype
+            if ($record->getType() && $record->getSubType()) {
+                $typeId        = $record->getType()->getId();
+                $subtypeTypeId = $record->getSubType()->getPastoralType()->getId();
+                if ($typeId !== $subtypeTypeId) {
+                    $record->setSubType(null);
+                }
+            }
+
             // Set severity separately from type
             if ($this->getConfigLoader()->get('pastoral_severity')) {
                 try {
