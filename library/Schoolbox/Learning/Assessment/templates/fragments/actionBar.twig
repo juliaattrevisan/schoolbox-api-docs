@@ -14,8 +14,7 @@
 <div class="small-12 column no-pad">
     <div class="component-action" data-action-bar="{{ participant.user.id }}" {{ massActions ?? null }} {{ dataAttrs ?? null }} style="{{ actionStyle }}">
         <section>
-
-            {% if attachedMsg is defined %}
+            {% if attachedMsg is defined and attachedMsg|length %}
                 <div class="component-action-info" data-feedback-attach-info>{{ attachedMsg|capitalize|raw }}</div>
             {% endif %}
 
