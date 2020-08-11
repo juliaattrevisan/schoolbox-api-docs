@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -45,7 +45,7 @@ class ExternalFileSystemHandler extends FileSystemHandler {
      * @throws Resource\Exception
      * @return Resource\Storage\IStorage
      */
-    public function fetch($id)
+    public function fetch(string $id): Resource\Storage\IStorage
     {
         $file = $this->locator->findById($id);
 

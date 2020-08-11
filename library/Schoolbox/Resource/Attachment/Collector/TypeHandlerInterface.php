@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,6 +17,5 @@ interface TypeHandlerInterface {
      * @param string $id
      * @return IStorage
      */
-    public function fetch($id);
-
-} 
+    public function fetch(string $id): IStorage;
+}
