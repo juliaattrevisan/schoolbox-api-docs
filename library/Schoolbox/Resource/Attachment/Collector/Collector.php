@@ -10,8 +10,18 @@ namespace Schoolbox\Resource\Attachment\Collector;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\IStorage;
 
+
+/**
+ * Collector for various types of storage handlers.
+ *
+ * This class' purpose is to provide a unified interface for collecting
+ * `IStorage` objects which reference an upload to an attachzone.
+ */
 class Collector
 {
+    /**
+     * Types of resources which this collector may collect.
+     */
     public const TYPE_STORAGE = 0x1;
     public const TYPE_SBFS    = 0x2;
     public const TYPE_MYFILE  = 0x4;
@@ -19,14 +29,32 @@ class Collector
     public const TYPE_OFFICE  = 0x10;
     public const TYPE_ALL     = 0xFF;
 
+
     /**
-     * @var array
+     * Format for the key of a storage object within the list of sources.
+     *
+     * The "id" pattern is the actual ID of the object: the "basename" pattern
+     * is an optional filename override for the object.
+     */
+    public const KEY_FORMAT = '/^(?P<id>.*?):?(?P<basename>.*?)$/';
+
+
+    /**
+     * The list of attachments that this collector is collecting, passed from an
+     * attachzone.
+     *
+     * key:   one of the `self::TYPE_*` constants
+     * value: a list of keys, in the format `self::KEY_FORMAT`
+     *
+     * @var array&string[][]
      */
     protected $source;
 
 
     /**
-     * @var TypeHandlerInterface[]
+     * The handlers which may accept a storage object.
+     *
+     * @var array&TypeHandlerInterface[] key: one of the `self::TYPE_*` constants
      */
     protected $handlers;
 
@@ -34,8 +62,8 @@ class Collector
     /**
      * Constructor
      *
-     * @param array                  $source in the form $source[$type][$i] = $id
-     * @param TypeHandlerInterface[] $handlers
+     * @param array&string[][]             $source
+     * @param array&TypeHandlerInterface[] $handlers
      */
     public function __construct(array $source, array $handlers)
     {
@@ -53,12 +81,12 @@ class Collector
      */
     public function getFirst($filter = self::TYPE_ALL): IStorage
     {
-        foreach ($this->source as $type => $ids) {
+        foreach ($this->source as $type => $keys) {
             if (!$type & $filter) {
                 continue;
             }
-            foreach ($ids as $id) {
-                if ($result = $this->get($type, $id)) {
+            foreach ($keys as $key) {
+                if ($result = $this->get($type, $key)) {
                     return $result;
                 }
             }
@@ -77,12 +105,12 @@ class Collector
     {
         $result = [];
 
-        foreach ($this->source as $type => $ids) {
+        foreach ($this->source as $type => $keys) {
             if (!$type & $filter) {
                 continue;
             }
-            foreach ($ids as $id) {
-                if ($r = $this->get($type, $id)) {
+            foreach ($keys as $key) {
+                if ($r = $this->get($type, $key)) {
                     $result[] = $r;
                 }
             }
@@ -95,17 +123,22 @@ class Collector
     /**
      * Retrieves a single result from the given handler and ID.
      *
+     * Note that this method returns clones of what each handler fetches:
+     * this is because if the key contains a basename then the storage object's
+     * basename will be changed; this is currently a mutation on the original
+     * object.
+     *
      * @param int    $type
-     * @param string $id
+     * @param string $key
      * @return IStorage|null
      */
-    protected function get($type, $id): ?IStorage
+    protected function get($type, $key): ?IStorage
     {
         if (empty($this->handlers[$type])) {
             return null;
         }
 
-        [$id, $replacementBasename] = $this->parseId($id);
+        [$id, $replacementBasename] = $this->parseKey($key);
         $storage = clone $this->handlers[$type]->fetch($id);
         if (isset($storage, $replacementBasename)) {
             $storage->setBasename($replacementBasename);
@@ -115,15 +148,14 @@ class Collector
 
 
     /**
-     * Parse an ID into its identifier and optional basename
-     * (filename+extension).
+     * Parse an key into its ID and an optional basename (filename+extension).
      *
-     * @param string $id
-     * @return array 0: the actual ID
+     * @param string $key
+     * @return array 0: the ID of this file
      *               1: a replacement basename, if it exists
      */
-    private function parseId(string $id): array
+    private function parseKey(string $key): array
     {
-        return array_pad(explode(':', $id, 2), 2, null);
+        return array_pad(explode(':', $key, 2), 2, null);
     }
 }
