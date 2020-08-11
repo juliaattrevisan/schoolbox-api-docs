@@ -35,8 +35,11 @@ class Collector
      *
      * The "id" pattern is the actual ID of the object: the "basename" pattern
      * is an optional filename override for the object.
+     *
+     * If the key doesn't match this format, assume the entire key is the ID and
+     * there is no basename.
      */
-    public const KEY_FORMAT = '/^(?P<id>.*?):?(?P<basename>.*?)$/';
+    public const KEY_FORMAT = '/^(?P<id>.*?):(?P<basename>.*?)$/';
 
 
     /**
@@ -156,6 +159,12 @@ class Collector
      */
     private function parseKey(string $key): array
     {
-        return array_pad(explode(':', $key, 2), 2, null);
+        if (preg_match(self::KEY_FORMAT, $key, $matches)) {
+            return [$matches['id'], $matches['basename'] ?? null];
+        }
+
+        // This didn't match?
+        // Assume the key is the ID and there's no basename
+        return [$key, null];
     }
 }
