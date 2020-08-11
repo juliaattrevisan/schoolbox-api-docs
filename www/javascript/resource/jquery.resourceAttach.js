@@ -1,33 +1,8 @@
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;
-// // It's dangerous to go alone. Take this.
-// // IE9+ polyfill: https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent
-// (function () {
-//     if (typeof window.CustomEvent == 'undefined') {
-//         function CustomEvent ( event, params ) {
-//             params = params || { bubbles: false, cancelable: false, detail: undefined };
-//             var evt = document.createEvent( 'CustomEvent' );
-//             evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-//             return evt;
-//         }
-//
-//         CustomEvent.prototype = window.Event.prototype;
-//
-//         window.CustomEvent = CustomEvent;
-//     }
-// })();
-//
-// // get a fix on your IE9 origin
-// if(typeof window.location.origin == 'undefined') {
-//     window.location.origin = window.location.protocol + '//' + window.location.hostname;
-// }
-
-(function ($, Dropzone, window, document, undefined) {
+;(function ($, Dropzone, window, document, undefined) {
 
     var pluginName     = 'resourceAttach',
         singletonModal = null,
