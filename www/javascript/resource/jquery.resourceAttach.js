@@ -149,7 +149,7 @@
                 });
 
                 this.on('success', function (file, response) {
-                    var data;
+                    var data, inputValue;
 
                     try {
                         data = JSON.parse(response);
@@ -158,9 +158,16 @@
                         data = response;
                     }
 
+                    // Use the name of the file in the hash if it was provided.
+                    // The attachzone parser may ignore this
+                    inputValue = data.hash;
+                    if (data.meta.name) {
+                        inputValue = inputValue + ':' + String(data.meta.name);
+                    }
+
                     $(file.previewElement)
                         .find('input[data-az-attachment]')
-                        .val(data.hash);
+                        .val(inputValue);
                     self.attach(data);
 
 
