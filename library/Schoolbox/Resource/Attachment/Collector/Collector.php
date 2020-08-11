@@ -1,8 +1,6 @@
 <?php
 /**
- * 
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -14,45 +12,53 @@ use Schoolbox\Resource\Storage\IStorage;
 
 class Collector
 {
+    public const TYPE_STORAGE = 0x1;
+    public const TYPE_SBFS    = 0x2;
+    public const TYPE_MYFILE  = 0x4;
+    public const TYPE_WEBDAV  = 0x8;
+    public const TYPE_OFFICE  = 0x10;
+    public const TYPE_ALL     = 0xFF;
 
-    const TYPE_STORAGE = 0x1;
-    const TYPE_SBFS    = 0x2;
-    const TYPE_MYFILE  = 0x4;
-    const TYPE_WEBDAV  = 0x8;
-    const TYPE_OFFICE  = 0x10;
-    const TYPE_ALL     = 0xFF;
-
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $source;
 
-    /** @var TypeHandlerInterface[] */
+
+    /**
+     * @var TypeHandlerInterface[]
+     */
     protected $handlers;
 
 
     /**
-     * @param array $source - in the form $source[$type][$i] = $id
+     * Constructor
+     *
+     * @param array                  $source in the form $source[$type][$i] = $id
      * @param TypeHandlerInterface[] $handlers
      */
-    public function __construct($source, $handlers)
+    public function __construct(array $source, array $handlers)
     {
-        $this->source = $source;
+        $this->source   = $source;
         $this->handlers = $handlers;
     }
 
 
     /**
-     * @param int $filter
+     * Retrieves the first result in the collector which matches the filter.
+     *
+     * @param int $filter A bitmask of the `self::TYPE_*` constants
      * @throws ResourceException
      * @return IStorage
      */
-    public function getFirst($filter = self::TYPE_ALL)
+    public function getFirst($filter = self::TYPE_ALL): IStorage
     {
         foreach ($this->source as $type => $ids) {
             if (!$type & $filter) {
                 continue;
             }
             foreach ($ids as $id) {
-                if($result = $this->get($type, $id)) {
+                if ($result = $this->get($type, $id)) {
                     return $result;
                 }
             }
@@ -62,19 +68,21 @@ class Collector
 
 
     /**
-     * @param int $filter
+     * Retrieves all results in the collector which match the filter.
+     *
+     * @param int $filter A bitmask of the `self::TYPE_*` constants
      * @return IStorage[]
      */
-    public function getAll($filter = self::TYPE_ALL)
+    public function getAll($filter = self::TYPE_ALL): array
     {
-        $result = array();
+        $result = [];
 
         foreach ($this->source as $type => $ids) {
-            if(!$type & $filter) {
+            if (!$type & $filter) {
                 continue;
             }
             foreach ($ids as $id) {
-                if($r = $this->get($type, $id)) {
+                if ($r = $this->get($type, $id)) {
                     $result[] = $r;
                 }
             }
@@ -85,18 +93,37 @@ class Collector
 
 
     /**
-     * @param int $type
+     * Retrieves a single result from the given handler and ID.
+     *
+     * @param int    $type
      * @param string $id
-     * @return IStorage
+     * @return IStorage|null
      */
-    protected function get($type, $id)
+    protected function get($type, $id): ?IStorage
     {
-
         if (empty($this->handlers[$type])) {
             return null;
         }
 
-        return $this->handlers[$type]->fetch($id);
+        [$id, $replacementBasename] = $this->parseId($id);
+        $storage = clone $this->handlers[$type]->fetch($id);
+        if (isset($storage, $replacementBasename)) {
+            $storage->setBasename($replacementBasename);
+        }
+        return $storage;
     }
 
-} 
+
+    /**
+     * Parse an ID into its identifier and optional basename
+     * (filename+extension).
+     *
+     * @param string $id
+     * @return array 0: the actual ID
+     *               1: a replacement basename, if it exists
+     */
+    private function parseId(string $id): array
+    {
+        return array_pad(explode(':', $id, 2), 2, null);
+    }
+}
