@@ -253,7 +253,7 @@ class Module extends Alaress\Module\Module
         }
 
         $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), null);
 
         /** @var Folder\Model $involvedFolder */
         foreach ($folders as $involvedFolder) {

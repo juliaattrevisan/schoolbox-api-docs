@@ -662,7 +662,7 @@ class CliPdfGenerator extends CliTool\App
             return $urls;
         }
 
-        $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes);
+        $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes, $this->roleTypeOverride);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
         foreach ($classFolders as $folder) {
@@ -682,18 +682,19 @@ class CliPdfGenerator extends CliTool\App
     /**
      * Returns the set of folders a user is/was enrolled in, that are not excluded
      *
-     * @param User  $student
-     * @param array $externalStudent
+     * @param User        $student
+     * @param array       $externalStudent
      * @param null|string $excludedClassCodes
+     * @param string|null $roleTypeOverride
      * @return Collection|Folder\Model[]
      * @throws InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes): Collection
+    private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes, ?string $roleTypeOverride): Collection
     {
         $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->reportDateOverride);
-        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes);
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes, $roleTypeOverride);
     }
 
 
