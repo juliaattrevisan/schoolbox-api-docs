@@ -90,7 +90,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	}
 
 	.selectize-input {
-		.error {
+		.item.error {
 			background-color: $selectize-error-background !important;
 			color: $selectize-error-text !important;
 
