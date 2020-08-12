@@ -143,7 +143,7 @@ class Collector
 
         [$id, $replacementBasename] = $this->parseKey($key);
         $storage = clone $this->handlers[$type]->fetch($id);
-        if (isset($storage, $replacementBasename)) {
+        if (isset($replacementBasename)) {
             $storage->setBasename($replacementBasename);
         }
         return $storage;
