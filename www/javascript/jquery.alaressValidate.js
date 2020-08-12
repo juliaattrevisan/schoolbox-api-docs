@@ -400,8 +400,10 @@
             element.parents('fieldset').find('div.error-placeholder').html(error);
         } else if (element.closest('.input-group').length) {
             error.insertAfter(element.closest('.input-group'));
-        } else if (element.is('.selectized')) {
-            error.insertAfter(element.closest('div, fieldset').find('.selectize-control'));
+        } else if (element[0].selectize) {
+            // var elements = element.closest('div, fieldset').find('.selectize-control');
+            // console.log(elements);
+            error.insertAfter(element[0].selectize.$control);
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
             var parentSearch;
 
