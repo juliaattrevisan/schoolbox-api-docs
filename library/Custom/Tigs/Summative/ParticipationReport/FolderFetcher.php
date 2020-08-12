@@ -121,23 +121,6 @@ class FolderFetcher
         //        AND sb.mark_visibility = 0
 
 
-        /* If there were submissions, show these folders;
-         * Otherwise remove them, since the student was known for participating in them
-         * but didn't actually submit anything
-         */
-
-        //    -- folders with submissions in them - but why do we need this, and (3)
-        //    SELECT
-        //    DISTINCT ar.folder_id,
-        //    ss.id
-        //    FROM participant p
-        //    INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
-        //    INNER JOIN v_assessment_relation ar ON pp.assessment_id = ar.assessment_id
-        //    LEFT JOIN submission_box sb ON sb.assessment_id = ar.assessment_id
-        //    LEFT JOIN student_submission ss ON ss.box_id = sb.id
-        //    WHERE p.user_id = 220
-        //    AND ss.id IS NOT NULL
-
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
             $folders = $folders->mergeUnique(
