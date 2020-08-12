@@ -69,7 +69,31 @@ class FolderFetcher
             ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
             ->setActualFinish($attributes->getCurriculumSemesterFinish());
 
+        /* This actually returns folders with Participations, findFoldersWithInteractionsForStudent()
+         * is probably not the best function name for what it does.
+         */
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($student, $term);
+
+        /* For SA-10636 we need to filter this set of $folders even further; classes to show
+         * are a function of their submissions/feedbacks and feedbacks' visibilities
+         */
+
+        /* If a student has a published feedback for an assessment in a particular folder,
+         * and the visibility of that feedback was students or parents, show it
+         */
+
+        /* If there was published feedback, but its visibility was set to staff,
+         * show only to staff
+         */
+
+        /* If there were no submissions, hide it
+         */
+
+        /* If there was no feedback hide it
+         */
+
+
+
 
         // Only retain folders that are either current or rolled-over classes
         $folders = $folders->filter(static function (Folder\Model $folder) {
