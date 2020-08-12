@@ -174,7 +174,7 @@ class FolderFetcher
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
             $folders = $folders->mergeUnique(
-                $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)),
+                $currentClasses,
                 $this->folderMapper->getIdentifierProperty()
             );
         }
