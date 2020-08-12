@@ -160,7 +160,7 @@ class FolderFetcher
         /* Iterate through folders, unsetting everything outside of $preservedClassIds
          */
         foreach ($folders as $idx => $folder) {
-            if (!\in_array($idx, $preservedClassIds, false)) {
+            if (!\in_array($folder->getId(), $preservedClassIds, false)) {
                 $folders->offsetUnset($idx);
             }
         }
