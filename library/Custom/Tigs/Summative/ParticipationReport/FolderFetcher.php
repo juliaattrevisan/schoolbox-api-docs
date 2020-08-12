@@ -88,6 +88,14 @@ class FolderFetcher
          *
          * Initially, presume them all to be hidden (excluded) unless deemed otherwise
          */
+        $participatingClassIds = $folders->getPropertyValues('id');
+
+        $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
+        $currentClassIds = $currentClasses->getPropertyValues('id');
+
+        /* The next pair of clauses aims to reduce this set further
+         */
+        $oldClassIds = array_diff($participatingClassIds, $currentClassIds);
 
         /* If a student has a published feedback for an assessment in a particular folder,
          * and the visibility of that feedback was students or parents, show it
