@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use Schoolbox\Learning\Assessment\Feedback\Visibility;
+use Schoolbox\Learning\Assessment\IAssessable;
 use function array_filter;
 use function array_map;
 use function array_merge;
@@ -93,41 +95,71 @@ class FolderFetcher
         $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
         $currentClassIds = $currentClasses->getPropertyValues('id');
 
-        /* The next pair of clauses aims to reduce this set further
+        /* All their old classes from which they moved
+         * The next set of clauses aims to reduce this set further
          */
         $oldClassIds = array_diff($participatingClassIds, $currentClassIds);
 
         /* If a student has a published feedback for an assessment in a particular folder,
          * and the visibility of that feedback was students or parents, show it
          */
+        $statement = $this->folderMapper->getDatabase()->prepare('
+            SELECT
+                ar.folder_id,
+                sb.mark_visibility
+            FROM `submission_return` sr
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
+            WHERE sr.`owner` = :ownerId
+            AND sr.deleted_at IS NULL
+            AND sb.mark_visibility >= :visibility
+        ');
 
-        //    -- (1) folders with published feedback, student/parent visible
-        //    SELECT
-        //    ar.assessment_id, ar.folder_id,
-        //    sb.id, sb.mark_visibility,
-        //    sr.*
-        //    FROM `submission_return` sr
-        //    INNER JOIN submission_box sb ON sr.box_id = sb.id
-        //    INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
-        //    WHERE sr.`owner` = 220
-        //        AND sb.mark_visibility >= 0
-
-
-        /* If there was published feedback, but its visibility was set to staff,
-         * show only to staff
+        /* If the report is being viewed by a staff
          */
+        $statement->execute([
+            'ownerId' => $student->getId(),
+            'visibility' => IAssessable::MARK_VISIBILITY_PRIVATE
+        ]);
 
-        //    -- (4) folders with published feedback, staff visible
-        //    SELECT
-        //    ar.assessment_id, ar.folder_id,
-        //    sb.id, sb.mark_visibility,
-        //    sr.*
-        //    FROM `submission_return` sr
-        //    INNER JOIN submission_box sb ON sr.box_id = sb.id
-        //    INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
-        //    WHERE sr.`owner` = 220
-        //        AND sb.mark_visibility = 0
+        /* If the report is being viewed by a student
+         */
+        $statement->execute([
+            'ownerId' => $student->getId(),
+            'visibility' => IAssessable::MARK_VISIBILITY_STUDENT
+        ]);
 
+        /* If the report is being viewed by a parent
+         */
+        $statement->execute([
+            'ownerId' => $student->getId(),
+            'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT
+        ]);
+
+        $keepIds = [];
+
+        foreach ($statement as $row) {
+            $keepIds[] = $row['folder_id'];
+        }
+
+        /* Manufacture an intersect; these are the old classes we need to keep
+         * because the current user can view some kind of feedback in them
+         */
+        $preservedClassIds = array_intersect($oldClassIds, $keepIds);
+
+        /* Iterate through folders, unsetting everything outside of $preservedClassIds
+         */
+        foreach ($folders as $idx => $folder) {
+            if (!\in_array($idx, $preservedClassIds, false)) {
+                $folders->offsetUnset($idx);
+            }
+        }
+
+        /* Then slap it together with the current student's classes, if reportDate not set
+         *
+         * Either way, this should give us only relevant previous classes as it filters out
+         * all previous classes that had no useful feedbacks in them
+         */
 
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
