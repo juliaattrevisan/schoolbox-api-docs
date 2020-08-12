@@ -22,13 +22,7 @@ case "$1" in
         # start logging
         date >> /var/log/schoolbox/upgrade.log;
         echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
-        # Test whether a2enmod is available (and thus also apache2ctl).
-        if [ -x /usr/sbin/a2enmod ]; then
-            # Enable the Apache2 rewrite module if not already enabled
-            a2enmod rewrite > /dev/null || true
-            a2enmod ssl > /dev/null || true
-            a2enmod headers > /dev/null || true
-        fi
+
         chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
