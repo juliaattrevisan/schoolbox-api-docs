@@ -97,9 +97,6 @@
                     // settings.value
                     var self = this;
 
-                    // Clear required attr to avoid jQuery validation conflict
-                    self.$control_input.removeAttr('required');
-
                     // Don't clear options if the caller explicitly provided them.
                     if (!(
                         options.hasOwnProperty('selectize') &&
@@ -173,6 +170,10 @@
         // Set up selectize on all elements
         element.each(function() {
             var singleElement = $(this);
+
+            // Clear required attr to avoid jQuery validation conflict
+            singleElement.removeAttr('required');
+
             singleElement.val('').selectize(settings.selectize);
 
             // Is this selectize inside a foundation modal ?
