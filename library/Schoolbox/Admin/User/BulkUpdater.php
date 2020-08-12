@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\User;
 
-use Alaress\Database\Wrapper\Db2\PDOStatement;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\User;
