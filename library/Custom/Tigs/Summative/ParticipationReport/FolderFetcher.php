@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
-use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
 use function array_filter;
 use function array_map;
