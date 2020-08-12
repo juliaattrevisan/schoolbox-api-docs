@@ -58,11 +58,12 @@ class FolderFetcher
      * @param StudentAttributes $attributes
      * @param string|null       $reportDate
      * @param null|string       $excludedClassCodes
+     * @param string|null       $roleTypeOverride
      * @return GenericCollection|Folder\Model[]
-     * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
+     * @throws \PDOException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, ?string $roleTypeOverride): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())
@@ -114,26 +115,36 @@ class FolderFetcher
             AND sb.mark_visibility >= :visibility
         ');
 
-        /* If the report is being viewed by a staff
-         */
-        $statement->execute([
-            'ownerId' => $student->getId(),
-            'visibility' => IAssessable::MARK_VISIBILITY_PRIVATE
-        ]);
+        switch ($roleTypeOverride) {
 
-        /* If the report is being viewed by a student
-         */
-        $statement->execute([
-            'ownerId' => $student->getId(),
-            'visibility' => IAssessable::MARK_VISIBILITY_STUDENT
-        ]);
+            /* If the report is being viewed by a student
+             */
+            case \Schoolbox\Role::STUDENT:
+                $statement->execute([
+                    'ownerId' => $student->getId(),
+                    'visibility' => IAssessable::MARK_VISIBILITY_STUDENT
+                ]);
+                break;
 
-        /* If the report is being viewed by a parent
-         */
-        $statement->execute([
-            'ownerId' => $student->getId(),
-            'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT
-        ]);
+            /* If the report is being viewed by a parent
+             */
+            case \Schoolbox\Role::PARENT:
+                $statement->execute([
+                    'ownerId' => $student->getId(),
+                    'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT
+                ]);
+                break;
+
+            /* If the report is being viewed by a staff
+             */
+            case \Schoolbox\Role::STAFF:
+            default:
+                $statement->execute([
+                    'ownerId'    => $student->getId(),
+                    'visibility' => IAssessable::MARK_VISIBILITY_PRIVATE
+                ]);
+                break;
+        }
 
         $keepIds = [];
 

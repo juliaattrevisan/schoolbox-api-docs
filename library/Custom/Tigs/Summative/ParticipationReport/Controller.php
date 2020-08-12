@@ -157,7 +157,7 @@ class Controller extends Web\Controller\Base
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
-        $subjectList   = $this->getSubjectList($user, $attributes, $reportDate);
+        $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
         $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
@@ -443,14 +443,15 @@ class Controller extends Web\Controller\Base
      * @param User              $user
      * @param StudentAttributes $attributes
      * @param null|string       $reportDate
+     * @param string|null       $roleTypeOverride
      * @return array
-     * @throws UnexpectedValueException
      * @throws DefinitionException
+     * @throws UnexpectedValueException
      */
-    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate): array
+    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate, ?string $roleTypeOverride): array
     {
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $roleTypeOverride);
 
         $subjects = [];
         foreach ($folders as $folder) {
