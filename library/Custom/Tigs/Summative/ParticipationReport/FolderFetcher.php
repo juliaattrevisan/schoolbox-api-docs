@@ -74,8 +74,19 @@ class FolderFetcher
          */
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($student, $term);
 
+        // Only retain folders that are either current or rolled-over classes
+        $folders = $folders->filter(static function (Folder\Model $folder) {
+            return $folder->isClass() || $folder->wasClass();
+        });
+
         /* For SA-10636 we need to filter this set of $folders even further; classes to show
          * are a function of their submissions/feedbacks and feedbacks' visibilities
+         */
+
+        /* Find all the participating classes minus the ones they're in now
+         * This subtraction gives us all their old classes from which they moved
+         *
+         * Initially, presume them all to be hidden (excluded) unless deemed otherwise
          */
 
         /* If a student has a published feedback for an assessment in a particular folder,
@@ -126,17 +137,6 @@ class FolderFetcher
         //    LEFT JOIN student_submission ss ON ss.box_id = sb.id
         //    WHERE p.user_id = 220
         //    AND ss.id IS NOT NULL
-
-
-
-
-
-
-
-        // Only retain folders that are either current or rolled-over classes
-        $folders = $folders->filter(static function (Folder\Model $folder) {
-            return $folder->isClass() || $folder->wasClass();
-        });
 
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
