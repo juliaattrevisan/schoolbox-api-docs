@@ -95,7 +95,11 @@
                 onInitialize: function() {
                     // Initialize: clear existing options, and add items from
                     // settings.value
-                    var self = this
+                    var self = this;
+
+                    // Clear required attr to avoid jQuery validation conflict
+                    self.$control_input.removeAttr('required');
+
                     // Don't clear options if the caller explicitly provided them.
                     if (!(
                         options.hasOwnProperty('selectize') &&
