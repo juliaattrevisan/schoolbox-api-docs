@@ -82,15 +82,53 @@ class FolderFetcher
          * and the visibility of that feedback was students or parents, show it
          */
 
+        //    -- (1) folders with published feedback, student/parent visible
+        //    SELECT
+        //    ar.assessment_id, ar.folder_id,
+        //    sb.id, sb.mark_visibility,
+        //    sr.*
+        //    FROM `submission_return` sr
+        //    INNER JOIN submission_box sb ON sr.box_id = sb.id
+        //    INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
+        //    WHERE sr.`owner` = 220
+        //        AND sb.mark_visibility >= 0
+
+
         /* If there was published feedback, but its visibility was set to staff,
          * show only to staff
          */
 
-        /* If there were no submissions, hide it
+        //    -- (4) folders with published feedback, staff visible
+        //    SELECT
+        //    ar.assessment_id, ar.folder_id,
+        //    sb.id, sb.mark_visibility,
+        //    sr.*
+        //    FROM `submission_return` sr
+        //    INNER JOIN submission_box sb ON sr.box_id = sb.id
+        //    INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
+        //    WHERE sr.`owner` = 220
+        //        AND sb.mark_visibility = 0
+
+
+        /* If there were submissions, show these folders;
+         * Otherwise remove them, since the student was known for participating in them
+         * but didn't actually submit anything
          */
 
-        /* If there was no feedback hide it
-         */
+        //    -- folders with submissions in them - but why do we need this, and (3)
+        //    SELECT
+        //    DISTINCT ar.folder_id,
+        //    ss.id
+        //    FROM participant p
+        //    INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
+        //    INNER JOIN v_assessment_relation ar ON pp.assessment_id = ar.assessment_id
+        //    LEFT JOIN submission_box sb ON sb.assessment_id = ar.assessment_id
+        //    LEFT JOIN student_submission ss ON ss.box_id = sb.id
+        //    WHERE p.user_id = 220
+        //    AND ss.id IS NOT NULL
+
+
+
 
 
 
