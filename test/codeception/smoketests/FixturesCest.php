@@ -12,6 +12,7 @@ namespace smoketests;
 
 use IntegrationTester;
 use Payload;
+use React\Tests\Socket\IntegrationTest;
 
 class FixturesCest
 {
@@ -134,5 +135,59 @@ class FixturesCest
         
         $i->seeResponseCodeIs('200');
     }
+    
+    public function createStatus(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $statusName= 'AutoTest SCreate ' . $timestamp;
+        $newStatus = new Payload\Fixtures\Status\Create($statusName);
+        
+        $i->sendRequest($newStatus);
+        
+        $i->seeResponseCodeIs('200');
+    }
+    
+    public function updateStatus(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $statusName= 'AutoTest SChangeMe ' . $timestamp;
+        
+        $newStatus = new Payload\Fixtures\Status\Create($statusName);
+        
+        $i->sendRequest($newStatus);
+        
+        $statusMapper=\Schoolbox\Fixtures\Status\Mapper::getInstance();
+        $statusModel=$statusMapper->findOneByColumn('name', $statusName);
+        
+        $updateStatus = new Payload\Fixtures\Status\Update($statusModel);
+        
+        $newStatusName= 'AutoTest SUpdate ' . $timestamp;
+        $updateStatus->setName($newStatusName);
+        
+        $i->sendRequest($updateStatus);
+        
+        $i->seeResponseCodeIs('200');
+        
+    }
+    
+    public function deleteStatus(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $statusName= 'AutoTest SDeleteMe ' . $timestamp;
+        
+        $newStatus = new Payload\Fixtures\Status\Create($statusName);
+        
+        $i->sendRequest($newStatus);
+        
+        $statusMapper=\Schoolbox\Fixtures\Status\Mapper::getInstance();
+        $statusModel=$statusMapper->findOneByColumn('name', $statusName);
+        
+        $deleteStatus = new Payload\Fixtures\Status\Delete($statusModel);
+        
+        $i->sendRequest($deleteStatus);
+        
+        $i->seeResponseCodeIs('204');
+    }
+    
+    
 }
-?>
