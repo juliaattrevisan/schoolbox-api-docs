@@ -77,10 +77,11 @@ trait FormTrait
         $this->setFormParam('title', $title);
     }
 
-    public function setRubricCapability(int $index, ?int $id, string $name): void
+    public function setRubricCapability(int $index, ?int $id, string $name, ?int $maxMark): void
     {
         $assessmentId = $this->getRubricAssessmentId();
 
+        $this->setFormParam("rb[$assessmentId][group][$index][maxValue]", $maxMark === null ? '' : (string)$maxMark);
         $this->setFormParam("rb[$assessmentId][group][$index][id]", $id === null ? '' : (string)$id);
         $this->setFormParam("rb[$assessmentId][group][$index][name]", $name);
     }

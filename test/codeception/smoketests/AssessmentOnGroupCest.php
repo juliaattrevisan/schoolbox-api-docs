@@ -366,6 +366,10 @@ class AssessmentOnGroupCest
         $capabilityNameSuffixes           = ['I', 'II', 'III'];
         $indicatorNameSuffixes            = ['1', '2', '3'];
         $levelNameSuffixes                = ['A', 'B', 'C'];
+        
+        $assessmentPayload->setFormParam('capability-markType', '1');
+        $assessmentPayload->setFormParam('capability-gradingScheme', '1');
+        $assessmentPayload->setFormParam('maxMark', '12');
 
         // Set rubric levels
         foreach ($levelNameSuffixes as $levelIndex => $levelNameSuffix) {
@@ -388,7 +392,7 @@ class AssessmentOnGroupCest
             $i->seeResponseCodeIs(200);
 
             // Initially form does not contain a capability id (only created when first indicator crated)
-            $assessmentPayload->setRubricCapability($capIndex, null, $capabilityName);
+            $assessmentPayload->setRubricCapability($capIndex, null, $capabilityName, null);
 
             foreach ($indicatorNameSuffixes as $indicatorNameSuffix) {
                 $indicatorName          = "Indicator #$indicatorNameSuffix";
@@ -411,7 +415,7 @@ class AssessmentOnGroupCest
                 $indicatorId = (int)$matches[1];
                 unset($matches);
 
-                $assessmentPayload->setRubricCapability($capIndex, $capabilityId, $capabilityName);
+                $assessmentPayload->setRubricCapability($capIndex, $capabilityId, $capabilityName, 4);
                 $assessmentPayload->setRubricIndicator($indicatorId, $capabilityId, $indicatorName, true);
 
                 foreach ($levelNameSuffixes as $levelIndex => $levelNameSuffix) {

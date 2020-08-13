@@ -252,7 +252,13 @@ class HomePageCest
      * Set up text component on homepage using curl requests. Sets up a text component, creates text in it, deletes it.
      *
      * Fires off create homepage.
+     * 
+     * ** Needs a complete rework.
+     *  Text box creation has changed to a completely different path, it uses a POST request to initialise the component
+     *  It uses then a get request to push the component change for the title when adding the initial title
+     *  Lastly it then has a sepperate request to modify to add the body text going to a new textbox inpoint.
      *
+     * @incomplete
      * @param IntegrationTester $i
      */
     public function setUpTextComponent(IntegrationTester $i): void
@@ -302,7 +308,7 @@ class HomePageCest
         $i->sendRequest($textBoxPayload);
 
         #THEN
-        $i->seeResponseCodeIs(302);
+        $i->seeResponseCodeIs(200);
 
         #WHEN
         $textComponentPayload = new Payload\Homepage\Component\Config($homePage->getId());
