@@ -274,4 +274,73 @@ class FixturesCest
         $i->seeResponseCodeIs('204');
     }
     
+    
+    /**
+     * Request URL:
+     *
+     *
+     * @param IntegrationTester $i
+     */
+    public function createExtSchool(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $schoolName= 'AutoTest SCreate ' . $timestamp;
+        $newSchool = new Payload\Fixtures\School\Create($schoolName);
+        
+        $i->sendRequest($newSchool);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateExtSchool(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $schoolName= 'AutoTest SChangeMe ' . $timestamp;
+        
+        $newSchool = new Payload\Fixtures\School\Create($schoolName);
+        
+        $i->sendRequest($newSchool);
+        
+        $schoolMapper=\Schoolbox\Fixtures\School\Mapper::getInstance();
+        $schoolModel=$schoolMapper->findOneByColumn('name', $schoolName);
+        
+        $updateSchool = new Payload\Fixtures\School\Update($schoolModel);
+        
+        $newSchoolName= 'AutoTest SUpdate ' . $timestamp;
+        $updateSchool->setName($newSchoolName);
+        
+        $i->sendRequest($updateSchool);
+        
+        $i->seeResponseCodeIs('303');
+        
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function deleteExtSchool(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $schoolName= 'AutoTest SDeleteMe ' . $timestamp;
+        
+        $newSchool = new Payload\Fixtures\School\Create($schoolName);
+        
+        $i->sendRequest($newSchool);
+        
+        $schoolMapper=\Schoolbox\Fixtures\School\Mapper::getInstance();
+        $schoolModel=$schoolMapper->findOneByColumn('name', $schoolName);
+        
+        $deleteSchool = new Payload\Fixtures\School\Delete($schoolModel);
+        
+        $i->sendRequest($deleteSchool);
+        
+        $i->seeResponseCodeIs('200');
+    }
 }
