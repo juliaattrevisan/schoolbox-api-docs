@@ -55,17 +55,11 @@ class External_DatabaseFactory
         // Try each database class in order of definition
         foreach ($databaseClasses as $databaseClass) {
             try {
-                $reflectionClass = new ReflectionClass($databaseClass);
+                return $this->buildClassInstance($databaseClass, $extraParams);
             } catch (ReflectionException $e) {
                 // Class doesn't exist: try the next one
                 continue;
-            }
-
-            try {
-                /** @var External\IConnector $connector */
-                $connector = $reflectionClass->newInstanceArgs($extraParams);
-                return $connector;
-            } catch (\Schoolbox\External\Exception|\Alaress\Database\Exception $e) {
+            } catch (Schoolbox\External\Exception|Alaress\Database\Exception $e) {
                 // Something went wrong, probably could not connect. Try the next one
                 continue;
             }
@@ -74,12 +68,35 @@ class External_DatabaseFactory
         // At this point: return an offline class.
         // If even that doesn't exist, error out.
         try {
-            $reflectionClass = new ReflectionClass($offlineClass);
-            $connector       = $reflectionClass->newInstanceArgs($extraParams);
-            return $connector;
-        } catch (ReflectionException $e) {
+            return $this->buildClassInstance($offlineClass, $extraParams);
+        } catch (ReflectionException|Schoolbox\External\Exception|Alaress\Database\Exception $e) {
             throw new LogicException("Class \"$offlineClass\" does not exist");
         }
+    }
+
+
+    /**
+     * Helper method for constructing an instance of `$databaseClass`.
+     *
+     * @param string $databaseClass
+     * @param array  $extraParams
+     * @return External\IConnector
+     * @throws ReflectionException          if `$databaseClass` doesn't exist
+     * @throws Schoolbox\External\Exception if for some reason the class could
+     *                                      not be constructed
+     * @throws Alaress\Database\Exception   if the instance couldn't connect to
+     *                                      its DB
+     */
+    private function buildClassInstance(string $databaseClass, array $extraParams): External\IConnector
+    {
+        $reflectionClass = new ReflectionClass($databaseClass);
+
+        /** @var External\IConnector $connector */
+        $connector = $reflectionClass->getConstructor()
+            ? $reflectionClass->newInstanceArgs($extraParams)
+            : $reflectionClass->newInstanceWithoutConstructor();
+
+        return $connector;
     }
 
 
@@ -186,10 +203,10 @@ class External_DatabaseFactory
             'markType' => Config::get('synergetic_mark_sync_value'),
         ];
         if(Config::get('external_markbook')) {
-            return $this->buildConnector('Markbook', $databaseName);
+            return $this->buildConnector('Markbook', $databaseName, $extraParams);
         }
 
-        return $this->buildConnector('Markbook', 'Offline');
+        return $this->buildConnector('Markbook', 'Offline', $extraParams);
     }
 
     /**
