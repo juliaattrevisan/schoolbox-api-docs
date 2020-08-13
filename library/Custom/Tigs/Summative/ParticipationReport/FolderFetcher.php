@@ -37,6 +37,12 @@ class FolderFetcher
 
 
     /**
+     * @var PreviousClassIdCache
+     */
+    private $previousClassIdCache;
+
+
+    /**
      * @param Folder\Mapper          $folderMapper
      * @param External_UserInterface $externalUser
      */
@@ -44,6 +50,10 @@ class FolderFetcher
     {
         $this->folderMapper = $folderMapper;
         $this->externalUser = $externalUser;
+
+        /* A cache for remembering previous class ids
+         */
+        $this->previousClassIdCache = new PreviousClassIdCache($folderMapper);
     }
 
 
@@ -84,81 +94,8 @@ class FolderFetcher
         /* For SA-10636 we need to filter this set of $folders even further; classes to show
          * are a function of their submissions/feedbacks and feedbacks' visibilities
          */
-
-        /* Find all the participating classes minus the ones they're in now
-         * This subtraction gives us all their old classes from which they moved
-         *
-         * Initially, presume them all to be hidden (excluded) unless deemed otherwise
-         */
-        $participatingClassIds = $folders->getPropertyValues('id');
-
         $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
-        $currentClassIds = $currentClasses->getPropertyValues('id');
-
-        /* All their old classes from which they moved
-         * The next set of clauses aims to reduce this set further
-         */
-        $oldClassIds = array_diff($participatingClassIds, $currentClassIds);
-
-        /* If a student has a published feedback for an assessment in a particular folder,
-         * and the visibility of that feedback was students or parents, show it
-         */
-        $statement = $this->folderMapper->getDatabase()->prepare('
-            SELECT DISTINCT ar.folder_id
-            FROM `submission_return` sr
-            INNER JOIN submission_box sb ON sr.box_id = sb.id
-            INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
-            INNER JOIN folder f ON ar.folder_id = f.id
-            INNER JOIN assessment a ON ar.assessment_id = a.id
-            WHERE sr.`owner` = :ownerId
-            AND sr.deleted_at IS NULL
-            AND sr.published_at IS NOT NULL
-            AND sb.mark_visibility >= :visibility
-            AND f.deleted_at IS NULL
-            AND a.deleted_at IS NULL
-        ');
-
-        switch ($roleTypeOverride) {
-
-            /* If the report is being viewed by a student
-             */
-            case Role::STUDENT:
-                $statement->execute([
-                    'ownerId' => $student->getId(),
-                    'visibility' => IAssessable::MARK_VISIBILITY_STUDENT
-                ]);
-                break;
-
-            /* If the report is being viewed by a parent
-             */
-            case Role::PARENT:
-                $statement->execute([
-                    'ownerId' => $student->getId(),
-                    'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT
-                ]);
-                break;
-
-            /* If the report is being viewed by a staff
-             */
-            case Role::STAFF:
-            default:
-                $statement->execute([
-                    'ownerId'    => $student->getId(),
-                    'visibility' => IAssessable::MARK_VISIBILITY_PRIVATE
-                ]);
-                break;
-        }
-
-        $keepIds = [];
-
-        foreach ($statement as $row) {
-            $keepIds[] = $row['folder_id'];
-        }
-
-        /* Manufacture an intersect; these are the old classes we need to keep
-         * because the current user can view some kind of feedback in them
-         */
-        $preservedClassIds = array_intersect($oldClassIds, $keepIds);
+        $preservedClassIds = $this->previousClassIdCache->find($student, $folders, $currentClasses, $roleTypeOverride);
 
         /* Iterate through folders, unsetting everything outside of $preservedClassIds
          */
@@ -232,5 +169,14 @@ class FolderFetcher
         }
 
         return false;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getPreviouClassIds(): array
+    {
+        return $this->previousClassIdCache->getIds();
     }
 }
