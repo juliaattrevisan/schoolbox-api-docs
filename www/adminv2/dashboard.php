@@ -10,7 +10,7 @@
 
 /** @var SitePage $this */
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    error(19);
+    error(19, "", 401);
 }
 
 /** @var SitePage $this */

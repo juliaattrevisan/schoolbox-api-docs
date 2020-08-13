@@ -13,7 +13,7 @@ if(!isset($this)) {
 }
 
 if(!$_SESSION['user']->isSuperuser()) {
-    error(101);
+    error(101, "", 401);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/rubric-results.html');

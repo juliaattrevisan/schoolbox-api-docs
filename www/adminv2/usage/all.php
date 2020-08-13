@@ -10,7 +10,7 @@
 use Schoolbox\Config\ConfigMapper;
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19);
+    error(19, "", 401);
 }
 
 $mapper = new \Schoolbox\Usage\All\UsageMapper();

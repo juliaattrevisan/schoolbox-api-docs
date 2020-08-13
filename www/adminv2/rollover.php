@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder;
 $group = new Group();
 
 if (!$group->isSuperuser()) {
-    error(19);
+    error(19, "", 401);
 }
 
 /**

@@ -7,7 +7,7 @@ use Schoolbox\File\MimetypeMapper;
 
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19);
+    error(19, "", 401);
 }
 
 $this->setTitle('Admin - Allowed Files');
