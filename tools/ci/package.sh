@@ -81,14 +81,6 @@ do
     exit 1;
   fi
 
-	echo "[$i] Create package specfic directory sql";
-	tools/generate-dir-sql.sh /var/lib/$i > sql/$i-package-config.sql;
-	if [ $? -ne 0 ];
-	then
-		echo "Error creating package specific directory sql";
-		exit 1;
-	fi
-
 	echo "[$i] Updating files with package specific names"
 	tools/pkg-live-vs-dev.sh $i;
 	if [ $? -ne 0 ];
