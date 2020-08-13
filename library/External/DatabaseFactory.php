@@ -21,13 +21,16 @@ class External_DatabaseFactory
      * @param string $databaseName The database type to use. Defaults to
      *                             whatever the configured external DB is, or
      *                             "offline" if it isn't enabled.
+     * @param array  $extraParams  Any extra parameters which may be passed to
+     *                             the connector's constructor.
+     *                             key: param name, value: param value
      *
      * @return External\IConnector
      * @throws LogicException if even the offline class could not be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
      */
-    private function buildConnector(string $databaseType, string $databaseName = ''): External\IConnector
+    private function buildConnector(string $databaseType, string $databaseName = '', array $extraParams = []): External\IConnector
     {
         $offlineClass    = "External_Offline_$databaseType";
         $databaseClasses = array();
@@ -51,22 +54,74 @@ class External_DatabaseFactory
 
         // Try each database class in order of definition
         foreach ($databaseClasses as $databaseClass) {
-
-            if (file_exists(Autoloader::getClassFile($databaseClass))) {
-                try {
-                    return new $databaseClass();
-                } catch (\Schoolbox\External\Exception $e) {
-                } catch (\Alaress\Database\Exception $e) {
-                }
+            try {
+                return $this->buildClassInstance($databaseClass, $extraParams);
+            } catch (ReflectionException $e) {
+                // Class doesn't exist: try the next one
+                continue;
+            } catch (Schoolbox\External\Exception|Alaress\Database\Exception $e) {
+                // Something went wrong, probably could not connect. Try the next one
+                continue;
             }
         }
 
         // At this point: return an offline class.
         // If even that doesn't exist, error out.
-        if (class_exists($offlineClass, true)) {
-            return new $offlineClass();
+        try {
+            return $this->buildClassInstance($offlineClass, $extraParams);
+        } catch (ReflectionException|Schoolbox\External\Exception|Alaress\Database\Exception $e) {
+            throw new LogicException("Class \"$offlineClass\" does not exist");
         }
-        throw new LogicException("Class \"$offlineClass\" does not exist");
+    }
+
+
+    /**
+     * Helper method for constructing an instance of `$databaseClass`.
+     *
+     * @param string $databaseClass
+     * @param array  $extraParams
+     * @return External\IConnector
+     * @throws ReflectionException          if `$databaseClass` doesn't exist
+     * @throws BadFunctionCallException     if not all mandatory parameters to
+     *                                      `$databaseClass` constructor were
+     *                                      passed
+     * @throws Schoolbox\External\Exception if for some reason the class could
+     *                                      not be constructed
+     * @throws Alaress\Database\Exception   if the instance couldn't connect to
+     *                                      its DB
+     */
+    private function buildClassInstance(string $databaseClass, array $extraParams): External\IConnector
+    {
+        $reflectionClass = new ReflectionClass($databaseClass);
+
+        /** @var External\IConnector $connector */
+        $connector   = null;
+        $constructor = $reflectionClass->getConstructor();
+        if (!$constructor) {
+            $connector = $reflectionClass->newInstanceWithoutConstructor();
+        } else {
+            // Build a list of params, as that's what `newInstanceArgs` expects.
+            $positionalParams = [];
+
+            foreach ($constructor->getParameters() as $i => $parameter) {
+                $paramName = $parameter->getName();
+                if (array_key_exists($paramName, $extraParams)) {
+                    $positionalParams[$i] = $extraParams[$paramName];
+                } elseif ($parameter->isDefaultValueAvailable()) {
+                    $positionalParams[$i] = $parameter->getDefaultValue();
+                } else {
+                    // No param value was provided, and there's no default:
+                    // this is almost certainly an error
+                    throw new BadFunctionCallException(
+                        sprintf('Class "%s" constructor is missing argument %d (%s)', $databaseClass, $i+1, $paramName)
+                    );
+                }
+            }
+
+            $connector = $reflectionClass->newInstanceArgs($positionalParams);
+        }
+
+        return $connector;
     }
 
 
@@ -169,11 +224,14 @@ class External_DatabaseFactory
      */
     public function buildMarkbookConnector(string $databaseName = ''): External_MarkbookInterface
     {
+        $extraParams = [
+            'markType' => Config::get('synergetic_mark_sync_value'),
+        ];
         if(Config::get('external_markbook')) {
-            return $this->buildConnector('Markbook', $databaseName);
+            return $this->buildConnector('Markbook', $databaseName, $extraParams);
         }
 
-        return $this->buildConnector('Markbook', 'Offline');
+        return $this->buildConnector('Markbook', 'Offline', $extraParams);
     }
 
     /**
