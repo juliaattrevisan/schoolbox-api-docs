@@ -11,7 +11,7 @@
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW, "", 401);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');

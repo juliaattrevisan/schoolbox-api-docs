@@ -7,7 +7,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19);
+    error(19, "", 401);
 }
 
 /** @var SitePage $this */
