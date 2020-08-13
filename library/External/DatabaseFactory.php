@@ -82,6 +82,9 @@ class External_DatabaseFactory
      * @param array  $extraParams
      * @return External\IConnector
      * @throws ReflectionException          if `$databaseClass` doesn't exist
+     * @throws BadFunctionCallException     if not all mandatory parameters to
+     *                                      `$databaseClass` constructor were
+     *                                      passed
      * @throws Schoolbox\External\Exception if for some reason the class could
      *                                      not be constructed
      * @throws Alaress\Database\Exception   if the instance couldn't connect to
@@ -92,9 +95,31 @@ class External_DatabaseFactory
         $reflectionClass = new ReflectionClass($databaseClass);
 
         /** @var External\IConnector $connector */
-        $connector = $reflectionClass->getConstructor()
-            ? $reflectionClass->newInstanceArgs($extraParams)
-            : $reflectionClass->newInstanceWithoutConstructor();
+        $connector   = null;
+        $constructor = $reflectionClass->getConstructor();
+        if (!$constructor) {
+            $connector = $reflectionClass->newInstanceWithoutConstructor();
+        } else {
+            // Build a list of params, as that's what `newInstanceArgs` expects.
+            $positionalParams = [];
+
+            foreach ($constructor->getParameters() as $i => $parameter) {
+                $paramName = $parameter->getName();
+                if (array_key_exists($paramName, $extraParams)) {
+                    $positionalParams[$i] = $extraParams[$paramName];
+                } elseif ($parameter->isDefaultValueAvailable()) {
+                    $positionalParams[$i] = $parameter->getDefaultValue();
+                } else {
+                    // No param value was provided, and there's no default:
+                    // this is almost certainly an error
+                    throw new BadFunctionCallException(
+                        sprintf('Class "%s" constructor is missing argument %d (%s)', $databaseClass, $i+1, $paramName)
+                    );
+                }
+            }
+
+            $connector = $reflectionClass->newInstanceArgs($positionalParams);
+        }
 
         return $connector;
     }
