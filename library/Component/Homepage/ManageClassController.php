@@ -109,12 +109,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $currentTerm = $this->termMapper->findForToday();
 
         // Show markbook link to staff on class or group pages
-        if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage) && $this->getConfigLoader()->get('class_markbook_enable')) {
-            $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
-            $this->parse('markbook_link_block', 'markbook_link');
-            $hasClassActions = true;
-        } else {
-            $this->setVar('markbook_link_block');
+        $this->setVar('markbook_link_block');
+        if ($isStaffOrSuper
+            && ($isGroupPage || $isClassPage || $wasClassPage)
+            && $this->getConfigLoader()->get('class_markbook_enable')
+        ) {
+            $classMarkbookLink = $this->buildMarkbookLink($wasClassPage, $currentTerm);
+            if ($classMarkbookLink) {
+                $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
+                $this->parse('markbook_link_block', 'markbook_link');
+                $hasClassActions = true;
+            }
         }
 
         /** @var Alaress\Authorizer\Authorizer $authorizer */
@@ -123,7 +128,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $params     = ['folderId' => $this->getContext()->getId()];
 
         // Show rubric markbook link on class or group pages to those who are authorized
-        if (($isGroupPage || $isClassPage || $wasClassPage)  && $this->getConfigLoader()->get('rubric_markbook_enable') && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())) {
+        // All of these permissions should be baked into the authorizer check
+        if (($isGroupPage || $isClassPage || $wasClassPage)
+            && $this->getConfigLoader()->get('rubric_markbook_enable')
+            && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
+        ) {
             $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
             $hasClassActions = true;
@@ -132,12 +141,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Show course markbook link to staff on unit or course pages (if feature enabled)
-        if ($isStaffOrSuper && ($isUnitPage || $isCoursePage) && $this->getConfigLoader()->get('course_markbook_enable')) {
-            $this->setVar('COURSE_MARKBOOK_LINK', $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage));
-            $this->parse('course_markbook_link_block', 'course_markbook_link');
-            $hasClassActions = true;
-        } else {
-            $this->setVar('course_markbook_link_block');
+        $this->setVar('course_markbook_link_block');
+        if ($isStaffOrSuper
+            && ($isUnitPage || $isCoursePage)
+            && $this->getConfigLoader()->get('course_markbook_enable')
+        ) {
+            $courseMarkbookLink = $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage);
+            if ($courseMarkbookLink) {
+                $this->setVar('COURSE_MARKBOOK_LINK', $this->buildCourseMarkbookLink($isUnitPage, $isCoursePage));
+                $this->parse('course_markbook_link_block', 'course_markbook_link');
+                $hasClassActions = true;
+            }
         }
 
         /* Assessment Calendar Link
@@ -145,7 +159,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $route = 'learningAssessmentCalendar.getReport';
         $params = [];
 
-        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser()) && $this->getConfigLoader()->get('assessment_calendar_enabled')) {
+        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
+            && $this->getConfigLoader()->get('assessment_calendar_enabled')
+        ) {
             $assessmentCalendarUrl = $this->getRouter()->generate('learningAssessmentCalendar.getReport');
             if ($isUnitPage) {
                 $assessmentCalendarUrl .= '?course=' . $this->getContext()->getUnitSpecification()->getCourse()->getId();
@@ -227,23 +243,30 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
 
     /**
-     * If homepage was a class, don't filter markbook by term, else filter to just the current term.
+     * Build a link to the markbook, if this controller's user has permission to
+     * view it.
      *
-     * @param bool       $wasClassPage
+     * @param bool       $wasClassPage If the homepage was a class, don't filter
+     *                                 markbook by term, else filter to just the
+     *                                 current term.
      * @param Term\Model $currentTerm
-     * @return string
+     * @return string|null
      * @throws RuntimeException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): string
+    private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): ?string
     {
         $classArg = [
             'folder'   => $this->getContext(),
             'folderId' => $this->getContext()->getId(),
         ];
         if ($wasClassPage) {
-            return $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', $classArg);
+            $route = 'learningMarkbook.getMarkbookForClass';
+            if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())) {
+                return null;
+            }
+            return $this->getRouter()->generate($route, $classArg);
         }
 
         $classAndTermArgs = array_merge(
@@ -253,7 +276,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 'termCode' => $currentTerm->getCode(),
             ]
         );
-        return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
+
+        $route = 'learningMarkbook.getMarkbookForClassAndTerm';
+        if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classAndTermArgs, $this->getUser())) {
+            return null;
+        }
+        return $this->getRouter()->generate($route, $classAndTermArgs);
     }
 
     /**
