@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\ParticipationReport;
 
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Role;
 use function array_filter;
 use function array_map;
 use function array_merge;
@@ -104,9 +105,7 @@ class FolderFetcher
          * and the visibility of that feedback was students or parents, show it
          */
         $statement = $this->folderMapper->getDatabase()->prepare('
-            SELECT
-                ar.folder_id,
-                sb.mark_visibility
+            SELECT DISTINCT ar.folder_id
             FROM `submission_return` sr
             INNER JOIN submission_box sb ON sr.box_id = sb.id
             INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
@@ -119,7 +118,7 @@ class FolderFetcher
 
             /* If the report is being viewed by a student
              */
-            case \Schoolbox\Role::STUDENT:
+            case Role::STUDENT:
                 $statement->execute([
                     'ownerId' => $student->getId(),
                     'visibility' => IAssessable::MARK_VISIBILITY_STUDENT
@@ -128,7 +127,7 @@ class FolderFetcher
 
             /* If the report is being viewed by a parent
              */
-            case \Schoolbox\Role::PARENT:
+            case Role::PARENT:
                 $statement->execute([
                     'ownerId' => $student->getId(),
                     'visibility' => IAssessable::MARK_VISIBILITY_PARENT_STUDENT
@@ -137,7 +136,7 @@ class FolderFetcher
 
             /* If the report is being viewed by a staff
              */
-            case \Schoolbox\Role::STAFF:
+            case Role::STAFF:
             default:
                 $statement->execute([
                     'ownerId'    => $student->getId(),
