@@ -112,6 +112,7 @@ class FolderFetcher
             INNER JOIN assessment a ON ar.assessment_id = a.id
             WHERE sr.`owner` = :ownerId
             AND sr.deleted_at IS NULL
+            AND sr.published_at IS NOT NULL
             AND sb.mark_visibility >= :visibility
             AND f.deleted_at IS NULL
             AND a.deleted_at IS NULL
