@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -36,7 +36,7 @@ class StorageHandler implements TypeHandlerInterface {
      * @param string $id
      * @return Storage\IStorage
      */
-    public function fetch($id)
+    public function fetch(string $id): Storage\IStorage
     {
         // storage file has already been uploaded, so retrieve it
         $storage = $this->mapper->findByHash($id);

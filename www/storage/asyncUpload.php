@@ -108,6 +108,7 @@ function attemptStorage($fileData)
         'meta'    => [
             'type' => $storage->getMimetype()->getMime(),
             'size' => $storage->getSize(),
+            'name' => $fileData['name'],
         ]
     ];
 }
