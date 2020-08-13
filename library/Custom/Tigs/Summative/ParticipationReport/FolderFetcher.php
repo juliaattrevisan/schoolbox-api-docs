@@ -21,7 +21,6 @@ use Schoolbox\Resource\Folder;
 use External_UserInterface;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Mapper;
 use UnexpectedValueException;
 
 /**
