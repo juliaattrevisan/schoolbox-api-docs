@@ -95,7 +95,8 @@
                 onInitialize: function() {
                     // Initialize: clear existing options, and add items from
                     // settings.value
-                    var self = this
+                    var self = this;
+
                     // Don't clear options if the caller explicitly provided them.
                     if (!(
                         options.hasOwnProperty('selectize') &&
@@ -169,6 +170,10 @@
         // Set up selectize on all elements
         element.each(function() {
             var singleElement = $(this);
+
+            // Clear required attr to avoid jQuery validation conflict
+            singleElement.removeAttr('required');
+
             singleElement.val('').selectize(settings.selectize);
 
             // Is this selectize inside a foundation modal ?
