@@ -89,6 +89,8 @@ Data:
                 {% set folderId = subject.folderId %}
                 {% set folderData = data[folderId] %}
                 {% set firstTeacher = folderData.teachers | first %}
+
+                {% if firstTeacher %}
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
                         <div class="card small-12 medium-6">
@@ -123,15 +125,17 @@ Data:
                                         {% set aasFound = false %}
                                         {# These units are ordered from latest to oldest #}
                                         {% for unitSpecData in folderData.unitSpecs if not aasFound %}
-                                            {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                {% set aasFound = true %}
-                                                {% set hasInterminGrades = true %}
-                                                {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                    <div class="result-item">
-                                                        <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
-                                                        <span class="result-value">{{ value|default('-') }}</span>
-                                                    </div>
-                                                {% endfor %}
+                                            {% if folderData.aasData|length %}
+                                                {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                    {% set aasFound = true %}
+                                                    {% set hasInterminGrades = true %}
+                                                    {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                        <div class="result-item">
+                                                            <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
+                                                            <span class="result-value">{{ value|default('-') }}</span>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
@@ -233,7 +237,9 @@ Data:
                                      # Used to come from folderData.aasData.data[unitSpec.id]
                                      #}
                                     {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                    {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                    {% if folderData.nesaGraphData %}
+                                        {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                    {% endif %}
                                 {% else %}
                                     {# All other comments come from the unitspec #}
                                     {% for unitSpec in folderData.unitSpecs if not commentFound %}
@@ -256,6 +262,7 @@ Data:
                         </div>
                     </a>
                 </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% endset %}
