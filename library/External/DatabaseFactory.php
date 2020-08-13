@@ -183,7 +183,7 @@ class External_DatabaseFactory
     public function buildMarkbookConnector(string $databaseName = ''): External_MarkbookInterface
     {
         $extraParams = [
-            'markType' => 'synergetic_mark_sync_value',
+            'markType' => Config::get('synergetic_mark_sync_value'),
         ];
         if(Config::get('external_markbook')) {
             return $this->buildConnector('Markbook', $databaseName);
