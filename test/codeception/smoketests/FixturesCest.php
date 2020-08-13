@@ -136,6 +136,12 @@ class FixturesCest
         $i->seeResponseCodeIs('200');
     }
     
+    /**
+     * Request URL:
+     * 
+     * 
+     * @param IntegrationTester $i
+     */
     public function createStatus(IntegrationTester $i): void
     {
         $timestamp=time();
@@ -147,6 +153,11 @@ class FixturesCest
         $i->seeResponseCodeIs('200');
     }
     
+    /**
+     * Request URL:
+     * 
+     * @param IntegrationTester $i
+     */
     public function updateStatus(IntegrationTester $i): void
     {
         $timestamp=time();
@@ -170,6 +181,11 @@ class FixturesCest
         
     }
     
+    /**
+     * Request URL:
+     * 
+     * @param IntegrationTester $i
+     */
     public function deleteStatus(IntegrationTester $i): void
     {
         $timestamp=time();
@@ -189,5 +205,73 @@ class FixturesCest
         $i->seeResponseCodeIs('204');
     }
     
+    /**
+     * Request URL:
+     *
+     *
+     * @param IntegrationTester $i
+     */
+    public function createVenue(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $venueName= 'AutoTest SCreate ' . $timestamp;
+        $newVenue = new Payload\Fixtures\Venue\Create($venueName);
+        
+        $i->sendRequest($newVenue);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateVenue(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $venueName= 'AutoTest SChangeMe ' . $timestamp;
+        
+        $newVenue = new Payload\Fixtures\Venue\Create($venueName);
+        
+        $i->sendRequest($newVenue);
+        
+        $venueMapper=\Schoolbox\Fixtures\Venue\Mapper::getInstance();
+        $venueModel=$venueMapper->findOneByColumn('name', $venueName);
+        
+        $updateVenue = new Payload\Fixtures\Venue\Update($venueModel);
+        
+        $newVenueName= 'AutoTest SUpdate ' . $timestamp;
+        $updateVenue->setName($newVenueName);
+        
+        $i->sendRequest($updateVenue);
+        
+        $i->seeResponseCodeIs('303');
+        
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function deleteVenue(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $venueName= 'AutoTest SDeleteMe ' . $timestamp;
+        
+        $newVenue = new Payload\Fixtures\Venue\Create($venueName);
+        
+        $i->sendRequest($newVenue);
+        
+        $venueMapper=\Schoolbox\Fixtures\Venue\Mapper::getInstance();
+        $venueModel=$venueMapper->findOneByColumn('name', $venueName);
+        
+        $deleteVenue = new Payload\Fixtures\Venue\Delete($venueModel);
+        
+        $i->sendRequest($deleteVenue);
+        
+        $i->seeResponseCodeIs('204');
+    }
     
 }

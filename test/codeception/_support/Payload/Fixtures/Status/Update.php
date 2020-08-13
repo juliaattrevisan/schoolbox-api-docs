@@ -13,6 +13,8 @@ class Update extends Request
 {
     use PostTrait;
     
+    private $state;
+    
     public function __construct(\Schoolbox\Fixtures\Status\Model $state)
     {
         $this->setReferer('/fixtures/statuses');

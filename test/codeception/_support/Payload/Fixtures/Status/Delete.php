@@ -23,7 +23,6 @@ class Delete extends Request
     
     public function getUrl():string
     {
-        $id=$this->state->getID();
         return '/fixtures/statuses/'.(string)($this->state->getId()).'/delete';
     }
 }
