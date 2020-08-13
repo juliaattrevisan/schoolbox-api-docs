@@ -125,7 +125,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         /** @var Alaress\Authorizer\Authorizer $authorizer */
         $authorizer = $this->getSitePage()->getDi()->get('authorizer');
         $route      = 'rubricMarkbook.getMarkbook';
-        $params     = ['folderId' => $this->getContext()->getId()];
+        $params     = [
+            'folder'   => $this->getContext(),
+            'folderId' => $this->getContext()->getId(),
+        ];
 
         // Show rubric markbook link on class or group pages to those who are authorized
         // All of these permissions should be baked into the authorizer check
