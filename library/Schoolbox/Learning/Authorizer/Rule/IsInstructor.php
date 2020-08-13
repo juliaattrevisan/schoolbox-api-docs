@@ -19,7 +19,7 @@ use InvalidArgumentException;
  * first, then checks if they are staff or have WRITE access to the folder.
  * @package Schoolbox\Learning\Authorizer\Rule
  */
-class isInstructor extends AbstractParticipationRule
+class IsInstructor extends AbstractParticipationRule
 {
 
     /**

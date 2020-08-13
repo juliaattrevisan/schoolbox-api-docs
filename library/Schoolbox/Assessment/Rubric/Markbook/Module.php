@@ -11,7 +11,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Learning\Authorizer\Rule\isInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Alaress\Twig\Loader\IChainLoader;
@@ -56,7 +56,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn('rubric_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new isInstructor(Access::getInstance())
+                new IsInstructor(Access::getInstance())
             )
         );
 
