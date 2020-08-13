@@ -109,9 +109,13 @@ class FolderFetcher
             FROM `submission_return` sr
             INNER JOIN submission_box sb ON sr.box_id = sb.id
             INNER JOIN v_assessment_relation ar ON sb.assessment_id = ar.assessment_id
+            INNER JOIN folder f ON ar.folder_id = f.id
+            INNER JOIN assessment a ON ar.assessment_id = a.id
             WHERE sr.`owner` = :ownerId
             AND sr.deleted_at IS NULL
             AND sb.mark_visibility >= :visibility
+            AND f.deleted_at IS NULL
+            AND a.deleted_at IS NULL
         ');
 
         switch ($roleTypeOverride) {
