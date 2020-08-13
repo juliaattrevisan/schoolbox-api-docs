@@ -229,9 +229,9 @@ Data:
 
                                 {% if attributes.isMyp %}
                                     {##
-                                 # MYP comments: no longer come from the unitspec, so don't iterate it.
-                                 # Used to come from folderData.aasData.data[unitSpec.id]
-                                    #}
+                                     # MYP comments: no longer come from the unitspec, so don't iterate it.
+                                     # Used to come from folderData.aasData.data[unitSpec.id]
+                                     #}
                                     {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
                                     {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                 {% else %}
