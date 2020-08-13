@@ -21,13 +21,16 @@ class External_DatabaseFactory
      * @param string $databaseName The database type to use. Defaults to
      *                             whatever the configured external DB is, or
      *                             "offline" if it isn't enabled.
+     * @param array  $extraParams  Any extra parameters which may be passed to
+     *                             the connector's constructor.
+     *                             key: param name, value: param value
      *
      * @return External\IConnector
      * @throws LogicException if even the offline class could not be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
      */
-    private function buildConnector(string $databaseType, string $databaseName = ''): External\IConnector
+    private function buildConnector(string $databaseType, string $databaseName = '', array $extraParams = []): External\IConnector
     {
         $offlineClass    = "External_Offline_$databaseType";
         $databaseClasses = array();
@@ -51,22 +54,32 @@ class External_DatabaseFactory
 
         // Try each database class in order of definition
         foreach ($databaseClasses as $databaseClass) {
+            try {
+                $reflectionClass = new ReflectionClass($databaseClass);
+            } catch (ReflectionException $e) {
+                // Class doesn't exist: try the next one
+                continue;
+            }
 
-            if (file_exists(Autoloader::getClassFile($databaseClass))) {
-                try {
-                    return new $databaseClass();
-                } catch (\Schoolbox\External\Exception $e) {
-                } catch (\Alaress\Database\Exception $e) {
-                }
+            try {
+                /** @var External\IConnector $connector */
+                $connector = $reflectionClass->newInstanceArgs($extraParams);
+                return $connector;
+            } catch (\Schoolbox\External\Exception|\Alaress\Database\Exception $e) {
+                // Something went wrong, probably could not connect. Try the next one
+                continue;
             }
         }
 
         // At this point: return an offline class.
         // If even that doesn't exist, error out.
-        if (class_exists($offlineClass, true)) {
-            return new $offlineClass();
+        try {
+            $reflectionClass = new ReflectionClass($offlineClass);
+            $connector       = $reflectionClass->newInstanceArgs($extraParams);
+            return $connector;
+        } catch (ReflectionException $e) {
+            throw new LogicException("Class \"$offlineClass\" does not exist");
         }
-        throw new LogicException("Class \"$offlineClass\" does not exist");
     }
 
 
@@ -169,6 +182,9 @@ class External_DatabaseFactory
      */
     public function buildMarkbookConnector(string $databaseName = ''): External_MarkbookInterface
     {
+        $extraParams = [
+            'markType' => 'synergetic_mark_sync_value',
+        ];
         if(Config::get('external_markbook')) {
             return $this->buildConnector('Markbook', $databaseName);
         }
