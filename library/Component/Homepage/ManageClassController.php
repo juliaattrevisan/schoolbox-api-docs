@@ -263,25 +263,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if ($wasClassPage) {
             $route = 'learningMarkbook.getMarkbookForClass';
-            if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())) {
-                return null;
-            }
-            return $this->getRouter()->generate($route, $classArg);
+        } else {
+            $route                = 'learningMarkbook.getMarkbookForClassAndTerm';
+            $classArg['term']     = $currentTerm;
+            $classArg['termCode'] = $currentTerm->getCode();
         }
 
-        $classAndTermArgs = array_merge(
-            $classArg,
-            [
-                'term'     => $currentTerm,
-                'termCode' => $currentTerm->getCode(),
-            ]
-        );
-
-        $route = 'learningMarkbook.getMarkbookForClassAndTerm';
-        if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classAndTermArgs, $this->getUser())) {
+        if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())) {
             return null;
         }
-        return $this->getRouter()->generate($route, $classAndTermArgs);
+        return $this->getRouter()->generate($route, $classArg);
     }
 
     /**
@@ -296,20 +287,27 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string
     {
-        $courseSpec = $this->getContext()->getCourseSpecification();
+        $route  = null;
+        $params = null;
         if ($isCoursePage) {
-            return $this->getRouter()->generate('courseMarkbook.getMarkbook', [
+            $courseSpec = $this->getContext()->getCourseSpecification();
+            $route      = 'courseMarkbook.getMarkbook';
+            $params     = [
                 'courseSpec'   => $courseSpec,
                 'courseSpecId' => $courseSpec->getId(),
-            ]);
-        }
-        if ($isUnitPage) {
-            return $this->getRouter()->generate('courseMarkbook.getRedirect', [
+            ];
+        } elseif ($isUnitPage) {
+            $route  = 'courseMarkbook.getRedirect';
+            $params = [
                 'courseSpecId' => $this->getContext()->getUnitSpecification()->getCourse()->getId(),
                 'unitSpecId'   => $this->getContext()->getUnitSpecification()->getId(),
                 'folderId'     => 0,
-            ]);
+            ];
         }
-        return '';
+
+        if ($route && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
+            return $this->getRouter()->generate($route, $params);
+        }
+        return null;
     }
 }
