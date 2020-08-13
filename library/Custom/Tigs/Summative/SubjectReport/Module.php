@@ -241,8 +241,8 @@ class Module extends Alaress\Module\Module
      * @return bool
      * @throws InvalidArgumentException
      * @throws InvalidPath
-     * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
+     * @throws \PDOException
      */
     private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $reportDate): bool
     {
@@ -253,7 +253,10 @@ class Module extends Alaress\Module\Module
         }
 
         $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), null);
+
+        /* FIXME Is there an alternative to $_SESSION['user'] to get the currently logged in person?
+         */
+        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $_SESSION['user'], null);
 
         /** @var Folder\Model $involvedFolder */
         foreach ($folders as $involvedFolder) {

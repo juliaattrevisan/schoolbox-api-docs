@@ -68,12 +68,18 @@ class PreviousClassIdCache
      * @param User              $student
      * @param GenericCollection $folders
      * @param GenericCollection $currentClasses
+     * @param User              $viewer
      * @param string|null       $roleTypeOverride
      * @return array
-     * @throws \PDOException
+     * @throws \PDOException|\DomainException
      */
-    public function find(User $student, GenericCollection $folders, GenericCollection $currentClasses, ?string $roleTypeOverride): array
-    {
+    public function find(
+        User $student,
+        GenericCollection $folders,
+        GenericCollection $currentClasses,
+        User $viewer,
+        ?string $roleTypeOverride
+    ): array {
 
         /* For SA-10636 we need to filter this set of $folders even further; classes to show
          * are a function of their submissions/feedbacks and feedbacks' visibilities
@@ -110,7 +116,12 @@ class PreviousClassIdCache
             AND a.deleted_at IS NULL
         ');
 
-        switch ($roleTypeOverride) {
+        /* If roleTypeOverride was provided, use that version
+         * Otherwise infer from the currently-logged-in user's roletype
+         */
+        $type = $roleTypeOverride ?? $viewer->getRole()->getType();
+
+        switch ($type) {
 
             /* If the report is being viewed by a student
              */
@@ -133,12 +144,16 @@ class PreviousClassIdCache
             /* If the report is being viewed by a staff
              */
             case Role::STAFF:
-            default:
                 $statement->execute([
                     'ownerId'    => $student->getId(),
                     'visibility' => IAssessable::MARK_VISIBILITY_PRIVATE
                 ]);
                 break;
+
+            /* Can't figure out the roletype; just die, because this should be impossible
+             */
+            default:
+                throw new \DomainException('Unknown role type for report access');
         }
 
         $keepIds = [];

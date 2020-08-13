@@ -451,7 +451,7 @@ class Controller extends Web\Controller\Base
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate, ?string $roleTypeOverride): array
     {
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $roleTypeOverride);
+        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $this->getUser(), $roleTypeOverride);
 
         $previousClassIds = $fetcher->getPreviouClassIds();
 

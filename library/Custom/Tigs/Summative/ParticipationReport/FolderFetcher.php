@@ -68,12 +68,14 @@ class FolderFetcher
      * @param StudentAttributes $attributes
      * @param string|null       $reportDate
      * @param null|string       $excludedClassCodes
+     * @param User              $viewer
      * @param string|null       $roleTypeOverride
      * @return GenericCollection|Folder\Model[]
      * @throws UnexpectedValueException
+     * @throws \DomainException
      * @throws \PDOException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, ?string $roleTypeOverride): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, User $viewer, ?string $roleTypeOverride): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())
@@ -95,7 +97,7 @@ class FolderFetcher
          * are a function of their submissions/feedbacks and feedbacks' visibilities
          */
         $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
-        $preservedClassIds = $this->previousClassIdCache->find($student, $folders, $currentClasses, $roleTypeOverride);
+        $preservedClassIds = $this->previousClassIdCache->find($student, $folders, $currentClasses, $viewer, $roleTypeOverride);
 
         /* Iterate through folders, unsetting everything outside of $preservedClassIds
          */
