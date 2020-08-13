@@ -257,12 +257,17 @@ class BulkUpdater
             /* Log the users we brutally updated en-masse
              */
             foreach ($statements['campus']['insert']['params'] as $campusParam) {
-                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']}) who is now in campus {$campusParam['campusId']}";
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']})";
             }
         }
 
         /* Log messages to this userBulkMapper log output thing
+         *
+         * Only care about unique messages because a user will have multiple messages associated
+         * when they change multiple campuses
          */
+        $messages = array_values(array_unique($messages));
+
         foreach ($messages as $message) {
             $this->userBulkMapper->log($message);
         }
