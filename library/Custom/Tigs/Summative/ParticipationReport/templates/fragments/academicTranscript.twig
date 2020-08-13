@@ -6,6 +6,7 @@ Data:
     subjects[idx].name                                           string
     subjects[idx].codes                                          string[]
     subjects[idx].folderId                                       int
+    subjects[idx].isPreviousClass                                bool
     data[folderId]                                               array
     data[folderId].folder                                        Folder\Model
     data[folderId].teachers                                      User[]
@@ -215,34 +216,40 @@ Data:
                         </div>
                         <div class="column small-12 teacher-comment content">
 
-                            {# Render the first comment only #}
-                            {% set commentFound = false %}
-                            {% set commentData = null %}
+                            {# Special case for previous classes w/ feedbacks #}
+                            {% if subject.isPreviousClass %}
+                                Student is no longer enrolled in this class.
+                            {% else %}
+                                {# Render the first comment only #}
+                                {% set commentFound = false %}
+                                {% set commentData = null %}
 
-                            {% if attributes.isMyp %}
-                                {##
+                                {% if attributes.isMyp %}
+                                    {##
                                  # MYP comments: no longer come from the unitspec, so don't iterate it.
                                  # Used to come from folderData.aasData.data[unitSpec.id]
-                                 #}
-                                {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
-                            {% else %}
-                                {# All other comments come from the unitspec #}
-                                {% for unitSpec in folderData.unitSpecs if not commentFound %}
-                                    {% if attributes.isDp %}
-                                        {% set commentData = folderData.aamData.data[unitSpec.id] %}
-                                    {% elseif attributes.isHsc %}
-                                        {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
-                                    {% endif %}
-                                    {% if commentData.comment is not null %}
-                                        {% set commentFound = true %}
-                                    {% endif %}
-                                {% endfor %}
+                                    #}
+                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
+                                    {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                {% else %}
+                                    {# All other comments come from the unitspec #}
+                                    {% for unitSpec in folderData.unitSpecs if not commentFound %}
+                                        {% if attributes.isDp %}
+                                            {% set commentData = folderData.aamData.data[unitSpec.id] %}
+                                        {% elseif attributes.isHsc %}
+                                            {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
+                                        {% endif %}
+                                        {% if commentData.comment is not null %}
+                                            {% set commentFound = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if commentData.comment is defined and commentData.comment|length %}
+                                    {{ commentData.comment | nl2br }}
+                                {% endif %}
                             {% endif %}
 
-                            {% if commentData.comment is defined and commentData.comment|length %}
-                                {{ commentData.comment | nl2br }}
-                            {% endif %}
                         </div>
                     </a>
                 </li>

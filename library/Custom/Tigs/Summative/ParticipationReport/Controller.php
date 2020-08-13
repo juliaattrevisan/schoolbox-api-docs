@@ -445,20 +445,23 @@ class Controller extends Web\Controller\Base
      * @param null|string       $reportDate
      * @param string|null       $roleTypeOverride
      * @return array
-     * @throws DefinitionException
      * @throws UnexpectedValueException
+     * @throws \PDOException
      */
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate, ?string $roleTypeOverride): array
     {
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
         $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $roleTypeOverride);
 
+        $previousClassIds = $fetcher->getPreviouClassIds();
+
         $subjects = [];
         foreach ($folders as $folder) {
             $subjects[] = [
-                'name'     => $folder->getName(),
-                'codes'    => $folder->getCodes()->getPropertyValues('code'),
+                'name' => $folder->getName(),
+                'codes' => $folder->getCodes()->getPropertyValues('code'),
                 'folderId' => $folder->getId(),
+                'isPreviousClass' => \in_array($folder->getId(), $previousClassIds, false)
             ];
         }
 
