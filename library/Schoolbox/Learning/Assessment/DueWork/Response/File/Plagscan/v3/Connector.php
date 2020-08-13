@@ -146,10 +146,22 @@ class Connector
             return $content['data']['docID'];
         }
 
+        /* The Documents endpoint can throw 4xx and 5xx errors (the latter isn't documented)
+         * These cases are considered non-recoverable (they will consistently fail) and become DomainExceptions
+         * unlike RuntimeExceptions, which were intended to represent transient problems since plag would
+         * occasionally die in new and wonderful ways, then come back
+         *
+         * All non-201 status codes at this juncture are classified as repeatable failures and will mark documents
+         * accordingly, instead of leaving them in a state where it can be tried again
+         */
+        if ((int)$response->getStatusCode() >= 400) {
+            throw new \DomainException("Domain error {$content['error']['code']}: {$content['error']['message']}");
+        }
+
         /* If you ended up here, the document can't be transmitted for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \RuntimeException("Error {$content['error']['code']}: {$content['error']['message']}");
+        throw new \RuntimeException("Runtime error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
