@@ -103,7 +103,8 @@ readsqlconfig() {
 	tempsqlldapbasealt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null`;
 	tempsqlldapusername=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_username'" 2>/dev/null`;
 
-
+	temp_sql_xml_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='xml_dir'" 2>/dev/null);
+	temp_sql_file_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='file_dir'" 2>/dev/null);
 }
 
 setsqlconfig() {
@@ -562,6 +563,32 @@ if [ "$sourceloc" = '[R]' ];
 then
 	rm -f $sourcedb >/dev/null 2>&1;
 fi
+
+## We may have just imported an old DB schema, which has configs that don't align to the current script.
+## In this case, apply custom fixes.
+function restore_pre_v20.1_config_dirs(){
+  readconf;
+  readsqlver;
+  local xml_dir, file_dir, sql_ver="$tempsqlver";
+  if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
+    echo "Restored DB is older than normalisation script. Try to restore previous value, or set new sane value if previous value not available"
+
+    if [[ -n "$temp_sql_xml_dir" ]]; then
+      xml_dir=$temp_sql_xml_dir
+    else
+      xml_dir="$thisdatadir/cache/xml"
+    fi;
+    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$xml_dir' WHERE name='xml_dir'";
+
+    if [[ -n "$temp_sql_file_dir" ]]; then
+      file_dir=$temp_sql_file_dir
+    else
+      file_dir="$thisdatadir/files"
+    fi;
+    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$file_dir' WHERE name='file_dir'";
+  fi
+}
+restore_pre_v20.1_config_dirs;
 
 ## Fix SQL config paths to data directory
 "$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
