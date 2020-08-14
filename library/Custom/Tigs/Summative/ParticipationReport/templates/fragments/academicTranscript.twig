@@ -146,7 +146,7 @@ Data:
                                     {% set ibGraphDatum = ibGraphData | first %}
                                     <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
                                         <div class="result-item myp-grade">
-                                            <span class="result-heading">{{ ibGraphDatum.header }}</span><br>
+                                            <span class="result-heading">{{ ibGraphDatum.header ?? '' }}</span><br>
                                             <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
                                         </div>
                                     </div>
