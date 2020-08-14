@@ -48,6 +48,7 @@ class Factory
                     BaseAuthorizationFailure::class,
                     SchoolboxException::class
                 ),
+                'error_types' => error_reporting(),
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set
