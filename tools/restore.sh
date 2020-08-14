@@ -175,30 +175,22 @@ echo "Using db credentials from: "`readlink -f $conffile`;
 echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
-thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
-if [ -z $thisfiledir ];
-then
-	errmsg="Unable to detect current data file directory";
-	error;
-else
-	if [ -z $thisfiledir ];
-	then
-		errmsg="Unable to locate data directory in database";
-		error;
-	fi
-	thisfiledir=`readlink -f $thisfiledir`;
-	if [ ! -d $thisfiledir ];
-	then
-		errmsg="Data file directory '$thisfiledir' is not a directory";
-		error;
-	fi
-	thisdatadir=${thisfiledir%/*};
-	if [ ! -d $thisdatadir ];
-	then
-		errmsg="Data directory '$thisdatadir' is not a directory";
-		error;
-	fi
+conf_backup_dir=$(mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
+if [ -z "$conf_backup_dir" ]; then
+  errmsg="Unable to locate data directory in database";
+  error;
 fi
+conf_backup_dir=$(readlink -f $conf_backup_dir);
+if [ ! -d "$conf_backup_dir" ]; then
+  errmsg="Backup directory '$conf_backup_dir' is not a directory";
+  error;
+fi
+thisdatadir=${conf_backup_dir%/*};
+if [ ! -d "$thisdatadir" ]; then
+  errmsg="Data directory '$thisdatadir' is not a directory";
+  error;
+fi
+
 
 # Check we have correct access to this install
 echo -e "\n* Checking Permissions *";
