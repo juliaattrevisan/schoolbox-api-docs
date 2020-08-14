@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -29,11 +30,25 @@ class IsInstructor extends AbstractParticipationRule
 
 
     /**
-     * @param Access $access
+     * Method used for locating the folder.
+     *
+     * By default, the folder will be in the "folder" key of params.
+     *
+     * @var callable|null
      */
-    public function __construct(Access $access)
+    private $folderLocator;
+
+
+    /**
+     * Constructor
+     *
+     * @param Access        $access
+     * @param callable|null $folderLocator
+     */
+    public function __construct(Access $access, callable $folderLocator = null)
     {
-        $this->access = $access;
+        $this->access        = $access;
+        $this->folderLocator = $folderLocator;
     }
 
 
@@ -47,7 +62,9 @@ class IsInstructor extends AbstractParticipationRule
     public function authorize(array $params = [], User $user = null)
     {
 
-        $folder     = $params['folder'];
+        $folder = is_callable($this->folderLocator)
+            ? call_user_func($this->folderLocator, $params)
+            : $this->defaultFolderLocator($params);
 
         if (!$user) {
             throw new InvalidArgumentException('No user supplied to authorize');
@@ -68,5 +85,17 @@ class IsInstructor extends AbstractParticipationRule
 
 
         throw new Failure\Unauthorized();
+    }
+
+
+    /**
+     * Default folder locator
+     *
+     * @param array $params
+     * @return FolderModel
+     */
+    private function defaultFolderLocator(array $params): FolderModel
+    {
+        return $params['folder'];
     }
 }
