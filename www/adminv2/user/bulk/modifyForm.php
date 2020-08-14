@@ -43,29 +43,23 @@ if (isset($_POST['updateUsers'])) {
     $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
     $userMapper->log($message);
 
-    /* Modify each user
-     */
-    foreach ($userIds as $currentUserId) {
-        $user = $userMapper->findById($currentUserId);
-
-        $userMapper->bulkModifyUpdate(
-            $user,
-            $_POST['apply_campus'],
-            $_POST['apply_role'],
-            $_POST['apply_year'],
-            $_POST['apply_eportfolio'],
-            $_POST['apply_emailfromusername'],
-            $_POST['apply_externalmailclient'],
-            $_POST['apply_webmail'],
-            $_POST['apply_accountenabled'],
-            $_POST['apply_hidecontacts'],
-            $_POST['apply_hidetimetable'],
-            $_POST['apply_position_title'],
-            $_POST['apply_displaygradegraph']
-        );
-
-        $modified->add($user);
-    }
+    $modified = (new \Schoolbox\Admin\User\BulkUpdater(
+        $_SESSION['user'],
+        $userMapper,
+        $userIds,
+        $_POST['apply_campus'],
+        (int)$_POST['apply_role'],
+        $_POST['apply_year'],
+        (int)$_POST['apply_eportfolio'],
+        (int)$_POST['apply_emailfromusername'],
+        (int)$_POST['apply_externalmailclient'],
+        (int)$_POST['apply_webmail'],
+        (int)$_POST['apply_accountenabled'],
+        (int)$_POST['apply_hidecontacts'],
+        (int)$_POST['apply_hidetimetable'],
+        $_POST['apply_position_title'],
+        (int)$_POST['apply_displaygradegraph']
+    ))->update();
 } else {
     if (isset($_POST['deleteUsers'])) {
         $userCollection = $userMapper->findByColumn('id', $userIds);

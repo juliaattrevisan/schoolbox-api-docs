@@ -1,7 +1,34 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
 <script type="text/javascript">
     $(function() {
+
+        /* Avoid woefully inefficient implementations of select-all
+         * You can shrink this further but I'm going to humour the select-all-for-group var
+         */
+        const selectAll = $('#selectAll');
+        const selector = '[data-select-all-group="users"]';
+        const allCheckboxes = $(selector);
+        const selectedCheckboxes = selector + ':checked';
+
+        selectAll.on('click', function(event) {
+            if ($(this).is(':checked')) {
+                allCheckboxes.prop('checked', true);
+            } else {
+                allCheckboxes.prop('checked', false);
+            }
+        });
+
+        /* Checkboxes in the group affect the select-all parent
+         */
+        allCheckboxes.on('change', function(event) {
+            if ($(this).prop('checked') === false) {
+                selectAll.prop('checked', false);
+            } else if ($(selectedCheckboxes).length === allCheckboxes.length) {
+                selectAll.prop('checked', true);
+            }
+        });
+
         /* Count number of things selected
          */
         $('[data-select-all-for-group="users"], [data-select-all-group="users"]').change(function () {
