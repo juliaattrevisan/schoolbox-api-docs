@@ -103,7 +103,8 @@ readsqlconfig() {
 	tempsqlldapbasealt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null`;
 	tempsqlldapusername=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_username'" 2>/dev/null`;
 
-
+	temp_sql_xml_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='xml_dir'" 2>/dev/null);
+	temp_sql_file_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='file_dir'" 2>/dev/null);
 }
 
 setsqlconfig() {
@@ -175,30 +176,22 @@ echo "Using db credentials from: "`readlink -f $conffile`;
 echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
-thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
-if [ -z $thisfiledir ];
-then
-	errmsg="Unable to detect current data file directory";
-	error;
-else
-	if [ -z $thisfiledir ];
-	then
-		errmsg="Unable to locate data directory in database";
-		error;
-	fi
-	thisfiledir=`readlink -f $thisfiledir`;
-	if [ ! -d $thisfiledir ];
-	then
-		errmsg="Data file directory '$thisfiledir' is not a directory";
-		error;
-	fi
-	thisdatadir=${thisfiledir%/*};
-	if [ ! -d $thisdatadir ];
-	then
-		errmsg="Data directory '$thisdatadir' is not a directory";
-		error;
-	fi
+conf_backup_dir=$(mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
+if [ -z "$conf_backup_dir" ]; then
+  errmsg="Unable to locate data directory in database";
+  error;
 fi
+conf_backup_dir=$(readlink -f $conf_backup_dir);
+if [ ! -d "$conf_backup_dir" ]; then
+  errmsg="Backup directory '$conf_backup_dir' is not a directory";
+  error;
+fi
+thisdatadir=${conf_backup_dir%/*};
+if [ ! -d "$thisdatadir" ]; then
+  errmsg="Data directory '$thisdatadir' is not a directory";
+  error;
+fi
+
 
 # Check we have correct access to this install
 echo -e "\n* Checking Permissions *";
@@ -292,7 +285,13 @@ do
 			then
 				tempconffile="/tmp/conf.php"
 				readconf;
-				tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='backup_dir'\""; 2>/dev/null`
+        sql_ver=$(ssh "$host" "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
+        if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
+          backup_dir='file_dir';
+        else
+          backup_dir='backup_dir';
+        fi
+        tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
 				if [ ! -z $tempfiledir ];
 				then
 					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
@@ -571,9 +570,36 @@ then
 	rm -f $sourcedb >/dev/null 2>&1;
 fi
 
+## We may have just imported an old DB schema, which has configs that don't align to the current script.
+## In this case, apply custom fixes.
+function restore_pre_v20.1_config_dirs(){
+  readconf;
+  readsqlver;
+  local sql_ver="$tempsqlver";
+  local xml_dir;
+  local file_dir,
+  if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
+    echo "Restored DB is older than normalisation script. Try to restore previous value, or set new sane value if previous value not available"
+
+    if [[ -n "$temp_sql_xml_dir" ]]; then
+      xml_dir=$temp_sql_xml_dir
+    else
+      xml_dir="$thisdatadir/cache/xml"
+    fi;
+    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$xml_dir' WHERE name='xml_dir'";
+
+    if [[ -n "$temp_sql_file_dir" ]]; then
+      file_dir=$temp_sql_file_dir
+    else
+      file_dir="$thisdatadir/files"
+    fi;
+    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$file_dir' WHERE name='file_dir'";
+  fi
+}
+restore_pre_v20.1_config_dirs;
+
 ## Fix SQL config paths to data directory
-$instdir/tools/generate-dir-sql.sh $thisdatadir > /tmp/schoolbox-restore-sql-paths;
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/schoolbox-restore-sql-paths;
+"$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
 ## Build SQL updates if required
 sqlupdates=`ls -1 $instdir/updates/*/scripts_list 2>/dev/null | wc -l`;
