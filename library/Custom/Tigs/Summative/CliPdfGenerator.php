@@ -694,7 +694,12 @@ class CliPdfGenerator extends CliTool\App
     private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes, ?string $roleTypeOverride): Collection
     {
         $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->reportDateOverride);
-        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes, $roleTypeOverride);
+
+        /* Throw in a null $viewer, because cli has no idea about "logged in user"
+         * Report generation is wholly contingent on the $roleTypeOverride in the cli tool context
+         * but to fulfil method signature, it requires a param
+         */
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes, null, $roleTypeOverride);
     }
 
 

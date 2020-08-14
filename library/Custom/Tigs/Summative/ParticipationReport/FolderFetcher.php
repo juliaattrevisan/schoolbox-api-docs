@@ -68,14 +68,14 @@ class FolderFetcher
      * @param StudentAttributes $attributes
      * @param string|null       $reportDate
      * @param null|string       $excludedClassCodes
-     * @param User              $viewer
+     * @param User|null         $viewer
      * @param string|null       $roleTypeOverride
      * @return GenericCollection|Folder\Model[]
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws \PDOException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, User $viewer, ?string $roleTypeOverride): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, ?User $viewer, ?string $roleTypeOverride): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())

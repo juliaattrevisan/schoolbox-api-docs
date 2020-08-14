@@ -68,7 +68,7 @@ class PreviousClassIdCache
      * @param User              $student
      * @param GenericCollection $folders
      * @param GenericCollection $currentClasses
-     * @param User              $viewer
+     * @param Usernull          $viewer
      * @param string|null       $roleTypeOverride
      * @return array
      * @throws \PDOException|\DomainException
@@ -77,7 +77,7 @@ class PreviousClassIdCache
         User $student,
         GenericCollection $folders,
         GenericCollection $currentClasses,
-        User $viewer,
+        ?User $viewer,
         ?string $roleTypeOverride
     ): array {
 
@@ -119,7 +119,7 @@ class PreviousClassIdCache
         /* If roleTypeOverride was provided, use that version
          * Otherwise infer from the currently-logged-in user's roletype
          */
-        $type = $roleTypeOverride ?? $viewer->getRole()->getType();
+        $type = $roleTypeOverride ?? ($viewer ? $viewer->getRole()->getType() : null);
 
         switch ($type) {
 
