@@ -564,8 +564,7 @@ then
 fi
 
 ## Fix SQL config paths to data directory
-$instdir/tools/generate-dir-sql.sh $thisdatadir > /tmp/schoolbox-restore-sql-paths;
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/schoolbox-restore-sql-paths;
+"$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
 ## Build SQL updates if required
 sqlupdates=`ls -1 $instdir/updates/*/scripts_list 2>/dev/null | wc -l`;
