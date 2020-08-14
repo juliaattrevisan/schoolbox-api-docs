@@ -56,11 +56,9 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -563,7 +561,6 @@ class Module extends BaseModule
                     new CanRespondToAssessment($this->getAccess())
                 ),
                 new Rule\All(
-//                    new Rule\HasRole(Role::STAFF),
                     $this->buildAuthRuleHasInstructorAccess(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new CanRespondToAssessment($this->getAccess()),
@@ -592,10 +589,7 @@ class Module extends BaseModule
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
-            new Rule\Any(
-                $this->buildAuthRuleHasInstructorAccess()
-//                new Rule\HasRole(Role::STAFF)
-            ),
+            $this->buildAuthRuleHasInstructorAccess(),
             new Rule\Any(
                 new IsImplementation(),
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
@@ -605,6 +599,11 @@ class Module extends BaseModule
 
 
     /**
+     * Prevent non-instructors from marking or modifying assessments.
+     *
+     * This uses the `IsInstructor` validator, which is the new standard for
+     * checking if a user has instructor permission over a folder.
+     *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
@@ -627,28 +626,9 @@ class Module extends BaseModule
                 return $ctx;
             }
         );
-//        return new Rule\HasHomepageAccess (
-//            $accessLevel,
-//            function (array $params)
-//            {
-//                if (isset($params['assessment'])) {
-//                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
-//                } elseif (isset($params['participant'])) {
-//                    $ctx = $params['participant']->getAssessable()->getContext()->getFolder()->getId();
-//                } elseif (isset($params['context'])) {
-//                    $ctx = $params['context']->getFolder()->getId();
-//                } else {
-//                    throw new NotFound('No assessment or context preloaded');
-//                }
-//
-//                return $ctx;
-//            },
-//            $this->getAccess()
-//        );
     }
 
     // will throw invalid arg if route params incorrect
-    /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
@@ -670,10 +650,6 @@ class Module extends BaseModule
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
                 // Instructor/staff viewing assessment details, on their own summary page
                 new Rule\All(
-//                    new Rule\Any(
-//                        $this->buildAuthRuleHasInstructorAccess(),
-//                        new Rule\HasRole(Role::STAFF)
-//                    ),
                     $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\IsUser('studentId')
                 )
