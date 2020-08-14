@@ -285,7 +285,13 @@ do
 			then
 				tempconffile="/tmp/conf.php"
 				readconf;
-				tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='backup_dir'\""; 2>/dev/null`
+        sql_ver=$(ssh "$host" "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
+        if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
+          backup_dir='file_dir';
+        else
+          backup_dir='backup_dir';
+        fi
+        tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
 				if [ ! -z $tempfiledir ];
 				then
 					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
@@ -569,7 +575,9 @@ fi
 function restore_pre_v20.1_config_dirs(){
   readconf;
   readsqlver;
-  local xml_dir, file_dir, sql_ver="$tempsqlver";
+  local sql_ver="$tempsqlver";
+  local xml_dir;
+  local file_dir,
   if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
     echo "Restored DB is older than normalisation script. Try to restore previous value, or set new sane value if previous value not available"
 
