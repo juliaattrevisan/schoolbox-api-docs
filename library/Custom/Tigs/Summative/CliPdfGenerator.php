@@ -740,6 +740,14 @@ class CliPdfGenerator extends CliTool\App
     private function createZipArchive(array $pdfFilenames, string $tempDir): void
     {
         $zipFilename = \tempnam($tempDir, 'zip');
+
+        /* https://stackoverflow.com/questions/32694148/ziparchivegetstatusstring-invalid-or-uninitialized-zip-object
+         * Also, SA-10419
+         *
+         * ZipArchive doesn't expect a file to exist when it's creating its zip archive
+         */
+        @unlink($zipFilename);
+
         $zipArchive  = new ZipArchive();
         $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
         $zipArchive->open($zipFilename, ZipArchive::CREATE);
