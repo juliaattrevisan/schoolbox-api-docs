@@ -173,7 +173,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 $periodList[$period]['day'][$day][$lesson['ClassCode']] = [
                     'description' => $lesson['subjectName'],
                     'code'        => $lesson['classCode'],
+                    'campus'      => $campus->getExtTimetableCode(),
                     'room'        => $lesson['room'],
+                    'staffID'     => $lesson['staffCode'],
                 ];
             }
         }
@@ -313,7 +315,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     [
                         'description' => $lesson['subjectName'],
                         'code'        => $lesson['classCode'],
+                        'campus'      => $campus->getExtTimetableCode(),
                         'room'        => $lesson['room'],
+                        'staffID'     => $lesson['staffCode'],
                     ]
                 );
             }

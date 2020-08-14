@@ -262,7 +262,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery(
             "
-            SELECT PERIOD_NUMBER, T.CLASS_CODE AS CODE, C.{$type}_NUMBER AS STAFFID, ROOM, CL.CLASS
+            SELECT PERIOD_NUMBER, T.CLASS_CODE AS CODE, C.{$type}_NUMBER AS STAFFID, ROOM, CL.CLASS, CAMPUS
             FROM SCHOOLBOX_TIMETABLE T
             LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
@@ -296,13 +296,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 if ($desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
                     && !isset($timetable[$x]['class'][$desc['CODE']])
                 ) {
-                    $timetable[$x]['class'][$desc['CODE']] = array(
+                    $timetable[$x]['class'][$desc['CODE']] = [
                         'description' => $desc['CLASS'],
-                        'code' => $desc['CODE'],
-                        'campus' => $desc['CAMPUS'],
-                        'room' => $desc['ROOM'],
-                        'staffID' => $desc['STAFFID'],
-                    );
+                        'code'        => $desc['CODE'],
+                        'campus'      => $desc['CAMPUS'],
+                        'room'        => $desc['ROOM'],
+                        'staffID'     => $desc['STAFFID'],
+                    ];
                     break;
                 }
             }
@@ -362,7 +362,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery(
             "
-            SELECT PERIOD_NUMBER, T.DAY_NUMBER, T.CLASS_CODE AS CODE, T.STAFF_NUMBER AS STAFFID, ROOM, CL.CLASS
+            SELECT PERIOD_NUMBER, T.DAY_NUMBER, T.CLASS_CODE AS CODE, T.STAFF_NUMBER AS STAFFID, ROOM, CL.CLASS, CAMPUS
             FROM SCHOOLBOX_TIMETABLE T
             LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
@@ -398,12 +398,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 if ($desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
                     && !isset($timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']])
                 ) {
-                    $timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']] = array(
+                    $timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']] = [
                         'description' => $desc['CLASS'],
-                        'code' => $desc['CODE'],
-                        'room' => $desc['ROOM'],
-                        'staffID' => $desc['STAFFID'],
-                    );
+                        'code'        => $desc['CODE'],
+                        'campus'      => $desc['CAMPUS'],
+                        'room'        => $desc['ROOM'],
+                        'staffID'     => $desc['STAFFID'],
+                    ];
                     break;
                 }
             }

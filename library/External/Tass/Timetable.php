@@ -245,8 +245,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                         $timetable[$x]['class'][$code] = array(
                             'description' => $desc['sub_desc'],
                             'code'        => $code,
+                            'campus'      => $campus->getExtTimetableCode(),
                             'room'        => $desc['room_code'],
-                            'staffCode'   => $desc['tch_code'],
+                            'staffID'     => $desc['tch_code'],
                         );
                         break;
                     }
@@ -336,8 +337,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                         $timetable[$x]['day'][$desc['day_code']][$code] = array(
                             'description' => $desc['sub_desc'],
                             'code'        => $code,
+                            'campus'      => $campus->getExtTimetableCode(),
                             'room'        => $desc['room_code'],
-                            'staffCode'   => $desc['tch_code'],
+                            'staffID'     => $desc['tch_code'],
                         );
                         break;
                     }

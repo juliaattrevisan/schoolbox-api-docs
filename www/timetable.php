@@ -6,6 +6,7 @@
  ************************************************************/
 //timetable object that displays the users timetable
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 if (!isset($this)) {
@@ -16,7 +17,7 @@ if (!isset($this)) {
 
 // If External_DB not enabled do not display page
 if (!Config::get('external_enable')) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $groupHandler     = new Group;
@@ -43,9 +44,9 @@ $this->setBlock("timetable", "day_header", "day_header_listing");
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
 /** @var Schoolbox\User[] $userList */
-$userList = [];
+$userList      = [];
 $numTimetables = 0;
-$child_id = $this->arg[0];
+$child_id      = $this->arg[0];
 
 if ($_SESSION['user']->getRole()->isParent()) {
     if (is_array($_SESSION['children'])) {
@@ -78,7 +79,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
                 $this->pageNotFound();
             }
         } else {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
     } else {
         // Output my own timetable (all campuses)
@@ -100,8 +101,10 @@ foreach ($userList as $user) {
             $checkedCampusList[$campusCode] = true;
 
             /* Setup colour map */
-            $subjectColourMap = array();
-            $colourIndex = 0;
+            $subjectColourMap = [];
+            $colourIndex      = 0;
+
+            $staffIdNameMap = [];
 
             $staffFlag = $user->getRole()->isStaff();
 
@@ -111,7 +114,7 @@ foreach ($userList as $user) {
             try {
                 $timetable = $timetableHandler->getFullTimetable($user->getExternalId(), $user->getId(), $campus);
             } catch (\Schoolbox\External\Exception $e) {
-                error(22);
+                error(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
             }
 
             $classCount = 0;
@@ -126,8 +129,7 @@ foreach ($userList as $user) {
                             foreach ($currentPeriod as $currentClass) {
                                 if (isset($currentClass['description']) && strlen($currentClass['description'])) {
                                     $classCount++;
-                                }
-                                else if (isset($currentClass['code']) && strlen($currentClass['code'])) {
+                                } elseif (isset($currentClass['code']) && strlen($currentClass['code'])) {
                                     $classCount++;
                                 }
                             }
@@ -142,12 +144,12 @@ foreach ($userList as $user) {
                 /* Only display subnav elements for timetables that contain data
                  */
                 $this->setVar([
-                    'TIMETABLE_PERSON'      => $user->formatName(),
-                    'TIMETABLE_YEAR'        => $user->getYear() ? ', Year ' . $user->getYear() : '',
-                    'TIMETABLE_USER_ID'     => $user->getId(),
-                    'CAMPUS_ID'   => $campus->getId(),
-                    'CAMPUS_CODE' => $campus->getExtTimetableCode(),
-                    'CAMPUS_NAME' => $campus->getName(),
+                    'TIMETABLE_PERSON'  => $user->formatName(),
+                    'TIMETABLE_YEAR'    => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                    'TIMETABLE_USER_ID' => $user->getId(),
+                    'CAMPUS_ID'         => $campus->getId(),
+                    'CAMPUS_CODE'       => $campus->getExtTimetableCode(),
+                    'CAMPUS_NAME'       => $campus->getName(),
                 ]);
 
                 $this->parse('timetable_person_block', 'timetable_person', true);
@@ -163,12 +165,12 @@ foreach ($userList as $user) {
                         $is_current_period =
                             $row['periodNumber'] == $periodCurrent['PeriodNumber']
                             && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'];
-                        $outputPeriodDefinition = array(
+                        $outputPeriodDefinition = [
                             'PERIOD_NAME'  => $row['periodName'],
                             'PERIOD_START' => $row['periodStart'],
                             'PERIOD_END'   => $row['periodEnd'],
                             'PERIOD_CLASS' => ($is_current_period ? 'timetable-period-active' : ''),
-                        );
+                        ];
                         $this->setVar($outputPeriodDefinition);
 
                         $dayCount = 1;
@@ -227,33 +229,23 @@ foreach ($userList as $user) {
                                     }
 
                                     // format teacher output
-                                    $period_staff = '';
-
-                                    // if not staff and external db is enabled
-                                    if (!$staffFlag && Config::get('external_enable')) {
-                                        switch (Config::get('external_type')) {
-                                            case 'maze':
-                                            case 'synergetic':
-                                            case 'isams':
-                                            case 'schooledge':
-                                            case 'schoolbox':
-                                                if ($class['staffSurname']) {
-                                                    $period_staff = $userHandler->formatName(
-                                                        array(
-                                                            'title'    => $class['staffTitle'],
-                                                            'lastname' => $class['staffSurname']
-                                                        )
-                                                    );
-                                                }
-                                                break;
-                                            case 'tass':
-                                                $period_staff = $class['staffCode'];
-                                                break;
-                                            case 'denbigh':
-                                            default:
-                                                break;
+                                    if (!isset($staffIdNameMap[$class['staffID']])) {
+                                        $name = '';
+                                        try {
+                                            $classStaff = $userMapper->findByExternalId($class['staffID']);
+                                            $name       = $classStaff->getFullName();
+                                        } catch (\Schoolbox\Mapper\Exception $e) {
                                         }
-                                    } // staff, or external_db is disabled
+                                        // When failed to find the user, use staffSurname it exists
+                                        if (empty($name) && $class['staffSurname']) {
+                                            $name = $class['staffSurname'];
+                                            // Optionally prepend a title, if that exists
+                                            if ($class['staffTitle']) {
+                                                $name = "{$class['staffTitle']} {$name}";
+                                            }
+                                        }
+                                        $staffIdNameMap[$class['staffID']] = $name;
+                                    }
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
                                     if (!array_key_exists($cacheKey, $catCache)) {
@@ -272,7 +264,7 @@ foreach ($userList as $user) {
                                         'PERIOD_DESC'   => Scrub::Text($description),
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
-                                        'PERIOD_STAFF'  => Scrub::Text($period_staff),
+                                        'PERIOD_STAFF'  => Scrub::Text($staffIdNameMap[$class['staffID']]),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey]),
                                     ]);
 
@@ -310,7 +302,7 @@ foreach ($userList as $user) {
                 //reset blocks in case we coming back...
                 $this->setVar('period_listing', '');
                 $this->setVar('day_header_listing', '');
-            } elseif ($days == 0) {
+            } else {
                 //In case no timetable has been output for what ever reason
                 $this->setVar('timetable_listing', '');
             }
@@ -319,19 +311,19 @@ foreach ($userList as $user) {
 }
 
 if ($numTimetables > 1) {
-    $this->setVar(array(
-        'NUM_PEOPLE_CLASS' => ''
-    ));
+    $this->setVar([
+        'NUM_PEOPLE_CLASS' => '',
+    ]);
 } else {
-    $this->setVar(array(
-        'NUM_PEOPLE_CLASS' => 'hide'
-    ));
+    $this->setVar([
+        'NUM_PEOPLE_CLASS' => 'hide',
+    ]);
 }
 
 if ($numTimetables) {
-    $this->setVar(array(
-        'no_timetable_block' => ''
-    ));
+    $this->setVar([
+        'no_timetable_block' => '',
+    ]);
 } else {
     $this->setVar('timetable_listing', '');
     $this->parse('no_timetable_block', 'no_timetable');

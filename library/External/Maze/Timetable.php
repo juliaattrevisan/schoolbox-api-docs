@@ -436,6 +436,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 }
 
                 $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM']) . " " . trim($currentRow['R2ROOM']);
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['campus'] = $campus->getExtTimetableCode();
             }
         }
 
@@ -539,6 +540,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 }
 
                 $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM']) . " " . trim($currentRow['R2ROOM']);
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['campus'] = $campus->getExtTimetableCode();
             }
         }
 
@@ -623,6 +625,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                     $timetable[$period]['day'][$day+1][0] = array(
                         'description'       => $allDayTimetables[$day][$period]['class'][0]['description'],
                         'code'              => $allDayTimetables[$day][$period]['class'][0]['code'],
+                        'campus'            => $allDayTimetables[$day][$period]['class'][0]['campus'],
                         'room'              => $allDayTimetables[$day][$period]['class'][0]['room'],
                         'staffID'           => $allDayTimetables[$day][$period]['class'][0]['staffID'],
                         'staffFirstname'    => $allDayTimetables[$day][$period]['class'][0]['staffFirstname'],
