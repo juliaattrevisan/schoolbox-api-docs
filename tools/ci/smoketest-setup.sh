@@ -29,15 +29,14 @@ mkdir mnt/data/php_tmp
 mkdir vagrant/data
 chmod 777 vagrant/data
 cp -rf schoolbox/* vagrant
-rm -rf schoolbox
-cd /tmp
-cp -rf develop-build.tar.gz/* /vagrant
-cp configfiles.tar.gz/configfiles/dhparams.pem /etc/dhparams.pem
-cp -rf configfiles.tar.gz/configfiles/nginx/* /etc/nginx
-cp -rf configfiles.tar.gz/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
-cp configfiles.tar.gz/configfiles/redis/redis.conf /etc/redis/redis.conf
-cp configfiles.tar.gz/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
-cp -rf sales.tar.gz/data/* /vagrant/data
+cd /
+cp -rf build-artifacts/* /vagrant
+cp qa-container-config/configfiles/dhparams.pem /etc/dhparams.pem
+cp -rf qa-container-config/configfiles/nginx/* /etc/nginx
+cp -rf qa-container-config/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
+cp qa-container-config/configfiles/redis/redis.conf /etc/redis/redis.conf
+cp qa-container-config/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
+cp -rf sales-dataset/sales.tar.gz/data/* /vagrant/data
 cd /vagrant
 composer install
 npm install
@@ -46,4 +45,3 @@ service php7.1-fpm start
 service nginx start
 service redis-server start
 service mysql start
-
