@@ -78,7 +78,13 @@
         data() {
             return {
                 payload: INITIAL_PAYLOAD,
-                event: {}
+                event: {},
+
+                /* Keep track of when an async request is in progress, locking
+                 * out other async requests until this has finished, preventing
+                 * rsvp-button spamming
+                 */
+                isTransacting: false
             }
         },
         beforeMount() {
@@ -99,11 +105,22 @@
              */
             eventExtendedProps() {
                 // Also need to render the event's buttons
-                let event      = this.event,
-                    data       = event?.extendedProps?.data,
-                    metadata   = data?.meta,
-                    modifyLink = null,
-                    deleteLink = null;
+
+                /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
+                 *
+                 * There's a weird modal overlay that now spawns, which can cause
+                 * this.event to be undefined. That leads to subsequent crashes
+                 * Therefore we now have to check whether this exists before using it
+                 */
+                // if (this.event == undefined) {
+                //     return;
+                // }
+
+                let event = this.event,
+                        data = event?.extendedProps?.data,
+                        metadata = data?.meta,
+                        modifyLink = null,
+                        deleteLink = null;
 
                 // Modify/delete links
                 if (metadata?.editable) {
@@ -192,17 +209,31 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
+                if (!this.isAccepted(this.eventExtendedProps.attendance.payload.currentUser.status)) {
+                    if (!this.isTransacting) {
+
+                        /* If you haven't already accepted,
+                         * async request to accept invitation
+                         */
+                        this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
+                    }
+                }
             },
+
 
             /**
              * Decline an invitation
              */
             rsvpDecline() {
                 if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
-                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                    if (!this.isDeclined(this.eventExtendedProps.attendance.payload.currentUser.status)) {
+                        if (!this.isTransacting) {
+                            this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                        }
+                    }
                 }
             },
+
 
             /**
              * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
@@ -213,6 +244,10 @@
             rsvp(status, endpoint) {
                 let self = this;
                 let toast = this.jQuery('[data-toast]');
+
+                /* Set a flag to prevent async spammage
+                 */
+                self.isTransacting = true;
 
                 let request = {
                     url: endpoint,
@@ -239,7 +274,6 @@
                                 css: 'success'
                             });
                         })
-                        .then(() => this.$emit(EVENT_MODIFIED, this.event))
                         .catch(error => {
                             if (error.response) {
                                 toast.toastTimeout({
@@ -247,6 +281,12 @@
                                     css: 'alert'
                                 });
                             }
+                        })
+                        .then(function (response) {
+
+                            /* Reset flag
+                             */
+                            self.isTransacting = false;
                         });
             },
 

@@ -81,7 +81,13 @@
                  */
                 isPersonalEvent: this.event.level === 'personal',
                 isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus'
+                isCampusEvent: this.event.level === 'campus',
+
+                /* Keep track of when an async request is in progress, locking
+                 * out other async requests until this has finished, preventing
+                 * rsvp-button spamming
+                 */
+                isTransacting: false
             }
         },
         computed: {
@@ -163,7 +169,15 @@
              * Accept an invitation
              */
             rsvpAccept() {
-                this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
+                if (!this.isAccepted(this.currentAttendanceStatus)) {
+                    if (!this.isTransacting) {
+
+                        /* If you haven't already accepted,
+                         * async request to accept invitation
+                         */
+                        this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
+                    }
+                }
             },
 
 
@@ -172,7 +186,15 @@
              */
             rsvpDecline() {
                 if (this.isInvited(this.currentAttendanceStatus)) {
-                    this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
+                    if (!this.isDeclined(this.currentAttendanceStatus)) {
+                        if (!this.isTransacting) {
+
+                            /* If you're invited, and you haven't already declined,
+                             * async request to decline invitatino
+                             */
+                            this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
+                        }
+                    }
                 }
             },
 
@@ -305,6 +327,10 @@
                 let self = this;
                 let toast = this.jQuery('[data-toast]');
 
+                /* Set a flag to prevent async spammage
+                 */
+                self.isTransacting = true;
+
                 let request = {
                     url: endpoint,
                     method: 'post',
@@ -338,6 +364,12 @@
                                     css: 'alert'
                                 });
                             }
+                        })
+                        .then(function (response) {
+
+                            /* Reset flag
+                             */
+                            self.isTransacting = false;
                         });
             },
 
