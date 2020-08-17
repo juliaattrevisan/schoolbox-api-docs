@@ -65,7 +65,7 @@ trait ComponentTrait
     /**
      * @return array
      */
-    public function getArguments()
+    public function getArguments(): ?array
     {
         return $this->arguments;
     }
@@ -75,21 +75,13 @@ trait ComponentTrait
      * @param array $arguments
      * @return static
      */
-    public function setArguments($arguments)
+    public function setArguments(array $arguments)
     {
-        // rather than typehint and have it blow up, at least using an exception is recoverable
-        if (!is_array($arguments)) {
-            throw new \InvalidArgumentException('Arguments must be an array, got ' . gettype($arguments));
-        }
-
-        if (empty($arguments)) {
-            $this->arguments = [];
-        }
-
         /* Square brackets persist in the db but we don't want that format
          * Deal with the bad data by removing it, temporarily, as re-saving
          * rulesets will repair the bad data for us anyway
          */
+        $this->arguments = [];
         foreach ($arguments as $current) {
             $this->arguments[] = is_string($current) ? str_replace('[]', '', $current) : $current;
         }
