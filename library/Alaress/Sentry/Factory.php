@@ -48,7 +48,9 @@ class Factory
                     BaseAuthorizationFailure::class,
                     SchoolboxException::class
                 ),
-                'error_types' => error_reporting(),
+                // Always filter out notices (even user notices),
+                // as error reporting can switch these back on
+                'error_types' => error_reporting() & (E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT),
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set
