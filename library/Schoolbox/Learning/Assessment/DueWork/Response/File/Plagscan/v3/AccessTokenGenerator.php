@@ -23,18 +23,6 @@ class AccessTokenGenerator
 {
 
     /**
-     * Api url where stuff is sent
-     */
-    public const API_URL = 'https://api.plagscan.com/v3/';
-
-
-    /**
-     * Maximum time that we allow plagscan to connect for before dropping
-     */
-    private const CONNECTION_TIMEOUT = 360;
-
-
-    /**
      * @var string
      */
     private $clientId;
@@ -71,15 +59,23 @@ class AccessTokenGenerator
 
 
     /**
+     * @var Client
+     */
+    private $client;
+
+
+    /**
      * AccessTokenGenerator constructor.
      *
+     * @param Client $client
      * @param string $clientId
      * @param string $apiKey
      */
-    public function __construct($clientId, $apiKey)
+    public function __construct($client, $clientId, $apiKey)
     {
         $this->clientId = $clientId;
         $this->apiKey = $apiKey;
+        $this->client = $client;
     }
 
 
@@ -103,14 +99,8 @@ class AccessTokenGenerator
             'client_secret' => $this->apiKey,
         ];
 
-        $client = new Client([
-            'base_uri'    => self::API_URL,
-            'timeout'     => self::CONNECTION_TIMEOUT,
-            'http_errors' => false,
-        ]);
-
         try {
-            $response = $client->post('token', [
+            $response = $this->client->post('token', [
                 'form_params' => $postData,
             ]);
         } catch (TransferException $e) {

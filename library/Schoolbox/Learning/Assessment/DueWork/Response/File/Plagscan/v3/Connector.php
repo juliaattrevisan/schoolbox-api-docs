@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Proxy\Server;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
 
@@ -21,6 +22,10 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
  */
 class Connector
 {
+    /**
+     * Api url where stuff is sent
+     */
+    public const API_URL = 'https://api.plagscan.com/v3/';
 
     /* Sorry, Plagscan does not have any names for these reports.
      *
@@ -58,6 +63,12 @@ class Connector
     private const PLAGSCAN_FILESIZE_LIMIT = 104857600;
 
     /**
+     * The Guzzle HTTP client for making API requests
+     * @var Client
+     */
+    private $client;
+
+    /**
      * A secret hash that Plagscan generates from your
      * Plagscan account somehow. AccessTokenGenerator
      * instances spawns it
@@ -82,7 +93,15 @@ class Connector
     public function __construct(int $plagscanClientId, string $plagscanApiKey)
     {
         $this->validFiles = new ValidFiles();
-        $this->accessTokenGenerator = new AccessTokenGenerator($plagscanClientId, $plagscanApiKey);
+        $this->client = new Client([
+            'base_uri'    => self::API_URL,
+            'timeout'     => self::PLAGSCAN_TIMEOUT,
+            'http_errors' => false,
+            'curl' => Server::getInstance()->buildCurlOptions()
+        ]);
+
+        $this->accessTokenGenerator = new AccessTokenGenerator($this->client, $plagscanClientId, $plagscanApiKey);
+
     }
 
     /**
@@ -120,18 +139,12 @@ class Connector
         ];
 
         try {
-            $client = new Client([
-                'base_uri'    => AccessTokenGenerator::API_URL,
-                'timeout'     => self::PLAGSCAN_TIMEOUT,
-                'http_errors' => false,
+            $response = $this->client->post("documents?access_token={$this->accessTokenGenerator->generate()}", [
+                'multipart' => $postData,
             ]);
         } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
-
-        $response = $client->post("documents?access_token={$this->accessTokenGenerator->generate()}", [
-            'multipart' => $postData,
-        ]);
 
         /* What was the outcome?
          */
@@ -203,14 +216,8 @@ class Connector
             'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
-        $client = new Client([
-            "base_uri"    => AccessTokenGenerator::API_URL,
-            "timeout"     => self::PLAGSCAN_TIMEOUT,
-            "http_errors" => false,
-        ]);
-
         try {
-            $response = $client->put("documents/{$plagscanId}/check", [
+            $response = $this->client->put("documents/{$plagscanId}/check", [
                 'form_params' => $postData,
             ]);
         } catch (TransferException $e) {
@@ -420,14 +427,8 @@ class Connector
             'mode'         => $mode,
         ];
 
-        $client = new Client([
-            'base_uri'    => AccessTokenGenerator::API_URL,
-            'timeout'     => self::PLAGSCAN_TIMEOUT,
-            'http_errors' => false,
-        ]);
-
         try {
-            $response = $client->get("documents/{$plagscanId}/retrieve", [
+            $response = $this->client->get("documents/{$plagscanId}/retrieve", [
                 'query' => $postData,
             ]);
         } catch (TransferException $e) {
@@ -456,14 +457,8 @@ class Connector
             'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
-        $client = new Client([
-            'base_uri'    => AccessTokenGenerator::API_URL,
-            'timeout'     => self::PLAGSCAN_TIMEOUT,
-            'http_errors' => false,
-        ]);
-
         try {
-            $response = $client->delete("documents/{$plagscanId}", [
+            $response = $this->client->delete("documents/{$plagscanId}", [
                 'query' => $postData,
             ]);
         } catch (TransferException $e) {
@@ -492,14 +487,8 @@ class Connector
             'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
-        $client = new Client([
-            'base_uri'    => AccessTokenGenerator::API_URL,
-            'timeout'     => self::PLAGSCAN_TIMEOUT,
-            'http_errors' => false,
-        ]);
-
         try {
-            $response = $client->put("documents/{$plagscanId}/private", [
+            $response = $this->client->put("documents/{$plagscanId}/private", [
                 'query' => $postData,
             ]);
         } catch (TransferException $e) {
