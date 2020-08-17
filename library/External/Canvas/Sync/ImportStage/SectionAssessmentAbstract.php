@@ -1383,6 +1383,11 @@ abstract class SectionAssessmentAbstract
             ->setDueDate($due === null ? null : Alaress_Date_Format::newDatabaseDate($due))
             ->setCloseDate($close === null ? null : Alaress_Date_Format::newDatabaseDate($close));
         $this->participantPlanMapper->save($plan);
+
+        if (!$assessmentImpl->getPlans()) {
+            $assessmentImpl->setPlans($this->participantPlanMapper->createCollection());
+        }
+
         $assessmentImpl->getPlans()->setOffset($plan->getId(), $plan);
         return $plan;
     }
