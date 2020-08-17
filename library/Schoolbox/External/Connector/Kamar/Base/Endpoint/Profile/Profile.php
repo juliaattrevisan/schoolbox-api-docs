@@ -583,15 +583,15 @@ class Profile implements IStrategy
 
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@id')[0]);
-            $username = trim((string)$staff->username);
-            $title = trim((string)$staff->title);
-            $firstname = trim((string)$staff->firstname);
-            $lastname = trim((string)$staff->lastname);
             $campus = $this->campus;
             $category = trim((string)$staff->classification);
             $email = trim((string)$staff->email);
-            $phone = trim((string)$staff->mobile);
+            $firstname = trim((string)$staff->firstname);
+            $lastname = trim((string)$staff->lastname);
+            $phone = trim((string)$staff->extension);
             $position = trim((string)$staff->position);
+            $title = trim((string)$staff->title);
+            $username = trim((string)$staff->username);
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
