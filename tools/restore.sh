@@ -11,6 +11,12 @@
 # @link        https://schoolbox.com.au/
 #
 
+# Ensure script run as sudo or root so we can read root's SSH credentials
+if [[ $EUID != "0" ]]; then
+  echo "Please execute script as sudo or root user";
+  exit 1;
+fi
+
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -271,7 +277,7 @@ do
 done
 
 # Detect other remote installs
-sshlist=`grep 'Host ' ~/.ssh/config 2>/dev/null | sed 's/Host\ //g'`;
+sshlist=`grep 'Host ' /root/.ssh/config 2>/dev/null | sed 's/Host\ //g'`;
 echo -e "\nRemote installs \c";
 for host in $sshlist;
 do
