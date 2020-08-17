@@ -1,0 +1,162 @@
+# 8 Pagination
+
+Sometimes you're working with a large data se and it's not nice to show it all at the same time. We can paginate it using a third party component `VuejsPaginate`.
+
+This is already included in a special minified file `schoolbox-vue.min.js` which is secretly compiled elsewhere. You can just use it, for now, like this:
+
+```html
+<!-- You need this; spawns after you "npm run build" for the first time -->
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script src="/javascript/components/userList.bundle.js"></script>
+```
+
+## 8.1 Register this component
+
+Add a `Paginate` component to the corresponding node in `user-list.vue`.
+
+```js
+components: {
+    'user': User,
+    'Paginate': VuejsPaginate
+},
+```
+
+## 8.2 Set up Pagination vars and methods
+
+Set up a local var to remember which page we're currently showing. Remember that vue is stateful in this way.
+
+```js
+data() {
+    return {
+        loading: true,
+        allUsers: [],
+
+        /* Number of items to show, per page
+         */
+        numPerPage: 5,
+
+        /* The current page number
+         */
+        page: 1
+    }
+},
+```
+
+Underneath your `axios` request to obtain a payload, we can add a little thing which manages the browser's history to simulate Back button behaviour while paginating. You don't need to think too much about this; it should mostly _just work_.
+
+```js
+/* Set up listener for window history state, for pagination refresh
+ * Don't pushState when window.onpopstate executes otherwise the Back
+ * button will only work once.
+ *
+ * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
+ */
+window.onpopstate = function (event) {
+    if (!event.state) {
+        // Return to defaults
+        self.page = 1;
+    } else if (event.state.page) {
+        self.page = event.state.page;
+    }
+}
+```
+
+Further down, in `methods()` we need to add this:
+
+```js
+/**
+ * Update the pushState history in the browser to simulate navigation
+ * with async requests
+ *
+ * @param page int - The page to change to
+ */
+onPaginate: function (page) {
+    const params = '?' + 'p=' + page;
+
+    window.history.pushState({page: page}, '', params);
+},
+```
+
+This adds querystring parameters to indicate which page we're on as we cycle through the `Paginate` component's navigation.
+
+## 8.3 Set up computed methods
+
+The `Paginate` component requires a couple more computed methods. Add these to the `computed()` node:
+
+```js
+
+/**
+ * The total number of pages available for the data set obtained
+ */
+pageCount: function () {
+    return Math.ceil(this.allUsers.length / this.numPerPage);
+},
+
+
+/**
+ * Calculate the paginated subset of all data
+ */
+users: function() {
+    if (!this.allUsers.length) {
+        return [];
+    }
+
+    const offset = (this.page-1) * this.numPerPage;
+    const total = offset + this.numPerPage;
+
+    return this.allUsers.slice(offset, total);
+}
+```
+
+The `pageCount` method is a computed property that tells us the maximum number of pages that are available.
+
+The `users` method is a computed property that takes a _subset_ of `this.allUsers` which we populated asynchronously with a giant pack of data. Instead of iterating over `allUsers`, we actually want to iterate over a subset of it - `users`. The offsets are calculated using the contents of the browser history via `window.onpopstate`.
+
+In `user-list.vue`,
+
+```html
+<li v-for="user in this.users">
+...
+</li>
+```
+
+## 8.4 Use the Paginate component
+
+At the bottom of `user-list.vue` w can add the `Paginate` component which will do all the heavy lifting for us.
+
+```html
+<template v-if="this.loading">
+    <div>
+        <h2>Loading data, wait</h2>
+    </div>
+</template>
+<template v-else>
+    <ul class="information-list">
+        <li v-for="user in this.users">
+            <user :fullname="user.fullname"
+                  :firstname="user.firstname"
+                  :lastname="user.lastname"
+                  :role="user.role"
+                  :route="user.route"
+                  :nameLength="nameLength(user.fullname)">
+            </user>
+        </li>
+    </ul>
+    <Paginate
+            v-model="page"
+            :page-count="pageCount"
+            :container-class="'pagination'"
+            :prev-text="'‹'"
+            :next-text="'›'"
+            :prev-link-class="'arrow'"
+            :next-link-class="'arrow'"
+            :disabled-class="'unavailable'"
+            :click-handler="onPaginate"
+    ></Paginate>
+</template>
+
+```
+
+Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser. Data is produced by a highly-cohesive decoupled class which can be both unit tested and used in a different context (e.g. phplib/twig instead of vue) without having to copypaste a lot.
+
+> Don't forget to dress it up so it looks nice by using our regular styles and so on.
