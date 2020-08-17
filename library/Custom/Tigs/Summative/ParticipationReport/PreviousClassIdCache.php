@@ -68,7 +68,7 @@ class PreviousClassIdCache
      * @param User              $student
      * @param GenericCollection $folders
      * @param GenericCollection $currentClasses
-     * @param Usernull          $viewer
+     * @param User|null         $viewer
      * @param string|null       $roleTypeOverride
      * @return array
      * @throws \PDOException|\DomainException
