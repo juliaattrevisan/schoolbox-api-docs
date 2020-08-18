@@ -47,7 +47,7 @@
 
     {# Select "All" by default if the component config is set #}
     <dd {% if slug == 'all' or not slug %}class="active"{% endif %}>
-        <a href="{{ url ~ '?topic=' ~ topicAll ~ params}}">All</a>
+        <a href="{{ url ~ '?topic=' ~ topicAll.slug ~ params}}">All</a>
     </dd>
 
     {% for topic in topics %}
