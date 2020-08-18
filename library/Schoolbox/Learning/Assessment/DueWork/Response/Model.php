@@ -90,7 +90,8 @@ class Model extends AbstractResponse
      *
      * @return bool
      */
-    public function isSubmittedOffline() : bool {
+    public function isSubmittedOffline(): bool
+    {
         return $this->allFiles->count() === 0;
     }
 
