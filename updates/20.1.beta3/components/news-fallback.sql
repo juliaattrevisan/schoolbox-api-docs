@@ -7,3 +7,37 @@ WHERE ccd.`key` IN ('itemImage','itemLayout');
 
 DELETE FROM component_config_definition
 WHERE `key` IN ('itemImage', 'itemLayout');
+
+-- Insert them into the config area instead
+
+INSERT INTO `config`
+    (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+VALUES ('comms_news_article_list_layout',
+        'list',
+        'Layout',
+        'Select layout format for articles',
+        (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+        'list;List:list-reversed;List Reversed:card;Card',
+        null,
+        'true',
+        'false',
+        'false',
+        'comms',
+        (SELECT MAX(sequence) + 1 FROM `config` c WHERE `module` = 'comms')
+        );
+
+INSERT INTO `config`
+(`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+VALUES ('comms_news_article_list_fallback_image',
+        null,
+        'Fallback Image',
+        'Select fallback image for articles when a feature image is omitted',
+        (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+        'author;Author Portrait:school-logo;School Logo',
+        null,
+        'true',
+        'false',
+        'false',
+        'comms',
+        (SELECT MAX(sequence) + 1 FROM `config` c WHERE `module` = 'comms')
+       );
