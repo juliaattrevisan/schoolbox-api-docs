@@ -747,8 +747,10 @@ class Controller extends Base
                 if ($effectTypeMapper->isMap($effectData['type'])) {
 
                     /* Keep arg[0], that token field
+                     * Default the token field to an empty string
+                     * (in case it was saved without a token field)
                      */
-                    $arg = $effectData['arguments'];
+                    $arg = $effectData['arguments'] ?? [''];
 
                     if ($fragmentFactory->isCollection($effectData['userProperty'])) {
                         $to = [];
@@ -762,8 +764,10 @@ class Controller extends Base
 
                     /* Forge this into key/value pairs and ram that
                      * into $args as well
+                     * (In either effect data or to field don't exist, consider
+                     *  the pairs list empty)
                      */
-                    $pairs = array_combine($effectData['from'], $to);
+                    $pairs = array_combine($effectData['from'] ?? [], $to ?? []);
 
                     /* array_filter filters out values that equate to false
                      * such as zero (which is valid data...). Use unset pears
