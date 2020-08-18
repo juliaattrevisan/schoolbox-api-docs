@@ -21,6 +21,12 @@ use Sentry;
 class Factory
 {
     /**
+     * Only these types of error are reported to Sentry.
+     */
+    private const ERROR_REPORTING = E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT;
+
+
+    /**
      * Build the Sentry reporter, if the token and project exist.
      *
      * Also installs the error, exception and fatal error handler integrations.
@@ -48,9 +54,7 @@ class Factory
                     BaseAuthorizationFailure::class,
                     SchoolboxException::class
                 ),
-                // Always filter out notices (even user notices),
-                // as error reporting can switch these back on
-                'error_types' => error_reporting() & (E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT),
+                'error_types' => self::ERROR_REPORTING,
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set
