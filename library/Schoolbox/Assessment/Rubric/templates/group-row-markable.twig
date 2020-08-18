@@ -102,7 +102,7 @@
                 {# Self-Assessment #}
                 {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
                     {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
-                    <p class="meta">{{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }}</p>
+                    <p class="meta">{{ selfAssessmentCapabilityMark ? selfAssessmentCapabilityMark.retrieveHumanReadableMark~' given in '~locale.selfAssessment }}</p>
                 {% endif %}
             </th>
         </tr>

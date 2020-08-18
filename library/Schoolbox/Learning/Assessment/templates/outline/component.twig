@@ -37,7 +37,7 @@
 {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
 <section>
 
-    {% if courseImplementation.units ?? []|length %}
+    {% if (courseImplementation.units ?? [])|length %}
 
         <p class="component-titlebar meta">
             <a class="icon-course" href="/homepage/{{ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
