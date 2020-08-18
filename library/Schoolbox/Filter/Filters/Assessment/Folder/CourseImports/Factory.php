@@ -7,12 +7,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
-use Schoolbox\Collection;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -91,7 +90,7 @@ class Factory extends FolderFilter\Factory
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
-                if ($this->isStaffOrInstructor($user, $extraFolder)) {
+                if ($this->hasInstructorPermission($user, $extraFolder)) {
                     $folders[$extraFolder->getId()] = $extraFolder;
                 }
             }
@@ -112,7 +111,7 @@ class Factory extends FolderFilter\Factory
             $availableFolders = $this->getFolderMapper()->createCollection();
             foreach ($courseImpls as $courseImpl) {
                 $folder = $courseImpl->getFolder();
-                if ($this->isStaffOrInstructor($user, $folder)) {
+                if ($this->hasInstructorPermission($user, $folder)) {
                     $availableFolders[$folder->getId()] = $folder;
                 }
             }
@@ -143,15 +142,36 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * Returns whether the specified user has the staff role type, or is an instructor of the specified folder
+     * Returns whether the specified user has instructor permission over the
+     * given folder.
+     *
+     * This uses the `IsInstructor` auth rule to determine if this is the case:
+     * this auth rule blocks staff who are read-level group members from being
+     * considered
      *
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
      */
-    private function isStaffOrInstructor(User $user, Folder\Model $folder): bool
+    private function hasInstructorPermission(User $user, Folder\Model $folder): bool
     {
-        return $user->getRole()->isStaff() || $this->getAccess()->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_WRITE;
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        // Use the IsInstructor auth rule to determine if the user has
+        // instructor permission.
+        $params = [
+            'folder'   => $folder,
+            'folderId' => $folder->getId(),
+        ];
+        $auth = new IsInstructor($this->getAccess());
+        try {
+            $auth->authorize($params, $user);
+            return true;
+        } catch (Unauthorized $e) {
+            return false;
+        }
     }
 
 

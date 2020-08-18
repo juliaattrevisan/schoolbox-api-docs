@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Learning\Authorizer\Rule\isInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 
 
 class Module extends BaseModule
@@ -59,7 +59,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new isInstructor(Access::getInstance())
+                new IsInstructor(Access::getInstance())
             )
         );
 

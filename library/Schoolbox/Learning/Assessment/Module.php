@@ -42,6 +42,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
@@ -55,10 +56,9 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -102,7 +102,7 @@ class Module extends BaseModule
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
         $loggedIn                 = $this->getAuthRule('isLoggedIn');
-        $canWrite                 = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
+        $canWrite                 = $this->buildAuthRuleHasInstructorAccess();
         $canViewSummary           = $this->buildAuthRuleCanViewSummary();
         $canSubmit                = $this->buildAuthRuleCanSubmit();
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
@@ -525,7 +525,7 @@ class Module extends BaseModule
                             new IsImplementation()
                         ),
                         new Rule\All(
-                            $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                            $this->buildAuthRuleHasInstructorAccess(),
                             new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
                         )
                     ),
@@ -561,8 +561,7 @@ class Module extends BaseModule
                     new CanRespondToAssessment($this->getAccess())
                 ),
                 new Rule\All(
-                    new Rule\HasRole(Role::STAFF),
-                    $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                    $this->buildAuthRuleHasInstructorAccess(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
@@ -590,10 +589,7 @@ class Module extends BaseModule
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
-            new Rule\Any(
-                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new Rule\HasRole(Role::STAFF)
-            ),
+            $this->buildAuthRuleHasInstructorAccess(),
             new Rule\Any(
                 new IsImplementation(),
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
@@ -603,34 +599,36 @@ class Module extends BaseModule
 
 
     /**
-     * @param int $accessLevel One of the UserAccess::ACCESS_* constants
-     * @return Rule\HasHomepageAccess
+     * Prevent non-instructors from marking or modifying assessments.
+     *
+     * This uses the `IsInstructor` validator, which is the new standard for
+     * checking if a user has instructor permission over a folder.
+     *
+     * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
-    private function buildAuthRuleHomepageAccess($accessLevel)
+    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
     {
-        return new Rule\HasHomepageAccess (
-            $accessLevel,
-            function (array $params)
+        return new IsInstructor(
+            $this->getAccess(),
+            static function (array $params): FolderModel
             {
                 if (isset($params['assessment'])) {
-                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                    $ctx = $params['assessment']->getContext()->getFolder();
                 } elseif (isset($params['participant'])) {
-                    $ctx = $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+                    $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
                 } elseif (isset($params['context'])) {
-                    $ctx = $params['context']->getFolder()->getId();
+                    $ctx = $params['context']->getFolder();
                 } else {
                     throw new NotFound('No assessment or context preloaded');
                 }
 
                 return $ctx;
-            },
-            $this->getAccess()
+            }
         );
     }
 
     // will throw invalid arg if route params incorrect
-    /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
@@ -652,10 +650,7 @@ class Module extends BaseModule
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
                 // Instructor/staff viewing assessment details, on their own summary page
                 new Rule\All(
-                    new Rule\Any(
-                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                        new Rule\HasRole(Role::STAFF)
-                    ),
+                    $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\IsUser('studentId')
                 )
             )

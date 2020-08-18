@@ -11,19 +11,16 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
 use Aura\Di\Container;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Filter;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends BaseModule
 {
@@ -59,12 +56,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn('rubric_markbook_enable', $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                // Allow staff regardless of access level to the folder
-                new Rule\HasRole(Role::STAFF),
-                // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params) {
-                    return $params['folderId'];
-                }, Access::getInstance())
+                new IsInstructor(Access::getInstance())
             )
         );
 
