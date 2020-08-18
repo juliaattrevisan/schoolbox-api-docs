@@ -27,7 +27,7 @@
                     {% endif %}
                 {% else %}
                     {% if multipleResponses %}
-                        Resubmitted
+                        Resubmitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
                     {% else %}
                         Submitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
                     {% endif %}
