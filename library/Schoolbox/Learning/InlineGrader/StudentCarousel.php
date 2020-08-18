@@ -89,13 +89,15 @@ class StudentCarousel
                 /** @var Submission $latestSubmission */
                 if ($latestSubmission) {
                     $multipleResponses = \count($currentParticipant->getAllResponses()) > 1;
+                    $inPerson = $latestSubmission->isSubmittedOffline() ? 'in person ' : '';
+
                     if ($latestSubmission->isSubmittedOnTime()) {
                         $css   = 'submitted';
-                        $label = $multipleResponses ? 'Resubmitted on time' : 'Submitted on time';
+                        $label = $multipleResponses ? 'Resubmitted ' . $inPerson . 'on time' : 'Submitted ' . $inPerson . 'on time';
 
                     } else {
                         $css   = 'submitted-late';
-                        $label = $multipleResponses ? 'Resubmitted late' : 'Submitted late';
+                        $label = $multipleResponses ? 'Resubmitted ' . $inPerson . 'late' : 'Submitted ' . $inPerson . 'late';
                     }
                 } else {
                     /* No submission exists

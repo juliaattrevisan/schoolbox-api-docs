@@ -27,9 +27,9 @@
                     {% endif %}
                 {% else %}
                     {% if multipleResponses %}
-                        Resubmitted
+                        Resubmitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
                     {% else %}
-                        Submitted
+                        Submitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
                     {% endif %}
                 {% endif %}
                 {% if assessable is not project %}

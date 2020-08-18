@@ -85,6 +85,15 @@ class Model extends AbstractResponse
         return !$this->isSubmitted();
     }
 
+    /**
+     * Did the student submit this work offline, and this is just the acknowledgement
+     *
+     * @return bool
+     */
+    public function isSubmittedOffline(): bool
+    {
+        return $this->allFiles->count() === 0;
+    }
 
     /**
      * Find a file with a particular $hash

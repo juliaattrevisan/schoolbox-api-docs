@@ -51,7 +51,11 @@
                             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
                             <p>
                                 {% if currentInteraction.isSubmitted %}
-                                    Submission
+                                    {% if currentInteraction.isSubmittedOffline %}
+                                        Submitted in person
+                                    {% else %}
+                                        Submission
+                                    {% endif %}
                                 {% else %}
                                     Draft Submission
                                 {% endif %}
