@@ -44,7 +44,8 @@ class Controller extends Base
         $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
 
         /* TODO: Remove Hardcoding
-         * Assume Literal Effect Type to start with
+         * This supposedly assumes Literal Effect Type to start with, but always
+         * loads the Map effect type (probably because it's first in the list)
          */
         $default = [
             'effectType' => null,
@@ -76,6 +77,12 @@ class Controller extends Base
 
         /* All fragments and subfragments use empty by default, thus
          * forcing the user to choose a userfield/mappingType combo
+         *
+         * This fragment must be empty, because this controller action doesn't
+         * know which user properties already have effects in the current rule.
+         *
+         * Therefore, this action can't presume a selected user property or
+         * fragment type.
          */
         $fragment = $fragmentFactory->produceEmpty();
 
