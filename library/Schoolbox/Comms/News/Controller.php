@@ -768,16 +768,32 @@ class Controller extends Base
          * Specifically applies to the index page which loads slightly differently than component variant
          */
         $data = [
+            /* Core and querystring params
+             */
+            'queryStringPage' => Querystring::PAGE_NUMBER,
+            'queryStringReferrer' => Querystring::REFERRER,
+            'queryStringTopic' => Querystring::TOPIC_SLUG,
+
+            /* Topics
+             */
             'topicAll' => [
                 'name' => 'All',
                 'slug' => Mapper::TOPIC_ALL_SLUG,
             ],
             'topic' => $params->getSlug() ?: 'all',
+
+            /* Referrers and Redirects
+             */
             'referrer' => $params->getReferrer(),
+
+            /* Layout
+             */
+            'itemLayout' => $this->getConfigLoader()->get('comms_news_article_list_layout'),
+            'fallbackImage' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+
+            /* Pagination
+             */
             'initialPage' => $params->getPageNum(),
-            'queryStringPage' => Querystring::PAGE_NUMBER,
-            'queryStringReferrer' => Querystring::REFERRER,
-            'queryStringTopic' => Querystring::TOPIC_SLUG,
 
             /* For configuring the rss button which changes per topic chosen
              */
