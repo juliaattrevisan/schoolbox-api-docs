@@ -29,7 +29,7 @@ VALUES ('comms_news_article_list_layout',
 INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES ('comms_news_article_list_fallback_image',
-        null,
+        'school-logo',
         'Fallback Image',
         'Select fallback image for articles when a feature image is omitted',
         (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
