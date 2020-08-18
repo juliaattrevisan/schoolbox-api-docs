@@ -334,15 +334,36 @@ class DataSource
     /**
      * Get a list of members that have not visited the homepage
      *
-     * @param int $folderId
+     * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
-     * @param int $limit
+     * @param null                 $role
+     * @param null                 $limit
      * @return Collection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getYetToVisit($folderId, $startDate, $endDate, $role = null, $limit = null)
     {
+
+        /* Find a list of users who are known to be in this class
+         */
+
+        /* Find a list of users who have visited this class
+         */
+
+        /* Find the diff, which tells you known users who should be visiting this class
+         * but haven't done so yet
+         */
+
+        /* findByColumn() on the diff result set, as that gives you all the details
+         * you could possibly want to use
+         */
+
+        /* Return a collection of users
+         */
+
         $queryParams = [
             'folderId' => $folderId,
             'startDate' => $startDate->getDatabase(),
