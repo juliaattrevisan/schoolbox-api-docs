@@ -678,7 +678,7 @@ class Controller extends Base
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
             $this->response->content->set($this->buildJsonOutput([
-                'articles' => $partialData['articles']
+                'articles' => $partialData['articles'],
             ]));
 
             return;
@@ -742,6 +742,10 @@ class Controller extends Base
             'folderId' => $params->getFolderId(),
             'showArchiveNewsLink' => $showArchiveNewsLink,
             'componentId' => $params->getComponentId(),
+            'fallbackImage' => [
+                'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+                'hash' => $this->getConfigLoader()->get('skin_logo_large')
+            ]
         ]);
     }
 
@@ -1053,7 +1057,11 @@ class Controller extends Base
             'hidePaginator' => $hidePaginator,
             'compactMode' => true,
             'pageNum' => $params->getPageNum(),
-            'referrer' => $params->getReferrer()
+            'referrer' => $params->getReferrer(),
+            'fallbackImage' => [
+                'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+                'hash' => $this->getConfigLoader()->get('skin_logo_large')
+            ]
         ]);
 
         $this->hydrateArticleAudiences($partialData['articles']);

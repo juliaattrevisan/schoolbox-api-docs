@@ -9,6 +9,7 @@
  # @param int unsaved
  # @param int compactMode
  # @param bool hidePaginator
+ # @param array fallbackImage  a tuple containing (type, hash) keys
  #}
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
@@ -18,11 +19,22 @@
             <li class="actions-small-2 {{ article.sticky ? 'sticky' : '' }}">
                 <div class="list-item">
                     <div class="small-12 card wrap-down">
-                        {%  set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
+                        {% set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
+
                         {% if article.featureImage %}
                             <a href="{{ articleURL }}">
                                 <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
                             </a>
+                        {% elseif fallbackImage.type == 'school-logo' %}
+                            <a href="{{ articleURL }}">
+                                <img src="/storage/image.php?hash={{ fallbackImage.hash }}&size=square64">
+                            </a>
+                        {% elseif fallbackImage.type == 'author' %}
+                            {% if article.author.portrait and article.author.portrait.hash %}
+                                <a href="{{ articleURL }}">
+                                    <img src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=square64">
+                                </a>
+                            {% endif %}
                         {% endif %}
 
                         <h3><a href="{{ articleURL }}">{{ article.title }}</a></h3>
