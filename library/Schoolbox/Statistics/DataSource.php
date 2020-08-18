@@ -362,84 +362,85 @@ class DataSource
      * @param string|null          $role
      * @param int|null             $limit
      * @return Collection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnderflowException
      */
-    public function getYetToVisit($folderId, $startDate, $endDate, $role = null, $limit = null)
+    public function getYetToVisit($folderId, $startDate, $endDate, $role = null, $limit = null): Collection
     {
 
         /* Find a list of users who are known to be in this class
+         * These are indexed by id so we can unset them later
          */
+
+        // TODO But I already have this in the controller...?
         $folder = $this->folderMapper->findById($folderId);
 
         $expectedUsers = $this->userAccessMapper->findUsersInCategory($folder, $role);
 
         /* Find a list of users who have visited this class
+         *
+         * I could have used FolderLogMapper but I'd be using it to get a list of data to delete
+         * That seems like completely wasted hydration efforts which I can shortcut here
          */
-
-        /* Find the diff, which tells you known users who should be visiting this class
-         * but haven't done so yet
-         */
-
-        /* findByColumn() on the diff result set, as that gives you all the details
-         * you could possibly want to use
-         */
-
-        /* Return a collection of users
-         */
-
-        $queryParams = [
+        $params = [
             'folderId' => $folderId,
             'startDate' => $startDate->getDatabase(),
             'endDate' => $endDate->getDatabase()
         ];
 
+        /* Optionals from the modal ui
+         */
         $roleFilter = '';
+
         if ($role !== null) {
-            $roleFilter = "AND ur.group_type = :role";
-            $queryParams['role'] = $role;
+            $roleFilter = 'AND r.group_type = :role';
+            $params['role'] = $role;
         }
 
         $queryLimit = '';
+
         if ($limit !== null) {
-            $queryLimit = "LIMIT {$limit}";
+            $queryLimit = 'LIMIT ' . (int)$limit;
         }
 
+        /* Pile it in the way it used to work
+         */
         $query = "
-            SELECT          {$this->userMapper->getColumnString('u')},
-                            {$this->userMapper->getJoinColumnString('role', 'ur')}
-            FROM            {$this->userMapper->getTable()} AS u
-            LEFT JOIN       {$this->userMapper->getJoinSql('userAccess', 'u', 'ua')}
-            LEFT JOIN       {$this->userMapper->getJoinSql('role', 'u', 'ur')}
-            RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
-            LEFT JOIN       groups g ON u.group_id = g.id
-            WHERE           ua.sid = :folderId
-                            AND ua.service = '1'
-                            AND u.deleted_at IS NULL
-                            {$roleFilter}
-                            AND u.id NOT IN (
-                                SELECT `user_id`
-                                FROM homepage_log
-                                WHERE folder_id = :folderId
-                                AND datetime BETWEEN :startDate AND :endDate
-                                GROUP BY `user_id`
-                            )
+            SELECT `user_id`
+            FROM homepage_log
+            INNER JOIN `user` u ON user_id = u.id
+            INNER JOIN `groups` r on u.group_id = r.id
+            WHERE folder_id = :folderId
+            AND datetime BETWEEN :startDate AND :endDate
+            {$roleFilter}
             {$queryLimit}
         ";
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute($queryParams);
+        $statement->execute($params);
 
-        $records = new Collection();
-
+        /* Find the diff, which tells you known users who should be visiting this class
+         * but haven't done so yet
+         */
         foreach ($statement as $row) {
-            $record = $this->userMapper->hydrate($row, 'u');
-            $record->setRole($this->userMapper->hydrateJoin($row, 'role', 'ur'));
-            $records->add($record);
+            $visitedUserId = $row['user_id'];
+
+            /* This person has visited, so we don't need to list them
+             * Everyone who remains are yet to visit
+             */
+            if ($expectedUsers->getOffset($visitedUserId)) {
+                $expectedUsers->offsetUnset($visitedUserId);
+            }
         }
 
-        return $records;
+        /* Return a collection of users
+         */
+        return $expectedUsers;
     }
 
 
