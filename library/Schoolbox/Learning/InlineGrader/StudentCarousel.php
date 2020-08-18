@@ -89,9 +89,10 @@ class StudentCarousel
                 /** @var Submission $latestSubmission */
                 if ($latestSubmission) {
                     $multipleResponses = \count($currentParticipant->getAllResponses()) > 1;
+                    $inPerson = $latestSubmission->isSubmittedOffline() ? 'in person ' : '';
+
                     if ($latestSubmission->isSubmittedOnTime()) {
                         $css   = 'submitted';
-                        $inPerson = $latestSubmission->isSubmittedOffline() ? 'in person ' : '';
                         $label = $multipleResponses ? 'Resubmitted '.$inPerson.'on time' : 'Submitted '.$inPerson.'on time';
 
                     } else {
