@@ -68,7 +68,11 @@ class Controller extends Base
             [
                 'articles' => $articles,
                 'referrer' => $params->getReferrer(),
-                'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE)
+                'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                'fallbackImage' => [
+                    'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+                    'hash' => $this->getConfigLoader()->get('skin_logo_large')
+                ]
             ],
             $sidebar->generate()
         );
