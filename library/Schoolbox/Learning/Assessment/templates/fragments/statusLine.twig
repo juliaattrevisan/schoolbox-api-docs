@@ -29,7 +29,7 @@
                     {% if multipleResponses %}
                         Resubmitted
                     {% else %}
-                        Submitted
+                        Submitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
                     {% endif %}
                 {% endif %}
                 {% if assessable is not project %}
