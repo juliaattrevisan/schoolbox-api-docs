@@ -153,14 +153,14 @@
                                 }
 
                                 /* Only load highcharts once otherwise error 16
+                                 * Highcharts can only load once, but you can't tell which Poll component loads it successfully
+                                 * Use the fail case which occurs when error 16 occurs to just go for it
                                  */
-                                if (typeof Highcharts == 'undefined') {
-                                    $.getScript("/javascript/components/highcharts-release/highcharts.js", function() {
-                                        componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
-                                    });
-                                } else {
+                                $.getScript("/javascript/components/highcharts-release/highcharts.js", function() {
                                     componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
-                                }
+                                }).fail(function(jqxhr, settings, exception) {
+                                    componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
+                                });
                             });
                         </script>
                         <div id='component-poll{POLL_ID}-graph'></div>
