@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Role;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
@@ -148,6 +147,7 @@ class Module extends BaseModule
             'visitMapper'      => $this->getMapperFactory()->getLazy(VisitsMapper::class),
             'logMapper'        => $this->getMapperFactory()->getLazy(LogMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
         ];
 
         // dependencies for Controller

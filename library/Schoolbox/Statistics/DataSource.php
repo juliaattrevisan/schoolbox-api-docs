@@ -1,12 +1,9 @@
 <?php
 /**
- * The source of all homepage statistics
- *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Statistics;
 
 use Schoolbox\Collection;
@@ -15,83 +12,108 @@ use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
 use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
+/**
+ * Class DataSource
+ *
+ * The source of all homepage statistics
+ *
+ * @package Schoolbox\Statistics
+ */
 class DataSource
 {
+
+    /**
+     * Object types for filtering the log
+     */
+    public const FILTER_FILE = 'file';
+    public const FILTER_LINK = 'link';
+
+
     /**
      * Data source for users
      *
      * @var UserMapper
      */
-    protected $userMapper;
+    private $userMapper;
+
 
     /**
      * Data source for folder logs
      *
      * @var FolderLogMapper
      */
-    protected $folderLogMapper;
+    private $folderLogMapper;
+
 
     /**
      * Data source for homepage visit counts
      *
      * @var VisitsMapper
      */
-    protected $visitsMapper;
+    private $visitsMapper;
+
 
     /**
      * Data source for all homepage access, write, etc logs
      *
      * @var LogMapper
      */
-    protected $logMapper;
+    private $logMapper;
+
 
     /**
      * Data source for user access to folders
      *
-     * @var LogMapper
+     * @var UserAccessMapper
      */
-    protected $userAccessMapper;
-
-    /**
-     * Object types for filtering the log
-     */
-    const FILTER_FILE = 'file';
-    const FILTER_LINK = 'link';
+    private $userAccessMapper;
 
 
     /**
-     * Constructor
-     *
-     * @param UserMapper $userMapper
-     * @param FolderLogMapper $folderLogMapper
-     * @param VisitsMapper $visitsMapper
-     * @param LogMapper $logMapper
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * DataSource constructor.
+     * @param UserMapper       $userMapper
+     * @param FolderLogMapper  $folderLogMapper
+     * @param VisitsMapper     $visitsMapper
+     * @param LogMapper        $logMapper
      * @param UserAccessMapper $userAccessMapper
+     * @param Folder\Mapper    $folderMapper
      */
     public function __construct(
         UserMapper $userMapper,
         FolderLogMapper $folderLogMapper,
         VisitsMapper $visitsMapper,
         LogMapper $logMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Folder\Mapper $folderMapper
     ) {
         $this->userMapper = $userMapper;
         $this->folderLogMapper = $folderLogMapper;
         $this->visitsMapper = $visitsMapper;
         $this->logMapper = $logMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->folderMapper = $folderMapper;
     }
 
 
     /**
      * Get homepage hits split into roles
      *
-     * @param int $folderId
+     * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
+     * @param null                 $role
      * @return Collection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getVisits($folderId, $startDate, $endDate, $role = null)
     {
@@ -136,13 +158,16 @@ class DataSource
     /**
      * Get a list of visitors and their hitcount for a homepage
      *
-     * @param int $folderId
+     * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
-     * @param string $orderBy
-     * @param int $limit
+     * @param null                 $role
+     * @param string               $orderBy
+     * @param null                 $limit
      * @return Collection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getVisitors($folderId, $startDate, $endDate, $role = null, $orderBy, $limit = null)
     {
@@ -200,11 +225,13 @@ class DataSource
     /**
      * Get a total visitor count for a homepage
      *
-     * @param int $folderId
+     * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
+     * @param string|null          $role
      * @return int
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getVisitorCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
     {
@@ -244,11 +271,10 @@ class DataSource
      * @param string               $object
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string               $role
-     * @param int                  $limit
+     * @param string|null          $role
+     * @param int|null             $limit
      * @param bool                 $hydrate
      * @return array
-     *
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
@@ -299,10 +325,6 @@ class DataSource
             {$queryLimit}
         ";
 
-        /*
-         *
-         */
-
         $statement = $this->logMapper->getDatabase()->prepare($query);
         $statement->execute($queryParams);
 
@@ -334,77 +356,99 @@ class DataSource
     /**
      * Get a list of members that have not visited the homepage
      *
-     * @param int $folderId
+     * @param Folder\Model         $folder
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
-     * @param int $limit
+     * @param string|null          $role
+     * @param int|null             $limit
      * @return Collection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
      */
-    public function getYetToVisit($folderId, $startDate, $endDate, $role = null, $limit = null)
+    public function getYetToVisit(Folder\Model $folder, $startDate, $endDate, $role = null, $limit = null): Collection
     {
-        $queryParams = [
-            'folderId' => $folderId,
+
+        /* Find a list of users who are known to be in this class
+         * These are indexed by id so we can unset them later
+         */
+        $expectedUsers = $this->userAccessMapper->findUsersInCategory($folder, $role);
+
+        /* Find a list of users who have visited this class
+         *
+         * I could have used FolderLogMapper but I'd be using it to get a list of data to delete
+         * That seems like completely wasted hydration efforts which I can shortcut here
+         */
+        $params = [
+            'folderId' => $folder->getId(),
             'startDate' => $startDate->getDatabase(),
             'endDate' => $endDate->getDatabase()
         ];
 
+        /* Optionals from the modal ui
+         */
         $roleFilter = '';
+
         if ($role !== null) {
-            $roleFilter = "AND ur.group_type = :role";
-            $queryParams['role'] = $role;
+            $roleFilter = 'AND r.group_type = :role';
+            $params['role'] = $role;
         }
 
         $queryLimit = '';
+
         if ($limit !== null) {
-            $queryLimit = "LIMIT {$limit}";
+            $queryLimit = 'LIMIT ' . (int)$limit;
         }
 
+        /* Pile it in the way it used to work
+         */
         $query = "
-            SELECT          {$this->userMapper->getColumnString('u')},
-                            {$this->userMapper->getJoinColumnString('role', 'ur')}
-            FROM            {$this->userMapper->getTable()} AS u
-            LEFT JOIN       {$this->userMapper->getJoinSql('userAccess', 'u', 'ua')}
-            LEFT JOIN       {$this->userMapper->getJoinSql('role', 'u', 'ur')}
-            RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
-            LEFT JOIN       groups g ON u.group_id = g.id
-            WHERE           ua.sid = :folderId
-                            AND ua.service = '1'
-                            AND u.deleted_at IS NULL
-                            {$roleFilter}
-                            AND u.id NOT IN (
-                                SELECT `user_id`
-                                FROM homepage_log
-                                WHERE folder_id = :folderId
-                                AND datetime BETWEEN :startDate AND :endDate
-                                GROUP BY `user_id`
-                            )
+            SELECT `user_id`
+            FROM homepage_log
+            INNER JOIN `user` u ON user_id = u.id
+            INNER JOIN `groups` r on u.group_id = r.id
+            WHERE folder_id = :folderId
+            AND datetime BETWEEN :startDate AND :endDate
+            {$roleFilter}
             {$queryLimit}
         ";
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute($queryParams);
+        $statement->execute($params);
 
-        $records = new Collection();
-
+        /* Find the diff, which tells you known users who should be visiting this class
+         * but haven't done so yet
+         */
         foreach ($statement as $row) {
-            $record = $this->userMapper->hydrate($row, 'u');
-            $record->setRole($this->userMapper->hydrateJoin($row, 'role', 'ur'));
-            $records->add($record);
+            $visitedUserId = $row['user_id'];
+
+            /* This person has visited, so we don't need to list them
+             * Everyone who remains are yet to visit
+             */
+            if ($expectedUsers->getOffset($visitedUserId)) {
+                $expectedUsers->offsetUnset($visitedUserId);
+            }
         }
 
-        return $records;
+        /* Return a collection of users
+         */
+        return $expectedUsers;
     }
 
 
     /**
      * Get count of visitors that have not visited a homepage
      *
-     * @param int $folderId
+     * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
+     * @param string|null          $role
      * @return int
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getYetToVisitCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
     {
