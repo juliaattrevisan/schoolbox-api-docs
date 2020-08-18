@@ -21,7 +21,7 @@ VALUES ('comms_news_article_list_layout',
         null,
         'true',
         'false',
-        'false',
+        'true',
         'comms',
         (SELECT MAX(sequence) + 1 FROM `config` c WHERE `module` = 'comms')
         );
@@ -33,11 +33,11 @@ VALUES ('comms_news_article_list_fallback_image',
         'Fallback Image',
         'Select fallback image for articles when a feature image is omitted',
         (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
-        'author;Author Portrait:school-logo;School Logo',
+        'school-logo;School Logo:author;Author Portrait',
         null,
         'true',
         'false',
-        'false',
+        'true',
         'comms',
         (SELECT MAX(sequence) + 1 FROM `config` c WHERE `module` = 'comms')
        );
