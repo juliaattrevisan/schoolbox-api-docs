@@ -274,6 +274,9 @@ class Controller extends Base
              * formed html file is rammed in and thus need to inject this manually
              */
             'dynamicInputName' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to][]",
+
+            // Also pass in preselected value, as the map-row template expects it
+            'preselected' => '',
         ];
 
         $this->getResponse()->content->set([

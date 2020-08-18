@@ -11,9 +11,15 @@
 
 <div class="small-12 columns">
     {% for mapFrom, preselected in currentEffect.arguments[1] ?? [] %}
-        {% include '@upsEffect/map-row.twig' %}
+        {% include '@upsEffect/map-row.twig' with {
+            mapFrom:     mapFrom,
+            preselected: preselected,
+        } %}
     {% endfor %}
 
     {# Always spawn an empty row to use #}
-    {% include '@upsEffect/map-row.twig' %}
+    {% include '@upsEffect/map-row.twig' with {
+        mapFrom:     '',
+        preselected: '',
+    } %}
 </div>
