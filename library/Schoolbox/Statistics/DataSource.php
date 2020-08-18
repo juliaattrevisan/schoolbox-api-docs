@@ -356,7 +356,7 @@ class DataSource
     /**
      * Get a list of members that have not visited the homepage
      *
-     * @param int                  $folderId
+     * @param Folder\Model         $folder
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @param string|null          $role
@@ -367,19 +367,14 @@ class DataSource
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnderflowException
      */
-    public function getYetToVisit($folderId, $startDate, $endDate, $role = null, $limit = null): Collection
+    public function getYetToVisit(Folder\Model $folder, $startDate, $endDate, $role = null, $limit = null): Collection
     {
 
         /* Find a list of users who are known to be in this class
          * These are indexed by id so we can unset them later
          */
-
-        // TODO But I already have this in the controller...?
-        $folder = $this->folderMapper->findById($folderId);
-
         $expectedUsers = $this->userAccessMapper->findUsersInCategory($folder, $role);
 
         /* Find a list of users who have visited this class
@@ -388,7 +383,7 @@ class DataSource
          * That seems like completely wasted hydration efforts which I can shortcut here
          */
         $params = [
-            'folderId' => $folderId,
+            'folderId' => $folder->getId(),
             'startDate' => $startDate->getDatabase(),
             'endDate' => $endDate->getDatabase()
         ];

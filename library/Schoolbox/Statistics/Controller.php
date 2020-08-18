@@ -676,7 +676,7 @@ class Controller extends Base
      */
     private function compileNotYetVisitedData(FolderModel $folder, DataSource $dataSource): array
     {
-        $yetToVisitors = $dataSource->getYetToVisit($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_YET_TO_VISIT);
+        $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_YET_TO_VISIT);
 
         $yetToVisitMore  = false;
         $yetToVisitCount = $dataSource->getYetToVisitCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
