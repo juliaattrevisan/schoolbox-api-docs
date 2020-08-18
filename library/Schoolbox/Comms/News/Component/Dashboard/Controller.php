@@ -65,7 +65,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             /* Layout
              */
             'compactMode' => $this->getConfig('compactMode'),
-            'itemLayout' => $this->getConfigLoader()->get('comms_news_article_list_layout'),
+            'itemLayout' => $this->getConfig('itemLayout'),
             'fallbackImage' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
 
             /* Routes
