@@ -662,6 +662,13 @@ class CliPdfGenerator extends CliTool\App
             return $urls;
         }
 
+        /* Include Subjects requires Role Type override
+         */
+        if (!$this->roleTypeOverride) {
+            $this->getLogger()->error('Please specify a Role Type');
+            exit;
+        }
+
         $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes, $this->roleTypeOverride);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
@@ -1008,7 +1015,7 @@ DESCRIPTION
          Must be one of [{$roleTypes}]
 
      $yellow--include-subjects$white
-         If provided, include the Subject Reports.
+         If provided, include the Subject Reports. Requires setting the --role-type option.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
