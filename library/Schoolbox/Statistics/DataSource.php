@@ -66,7 +66,7 @@ class DataSource
     /**
      * Data source for user access to folders
      *
-     * @var LogMapper
+     * @var UserAccessMapper
      */
     private $userAccessMapper;
 
