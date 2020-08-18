@@ -152,6 +152,7 @@ class External_Tass_V52_User extends External_Tass_User
                 AND student.cmpy_code = parent.cmpy_code
             INNER JOIN family
                 ON parent.par_code = family.entity_code
+                AND parent.cmpy_code = family.cmpy_code
                 AND family.entity_gender = '{$gender[$i]}'
                 AND (family.entity_type = 'P' OR family.entity_type = 'E')
             INNER JOIN persondefs pd
@@ -197,6 +198,7 @@ class External_Tass_V52_User extends External_Tass_User
                 AND parent.cmpy_code = sf.cmpy_code
             INNER JOIN family
                 ON parent.par_code = family.entity_code
+                AND parent.cmpy_code = family.cmpy_code
                 AND family.entity_gender = '{$gender[$i]}'
                 AND (family.entity_type = 'P' OR family.entity_type = 'E')
             INNER JOIN persondefs pd
