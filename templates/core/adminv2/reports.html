@@ -35,21 +35,20 @@
 </div>
 
 <!-- BEGIN result_table -->
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
+        </div>
+    </div>
+    <!-- BEGIN download_report -->
+    <nav>
+        <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="icon-download" title="Download Report"></a>
+    </nav>
+    <!-- END download_report -->
+</div>
 <div class="row">
     <div class="small-12 columns">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
-                </div>
-            </div>
-            <!-- BEGIN download_report -->
-            <nav>
-                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="icon-download" title="Download Report"></a>
-            </nav>
-            <!-- END download_report -->
-        </div>
-
         <!-- BEGIN result -->
         {RESULT}
         <!-- END result -->
