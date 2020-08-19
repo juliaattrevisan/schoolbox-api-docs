@@ -415,17 +415,27 @@ class CourseSection
         // Fetch all relevant Canvas CourseSection SisSourceIds
         // Initially set mapping to NULL
         $this->sisSourceIdToYearAndFolderCodeMap = [];
-        foreach ($this->getSectionSisSourceIds() as $sisSourceId) {
-            $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId] = null;
-        }
 
         // Try to match against the unPrefixed year+folderCodes
         $regexNotMatch                  = [];
         $regexMatchButNoFolderCodeMatch = [];
         $regexMatchAndFolderCodeMatch   = [];
 
-        foreach (array_keys($this->sisSourceIdToYearAndFolderCodeMap) as $sisSourceId) {
-            $year        = $this->parseYearFromSisSourceId($sisSourceId) ?? '';
+        // This is pre-populated in a structure of Academic year -> [SB FolderCodes -> Canvas CourseSections.SisSourceIds]
+        // Array keys are years parsed from class "root" folders
+        // It'll be empty string, if a class root folder does not have 4 digits
+        $years  = array_keys($this->yearAndFolderCodeToSisSourceIdMap);
+        $noYear = count($years) === 1 && $years[0] === '';
+
+        // Gets all Canvas sections and map to schoolbox classes
+        foreach ($this->getSectionSisSourceIds() as $sisSource) {
+            $sisSourceId = $sisSource['sis_source_id'];
+            if (empty($sisSourceId) || key_exists($sisSourceId, $this->sisSourceIdToYearAndFolderCodeMap)) {
+                continue;
+            }
+            $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId] = null;
+
+            $year        = $noYear ? '' : $this->parseYearFromSisSourceId($sisSourceId, $sisSource['term_name']) ?? '';
             $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId);
             if ($subjectCode === null) {
                 $regexNotMatch[] = $sisSourceId;
@@ -476,7 +486,7 @@ class CourseSection
     /**
      * Returns the Canvas CourseSection.SisSourceIds to match to Schoolbox folder codes
      *
-     * @return string[]
+     * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
@@ -486,24 +496,28 @@ class CourseSection
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
-            SELECT cs.sis_source_id
+            SELECT cs.sis_source_id, term.name as term_name
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
             WHERE {$whereClause}
         ";
-        return $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+        return $this->canvasDb->executeQuery($sql, $pb->getParams())->fetchAll();
     }
 
 
     /**
-     * Attempt to parse a year from a sisSourceId
+     * Attempt to get a year from term name
      *
      * @param string $sisSourceId
+     * @param string $termName
      * @return string|null
      */
-    public function parseYearFromSisSourceId(string $sisSourceId): ?string
+    public function parseYearFromSisSourceId(string $sisSourceId, string $termName): ?string
     {
+        if (preg_match('/(\d{4})/', $termName, $matches)) {
+            return $matches[1];
+        }
         return null;
     }
 

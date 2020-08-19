@@ -50,6 +50,15 @@ class Submission extends SectionAssignment
     private $syncMarkCount;
 
     /**
+     * canvasUserId => SB User
+     * @var array
+     */
+    private $canvasUserIdUserMap;
+
+    /** @var User */
+    private $schoolboxAdmin;
+
+    /**
      * @param IConnector                $canvasDb
      * @param IConnector                $schoolboxDb
      * @param External_ClassInterface   $externalClass
@@ -127,6 +136,7 @@ class Submission extends SectionAssignment
         $this->log->notice("Synchronising Canvas Submissions");
 
         $this->resetCounts();
+        $this->canvasUserIdUserMap = [];
 
         $sectionSisSourceIds   = $this->courseSectionBridge->getMappedSisSourceIds();
         $coursesSectionData    = $this->loadCanvasSectionStudentData($sectionSisSourceIds);
@@ -176,23 +186,20 @@ class Submission extends SectionAssignment
                                     // current canvas submission is not for this participant
                                     continue;
                                 }
-                                try {
-                                    $reviewee = $this->userMapper->findByExternalId($canvasSubmission['reviewee_id']);
-                                } catch (Mapper\Exception $e) {
-                                    // If the reviewee (i.e. student) does not exist, skip this canvas submission
-                                    $this->log->debug("Reviewee (ExternalId: {$canvasSubmission['reviewee_id']}) does not exist in Schoolbox");
-                                    continue;
+                                // $participant should be a school box user with this reviewee_id as their external_id
+                                $reviewee = $participant->getUser();
+                                if (!empty($canvasSubmission['comment']
+                                    && $canvasSubmission['comment_created_at'] > $canvasSubmission['graded_at'])
+                                ) {
+                                    $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['commenter_id']);
+                                    $feedbackTime = $canvasSubmission['comment_created_at'];
+                                } else {
+                                    $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
+                                    $feedbackTime = $canvasSubmission['graded_at'];
                                 }
-
-                                try {
-                                    $reviewer = $this->userMapper->findByExternalId($canvasSubmission['reviewer_id']);
-                                } catch (Mapper\Exception $e) {
-                                    $reviewer = $this->userMapper->findById($this->getSchoolboxAdminUserId());
-                                }
-                                $this->log->debug("Synchronising Canvas mark for {$reviewee->getFullName()} [{$reviewee->getId()}]");
 
                                 $feedback            = $this->syncFeedback(
-                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks, $markScheme
+                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks, $markScheme, $feedbackTime
                                 );
                                 $syncedFeedbackIds[] = $feedback->getId();
                                 $this->syncMarkCount++;
@@ -218,11 +225,20 @@ class Submission extends SectionAssignment
      * @param User              $reviewee
      * @param array             $canvasSubmission
      * @param GenericCollection $existingFeedbacks
+     * @param IMarkScheme       $markScheme
+     * @param string            $feedbackTime
      * @return SubmissionBox\ReturnedWork
      * @throws Mapper\Exception
      */
-    private function syncFeedback(SubmissionBox $submissionBox, User $reviewer, User $reviewee, array $canvasSubmission, GenericCollection $existingFeedbacks, IMarkScheme $markScheme): SubmissionBox\ReturnedWork
-    {
+    private function syncFeedback(
+        SubmissionBox $submissionBox,
+        User $reviewer,
+        User $reviewee,
+        array $canvasSubmission,
+        GenericCollection $existingFeedbacks,
+        IMarkScheme $markScheme,
+        string $feedbackTime
+    ): SubmissionBox\ReturnedWork {
         $normMark = $canvasSubmission['norm_mark'];
         if ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
@@ -245,6 +261,9 @@ class Submission extends SectionAssignment
             }
         }
 
+        // time string from Canvas is coming in UTC
+        $feedbackTime = date_create("{$feedbackTime} UTC");
+
         // Couldn't find. Creating a new feedback
         $feedback = $this->returnedWorkMapper->createModel();
         $feedback->setSubmissionBox($submissionBox)
@@ -254,9 +273,9 @@ class Submission extends SectionAssignment
                  ->setComment($canvasSubmission['comment'])
                  ->setHumanReadableMark($readableMark)
                  ->setNormalizedMark($normMark)
-                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']))
-                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($canvasSubmission['graded_at']));
+                 ->setCreatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
+                 ->setPublishedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
+                 ->setUpdatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()));
 
         /* Cannot use mappers here to save because:
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
@@ -321,15 +340,18 @@ class Submission extends SectionAssignment
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
                 submission_fact.published_score as norm_mark,
-                reviewer.sis_user_id as reviewer_id,
                 reviewee.sis_user_id as reviewee_id,
+                submission_dim.grader_id as grader_user_id,
+                submission_dim.graded_at as graded_at,
                 submission_comment_dim.comment as comment,
-                submission_dim.graded_at as graded_at
+                submission_comment_dim.author_id as commenter_id,
+                submission_comment_dim.created_at as comment_created_at,
+                submission_comment_dim.updated_at as comment_updated_at
             FROM assignment_dim
             LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             LEFT JOIN submission_fact ON submission_fact.submission_id = submission_dim.id
             LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id
-            LEFT JOIN pseudonym_dim as reviewer ON reviewer.user_id = submission_dim.grader_id AND reviewer.workflow_state = 'active'
+                                             AND submission_comment_dim.author_id <> submission_dim.user_id
             LEFT JOIN pseudonym_dim as reviewee ON reviewee.user_id = submission_dim.user_id AND reviewee.workflow_state = 'active'
 
             WHERE {$whereClause}
@@ -338,6 +360,54 @@ class Submission extends SectionAssignment
 
         $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
         return $statement->fetchAll();
+    }
+
+    /**
+     * Find a SB user who matches Canvas user with given canvas user id
+     * 1. attempt to match using Canvas sis_user_id and SB synergy_id
+     * 2. if 1 failed, try matching Canvas unique_name and SB email address
+     * 3. if 2 failed, return schoolbox admin
+     * @param string $canvasUserId
+     * @return User|null
+     * @throws Mapper\Exception
+     */
+    private function findUserByCanvasUserId(string $canvasUserId): ?User
+    {
+        if (key_exists($canvasUserId, $this->canvasUserIdUserMap)) {
+            return $this->canvasUserIdUserMap[$canvasUserId];
+        }
+
+        $sql = "SELECT sis_user_id, unique_name FROM pseudonym_dim
+                 WHERE workflow_state = 'active'
+                   AND user_id = :userId";
+
+        $statement = $this->canvasDb->executeQuery($sql, ['userId' => $canvasUserId]);
+
+        if ($canvasUser = $statement->fetch()) {
+            // Try sis user id
+            try {
+                $this->canvasUserIdUserMap[$canvasUserId] = $this->userMapper->findByExternalId($canvasUser['sis_user_id']);
+                return $this->canvasUserIdUserMap[$canvasUserId];
+            } catch (Mapper\Exception $e) {
+            }
+
+            // Try email address
+            try {
+                $emailUsers = $this->userMapper->findByEmail($canvasUser['unique_name']);
+                foreach ($emailUsers as $user) {
+                    $this->canvasUserIdUserMap[$canvasUserId] = $user;
+                    return $this->canvasUserIdUserMap[$canvasUserId];
+                }
+            } catch (Mapper\Exception $e) {
+            }
+        }
+
+        // If failed to find, return admin
+        if (empty($this->schoolboxAdmin)) {
+            $this->schoolboxAdmin = $this->userMapper->findById($this->getSchoolboxAdminUserId());
+        }
+        $this->canvasUserIdUserMap[$canvasUserId] = $this->schoolboxAdmin;
+        return $this->canvasUserIdUserMap[$canvasUserId];
     }
 
     /**

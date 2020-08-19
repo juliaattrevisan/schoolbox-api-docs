@@ -120,9 +120,10 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
      * 'xxx'            => null
      *
      * @param string $sisSourceId
+     * @param string $termName
      * @return string|null
      */
-    public function parseYearFromSisSourceId(string $sisSourceId): ?string
+    public function parseYearFromSisSourceId(string $sisSourceId, string $termName): ?string
     {
         if (preg_match("/^Y(\d{4})C.+$/", $sisSourceId, $canonicalYearMatch)) {
             // This is the canonical form.
