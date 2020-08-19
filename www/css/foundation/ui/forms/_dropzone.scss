@@ -17,10 +17,37 @@ $attachzone-error-color: $alert-color;
 $attachzone-overlay-duration: 800ms;
 $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
-// Center the icon in Mr Matt's Modal file uploader
-#filesystem-upload {
-  .dz-image {
-    text-align: center;
+/* Special layout for our file uploader in Mr Matt's Modal
+ */
+#filesystem-upload-panel #ab-upload {
+  .dz-preview {
+    border: 0;
+    border-bottom: solid 1px $monsoon;
+    display: flex;
+    min-height: 6rem;
+    max-height: 6rem;
+    width: 50%;
+
+    .dz-image {
+      flex: 0 0 20%;
+    }
+
+    .dz-details {
+      flex: 0 0 70%;
+
+      .dz-size {
+        text-align: left;
+      }
+
+      .dz-filename {
+        text-align: left;
+      }
+    }
+
+    .dz-close {
+      flex: 0 0 10%;
+      text-align: left;
+    }
   }
 }
 
@@ -479,10 +506,6 @@ ul.az-error-list {
         position: relative;
         top: 0;
         left: 0;
-        // Massage to fit within the file display block
-        min-width: 100px;
-        max-width: 118px;
-        word-break: break-word;
 
         // Undo some of the base background styles
         opacity: 1;
@@ -508,7 +531,7 @@ ul.az-error-list {
     }
     img[data-dz-thumbnail] {
         margin: 9px;
-        max-width: 100px;
+        max-width: 64px;
     }
     .dz-filename {
         padding: 0 9px;
