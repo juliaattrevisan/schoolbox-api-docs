@@ -23,7 +23,7 @@
         </thead>
         <tbody>
         {% for groupIndex, group in rubricGrid.iterateCapabilities -%}
-            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?? group.indicators|length + 2 } -%}
+            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?? (group.indicators|length + 2) } -%}
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
             <th colspan="{{ rubricGrid.levels|length + 3 }}">
