@@ -186,6 +186,7 @@ class Submission extends SectionAssignment
                                     // current canvas submission is not for this participant
                                     continue;
                                 }
+                                // $participant should be a school box user with this reviewee_id as their external_id
                                 $reviewee = $participant->getUser();
                                 if (!empty($canvasSubmission['comment']
                                     && $canvasSubmission['comment_created_at'] > $canvasSubmission['graded_at'])
@@ -260,6 +261,9 @@ class Submission extends SectionAssignment
             }
         }
 
+        // time string from Canvas is coming in UTC
+        $feedbackTime = date_create("{$feedbackTime} UTC");
+
         // Couldn't find. Creating a new feedback
         $feedback = $this->returnedWorkMapper->createModel();
         $feedback->setSubmissionBox($submissionBox)
@@ -269,9 +273,9 @@ class Submission extends SectionAssignment
                  ->setComment($canvasSubmission['comment'])
                  ->setHumanReadableMark($readableMark)
                  ->setNormalizedMark($normMark)
-                 ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($feedbackTime))
-                 ->setPublishedAt(Alaress_Date_Format::newDatabaseDate($feedbackTime))
-                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($feedbackTime));
+                 ->setCreatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
+                 ->setPublishedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
+                 ->setUpdatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()));
 
         /* Cannot use mappers here to save because:
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
@@ -359,6 +363,10 @@ class Submission extends SectionAssignment
     }
 
     /**
+     * Find a SB user who matches Canvas user with given canvas user id
+     * 1. attempt to match using Canvas sis_user_id and SB synergy_id
+     * 2. if 1 failed, try matching Canvas unique_name and SB email address
+     * 3. if 2 failed, return schoolbox admin
      * @param string $canvasUserId
      * @return User|null
      * @throws Mapper\Exception

@@ -421,9 +421,13 @@ class CourseSection
         $regexMatchButNoFolderCodeMatch = [];
         $regexMatchAndFolderCodeMatch   = [];
 
+        // This is pre-populated in a structure of Academic year -> [SB FolderCodes -> Canvas CourseSections.SisSourceIds]
+        // Array keys are years parsed from class "root" folders
+        // It'll be empty string, if a class root folder does not have 4 digits
         $years  = array_keys($this->yearAndFolderCodeToSisSourceIdMap);
         $noYear = count($years) === 1 && $years[0] === '';
 
+        // Gets all Canvas sections and map to schoolbox classes
         foreach ($this->getSectionSisSourceIds() as $sisSource) {
             $sisSourceId = $sisSource['sis_source_id'];
             if (empty($sisSourceId) || key_exists($sisSourceId, $this->sisSourceIdToYearAndFolderCodeMap)) {
@@ -503,7 +507,7 @@ class CourseSection
 
 
     /**
-     * Attempt to get a year from a sisSourceId
+     * Attempt to get a year from term name
      *
      * @param string $sisSourceId
      * @param string $termName
