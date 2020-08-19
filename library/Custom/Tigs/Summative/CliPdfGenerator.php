@@ -307,6 +307,15 @@ class CliPdfGenerator extends CliTool\App
             $valid = false;
         }
 
+
+        /* Include Subjects requires Role Type override
+         */
+        if (!$this->roleTypeOverride && (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
+            $this->getLogger()->alert("A valid 'role-type' option must be set if using 'include-subjects'");
+            $valid = false;
+        }
+
+
         $this->getLogger()->debug("Command Line Options:");
         $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
         $this->getLogger()->debug("    username: {$this->username}");
@@ -660,13 +669,6 @@ class CliPdfGenerator extends CliTool\App
          */
         if (!(bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
             return $urls;
-        }
-
-        /* Include Subjects requires Role Type override
-         */
-        if (!$this->roleTypeOverride) {
-            $this->getLogger()->error('Please specify a Role Type');
-            exit;
         }
 
         $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes, $this->roleTypeOverride);
