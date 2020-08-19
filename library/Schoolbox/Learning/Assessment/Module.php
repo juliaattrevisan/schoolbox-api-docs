@@ -328,7 +328,8 @@ class Module extends BaseModule
         // abstract controller
         $ac =& $injector->params[Controller::class];
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
-            'router' => $injector->lazyGet('router')
+            'router'     => $injector->lazyGet('router'),
+            'authorizer' => $injector->lazyGet('authorizer'),
         ]);
         $ac['workTypeMapper']        = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
         $ac['termMapper']            = $this->getMapperFactory()->getLazy(Term\Mapper::class);

@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use \Schoolbox\Collection;
 
@@ -32,14 +33,29 @@ class Factory
      */
     private $router;
 
+
+    /**
+     * @var Authorizer
+     */
+    private $authorizer;
+
+
     /**
      * Constructor
      *
      * @param Router $router Used to generate route URLs
      */
-    public function __construct(Router $router)
+    /**
+     * Constructor
+     *
+     * @param Router     $router     Used to generate route URLs
+     * @param Authorizer $authorizer Used to verify that route URLs are
+     *                               accessible
+     */
+    public function __construct(Router $router, Authorizer $authorizer)
     {
-        $this->router = $router;
+        $this->router     = $router;
+        $this->authorizer = $authorizer;
     }
 
     /**
@@ -73,8 +89,13 @@ class Factory
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
 
         } elseif ($context instanceof UnitImplementation) {
-            if ($user->getRole()->isStaff()) {
-                $path = $this->router->generate('learningMarkbook.getMarkbookForClass', ['folder' => $context->getFolder(), 'folderId' => $context->getFolder()->getId()]);
+            $markbookRouteName   = 'learningMarkbook.getMarkbookForClass';
+            $markbookRouteParams = [
+                'folder'   => $context->getFolder(),
+                'folderId' => $context->getFolder()->getId(),
+            ];
+            if ($this->authorizer->isPathAuthorizedForUser($markbookRouteName, $markbookRouteParams, $user)) {
+                $path = $this->router->generate($markbookRouteName, $markbookRouteParams);
 
             } elseif ($user->getRole()->isStudent()) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
@@ -86,7 +107,7 @@ class Factory
             $trail->add([$context->getFolder()->getTitle(), $path]);
 
         } else {
-            if (Access::getInstance()->getFolderAccess($user,$context->getFolder()->getId())) {
+            if (Access::getInstance()->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
             }
         }
