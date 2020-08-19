@@ -14,8 +14,7 @@
       cancel: function () { /* noop */ },
       needAuth: function () { /* noop */ },
       loaded: function () {
-        $('#attachment-browser-panel-container')
-            .find('li[data-source="external-google"]')
+        $('#external-google-panel')
             .find('div.explorer')
             .removeClass('preload');
       }
