@@ -330,6 +330,7 @@ class Module extends BaseModule
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router'     => $injector->lazyGet('router'),
             'authorizer' => $injector->lazyGet('authorizer'),
+            'access'     => $this->getAccess(),
         ]);
         $ac['workTypeMapper']        = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
         $ac['termMapper']            = $this->getMapperFactory()->getLazy(Term\Mapper::class);

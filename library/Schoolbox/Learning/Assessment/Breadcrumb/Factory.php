@@ -41,6 +41,12 @@ class Factory
 
 
     /**
+     * @var Access
+     */
+    private $access;
+
+
+    /**
      * Constructor
      *
      * @param Router $router Used to generate route URLs
@@ -51,11 +57,13 @@ class Factory
      * @param Router     $router     Used to generate route URLs
      * @param Authorizer $authorizer Used to verify that route URLs are
      *                               accessible
+     * @param Access     $access     Used to verify homepage access permissions
      */
-    public function __construct(Router $router, Authorizer $authorizer)
+    public function __construct(Router $router, Authorizer $authorizer, Access $access)
     {
         $this->router     = $router;
         $this->authorizer = $authorizer;
+        $this->access     = $access;
     }
 
     /**
@@ -97,7 +105,7 @@ class Factory
             if ($this->authorizer->isPathAuthorizedForUser($markbookRouteName, $markbookRouteParams, $user)) {
                 $path = $this->router->generate($markbookRouteName, $markbookRouteParams);
 
-            } elseif ($user->getRole()->isStudent()) {
+            } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
 
             } else {
@@ -107,7 +115,7 @@ class Factory
             $trail->add([$context->getFolder()->getTitle(), $path]);
 
         } else {
-            if (Access::getInstance()->getFolderAccess($user, $context->getFolder()->getId())) {
+            if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
             }
         }
