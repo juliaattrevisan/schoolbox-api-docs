@@ -24,7 +24,7 @@
                             <p class="meta">{{ match.startAt.getLong }}</p>
 
                             {% if user.role.type == 'parent' %}
-                                {% if match.homeTeam.players | length %}
+                                {% if (match.homeTeam.players ?? []) | length %}
                                     <p class="meta">
                                         {% for child in match.homeTeam.players %}
                                             {% if not loop.first and not loop.last %},{% endif %}
