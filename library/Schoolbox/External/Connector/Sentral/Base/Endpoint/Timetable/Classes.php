@@ -137,6 +137,12 @@ class Classes implements IStrategy
     /**
      * Get a list of (day, period) tuples
      *
+     * TODO review the results this method returns
+     * Previously it joined `sis_timetable_cycle` via `sis_timetable_campus`,
+     * but `sis_timetable_campus` no longer exists. I am presuming that the join
+     * from `luCampus.ext_timetable_code` to `sis_timetable_cycle.cycle_identifier`
+     * is correct.
+     *
      * @return array
      * @throws Exception
      */
@@ -147,8 +153,7 @@ class Classes implements IStrategy
                 luCampus.ext_timetable_code,
                 period.day, period.id, period.title
             FROM luCampus
-            LEFT JOIN sis_timetable_campus campus ON luCampus.id = campus.campus_id
-            LEFT JOIN sis_timetable_cycle cycle ON campus.cycle_id = cycle.id
+            LEFT JOIN sis_timetable_cycle cycle ON luCampus.ext_timetable_code = cycle.cycle_identifier
             LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
             WHERE luCampus.deleted_at IS NULL
         ');

@@ -420,7 +420,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             sis_timetable_period.day AS DayNumber,
                             sis_timetable_period.sequence AS PeriodNumber,
                             luCampus.ext_timetable_code AS TimetableGroup,
-                            sis_timetable_campus.campus_id AS TimetableCampus,
+                            luCampus.id AS TimetableCampus,
                             sis_class.code AS ClassCode,
                             user.synergy_id AS StaffID,
                             user.title AS StaffTitle,
@@ -432,11 +432,11 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 FROM        sis_class_period
                 LEFT JOIN   user ON sis_class_period.teacher_external_id = user.synergy_id AND user.deleted_at IS NULL
                 INNER JOIN  sis_timetable_period ON sis_class_period.period_id = sis_timetable_period.id
-                INNER JOIN  sis_timetable_campus ON sis_timetable_period.cycle_id = sis_timetable_campus.cycle_id
-                INNER JOIN  luCampus ON sis_timetable_campus.campus_id = luCampus.id
+                INNER JOIN  sis_timetable_cycle ON sis_timetable_period.cycle_id = sis_timetable_cycle.id
+                INNER JOIN  luCampus ON sis_timetable_cycle.cycle_identifier = luCampus.ext_timetable_code
                 INNER JOIN  sis_class ON sis_class_period.class_id = sis_class.id
-                WHERE       sis_timetable_campus.start <= DATE(NOW()) AND
-                            sis_timetable_campus.finish >= DATE(NOW()) AND
+                WHERE       sis_timetable_cycle.start <= DATE(NOW()) AND
+                            sis_timetable_cycle.finish >= DATE(NOW()) AND
                             sis_class_period.room IN ({$predicate["placeholders"]}) AND
                             luCampus.deleted_at IS NULL
                 ORDER BY    sis_timetable_period.day ASC,
