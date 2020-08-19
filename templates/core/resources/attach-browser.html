@@ -55,12 +55,9 @@
                  * once content has loaded
                  */
                 if (method === 'inline') {
-                    panel.load(url, null, function() {
-                       panel.removeClass('preload');
-                    });
+                    panel.load(url, null);
                 } else if (method === 'iframe') {
                     panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
-                    panel.removeClass('preload');
                 }
             }
         });
@@ -86,7 +83,9 @@
         </div>
         <div id="attachment-browser-panel-container" class="attachment-browser-panel-container tabs-content">
             <!-- BEGIN source_panel -->
-            <div id="{SRC_SLUG}-panel" class="preload content"></div>
+            <div id="{SRC_SLUG}-panel" class="content">
+                <div class="loader"></div>
+            </div>
             <!-- END source_panel -->
         </div>
     </div>
