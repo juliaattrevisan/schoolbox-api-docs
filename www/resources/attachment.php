@@ -73,11 +73,6 @@ if ($_SESSION['user'] instanceof User) {
 
 foreach ($factory->getMappedControllers() as $controller) {
 
-    // the first controller found will be considered the 'default'
-    if (!$this->getVar('DEFAULT_VIEW')) {
-         $this->setVar('DEFAULT_VIEW', $controller->getSlug());
-    }
-
     /* Render out the attachment option
      */
     $this->setVar([
@@ -93,7 +88,6 @@ foreach ($factory->getMappedControllers() as $controller) {
     /* Render out the attachment option's corresponding panel
      */
     $this->parse('source_panel_block', 'source_panel', true);
-
 }
 
 $this->template->pparse('finaloutput', TEMPLATE_content);

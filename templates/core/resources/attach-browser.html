@@ -19,54 +19,6 @@
             .removeClass('preload');
       }
     };
-    //
-    // $(function() {
-    //   var ab = $('#attachment-browser');
-    //
-    //   ab.on('toggled', function (e, panel) {
-    //
-    //     panel = $(panel);
-    //
-    //     var src = panel.closest('[data-source]').attr('data-source');
-    //
-    //     if (!ab.data(src)) {
-    //
-    //       // load this tab
-    //       ab.data(src, {loaded: true});
-    //
-    //       var url = panel.attr('data-url'),
-    //           mth = panel.attr('data-method');
-    //
-    //       if (mth == 'inline') {
-    //         panel.load(url, null, function() {
-    //           panel.removeClass('preload');
-    //         });
-    //       }
-    //       else if (mth == 'iframe') {
-    //         panel.removeClass('preload');
-    //         panel.html($('<iframe/>').attr('src', url).height(350));
-    //       }
-    //     }
-    //   });
-    //
-    //   $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
-    // });
-    //
-    //
-    // $('#attachment-browser').on('click', '[data-toggle]', function (e) {
-    //
-    //   var oldPanel = $('[data-accordion-pane] .active'),
-    //       newPanel = $(this).closest('[data-source]').find('.content');
-    //
-    //   // hide the current panel
-    //   oldPanel.slideUp();
-    //
-    //   // open the new one
-    //   if (!oldPanel.is(newPanel)) {
-    //     newPanel.slideDown();
-    //   }
-    //
-    // }).find('[data-toggle]').first().trigger('click');
 
     $(document).foundation();
 
@@ -112,6 +64,10 @@
                 }
             }
         });
+
+        /* Activate default tab
+         */
+        $('#attachment-browser-filesystems a').first().trigger('click');
     });
 </script>
 </head>
