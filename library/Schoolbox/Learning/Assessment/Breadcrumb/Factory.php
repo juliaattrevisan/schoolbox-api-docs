@@ -84,26 +84,31 @@ class Factory
         $context = $assessment->getContext();
 
         if ($context instanceof Project) {
-            if($user->getRole()->isStaff()) {
-                $path = $this->router->generate('learningAssessment.getStatus', ['assessmentId' => $context->getId()]);
+            $routeName   = 'learningAssessment.getStatus';
+            $routeParams = [
+                'assessment'   => $context,
+                'assessmentId' => $context->getId(),
+            ];
+
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
+                $path = $this->router->generate($routeName, $routeParams);
             } else {
-                $path = $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()]);
+                $path = $this->router->generate('learningAssessment.getSummary', $routeParams);
             }
 
             $trail = $this->produceFromAssessment($context, $user);
 
         } elseif ($context instanceof UnitSpecification) {
-
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
 
         } elseif ($context instanceof UnitImplementation) {
-            $markbookRouteName   = 'learningMarkbook.getMarkbookForClass';
-            $markbookRouteParams = [
+            $routeName   = 'learningMarkbook.getMarkbookForClass';
+            $routeParams = [
                 'folder'   => $context->getFolder(),
                 'folderId' => $context->getFolder()->getId(),
             ];
-            if ($this->authorizer->isPathAuthorizedForUser($markbookRouteName, $markbookRouteParams, $user)) {
-                $path = $this->router->generate($markbookRouteName, $markbookRouteParams);
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
+                $path = $this->router->generate($routeName, $routeParams);
 
             } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
@@ -114,10 +119,8 @@ class Factory
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
 
-        } else {
-            if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
-                $path = "/homepage/{$context->getFolder()->getId()}";
-            }
+        } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
+            $path = "/homepage/{$context->getFolder()->getId()}";
         }
 
         $trail->add([$context->getTitle(), $path]);
