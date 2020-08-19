@@ -74,6 +74,8 @@
         let filesystems = $('#attachment-browser-filesystems');
 
         filesystems.find('[data-source]').on('click', function(event) {
+            const MAX_IFRAME_HEIGHT = 350;
+
             let source = $(this).attr('data-source');
             let panel = $('#' + source + '-panel');
 
@@ -105,7 +107,7 @@
                        panel.removeClass('preload');
                     });
                 } else if (method === 'iframe') {
-                    panel.html($('<iframe/>').attr('src', url).height(350));
+                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
                     panel.removeClass('preload');
                 }
             }
