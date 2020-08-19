@@ -137,6 +137,12 @@ class Classes implements IStrategy
     /**
      * Get a list of (day, period) tuples
      *
+     * TODO review the results this method returns
+     * Previously it joined `sis_timetable_cycle` via `sis_timetable_campus`,
+     * but `sis_timetable_campus` no longer exists. I am presuming that the join
+     * from `luCampus.ext_timetable_code` to `sis_timetable_cycle.cycle_identifier`
+     * is correct.
+     *
      * @return array
      * @throws Exception
      */
