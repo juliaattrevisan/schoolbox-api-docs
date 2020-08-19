@@ -1,9 +1,23 @@
-.attachment-browser-filesystems {
-  max-width: 20%;
+.attachment-browser-container {
+  display: flex;
+
+  .attachment-browser-filesystems {
+    flex: 0 0 25%;
+
+    .tab-title {
+
+      // https://stackoverflow.com/questions/2943548/how-to-reset-remove-chromes-input-highlighting-focus-border
+      // probably shouldn't remove this, but it puts an ugly black border around selected element
+      a:focus {
+        outline-style: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .attachment-browser-panel-container {
+    flex: 0 0 75%;
+  }
 }
 
-.attachment-browser-panel-container {
-  max-width:80%;
-  padding: 1rem;
-  float:right;
-}
+
