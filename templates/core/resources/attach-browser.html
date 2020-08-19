@@ -53,7 +53,6 @@
     //   $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
     // });
     //
-    // $(document).foundation();
     //
     // $('#attachment-browser').on('click', '[data-toggle]', function (e) {
     //
@@ -69,6 +68,8 @@
     //   }
     //
     // }).find('[data-toggle]').first().trigger('click');
+
+    $(document).foundation();
 
     $(function() {
         let filesystems = $('#attachment-browser-filesystems');
@@ -116,32 +117,19 @@
 </script>
 </head>
 <body>
-
     <dl id="attachment-browser-filesystems" class="tabs vertical" data-tab>
         <!-- BEGIN source -->
         <dd class="tab-title accordion-navigation" data-source="{SRC_SLUG}" data-url="{SRC_URL}" data-method="{SRC_METHOD}">
-            <a class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
+            <a class="icon-{SRC_ICON}" href="#{SRC_SLUG}-panel">{SRC_LABEL}</a>
         </dd>
         <!-- END source -->
     </dl>
     <div id="attachment-browser" class="tabs-content">
         <!-- BEGIN source_panel -->
-        <div class="content">
-            <div id="{SRC_SLUG}-panel" class="preload content"></div>
-        </div>
+        <div id="{SRC_SLUG}-panel" class="preload content"></div>
         <!-- END source_panel -->
     </div>
 
-
-<!--    <dl id="attachment-browser" class="accordion" data-accordion>-->
-<!--        &lt;!&ndash; BEGIN source &ndash;&gt;-->
-<!--        &lt;!&ndash; This is a panel &ndash;&gt;-->
-<!--        <dd class="accordion-navigation" data-source="{SRC_SLUG}" data-accordion-pane>-->
-<!--            <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>-->
-<!--            <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>-->
-<!--        </dd>-->
-<!--        &lt;!&ndash; END source &ndash;&gt;-->
-<!--    </dl>-->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </body>
 </html>
