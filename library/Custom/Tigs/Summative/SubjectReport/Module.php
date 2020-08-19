@@ -176,7 +176,7 @@ class Module extends Alaress\Module\Module
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\Callback(function (array $params) {
+                new Rule\Callback(function (array $params, User $currentUser) {
                     // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
                     if (!($params['user'] ?? null) instanceof User) {
                         throw new InvalidPath("No user found in route params");
@@ -211,7 +211,7 @@ class Module extends Alaress\Module\Module
                     // User must be enrolled in the specified folder and not excluded
                     /** @var User $user */
                     $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['reportDate'] ?? null)) {
+                    if (!$this->isUserEnrolledInFolder($user, $currentUser, $folder, $params['reportDate'] ?? null)) {
                         throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
@@ -236,15 +236,17 @@ class Module extends Alaress\Module\Module
      * Returns whether a user is enrolled in a class folder by examining external SIS class membership
      *
      * @param User         $user
+     * @param User         $currentUser
      * @param Folder\Model $folder
      * @param string|null  $reportDate
      * @return bool
      * @throws InvalidArgumentException
      * @throws InvalidPath
-     * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \PDOException
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $reportDate): bool
+    private function isUserEnrolledInFolder(User $user, User $currentUser, Folder\Model $folder, ?string $reportDate): bool
     {
         try {
             $attributes = new StudentAttributes($this->getConfig(), $user, null, $reportDate);
@@ -253,7 +255,10 @@ class Module extends Alaress\Module\Module
         }
 
         $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+
+        /* I guess Role Type is null for this check; it should be derived from $currentUser's roletype anyway
+         */
+        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $currentUser, null);
 
         /** @var Folder\Model $involvedFolder */
         foreach ($folders as $involvedFolder) {

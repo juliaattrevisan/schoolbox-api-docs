@@ -6,6 +6,7 @@ Data:
     subjects[idx].name                                           string
     subjects[idx].codes                                          string[]
     subjects[idx].folderId                                       int
+    subjects[idx].isPreviousClass                                bool
     data[folderId]                                               array
     data[folderId].folder                                        Folder\Model
     data[folderId].teachers                                      User[]
@@ -88,6 +89,8 @@ Data:
                 {% set folderId = subject.folderId %}
                 {% set folderData = data[folderId] %}
                 {% set firstTeacher = folderData.teachers | first %}
+
+                {% if firstTeacher %}
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
                         <div class="card small-12 medium-6">
@@ -106,146 +109,160 @@ Data:
                             </div>
                         </div>
                         <div class="column small-12 medium-6 results">
-                            <div class="result-group fal">
-                                {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
-                                {% if folderData.falData.data %}
-                                    {# Explicit FAL data found, use that #}
-                                    {% for label, value in folderData.falData.data %}
-                                        <div class="result-item">
-                                            <span class="result-heading">{{ label | last }}</span><br>
-                                            <span class="result-value">{{ value|default('-') }}</span>
+                            {% if not subject.isPreviousClass %}
+                                <div class="result-group fal">
+                                    {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
+                                    {% if folderData.falData.data ?? false %}
+                                        {# Explicit FAL data found, use that #}
+                                        {% for label, value in folderData.falData.data %}
+                                            <div class="result-item">
+                                                <span class="result-heading">{{ label | last }}</span><br>
+                                                <span class="result-value">{{ value|default('-') }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        {# No explicit FAL data found, fall back to latest AAS assessment #}
+                                        {% set aasFound = false %}
+                                        {# These units are ordered from latest to oldest #}
+                                        {% for unitSpecData in folderData.unitSpecs if not aasFound %}
+                                            {% if folderData.aasData|length %}
+                                                {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                    {% set aasFound = true %}
+                                                    {% set hasInterminGrades = true %}
+                                                    {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                        <div class="result-item">
+                                                            <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
+                                                            <span class="result-value">{{ value|default('-') }}</span>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
+                                {% if ibGraphData %}
+                                    {% set ibGraphDatum = ibGraphData | first %}
+                                    <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
+                                        <div class="result-item myp-grade">
+                                            <span class="result-heading">{{ ibGraphDatum.header ?? '' }}</span><br>
+                                            <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
                                         </div>
-                                    {% endfor %}
-                                {% else %}
-                                    {# No explicit FAL data found, fall back to latest AAS assessment #}
-                                    {% set aasFound = false %}
-                                    {# These units are ordered from latest to oldest #}
-                                    {% for unitSpecData in folderData.unitSpecs if not aasFound %}
-                                        {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                            {% set aasFound = true %}
-                                            {% set hasInterminGrades = true %}
-                                            {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                <div class="result-item">
-                                                    <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
-                                                    <span class="result-value">{{ value|default('-') }}</span>
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endfor %}
+                                    </div>
                                 {% endif %}
-                            </div>
 
-                            {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
-                            {% if ibGraphData %}
-                                {% set ibGraphDatum = ibGraphData | first %}
-                                <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
-                                    <div class="result-item myp-grade">
-                                        <span class="result-heading">{{ ibGraphDatum.header }}</span><br>
-                                        <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
-                            {% if folderData.hscRankData %}
-                                <div class="result-group hsc-rank">
-                                    {% if folderData.hscRankData.assessmentMark is defined %}
-                                        <div class="result-item hsc-rank-mark">
-                                            <span class="result-heading">Mark</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
-                                        </div>
-                                    {% endif %}
-                                    {% if folderData.hscRankData.assessmentAverage is defined %}
-                                        <div class="result-item hsc-rank-average">
-                                            <span class="result-heading">Average</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
-                                        </div>
-                                    {% endif %}
-                                    {% if folderData.hscRankData.assessmentRank is defined %}
-                                    <div class="result-item hsc-rank-rank">
-                                        <span class="result-heading">Rank</span><br>
-                                        <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <div class="result-group hsc-rank">
-                                {% set hasTaskFound = false %}
-                                {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
-                                    {% if folderData.hscTaskMarks.data[unitSpecData.id] %}
-                                        {% set hasTaskFound = true %}
-                                        {% set hasInterminGrades = true %}
-                                        {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
-                                        {% if hscTaskMarkData.studentMark is defined %}
+                                {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
+                                {% if folderData.hscRankData %}
+                                    <div class="result-group hsc-rank">
+                                        {% if folderData.hscRankData.assessmentMark is defined %}
                                             <div class="result-item hsc-rank-mark">
-                                                <span class="result-heading">Mark*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
+                                                <span class="result-heading">Mark</span><br>
+                                                <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
                                             </div>
                                         {% endif %}
-                                        {% if hscTaskMarkData.cohortAverage is defined %}
+                                        {% if folderData.hscRankData.assessmentAverage is defined %}
                                             <div class="result-item hsc-rank-average">
-                                                <span class="result-heading">Average*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
+                                                <span class="result-heading">Average</span><br>
+                                                <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
                                             </div>
                                         {% endif %}
-                                        {% if hscTaskMarkData.cohortRank is defined %}
-                                            <div class="result-item hsc-rank-rank">
-                                                <span class="result-heading">Rank*</span><br>
-                                                <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}
-
-                            {% if nesaGraphData  %}
-                                {% set nesaGraphDatum = folderData.nesaGraphData.data | first %}
-                                {% if nesaGraphDatum  %}
-                                    <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
-                                        <div class="result-item nesa-grade">
-                                            <span class="result-heading">NESA Grade</span><br>
-                                            <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
+                                        {% if folderData.hscRankData.assessmentRank is defined %}
+                                        <div class="result-item hsc-rank-rank">
+                                            <span class="result-heading">Rank</span><br>
+                                            <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
                                         </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="result-group hsc-rank">
+                                    {% set hasTaskFound = false %}
+                                    {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                        {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
+                                            {% set hasTaskFound = true %}
+                                            {% set hasInterminGrades = true %}
+                                            {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                            {% if hscTaskMarkData.studentMark is defined %}
+                                                <div class="result-item hsc-rank-mark">
+                                                    <span class="result-heading">Mark*</span><br>
+                                                    <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if hscTaskMarkData.cohortAverage is defined %}
+                                                <div class="result-item hsc-rank-average">
+                                                    <span class="result-heading">Average*</span><br>
+                                                    <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if hscTaskMarkData.cohortRank is defined %}
+                                                <div class="result-item hsc-rank-rank">
+                                                    <span class="result-heading">Rank*</span><br>
+                                                    <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
                                     </div>
                                 {% endif %}
+
+                                {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}
+
+                                {% if nesaGraphData %}
+                                    {% set nesaGraphDatum = folderData.nesaGraphData.data | first %}
+                                    {% if nesaGraphDatum  %}
+                                        <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
+                                            <div class="result-item nesa-grade">
+                                                <span class="result-heading">NESA Grade</span><br>
+                                                <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+
                             {% endif %}
                         </div>
                         <div class="column small-12 teacher-comment content">
 
-                            {# Render the first comment only #}
-                            {% set commentFound = false %}
-                            {% set commentData = null %}
-
-                            {% if attributes.isMyp %}
-                                {##
-                                 # MYP comments: no longer come from the unitspec, so don't iterate it.
-                                 # Used to come from folderData.aasData.data[unitSpec.id]
-                                 #}
-                                {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                {% set commentData = folderData.nesaGraphData.data.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                            {# Special case for previous classes w/ feedbacks #}
+                            {% if subject.isPreviousClass %}
+                                Student is no longer enrolled in this class.
                             {% else %}
-                                {# All other comments come from the unitspec #}
-                                {% for unitSpec in folderData.unitSpecs if not commentFound %}
-                                    {% if attributes.isDp %}
-                                        {% set commentData = folderData.aamData.data[unitSpec.id] %}
-                                    {% elseif attributes.isHsc %}
-                                        {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
+                                {# Render the first comment only #}
+                                {% set commentFound = false %}
+                                {% set commentData = null %}
+
+                                {% if attributes.isMyp %}
+                                    {##
+                                     # MYP comments: no longer come from the unitspec, so don't iterate it.
+                                     # Used to come from folderData.aasData.data[unitSpec.id]
+                                     #}
+                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
+                                    {% if folderData.nesaGraphData %}
+                                        {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                     {% endif %}
-                                    {% if commentData.comment is not null %}
-                                        {% set commentFound = true %}
-                                    {% endif %}
-                                {% endfor %}
+                                {% else %}
+                                    {# All other comments come from the unitspec #}
+                                    {% for unitSpec in folderData.unitSpecs if not commentFound %}
+                                        {% if attributes.isDp %}
+                                            {% set commentData = folderData.aamData.data[unitSpec.id] %}
+                                        {% elseif attributes.isHsc %}
+                                            {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
+                                        {% endif %}
+                                        {% if commentData.comment is not null %}
+                                            {% set commentFound = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if commentData.comment is defined and commentData.comment|length %}
+                                    {{ commentData.comment | nl2br }}
+                                {% endif %}
                             {% endif %}
 
-                            {% if commentData.comment is not null %}
-                                {{ commentData.comment | nl2br }}
-                            {% endif %}
                         </div>
                     </a>
                 </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% endset %}

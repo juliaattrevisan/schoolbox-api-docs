@@ -307,6 +307,15 @@ class CliPdfGenerator extends CliTool\App
             $valid = false;
         }
 
+
+        /* Include Subjects requires Role Type override
+         */
+        if (!$this->roleTypeOverride && (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
+            $this->getLogger()->alert("A valid 'role-type' option must be set if using 'include-subjects'");
+            $valid = false;
+        }
+
+
         $this->getLogger()->debug("Command Line Options:");
         $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
         $this->getLogger()->debug("    username: {$this->username}");
@@ -662,7 +671,7 @@ class CliPdfGenerator extends CliTool\App
             return $urls;
         }
 
-        $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes);
+        $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes, $this->roleTypeOverride);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
         foreach ($classFolders as $folder) {
@@ -682,18 +691,24 @@ class CliPdfGenerator extends CliTool\App
     /**
      * Returns the set of folders a user is/was enrolled in, that are not excluded
      *
-     * @param User  $student
-     * @param array $externalStudent
+     * @param User        $student
+     * @param array       $externalStudent
      * @param null|string $excludedClassCodes
+     * @param string|null $roleTypeOverride
      * @return Collection|Folder\Model[]
      * @throws InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes): Collection
+    private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes, ?string $roleTypeOverride): Collection
     {
         $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->reportDateOverride);
-        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes);
+
+        /* Throw in a null $viewer, because cli has no idea about "logged in user"
+         * Report generation is wholly contingent on the $roleTypeOverride in the cli tool context
+         * but to fulfil method signature, it requires a param
+         */
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes, null, $roleTypeOverride);
     }
 
 
@@ -739,6 +754,14 @@ class CliPdfGenerator extends CliTool\App
     private function createZipArchive(array $pdfFilenames, string $tempDir): void
     {
         $zipFilename = \tempnam($tempDir, 'zip');
+
+        /* https://stackoverflow.com/questions/32694148/ziparchivegetstatusstring-invalid-or-uninitialized-zip-object
+         * Also, SA-10419
+         *
+         * ZipArchive doesn't expect a file to exist when it's creating its zip archive
+         */
+        @unlink($zipFilename);
+
         $zipArchive  = new ZipArchive();
         $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
         $zipArchive->open($zipFilename, ZipArchive::CREATE);
@@ -994,7 +1017,7 @@ DESCRIPTION
          Must be one of [{$roleTypes}]
 
      $yellow--include-subjects$white
-         If provided, include the Subject Reports.
+         If provided, include the Subject Reports. Requires setting the --role-type option.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip

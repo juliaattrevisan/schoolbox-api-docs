@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Role;
 use function array_filter;
 use function array_map;
 use function array_merge;
@@ -19,7 +21,6 @@ use Schoolbox\Resource\Folder;
 use External_UserInterface;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Mapper;
 use UnexpectedValueException;
 
 /**
@@ -36,6 +37,12 @@ class FolderFetcher
 
 
     /**
+     * @var PreviousClassIdCache
+     */
+    private $previousClassIdCache;
+
+
+    /**
      * @param Folder\Mapper          $folderMapper
      * @param External_UserInterface $externalUser
      */
@@ -43,6 +50,10 @@ class FolderFetcher
     {
         $this->folderMapper = $folderMapper;
         $this->externalUser = $externalUser;
+
+        /* A cache for remembering previous class ids
+         */
+        $this->previousClassIdCache = new PreviousClassIdCache($folderMapper);
     }
 
 
@@ -57,11 +68,14 @@ class FolderFetcher
      * @param StudentAttributes $attributes
      * @param string|null       $reportDate
      * @param null|string       $excludedClassCodes
+     * @param User|null         $viewer
+     * @param string|null       $roleTypeOverride
      * @return GenericCollection|Folder\Model[]
-     * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \PDOException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, ?User $viewer, ?string $roleTypeOverride): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())
@@ -69,6 +83,9 @@ class FolderFetcher
             ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
             ->setActualFinish($attributes->getCurriculumSemesterFinish());
 
+        /* This actually returns folders with Participations, findFoldersWithInteractionsForStudent()
+         * is probably not the best function name for what it does.
+         */
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($student, $term);
 
         // Only retain folders that are either current or rolled-over classes
@@ -76,10 +93,30 @@ class FolderFetcher
             return $folder->isClass() || $folder->wasClass();
         });
 
+        /* For SA-10636 we need to filter this set of $folders even further; classes to show
+         * are a function of their submissions/feedbacks and feedbacks' visibilities
+         */
+        $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
+        $preservedClassIds = $this->previousClassIdCache->find($student, $folders, $currentClasses, $viewer, $roleTypeOverride);
+
+        /* Iterate through folders, unsetting everything outside of $preservedClassIds
+         */
+        foreach ($folders as $idx => $folder) {
+            if (!\in_array($folder->getId(), $preservedClassIds, false)) {
+                $folders->offsetUnset($idx);
+            }
+        }
+
+        /* Then slap it together with the current student's classes, if reportDate not set
+         *
+         * Either way, this should give us only relevant previous classes as it filters out
+         * all previous classes that had no useful feedbacks in them
+         */
+
         // If current report, also fetch enrolled folders
         if (null === $reportDate) {
             $folders = $folders->mergeUnique(
-                $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)),
+                $currentClasses,
                 $this->folderMapper->getIdentifierProperty()
             );
         }
@@ -134,5 +171,14 @@ class FolderFetcher
         }
 
         return false;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getPreviouClassIds(): array
+    {
+        return $this->previousClassIdCache->getIds();
     }
 }
