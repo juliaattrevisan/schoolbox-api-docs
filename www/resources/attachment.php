@@ -22,6 +22,7 @@ $this->setAjax();
 
 $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
+$this->setBlock(TEMPLATE_content, 'source_panel', 'source_panel_block');
 
 $multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
@@ -77,15 +78,22 @@ foreach ($factory->getMappedControllers() as $controller) {
          $this->setVar('DEFAULT_VIEW', $controller->getSlug());
     }
 
-    $this->setVar(array(
+    /* Render out the attachment option
+     */
+    $this->setVar([
         'SRC_SLUG'   => str_replace('/', '-', $controller->getSlug()),
         'SRC_ICON'   => $controller->getIcon(),
         'SRC_LABEL'  => $controller->getLabel(),
         'SRC_URL'    => $controller->getUrl(),
         'SRC_METHOD' => $controller->getRenderMethod()
-    ));
+    ]);
 
     $this->parse('source_block', 'source', true);
+
+    /* Render out the attachment option's corresponding panel
+     */
+    $this->parse('source_panel_block', 'source_panel', true);
+
 }
 
 $this->template->pparse('finaloutput', TEMPLATE_content);

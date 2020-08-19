@@ -20,67 +20,126 @@
             .removeClass('preload');
       }
     };
+    //
+    // $(function() {
+    //   var ab = $('#attachment-browser');
+    //
+    //   ab.on('toggled', function (e, panel) {
+    //
+    //     panel = $(panel);
+    //
+    //     var src = panel.closest('[data-source]').attr('data-source');
+    //
+    //     if (!ab.data(src)) {
+    //
+    //       // load this tab
+    //       ab.data(src, {loaded: true});
+    //
+    //       var url = panel.attr('data-url'),
+    //           mth = panel.attr('data-method');
+    //
+    //       if (mth == 'inline') {
+    //         panel.load(url, null, function() {
+    //           panel.removeClass('preload');
+    //         });
+    //       }
+    //       else if (mth == 'iframe') {
+    //         panel.removeClass('preload');
+    //         panel.html($('<iframe/>').attr('src', url).height(350));
+    //       }
+    //     }
+    //   });
+    //
+    //   $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
+    // });
+    //
+    // $(document).foundation();
+    //
+    // $('#attachment-browser').on('click', '[data-toggle]', function (e) {
+    //
+    //   var oldPanel = $('[data-accordion-pane] .active'),
+    //       newPanel = $(this).closest('[data-source]').find('.content');
+    //
+    //   // hide the current panel
+    //   oldPanel.slideUp();
+    //
+    //   // open the new one
+    //   if (!oldPanel.is(newPanel)) {
+    //     newPanel.slideDown();
+    //   }
+    //
+    // }).find('[data-toggle]').first().trigger('click');
 
     $(function() {
-      var ab = $('#attachment-browser');
+        let filesystems = $('#attachment-browser-filesystems');
 
-      ab.on('toggled', function (e, panel) {
+        filesystems.find('[data-source]').on('click', function(event) {
+            let source = $(this).attr('data-source');
+            let panel = $('#' + source + '-panel');
 
-        panel = $(panel);
+            /* Decide if source was already load previously;
+             * If it wasn't previously loaded, do so asynchronously
+             * Otherwise just show the tab
+             */
+            if (!filesystems.data(source)) {
 
-        var src = panel.closest('[data-source]').attr('data-source');
+                /* Remember we loaded this source previously
+                 */
+                filesystems.data(source, {loaded: true});
 
-        if (!ab.data(src)) {
+                let url = $(this).attr('data-url');
+                let method = $(this).attr('data-method');
 
-          // load this tab
-          ab.data(src, {loaded: true});
-
-          var url = panel.attr('data-url'),
-              mth = panel.attr('data-method');
-
-          if (mth == 'inline') {
-            panel.load(url, null, function() {
-              panel.removeClass('preload');
-            });
-          }
-          else if (mth == 'iframe') {
-            panel.removeClass('preload');
-            panel.html($('<iframe/>').attr('src', url).height(350));
-          }
-        }
-      });
-
-      $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
+                /* Use the $method var to decide whether this is inline content
+                 * such as all our internal file upload dropzone options, recorder
+                 * my files, resources, etc.
+                 *
+                 * or whether it should be loaded into an iframe, such as with third
+                 * parties like ms teams, goggle drive, office 365 etc.
+                 *
+                 * Inline content starts with a preloader class which should be removed
+                 * once content has loaded
+                 */
+                if (method === 'inline') {
+                    panel.load(url, null, function() {
+                       panel.removeClass('preload');
+                    });
+                } else if (method === 'iframe') {
+                    panel.html($('<iframe/>').attr('src', url).height(350));
+                    panel.removeClass('preload');
+                }
+            }
+        });
     });
-
-    $(document).foundation();
-
-    $('#attachment-browser').on('click', '[data-toggle]', function (e) {
-
-      var oldPanel = $('[data-accordion-pane] .active'),
-          newPanel = $(this).closest('[data-source]').find('.content');
-
-      // hide the current panel
-      oldPanel.slideUp();
-
-      // open the new one
-      if (!oldPanel.is(newPanel)) {
-        newPanel.slideDown();
-      }
-
-    }).find('[data-toggle]').first().trigger('click');
-
-  </script>
+</script>
 </head>
 <body>
-<dl id="attachment-browser" class="accordion" data-accordion>
-  <!-- BEGIN source -->
-  <dd class="accordion-navigation" data-source="{SRC_SLUG}" data-accordion-pane>
-    <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
-    <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>
-  </dd>
-  <!-- END source -->
-</dl>
-<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+    <dl id="attachment-browser-filesystems" class="tabs vertical" data-tab>
+        <!-- BEGIN source -->
+        <dd class="tab-title accordion-navigation" data-source="{SRC_SLUG}" data-url="{SRC_URL}" data-method="{SRC_METHOD}">
+            <a class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
+        </dd>
+        <!-- END source -->
+    </dl>
+    <div id="attachment-browser" class="tabs-content">
+        <!-- BEGIN source_panel -->
+        <div class="content">
+            <div id="{SRC_SLUG}-panel" class="preload content"></div>
+        </div>
+        <!-- END source_panel -->
+    </div>
+
+
+<!--    <dl id="attachment-browser" class="accordion" data-accordion>-->
+<!--        &lt;!&ndash; BEGIN source &ndash;&gt;-->
+<!--        &lt;!&ndash; This is a panel &ndash;&gt;-->
+<!--        <dd class="accordion-navigation" data-source="{SRC_SLUG}" data-accordion-pane>-->
+<!--            <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>-->
+<!--            <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>-->
+<!--        </dd>-->
+<!--        &lt;!&ndash; END source &ndash;&gt;-->
+<!--    </dl>-->
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </body>
 </html>
