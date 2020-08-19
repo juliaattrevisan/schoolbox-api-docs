@@ -164,7 +164,7 @@ HELP;
         ));
 
         $this->getLogger()->info(sprintf(
-            'Imported classes should be associated with cycle_id %s which is described in sis_timetable_campus and sis_timetable_cycle',
+            'Imported classes should be associated with cycle_id %s which is described in sis_timetable_cycle',
             $currentCycleId
         ));
 
