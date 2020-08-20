@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -250,19 +251,20 @@ class External_Pcschools_User implements External_UserInterface
             $id  = $row['IDENTITY_ID#'];
             // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_FATHER] = $row['DAD_EMAIL'];
+                $results[$id.'-'.self::CONTACT_TYPE_FATHER][] = $row['DAD_EMAIL'];
             }
             if ($row['MUM_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_MOTHER] = $row['MUM_EMAIL'];
+                $results[$id.'-'.self::CONTACT_TYPE_MOTHER][] = $row['MUM_EMAIL'];
             }
             if ($row['GUARD_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_GUARDIAN] = $row['GUARD_EMAIL'];
+                $results[$id.'-'.self::CONTACT_TYPE_GUARDIAN][] = $row['GUARD_EMAIL'];
             }
             if ($row['CGIVE_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_CAREGIVER] = $row['CGIVE_EMAIL'];
+                $results[$id.'-'.self::CONTACT_TYPE_CAREGIVER][] = $row['CGIVE_EMAIL'];
             }
         }
-        return $results;
+
+        return (new TupleStack())->normalise($results);
     }
 
     /**
