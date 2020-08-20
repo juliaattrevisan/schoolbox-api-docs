@@ -1006,3 +1006,18 @@ input.invalid-data, input.invalid-data:focus {
 @import 'datetime';
 @import 'tinymce';
 @import 'rangeslider';
+
+// A table-like layout of input fields
+// Remove excess padding on everything
+// Reset padding to something sane on top and bottom
+
+.gridded-inputs {
+  .column, .columns {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    input, select, .switch {
+      margin: 0
+    }
+  }
+}
