@@ -896,7 +896,14 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
-        $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+        if ($subObject) {
+            $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+        } else {
+            // Refuse to save an assessment with no sub-object
+            throw new UnexpectedValueException(
+                sprintf('Assessment #%d has no sub-object, and thus cannot be saved', $dataModel->getId())
+            );
+        }
 
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
