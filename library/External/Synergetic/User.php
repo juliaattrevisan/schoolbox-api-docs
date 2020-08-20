@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder as PredicateBuilder;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -233,14 +234,14 @@ class External_Synergetic_User implements External_UserInterface
 
             if (count($emailArray) > 0) {
                 foreach ($emailArray as $key => $email) {
-                    $emailList["{$parent['RelatedID']}-{$key}"] = $email;
+                    $emailList["{$parent['RelatedID']}-{$key}"][] = $email;
                 }
             } else {
-                $emailList[$parent['RelatedID']] = $parent['Email'];
+                $emailList[$parent['RelatedID']][] = $parent['Email'];
             }
         }
 
-        return $emailList;
+        return (new TupleStack())->normalise($emailList);
     }
 
     /**
