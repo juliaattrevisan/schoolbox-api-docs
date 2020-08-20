@@ -4,8 +4,21 @@
   .attachment-browser-filesystems {
     flex: 0 0 25%;
 
-    .tab-title {
+    li {
+      a {
+        background: $ghost;
+        border-right: 1px solid $silver;
+        color: $anchor-font-color;
+      }
 
+      &.active > a {
+        background: $white;
+        border-right: 0;
+        font-weight: normal;
+      }
+    }
+
+    .tab-title {
       // https://stackoverflow.com/questions/2943548/how-to-reset-remove-chromes-input-highlighting-focus-border
       // probably shouldn't remove this, but it puts an ugly black border around selected element
       a:focus {
