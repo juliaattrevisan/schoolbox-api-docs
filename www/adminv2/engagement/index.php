@@ -19,7 +19,7 @@ if($this->arg[1]) {
 }
 else {
     $start = new Alaress_Date_Format();
-    $start = $start->addMonths(-6);
+    $start = $start->addMonths(-4);
 }
 $start = $start->startOfMonth();
 
@@ -35,7 +35,7 @@ if(in_array($this->arg[0],$validPages)) {
     $page = $this->arg[0];
 }
 else {
-    $page = 'login';
+    $page = 'dueWork';
 }
 
 $this->setVar(array(

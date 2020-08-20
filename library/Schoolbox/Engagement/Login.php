@@ -45,16 +45,12 @@ class Login
     public function loginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end)
     {
         $query = '
-            SELECT
+             SELECT
                 groups.name,
                 groups.id,
-                COUNT(*) AS total
-            FROM login_log
-            JOIN `user` ON login_log.username = `user`.username
-            JOIN groups ON user.group_id = groups.id
-            WHERE login=1 AND date >= :start AND date <= :end AND `user`.created_at <=  :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start)
-            AND `groups`.deleted_at IS NULL
-            GROUP BY group_id';
+                (SELECT COUNT(*) FROM login_log JOIN user ON login_log.username=user.username AND  `user`.created_at <=  :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start) WHERE login=1 AND date >= :start AND date <= :end AND user.group_id = groups.id ) AS total
+                FROM `groups`
+            WHERE   `groups`.deleted_at IS NULL';
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
@@ -79,7 +75,7 @@ class Login
                 SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
                 INNER JOIN login_log ON `user`.username = login_log.username
                 WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.created_at <=  :end AND
-                      (`user`.deleted_at IS NULL OR `user`.deleted_at > :start) 
+                      (`user`.deleted_at IS NULL OR `user`.deleted_at > :start)
             ) AS total
             FROM groups
             WHERE `groups`.deleted_at IS NULL';
@@ -117,7 +113,7 @@ class Login
         $query = "
                 SELECT groups.id, groups.`name`, COUNT(*) total
                 FROM groups
-                JOIN `user` ON groups.id=`user`.group_id 
+                JOIN `user` ON groups.id=`user`.group_id
                 WHERE {$userWhere} AND `groups`.deleted_at IS NULL
                 GROUP BY groups.id
                 ORDER BY groups.`name`";
