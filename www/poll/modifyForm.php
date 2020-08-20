@@ -76,6 +76,24 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
         SitePage::localRedir("/homepage/" . $poll['folder_id']);
     }
 
+    try {
+
+        /* Look for an existing component configuration for this component
+         * If one exists, just reuse its stuff
+         */
+
+    } catch (\Schoolbox\Mapper\Exception $e) {
+
+        /* Otherwise, create a new component configuration
+         */
+
+    }
+
+
+    /* Then update its value to be the new poll id
+     */
+
+
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
     $confI->setInstanceId($cim->getId());
