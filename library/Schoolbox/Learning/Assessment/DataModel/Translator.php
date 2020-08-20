@@ -461,9 +461,12 @@ class Translator
             /** @var Project $domainObject */
             $domainObject->setAssessables(new GenericCollection(IAssessable::class));
             foreach ($dataModel->getAssessments() as $idx => $dataChild) {
-                $domainChild = $this->translateToDomainModelRecursive($dataChild->getSubObject(), $depth + 1);
-                $domainChild->setContext($domainObject);
-                $domainObject->getAssessables()[$idx] = $domainChild;
+                $subModel = $dataChild->getSubObject();
+                if ($subModel) {
+                    $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
+                    $domainChild->setContext($domainObject);
+                    $domainObject->getAssessables()[$idx] = $domainChild;
+                }
             }
         }
 
