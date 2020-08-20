@@ -20,6 +20,10 @@ namespace Schoolbox\External\Normalise;
  * If $values is a scalar, it'll get put into its own stack
  * If values is null, it'll be given an empty stack
  *
+ * Other usages, such as having an array of arrays of arrays of objects will start
+ * returning warnings, and maybe unexpected outcomes; this should predominantly be
+ * used to filter (key-values) stacks where values is a stack of scalars.
+ *
  * @package Schoolbox\External\Normalise
  */
 class TupleStack

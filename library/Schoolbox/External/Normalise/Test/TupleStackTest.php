@@ -143,6 +143,28 @@ class TupleStackTest extends TestCase
                     'id6' => []
                 ]
             ],
+
+            /* This causes a warning, but will silently proceed anyway, but you might
+             * not get what you wanted.
+             */
+//            'Invalid Usage' => [
+//                [
+//                    'a',
+//                    [
+//                        'bb'
+//                    ],
+//                    [
+//                        'what' => 'does this do',
+//                        'when' => 'i keep providing more stuff'
+//                    ],
+//                    [
+//                        'and then' => [
+//                            'i keep providing more' => 'and more and more and more',
+//                            'until' => 'it cannot eat a single bite'
+//                        ]
+//                    ],
+//                ]
+//            ]
         ];
     }
 }
