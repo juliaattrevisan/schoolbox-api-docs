@@ -429,10 +429,14 @@ class Translator
         if ($specification instanceof Model) {
             // Turn it inside out, because that's the way I got it
             $model = $specification->getSubObject();
-            $model->setAssessmentModel($specification);
+            if ($model) {
+                $model->setAssessmentModel($specification);
 
-            // Holy recursion batman
-            $domainObject->setSpecificationAssessment($this->translateToDomainModel($model));
+                // Holy recursion batman
+                $domainObject->setSpecificationAssessment($this->translateToDomainModel($model));
+            }
+            // If there's a spec assessment but it has no sub-object:
+            // Probably just pretend that it has no spec
         }
 
         // Translate assessment context
