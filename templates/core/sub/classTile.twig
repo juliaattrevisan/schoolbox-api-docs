@@ -38,7 +38,7 @@
                     {folder: class, folderId: class.id, term: term, termCode: term.code})
                 %}
                 {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>{% endif %}
-                {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folderId: class.id}) %}
+                {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
                 {% if courses | length %}

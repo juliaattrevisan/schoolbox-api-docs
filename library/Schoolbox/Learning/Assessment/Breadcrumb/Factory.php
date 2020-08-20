@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use \Schoolbox\Collection;
 
@@ -32,14 +33,37 @@ class Factory
      */
     private $router;
 
+
+    /**
+     * @var Authorizer
+     */
+    private $authorizer;
+
+
+    /**
+     * @var Access
+     */
+    private $access;
+
+
     /**
      * Constructor
      *
      * @param Router $router Used to generate route URLs
      */
-    public function __construct(Router $router)
+    /**
+     * Constructor
+     *
+     * @param Router     $router     Used to generate route URLs
+     * @param Authorizer $authorizer Used to verify that route URLs are
+     *                               accessible
+     * @param Access     $access     Used to verify homepage access permissions
+     */
+    public function __construct(Router $router, Authorizer $authorizer, Access $access)
     {
-        $this->router = $router;
+        $this->router     = $router;
+        $this->authorizer = $authorizer;
+        $this->access     = $access;
     }
 
     /**
@@ -60,23 +84,33 @@ class Factory
         $context = $assessment->getContext();
 
         if ($context instanceof Project) {
-            if($user->getRole()->isStaff()) {
-                $path = $this->router->generate('learningAssessment.getStatus', ['assessmentId' => $context->getId()]);
+            $routeName   = 'learningAssessment.getStatus';
+            $routeParams = [
+                'assessment'   => $context,
+                'assessmentId' => $context->getId(),
+            ];
+
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
+                $path = $this->router->generate($routeName, $routeParams);
             } else {
-                $path = $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()]);
+                $path = $this->router->generate('learningAssessment.getSummary', $routeParams);
             }
 
             $trail = $this->produceFromAssessment($context, $user);
 
         } elseif ($context instanceof UnitSpecification) {
-
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
 
         } elseif ($context instanceof UnitImplementation) {
-            if ($user->getRole()->isStaff()) {
-                $path = $this->router->generate('learningMarkbook.getMarkbookForClass', ['folder' => $context->getFolder(), 'folderId' => $context->getFolder()->getId()]);
+            $routeName   = 'learningMarkbook.getMarkbookForClass';
+            $routeParams = [
+                'folder'   => $context->getFolder(),
+                'folderId' => $context->getFolder()->getId(),
+            ];
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
+                $path = $this->router->generate($routeName, $routeParams);
 
-            } elseif ($user->getRole()->isStudent()) {
+            } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
 
             } else {
@@ -85,10 +119,8 @@ class Factory
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
 
-        } else {
-            if (Access::getInstance()->getFolderAccess($user,$context->getFolder()->getId())) {
-                $path = "/homepage/{$context->getFolder()->getId()}";
-            }
+        } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
+            $path = "/homepage/{$context->getFolder()->getId()}";
         }
 
         $trail->add([$context->getTitle(), $path]);
