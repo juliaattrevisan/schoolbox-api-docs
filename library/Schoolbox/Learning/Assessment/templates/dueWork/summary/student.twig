@@ -111,7 +111,7 @@
     } %}
 {% endif %}
 
-{% if ((currentFeedback.isSelfAssessment ?? false) or (participant and participant.assessable.isFeedbackVisibleToUser(USER))) and selfAssessmentFeedback.comment ?? ''|length %}
+{% if ((currentFeedback.isSelfAssessment ?? false) or (participant and participant.assessable.isFeedbackVisibleToUser(USER))) and (selfAssessmentFeedback.comment ?? '')|length %}
     <div class="row">
         <div class="small-12 island">
             <legend class="subheader">

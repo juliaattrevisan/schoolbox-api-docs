@@ -8,9 +8,9 @@
 #}
 
 {% set unitSpec                    = unitImpl.specification %}
-{% set assessmentPairs             = dto.assessmentPairs[unitSpec.id] %}
-{% set unitAssessmentCount         = dto.availableAssessmentCounts[unitSpec.id] %}
-{% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] %}
+{% set assessmentPairs             = dto.assessmentPairs[unitSpec.id] ?? [] %}
+{% set unitAssessmentCount         = dto.availableAssessmentCounts[unitSpec.id] ?? [] %}
+{% set unitAssessmentCountSelected = dto.selectedAssessmentCounts[unitSpec.id] ?? [] %}
 {% set unitAction                  = unitImpl.id ? 'modify' : 'import' %}
 
 <input type="hidden" name="unit[{{ unitSpec.id }}][unit_spec_id]" value="{{ unitSpec.id }}" />

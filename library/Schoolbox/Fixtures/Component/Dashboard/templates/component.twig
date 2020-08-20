@@ -24,7 +24,7 @@
                             <p class="meta">{{ match.startAt.getLong }}</p>
 
                             {% if user.role.type == 'parent' %}
-                                {% if match.homeTeam.players | length %}
+                                {% if (match.homeTeam.players ?? []) | length %}
                                     <p class="meta">
                                         {% for child in match.homeTeam.players %}
                                             {% if not loop.first and not loop.last %},{% endif %}
@@ -36,7 +36,7 @@
                                     </p>
                                 {% endif %}
 
-                                {% if match.awayTeam.players ?? []| length %}
+                                {% if (match.awayTeam.players ?? [])| length %}
                                     <p class="meta">
                                         {% for child in match.awayTeam.players %}
                                             {% if not loop.first and not loop.last %},{% endif %}
@@ -47,7 +47,7 @@
                                         {% endfor %} playing for {{ match.awayTeam.name }}
                                     </p>
                                 {% endif %}
-                            {% endif %}
+                                {% endif %}
                         </div>
                     </div>
                 </li>

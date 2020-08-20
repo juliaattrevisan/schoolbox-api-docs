@@ -84,7 +84,7 @@
             {% if not loop.first %}
                 <tr><th class="rubric-progression-capability">&nbsp;</th>
             {% endif %}
-            <th class="rubric-progression-indicator">{{ indicator.name ?? '' | nl2br}}</th>
+            <th class="rubric-progression-indicator">{{ (indicator.name ?? '') | nl2br}}</th>
             <td class="rubric-progression-graph">
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">

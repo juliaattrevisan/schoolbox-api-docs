@@ -45,12 +45,12 @@
                 {% if not loop.first %}
                     <tr>
                 {% endif %}
-                <th class="rb-criterion-name">{{ indicator.name  ?? '' | nl2br }}</th>
+                <th class="rb-criterion-name">{{ (indicator.name  ?? '') | nl2br }}</th>
                 {% for activity_id, activity in rubricAssessmentList %}
                     {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
                     <td><div><span class="rb-description">
                             {% if activity %}<b>{{ activity.level ?? '' }}</b><br />{% endif %}
-                            {{ activity.descriptor ?? '' }} {% if activity and activity.value is defined and showRubricPoints %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                            {{ (activity.descriptor ?? '') | nl2br }} {% if activity and activity.value is defined and showRubricPoints %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
                         </span></div>
                     </td>
                 {% endfor %}
