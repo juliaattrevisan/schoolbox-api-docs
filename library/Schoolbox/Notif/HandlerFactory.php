@@ -17,6 +17,7 @@ use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use RuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Swift_Mailer;
@@ -137,6 +138,11 @@ class HandlerFactory
      */
     public function getFileLogHandler($topic)
     {
+        if(!is_dir($this->conf->get('logs_dir'))) {
+            if(!mkdir($concurrentDirectory = $this->conf->get('logs_dir'), 0770, true) && !is_dir($concurrentDirectory)) {
+                throw new RuntimeException("Cannot create log directory: $concurrentDirectory");
+            }
+        }
         $logfile = sprintf("%s/%s.log", $this->conf->get('logs_dir'), $topic);
 
         if (is_resource($lp = fopen($logfile, 'ab'))) {
