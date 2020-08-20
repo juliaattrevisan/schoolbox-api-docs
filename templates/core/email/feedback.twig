@@ -2,11 +2,6 @@
 
 {% extends 'schoolmail.twig' %}
 {% block content %}
-    {# dig into the context #}
-    {% set ns = (groups ?? [])|first %}
-    {% set row = (ns.rows ?? [])|first %}
-    {% set msg = (row.messages ?? [])|first %}
-
     <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
     <tr>{{ fn.spacer(config.fqdn, 16, 0) }}</tr>
     <tr>
@@ -24,14 +19,14 @@
     <tr>
         <td width="640">
             <p>Name: {{ NAME }}</p>
-	    <p>Email: {{ EMAIL }}</p>
-	    <p>Subject: {{ SUBJECT }}</p>
+            <p>Email: {{ EMAIL }}</p>
+            <p>Subject: {{ SUBJECT }}</p>
         </td>
     </tr>
     <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
     <tr>
         <td width="640">
-	    <p>Message:<br>{{ MESSAGE }}</p>
+            <p>Message:<br>{{ MESSAGE }}</p>
         </td>
     </tr>
     <tr>{{ fn.spacer(config.fqdn, 16, 0, 2) }}</tr>
