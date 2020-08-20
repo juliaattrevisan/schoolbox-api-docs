@@ -349,14 +349,14 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Gets the sub-object for this model (task, quiz, duework, project)
+     * Gets the sub-object for this model (task, quiz, duework, project), or
+     * null if somehow no model is associated.
      *
      * TODO figure out a better name than subobject
      *
-     * @return IAssessableDataModel
-     * @throws \UnexpectedValueException if there's no sub-object
+     * @return IAssessableDataModel|null
      */
-    public function getSubObject()
+    public function getSubObject(): ?IAssessableDataModel
     {
         if ($this->hasDueWork()) {
             return $this->getDueWork();
@@ -371,7 +371,11 @@ class Model implements ISoftDeletable
             // this test must go last because old course-based quizzes and works register as "task == true" :(
             return $this->getTask();
         }
-        throw new \UnexpectedValueException('This object has no sub-object');
+
+        // This used to raise an UnexpectedValueException.
+        // The absence of a sub-object is still a data issue, but it's one for
+        // calling classes to figure out.
+        return null;
     }
 
     /**
