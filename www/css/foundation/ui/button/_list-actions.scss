@@ -95,6 +95,10 @@
 				 @media #{$small-only} {
 					 right: 0;
 				 }
+
+                 @media #{$medium-only} {
+                   right: 1.5rem;
+                 }
 			 }
 		 }
 	}
