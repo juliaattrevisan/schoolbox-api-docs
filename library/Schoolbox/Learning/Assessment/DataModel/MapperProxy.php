@@ -1087,7 +1087,11 @@ class MapperProxy
         $domainObjects = $this->createCollection();
         foreach ($dataModels as $idx => $dataModel) {
             if ($dataModel instanceof Model) {
-                $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
+                try {
+                    $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
+                } catch (UnexpectedValueException $e) {
+                    // This object couldn't be translated: ignore it
+                }
             }
         }
         return $domainObjects;
