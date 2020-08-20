@@ -1020,11 +1020,12 @@ class MapperProxy
     {
         // Delete assessment
         $dataModel = $this->translateToDataModel($assessable);
-        if ($dataModel->getSubObject() instanceof SubmissionBox) {
+        $subModel  = $dataModel->getSubObject();
+        if ($subModel instanceof SubmissionBox) {
             // The assessment model is a component of the submission box.
             // The composite object is responsible for deleting its components
             // TODO - roll out this methodology to other assessment types
-            SubmissionBoxMapper::getInstance()->delete($dataModel->getSubObject());
+            SubmissionBoxMapper::getInstance()->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
