@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -394,10 +395,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
 
         foreach ($userEmails as $i => $email) {
-            $emails[$email['externalId'] . '-' . $i] = $email['email'];
+            $emails[$email['externalId'] . '-' . $i][] = $email['email'];
         }
 
-        return array_filter(array_unique($emails));
+        return (new TupleStack())->normalise($emails);
     }
 
     /**
