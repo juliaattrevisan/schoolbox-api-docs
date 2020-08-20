@@ -61,9 +61,13 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Select this poll in the component
      */
+    $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+    $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
+
     try {
-        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
-        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+        $cdm = $componentConfigDefinitionMapper->findOneByColumn('key', 'poll');
+        $cim = $componentInstanceMapper->findOneByColumnList(
             array(
                 'id'                      => $_POST['homepageComponentID'],
                 'module'                  => 'homepage',
@@ -75,8 +79,6 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     catch (Schoolbox\Mapper\Exception $e) {
         SitePage::localRedir("/homepage/" . $poll['folder_id']);
     }
-
-    $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
     try {
 
@@ -91,7 +93,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
         /* Otherwise, create a new component configuration
          */
-        $componentConfigInstance = new Component_Config();
+        $componentConfigInstance = $componentConfigInstanceMapper->createModel();
     }
 
     /* Then update its value to be the new poll id
