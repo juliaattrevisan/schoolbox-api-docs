@@ -5,9 +5,13 @@
     flex: 0 0 25%;
     min-width: rem-calc(220);
 
+    ul {
+      background: $ghost;
+      height: 100%;
+    }
+
     li {
       a {
-        background: $ghost;
         border-right: 1px solid $silver;
         color: $aluminum;
 
@@ -15,6 +19,7 @@
           padding: .5rem !important;
           max-width: rem-calc(124);
           text-align: center;
+          // Accommodate the Microsoft Teams Meetings tab
           word-wrap: break-word;
 
           &::before {
@@ -48,9 +53,25 @@
 
   .attachment-browser-panel-container {
     flex: 0 0 75%;
+    padding: 0;
+    position: relative;
 
-    @media #{$medium-down} {
+    .content {
+      padding: 1rem;
+      height: 100%;
 
+      &.active {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+  .component-action {
+    display: flex;
+    margin-top: auto;
+
+    section {
+      width: 100%;
     }
   }
 }
