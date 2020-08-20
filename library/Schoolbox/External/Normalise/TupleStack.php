@@ -47,7 +47,7 @@ class TupleStack
                 /* Scalars get shoved into their own array
                  * (Alternatively you can omit the scalar; it may be wrong entirely)
                  */
-                $processed[$key] = array_filter([trim($values)]);
+                $processed[$key] = array_filter([trim((string)$values)]);
             } else {
 
                 /* Nulls and other unknown types just get an empty stack

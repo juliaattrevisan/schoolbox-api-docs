@@ -22,7 +22,7 @@ class TupleStackTest extends TestCase
      * @dataProvider provider_validNormaliser
      *
      * @param array $stack
-     * @param bool  $expected
+     * @param array $expected
      */
     public function testNormaliser(array $stack, array $expected): void
     {
@@ -42,6 +42,7 @@ class TupleStackTest extends TestCase
                 [],
                 []
             ],
+
             'Key Only' => [
                 [
                     'cat' => 'cat'
@@ -52,6 +53,51 @@ class TupleStackTest extends TestCase
                     ]
                 ]
             ],
+
+            'Scalars Only' => [
+                [
+                    'a',
+                    'b',
+                    'c',
+                    'd'
+                ],
+                [
+                    0 => [
+                        'a'
+                    ],
+                    1 => [
+                        'b'
+                    ],
+                    2 => [
+                        'c'
+                    ],
+                    3 => [
+                        'd'
+                    ]
+                ],
+            ],
+
+            'Scalars Only Mixed Bag' => [
+                [
+                    'a',
+                    '',
+                    false,
+                    'd',
+                    null
+                ],
+                [
+                    0 => [
+                        'a'
+                    ],
+                    1 => [],
+                    2 => [],
+                    3 => [
+                        'd'
+                    ],
+                    4 => []
+                ],
+            ],
+
             'Mixed Bag' => [
                 [
                     'id1' => [
