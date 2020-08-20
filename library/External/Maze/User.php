@@ -8,6 +8,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -202,11 +203,11 @@ class External_Maze_User implements External_UserInterface
                  */
                 if ($relatedID1 !== '') {
                     if ($familyEmail1) {
-                        $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
+                        $processed[$currentEmail['RelatedID1']][] = $currentEmail['FamilyEmail1'];
                     }
                     if ($familyEmail2 !== '') {
                         // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                        $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
+                        $processed["{$currentEmail['RelatedID1']}-2"][] = $currentEmail['FamilyEmail2'];
                     }
                 }
 
@@ -218,17 +219,17 @@ class External_Maze_User implements External_UserInterface
                  */
                 if ($relatedID2 !== '') {
                     if ($altFamilyEmail1 !== '') {
-                        $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
+                        $processed[$currentEmail['RelatedID2']][] = $currentEmail['AltFamilyEmail1'];
                     }
                     if ($altFamilyEmail2 !== '') {
                         // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                        $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
+                        $processed["{$currentEmail['RelatedID2']}-2"][] = $currentEmail['AltFamilyEmail2'];
                     }
                 }
             }
         }
 
-        return $processed;
+        return (new TupleStack())->normalise($processed);
     }
 
     /**
