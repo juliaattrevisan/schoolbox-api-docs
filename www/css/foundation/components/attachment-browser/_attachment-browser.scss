@@ -3,7 +3,8 @@
 
   .attachment-browser-filesystems {
     flex: 0 0 25%;
-    min-width: rem-calc(220);
+    //min-width: rem-calc(220);
+    min-width: max-content;
 
     ul {
       background: $ghost;
@@ -48,6 +49,7 @@
 
     @media #{$medium-down} {
       min-width: max-content;
+      flex: 0;
     }
   }
 
@@ -64,6 +66,9 @@
         display: flex;
         flex-direction: column;
       }
+    }
+    @media #{$medium-down} {
+      flex-grow: 1;
     }
   }
   .component-action {

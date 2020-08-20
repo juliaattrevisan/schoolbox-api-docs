@@ -1447,7 +1447,8 @@ $selector-width: 2.25rem;
 
 // Reveal
 .reveal-modal {
-    margin-top: 10vh !important; // foundation hardcodes an inline 100px -_-
+    margin-top: 10vh !important; // override Foundation inline 100px
+    min-height: auto;
 
     &:focus {
         outline: none;
@@ -1482,6 +1483,10 @@ $selector-width: 2.25rem;
 
     .close-reveal-modal {
         right: $reveal-close-right;
+
+        @media #{$small-only} {
+            right: .5rem;
+        }
     }
 
     form {
