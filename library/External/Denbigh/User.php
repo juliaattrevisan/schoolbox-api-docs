@@ -8,6 +8,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -46,7 +47,7 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $parentIterator = $this->externalDatabase->getQueryIterator(
             "
-                SELECT        Family.email
+                SELECT        Family.familyDenbighID, Family.email
                 FROM          Schoolbox_Students
                 LEFT JOIN     Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
                 WHERE         Schoolbox_Students.denbighID IN ({$predicate["placeholders"]})
@@ -57,13 +58,17 @@ class External_Denbigh_User implements External_UserInterface
         $emailList = [];
 
         foreach ($parentIterator as $parent) {
-            $emailList = array_merge(
-                $emailList,
+            if (!isset($emailList['familyDenbighID'])) {
+                $emailList['familyDenbighID'] = [];
+            }
+
+            $emailList['familyDenbighID'] = array_merge(
+                $emailList['familyDenbighID'],
                 array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']))
             );
         }
 
-        return $emailList;
+        return (new TupleStack())->normalise($emailList);
     }
 
     /**
