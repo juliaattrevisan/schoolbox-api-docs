@@ -3,17 +3,31 @@
 
   .attachment-browser-filesystems {
     flex: 0 0 25%;
+    min-width: rem-calc(220);
 
     li {
       a {
         background: $ghost;
         border-right: 1px solid $silver;
-        color: $anchor-font-color;
+        color: $aluminum;
+
+        @media #{$medium-down} {
+          padding: .5rem !important;
+          max-width: rem-calc(124);
+          text-align: center;
+          word-wrap: break-word;
+
+          &::before {
+            display: block;
+            padding-right: 0;
+          }
+        }
       }
 
       &.active > a {
         background: $white;
         border-right: 0;
+        color: $anchor-font-color;
         font-weight: normal;
       }
     }
@@ -26,10 +40,18 @@
         box-shadow: none;
       }
     }
+
+    @media #{$medium-down} {
+      min-width: max-content;
+    }
   }
 
   .attachment-browser-panel-container {
     flex: 0 0 75%;
+
+    @media #{$medium-down} {
+
+    }
   }
 }
 
