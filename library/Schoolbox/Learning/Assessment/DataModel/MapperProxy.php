@@ -1051,11 +1051,19 @@ class MapperProxy
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDomainModel(Model $model)
+    public function translateToDomainModel(Model $model): IAssessable
     {
         // Turn the data model inside out
         // TODO try to remove this, and update translator to return Model objects directly
         $subModel = $model->getSubObject();
+        if (!$subModel) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Assessment #%d has no sub-object, and thus cannot be translated to a domain model',
+                    $model->getId()
+                )
+            );
+        }
         $subModel->setAssessmentModel($model);
 
         return $this->translator->translateToDomainModel($subModel);
