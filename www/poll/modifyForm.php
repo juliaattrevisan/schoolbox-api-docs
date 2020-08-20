@@ -66,18 +66,20 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentInstanceMapper = Component_InstanceMapper::getInstance();
 
     try {
-        $cdm = $componentConfigDefinitionMapper->findOneByColumn('key', 'poll');
-        $cim = $componentInstanceMapper->findOneByColumnList(
-            array(
-                'id'                      => $_POST['homepageComponentID'],
-                'module'                  => 'homepage',
-                'identifier'              => $_POST['folder_id'],
-                'component_definition_id' => $cdm->getDefinitionId(),
-            )
-        );
-    }
-    catch (Schoolbox\Mapper\Exception $e) {
-        SitePage::localRedir("/homepage/" . $poll['folder_id']);
+        $cd = $componentConfigDefinitionMapper->findOneByColumn('key', 'poll');
+        $ci = $componentInstanceMapper->findOneByColumnList([
+            'id'                      => $_POST['homepageComponentID'],
+            'module'                  => 'homepage',
+            'identifier'              => $_POST['folder_id'],
+            'component_definition_id' => $cd->getDefinitionId(),
+        ]);
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+
+        /* noop something went wrong; couldn't find config info
+         * just goes back to homepage
+         */
+        SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
     }
 
     try {
@@ -86,7 +88,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
          * If one exists, just reuse its stuff
          */
         $componentConfigInstance = $componentConfigInstanceMapper->findOneByColumnList([
-            'component_config_definition_id' => $cdm->getId(),
+            'component_config_definition_id' => $cd->getId(),
             'component_instance_id' => (int)$_POST['homepageComponentID']
         ]);
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -98,9 +100,9 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Then update its value to be the new poll id
      */
-    $componentConfigInstance->setConfigDefinitionId($cdm->getId())
-        ->setInstanceId($cim->getId())
-        ->setValue($poll['id']);
+    $componentConfigInstance->setConfigDefinitionId($cd->getId())
+                            ->setInstanceId($ci->getId())
+                            ->setValue($poll['id']);
 
     $componentConfigInstanceMapper->save($componentConfigInstance);
 
