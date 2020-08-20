@@ -884,6 +884,7 @@ class External_Doublefirst_User implements External_UserInterface
             JOIN    VLPupilContact vpc ON vpc.PupilID = pcs.PupilID
             WHERE   ReasonForLeaving IN ('', '00', '0000') AND
                     vpc.RelationshipToPupil IN (
+                      'Carers',
                       'Parents',
                       'Mother',
                       'Father',
