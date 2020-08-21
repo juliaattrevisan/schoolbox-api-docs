@@ -314,7 +314,9 @@ class Module extends BaseModule
                 'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
                 'responseDataSource' => $injector->lazyGet('responseDataSource'),
                 'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
-                    'router' => $injector->lazyGet('router')
+                    'router'     => $injector->lazyGet('router'),
+                    'authorizer' => $injector->lazyGet('authorizer'),
+                    'access'     => Access::getInstance(),
                 ]),
                 'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
                 'kamiMapper' => $this->getMapperFactory()->getLazy(Kami\Mapper::class),
