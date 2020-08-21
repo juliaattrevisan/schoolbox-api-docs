@@ -55,6 +55,8 @@ class TupleStackTest extends TestCase
                     'horse@schoolbox.com.au',
                     'cat@schoolbox.com.au',
                     [],
+                    'elephant@alaress.com.au;rhino@alaress.com.au;fox@alaress.com.au;;;;;',
+                    "this\nis\na\nbig\rparagraph;\r\nof\nlines",
                     "\n"
                 ],
                 [
@@ -62,6 +64,11 @@ class TupleStackTest extends TestCase
                     0,
                     'horse@schoolbox.com.au',
                     'cat',
+                    'elephant@alaress.com.au',
+                    'rhino@alaress.com.au',
+                    'fox@alaress.com.au',
+                    "this\nis\na\nbig\rparagraph",
+                    "\r\nof\nlines",
                 ]
             ]
         ];
@@ -105,6 +112,8 @@ class TupleStackTest extends TestCase
                     'horse@schoolbox.com.au',
                     'cat@schoolbox.com.au',
                     [],
+                    'elephant@alaress.com.au,rhino@alaress.com.au,fox@alaress.com.au,,,,,',
+                    "this\nis\na\nbig\rparagraph,\r\nof\nlines",
                     "\n"
                 ],
                 [
@@ -112,6 +121,11 @@ class TupleStackTest extends TestCase
                     0,
                     'horse@schoolbox.com.au',
                     'cat',
+                    'elephant@alaress.com.au',
+                    'rhino@alaress.com.au',
+                    'fox@alaress.com.au',
+                    "this\nis\na\nbig\rparagraph",
+                    "\r\nof\nlines",
                 ]
             ]
         ];
