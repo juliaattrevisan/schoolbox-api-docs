@@ -19,14 +19,14 @@ class TupleStackTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validNormaliser
+     * @dataProvider provider_validNormaliseTuples
      *
      * @param array $stack
      * @param array $expected
      */
-    public function testNormaliser(array $stack, array $expected): void
+    public function testNormaliseTuples(array $stack, array $expected): void
     {
-        $this->assertEquals($expected, (new TupleStack())->normalise($stack));
+        $this->assertEquals($expected, (new TupleStack())->normaliseTuples($stack));
     }
 
 
@@ -35,7 +35,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliser(): array
+    public function provider_validNormaliseTuples(): array
     {
         return [
             'Empty' => [

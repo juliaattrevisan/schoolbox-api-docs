@@ -35,7 +35,7 @@ class TupleStack
      * @param array $stack
      * @return array
      */
-    public function normalise(array $stack): array
+    public function normaliseTuples(array $stack): array
     {
         $processed = [];
 
