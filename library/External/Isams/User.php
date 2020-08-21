@@ -98,12 +98,10 @@ class External_Isams_User implements External_UserInterface
         $iterator = $this->getConnector()->getQueryIterator($query, $pb->getParams());
 
         foreach ($iterator as $currentRow) {
-            if (!isset($emailList[$currentRow['ParentID']])) {
-                $emailList[$currentRow['ParentID']][] = $currentRow['PersonalEmail'];
-            }
+            $emailList[] = $currentRow['PersonalEmail'];
         }
 
-        return (new TupleStack())->normalise($emailList);
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
     /**

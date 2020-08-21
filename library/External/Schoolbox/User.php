@@ -59,10 +59,10 @@ class External_Schoolbox_User implements External_UserInterface
         );
 
         foreach ($parentIterator as $parent) {
-            $emailList[$parent['StudentContactID']][] = $parent['StudentContactEmail'];
+            $emailList[] = $parent['StudentContactEmail'];
         }
 
-        return (new TupleStack())->normalise($emailList);
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
 

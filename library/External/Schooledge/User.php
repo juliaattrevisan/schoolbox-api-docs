@@ -308,11 +308,12 @@ class External_Schooledge_User implements External_UserInterface
         ";
 
         $result = [];
+
         foreach ($this->database->getAll($query) as $row) {
-            $result[$row['StudentID'].'-'.$row['ContactID']][] = $row['Email'];
+            $result[] = $row['Email'];
         }
 
-        return (new TupleStack())->normalise($result);
+        return (new TupleStack())->normaliseValues($result);
     }
 
 

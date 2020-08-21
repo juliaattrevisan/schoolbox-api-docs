@@ -44,7 +44,7 @@ class TupleStack
              */
             $processed = [];
 
-            foreach ($stack as $key => $value) {
+            foreach ($stack as $value) {
 
                 /* Skip some bad data
                  */

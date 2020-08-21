@@ -229,19 +229,10 @@ class External_Synergetic_User implements External_UserInterface
         $emailList = [];
 
         foreach ($iteratorParents as $parent) {
-
-            $emailArray = explode(';', $parent['Email']);
-
-            if (count($emailArray) > 0) {
-                foreach ($emailArray as $key => $email) {
-                    $emailList["{$parent['RelatedID']}-{$key}"][] = $email;
-                }
-            } else {
-                $emailList[$parent['RelatedID']][] = $parent['Email'];
-            }
+            $emailList[] = $parent['Email'];
         }
 
-        return (new TupleStack())->normalise($emailList);
+        return (new TupleStack())->normaliseValues($emailList, TupleStack::SPLIT_SEMICOLON);
     }
 
     /**

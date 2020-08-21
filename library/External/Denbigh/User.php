@@ -58,17 +58,19 @@ class External_Denbigh_User implements External_UserInterface
         $emailList = [];
 
         foreach ($parentIterator as $parent) {
-            if (!isset($emailList['familyDenbighID'])) {
-                $emailList['familyDenbighID'] = [];
-            }
 
-            $emailList['familyDenbighID'] = array_merge(
-                $emailList['familyDenbighID'],
-                array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']))
-            );
+            /* Split emails on semicolon, colon, whitespace chars (wow)
+             */
+            $subEmails = array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']));
+
+            /* Add each found sub-email into the stack
+             */
+            foreach ($subEmails as $subEmail) {
+                $emailList[] = $subEmail;
+            }
         }
 
-        return (new TupleStack())->normalise($emailList);
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
     /**

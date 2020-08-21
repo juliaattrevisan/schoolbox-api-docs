@@ -120,20 +120,13 @@ class External_Tass_User implements External_UserInterface
         }
 
         $statement = $this->database->query($query, $params);
+
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            if (false !== strpos($row['e_mail'], ';')) {
-                $i = 0;
-                foreach(explode(';',$row['e_mail']) as $email) {
-                    $emailList[trim($row['par_code']).'-'.trim($row['add_num'].'-'.$i++)][] = $email;
-                }
-            }
-            else {
-                $emailList[trim($row['par_code']).'-'.trim($row['add_num'])][] = trim($row['e_mail']);
-            }
+            $emailList[] = $row['email'];
         }
 
-        return (new TupleStack())->normalise($emailList);
+        return (new TupleStack())->normaliseValues($emailList, TupleStack::SPLIT_SEMICOLON);
     }
 
 

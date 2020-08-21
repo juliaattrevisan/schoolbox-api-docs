@@ -248,23 +248,23 @@ class External_Pcschools_User implements External_UserInterface
         $results = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $row = $this->getDatabase()->trimRow($row);
-            $id  = $row['IDENTITY_ID#'];
+
             // For now, I'm going to assume that parent IDs will be suffixed
             if ($row['DAD_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_FATHER][] = $row['DAD_EMAIL'];
+                $results[] = $row['DAD_EMAIL'];
             }
             if ($row['MUM_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_MOTHER][] = $row['MUM_EMAIL'];
+                $results[] = $row['MUM_EMAIL'];
             }
             if ($row['GUARD_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_GUARDIAN][] = $row['GUARD_EMAIL'];
+                $results[] = $row['GUARD_EMAIL'];
             }
             if ($row['CGIVE_LMS'] === self::CONTACT_LEVEL_FULL) {
-                $results[$id.'-'.self::CONTACT_TYPE_CAREGIVER][] = $row['CGIVE_EMAIL'];
+                $results[] = $row['CGIVE_EMAIL'];
             }
         }
 
-        return (new TupleStack())->normalise($results);
+        return (new TupleStack())->normaliseValues($results);
     }
 
     /**

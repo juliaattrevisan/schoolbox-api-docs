@@ -90,7 +90,7 @@ class External_Schoolpro_User implements External_UserInterface
 
                     /* Get this contact's email
                      */
-                    $emails[$currentStudentContact['ID']][] = $currentStudentContact['email'];
+                    $emails[] = $currentStudentContact['email'];
 
                     /* Also get the spouse's email
                      */
@@ -109,7 +109,7 @@ class External_Schoolpro_User implements External_UserInterface
                      * but the Contact doesn't have the Spouse's email ><
                      */
                     if ($currentStudentSpouse) {
-                        $emails[$currentStudentContact['SpouseID']][] = $currentStudentSpouse['email'];
+                        $emails[] = $currentStudentSpouse['email'];
                     }
                 }
             }
@@ -117,7 +117,7 @@ class External_Schoolpro_User implements External_UserInterface
 
         /* Ditch any busted emails, then return them
          */
-        return (new TupleStack())->normalise($emails);
+        return (new TupleStack())->normaliseValues($emails);
     }
 
     /**
