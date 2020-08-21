@@ -2,18 +2,16 @@
   display: flex;
 
   .attachment-browser-filesystems {
-    flex: 0 0 25%;
-    //min-width: rem-calc(220);
-    min-width: max-content;
+    flex: 0 0 auto;
 
     ul {
       background: $ghost;
+      box-shadow: inset -1px 0px 0px $silver;
       height: 100%;
     }
 
     li {
       a {
-        border-right: 1px solid $silver;
         color: $aluminum;
 
         @media #{$medium-down} {
@@ -32,7 +30,7 @@
 
       &.active > a {
         background: $white;
-        border-right: 0;
+        border-right: 1px solid $white;
         color: $anchor-font-color;
         font-weight: normal;
       }
