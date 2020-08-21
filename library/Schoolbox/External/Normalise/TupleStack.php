@@ -35,35 +35,33 @@ class TupleStack
      */
     public function normaliseValues(array $stack, string $split = null): array
     {
-        $processed = [];
-
         if (\in_array($split, [self::SPLIT_SEMICOLON, self::SPLIT_COMMA], true)) {
 
             /* If you specified a character to split upon,
              * iterate and explode, then merge the exploded pieces in to $processed
              */
+            $processed = [];
+
             foreach ($stack as $key => $value) {
 
                 /* Skip some bad data
                  */
-                if (is_array($value)) {
-                    continue;
+                if (is_scalar($value)) {
+                    $processed = array_merge($processed, explode($split, (string)$value));
                 }
-
-                $processed = array_merge($processed, explode($split, (string)$value));
             }
+        } else {
+            $processed = $stack;
         }
 
         /* Then trim every value, filter and uniquify using built-in methods
          * Reindex the stack
+         *
+         * Return the cleansed and indexed stack of value
          */
-        $processed = array_values(array_unique(array_filter($stack, function($value) {
+        return array_values(array_unique(array_filter($processed, function($value) {
             return is_scalar($value) && '' !== trim((string)$value);
         })));
-
-        /* Return the cleansed and indexed stack of value
-         */
-        return $processed;
     }
 
 

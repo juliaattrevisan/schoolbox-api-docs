@@ -18,6 +18,105 @@ use Schoolbox\External\Normalise\TupleStack;
 class TupleStackTest extends TestCase
 {
 
+    /**
+     * @dataProvider provider_validNormaliseValuesSplitSemicolon
+     *
+     * @param array $stack
+     * @param array $expected
+     */
+    public function testNormaliseValuesSplitSemicolon(array $stack, array $expected): void
+    {
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, TupleStack::SPLIT_SEMICOLON));
+    }
+
+
+    /**
+     * A valid stack for us to process
+     *
+     * @return array
+     */
+    public function provider_validNormaliseValuesSplitSemicolon(): array
+    {
+        return [
+            'Empty' => [
+                [],
+                []
+            ],
+            'Mixed Bag' => [
+                [
+                    false,
+                    '',
+                    'cat@schoolbox.com.au;cat@schoolbox.com.au;',
+                    null,
+                    0,
+                    'cat@schoolbox.com.au;horse@schoolbox.com.au',
+                    'cat',
+                    '      ',
+                    'horse@schoolbox.com.au',
+                    'cat@schoolbox.com.au',
+                    [],
+                    "\n"
+                ],
+                [
+                    'cat@schoolbox.com.au',
+                    0,
+                    'horse@schoolbox.com.au',
+                    'cat',
+                ]
+            ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_validNormaliseValuesSplitComma
+     *
+     * @param array $stack
+     * @param array $expected
+     */
+    public function testNormaliseValuesSplitComma(array $stack, array $expected): void
+    {
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, TupleStack::SPLIT_COMMA));
+    }
+
+
+    /**
+     * A valid stack for us to process
+     *
+     * @return array
+     */
+    public function provider_validNormaliseValuesSplitComma(): array
+    {
+        return [
+            'Empty' => [
+                [],
+                []
+            ],
+            'Mixed Bag' => [
+                [
+                    false,
+                    '',
+                    'cat@schoolbox.com.au,cat@schoolbox.com.au,',
+                    null,
+                    0,
+                    'cat@schoolbox.com.au,horse@schoolbox.com.au',
+                    'cat',
+                    '      ',
+                    'horse@schoolbox.com.au',
+                    'cat@schoolbox.com.au',
+                    [],
+                    "\n"
+                ],
+                [
+                    'cat@schoolbox.com.au',
+                    0,
+                    'horse@schoolbox.com.au',
+                    'cat',
+                ]
+            ]
+        ];
+    }
+
 
     /**
      * @dataProvider provider_validNormaliseValues
