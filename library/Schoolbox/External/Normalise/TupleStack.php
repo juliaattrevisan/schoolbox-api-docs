@@ -20,12 +20,6 @@ class TupleStack
 {
 
     /**
-     * You can split every value on this char
-     */
-    public const SPLIT_SEMICOLON = ';';
-    public const SPLIT_COMMA  = ',';
-
-    /**
      * Take an array of values and do some preprocessing on them
      * Returns a stack of unique, trimmed and non-empty data
      *
@@ -37,14 +31,10 @@ class TupleStack
      */
     public function normaliseValues(array $stack, string $split = null): array
     {
-        /* TODO: Can probably split this on multiple chars by passing similar method signature
-         *  to explode(), which allows you to detonate on any char
+        /* If you specified a character to split upon,
+         * iterate and explode, then merge the exploded pieces in to $processed
          */
-        if (\in_array($split, [self::SPLIT_SEMICOLON, self::SPLIT_COMMA], true)) {
-
-            /* If you specified a character to split upon,
-             * iterate and explode, then merge the exploded pieces in to $processed
-             */
+        if (null !== $split) {
             $processed = [];
 
             foreach ($stack as $value) {
@@ -52,7 +42,7 @@ class TupleStack
                 /* Skip some bad data
                  */
                 if (is_scalar($value)) {
-                    $processed = array_merge($processed, explode($split, (string)$value));
+                    $processed = array_merge($processed, preg_split('/[' . $split . ']/', (string)$value));
                 }
             }
         } else {

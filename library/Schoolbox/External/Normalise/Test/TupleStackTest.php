@@ -19,6 +19,54 @@ class TupleStackTest extends TestCase
 {
 
     /**
+     * @dataProvider provider_validNormaliseValuesSplitNewlines
+     *
+     * @param array $stack
+     * @param array $expected
+     */
+    public function testNormaliseValuesSplitNewlines(array $stack, array $expected): void
+    {
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, "\r\n"));
+    }
+
+
+    /**
+     * A valid stack for us to process
+     *
+     * @return array
+     */
+    public function provider_validNormaliseValuesSplitNewlines(): array
+    {
+        return [
+            'Empty' => [
+                [],
+                []
+            ],
+            'Mixed Bag' => [
+                [
+                    "  \n   cat@schoolbox.com.au     \n\n\n rhino@alaress.com.au\r\nfox@alaress.com.au\rhorse@alaress.com.au",
+                    "this\nis\na\nbig\rparagraph;\r\nof\nlines",
+                    "\n"
+                ],
+                [
+                    'cat@schoolbox.com.au',
+                    'rhino@alaress.com.au',
+                    'fox@alaress.com.au',
+                    'horse@alaress.com.au',
+                    'this',
+                    'is',
+                    'a',
+                    'big',
+                    'paragraph;',
+                    'of',
+                    'lines'
+                ]
+            ]
+        ];
+    }
+
+
+    /**
      * @dataProvider provider_validNormaliseValuesSplitSemicolon
      *
      * @param array $stack
@@ -26,7 +74,7 @@ class TupleStackTest extends TestCase
      */
     public function testNormaliseValuesSplitSemicolon(array $stack, array $expected): void
     {
-        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, TupleStack::SPLIT_SEMICOLON));
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ';'));
     }
 
 
@@ -83,7 +131,7 @@ class TupleStackTest extends TestCase
      */
     public function testNormaliseValuesSplitComma(array $stack, array $expected): void
     {
-        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, TupleStack::SPLIT_COMMA));
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ','));
     }
 
 
