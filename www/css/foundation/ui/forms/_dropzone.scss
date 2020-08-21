@@ -21,7 +21,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
  */
 #filesystem-upload-panel #ab-upload {
   .dz-preview {
-    border: 1px solid $monsoon;
+    border: 1px solid $attachzone-resting-color;
     display: flex;
     height: 5rem;
     width: calc(50% - .5rem);
