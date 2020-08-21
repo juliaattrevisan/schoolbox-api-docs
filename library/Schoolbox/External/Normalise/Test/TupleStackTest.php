@@ -18,6 +18,56 @@ use Schoolbox\External\Normalise\TupleStack;
 class TupleStackTest extends TestCase
 {
 
+
+    /**
+     * @dataProvider provider_validNormaliseValues
+     *
+     * @param array $stack
+     * @param array $expected
+     */
+    public function testNormaliseValues(array $stack, array $expected): void
+    {
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack));
+    }
+
+
+    /**
+     * A valid stack for us to process
+     *
+     * @return array
+     */
+    public function provider_validNormaliseValues(): array
+    {
+        return [
+            'Empty' => [
+                [],
+                []
+            ],
+            'Mixed Bag' => [
+                [
+                    false,
+                    '',
+                    'cat@schoolbox.com.au',
+                    null,
+                    0,
+                    'cat@schoolbox.com.au',
+                    'cat',
+                    '      ',
+                    'cat@schoolbox.com.au',
+                    [],
+                    "\n"
+                ],
+                [
+                    'cat@schoolbox.com.au',
+                    0,
+                    'cat',
+                ]
+            ]
+        ];
+    }
+
+
+
     /**
      * @dataProvider provider_validNormaliseTuples
      *

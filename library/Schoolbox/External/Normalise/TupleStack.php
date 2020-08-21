@@ -20,39 +20,50 @@ class TupleStack
 {
 
     /**
-     * Take an array of (key-values) structs and do some preprocessing on them
+     * You can split every value on this char
+     */
+    public const SPLIT_SEMICOLON = ';';
+    public const SPLIT_COMMA  = ',';
+
+    /**
+     * Take an array of values and do some preprocessing on them
      * Returns a stack of unique, trimmed and non-empty data
      *
-     * @param array $stack
+     * @param array       $stack  A one-dimensional stack
+     * @param string|null $split  Optionally, a char used to split values
      * @return array
      */
-    public function normaliseValues(array $stack, int $split = 0): array
+    public function normaliseValues(array $stack, string $split = null): array
     {
-        /* If you didn't specify a character to split upon,
-         * just trim every value, filter and uniquify using built-in methods
-         */
-
-        /* Return the cleansed and indexed stack
-         */
-
-        /* If you specified a character to split upon,
-         * iterate and explode, then merge the exploded pieces in to $processed
-         */
-
-        /* Then trim every value, filter and uniquify using built-in methods
-         */
-
-        /* Return the cleansed and indexed stack
-         */
-
-        if ($split) {
-        }
-
         $processed = [];
 
-        foreach ($stack as $key => $value) {
+        if (\in_array($split, [self::SPLIT_SEMICOLON, self::SPLIT_COMMA], true)) {
 
+            /* If you specified a character to split upon,
+             * iterate and explode, then merge the exploded pieces in to $processed
+             */
+            foreach ($stack as $key => $value) {
+
+                /* Skip some bad data
+                 */
+                if (is_array($value)) {
+                    continue;
+                }
+
+                $processed = array_merge($processed, explode($split, (string)$value));
+            }
         }
+
+        /* Then trim every value, filter and uniquify using built-in methods
+         * Reindex the stack
+         */
+        $processed = array_values(array_unique(array_filter($stack, function($value) {
+            return is_scalar($value) && '' !== trim((string)$value);
+        })));
+
+        /* Return the cleansed and indexed stack of value
+         */
+        return $processed;
     }
 
 
@@ -71,7 +82,7 @@ class TupleStack
      * returning warnings, and maybe unexpected outcomes; this should predominantly be
      * used to filter (key-values) stacks where values is a stack of scalars.
      *
-     * @param array $stack
+     * @param array $stack  A set of key-values structs
      * @return array
      */
     public function normaliseTuples(array $stack): array
