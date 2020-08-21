@@ -37,6 +37,9 @@ class TupleStack
      */
     public function normaliseValues(array $stack, string $split = null): array
     {
+        /* TODO: Can probably split this on multiple chars by passing similar method signature
+         *  to explode(), which allows you to detonate on any char
+         */
         if (\in_array($split, [self::SPLIT_SEMICOLON, self::SPLIT_COMMA], true)) {
 
             /* If you specified a character to split upon,
