@@ -21,32 +21,38 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
  */
 #filesystem-upload-panel #ab-upload {
   .dz-preview {
-    border: 0;
-    border-bottom: solid 1px $monsoon;
+    border: 1px solid $monsoon;
     display: flex;
-    min-height: 6rem;
-    max-height: 6rem;
-    width: 50%;
+    height: 5rem;
+    width: calc(50% - .5rem);
+    margin: 0 .5rem .5rem 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.dz-error {
+      border: 1px solid $alert-color;
+
+      .dz-remove {
+        color: $alert-color;
+      }
+    }
 
     .dz-image {
-      flex: 0 0 20%;
+      flex: 0 0 4rem;
     }
 
     .dz-details {
-      flex: 0 0 70%;
+      flex: 1 0 auto;
+      max-width: rem-calc(244);
 
-      .dz-size {
-        text-align: left;
-      }
-
+      .dz-size,
       .dz-filename {
         text-align: left;
       }
     }
 
     .dz-close {
-      flex: 0 0 10%;
-      text-align: left;
+      flex: 0 0 2.5rem;
     }
   }
 }
@@ -484,9 +490,6 @@ ul.az-error-list {
             }
         }
     }
-    .dz-details {
-        padding-bottom: 1rem;
-    }
     .dz-error-mark {
         color: $alert-color;
     }
@@ -510,13 +513,13 @@ ul.az-error-list {
         // Undo some of the base background styles
         opacity: 1;
         background: transparent;
-
-        // Make space for .dz-progress
-        margin-bottom: 6px;
     }
     .dz-remove {
-        position: relative;
-        //top: 1rem;
+      background-color: transparent;
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 2rem;
+      line-height: 1rem;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
@@ -530,7 +533,6 @@ ul.az-error-list {
         box-sizing: border-box;
     }
     img[data-dz-thumbnail] {
-        margin: 9px;
         max-width: 64px;
     }
     .dz-filename {
@@ -679,8 +681,6 @@ ul.az-error-list {
 .dz-preview .dz-details,
 .dropzone-previews .dz-preview .dz-details {
     position: relative;
-    //padding: 5px;
-    //margin-bottom: 22px;
 }
 .dz-preview .dz-details .dz-filename,
 .dropzone-previews .dz-preview .dz-details .dz-filename {
@@ -749,6 +749,7 @@ ul.az-error-list {
     background: rgba($white, 0.8);
     padding: 8px 10px;
     color: $alert-color;
+    font-style: italic;
     min-width: 140px;
     max-width: 500px;
     z-index: 500;
