@@ -264,13 +264,6 @@ class UserResolver implements IUserResolver
      * @return array
      * @throws Database\Exception
      * @throws DefinitionException
-     * @throws Exception
-     * @throws Exception\InsufficientHydrationException
-     * @throws InvalidArgumentException
-     * @throws InvalidColumnException
-     * @throws News\Exceptions\UnknownEntityTypeException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
      */
     private function buildMutedRelatedDimensionsQuery(
         string $userTableAlias,
@@ -341,22 +334,19 @@ class UserResolver implements IUserResolver
      * @param string          $relationship
      * @param null[]|string[] $folderIds
      * @return array
-     * @throws Database\Exception
-     * @throws Exception
-     * @throws Exception\InsufficientHydrationException
-     * @throws InvalidArgumentException
-     * @throws InvalidColumnException
-     * @throws News\Exceptions\UnknownEntityTypeException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     * @throws DefinitionException
      */
     private function getNonMutedFolderRelatedUsers(string $relationship, array $folderIds): array
     {
         /** @var Segment\Strategy\Folder $strategy */
         $strategy        = $this->strategyFactory->makeSimpleStrategy(Segment\Strategy\Folder::getEntityType());
-        $nnianFolderIds  = $strategy->findNnianFolderIds($folderIds);
-        $mutedFolders    = $strategy->getMutedUsersPerFolder($nnianFolderIds);
+        try {
+            $nnianFolderIds = $strategy->findNnianFolderIds($folderIds);
+            $mutedFolders   = $strategy->getMutedUsersPerFolder($nnianFolderIds);
+        } catch (Exception $e) {
+            // rather than stopping notification, report the issue and proceed
+            trigger_error('Failed to get muted folders for ' . implode(',', $folderIds) . ': ' . $e->getMessage(), E_USER_WARNING);
+            $mutedFolders = [];
+        }
         $allRelatedUsers = [];
         foreach ($folderIds as $folderId) {
             $userResSql        = $strategy->getUserResolutionSql('user', "", [$folderId], false);

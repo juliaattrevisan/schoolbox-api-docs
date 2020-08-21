@@ -785,6 +785,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         Timetable.ClassCampus, Timetable.ClassCode
                     FROM
                         dbo.SubjectClasses SubjectClasses,
+--                        dbo.TimetableSubstitutes Timetable
                         dbo.Timetable Timetable
                     WHERE
                         Timetable.ClassCampus = SubjectClasses.ClassCampus AND

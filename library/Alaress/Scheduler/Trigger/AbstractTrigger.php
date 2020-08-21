@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -106,7 +106,7 @@ abstract class AbstractTrigger implements TriggerInterface {
     {
         $event       = $this->getEvent();
         $getIdMethod = 'getId';
-        if ($event instanceof CrudEventInterface && $event->getMapper()->hasIdentifier()) {
+        if ($event instanceof CrudEventInterface && $event->getMapper() && $event->getMapper()->hasIdentifier()) {
             $getIdMethod = $event->getMapper()->getGetIdentifierMethodName();
         }
         return $getIdMethod;
