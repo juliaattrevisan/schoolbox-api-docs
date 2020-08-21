@@ -10,19 +10,9 @@ namespace Schoolbox\External\Normalise;
 /**
  * Class TupleStack
  *
- * Take an array of (key-values) structs and do some preprocessing on them:
- *   - remove dupes from $values
- *   - trim all elements inside $values
- *   - remove anything falsey like null, empty string from $values
- *   - filter and uniquify remaining $values
- *   - reset numerical indexes on $values
- *
- * If $values is a scalar, it'll get put into its own stack
- * If values is null, it'll be given an empty stack
- *
- * Other usages, such as having an array of arrays of arrays of objects will start
- * returning warnings, and maybe unexpected outcomes; this should predominantly be
- * used to filter (key-values) stacks where values is a stack of scalars.
+ * Take an array of (key-values) structs and do some preprocessing on them,
+ * removing empty strings and dupes. Depending on the method you use, you
+ * can return a stack, or retain the key-value structure
  *
  * @package Schoolbox\External\Normalise
  */
@@ -31,6 +21,55 @@ class TupleStack
 
     /**
      * Take an array of (key-values) structs and do some preprocessing on them
+     * Returns a stack of unique, trimmed and non-empty data
+     *
+     * @param array $stack
+     * @return array
+     */
+    public function normaliseValues(array $stack, int $split = 0): array
+    {
+        /* If you didn't specify a character to split upon,
+         * just trim every value, filter and uniquify using built-in methods
+         */
+
+        /* Return the cleansed and indexed stack
+         */
+
+        /* If you specified a character to split upon,
+         * iterate and explode, then merge the exploded pieces in to $processed
+         */
+
+        /* Then trim every value, filter and uniquify using built-in methods
+         */
+
+        /* Return the cleansed and indexed stack
+         */
+
+        if ($split) {
+        }
+
+        $processed = [];
+
+        foreach ($stack as $key => $value) {
+
+        }
+    }
+
+
+    /**
+     * Take an array of (key-values) structs and do some preprocessing on them:
+     *   - remove dupes from $values
+     *   - trim all elements inside $values
+     *   - remove anything falsey like null, empty string from $values
+     *   - filter and uniquify remaining $values
+     *   - reset numerical indexes on $values
+     *
+     * If $values is a scalar, it'll get put into its own stack
+     * If values is null, it'll be given an empty stack
+     *
+     * Other usages, such as having an array of arrays of arrays of objects will start
+     * returning warnings, and maybe unexpected outcomes; this should predominantly be
+     * used to filter (key-values) stacks where values is a stack of scalars.
      *
      * @param array $stack
      * @return array
