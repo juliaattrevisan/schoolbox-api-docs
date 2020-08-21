@@ -267,7 +267,11 @@
                             self.payload.currentUser.status = status;
                             self.payload.attendees = response.data.attendees;
 
-                            self.event.setExtendedProp('data', self.event.extendedProps.data);
+                            // Update event's status so its rendering updates
+                            if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
+                                self.event.extendedProps.data.attendance.status.current = status;
+                                self.event.setExtendedProp('data', self.event.extendedProps.data);
+                            }
 
                             toast.toastTimeout({
                                 text: 'Invitation successfully updated',
@@ -282,7 +286,7 @@
                                 });
                             }
                         })
-                        .then(function (response) {
+                        .finally(function () {
 
                             /* Reset flag
                              */
