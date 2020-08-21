@@ -231,7 +231,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                 if (\is_array($allParents) && \count($allParents) > 0) {
                     // Uniqueify, cleanup empty string emails and merge to string
-                    $emailAllParents = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($allParents)));
+                    $emailAllParents = implode(AbstractMailer::implodeGlue(), $allParents);
                 }
 
                 $this->setVar([

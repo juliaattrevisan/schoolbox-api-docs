@@ -38,7 +38,7 @@ if (Config::get('mail_enable') == 1) {
         /* Now get the parents of the students
          */
         if (in_array('parents', $selectedGroups)) {
-            $addressLists['bcc'] = array_merge($addressLists['bcc'], array_values($externalHandler->getParentEmails($studentExternalIds)));
+            $addressLists['bcc'] = array_merge($addressLists['bcc'], $externalHandler->getParentEmails($studentExternalIds));
         }
         if (in_array('students', $selectedGroups)) {
             $users = $userMapper->findByColumn('synergy_id', $studentExternalIds);
