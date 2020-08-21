@@ -47,7 +47,7 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         $parentIterator = $this->externalDatabase->getQueryIterator(
             "
-                SELECT        Family.familyDenbighID, Family.email
+                SELECT        Family.email
                 FROM          Schoolbox_Students
                 LEFT JOIN     Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
                 WHERE         Schoolbox_Students.denbighID IN ({$predicate["placeholders"]})
