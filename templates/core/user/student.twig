@@ -352,7 +352,7 @@
                                     {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
-                                        <form id="email-all-form" action="/mail/createMail.php" class="hide">
+                                        <form id="email-all-form" action="/mail/createMail.php" class="hide" method="post">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
                                             <input name="replyto" value="{{ replyTo }}" type="hidden">
                                         </form>

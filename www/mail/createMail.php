@@ -32,6 +32,7 @@ if (Config::get('mail_enable') == 1) {
 
     // Only students' externalIds are passed in. Building emails from there.
     $buildEmailFromId = isset($_POST['selectedIds']) && !empty($_POST['selectedIds']);
+
     if ($buildEmailFromId) {
         $studentExternalIds = explode(',', $_POST['selectedIds']);
         $selectedGroups     = isset($_POST['selectedGroups']) ? explode(',', $_POST['selectedGroups']) : [];
