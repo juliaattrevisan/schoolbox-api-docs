@@ -60,14 +60,9 @@ class External_Denbigh_User implements External_UserInterface
         foreach ($parentIterator as $parent) {
 
             /* Split emails on semicolon, colon, whitespace chars (wow)
+             * Add each found sub-email into the stack
              */
-            $subEmails = array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']));
-
-            /* Add each found sub-email into the stack
-             */
-            foreach ($subEmails as $subEmail) {
-                $emailList[] = $subEmail;
-            }
+            $emailList = array_merge($emailList, array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email'])));
         }
 
         return (new TupleStack())->normaliseValues($emailList);
