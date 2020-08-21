@@ -91,12 +91,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     protected function scheduleNotification(TriggerInterface $trigger): void
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
+            $this->log->info("Cancel Trigger received. Unscheduling {$trigger->getIdString()}"); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
 
-        if ($trigger->getTimestamp() < 0) {
-            $this->log->info("[AbstractScheduler] Trigger with negative timestamp received: {$trigger->getEventObjectId()} {$trigger->getLabel()}"); // FIREFIGHT
+        if($trigger->getTimestamp() < 0) {
+            $this->log->info("Trigger with negative timestamp received. Unscheduling {$trigger->getIdString()}"); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
@@ -104,9 +105,9 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $interval = $trigger->getTimestamp() - $this->clock->time();
 
         if ($interval <= 0) {
-            $this->log->info("[AbstractScheduler] Immediately dispatching trigger: {$trigger->getEventObjectId()} {$trigger->getLabel()}");
+            $this->log->info('Immediately dispatching trigger '.$trigger->getIdString());
             $previousTriggerExisted = $this->unschedule($trigger);
-            $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', ['char' => '-']);
+            $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', [ 'char' => '-' ]);
 
             $this->dispatchTrigger($trigger);
 
@@ -157,7 +158,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             );
         }
         if (count($trigger->getCallbacks()) === 0) {
-            $this->log->warning("Trigger for '{$trigger->getEventObjectId()} {$trigger->getLabel()}' has no callbacks");
+            $this->log->warning("Trigger for '{$trigger->getIdString()}' has no callbacks");
         }
     }
 
@@ -175,12 +176,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
-            $this->log->debug('[AbstractScheduler] Cannot schedule CancelTrigger');
+            $this->log->debug('Cannot schedule CancelTrigger');
             return false;
         }
 
         // firstly, remove any existing timer for this trigger
         if ($cancelPrevious) {
+            $this->log->debug("Clearing existing trigger for {$trigger->getIdString()}.");
             $this->unschedule($trigger);
         }
 
@@ -192,8 +194,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $this->putTimer($model, $label, $timer);
 
         $this->log->info(
-            sprintf("[AbstractScheduler] Scheduling trigger '%s:%s' for %s in %s seconds",
-                $trigger->getEventObjectId(), $trigger->getLabel(), date('Y-m-d H:i:s', $trigger->getTimestamp()), $interval),
+            sprintf("[AbstractScheduler] Scheduling trigger '%s' for %s in %s seconds", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp()), $interval),
             ['char' => '+']
         );
 
@@ -214,12 +215,12 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         if ($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
-            $this->log->info("[AbstractScheduler] Canceling existing timer for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", array('char' => '-'));
+            $this->log->info("Canceling existing timer for '{$trigger->getIdString()} - {$trigger->getLabel()}'", array('char' => '-'));
 
             if ($timer instanceof TimerInterface) {
                 $this->loop->cancelTimer($timer);
             } else {
-                $this->log->debug("[AbstractScheduler] Timer is not set properly for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", array('char' => '-'));
+                $this->log->debug("Timer is not set properly for '{$trigger->getIdString()} - {$trigger->getLabel()}'", array('char' => '-'));
             }
             $this->removeTimer($model, $label);
             return true;

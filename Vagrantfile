@@ -34,9 +34,6 @@ if File.file?('vagrant.yaml')
   if !conf["memory"].nil?
     memory = conf["memory"]
   end
-  if !conf["cpus"].nil?
-    cpus = conf["cpus"]
-  end
   if !conf["external_db"].nil?
     external_db = conf["external_db"]
   end
@@ -96,18 +93,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", memory]
-    if cpus
-      vb.customize ["modifyvm", :id, "--cpus", cpus]
-    end
     # Workaround issues in Vitualbox < 5.1.6
     vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
   end
 
   config.vm.provider "vmware_fusion" do |vf|
     vf.vmx["memsize"] = memory
-    if cpus
-        vf.vmx["numvcpus"] = cpus
-    end
   end
 
   config.vm.provision "shell", run: "always", path: "tools/vagrant-provision-pre-puppet.sh"

@@ -388,6 +388,13 @@ class Folder extends SimpleStrategy
      * @param array  $entityValues
      * @param bool   $excludeMuted
      * @return UserResolutionSql
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function getUserResolutionSql(
         string $userTableAlias,
@@ -402,12 +409,7 @@ class Folder extends SimpleStrategy
         }
 
         // Always fetch members from NNIAN folders
-        try {
-            $nnianFolderIds = $this->findNnianFolderIds($filtered);
-        } catch (Mapper\Exception $e) {
-            trigger_error('Failed to get muted folders for ' . implode(',', $filtered) . ': ' . $e->getMessage(), E_USER_WARNING);
-            $nnianFolderIds = [];
-        }
+        $nnianFolderIds = $this->findNnianFolderIds($filtered);
 
         // For performance reasons, it is faster to UNION the GROUP + CLASS members, rather than LEFT JOIN them.
         // This is incompatible with the interface's return type. Therefore we will just resolve the user ids,
