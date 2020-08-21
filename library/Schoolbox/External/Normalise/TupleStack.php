@@ -29,7 +29,9 @@ class TupleStack
      * Take an array of values and do some preprocessing on them
      * Returns a stack of unique, trimmed and non-empty data
      *
-     * @param array       $stack  A one-dimensional stack
+     * Only processes scalars. Non-scalars are discarded from the result set.
+     *
+     * @param array       $stack  A one-dimensional stack of scalars
      * @param string|null $split  Optionally, a char used to split values
      * @return array
      */
