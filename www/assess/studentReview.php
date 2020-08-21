@@ -169,7 +169,7 @@ else {
 
 // Parse finished/unfinished/not finished yet blockage
 if (!isset($attempt['finish'])) {
-    if ($dueDate->isPast()) {
+    if ($assessment->getDueAt()->isPast()) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');
     } else {
         $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
@@ -280,9 +280,18 @@ else {
 if (isset($_GET["returnUrl"])) {
     $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
 } else {
-    $returnUrl = '/assess/summary/' . $assess['assess_id'];
+    /** @var \Aura\Router\Router $router */
+    $router = $this->getDi()->get('router');
+    $params = [
+        'assessmentId' => $assess['assessment_id'],
+        'assessment'   => $assessment,
+    ];
+    if ($sessionUser->getRole()->isStaff()) {
+        $returnUrl = $router->generate('learningAssessment.getStatus', $params);
+    } else {
+        $returnUrl = $router->generate('learningAssessment.getSummary', $params);
+    }
 }
-
 
 // Breadcrumbs
 $trail = new \Schoolbox\Breadcrumbs();
@@ -302,8 +311,8 @@ $trail->renderIntoSitePage(
         ],
         [
             'text'  => $user->formatName(),
-            'href'  => '/assess/attempts/' . $assess['assess_id'] . '/' . $user->getId().$returnUrlSuffix,
-            'class' => ''
+            'href'  => '/learning/assessments/' . $assessment->getId() . '/' . $user->getId() . $returnUrlSuffix,
+            'class' => '',
         ],
         [
             'text'  => 'Review',
