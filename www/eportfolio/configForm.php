@@ -64,6 +64,24 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     Component_InstanceMapper::getInstance()->save($instanceCollection);
                 }
             }
+
+            // Render the component just moved, so it can be re-rendered
+            if ($_POST['movedComponentId']) {
+                $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+                $factoryFactory   = new Component_FactoryFactory();
+                $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
+                $renderer         = new Component_Renderer();
+                $eportfolioPage   = new Eportfolio_Page_Instance(
+                    $page,
+                    $eportfolioHandler->getPageInstance()->getOwner()->getId(),
+                    $eportfolioHandler->getPageId(),
+                    UserAccess::ACCESS_FULL
+                );
+
+                /** @var Component_Eportfolio_ControllerAbstract $component */
+                $component = $componentFactory->buildComponent($instance);
+                $renderer->renderEportfolioComponent($eportfolioPage, $component);
+            }
         } elseif (is_numeric($_POST['delete'])) {
             // Delete the instance and its configuration
 

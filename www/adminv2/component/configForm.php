@@ -60,6 +60,17 @@ if ($_POST['type'] == 'components') {
 
         Component_InstanceMapper::getInstance()->save($instanceList);
     }
+
+    // Was any one component requested?
+    // If so render it only so it can be re-rendered
+    if ($_POST['movedComponentId']) {
+        $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+        $factoryFactory   = new Component_FactoryFactory();
+        $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
+        $renderer         = new Component_Renderer();
+        $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
+        $page->outputPage(true);
+    }
 } elseif (is_numeric($_POST['delete'])) {
     // AJAX request to delete component from homepage
     // locate the instance, locate its config instances, then blast them away
