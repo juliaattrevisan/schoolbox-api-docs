@@ -126,7 +126,7 @@ class External_Tass_User implements External_UserInterface
             $emailList[] = $row['email'];
         }
 
-        return (new TupleStack())->normaliseValues($emailList, TupleStack::SPLIT_SEMICOLON);
+        return (new TupleStack())->normaliseValues($emailList, ';');
     }
 
 

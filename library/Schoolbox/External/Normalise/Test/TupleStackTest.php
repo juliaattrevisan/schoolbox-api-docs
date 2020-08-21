@@ -19,6 +19,91 @@ class TupleStackTest extends TestCase
 {
 
     /**
+     * @dataProvider provider_validNormaliseValuesSplitMultiSeparator
+     *
+     * @param array $stack
+     * @param array $expected
+     */
+    public function testNormaliseValuesSplitMultiSeparator(array $stack, array $expected): void
+    {
+        $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ";, \r\n"));
+    }
+
+
+    /**
+     * A valid stack for us to process
+     *
+     * @return array
+     */
+    public function provider_validNormaliseValuesSplitMultiSeparator(): array
+    {
+        return [
+            'Empty 6' => [
+                [],
+                []
+            ],
+            'Mixed Bag 6' => [
+                [
+                    "  \n   cat@schoolbox.com.au     \n\n\n rhino@alaress.com.au\r\nfox@alaress.com.au\rhorse@alaress.com.au",
+                    "this\nis\na\nbig\rparagraph;\r\nof\nlines",
+                    "\n",
+                    false,
+                    '1',
+                    'cat@schoolbox.com.au;cat@schoolbox.com.au;',
+                    null,
+                    0,
+                    'cat@schoolbox.com.au;horse@schoolbox.com.au',
+                    'cat',
+                    '      ',
+                    'horse@schoolbox.com.au',
+                    'cat@schoolbox.com.au',
+                    [],
+                    '     elephant@alaress.com.au     ; rhino@alaress.com.au;fox@alaress.com.au;;;;;',
+                    "this\nis\na\nbig\rparagraph;\r\nof\nlines",
+                    "\n",
+                    false,
+                    new \stdClass(),
+                    '',
+                    'ocelotte@schoolbox.com.au,lothric@schoolbox.com.au,',
+                    null,
+                    0,
+                    'yoel@schoolbox.com.au,',
+                    'cat',
+                    '      ',
+                    'horse@schoolbox.com.au',
+                    'cat@schoolbox.com.au',
+                    ['maguffin', 'bleah', 23987],
+                    '     elephant@alaress.com.au     , rhino@alaress.com.au,fox@alaress.com.au,,,,,',
+                    "this\nis\na\nbig\rparagraph,\r\nof\nlines",
+                    "\n"
+                ],
+                [
+                    'cat@schoolbox.com.au',
+                    'rhino@alaress.com.au',
+                    'fox@alaress.com.au',
+                    'horse@alaress.com.au',
+                    'this',
+                    'is',
+                    'a',
+                    'big',
+                    'paragraph',
+                    'of',
+                    'lines',
+                    '1',
+                    '0',
+                    'horse@schoolbox.com.au',
+                    'cat',
+                    'elephant@alaress.com.au',
+                    'ocelotte@schoolbox.com.au',
+                    'lothric@schoolbox.com.au',
+                    'yoel@schoolbox.com.au',
+                ]
+            ]
+        ];
+    }
+
+
+    /**
      * @dataProvider provider_validNormaliseValuesSplitNewlines
      *
      * @param array $stack
@@ -38,11 +123,11 @@ class TupleStackTest extends TestCase
     public function provider_validNormaliseValuesSplitNewlines(): array
     {
         return [
-            'Empty' => [
+            'Empty 5' => [
                 [],
                 []
             ],
-            'Mixed Bag' => [
+            'Mixed Bag 5' => [
                 [
                     "  \n   cat@schoolbox.com.au     \n\n\n rhino@alaress.com.au\r\nfox@alaress.com.au\rhorse@alaress.com.au",
                     "this\nis\na\nbig\rparagraph;\r\nof\nlines",
@@ -86,11 +171,11 @@ class TupleStackTest extends TestCase
     public function provider_validNormaliseValuesSplitSemicolon(): array
     {
         return [
-            'Empty' => [
+            'Empty 4' => [
                 [],
                 []
             ],
-            'Mixed Bag' => [
+            'Mixed Bag 4' => [
                 [
                     false,
                     '',
@@ -143,11 +228,11 @@ class TupleStackTest extends TestCase
     public function provider_validNormaliseValuesSplitComma(): array
     {
         return [
-            'Empty' => [
+            'Empty 3' => [
                 [],
                 []
             ],
-            'Mixed Bag' => [
+            'Mixed Bag 3' => [
                 [
                     false,
                     '',
@@ -200,11 +285,11 @@ class TupleStackTest extends TestCase
     public function provider_validNormaliseValues(): array
     {
         return [
-            'Empty' => [
+            'Empty 2' => [
                 [],
                 []
             ],
-            'Mixed Bag' => [
+            'Mixed Bag 2' => [
                 [
                     false,
                     '',
@@ -249,12 +334,12 @@ class TupleStackTest extends TestCase
     public function provider_validNormaliseTuples(): array
     {
         return [
-            'Empty' => [
+            'Empty 1' => [
                 [],
                 []
             ],
 
-            'Key Only' => [
+            'Key Only 1' => [
                 [
                     'cat' => 'cat'
                 ],
@@ -265,7 +350,7 @@ class TupleStackTest extends TestCase
                 ]
             ],
 
-            'Scalars Only' => [
+            'Scalars Only 1' => [
                 [
                     'a',
                     'b',
@@ -288,7 +373,7 @@ class TupleStackTest extends TestCase
                 ],
             ],
 
-            'Scalars Only Mixed Bag' => [
+            'Scalars Only Mixed Bag 1' => [
                 [
                     'a',
                     '',
@@ -309,7 +394,7 @@ class TupleStackTest extends TestCase
                 ],
             ],
 
-            'Mixed Bag' => [
+            'Mixed Bag 1' => [
                 [
                     'id1' => [
                         'email1',

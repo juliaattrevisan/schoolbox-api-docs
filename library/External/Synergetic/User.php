@@ -232,7 +232,7 @@ class External_Synergetic_User implements External_UserInterface
             $emailList[] = $parent['Email'];
         }
 
-        return (new TupleStack())->normaliseValues($emailList, TupleStack::SPLIT_SEMICOLON);
+        return (new TupleStack())->normaliseValues($emailList, ';');
     }
 
     /**
