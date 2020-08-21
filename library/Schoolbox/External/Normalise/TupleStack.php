@@ -61,9 +61,9 @@ class TupleStack
          *
          * Return the cleansed and indexed stack of value
          */
-        return array_values(array_unique(array_filter($processed, static function($value) {
+        return array_map('trim', array_values(array_unique(array_filter($processed, static function($value) {
             return is_scalar($value) && '' !== trim((string)$value);
-        })));
+        }))));
     }
 
 
