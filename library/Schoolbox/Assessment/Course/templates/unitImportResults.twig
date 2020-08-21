@@ -59,19 +59,32 @@
 
                 // Only enable dates for sub-assessments that are selected
                 $projectAssessments.each(function(idx, elem){
-                    var $subRow         = $(elem);
-                    var subAssessmentId = $subRow.data('assessment');
-                    var $checkbox       = $subRow.find('[data-assessment-import=' + subAssessmentId + ']');
+                    let $subRow         = $(elem);
+                    let subAssessmentId = $subRow.data('assessment');
+                    let $checkbox       = $subRow.find('[data-assessment-import=' + subAssessmentId + ']');
 
                     // Enable all directly-nested checkboxes
                     $checkbox.prop('disabled', false);
-                    if($checkbox.prop('checked')){
-                        var $dates = $subRow.find('[data-assessment-dates=' + subAssessmentId + ']');
+
+                    if ($checkbox.prop('checked')){
+                        let $dates = $subRow.find('[data-assessment-dates=' + subAssessmentId + ']');
                         $dates.find('input').prop('disabled', false);
                     }
                 });
+
                 $subAssessmentList.show();
             } else {
+
+                /* Disable a project's assessments when the project itself is unchosen
+                 */
+                $projectAssessments.each(function(idx, elem) {
+                    let $subRow         = $(elem);
+                    let subAssessmentId = $subRow.data('assessment');
+                    let $checkbox       = $subRow.find('[data-assessment-import=' + subAssessmentId + ']');
+
+                    $checkbox.prop('disabled', true);
+                });
+
                 $subAssessmentList.hide();
                 // Disable all dates on project's sub-assessments so these are not validated or posted to server
                 $subAssessmentList.find('[data-assessment-dates]').prop('disabled', true);
