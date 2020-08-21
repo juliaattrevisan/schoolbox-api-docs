@@ -44,11 +44,12 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
     .dz-image {
       flex: 0 0 4rem;
+      padding: .45rem 0 0 .4rem;
     }
 
     .dz-details {
       flex: 1 0 auto;
-      max-width: rem-calc(244);
+      max-width: 16.25rem;
       padding: .5rem;
 
       .dz-size,
