@@ -52,7 +52,7 @@
   }
 
   .attachment-browser-panel-container {
-    flex: 0 0 75%;
+    flex: 1 0 75%;
     padding: 0;
     position: relative;
 
@@ -71,7 +71,8 @@
   }
   .component-action {
     display: flex;
-    margin-top: auto;
+    //margin-top: auto;
+    margin: auto -0.985rem -0.975rem;
 
     section {
       width: 100%;
