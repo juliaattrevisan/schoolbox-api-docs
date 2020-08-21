@@ -65,6 +65,7 @@ class TupleStackTest extends TestCase
                     new \stdClass(),
                     '',
                     'ocelotte@schoolbox.com.au,lothric@schoolbox.com.au,',
+                    'so there was this really great idea',
                     null,
                     0,
                     'yoel@schoolbox.com.au,',
@@ -96,6 +97,12 @@ class TupleStackTest extends TestCase
                     'elephant@alaress.com.au',
                     'ocelotte@schoolbox.com.au',
                     'lothric@schoolbox.com.au',
+                    'so',
+                    'there',
+                    'was',
+                    'really',
+                    'great',
+                    'idea',
                     'yoel@schoolbox.com.au',
                 ]
             ]
