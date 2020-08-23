@@ -139,7 +139,7 @@ class Vcal
         $timezone = new DateTimeZone('UTC');
         $document = Reader::read($source, Reader::OPTION_FORGIVING);
         if ($document instanceof VCalendar) {
-            $document->expand(
+            $document = $document->expand(
                 new DateTimeImmutable('-1 year', $timezone),
                 new DateTimeImmutable('+1 year', $timezone)
             );
