@@ -27,8 +27,6 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     width: calc(50% - .5rem);
     min-width: rem-calc(334);
     margin: .25rem;
-    text-overflow: ellipsis;
-    overflow: hidden;
 
     &:hover {
       cursor: auto;
@@ -48,9 +46,12 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     }
 
     .dz-details {
-      flex: 1 0 auto;
-      max-width: 16.125rem;
+      flex-grow: 1;
+      //max-width: 16.125rem;
       padding: .5rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
 
       .dz-size,
       .dz-filename {
