@@ -118,7 +118,7 @@
                 </thead>
                 <tbody>
                 {% for event in eventList %}
-                    {% set booking = event.getBooking() %}
+                    {% set booking = event.getBooking() ?? null %}
                     <tr>
                         <td data-sort="{{ event.getStartTime().getUnixTimeStamp() }}">
                              <time>

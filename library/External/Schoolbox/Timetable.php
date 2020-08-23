@@ -416,7 +416,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $statement = $this->internalDatabase->executeQuery(
             "
                 SELECT      sis_class_period.room AS RoomCode,
-                            sis_class.description AS Description,
+                            sis_class.name AS Description,
                             sis_timetable_period.day AS DayNumber,
                             sis_timetable_period.sequence AS PeriodNumber,
                             luCampus.ext_timetable_code AS TimetableGroup,
