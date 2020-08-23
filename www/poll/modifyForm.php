@@ -61,29 +61,50 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Select this poll in the component
      */
-    try {
-        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
-        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-            array(
-                'id'                      => $_POST['homepageComponentID'],
-                'module'                  => 'homepage',
-                'identifier'              => $_POST['folder_id'],
-                'component_definition_id' => $cdm->getDefinitionId(),
-            )
-        );
-    }
-    catch (Schoolbox\Mapper\Exception $e) {
-        SitePage::localRedir("/homepage/" . $poll['folder_id']);
-    }
-
-    $confI = new Component_Config();
-    $confI->setConfigDefinitionId($cdm->getId());
-    $confI->setInstanceId($cim->getId());
-    $confI->setValue($poll['id']);
-
+    $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
-    $componentConfigInstanceMapper->save($confI);
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
 
+    try {
+        $cd = $componentConfigDefinitionMapper->findOneByColumn('key', 'poll');
+        $ci = $componentInstanceMapper->findOneByColumnList([
+            'id'                      => $_POST['homepageComponentID'],
+            'module'                  => 'homepage',
+            'identifier'              => $_POST['folder_id'],
+            'component_definition_id' => $cd->getDefinitionId(),
+        ]);
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+
+        /* noop something went wrong; couldn't find config info
+         * just goes back to homepage
+         */
+        SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
+    }
+
+    try {
+
+        /* Look for an existing component configuration for this component
+         * If one exists, just reuse its stuff
+         */
+        $componentConfigInstance = $componentConfigInstanceMapper->findOneByColumnList([
+            'component_config_definition_id' => $cd->getId(),
+            'component_instance_id' => (int)$_POST['homepageComponentID']
+        ]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+
+        /* Otherwise, create a new component configuration
+         */
+        $componentConfigInstance = $componentConfigInstanceMapper->createModel();
+    }
+
+    /* Then update its value to be the new poll id
+     */
+    $componentConfigInstance->setConfigDefinitionId($cd->getId())
+                            ->setInstanceId($ci->getId())
+                            ->setValue($poll['id']);
+
+    $componentConfigInstanceMapper->save($componentConfigInstance);
 
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
 } else if (is_numeric($_GET['delete'])) {
