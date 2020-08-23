@@ -69,12 +69,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
 
-
-# TODO remove this, add Composer to base box
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing Composer";
-apt-get install -y composer
-
-
 # Function to fetch value from .env file by key
 # Usage: value=$(read_var $key)
 read_var() {
