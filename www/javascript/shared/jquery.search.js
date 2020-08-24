@@ -197,8 +197,6 @@
 
         /**
          * Update UI styles
-         *
-         * @param sectionElement
          */
         function updateStyles() {
 
