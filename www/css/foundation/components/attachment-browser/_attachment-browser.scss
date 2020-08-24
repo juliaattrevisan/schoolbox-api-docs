@@ -79,10 +79,6 @@
         }
       }
     }
-
-    @media #{$medium-down} {
-      flex-grow: 1;
-    }
   }
   .component-action {
     display: flex;
