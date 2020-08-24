@@ -103,8 +103,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
     }
 
     // Active styles
-    &.active a,
-    &.last a {
+    &.active a {
       &:before {
         margin-left: 0;
       }
@@ -120,9 +119,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
     }
 
     &.active a,
-    &.last a,
-    &.active a:after,
-    &.last a:after {
+    &.active a:after {
       background-color: $breadcrumb-active-bg-color;
       border-left: 0 solid $breadcrumb-active-bg-color;
     }
