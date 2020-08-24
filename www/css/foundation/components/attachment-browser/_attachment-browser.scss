@@ -65,6 +65,21 @@
         flex-direction: column;
       }
     }
+    // Recording vertical centre
+    #ab-usermedia {
+      height: 100%;
+
+      .dz-default {
+        display: flex;
+        align-items: center;
+        height: 100%;
+
+        label {
+          width: 100%;
+        }
+      }
+    }
+
     @media #{$medium-down} {
       flex-grow: 1;
     }
