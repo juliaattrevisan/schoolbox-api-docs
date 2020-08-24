@@ -17,6 +17,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 require_once __DIR__ . '/../../resource/searchConfig.php';
 
 /* Clean params
+ * $current_page is defined inside this include as a sanitised version of $_GET['p']
  */
 require_once __DIR__ . '/../../resource/searchClean.php';
 
@@ -93,7 +94,8 @@ if (!$count['all']) {
      * are tied in to the keys in the array, which really isn't nice.
      */
     if (!empty($handle[$type])) {
-/* Particular ordering and sorting for Categories
+
+        /* Particular ordering and sorting for Categories
          */
         if ($type != 'all') {
             // perform search for individual category (without formatting for ajax call)
