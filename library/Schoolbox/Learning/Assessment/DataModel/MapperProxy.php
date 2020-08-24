@@ -896,7 +896,14 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
-        $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+        if ($subObject) {
+            $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
+        } else {
+            // Refuse to save an assessment with no sub-object
+            throw new UnexpectedValueException(
+                sprintf('Assessment #%d has no sub-object, and thus cannot be saved', $dataModel->getId())
+            );
+        }
 
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
@@ -943,7 +950,7 @@ class MapperProxy
                 foreach ($assessable->getAssessables() as $projectAssessable) {
                     // Disallow save of projects within projects
                     if ($projectAssessable instanceof ProjectObject) {
-                        throw new \UnexpectedValueException('Projects may not contain projects');
+                        throw new UnexpectedValueException('Projects may not contain projects');
                     }
                     $this->save($projectAssessable);
                 }
@@ -1020,11 +1027,12 @@ class MapperProxy
     {
         // Delete assessment
         $dataModel = $this->translateToDataModel($assessable);
-        if ($dataModel->getSubObject() instanceof SubmissionBox) {
+        $subModel  = $dataModel->getSubObject();
+        if ($subModel instanceof SubmissionBox) {
             // The assessment model is a component of the submission box.
             // The composite object is responsible for deleting its components
             // TODO - roll out this methodology to other assessment types
-            SubmissionBoxMapper::getInstance()->delete($dataModel->getSubObject());
+            SubmissionBoxMapper::getInstance()->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
@@ -1043,11 +1051,19 @@ class MapperProxy
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDomainModel(Model $model)
+    public function translateToDomainModel(Model $model): IAssessable
     {
         // Turn the data model inside out
         // TODO try to remove this, and update translator to return Model objects directly
         $subModel = $model->getSubObject();
+        if (!$subModel) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Assessment #%d has no sub-object, and thus cannot be translated to a domain model',
+                    $model->getId()
+                )
+            );
+        }
         $subModel->setAssessmentModel($model);
 
         return $this->translator->translateToDomainModel($subModel);
@@ -1071,7 +1087,11 @@ class MapperProxy
         $domainObjects = $this->createCollection();
         foreach ($dataModels as $idx => $dataModel) {
             if ($dataModel instanceof Model) {
-                $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
+                try {
+                    $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
+                } catch (UnexpectedValueException $e) {
+                    // This object couldn't be translated: ignore it
+                }
             }
         }
         return $domainObjects;
@@ -1103,34 +1123,53 @@ class MapperProxy
      * @param bool      $loadParticipants Should we load participations?
      * @param null|User $student          If specified, only load this user's interactions
      * @return IAssessable
-     * @throws DefinitionException If unable to locate a specified mapper join
-     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException      If unable to locate a specified mapper join
+     * @throws DomainException          If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
-     * @throws LogicException If cyclic graph detected
-     * @throws MapperException\Deleted if the assessment was deleted
-     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws LogicException           If cyclic graph detected
+     * @throws MapperException          if the assessment does not exist at all.
+     *                                  This includes if it is in the incomplete
+     *                                  state of not having an associated quiz,
+     *                                  due work, task or project.
+     * @throws MapperException\Deleted  if the assessment was soft-deleted
      */
     public function findOneByColumn(string $column, $value, bool $loadParticipants = false, User $student = null): IAssessable
     {
+        $assessmentId = null;
         try {
-            // Load model and its participants
-            $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
-
-            $assessment = $this->translateToDomainModel($originalModel);
-            if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            // This is wrapped in two levels of try/catch, because I want to:
+            // catch an unexpected value from `translateToDomainModel` from both
+            // the try and catch deleted block.
+            try {
+                // Load model and its participants
+                $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
+                $assessmentId  = $originalModel->getId();
+                $assessment    = $this->translateToDomainModel($originalModel);
+                if ($loadParticipants) {
+                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                }
+                return $assessment;
+            } catch (MapperException\Deleted $e) {
+                // Populate participants for the deleted assessment, and rethrow
+                $originalModel = $e->getDeletedObject();
+                if ($originalModel instanceof Model) {
+                    $assessmentId = $originalModel->getId();
+                    $assessment   = $this->translateToDomainModel($originalModel);
+                    if ($loadParticipants) {
+                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                    }
+                    $e->setDeletedObject($assessment);
+                }
+                throw $e;
             }
-            return $assessment;
-        } // This can be thrown. The @method annotation masks exceptions thrown from base implementation.
-            /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException\Deleted $e) {
-            // Populate participants for the deleted assessment, and rethrow
-            $assessment = $this->translateToDomainModel($e->getDeletedObject());
-            if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-            }
-            $e->setDeletedObject($assessment);
-            throw $e;
+        } catch (UnexpectedValueException $e) {
+            // This is likely caused by the assessment not having a due work,
+            // quiz, task or project associated with it.
+            // Treat it as not found.
+            $message = $assessmentId
+                ? sprintf('Assessment #%d was found, but has no sub-object: treating as deleted', $assessmentId)
+                : 'Assessment was found, but has no sub-object: treating as deleted';
+            throw new MapperException($message, 0, $e);
         }
     }
 

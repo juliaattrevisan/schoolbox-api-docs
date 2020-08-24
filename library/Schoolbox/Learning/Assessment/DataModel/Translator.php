@@ -429,10 +429,14 @@ class Translator
         if ($specification instanceof Model) {
             // Turn it inside out, because that's the way I got it
             $model = $specification->getSubObject();
-            $model->setAssessmentModel($specification);
+            if ($model) {
+                $model->setAssessmentModel($specification);
 
-            // Holy recursion batman
-            $domainObject->setSpecificationAssessment($this->translateToDomainModel($model));
+                // Holy recursion batman
+                $domainObject->setSpecificationAssessment($this->translateToDomainModel($model));
+            }
+            // If there's a spec assessment but it has no sub-object:
+            // Probably just pretend that it has no spec
         }
 
         // Translate assessment context
@@ -457,9 +461,12 @@ class Translator
             /** @var Project $domainObject */
             $domainObject->setAssessables(new GenericCollection(IAssessable::class));
             foreach ($dataModel->getAssessments() as $idx => $dataChild) {
-                $domainChild = $this->translateToDomainModelRecursive($dataChild->getSubObject(), $depth + 1);
-                $domainChild->setContext($domainObject);
-                $domainObject->getAssessables()[$idx] = $domainChild;
+                $subModel = $dataChild->getSubObject();
+                if ($subModel) {
+                    $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
+                    $domainChild->setContext($domainObject);
+                    $domainObject->getAssessables()[$idx] = $domainChild;
+                }
             }
         }
 

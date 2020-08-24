@@ -931,12 +931,7 @@ class Mapper extends BaseMapper
 
             // Augment list with due work files
             foreach ($modelList as $model) {
-                try {
-                    $submodel = $model->getSubObject();
-                } catch (\UnexpectedValueException $e) {
-                    // Broken assessment - not much I can do besides ignore
-                    continue;
-                }
+                $submodel = $model->getSubObject();
                 if ($submodel instanceof SubmissionBox) {
                     if (!empty($files[$submodel->getId()])) {
                         $submodel->setAttachments($files[$submodel->getId()]);
@@ -1068,12 +1063,7 @@ class Mapper extends BaseMapper
         /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
         $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
         foreach ($modelList as $model) {
-            try {
-                $submodel = $model->getSubObject();
-            } catch (\UnexpectedValueException $e) {
-                // Broken assessment - not much I can do besides ignore
-                continue;
-            }
+            $submodel = $model->getSubObject();
             if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
