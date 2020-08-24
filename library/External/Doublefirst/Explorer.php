@@ -94,4 +94,13 @@ class External_Doublefirst_Explorer
             new \Alaress_Probe($table, $example);
         }
     }
+
+
+    /**
+     * @return MSSQL
+     */
+    public function getDb(): \MSSQL
+    {
+        return $this->db;
+    }
 }
