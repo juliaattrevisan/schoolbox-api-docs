@@ -242,7 +242,7 @@ class Controller extends BaseController
                 }
 
             } catch (Resource\Exception $e) {
-                $this->sendError(', provided certificate is invalid.  Please try again with a different certificate');
+                $this->sendError('A certificate is required to register a new Apple push notification service.');
                 return;
             }
         }
