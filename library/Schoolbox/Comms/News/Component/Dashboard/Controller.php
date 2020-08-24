@@ -70,9 +70,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             /* Routes
              */
-            'getArticlesRoute' => $this->getRouter()->generate('commsNews.getListForIndex') . '?' . http_build_query([
-                News\Querystring::ITEM_IMAGE => $this->getConfig('itemImage')
-            ])
+            'getArticlesRoute' => $this->getRouter()->generate('commsNews.getListForIndex')
         ]);
     }
 }
