@@ -646,16 +646,17 @@ class Calendar extends DeprecatedModel
             LEFT JOIN resource_booking ON event.id = resource_booking.event_id
             LEFT JOIN event_user       ON event.id = event_user.event_id     AND access = %d
             LEFT JOIN event_folder     ON event.id = event_folder.event_id   AND access = %d
-            LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL AND folder.deleted_at IS NULL
+            LEFT JOIN folder           ON event_folder.folder_id = folder.id AND event_folder.folder_id IS NOT NULL
             LEFT JOIN event_role       ON event.id = event_role.event_id     AND access = %d
             LEFT JOIN event_campus     ON event.id = event_campus.event_id   AND access = %d
             LEFT JOIN event_attendance ON event.id = event_attendance.event_id
             WHERE
-                event.deleted_at is NULL AND
-                resource_booking.id IS NULL
-                $access_query
-                $dateQuery
-                $filter_query
+                event.deleted_at is NULL
+                AND resource_booking.id IS NULL
+                AND folder.deleted_at IS NULL
+                {$access_query}
+                {$dateQuery}
+                {$filter_query}
             GROUP BY id
             ORDER BY
                 event.start_datetime, event.end_datetime
