@@ -1,39 +1,40 @@
 <div class="row">
-	<div class="small-12 island">
-	<h2 class="subheader">Blogs <!-- BEGIN count -->({BLOG_DISP_COUNT} / {BLOG_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-	    		<!-- BEGIN blog -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="/blog/{BLOG_ID}">
-								<div class="icon-blog size-32"></div>
-								<h3>{BLOG_HEADING}</h3>
-								<p class="meta">{BLOG_BREADCRUMB}</p>
-								<p class="meta">Written by <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> {BLOG_CREATED}</p>
-							</a>
-						</div>
-					</div>
-					<article>{BLOG_BODY}</article>
-				</li>
-    			<!-- END blog -->
-			</ul>
+    <div class="small-12 island">
+    <h2 class="subheader">Blogs <!-- BEGIN count -->({BLOG_DISP_COUNT} / {BLOG_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN blog -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/blog/{BLOG_ID}">
+                                <div class="icon-blog size-32"></div>
+                                <h3>{BLOG_HEADING}</h3>
+                                <p class="meta">{BLOG_BREADCRUMB}</p>
+                                <p class="meta">Written by <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> {BLOG_CREATED}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <article>{BLOG_BODY}</article>
+                </li>
+                <!-- END blog -->
+            </ul>
 
             <!-- BEGIN see_more -->
             <div class="component-action">
-				<section>
-                	<a id="blog-more" data-more="blog" class="button" href="#">See all {MORE_COUNT} results for Blogs</a>
-				</section>
+                <section>
+                    <a id="blog-more" data-more="blog" class="button" href="#">See all {MORE_COUNT} results for Blogs</a>
+                </section>
             </div>
             <!-- END see_more -->
-		</section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+        </section>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>
 
 

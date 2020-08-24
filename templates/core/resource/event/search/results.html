@@ -1,39 +1,40 @@
 <div class="row">
-	<div class="small-12 island">
-	<h2 class="subheader">{TPL_LOCAL_CALENDAR_PC} <!-- BEGIN count -->({EVENT_DISP_COUNT} / {EVENT_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-			    <!-- BEGIN event -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="/calendar/{EVENT_DATE_RAW}#day">
-								<div class="icon-calendar size-32"></div>
-								<h3>{EVENT_TITLE}</h3>
-								<p class="meta">{EVENT_DATE} {EVENT_TIME}</p>
+    <div class="small-12 island">
+    <h2 class="subheader">{TPL_LOCAL_CALENDAR_PC} <!-- BEGIN count -->({EVENT_DISP_COUNT} / {EVENT_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN event -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/calendar/{EVENT_DATE_RAW}#day">
+                                <div class="icon-calendar size-32"></div>
+                                <h3>{EVENT_TITLE}</h3>
+                                <p class="meta">{EVENT_DATE} {EVENT_TIME}</p>
                                 <p class="meta">{EVENT_TYPE}</p>
                                 <p class="meta">{EVENT_LOCATION}</p>
-							</a>
-						</div>
-					</div>
-					<article>{EVENT_DETAIL}</article>
-				</li>
-			    <!-- END event -->
-			</ul>
+                            </a>
+                        </div>
+                    </div>
+                    <article>{EVENT_DETAIL}</article>
+                </li>
+                <!-- END event -->
+            </ul>
 
             <!-- BEGIN see_more -->
-			<div class="component-action">
-				<section>
-                	<a id="event-more" data-more="event" class="button" href="#">See all {MORE_COUNT} results for Events</a>
-				</section>
+            <div class="component-action">
+                <section>
+                    <a id="event-more" data-more="event" class="button" href="#">See all {MORE_COUNT} results for Events</a>
+                </section>
             </div>
             <!-- END see_more -->
-		</section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+        </section>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>
 

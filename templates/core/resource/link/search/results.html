@@ -1,37 +1,38 @@
 <div class="row">
-	<div class="small-12 island">
-	<h2 class="subheader">Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-			    <!-- BEGIN link -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="{LINK_URL}" rel="{LINK_TARGET}">
-								<div class="icon-link size-32"></div>
-								<h3>{LINK_DESCRIPTION}</h3>
-								<p class="meta">{LINK_BREADCRUMB}</p>
-								<p class="meta">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
-							</a>
-						</div>
-					</div>
-					<article>{LINK_COMMENT}</article>
-				</li>
-			    <!-- END link -->
-			</ul>
+    <div class="small-12 island">
+    <h2 class="subheader">Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN link -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="{LINK_URL}" rel="{LINK_TARGET}">
+                                <div class="icon-link size-32"></div>
+                                <h3>{LINK_DESCRIPTION}</h3>
+                                <p class="meta">{LINK_BREADCRUMB}</p>
+                                <p class="meta">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <article>{LINK_COMMENT}</article>
+                </li>
+                <!-- END link -->
+            </ul>
 
             <!-- BEGIN see_more -->
-			<div class="component-action">
-				<section>
-                	<a id="link-more" data-more="link" class="button" href="#">See all {MORE_COUNT} results for links</a>
-				</section>
+            <div class="component-action">
+                <section>
+                    <a id="link-more" data-more="link" class="button" href="#">See all {MORE_COUNT} results for links</a>
+                </section>
             </div>
             <!-- END see_more -->
-		</section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+        </section>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>
