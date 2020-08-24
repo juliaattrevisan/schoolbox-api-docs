@@ -143,7 +143,7 @@
          * Add pagination events to all the <a> links
          */
         function paginate() {
-            $('[data-search-pagination] [data-page]').bind('click', function(event) {
+            $('[data-search-pagination] [data-page]').unbind('click').bind('click', function(event) {
                 event.preventDefault();
 
                 /* Set the page number
@@ -170,7 +170,7 @@
             /* Show the pagination div again
              * but only for non-all portions
              */
-            if (config.section == 'all') {
+            if (config.section === 'all') {
                 $('[data-search-pagination]').hide();
             }
             else {
