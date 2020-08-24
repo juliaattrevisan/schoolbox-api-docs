@@ -75,6 +75,10 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
     .dz-close {
       flex: 0 0 2.5rem;
+
+      a:hover {
+        background-color: rgba(0,0,0,0.1);
+      }
     }
   }
 }
