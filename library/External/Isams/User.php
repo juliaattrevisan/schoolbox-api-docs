@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -89,7 +90,7 @@ class External_Isams_User implements External_UserInterface
 
         $query =
         "
-            SELECT V_Parent.ParentID, V_Parent.PersonalEmail 
+            SELECT V_Parent.ParentID, V_Parent.PersonalEmail
             FROM V_Parent
             WHERE $whereString
         ";
@@ -97,12 +98,10 @@ class External_Isams_User implements External_UserInterface
         $iterator = $this->getConnector()->getQueryIterator($query, $pb->getParams());
 
         foreach ($iterator as $currentRow) {
-            if (!isset($emailList[$currentRow['ParentID']])) {
-                $emailList[$currentRow['ParentID']] = $currentRow['PersonalEmail'];
-            }
+            $emailList[] = $currentRow['PersonalEmail'];
         }
 
-        return $emailList;
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
     /**
@@ -116,7 +115,7 @@ class External_Isams_User implements External_UserInterface
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
                         ''                      AS StudentGender,
-                        CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,                
+                        CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,
                         ''                      AS StudentTutorName,
                         ''                      AS StudentHeadOfHouse,
                         ''                      AS HeadOfHouseID,
@@ -129,7 +128,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentHouse,
                         Grade                   AS StudentYearLevel,
                         ''                      AS StudentEmergencyName,
-                        ''                      AS StudentEmergencyPhone, 
+                        ''                      AS StudentEmergencyPhone,
                         ''                      AS StudentEmergencyPhoneAlt,
                         txtadditionalHealth     AS StudentMedicalAlert,
                         ''                      AS CourtOrderType,
@@ -183,7 +182,7 @@ class External_Isams_User implements External_UserInterface
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         $query = "
-            SELECT      
+            SELECT
                         V_Student.StudentID           AS StudentID,
                         V_Student.StudentFirstName    AS StudentPreferred,
                         V_Student.StudentSurname      AS StudentSurname,
@@ -216,14 +215,14 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Mobile               AS StudentContactMobilePhone,
                         ''                            AS StudentContactOccupPhone,
                         V_Parent.Relationship         AS StudentContactRelation,
-                        
+
 
                         ''                            AS StudentContactSpouseID,
                         ''                            AS StudentContactSpouseTitle,
                         ''                            AS StudentContactSpousePreferred,
                         ''                            AS StudentContactSpouseSurname,
                         ''                            AS StudentContactSpouseMobilePhone,
-                        ''                            AS StudentContactSpouseOccupPhone, 
+                        ''                            AS StudentContactSpouseOccupPhone,
                         ''                            AS StudentContactSpouseDefaultEmail,
                         'SC1'                         AS StudentContactType,
                         0                             AS StudentContactSilentPhoneFlag,
@@ -258,7 +257,7 @@ class External_Isams_User implements External_UserInterface
         $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         $query = "
-            SELECT      
+            SELECT
                         V_Parent.ParentID             AS StudentContactID,
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
@@ -274,10 +273,10 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpousePreferred,
                         ''                            AS StudentContactSpouseSurname,
                         ''                            AS StudentContactSpouseMobilePhone,
-                        ''                            AS StudentContactSpouseOccupPhone, 
+                        ''                            AS StudentContactSpouseOccupPhone,
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
-            JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
+            JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID
             WHERE       V_Student.StudentID IN ({$predicate['placeholders']})
         ";
 
@@ -339,7 +338,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT    StudentID AS RelatedID
-            FROM      V_Parent   
+            FROM      V_Parent
             WHERE     V_Parent.ParentID = :external_user_id
         ";
 
@@ -428,10 +427,10 @@ class External_Isams_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        $query =" 
+        $query ="
             SELECT DISTINCT Grade AS Code, Grade AS Description
             FROM        V_Student
-            WHERE ISNULL(Grade, '') != ''            
+            WHERE ISNULL(Grade, '') != ''
         ";
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }

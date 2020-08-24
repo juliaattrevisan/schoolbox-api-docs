@@ -8,6 +8,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -49,7 +50,7 @@ class External_Schoolbox_User implements External_UserInterface
             "SELECT     parent.external_id AS StudentContactID,
                             supp.email AS StudentContactEmail
                 FROM        sis_user_profile child
-                JOIN        sis_user_profile_relation supr ON child.id = child_profile_id 
+                JOIN        sis_user_profile_relation supr ON child.id = child_profile_id
                 JOIN        sis_user_profile parent ON supr.user_profile_id = parent.id
                 JOIN        sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
                 WHERE       child.external_id IN ({$predicate['placeholders']})
@@ -58,10 +59,10 @@ class External_Schoolbox_User implements External_UserInterface
         );
 
         foreach ($parentIterator as $parent) {
-            $emailList[$parent['StudentContactID']] = $parent['StudentContactEmail'];
+            $emailList[] = $parent['StudentContactEmail'];
         }
 
-        return $emailList;
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
 
@@ -155,7 +156,7 @@ class External_Schoolbox_User implements External_UserInterface
                             '' AS StudentContactSpouseMobilePhone,
                             '' AS StudentContactSpouseOccupPhone
                 FROM        sis_user_profile child
-                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id 
+                    JOIN    sis_user_profile_relation supr ON child.id = child_profile_id
                     JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
                     JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
                 WHERE       child.external_id IN ({$predicate['placeholders']})
@@ -180,7 +181,7 @@ class External_Schoolbox_User implements External_UserInterface
         $params = ['externalUserId' => $externalId];
 
         $classQuery = $this->internalDatabase->executeQuery(
-            "SELECT     c.name, 
+            "SELECT     c.name,
                             c.code,
                             '' AS classType,
                             '' AS campusCode
@@ -202,7 +203,7 @@ class External_Schoolbox_User implements External_UserInterface
                 FROM        sis_class_period cp
                 INNER JOIN  sis_class c ON c.id = cp.class_id
                 WHERE       cp.teacher_external_id = :externalUserId
-                ORDER BY    c.code ASC, 
+                ORDER BY    c.code ASC,
                             c.name ASC
             ",
             $params
@@ -231,7 +232,7 @@ class External_Schoolbox_User implements External_UserInterface
                 FROM sis_user_profile sup
                     JOIN sis_user_profile_parent supp on sup.id = supp.sis_user_profile_id
                     JOIN sis_user_profile_relation supr ON supp.sis_user_profile_id =supr.user_profile_id
-                    JOIN sis_user_profile sup_child ON supr.child_profile_id = sup_child.id 
+                    JOIN sis_user_profile sup_child ON supr.child_profile_id = sup_child.id
                 WHERE sup.external_id = :externalUserId
             ',
             [
@@ -288,7 +289,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getStaffContactListExtended(): array
     {
         return $this->internalDatabase->executeQuery(
-            "SELECT    
+            "SELECT
                       external_id AS StaffID,
                       username AS NetworkLogin,
                       '' AS ActiveFlag,
@@ -446,7 +447,7 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         return $this->internalDatabase->executeQuery(
-            "SELECT    
+            "SELECT
                         child.external_id AS StudentID,
                         child.firstname AS StudentPreferred,
                         child.lastname AS StudentSurname,
@@ -478,7 +479,7 @@ class External_Schoolbox_User implements External_UserInterface
                         '' AS StudentParentsSeparatedFlag
             FROM      `sis_user_profile` child
             JOIN      `sis_user_profile_student` sups ON child.id = sups.sis_user_profile_id
-            JOIN      sis_user_profile_relation supr ON child.id = child_profile_id 
+            JOIN      sis_user_profile_relation supr ON child.id = child_profile_id
             JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
             WHERE     1=1 {$yearLevelQuery} {$formQuery} {$nameQuery} {$boardingQuery}

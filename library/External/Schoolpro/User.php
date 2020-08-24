@@ -8,6 +8,7 @@
 */
 declare(strict_types=1);
 
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -88,13 +89,8 @@ class External_Schoolpro_User implements External_UserInterface
                 if ($currentStudentContact) {
 
                     /* Get this contact's email
-                     * De-dupe it just in case
                      */
-                    $email = trim($currentStudentContact['email'] ?? '');
-
-                    if ('' !== $email) {
-                        $emails[$email] = $email;
-                    }
+                    $emails[] = $currentStudentContact['email'];
 
                     /* Also get the spouse's email
                      */
@@ -113,11 +109,7 @@ class External_Schoolpro_User implements External_UserInterface
                      * but the Contact doesn't have the Spouse's email ><
                      */
                     if ($currentStudentSpouse) {
-                        $email = trim($currentStudentSpouse['email'] ?? '');
-
-                        if ('' !== $email) {
-                            $emails[$email] = $email;
-                        }
+                        $emails[] = $currentStudentSpouse['email'];
                     }
                 }
             }
@@ -125,7 +117,7 @@ class External_Schoolpro_User implements External_UserInterface
 
         /* Ditch any busted emails, then return them
          */
-        return array_filter(array_keys($emails));
+        return (new TupleStack())->normaliseValues($emails);
     }
 
     /**

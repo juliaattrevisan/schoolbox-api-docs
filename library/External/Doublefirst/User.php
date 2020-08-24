@@ -5,6 +5,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -252,11 +253,10 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getParentEmails(array $externalUserIds): array
     {
-        $emailList = array();
-        $id_list = implode(',', array_map('intval', $externalUserIds));
+        $studentExternalIds = implode(',', array_map('intval', $externalUserIds));
 
-        if (empty($id_list)) {
-            return array();
+        if (empty($studentExternalIds)) {
+            return [];
         }
 
         $query =
@@ -265,7 +265,7 @@ class External_Doublefirst_User implements External_UserInterface
                               cei.EmailID             AS DefaultEmail
             FROM              VLPupilContact          pc
             INNER JOIN        ContactEmailInformation cei ON cei.ContactID = pc.ContactID
-            WHERE             pc.PupilID IN ($id_list)
+            WHERE             pc.PupilID IN ({$studentExternalIds})
             AND               pc.IsContactParental = 1
             AND               cei.PrimaryEmail = 1
             AND               pc.ContactID <> ''
@@ -274,13 +274,13 @@ class External_Doublefirst_User implements External_UserInterface
 
         $statement = $this->getDatabase()->query($query);
 
+        $emailList = [];
+
         while ($row = $statement->fetch()) {
-            if (!isset($emailList[$row['RelatedID']])) {
-                $emailList[$row['RelatedID']] = $row['DefaultEmail'];
-            }
+            $emailList[] = $row['DefaultEmail'];
         }
 
-        return $emailList;
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
     /**
@@ -884,6 +884,7 @@ class External_Doublefirst_User implements External_UserInterface
             JOIN    VLPupilContact vpc ON vpc.PupilID = pcs.PupilID
             WHERE   ReasonForLeaving IN ('', '00', '0000') AND
                     vpc.RelationshipToPupil IN (
+                      'Carers',
                       'Parents',
                       'Mother',
                       'Father',

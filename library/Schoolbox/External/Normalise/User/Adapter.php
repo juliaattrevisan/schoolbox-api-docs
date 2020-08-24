@@ -128,51 +128,7 @@ class Adapter {
      */
     public function getParentEmails($externalUserId): Collection
     {
-        $allGuardians = array();
-
-        $allResults = $this->handler->getParentEmails($externalUserId);
-
-        if (\is_array($allResults) && \count($allResults)) {
-
-            /* Samuel made array keys in the format 131-0, 131-1
-             * to allow multiple email addresses from a connector
-             */
-            $allKeys = array_keys($allResults);
-
-            foreach ($allKeys as $currentKey) {
-
-                /* bits equals boom
-                 */
-                $bits = explode('-', $currentKey);
-                $id = $bits[0];
-
-                /* Get the email address
-                 */
-                $guardianEmail = new Common\Email();
-                $guardianEmail->setAddress($allResults[$currentKey]);
-
-                /* Check if the guardian already exists
-                 * Otherwise spawn a new one
-                 */
-                if ($allGuardians[$id] instanceof Guardian) {
-                    $allGuardians[$id]->addEmail($guardianEmail);
-                }
-                else {
-                    $guardian = new Guardian();
-                    $guardian
-                        ->setId($id)
-                        ->addEmail($guardianEmail);
-
-                    $allGuardians[$id] = $guardian;
-                }
-            }
-        }
-
-        /* Stack 'em up
-         */
-        $collection = new Collection(array_values($allGuardians));
-
-        return $collection;
+        return new Collection($this->handler->getParentEmails($externalUserId));
     }
 
 

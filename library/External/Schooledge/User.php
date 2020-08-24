@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 use Schoolbox\CampusMapper;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
 
@@ -307,10 +308,12 @@ class External_Schooledge_User implements External_UserInterface
         ";
 
         $result = [];
+
         foreach ($this->database->getAll($query) as $row) {
-            $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
+            $result[] = $row['Email'];
         }
-        return $result;
+
+        return (new TupleStack())->normaliseValues($result);
     }
 
 

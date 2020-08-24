@@ -8,6 +8,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -57,13 +58,13 @@ class External_Denbigh_User implements External_UserInterface
         $emailList = [];
 
         foreach ($parentIterator as $parent) {
-            $emailList = array_merge(
-                $emailList,
-                array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']))
-            );
+            $emailList[] = $parent['email'];
         }
 
-        return $emailList;
+        /* Split emails on semicolon, colon, whitespace chars (wow)
+         * Add each found sub-email into the stack
+         */
+        return (new TupleStack())->normaliseValues($emailList, ";,\s\r\n");
     }
 
     /**

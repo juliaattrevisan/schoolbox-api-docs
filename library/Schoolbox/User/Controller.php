@@ -9,6 +9,7 @@ namespace Schoolbox\User;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -119,14 +120,9 @@ class Controller extends Base
         // Use the student ids to grab an array of parent emails and add it to $parentEmails
         $parentEmails = array_merge($parentEmails, $this->externalHandler->getParentEmails($studentIds) ?: []);
 
-        // Reset the array with no keys (getParentEmails() returns student ids as array keys)
-        $parentEmails = array_values($parentEmails);
-
-        // Dedupe emails
-        $parentEmails = array_unique($parentEmails);
-
-        // Reset the array with no keys again https://stackoverflow.com/questions/17876414/json-encode-after-array-unique-returning-associative-array
-        $parentEmails = array_values($parentEmails);
+        /* $parentEmails as accumulated from two independent sources so dedupe them again
+         */
+        $parentEmails = (new TupleStack())->normaliseValues($parentEmails);
 
         // Return a json encoded array :)
         $this->getResponse()->content->set($this->buildJsonOutput($parentEmails));

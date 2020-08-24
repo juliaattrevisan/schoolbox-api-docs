@@ -8,6 +8,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -228,7 +229,9 @@ class External_Maze_User implements External_UserInterface
             }
         }
 
-        return $processed;
+        /* Just accept the existing arcane logic about split families and use the values directly
+         */
+        return (new TupleStack())->normaliseValues(array_values($processed));
     }
 
     /**

@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -379,25 +380,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getParentEmails(array $externalUserIds): array
     {
         $emails = [];
-        $userEmails = [];
         $contacts = $this->getStudentContactList($externalUserIds);
 
         foreach ($contacts as $contact) {
-            $userEmails[] = [
-                'externalId' => $contact['StudentContactID'],
-                'email' => $contact['StudentContactDefaultEmail']
-            ];
-            $userEmails[] = [
-                'externalId' => $contact['StudentContactID'],
-                'email' => $contact['StudentContactSpouseDefaultEmail']
-            ];
+            $emails[] = $contact['StudentContactDefaultEmail'];
+            $emails[] = $contact['StudentContactSpouseDefaultEmail'];
         }
 
-        foreach ($userEmails as $i => $email) {
-            $emails[$email['externalId'] . '-' . $i] = $email['email'];
-        }
-
-        return array_filter(array_unique($emails));
+        return (new TupleStack())->normaliseValues($emails);
     }
 
     /**
