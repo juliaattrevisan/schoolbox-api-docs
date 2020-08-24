@@ -549,7 +549,7 @@
                         $participant.attr('data-status', 'pending');
                         $actionBar.removeAttr('data-mass-submit');
                         $statusIcon.addClass('{{ statusPending }}');
-                        $statusLabel.html('Submitted ' + (submittedLate ? 'late' : 'on time'));
+                        $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
                         $statusIcon.attr('title', '{{ labelPending }}');
                         $('#filters').find('[data-status="pending"]').prop('checked', true);
                     }
