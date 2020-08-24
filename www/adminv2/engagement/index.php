@@ -35,7 +35,7 @@ if(in_array($this->arg[0],$validPages)) {
     $page = $this->arg[0];
 }
 else {
-    $page = 'dueWork';
+    $page = 'collaboration';
 }
 
 $this->setVar(array(
