@@ -5,6 +5,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -279,7 +280,7 @@ class External_Doublefirst_User implements External_UserInterface
             $emailList[] = $row['DefaultEmail'];
         }
 
-        return $emailList;
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
     /**
