@@ -1,37 +1,38 @@
 <div class="row">
-	<div class="small-12 island">
-	<h2 class="subheader">Textboxes <!-- BEGIN count -->({TEXTBOX_DISP_COUNT} / {TEXTBOX_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-			    <!-- BEGIN textbox -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="/homepage/{TEXTBOX_FOLDER_ID}#textbox{TEXTBOX_ID}">
-								<div class="icon-textbox size-32"></div>
-								<h3>{TEXTBOX_HEADING}</h3>
-								<p class="meta">{TEXTBOX_BREADCRUMB}</p>
-							</a>
-						</div>
-					</div>
-					<article>{TEXTBOX_BODY}</article>
-				</li>
-			    <!-- END textbox -->
-			</ul>
+    <div class="small-12 island">
+    <h2 class="subheader">Textboxes <!-- BEGIN count -->({TEXTBOX_DISP_COUNT} / {TEXTBOX_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN textbox -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/homepage/{TEXTBOX_FOLDER_ID}#textbox{TEXTBOX_ID}">
+                                <div class="icon-textbox size-32"></div>
+                                <h3>{TEXTBOX_HEADING}</h3>
+                                <p class="meta">{TEXTBOX_BREADCRUMB}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <article>{TEXTBOX_BODY}</article>
+                </li>
+                <!-- END textbox -->
+            </ul>
 
             <!-- BEGIN see_more -->
-			<div class="component-action">
-				<section>
-                	<a id="textbox-more" data-more="textbox" class="button" href="#">See all {MORE_COUNT} results for Textboxes</a>
-				</section>
+            <div class="component-action">
+                <section>
+                    <a id="textbox-more" data-more="textbox" class="button" href="#">See all {MORE_COUNT} results for Textboxes</a>
+                </section>
             </div>
             <!-- END see_more -->
-		</section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+        </section>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>
 

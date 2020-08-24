@@ -1,37 +1,38 @@
 <div class="row">
-	<div class="small-12 island">
-		<h2 class="subheader">Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-	    		<!-- BEGIN wiki -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">
-								<div class="icon-wiki size-32"></div>
-								<h3>{WIKI_HEADING}</h3>
-								<p class="meta">{WIKI_BREADCRUMB}</p>
-								<p class="meta">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
-							</a>
-						</div>
-					</div>
-					<article>{WIKI_BODY}</article>
-				</li>
-    			<!-- END wiki -->
-			</ul>
+    <div class="small-12 island">
+        <h2 class="subheader">Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN wiki -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">
+                                <div class="icon-wiki size-32"></div>
+                                <h3>{WIKI_HEADING}</h3>
+                                <p class="meta">{WIKI_BREADCRUMB}</p>
+                                <p class="meta">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <article>{WIKI_BODY}</article>
+                </li>
+                <!-- END wiki -->
+            </ul>
 
             <!-- BEGIN see_more -->
-			<div class="component-action">
-				<section>
-                	<a id="wiki-more" data-more="wiki" class="button" href="#">See all {MORE_COUNT} results for Wiki</a>
-				</section>
+            <div class="component-action">
+                <section>
+                    <a id="wiki-more" data-more="wiki" class="button" href="#">See all {MORE_COUNT} results for Wiki</a>
+                </section>
             </div>
             <!-- END see_more -->
         </section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>

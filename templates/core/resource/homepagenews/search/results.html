@@ -1,37 +1,38 @@
 <div class="row">
-	<div class="small-12 island">
-	<h2 class="subheader">Homepage News <!-- BEGIN count -->({HOMEPAGENEWS_DISP_COUNT} / {HOMEPAGENEWS_COUNT})<!-- END count --></h2>
-		<section>
-			<ul class="action-list">
-	    		<!-- BEGIN homepagenews -->
-				<li class="row">
-					<div class="list-item">
-						<div class="card small-12">
-							<a href="{HOMEPAGENEWS_LINK}">
-								<div class="icon-news size-32"></div>
-								<h3>{HOMEPAGENEWS_HEADING}</h3>
-							</a>
-							<p class="meta">{HOMEPAGENEWS_BREADCRUMB}</p>
-							<p class="meta">Written by <a href="/search/user/{HOMEPAGENEWS_OWNER}">{HOMEPAGENEWS_OWNER_NAME}</a> {HOMEPAGENEWS_CREATED}</p>
-						</div>
-					</div>
-					<article>{HOMEPAGENEWS_BODY}</article>
-				</li>
-    			<!-- END homepagenews -->
-			</ul>
+    <div class="small-12 island">
+    <h2 class="subheader">Homepage News <!-- BEGIN count -->({HOMEPAGENEWS_DISP_COUNT} / {HOMEPAGENEWS_COUNT})<!-- END count --></h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN homepagenews -->
+                <li class="row">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="{HOMEPAGENEWS_LINK}">
+                                <div class="icon-news size-32"></div>
+                                <h3>{HOMEPAGENEWS_HEADING}</h3>
+                            </a>
+                            <p class="meta">{HOMEPAGENEWS_BREADCRUMB}</p>
+                            <p class="meta">Written by <a href="/search/user/{HOMEPAGENEWS_OWNER}">{HOMEPAGENEWS_OWNER_NAME}</a> {HOMEPAGENEWS_CREATED}</p>
+                        </div>
+                    </div>
+                    <article>{HOMEPAGENEWS_BODY}</article>
+                </li>
+                <!-- END homepagenews -->
+            </ul>
 
             <!-- BEGIN see_more -->
-			<div class="component-action">
-				<section>
-                	<a id="homepagenews-more" data-more="homepagenews" class="button" href="#">See all {MORE_COUNT} results for Homepage News</a>
-				</section>
+            <div class="component-action">
+                <section>
+                    <a id="homepagenews-more" data-more="homepagenews" class="button" href="#">See all {MORE_COUNT} results for Homepage News</a>
+                </section>
             </div>
             <!-- END see_more -->
         </section>
-	</div>
-	<ul class="pagination" data-search-pagination>
-		<!-- BEGIN pagination -->
-		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
-		<!-- END pagination -->
-	</ul>
+
+        <ul class="pagination" data-search-pagination>
+            <!-- BEGIN pagination -->
+            <li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+            <!-- END pagination -->
+        </ul>
+    </div>
 </div>

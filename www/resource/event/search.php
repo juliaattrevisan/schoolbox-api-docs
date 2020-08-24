@@ -22,12 +22,12 @@ require_once('./resource/searchClean.php');
 /**
  * Execute searches for all handlers and mappers
  */
-$forumHandler = new Calendar();
+$eventHandler = new Calendar();
 $type = 'event';
 
 /* search() calls access a global counter array, $count
  */
-$result[$type] = $forumHandler->search($keyword, 0, Config::get('search_all_limit'), $count[$type]);
+$result[$type] = $eventHandler->search($keyword, 0, Config::get('search_all_limit'), $count[$type]);
 
 $count['all'] = array_sum($count);
 
@@ -35,7 +35,7 @@ $count['all'] = array_sum($count);
  * traversing to $currentPage-1 manually in php, manually constructing
  * the page's contents
  */
-$result[$type] = $forumHandler->search($keyword, ($current_page - 1) * Config::get('search_type_limit'), Config::get('search_type_limit'), $count[$type]);
+$result[$type] = $eventHandler->search($keyword, ($current_page - 1) * Config::get('search_type_limit'), Config::get('search_type_limit'), $count[$type]);
 
 $renderer = new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, $current_page);
 $renderer->render();
