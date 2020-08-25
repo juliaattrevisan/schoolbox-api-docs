@@ -217,8 +217,6 @@ class Controller extends BaseController
      */
     public function postModifyApp()
     {
-        $resolutions = [];
-
         $rq   = $this->getRequest();
         $post = $rq->post;
 
@@ -230,7 +228,8 @@ class Controller extends BaseController
         if ($provider === MobileApp\Registry::PROVIDER_GOOGLE) {
             // require key for GCM
             if (empty($key)) {
-                $resolutions[] = "specify the {$provider} API key";
+                $this->sendError("Unable to setup Google service, please provide a key");
+                return;
             }
         } elseif ($provider === MobileApp\Registry::PROVIDER_APPLE) {
             // require a certificate for APNS
@@ -243,17 +242,13 @@ class Controller extends BaseController
                 }
 
             } catch (Resource\Exception $e) {
-                // no file supplied
-                $resolutions[] = "provide the {$provider} certificate";
+                $this->sendError('A certificate is required to register a new Apple push notification service.');
+                return;
             }
         }
 
         if (empty($appId)) {
-            $resolutions[] = "specify the {$provider} app identifier";
-        }
-
-        if (count($resolutions)) {
-            $this->sendError('Could not register app', $resolutions);
+            $this->sendError('Unable to setup service, please provide an app ID');
             return;
         }
 
