@@ -42,6 +42,14 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
       cursor: auto;
     }
 
+    &.dz-success {
+      border: 1px solid $success-color;
+
+      .dz-remove {
+        color: $success-color;
+      }
+    }
+
     &.dz-error {
       border: 1px solid $alert-color;
 
@@ -545,7 +553,7 @@ ul.az-error-list {
       width: 2.5rem;
       height: 2.5rem;
       font-size: 2rem;
-      line-height: 1rem;
+      line-height: 1.2rem;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
