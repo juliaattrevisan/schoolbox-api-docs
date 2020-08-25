@@ -29,10 +29,10 @@
             <span> &mdash; <time datetime="{{ article.publishAt.database }}" title="{{ article.publishAt.long }}">{{ article.publishAt.relativeDay }}</time></span>
             {% if article.topics|length %}
                 <span>in
-                        {% for topic in article.topics %}
-                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    </span>
+                    {% for topic in article.topics %}
+                        <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
             {% endif %}
 
             <span id="audience-container" v-if="audienceBricks.length > 0">
