@@ -37,7 +37,7 @@ VALUES ('comms_news_article_list_fallback_image',
         null,
         'true',
         'false',
-        'false',
+        'true',
         'comms',
         (SELECT MAX(sequence) + 1 FROM `config` c WHERE `module` = 'comms')
        );
