@@ -245,8 +245,12 @@ class Notifier extends AbstractModuleNotifier
                         $bundle->detach(self::TRIGGER_EXPIRED);
                     }
                 }
-                // title has been changed, attempt to replace existing notification
-                if (!$retracted && ($previous->getTitle() !== $article->getTitle())) {
+                // If there's any change to contents of posted notification, re-trigger posted
+                if (!$retracted
+                    && (($previous->getTitle() !== $article->getTitle())
+                        || ($previous->getBlurb() !== $article->getBlurb())
+                        || ($previous->getBody() !== $article->getBody())
+                    )) {
                     $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
                 }
             }
