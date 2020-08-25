@@ -244,15 +244,21 @@ $(function () {
         <div class="dz-details">
             <div class="dz-size"><span data-dz-size></span></div>
             <div class="dz-filename"><span data-dz-name></span></div>
+            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+
+            <div class="dz-progress">
+                <span class="dz-upload" data-dz-uploadprogress></span>
+            </div>
+
+            <div class="dz-success-mark">
+                <span class="icon-approve"></span>
+            </div>
+            <div class="dz-error-mark">
+                <span class="icon-close"></span>
+            </div>
         </div>
-        <a class="button dz-remove full-width no-margin" data-dz-remove>Remove file</a>
-        <div class="dz-error-message"><span data-dz-errormessage></span></div>
-        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-        <div class="dz-success-mark">
-            <span class="icon-approve"></span>
-        </div>
-        <div class="dz-error-mark">
-            <span class="icon-close"></span>
+        <div class="dz-close">
+            <a class="button dz-remove no-margin" data-dz-remove>&#215;</a>
         </div>
     </div>
 </div>

@@ -17,10 +17,77 @@ $attachzone-error-color: $alert-color;
 $attachzone-overlay-duration: 800ms;
 $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
-// Center the icon in Mr Matt's Modal file uploader
-#filesystem-upload {
-  .dz-image {
-    text-align: center;
+/* Special layout for our file uploader in Mr Matt's Modal
+ */
+#filesystem-upload-panel #ab-upload {
+  height: 100%;
+
+  .dzone {
+    height: 100%;
+  }
+
+  .dz-default {
+    align-self: stretch;
+  }
+
+  .dz-preview {
+    border: 1px solid $attachzone-resting-color;
+    display: flex;
+    height: 5rem;
+    width: calc(50% - .5rem);
+    min-width: rem-calc(334);
+    margin: .25rem;
+
+    &:hover {
+      cursor: auto;
+    }
+
+    &.dz-success {
+      border: 1px solid $success-color;
+
+      .dz-remove {
+        color: $success-color;
+      }
+    }
+
+    &.dz-error {
+      border: 1px solid $alert-color;
+
+      .dz-remove {
+        color: $alert-color;
+      }
+    }
+
+    .dz-image {
+      flex: 0 0 4rem;
+      padding: .45rem 0 0 .4rem;
+    }
+
+    .dz-details {
+      flex-grow: 1;
+      padding: .5rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      .dz-size,
+      .dz-filename {
+        padding: 0;
+        text-align: left;
+      }
+
+      .dz-error-message {
+        padding: 0;
+      }
+    }
+
+    .dz-close {
+      flex: 0 0 2.5rem;
+
+      a:hover {
+        background-color: rgba(0,0,0,0.1);
+      }
+    }
   }
 }
 
@@ -457,9 +524,6 @@ ul.az-error-list {
             }
         }
     }
-    .dz-details {
-        padding-bottom: 1rem;
-    }
     .dz-error-mark {
         color: $alert-color;
     }
@@ -479,21 +543,17 @@ ul.az-error-list {
         position: relative;
         top: 0;
         left: 0;
-        // Massage to fit within the file display block
-        min-width: 100px;
-        max-width: 118px;
-        word-break: break-word;
 
         // Undo some of the base background styles
         opacity: 1;
         background: transparent;
-
-        // Make space for .dz-progress
-        margin-bottom: 6px;
     }
     .dz-remove {
-        position: relative;
-        //top: 1rem;
+      background-color: transparent;
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 2rem;
+      line-height: 1.2rem;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
@@ -507,8 +567,7 @@ ul.az-error-list {
         box-sizing: border-box;
     }
     img[data-dz-thumbnail] {
-        margin: 9px;
-        max-width: 100px;
+        max-width: 64px;
     }
     .dz-filename {
         padding: 0 9px;
@@ -656,8 +715,6 @@ ul.az-error-list {
 .dz-preview .dz-details,
 .dropzone-previews .dz-preview .dz-details {
     position: relative;
-    //padding: 5px;
-    //margin-bottom: 22px;
 }
 .dz-preview .dz-details .dz-filename,
 .dropzone-previews .dz-preview .dz-details .dz-filename {
@@ -726,6 +783,7 @@ ul.az-error-list {
     background: rgba($white, 0.8);
     padding: 8px 10px;
     color: $alert-color;
+    font-style: italic;
     min-width: 140px;
     max-width: 500px;
     z-index: 500;

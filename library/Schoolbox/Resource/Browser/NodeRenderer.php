@@ -136,7 +136,7 @@ class NodeRenderer
         $j = 0;
         foreach ($allBreadcrumbs as $currentBreadcrumb) {
             $this->getPage()->setVar(array(
-                'BREADCRUMB_CLASS'       => (count($allBreadcrumbs) - 1 == $j) ? 'last' : '',
+                'BREADCRUMB_CLASS'       => (count($allBreadcrumbs) - 1 == $j) ? 'active' : '',
                 'BREADCRUMB_CATEGORY_ID' => $currentBreadcrumb['categoryId'],
                 'BREADCRUMB_NAME'        => Scrub::text($currentBreadcrumb['name'])
             ));

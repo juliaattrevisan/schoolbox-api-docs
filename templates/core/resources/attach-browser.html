@@ -14,73 +14,80 @@
       cancel: function () { /* noop */ },
       needAuth: function () { /* noop */ },
       loaded: function () {
-        $('#attachment-browser')
-            .find('li[data-source="external-google"]')
+        $('#external-google-panel')
             .find('div.explorer')
             .removeClass('preload');
       }
     };
 
-    $(function() {
-      var ab = $('#attachment-browser');
-
-      ab.on('toggled', function (e, panel) {
-
-        panel = $(panel);
-
-        var src = panel.closest('[data-source]').attr('data-source');
-
-        if (!ab.data(src)) {
-
-          // load this tab
-          ab.data(src, {loaded: true});
-
-          var url = panel.attr('data-url'),
-              mth = panel.attr('data-method');
-
-          if (mth == 'inline') {
-            panel.load(url, null, function() {
-              panel.removeClass('preload');
-            });
-          }
-          else if (mth == 'iframe') {
-            panel.removeClass('preload');
-            panel.html($('<iframe/>').attr('src', url).height(350));
-          }
-        }
-      });
-
-      $('dd[data-source="{DEFAULT_VIEW}"] a').trigger('click');
-    });
-
     $(document).foundation();
 
-    $('#attachment-browser').on('click', '[data-toggle]', function (e) {
+    $(function() {
+        let filesystems = $('#attachment-browser-filesystems');
 
-      var oldPanel = $('[data-accordion-pane] .active'),
-          newPanel = $(this).closest('[data-source]').find('.content');
+        filesystems.find('[data-source]').on('click', function(event) {
+            const MAX_IFRAME_HEIGHT = 350;
 
-      // hide the current panel
-      oldPanel.slideUp();
+            let source = $(this).attr('data-source');
+            let panel = $('#' + source + '-panel');
 
-      // open the new one
-      if (!oldPanel.is(newPanel)) {
-        newPanel.slideDown();
-      }
+            /* Decide if source was already load previously;
+             * If it wasn't previously loaded, do so asynchronously
+             * Otherwise just show the tab
+             */
+            if (!filesystems.data(source)) {
 
-    }).find('[data-toggle]').first().trigger('click');
+                /* Remember we loaded this source previously
+                 */
+                filesystems.data(source, {loaded: true});
 
-  </script>
+                let url = $(this).attr('data-url');
+                let method = $(this).attr('data-method');
+
+                /* Use the $method var to decide whether this is inline content
+                 * such as all our internal file upload dropzone options, recorder
+                 * my files, resources, etc.
+                 *
+                 * or whether it should be loaded into an iframe, such as with third
+                 * parties like ms teams, goggle drive, office 365 etc.
+                 *
+                 * Inline content starts with a preloader class which should be removed
+                 * once content has loaded
+                 */
+                if (method === 'inline') {
+                    panel.load(url, null);
+                } else if (method === 'iframe') {
+                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                }
+            }
+        });
+
+        /* Activate default tab
+         */
+        $('#attachment-browser-filesystems a').first().trigger('click');
+    });
+</script>
 </head>
 <body>
-<dl id="attachment-browser" class="accordion" data-accordion>
-  <!-- BEGIN source -->
-  <dd class="accordion-navigation" data-source="{SRC_SLUG}" data-accordion-pane>
-    <a data-toggle class="icon-{SRC_ICON}" href="#{SRC_SLUG}">{SRC_LABEL}</a>
-    <div id="{SRC_SLUG}" class="preload content" data-url="{SRC_URL}" data-method="{SRC_METHOD}"></div>
-  </dd>
-  <!-- END source -->
-</dl>
-<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    <div class="attachment-browser-container">
+        <div class="attachment-browser-filesystems">
+            <ul id="attachment-browser-filesystems" class="side-nav" data-tab>
+                <!-- BEGIN source -->
+                <li class="tab-title" data-source="{SRC_SLUG}" data-url="{SRC_URL}" data-method="{SRC_METHOD}">
+                    <a class="icon-{SRC_ICON}" href="#{SRC_SLUG}-panel">{SRC_LABEL}</a>
+                </li>
+                <!-- END source -->
+            </ul>
+        </div>
+
+        <div id="attachment-browser-panel-container" class="attachment-browser-panel-container tabs-content">
+            <!-- BEGIN source_panel -->
+            <div id="{SRC_SLUG}-panel" class="content">
+                <div class="loader"></div>
+            </div>
+            <!-- END source_panel -->
+        </div>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </body>
 </html>
