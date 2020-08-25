@@ -24,7 +24,7 @@
         .indicator {
             position: relative;
             top: .75rem;
-            right: .5rem;
+            margin-right: .5rem;
         }
         p {
             display: inline-block;
@@ -35,9 +35,9 @@
             margin-right: 2rem;
         }
     }
-
-    .empty-state {
-        margin:0 1rem 1rem;
+    .actions-small-1 .legend {
+      margin-right: 3rem;
+      margin-top: .5rem;
     }
 
     // Indicators: used in legend, so don't put in .marksheet

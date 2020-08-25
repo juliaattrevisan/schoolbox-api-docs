@@ -16,31 +16,32 @@
 {% set functionDegradeLimit = 80 %}
 {% set studentCount = markbook.students|length %}
 
-<div class="row">
-    <div class="actions-small-1 row">
-        <nav>
-            <div class="legend">
-                <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
-                <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
-                <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
-                <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
-                <div class="checklist">
-                    <input type="checkbox" id="show-drafts">
-                    <label for="show-drafts">
-                        Show Drafts
-                    </label>
-                </div>
-                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+<div class="small-12 island">
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <div class="legend right">
+            <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
+            <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
+            <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
+            <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
+            <div class="checklist">
+                <input type="checkbox" id="show-drafts">
+                <label for="show-drafts">
+                    Show Drafts
+                </label>
             </div>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            <li class="separator">Report</li>
-            <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExportForClass', {folder: folder, folderId: folder.id}) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
-        </ul>
+        </div>
     </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExportForClass', {folder: folder, folderId: folder.id}) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+    </ul>
 </div>
 {% if studentCount >= functionDegradeLimit %}
-<div id="report_actions" class="row">
+<div id="report_actions">
     <div class="small-12 column list-item">
         <ul class="meta">
             <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
@@ -48,8 +49,7 @@
     </div>
 </div>
 {% endif %}
-<div class="row">
-    <div class="small-12 island">
+
         {% if markbook.assessments|length > 0 %}
         <table id="marksheet-styles" class="marksheet" data-mark-sheet>
             <thead>
@@ -236,5 +236,6 @@
         </div>
         {% endif %}
         <div class="toast" data-alert data-save-progress-state></div>
-    </div>
+
+</div>
 </div>
