@@ -166,11 +166,10 @@ button.submit {
 		a, button {
 			@include flex;
 			@extend .button;
-            line-height: 1.5;
 			justify-content: center;
             margin-bottom: 0;
 			&.submit {
-				@extend [type="submit"];
+              @extend [type="submit"];
 			}
 		}
     }

@@ -316,7 +316,7 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment);
-        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Success!']));
+        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Loaded successfully']));
     }
 
     /**
@@ -339,7 +339,7 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setMarkVisibility($visibility);
         $this->getAssessmentMapper()->save($assessment);
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Success!']));
+        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
     }
 
     /**
