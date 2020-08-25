@@ -27,7 +27,7 @@
                             </a>
                         {% elseif fallbackImage.type == 'school-logo' %}
                             <a href="{{ articleURL }}">
-                                <img src="/storage/image.php?hash={{ fallbackImage.hash }}&size=square64">
+                                <img src="/images/logo.php?logo=skin_logo_square&size=favicon">
                             </a>
                         {% elseif fallbackImage.type == 'author' %}
                             {% if article.author.portrait and article.author.portrait.hash %}
