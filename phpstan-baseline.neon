@@ -1541,21 +1541,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
 
 		-
-			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\:\\:getOpenDate\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBoxNotifier.php
-
-		-
-			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\:\\:getOwner\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Component/SubmissionBoxNotifier.php
-
-		-
-			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\:\\:getDueDate\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBoxNotifier.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$templateId with type int\\|null is not subtype of native type int\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Controller.php
