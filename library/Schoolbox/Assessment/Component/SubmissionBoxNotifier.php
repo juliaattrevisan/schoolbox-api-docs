@@ -247,11 +247,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         // be sure the target method exists
-        if (!$this->getMapper() instanceof FeedableMapperInterface) {
+        if (!$this->mapper instanceof FeedableMapperInterface) {
             return $c;
         }
 
-        $boxes = $this->getMapper()->findForFeed($context, $limit, $offset);
+        $boxes = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($boxes as $box) {
             $c = $c
