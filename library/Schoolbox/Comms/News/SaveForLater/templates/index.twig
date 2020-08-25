@@ -34,7 +34,7 @@
                                     </a>
                                 {% elseif fallbackImage.type == 'school-logo' %}
                                     <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
-                                        <img src="/storage/image.php?hash={{ fallbackImage.hash }}&size=square64">
+                                        <img src="/images/logo.php?logo=skin_logo_large&size=favicon">
                                     </a>
                                 {% elseif fallbackImage.type == 'author' %}
                                     {% if article.author.portrait and article.author.portrait.hash %}
