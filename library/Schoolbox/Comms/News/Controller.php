@@ -678,7 +678,7 @@ class Controller extends Base
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
             $this->response->content->set($this->buildJsonOutput([
-                'articles' => $partialData['articles']
+                'articles' => $partialData['articles'],
             ]));
 
             return;
@@ -742,6 +742,10 @@ class Controller extends Base
             'folderId' => $params->getFolderId(),
             'showArchiveNewsLink' => $showArchiveNewsLink,
             'componentId' => $params->getComponentId(),
+            'fallbackImage' => [
+                'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+                'hash' => $this->getConfigLoader()->get('skin_logo_large')
+            ]
         ]);
     }
 
@@ -768,16 +772,32 @@ class Controller extends Base
          * Specifically applies to the index page which loads slightly differently than component variant
          */
         $data = [
+            /* Core and querystring params
+             */
+            'queryStringPage' => Querystring::PAGE_NUMBER,
+            'queryStringReferrer' => Querystring::REFERRER,
+            'queryStringTopic' => Querystring::TOPIC_SLUG,
+
+            /* Topics
+             */
             'topicAll' => [
                 'name' => 'All',
                 'slug' => Mapper::TOPIC_ALL_SLUG,
             ],
             'topic' => $params->getSlug() ?: 'all',
+
+            /* Referrers and Redirects
+             */
             'referrer' => $params->getReferrer(),
+
+            /* Layout
+             */
+            'itemLayout' => $this->getConfigLoader()->get('comms_news_article_list_layout'),
+            'fallbackImage' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+
+            /* Pagination
+             */
             'initialPage' => $params->getPageNum(),
-            'queryStringPage' => Querystring::PAGE_NUMBER,
-            'queryStringReferrer' => Querystring::REFERRER,
-            'queryStringTopic' => Querystring::TOPIC_SLUG,
 
             /* For configuring the rss button which changes per topic chosen
              */
@@ -1037,7 +1057,11 @@ class Controller extends Base
             'hidePaginator' => $hidePaginator,
             'compactMode' => true,
             'pageNum' => $params->getPageNum(),
-            'referrer' => $params->getReferrer()
+            'referrer' => $params->getReferrer(),
+            'fallbackImage' => [
+                'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
+                'hash' => $this->getConfigLoader()->get('skin_logo_large')
+            ]
         ]);
 
         $this->hydrateArticleAudiences($partialData['articles']);

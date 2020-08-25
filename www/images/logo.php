@@ -21,38 +21,33 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
-$placeholders = [
-    'skin_logo_login'  => '/core/logo.png',
-    'skin_logo_square' => '/core/m-hercules.png',
-    'skin_logo_large'  => '/core/hercules.png',
-];
-
 $logoSizes = [
     'skin_logo_square' => [
-        'normal'   => [80, 80],
-        'hidpi'    => [160, 160],
-        'favicon'  => [64, 64],
-        'tile70'   => [70, 70],
-        'tile150'  => [150, 150],
-        'apple57'  => [57, 57],
-        'apple60'  => [60, 60],
-        'apple72'  => [72, 72],
-        'apple76'  => [76, 76],
-        'apple114' => [114, 114],
-        'apple120' => [120, 120],
-        'apple144' => [144, 144],
-        'apple152' => [152, 152],
-        'apple180' => [180, 180],
+        'normal'   => [80, 80, '/core/m-hercules.png'],
+        'hidpi'    => [160, 160, '/core/m-hercules.png'],
+        'favicon'  => [64, 64, '/core/m-hercules.png'],
+        'tile70'   => [70, 70, '/core/m-hercules.png'],
+        'tile150'  => [150, 150, '/core/m-hercules.png'],
+        'apple57'  => [57, 57, '/core/m-hercules.png'],
+        'apple60'  => [60, 60, '/core/m-hercules.png'],
+        'apple72'  => [72, 72, '/core/m-hercules.png'],
+        'apple76'  => [76, 76, '/core/m-hercules.png'],
+        'apple114' => [114, 114, '/core/m-hercules.png'],
+        'apple120' => [120, 120, '/core/m-hercules.png'],
+        'apple144' => [144, 144, '/core/m-hercules.png'],
+        'apple152' => [152, 152, '/core/m-hercules.png'],
+        'apple180' => [180, 180, '/core/m-hercules.png'],
     ],
     'skin_logo_large'  => [
-        'normal'  => [196, 400],
-        'hidpi'   => [392, 800],
-        'tile310' => [310, 310],
+        'favicon' => [64, 64, '/core/hercules-64x64.png'],
+        'normal'  => [196, 400, '/core/hercules.png'],
+        'hidpi'   => [392, 800, '/core/hercules.png'],
+        'tile310' => [310, 310, '/core/hercules.png'],
     ],
     'skin_logo_login'  => [
-        'normal'  => [296, 400],
-        'hidpi'   => [592, 800],
-        'tile310' => [310, 150],
+        'normal'  => [296, 400, '/core/logo.png'],
+        'hidpi'   => [592, 800, '/core/logo.png'],
+        'tile310' => [310, 150, '/core/logo.png'],
     ],
 ];
 
@@ -103,7 +98,8 @@ try {
     );
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-    $placeHolderFile = __DIR__ . $placeholders[$logo];
+    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+
     if (is_readable($placeHolderFile)) {
         header('Content-type: image/png');
         readfile($placeHolderFile);

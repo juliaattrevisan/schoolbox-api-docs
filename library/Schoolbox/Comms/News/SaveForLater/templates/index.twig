@@ -32,6 +32,16 @@
                                     <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
                                         <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
                                     </a>
+                                {% elseif fallbackImage.type == 'school-logo' %}
+                                    <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
+                                        <img src="/images/logo.php?logo=skin_logo_large&size=favicon">
+                                    </a>
+                                {% elseif fallbackImage.type == 'author' %}
+                                    {% if article.author.portrait and article.author.portrait.hash %}
+                                        <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
+                                            <img src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=square64">
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
 
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">{{ article.title|default('(untitled)') }}</a></h3>
