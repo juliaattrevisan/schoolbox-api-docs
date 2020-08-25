@@ -136,7 +136,10 @@ button {
 		background-color: $submit-button-bg-color;
 	}
 	&[readonly] {
-		background-color: rgba($submit-button-bg-color, $button-disabled-opacity);
+		background-color: css-change-color(
+            $submit-button-bg-color,
+            $alpha: $button-disabled-opacity
+        );
 		background-image: url('/images/foundation/preloader.gif');
 		background-repeat: no-repeat;
 		background-size: 1rem;

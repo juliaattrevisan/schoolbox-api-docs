@@ -73,10 +73,12 @@
 
 
 /**
- * Partial port of SASS `adjust_color`: works only for the HSL and A channels.
+ * Partial port of SASS `adjust-color`: works only for the HSL and A channels.
  *
  * Expects that $colorVar is a `var(--name)` value, and that
  * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#adjust
  */
 @function css-adjust-color($colorVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)
 {
@@ -107,10 +109,12 @@
 
 
 /**
- * Partial port of SASS `scale_color`: works only for the HSL and A channels.
+ * Partial port of SASS `scale-color`: works only for the HSL and A channels.
  *
  * Expects that $colorVar is a `var(--name)` value, and that
  * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#scale
  */
 @function css-scale-color($colorVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)
 {
@@ -126,6 +130,38 @@
   }
   @if ($alpha) {
     $components: map-merge($components, ('a': scale-channel(map-get($components, 'a'), $alpha)));
+  }
+  @return hsla(
+                  #{map-get($components, 'h')},
+                  #{map-get($components, 's')},
+                  #{map-get($components, 'l')},
+                  #{map-get($components, 'a')}
+  );
+}
+
+
+/**
+ * Partial port of SASS `change-color`: works only for the HSL and A channels.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#change
+ */
+@function css-change-color($colorVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)
+{
+  $components: color-var-components($colorVar);
+  @if ($hue) {
+    $components: map-merge($components, ('h': $hue));
+  }
+  @if ($saturation) {
+    $components: map-merge($components, ('s': $saturation));
+  }
+  @if ($lightness) {
+    $components: map-merge($components, ('l': $lightness));
+  }
+  @if ($alpha) {
+    $components: map-merge($components, ('a': $alpha));
   }
   @return hsla(
                   #{map-get($components, 'h')},
