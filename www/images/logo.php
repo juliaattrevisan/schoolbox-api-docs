@@ -45,6 +45,7 @@ $logoSizes = [
         'apple180' => [180, 180],
     ],
     'skin_logo_large'  => [
+        'favicon' => [64, 64],
         'normal'  => [196, 400],
         'hidpi'   => [392, 800],
         'tile310' => [310, 310],
