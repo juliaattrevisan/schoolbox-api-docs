@@ -195,11 +195,8 @@ Data:
                         <li>
                             <div class="flex-grade">
                                 <div class="small-12 compact card columns">
-
                                     {# cache to prevent repeated traversals #}
                                     {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
-
-
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                         <p>
