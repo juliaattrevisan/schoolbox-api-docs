@@ -145,11 +145,11 @@ Data:
                                         </p>
                                         {% endif %}
 
-{#                                            {% if assessable.weight %}#}
-                                                <p class="meta">
-                                                    Weight: {{ assessable.weight }}
-                                                </p>
-{#                                            {% endif %}#}
+                                        {% if assessable.weight %}
+                                            <p class="meta">
+                                                Weight: {{ assessable.weight }}
+                                            </p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% if hasActions %}
