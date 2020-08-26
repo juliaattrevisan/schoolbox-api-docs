@@ -88,15 +88,13 @@
     <div class="small-12 medium-6 island">
         {% include '@learningAssessment/project/summary/meta.twig' with {assessment: assessment, student: student} only %}
     </div>
-    <div class="small-12 medium-6 island">
+    <div class="small-12 medium-3 xlarge-2 right">
 
         {% if assessment.isFeedbackVisibleToUser(USER) and participant and assessment.humanReadableMark(participant, true) is not null %}
             <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
-                <div class="grade content">
-                    <span class="{{ urgency.marks(assessment.normalisedMark(participant, true)) }}">
-                        {{ assessment.humanReadableMark(participant, true) }}
-                    </span>
+                <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg text-center">
+                    <span>{{ assessment.humanReadableMark(participant, true) }}</span>
                 </div>
             </section>
         {% endif %}
