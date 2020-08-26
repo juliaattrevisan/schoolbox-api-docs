@@ -108,9 +108,14 @@
         {% if assessment.assessables|length %}
             <h2 class="subheader">Activities</h2>
             <section>
-                <ul class="information-list">
+                <ul class="activity-list">
                     {% for assessable in assessment.assessables %}
-                        {% include '@learningAssessment/fragments/card.twig' with {assessment: assessment, student: student, assessable: assessable, type: 'student'} %}
+                    <li>
+                        {% include '@learningGrades/fragments/assessmentGrade.twig' with {
+                            assessment:  assessable,
+                            student:     student,
+                        } only %}
+                    </li>
                     {% endfor %}
                 </ul>
             </section>

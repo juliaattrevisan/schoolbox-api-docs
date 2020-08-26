@@ -33,7 +33,7 @@
                 assessable: assessment,
                 student:    student
             } only %}
-            <span class="pipe meta">{{ assessment.typeName }}</span>
+            <span class="{{ participant ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
             <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
             {% if assessment is quiz and summaryRoute and participant.allResponses | length %}
             <span class="pipe meta">
@@ -57,11 +57,11 @@
         {% endif %}
     {% endif %}
 </div>
-{% if assessment.isFeedbackVisibleToUser(USER) %}
+{% if participant and assessment.isFeedbackVisibleToUser(USER) %}
     {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
-            <p class="comment">{{ feedback.comment | linkify | nl2br }}</p>
+            <blockquote>{{ feedback.comment | linkify | nl2br }}</blockquote>
             {% if (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
                 <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                     View assessment details</a>
