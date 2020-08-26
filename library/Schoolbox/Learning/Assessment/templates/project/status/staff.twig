@@ -209,6 +209,7 @@ Data:
                                         <p>
                                             {{ participant.user.formatName }}
                                             <span class="pipe meta">
+                                                {% set stats = participantStats[participant.user.id] %}
                                                 {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
                                             </span>
                                         </p>
