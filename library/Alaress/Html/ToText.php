@@ -15,6 +15,16 @@ use Html2Text\Html2Text;
 class ToText extends Html2Text
 {
     /**
+     * Overriding to allow single quote
+     * @inheritDoc
+     */
+    public function __construct($html = '', $options = [])
+    {
+        parent::__construct($html, $options);
+        $this->htmlFuncFlags = ENT_QUOTES | ENT_HTML5;
+    }
+
+    /**
      * I don't want strtoupper conversion
      *
      * @param  string $str Text to convert
