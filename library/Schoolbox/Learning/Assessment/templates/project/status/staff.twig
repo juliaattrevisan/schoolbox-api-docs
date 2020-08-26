@@ -97,7 +97,7 @@ Data:
     {% if assessment.baseContext is unitSpecification %}
     <div class="small-12 island">
     {% else %}
-    <div class="small-12 medium-6 island">
+    <div class="small-12 large-6 island">
         {% endif %}
         <h2 class="subheader">Activities</h2>
 
@@ -124,27 +124,30 @@ Data:
                             <div{% if hasActions %} class="actions-small-1"{% endif %}>
                                 <div class="grip"></div>
                                 <div class="list-item">
-                                    <div class="card small-12 wrap-down">
-                                        <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
-
+                                    <div class="compact card small-12 wrap-down">
                                         {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
-                                        {% if viewRoute %}<a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
-                                            <h3>{{ assessable.title }}</h3>
-                                            {% if viewRoute %}</a>{% endif %}
+                                        {% if viewRoute %}
+                                        <a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                                        {% endif %}
+                                        <span class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></span>
+                                        <p>{{ assessable.title }}</p>
+                                        {% if viewRoute %}</a>{% endif %}
 
                                         {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta">{{ dueDate.forAssessment(assessable) }}</p>
-                                        {% endif %}
-
-                                        {% if assessable.weight %}
-                                            <p class="meta">
-                                                Weight: {{ assessable.weight }}
-                                            </p>
+                                        <p class="meta">
+                                            {{ dueDate.forAssessment(assessable) }}
+                                        </p>
                                         {% endif %}
 
                                         {% if assessable.getDueAt.isNull == false %}
                                             <p class="meta">
                                                 {{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
+                                            </p>
+                                        {% endif %}
+
+                                        {% if assessable.weight %}
+                                            <p class="meta">
+                                                Weight: {{ assessable.weight }}
                                             </p>
                                         {% endif %}
                                     </div>
@@ -183,7 +186,7 @@ Data:
         </div>
     </div>
     {% if assessment.baseContext is not unitSpecification %}
-    <div class="small-12 medium-6 island">
+    <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
 
         {% if assessment.allParticipants | length %}
@@ -192,7 +195,7 @@ Data:
                     {% for participant in assessment.allParticipants %}
                         <li>
                             <div class="list-item">
-                                <div class="card small-12">
+                                <div class="compact card small-12">
 
                                     {# cache to prevent repeated traversals #}
                                     {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
@@ -204,14 +207,14 @@ Data:
                                     {% endif %}
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
-                                        <h3>
+                                        <p>
                                             {{ participant.user.formatName }}
-                                        </h3>
+                                            <span class="pipe meta">
+                                                {% set stats = participantStats[participant.user.id] %}
+                                                {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                                            </span>
+                                        </p>
                                     </a>
-                                    <p class="meta">
-                                        {% set stats = participantStats[participant.user.id] %}
-                                        {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
-                                    </p>
                                 </div>
                             </div>
                         </li>
