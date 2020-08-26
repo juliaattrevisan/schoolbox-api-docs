@@ -193,17 +193,13 @@ Data:
                 <ul class="information-list">
                     {% for participant in assessment.allParticipants %}
                         <li>
-                            <div class="list-item">
-                                <div class="compact card small-12">
+                            <div class="flex-grade">
+                                <div class="small-12 compact card columns">
 
                                     {# cache to prevent repeated traversals #}
                                     {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
 
-                                    {% if publishedHumanReadableMark is not null %}
-                                        <span class="neutral label right">
-                                        {{ publishedHumanReadableMark }}
-                                    </span>
-                                    {% endif %}
+
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                         <p>
@@ -215,6 +211,11 @@ Data:
                                         </p>
                                     </a>
                                 </div>
+                                {% if publishedHumanReadableMark is not null %}
+                                    <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                                        <span>{{ publishedHumanReadableMark }}</span>
+                                    </div>
+                                {% endif %}
                             </div>
                         </li>
                     {% endfor %}
