@@ -74,6 +74,8 @@ Data:
 </script>
 
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -109,6 +111,10 @@ Data:
                     data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: assessment}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                     {% for assessable in assessment.assessables %}
                         {% set stats = assessmentStats[assessable.id] %}
+                        {% if stats.countParticipants %}
+                            {% set completionGradient = ( (stats.countParticipants - stats.countResponseRequired) / stats.countParticipants ) * 100 %}
+                        {% endif %}
+
                         {% import '@learningAssessment/project/macro/icon.twig' as icon %}
                         {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportForm', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
@@ -136,19 +142,12 @@ Data:
                                         {% if assessable.getDueAt.isNull == false %}
                                         <p class="meta">
                                             {{ dueDate.forAssessment(assessable) }}
-                                        </p>
-                                        {% endif %}
-
-                                        {% if assessable.getDueAt.isNull == false %}
-                                            <p class="meta">
+                                            {% if assessable.getDueAt.isNull == false %}
+                                                &nbsp;|&nbsp;<span class=" {{ urgency.marks(completionGradient ?? '') }}">
                                                 {{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
-                                            </p>
-                                        {% endif %}
-
-                                        {% if assessable.weight %}
-                                            <p class="meta">
-                                                Weight: {{ assessable.weight }}
-                                            </p>
+                                            </span>
+                                            {% endif %}
+                                        </p>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -194,17 +193,10 @@ Data:
                 <ul class="information-list">
                     {% for participant in assessment.allParticipants %}
                         <li>
-                            <div class="list-item">
-                                <div class="compact card small-12">
-
+                            <div class="flex-grade">
+                                <div class="small-12 compact card columns">
                                     {# cache to prevent repeated traversals #}
                                     {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
-
-                                    {% if publishedHumanReadableMark is not null %}
-                                        <span class="neutral label right">
-                                        {{ publishedHumanReadableMark }}
-                                    </span>
-                                    {% endif %}
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         <img src="/portrait.php?userId={{ participant.user.externalId }}&size=square64" width="48">
                                         <p>
@@ -216,6 +208,11 @@ Data:
                                         </p>
                                     </a>
                                 </div>
+                                {% if publishedHumanReadableMark is not null %}
+                                    <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                                        <span>{{ publishedHumanReadableMark }}</span>
+                                    </div>
+                                {% endif %}
                             </div>
                         </li>
                     {% endfor %}

@@ -12,7 +12,7 @@
         <li class="icon-calendar">{{ dueDate.dueDate(assessment, student ?? USER) }}</li>
     {% endif %}
     {% if USER.role.isStaff %}
-        <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
+        <li class="icon-progress">Mark calculated as {{ assessment.summator.title }}</li>
 
         {% if student is defined %}
             <li class="icon-staff-students">{{ student.fullname }}</li>
