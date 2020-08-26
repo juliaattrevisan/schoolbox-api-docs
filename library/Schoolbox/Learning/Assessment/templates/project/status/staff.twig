@@ -136,13 +136,13 @@ Data:
                                         {% if assessable.getDueAt.isNull == false %}
                                         <p class="meta">
                                             {{ dueDate.forAssessment(assessable) }}
-
-                                            {% if assessable.getDueAt.isNull == false %}
-                                            <span class="pipe meta">
-                                                {{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
-                                            </span>
-                                            {% endif %}
                                         </p>
+                                        {% endif %}
+
+                                        {% if assessable.getDueAt.isNull == false %}
+                                            <p class="meta">
+                                                {{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
+                                            </p>
                                         {% endif %}
 
                                         {% if assessable.weight %}
