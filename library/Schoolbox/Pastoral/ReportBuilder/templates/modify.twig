@@ -232,6 +232,13 @@
                             <div class="checklist">
                                 <input id="year-all" type="checkbox" data-check-all-year>
                                 <label for="year-all">Select All</label>
+                                <input id="year-null"
+                                       name="years[]"
+                                       value="null"
+                                       type="checkbox"
+                                       data-check-year
+                                >
+                                <label for="year-null">(No Year Level)</label>
                                 {% for year in years %}
                                     <input id="year-{{ year }}"
                                            name="years[]"
@@ -256,6 +263,13 @@
                             <div class="checklist">
                                 <input id="house-all" type="checkbox" data-check-all-house>
                                 <label for="house-all">Select All</label>
+                                <input id="house-null"
+                                       name="houses[]"
+                                       value="null"
+                                       type="checkbox"
+                                       data-check-house
+                                >
+                                <label for="house-null">(No House)</label>
                                 {% for house in houses %}
                                     <input id="house-{{ house.id }}"
                                            name="houses[]"
