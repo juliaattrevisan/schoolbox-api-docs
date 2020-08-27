@@ -233,15 +233,18 @@ class External_Pcschools_User implements External_UserInterface
         }
         $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
 
-        // sorry for the hack!!
+        /* PCSchools comes in two flavours: Freedom, and Non Freedom
+         * They do things slightly differently
+         *
+         * The contents of the db determines which flavour is being used
+         * Search for IQueryHelper::FREEDOM_DETECT
+         *
+         * Maintaining this "hack" for now. Thanks for the mystery.
+         */
         if ($this->queryHelper instanceof Freedom) {
-            // freedom returns the data cleanly, just index by ID and return
             $result = $this->getDatabase()->getAll($query, $params);
 
-            return array_combine(
-                array_column($result, 'IDENTITY_ID#'),
-                array_column($result, 'EMAIL')
-            );
+            return (new TupleStack())->normaliseValues(array_column($result, 'EMAIL'));
         }
 
         // Munge data in same way we would in getStudentContactList
