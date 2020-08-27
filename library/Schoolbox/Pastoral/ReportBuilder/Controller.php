@@ -567,6 +567,9 @@ class Controller extends Base
             $pastoralReport->setHousesCsv('');
         }
 
+        $pastoralReport->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
+        $pastoralReport->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
+
         // Save groups the report is shared with
 
         if (is_array($post['group'])) {
