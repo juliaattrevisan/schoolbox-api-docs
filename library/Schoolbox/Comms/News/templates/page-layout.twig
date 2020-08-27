@@ -1,33 +1,31 @@
 {% block breadCrumbs %}{% endblock %}
 
 <div class="row">
-    <div class="small-12 medium-8 large-9 columns">
-
-        <div class="row">
-            <div class="small-9 columns">
-                <h1>{% block newsTitle %}{% endblock %}</h1>
-
+    <div class="small-12 medium-8 large-9 island">
+        <div class="row actions-small-3">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>{% block newsTitle %}{% endblock %}</h1>
+                </div>
             </div>
 
             {% block actionIcons %}
-                <div class="small-3 columns actions-small-3">
-                    <nav>
-                        {% block createLink %}
-                            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-                            {% if createRoute %}
-                                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-                            {% endif %}
-                        {% endblock %}
+            <nav>
+                {% block createLink %}
+                    {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                    {% if createRoute %}
+                        <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                    {% endif %}
+                {% endblock %}
 
-                        {% block rssLink %}
-                        {% endblock %}
+                {% block rssLink %}
+                {% endblock %}
 
-                        {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
-                        {% if adminRoute %}
-                            <a class="icon-settings" href="{{ adminRoute }}" title="{{ locale.news.proper }} Administration"></a>
-                        {% endif %}
-                    </nav>
-                </div>
+                {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
+                {% if adminRoute %}
+                    <a class="icon-settings" href="{{ adminRoute }}" title="{{ locale.news.proper }} Administration"></a>
+                {% endif %}
+            </nav>
             {% endblock %}
         </div>
     </div>
