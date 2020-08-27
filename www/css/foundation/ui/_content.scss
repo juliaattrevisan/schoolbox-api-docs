@@ -1304,7 +1304,7 @@ $selector-width: 2.25rem;
 .grade-small {
     display: none;
 
-    @media #{$medium-down} {
+    @media #{$mediumwide-down} {
         display: flex;
         flex: 1 100%;
         padding: 0 1rem;
