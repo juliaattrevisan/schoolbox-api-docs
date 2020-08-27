@@ -72,7 +72,7 @@
     </div>
 </div>
 
-{% if canAttempt %}
+{% if canAttempt and quiz.sections|length > 0 %}
     <div class="row">
         <div class="small-12 column">
             <p>
