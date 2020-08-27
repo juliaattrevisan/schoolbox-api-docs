@@ -438,7 +438,7 @@ class Controller extends Base
      */
     private function getClassListsEmailGroups(): string
     {
-        $availableEmailGroups = ['parents' => 'email_all_parents', 'housemasters' => 'email_housemasters'];
+        $availableEmailGroups = ['Parents' => 'email_all_parents', 'Head of House' => 'email_housemasters'];
 
         $result[] = [
             self::LABEL_KEY => 'students',

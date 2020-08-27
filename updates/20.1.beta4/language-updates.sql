@@ -9,3 +9,5 @@ UPDATE config SET title='Display Progression Graph on Grades Page' WHERE name li
 UPDATE config SET title='Display Capabilities and Indicators on Grades Pages' WHERE name like 'enable_grades_criteria';
 UPDATE config SET title='Display Capability Marks on Grades Page' WHERE name like 'grade_capability_display';
 
+UPDATE config SET hidden='false' WHERE name like 'grades_enabled';
+UPDATE config SET hidden='false' WHERE name like 'upcoming_assessments_enabled';
